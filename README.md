@@ -52,11 +52,17 @@ in Visual Studio 2015.
 
 ## Installation
 
-IDisposableAnalyzers can be installed using [Paket](https://fsprojects.github.io/Paket/) or the NuGet command line or the NuGet Package Manager in Visual Studio 2015.
+IDisposableAnalyzers can be installed using:
+- [Paket](https://fsprojects.github.io/Paket/) 
+- NuGet command line
+- NuGet Package Manager in Visual Studio.
 
 
 **Install using the command line:**
 ```bash
+paket add IDisposableAnalyzers --project <project>
+
+or if you prefer NuGet
 Install-Package IDisposableAnalyzers
 ```
 
