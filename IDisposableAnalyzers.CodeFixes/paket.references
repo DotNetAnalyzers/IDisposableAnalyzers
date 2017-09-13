@@ -1,0 +1,12 @@
+Microsoft.CodeAnalysis.Workspaces.Common
+Microsoft.CodeAnalysis.CSharp.Workspaces
+Microsoft.CodeAnalysis.Common
+Microsoft.CodeAnalysis.CSharp
+Microsoft.Composition
+System.Collections.Immutable
+
+group Analyzers
+  StyleCop.Analyzers
+  AsyncUsageAnalyzers
+  JetBrains.Annotations
+  Microsoft.CodeAnalysis.Analyzers

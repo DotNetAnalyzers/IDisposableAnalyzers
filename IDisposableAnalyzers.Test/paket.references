@@ -1,0 +1,17 @@
+Microsoft.CodeAnalysis.CSharp.Workspaces
+Microsoft.CodeAnalysis.Common
+Microsoft.CodeAnalysis.CSharp
+Microsoft.CodeAnalysis.Workspaces.Common
+Microsoft.Composition
+System.Collections.Immutable
+
+group Analyzers
+  StyleCop.Analyzers
+  AsyncUsageAnalyzers
+  Microsoft.CodeAnalysis.Analyzers
+
+group Test
+  NUnit
+  System.Reactive
+  System.Reactive.Linq
+  System.Reactive.PlatformServices

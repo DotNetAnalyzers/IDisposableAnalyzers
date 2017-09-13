@@ -1,0 +1,21 @@
+﻿type file
+version 0.1.0.0-dev
+title IDisposableAnalyzers
+id IDisposableAnalyzers
+authors Johan Larsson, milleniumbug
+owners Johan Larsson
+copyright Copyright Johan Larsson 2016
+developmentDependency true
+description Roslyn analyzers.
+tags Roslyn Diagnostic Analyzer DotnetAnalyzers
+
+projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
+licenseUrl http://opensource.org/licenses/MIT
+
+files
+  ../IDisposableAnalyzers.Analyzers/bin/Release/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs
+  ../IDisposableAnalyzers.Analyzers/bin/Release/IDisposableAnalyzers.Analyzers.pdb ==> analyzers/dotnet/cs
+  ../IDisposableAnalyzers.CodeFixes/bin/Release/IDisposableAnalyzers.CodeFixes.dll ==> analyzers/dotnet/cs
+  ../IDisposableAnalyzers.CodeFixes/bin/Release/IDisposableAnalyzers.CodeFixes.pdb ==> analyzers/dotnet/cs
+  ../.paket/tools/*.ps1 ==> tools
+
