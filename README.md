@@ -61,8 +61,10 @@ IDisposableAnalyzers can be installed using:
 **Install using the command line:**
 ```bash
 paket add IDisposableAnalyzers --project <project>
+```
 
 or if you prefer NuGet
+```bash
 Install-Package IDisposableAnalyzers
 ```
 
