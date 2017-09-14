@@ -1,17 +1,20 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class Diagnostics : DiagnosticVerifier<IDISP001DisposeCreated>
+    internal partial class Diagnostics
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
@@ -22,7 +25,7 @@ public class Disposable : IDisposable
         [TestCase("null ?? File.OpenRead(string.Empty)")]
         [TestCase("true ? null : File.OpenRead(string.Empty)")]
         [TestCase("true ? File.OpenRead(string.Empty) : null")]
-        public async Task LanguageConstructs(string code)
+        public void LanguageConstructs(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,16 +42,15 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new Disposable()", code);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task PropertyInitializedPasswordBoxSecurePassword()
+        public void PropertyInitializedPasswordBoxSecurePassword()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Windows.Controls;
 
     public class Foo
@@ -60,18 +62,18 @@ namespace RoslynSandbox
             ↓var pwd = PasswordBox.SecurePassword;
             return pwd.Length;
         }
-    }";
+    }
+}";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task StaticPropertyInitializedPasswordBoxSecurePassword()
+        public void StaticPropertyInitializedPasswordBoxSecurePassword()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Windows.Controls;
 
     public class Foo
@@ -83,18 +85,18 @@ namespace RoslynSandbox
             ↓var pwd = PasswordBox.SecurePassword;
             return pwd.Length;
         }
-    }";
+    }
+}";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task FileOpenRead()
+        public void FileOpenRead()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -104,18 +106,18 @@ namespace RoslynSandbox
             ↓var stream = File.OpenRead(string.Empty);
             return stream.Length;
         }
-    }";
+    }
+}";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task NewDisposable()
+        public void NewDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public static class Foo
     {
         public static long Bar()
@@ -123,17 +125,17 @@ namespace RoslynSandbox
             ↓var meh = new Disposable();
             return 1;
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { testCode, DisposableCode }, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task MethodCreatingDisposable1()
+        public void MethodCreatingDisposable1()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -148,17 +150,17 @@ namespace RoslynSandbox
         {
             return File.OpenRead(string.Empty);
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task MethodCreatingDisposable2()
+        public void MethodCreatingDisposable2()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -174,17 +176,17 @@ namespace RoslynSandbox
             var stream = File.OpenRead(string.Empty);
             return stream;
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task MethodCreatingDisposableExpressionBody()
+        public void MethodCreatingDisposableExpressionBody()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -196,17 +198,17 @@ namespace RoslynSandbox
         }
 
         public static Stream GetStream() => File.OpenRead(string.Empty);
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task PropertyCreatingDisposableSimple()
+        public void PropertyCreatingDisposableSimple()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -221,17 +223,17 @@ namespace RoslynSandbox
             ↓var stream = Stream;
             return stream.Length;
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task PropertyCreatingDisposableGetBody()
+        public void PropertyCreatingDisposableGetBody()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -250,17 +252,17 @@ namespace RoslynSandbox
             ↓var stream = Stream;
             return stream.Length;
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task PropertyCreatingDisposableExpressionBody()
+        public void PropertyCreatingDisposableExpressionBody()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -272,11 +274,9 @@ namespace RoslynSandbox
             ↓var stream = Stream;
             return stream.Length;
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
         }
     }
 }

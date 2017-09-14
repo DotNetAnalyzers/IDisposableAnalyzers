@@ -1,12 +1,12 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal class CodeFixCreateAndAssignField : CodeFixVerifier<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>
     {
         [Test]
-        public async Task LocalExplictTypeToFieldInCtor()
+        public void LocalExplictTypeToFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -22,10 +22,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -43,11 +39,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task LocalVarToFieldInCtor()
+        public void LocalVarToFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -63,10 +60,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose created.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -84,7 +77,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
         }
     }
 }
