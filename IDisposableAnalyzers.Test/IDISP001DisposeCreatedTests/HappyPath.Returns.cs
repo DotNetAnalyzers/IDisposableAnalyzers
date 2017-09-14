@@ -1,6 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Returns : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task SimpleStatementBody()
+            public void SimpleStatementBody()
             {
                 var testCode = @"
     using System.IO;
@@ -20,12 +20,11 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             return File.OpenRead(string.Empty);
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task SimpleExpressionBody()
+            public void SimpleExpressionBody()
             {
                 var testCode = @"
     using System.IO;
@@ -34,12 +33,11 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     {
         public static Stream Bar() => File.OpenRead(string.Empty);
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalFileOpenRead()
+            public void LocalFileOpenRead()
             {
                 var testCode = @"
     using System.IO;
@@ -52,12 +50,11 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             return stream;
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalFileOpenReadAfterAccessingLength()
+            public void LocalFileOpenReadAfterAccessingLength()
             {
                 var testCode = @"
     using System.IO;
@@ -71,12 +68,11 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             return stream;
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInIfAndEnd()
+            public void LocalInIfAndEnd()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,12 +93,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInIf()
+            public void LocalInIf()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -124,12 +119,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInStreamReaderMethodBody()
+            public void LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
     using System.IO;
@@ -142,12 +136,11 @@ namespace RoslynSandbox
             return new StreamReader(stream);
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task FileOpenReadIsReturnedInCompositeDisposableMethodBody()
+            public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
             {
                 var testCode = @"
 using System.IO;
@@ -161,12 +154,11 @@ public static class Foo
         return new CompositeDisposable { stream };
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertySimple()
+            public void WhenDisposableIsReturnedPropertySimple()
             {
                 var testCode = @"
     using System.IO;
@@ -181,12 +173,11 @@ public static class Foo
             }
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertyBody()
+            public void WhenDisposableIsReturnedPropertyBody()
             {
                 var testCode = @"
     using System.IO;
@@ -202,12 +193,11 @@ public static class Foo
             }
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertyExpressionBody()
+            public void WhenDisposableIsReturnedPropertyExpressionBody()
             {
                 var testCode = @"
     using System.IO;
@@ -216,8 +206,7 @@ public static class Foo
     {
         public static Stream Bar => File.OpenRead(string.Empty);
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
         }
     }

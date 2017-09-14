@@ -1,6 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
@@ -8,167 +8,182 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Assigned : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task AssignField()
+            public void AssignField()
             {
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Disposable disposable;
-
-    public Foo()
+    public class Foo
     {
-        disposable = new Disposable();
-    }
-}";
+        private readonly Disposable disposable;
 
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task AssignFieldLocal()
-            {
-                var testCode = @"
-public class Foo
-{
-    private readonly Disposable disposable;
-
-    public Foo()
-    {
-        var temp = new Disposable();
-        this.disposable = temp;
-    }
-}";
-
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task AssignProperty()
-            {
-                var testCode = @"
-public class Foo
-{
-    public Foo()
-    {
-        this.Disposable = new Disposable();
-    }
-
-    public Disposable Disposable { get; }
-}";
-
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task AssignPropertyLocal()
-            {
-                var testCode = @"
-public class Foo
-{
-    private readonly Disposable disposable;
-
-    public Foo()
-    {
-        var temp = new Disposable();
-        this.Disposable = temp;
-    }
-
-    public Disposable Disposable { get; }
-}";
-
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task AssignFieldIndexer()
-            {
-                var testCode = @"
-public class Foo
-{
-    private Disposable[] disposables = new Disposable[2];
-
-    public Foo()
-    {
-        for (var i = 0; i < 2; i++)
+        public Foo()
         {
-            var item = new Disposable();
-            disposables[i] = item;
+            disposable = new Disposable();
+        }
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            }
+
+            [Test]
+            public void AssignFieldLocal()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Disposable disposable;
+
+        public Foo()
+        {
+            var temp = new Disposable();
+            this.disposable = temp;
         }
     }
 }";
 
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task AssignFieldListAdd()
+            public void AssignProperty()
             {
                 var testCode = @"
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private List<Disposable> disposables = new List<Disposable>();
-
-    public Foo()
+    public class Foo
     {
-        for (var i = 0; i < 2; i++)
+        public Foo()
         {
-            var item = new Disposable();
-            disposables.Add(item);
+            this.Disposable = new Disposable();
+        }
+
+        public Disposable Disposable { get; }
+    }
+}";
+
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            }
+
+            [Test]
+            public void AssignPropertyLocal()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private readonly Disposable disposable;
+
+        public Foo()
+        {
+            var temp = new Disposable();
+            this.Disposable = temp;
+        }
+
+        public Disposable Disposable { get; }
+    }
+}";
+
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            }
+
+            [Test]
+            public void AssignFieldIndexer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private Disposable[] disposables = new Disposable[2];
+
+        public Foo()
+        {
+            for (var i = 0; i < 2; i++)
+            {
+                var item = new Disposable();
+                disposables[i] = item;
+            }
         }
     }
 }";
 
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task BuildCollectionThenAssignField()
+            public void AssignFieldListAdd()
             {
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private Disposable[] disposables;
+    using System.Collections.Generic;
 
-    public Foo()
+    public class Foo
     {
-        var items = new Disposable[2];
-        for (var i = 0; i < 2; i++)
+        private List<Disposable> disposables = new List<Disposable>();
+
+        public Foo()
         {
-            var item = new Disposable();
-            items[i] = item;
+            for (var i = 0; i < 2; i++)
+            {
+                var item = new Disposable();
+                disposables.Add(item);
+            }
         }
-
-        this.disposables = items;
     }
 }";
 
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task AssignAssemblyLoadToLocal()
+            public void BuildCollectionThenAssignField()
             {
                 var testCode = @"
-using System.Reflection;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
+    public class Foo
     {
-        var assembly = Assembly.Load(string.Empty);
+        private Disposable[] disposables;
+
+        public Foo()
+        {
+            var items = new Disposable[2];
+            for (var i = 0; i < 2; i++)
+            {
+                var item = new Disposable();
+                items[i] = item;
+            }
+
+            this.disposables = items;
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                            .ConfigureAwait(false);
+
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            }
+
+            [Test]
+            public void AssignAssemblyLoadToLocal()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Reflection;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            var assembly = Assembly.Load(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
         }
     }

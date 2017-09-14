@@ -1,6 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
@@ -8,9 +8,11 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         internal class Assigns : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task DontUseUsingWhenAssigningAField()
+            public void DontUseUsingWhenAssigningAField()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -22,15 +24,17 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var stream = Stream;
             return stream.Length;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenAssigningAFieldTernary()
+            public void DontUseUsingWhenAssigningAFieldTernary()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -44,15 +48,17 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
                 ? temp
                 : temp;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenAssigningAFieldInAMethod()
+            public void DontUseUsingWhenAssigningAFieldInAMethod()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -63,15 +69,17 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         {
             this.stream = File.OpenRead(string.Empty);
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
+            public void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -83,15 +91,17 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var newStream = File.OpenRead(string.Empty);
             this.stream = newStream;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenAddingLocalVariableToFieldList()
+            public void DontUseUsingWhenAddingLocalVariableToFieldList()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.Collections.Generic;
     using System.IO;
 
@@ -104,142 +114,151 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var stream = File.OpenRead(string.Empty);
             this.streams.Add(stream);
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task DontUseUsingWhenAssigningACallThatReturnsAStaticField()
-            {
-                var testCode = @"
-using System.IO;
-
-public static class Foo
-{
-    private static readonly Stream Stream = File.OpenRead(string.Empty);
-
-    public static long Bar()
-    {
-        var stream = GetStream();
-        return stream.Length;
-    }
-
-    public static Stream GetStream()
-    {
-        return Stream;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenAssigningACallThatReturnsAField()
+            public void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
             {
                 var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Stream cachedStream = File.OpenRead(string.Empty);
+    using System.IO;
 
-    public long Bar()
+    public static class Foo
     {
-        var stream = GetStream();
-        return stream.Length;
-    }
+        private static readonly Stream Stream = File.OpenRead(string.Empty);
 
-    public Stream GetStream()
-    {
-        return cachedStream;
-    }
-}";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
-            {
-                var testCode = @"
-using System;
-using System.IO;
-
-public static class Foo
-{
-    private static readonly Stream Stream = File.OpenRead(string.Empty);
-
-    public static long Bar()
-    {
-        var stream = GetStream(FileAccess.Read);
-        return stream.Length;
-    }
-
-    public static Stream GetStream(FileAccess fileAccess)
-    {
-        switch (fileAccess)
+        public static long Bar()
         {
-            case FileAccess.Read:
-                return Stream;
-            case FileAccess.Write:
-                return Stream;
-            case FileAccess.ReadWrite:
-                return Stream;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(fileAccess), fileAccess, null);
+            var stream = GetStream();
+            return stream.Length;
+        }
+
+        public static Stream GetStream()
+        {
+            return Stream;
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task BuildCollectionThenAssignFieldIndexer()
+            public void DontUseUsingWhenAssigningACallThatReturnsAField()
             {
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private Disposable[] disposables = new Disposable[2];
+    using System.IO;
 
-    public Foo()
+    public class Foo
     {
-        for (var i = 0; i < 2; i++)
+        private readonly Stream cachedStream = File.OpenRead(string.Empty);
+
+        public long Bar()
         {
-            var item = new Disposable();
-            this.disposables[i] = item;
+            var stream = GetStream();
+            return stream.Length;
+        }
+
+        public Stream GetStream()
+        {
+            return cachedStream;
+        }
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            }
+
+            [Test]
+            public void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        private static readonly Stream Stream = File.OpenRead(string.Empty);
+
+        public static long Bar()
+        {
+            var stream = GetStream(FileAccess.Read);
+            return stream.Length;
+        }
+
+        public static Stream GetStream(FileAccess fileAccess)
+        {
+            switch (fileAccess)
+            {
+                case FileAccess.Read:
+                    return Stream;
+                case FileAccess.Write:
+                    return Stream;
+                case FileAccess.ReadWrite:
+                    return Stream;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(fileAccess), fileAccess, null);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            }
+
+            [Test]
+            public void BuildCollectionThenAssignFieldIndexer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        private Disposable[] disposables = new Disposable[2];
+
+        public Foo()
+        {
+            for (var i = 0; i < 2; i++)
+            {
+                var item = new Disposable();
+                this.disposables[i] = item;
+            }
         }
     }
 }";
 
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task BuildCollectionThenAssignField()
+            public void BuildCollectionThenAssignField()
             {
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    private Disposable[] disposables;
-
-    public Foo()
+    public class Foo
     {
-        var items = new Disposable[2];
-        for (var i = 0; i < 2; i++)
-        {
-            var item = new Disposable();
-            items[i] = item;
-        }
+        private Disposable[] disposables;
 
-        this.disposables = items;
+        public Foo()
+        {
+            var items = new Disposable[2];
+            for (var i = 0; i < 2; i++)
+            {
+                var item = new Disposable();
+                items[i] = item;
+            }
+
+            this.disposables = items;
+        }
     }
 }";
-
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
         }
     }

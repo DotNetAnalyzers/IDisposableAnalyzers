@@ -1,6 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Cached : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task DontUseUsingWhenGettingFromStaticFieldConcurrentDictionaryGetOrAdd()
+            public void DontUseUsingWhenGettingFromStaticFieldConcurrentDictionaryGetOrAdd()
             {
                 var testCode = @"
 using System.Collections.Concurrent;
@@ -24,12 +24,11 @@ public static class Foo
         return stream.Length;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenGettingFromFieldConcurrentDictionaryGetOrAdd()
+            public void DontUseUsingWhenGettingFromFieldConcurrentDictionaryGetOrAdd()
             {
                 var testCode = @"
 using System.Collections.Concurrent;
@@ -45,12 +44,11 @@ public class Foo
         return stream.Length;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenGettingFromConcurrentDictionaryTryGetValue()
+            public void DontUseUsingWhenGettingFromConcurrentDictionaryTryGetValue()
             {
                 var testCode = @"
 using System.Collections.Concurrent;
@@ -71,12 +69,11 @@ public static class Foo
         return 0;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DontUseUsingWhenGettingFromConditionalWeakTableTryGetValue()
+            public void DontUseUsingWhenGettingFromConditionalWeakTableTryGetValue()
             {
                 var testCode = @"
 using System.IO;
@@ -97,8 +94,7 @@ public static class Foo
         return 0;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
         }
     }

@@ -3,21 +3,20 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Test.ruleset</CodeAnalysisRuleSet>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
-    <Import Project="..\.paket\Paket.Restore.targets" />
-    <ItemGroup>
-      <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
-      <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
-    </ItemGroup>
-    <ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
+    <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

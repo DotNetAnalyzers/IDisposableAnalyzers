@@ -1,6 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Recursion : NestedHappyPathVerifier<HappyPath>
         {
             [Test]
-            public async Task IgnoresRecursiveCalculatedProperty()
+            public void IgnoresRecursiveCalculatedProperty()
             {
                 var testCode = @"
 using System;
@@ -30,12 +30,11 @@ public class Foo
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task IgnoresRecursiveGetSetProperty()
+            public void IgnoresRecursiveGetSetProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -63,12 +62,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task MethodStatementBody()
+            public void MethodStatementBody()
             {
                 var testCode = @"
     using System;
@@ -93,12 +91,11 @@ namespace RoslynSandbox
             return Forever();
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task MethodExpressionBody()
+            public void MethodExpressionBody()
             {
                 var testCode = @"
 using System;
@@ -121,8 +118,7 @@ public class Foo
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
         }
     }

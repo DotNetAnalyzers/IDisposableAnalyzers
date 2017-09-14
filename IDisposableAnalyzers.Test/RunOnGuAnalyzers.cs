@@ -94,11 +94,13 @@ namespace IDisposableAnalyzers.Test
             [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
             private static FileInfo ProjFile(Type typeInAssembly)
             {
-                return new FileInfo(new Uri(typeInAssembly.Assembly.CodeBase).LocalPath)
+                var directoryInfo = new FileInfo(new Uri(typeInAssembly.Assembly.CodeBase).LocalPath)
                     .Directory
                     .Parent
                     .Parent
                     .Parent
+                    .Parent;
+                return directoryInfo
                     .EnumerateFiles("IDisposableAnalyzers.Analyzers.csproj", SearchOption.AllDirectories)
                     .Single();
             }
