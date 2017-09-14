@@ -1,7 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class CodeFix : CodeFixVerifier<IDISP002DisposeMember, DisposeMemberCodeFixProvider>
@@ -12,24 +12,27 @@
             public async Task CtorPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly IDisposable disposable;
+    using System;
 
-    public Foo()
-        : this(new Disposable())
+    public sealed class Foo : IDisposable
     {
-    }
+        ↓private readonly IDisposable disposable;
 
-    private Foo(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
+        public Foo()
+            : this(new Disposable())
+        {
+        }
 
-    public void Dispose()
-    {
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
                 var expected = this.CSharpDiagnostic()
@@ -39,25 +42,28 @@ public sealed class Foo : IDisposable
                           .ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo()
-        : this(new Disposable())
+    public sealed class Foo : IDisposable
     {
-    }
+        private readonly IDisposable disposable;
 
-    private Foo(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
+        public Foo()
+            : this(new Disposable())
+        {
+        }
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
@@ -68,24 +74,27 @@ public sealed class Foo : IDisposable
             public async Task FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly IDisposable disposable;
+    using System;
 
-    private Foo(IDisposable disposable)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = disposable;
-    }
+        ↓private readonly IDisposable disposable;
 
-    public static Foo Create()
-    {
-        return new Foo(new Disposable());
-    }
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
 
-    public void Dispose()
-    {
+        public static Foo Create()
+        {
+            return new Foo(new Disposable());
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
                 var expected = this.CSharpDiagnostic()
@@ -95,25 +104,28 @@ public sealed class Foo : IDisposable
                           .ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    private Foo(IDisposable disposable)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = disposable;
-    }
+        private readonly IDisposable disposable;
 
-    public static Foo Create()
-    {
-        return new Foo(new Disposable());
-    }
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public static Foo Create()
+        {
+            return new Foo(new Disposable());
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
@@ -124,30 +136,36 @@ public sealed class Foo : IDisposable
             public async Task FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
-using System;
-
-public static class Factory
+namespace RoslynSandbox
 {
-    public static IDisposable AsDisposable(this object value)
+    using System;
+
+    public static class Factory
     {
-        return new Disposable();
+        public static IDisposable AsDisposable(this object value)
+        {
+            return new Disposable();
+        }
     }
 }";
 
                 var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly IDisposable disposable;
+    using System;
 
-    public Foo(object value)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = value.AsDisposable();
-    }
+        ↓private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
+        public Foo(object value)
+        {
+            this.disposable = value.AsDisposable();
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
                 var expected = this.CSharpDiagnostic()
@@ -157,20 +175,23 @@ public sealed class Foo : IDisposable
                           .ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo(object value)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = value.AsDisposable();
-    }
+        private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
-        this.disposable?.Dispose();
+        public Foo(object value)
+        {
+            this.disposable = value.AsDisposable();
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
@@ -181,30 +202,36 @@ public sealed class Foo : IDisposable
             public async Task FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
-using System;
-
-public static class Factory
+namespace RoslynSandbox
 {
-    public static IDisposable AsDisposable<T>(this T value)
+    using System;
+
+    public static class Factory
     {
-        return new Disposable();
+        public static IDisposable AsDisposable<T>(this T value)
+        {
+            return new Disposable();
+        }
     }
 }";
 
                 var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly IDisposable disposable;
+    using System;
 
-    public Foo(object value)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = value.AsDisposable();
-    }
+        ↓private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
+        public Foo(object value)
+        {
+            this.disposable = value.AsDisposable();
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
                 var expected = this.CSharpDiagnostic()
@@ -214,20 +241,23 @@ public sealed class Foo : IDisposable
                           .ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo(object value)
+    public sealed class Foo : IDisposable
     {
-        this.disposable = value.AsDisposable();
-    }
+        private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
-        this.disposable?.Dispose();
+        public Foo(object value)
+        {
+            this.disposable = value.AsDisposable();
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
     }
 }";
                 await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
@@ -257,10 +287,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -283,7 +309,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
         }
     }

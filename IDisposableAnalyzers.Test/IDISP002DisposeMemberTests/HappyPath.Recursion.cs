@@ -1,15 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        public class Recursion : NestedHappyPathVerifier<HappyPath>
+        public class Recursion
         {
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveProperty()
+            public void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -26,12 +25,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenNotDisposingRecursiveProperty()
+            public void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -47,12 +45,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -76,12 +73,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -104,12 +100,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveMethod()
+            public void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -126,12 +121,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveMethodChain()
+            public void IgnoresWhenDisposingRecursiveMethodChain()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -150,12 +144,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresRecursiveOutParameter()
+            public void IgnoresRecursiveOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -181,12 +174,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoresRecursiveOutParameterChain()
+            public void IgnoresRecursiveOutParameterChain()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -215,8 +207,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
         }
     }

@@ -1,63 +1,65 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix : CodeFixVerifier<IDISP002DisposeMember, DisposeMemberCodeFixProvider>
+    internal partial class CodeFix
     {
-        internal class Rx : NestedCodeFixVerifier<CodeFix>
+        internal class Rx
         {
             [Test]
-            public async Task SerialDisposable()
+            public void SerialDisposable()
             {
                 var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly SerialDisposable disposable = new SerialDisposable();
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    public void Update()
+    public sealed class Foo : IDisposable
     {
-        this.disposable.Disposable = File.OpenRead(string.Empty);
-    }
+        ↓private readonly SerialDisposable disposable = new SerialDisposable();
 
-    public void Dispose()
-    {
+        public void Update()
+        {
+            this.disposable.Disposable = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                   .WithLocationIndicated(ref testCode)
-                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly SerialDisposable disposable = new SerialDisposable();
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    public void Update()
+    public sealed class Foo : IDisposable
     {
-        this.disposable.Disposable = File.OpenRead(string.Empty);
-    }
+        private readonly SerialDisposable disposable = new SerialDisposable();
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public void Update()
+        {
+            this.disposable.Disposable = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task ObservableSubscribe()
+            public void ObservableSubscribe()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -78,10 +80,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -103,7 +101,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
         }
     }

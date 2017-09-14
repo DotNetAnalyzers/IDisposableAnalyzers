@@ -1,15 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        internal class Rx : NestedHappyPathVerifier<HappyPath>
+        internal class Rx
         {
             [Test]
-            public async Task SerialDisposable()
+            public void SerialDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -34,8 +33,7 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP002DisposeMember>(testCode);
             }
         }
     }

@@ -1,791 +1,849 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix : CodeFixVerifier<IDISP002DisposeMember, DisposeMemberCodeFixProvider>
+    internal partial class CodeFix
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
         [Test]
-        public async Task NotDisposingPrivateReadonlyFieldInitializedWithFileOpenReadInDisposeMethod()
+        public void NotDisposingPrivateReadonlyFieldInitializedWithFileOpenReadInDisposeMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.stream?.Dispose();
+        private readonly Stream stream = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task ArrayOfStreamsFieldInitializer()
+        public void ArrayOfStreamsFieldInitializer()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        foreach(var stream in this.streams)
+        private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
+
+        public void Dispose()
         {
-            stream.Dispose();
+            foreach(var stream in this.streams)
+            {
+                stream.Dispose();
+            }
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingPrivateReadonlyFieldInitializedWithNewInDisposeMethod()
+        public void NotDisposingPrivateReadonlyFieldInitializedWithNewInDisposeMethod()
         {
             var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly IDisposable disposable = new Disposable();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly IDisposable disposable = new Disposable();
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable = new Disposable();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.disposable.Dispose();
+        private readonly IDisposable disposable = new Disposable();
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
         }
 
         [Test]
-        public async Task NotDisposingFieldAssignedInExpressionBody()
+        public void NotDisposingFieldAssignedInExpressionBody()
         {
             var testCode = @"
-using System;
-class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓IDisposable _disposable;
-    public void Create()  => _disposable = new Disposable();
-    public void Dispose()
+    using System;
+
+    class Foo : IDisposable
     {
+        ↓IDisposable _disposable;
+        public void Create()  => _disposable = new Disposable();
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-class Foo : IDisposable
+namespace RoslynSandbox
 {
-    IDisposable _disposable;
-    public void Create()  => _disposable = new Disposable();
-    public void Dispose()
+    using System;
+
+    class Foo : IDisposable
     {
-        _disposable?.Dispose();
+        IDisposable _disposable;
+        public void Create()  => _disposable = new Disposable();
+        public void Dispose()
+        {
+            _disposable?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
         }
 
         [Test]
-        public async Task NotDisposingPrivateFieldThatCanBeNullInDisposeMethod()
+        public void NotDisposingPrivateFieldThatCanBeNullInDisposeMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private Stream stream = File.OpenRead(string.Empty);
+    using System;
+    using System.IO;
 
-    public void Meh()
+    public sealed class Foo : IDisposable
     {
-        this.stream.Dispose();
-        this.stream = null;
-    }
+        ↓private Stream stream = File.OpenRead(string.Empty);
 
-    public void Dispose()
-    {
+        public void Meh()
+        {
+            this.stream.Dispose();
+            this.stream = null;
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private Stream stream = File.OpenRead(string.Empty);
+    using System;
+    using System.IO;
 
-    public void Meh()
+    public sealed class Foo : IDisposable
     {
-        this.stream.Dispose();
-        this.stream = null;
-    }
+        private Stream stream = File.OpenRead(string.Empty);
 
-    public void Dispose()
-    {
-        this.stream?.Dispose();
+        public void Meh()
+        {
+            this.stream.Dispose();
+            this.stream = null;
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldAssignedWithFileOpenReadInCtor()
+        public void NotDisposingFieldAssignedWithFileOpenReadInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.stream = File.OpenRead(string.Empty);
-    }
+        ↓private readonly Stream stream;
 
-    public void Dispose()
-    {
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
-            var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
-{
-    private readonly Stream stream;
-
-    public Foo()
-    {
-        this.stream = File.OpenRead(string.Empty);
-    }
-
-    public void Dispose()
-    {
-        this.stream?.Dispose();
-    }
-}";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task NotDisposingFieldAssignedWithNewDisposableInCtor()
-        {
-            var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
-{
-    ↓private readonly IDisposable disposable;
-
-    public Foo()
-    {
-        this.disposable = new Disposable();
-    }
-
-    public void Dispose()
-    {
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
-
-            var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
-{
-    private readonly IDisposable disposable;
-
-    public Foo()
-    {
-        this.disposable = new Disposable();
-    }
-
-    public void Dispose()
-    {
-        this.disposable.Dispose();
-    }
-}";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task NotDisposingFieldWhenConditionallyAssignedInCtor()
-        {
-            var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
-{
-    ↓private readonly Stream stream;
-
-    public Foo(bool condition)
-    {
-        if(condition)
+        public Foo()
         {
             this.stream = File.OpenRead(string.Empty);
         }
-    }
 
-    public void Dispose()
-    {
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo(bool condition)
+    public sealed class Foo : IDisposable
     {
-        if(condition)
+        private readonly Stream stream;
+
+        public Foo()
         {
             this.stream = File.OpenRead(string.Empty);
         }
-    }
 
-    public void Dispose()
-    {
-        this.stream?.Dispose();
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldAssignedInCtorNullCoalescing()
+        public void NotDisposingFieldAssignedWithNewDisposableInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.stream = null ?? File.OpenRead(string.Empty);
-    }
+        ↓private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
+        public Foo()
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.stream = null ?? File.OpenRead(string.Empty);
-    }
+        private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
-        this.stream?.Dispose();
+        public Foo()
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
         }
 
         [Test]
-        public async Task NotDisposingFieldAssignedInCtorTernary()
+        public void NotDisposingFieldWhenConditionallyAssignedInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo(bool value)
+    public sealed class Foo : IDisposable
     {
-        this.stream = value ? null : File.OpenRead(string.Empty);
-    }
+        ↓private readonly Stream stream;
 
-    public void Dispose()
-    {
+        public Foo(bool condition)
+        {
+            if(condition)
+            {
+                this.stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo(bool value)
+    public sealed class Foo : IDisposable
     {
-        this.stream = value ? null : File.OpenRead(string.Empty);
-    }
+        private readonly Stream stream;
 
-    public void Dispose()
-    {
-        this.stream?.Dispose();
+        public Foo(bool condition)
+        {
+            if(condition)
+            {
+                this.stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingProtectedFieldInDisposeMethod()
+        public void NotDisposingFieldAssignedInCtorNullCoalescing()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓protected Stream stream = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly Stream stream;
+
+        public Foo()
+        {
+            this.stream = null ?? File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    protected Stream stream = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        this.stream?.Dispose();
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            this.stream = null ?? File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldInDisposeMethod2()
+        public void NotDisposingFieldAssignedInCtorTernary()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        stream1.Dispose();
+        ↓private readonly Stream stream;
+
+        public Foo(bool value)
+        {
+            this.stream = value ? null : File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        stream1.Dispose();
-        this.stream2?.Dispose();
+        private readonly Stream stream;
+
+        public Foo(bool value)
+        {
+            this.stream = value ? null : File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldInDisposeMethodExpressionBody()
+        public void NotDisposingProtectedFieldInDisposeMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
-    public void Dispose() => this.stream1.Dispose();
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    using System;
+    using System.IO;
 
-            var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
-{
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.stream1.Dispose();
-        this.stream2?.Dispose();
+        ↓protected Stream stream = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        protected Stream stream = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldOfTypeObjectInDisposeMethod()
+        public void NotDisposingFieldInDisposeMethod2()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly object stream = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            stream1.Dispose();
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly object stream = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        (this.stream as IDisposable)?.Dispose();
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        private readonly Stream stream2 = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            stream1.Dispose();
+            this.stream2?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingPropertyWhenInitializedInline()
+        public void NotDisposingFieldInDisposeMethodExpressionBody()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
+        
+        public void Dispose() => this.stream1.Dispose();
     }
 }";
-
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Stream Stream { get; set; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        this.Stream?.Dispose();
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        private readonly Stream stream2 = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            this.stream1.Dispose();
+            this.stream2?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingGetOnlyPropertyWhenInitializedInline()
+        public void NotDisposingFieldOfTypeObjectInDisposeMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly object stream = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
     }
 }";
-
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Stream Stream { get; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        this.Stream?.Dispose();
+        private readonly object stream = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            (this.stream as IDisposable)?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingGetSetPropertyOfTypeObjectWhenInitializedInline()
+        public void NotDisposingPropertyWhenInitializedInline()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓public object Stream { get; set; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
     }
 }";
-
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public object Stream { get; set; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        (this.Stream as IDisposable)?.Dispose();
+        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingGetOnlyPropertyOfTypeObjectWhenInitializedInline()
+        public void NotDisposingGetOnlyPropertyWhenInitializedInline()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓public object Stream { get; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
+        ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
     }
 }";
-
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public object Stream { get; } = File.OpenRead(string.Empty);
-        
-    public void Dispose()
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
     {
-        (this.Stream as IDisposable)?.Dispose();
+        public Stream Stream { get; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingGetSetPropertyWhenInitializedInCtor()
+        public void NotDisposingGetSetPropertyOfTypeObjectWhenInitializedInline()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    ↓public Stream Stream { get; set; }
-
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        ↓public object Stream { get; set; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
     }
 }";
-
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    public Stream Stream { get; set; }
-
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.Stream?.Dispose();
+        public object Stream { get; set; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            (this.Stream as IDisposable)?.Dispose();
+        }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingGetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
+        public void NotDisposingGetOnlyPropertyOfTypeObjectWhenInitializedInline()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓public object Stream { get; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public object Stream { get; } = File.OpenRead(string.Empty);
+        
+        public void Dispose()
+        {
+            (this.Stream as IDisposable)?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+        }
+
+        [Test]
+        public void NotDisposingGetSetPropertyWhenInitializedInCtor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        ↓public Stream Stream { get; set; }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; set; }
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+        }
+
+        [Test]
+        public void NotDisposingGetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
         {
             var testCode = @"
 using System;
@@ -811,11 +869,6 @@ public sealed class Foo : IDisposable
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
             var fixedCode = @"
 using System;
 using System.IO;
@@ -840,7 +893,8 @@ public sealed class Foo : IDisposable
         _stream?.Dispose();
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
@@ -864,11 +918,6 @@ public sealed class Foo : IDisposable
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
             var fixedCode = @"
 using System;
 using System.IO;
@@ -887,7 +936,8 @@ public sealed class Foo : IDisposable
         this.Stream?.Dispose();
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
@@ -1068,59 +1118,65 @@ namespace RoslynSandbox
         public async Task DisposeFirstMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
-using System;
-
-public class BaseClass : IDisposable
+namespace RoslynSandbox
 {
-    private bool disposed;
+    using System;
 
-    public void Dispose()
+    public class BaseClass : IDisposable
     {
-        this.Dispose(true);
-    }
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-        }
-    }
+            if (this.disposed)
+            {
+                return;
+            }
 
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";
             var testCode = @"
-using System.IO;
-
-public class Foo : BaseClass
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed;
+    using System.IO;
 
-    protected override void Dispose(bool disposing)
+    public class Foo : BaseClass
     {
-        if (this.disposed)
-        {
-            return;
-        }
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
 
-        this.disposed = true;
-        if (disposing)
+        protected override void Dispose(bool disposing)
         {
-        }
+            if (this.disposed)
+            {
+                return;
+            }
 
-        base.Dispose(disposing);
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }";
             var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
@@ -1130,27 +1186,30 @@ public class Foo : BaseClass
                       .ConfigureAwait(false);
 
             var fixedCode = @"
-using System.IO;
-
-public class Foo : BaseClass
+namespace RoslynSandbox
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed;
+    using System.IO;
 
-    protected override void Dispose(bool disposing)
+    public class Foo : BaseClass
     {
-        if (this.disposed)
-        {
-            return;
-        }
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
 
-        this.disposed = true;
-        if (disposing)
+        protected override void Dispose(bool disposing)
         {
-            this.stream?.Dispose();
-        }
+            if (this.disposed)
+            {
+                return;
+            }
 
-        base.Dispose(disposing);
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
@@ -1161,62 +1220,68 @@ public class Foo : BaseClass
         public async Task DisposeSecondMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
-using System;
-
-public class BaseClass : IDisposable
+namespace RoslynSandbox
 {
-    private bool disposed;
+    using System;
 
-    public void Dispose()
+    public class BaseClass : IDisposable
     {
-        this.Dispose(true);
-    }
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-        }
-    }
+            if (this.disposed)
+            {
+                return;
+            }
 
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";
             var testCode = @"
-using System.IO;
-
-public class Foo : BaseClass
+namespace RoslynSandbox
 {
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
+    using System.IO;
 
-    private bool disposed;
-
-    protected override void Dispose(bool disposing)
+    public class Foo : BaseClass
     {
-        if (this.disposed)
-        {
-            return;
-        }
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
 
-        this.disposed = true;
-        if (disposing)
-        {
-            this.stream1.Dispose();
-        }
+        private bool disposed;
 
-        base.Dispose(disposing);
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream1.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }";
             var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
@@ -1226,30 +1291,33 @@ public class Foo : BaseClass
                       .ConfigureAwait(false);
 
             var fixedCode = @"
-using System.IO;
-
-public class Foo : BaseClass
+namespace RoslynSandbox
 {
-    private readonly Stream stream1 = File.OpenRead(string.Empty);
-    private readonly Stream stream2 = File.OpenRead(string.Empty);
+    using System.IO;
 
-    private bool disposed;
-
-    protected override void Dispose(bool disposing)
+    public class Foo : BaseClass
     {
-        if (this.disposed)
-        {
-            return;
-        }
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        private readonly Stream stream2 = File.OpenRead(string.Empty);
 
-        this.disposed = true;
-        if (disposing)
-        {
-            this.stream1.Dispose();
-            this.stream2?.Dispose();
-        }
+        private bool disposed;
 
-        base.Dispose(disposing);
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream1.Dispose();
+                this.stream2?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
@@ -1260,18 +1328,24 @@ public class Foo : BaseClass
         public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
         {
             var subclassCode = @"
-public sealed class Bar : Disposable
+namespace RoslynSandbox
 {
+    public sealed class Bar : Disposable
+    {
+    }
 }";
             var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Bar bar = new Bar();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        ↓private readonly Bar bar = new Bar();
+
+        public void Dispose()
+        {
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -1280,15 +1354,18 @@ public sealed class Foo : IDisposable
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Bar bar = new Bar();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.bar.Dispose();
+        private readonly Bar bar = new Bar();
+
+        public void Dispose()
+        {
+            this.bar.Dispose();
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
@@ -1298,18 +1375,24 @@ public sealed class Foo : IDisposable
         public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
         {
             var subclassCode = @"
-public sealed class Bar<T> : Disposable
+namespace RoslynSandbox
 {
+    public sealed class Bar<T> : Disposable
+    {
+    }
 }";
             var testCode = @"
-using System;
-
-public sealed class Foo<T> : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Bar<T> bar = new Bar<T>();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo<T> : IDisposable
     {
+        ↓private readonly Bar<T> bar = new Bar<T>();
+
+        public void Dispose()
+        {
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -1318,15 +1401,18 @@ public sealed class Foo<T> : IDisposable
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-
-public sealed class Foo<T> : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Bar<T> bar = new Bar<T>();
+    using System;
 
-    public void Dispose()
+    public sealed class Foo<T> : IDisposable
     {
-        this.bar.Dispose();
+        private readonly Bar<T> bar = new Bar<T>();
+
+        public void Dispose()
+        {
+            this.bar.Dispose();
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
@@ -1336,38 +1422,44 @@ public sealed class Foo<T> : IDisposable
         public async Task WhenNotCallingBaseDisposeWithBaseCode()
         {
             var fooBaseCode = @"
-using System;
-
-public abstract class FooBase : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable = new Disposable();
-    private bool disposed;
+    using System;
 
-    /// <inheritdoc/>
-    public void Dispose()
+    public abstract class FooBase : IDisposable
     {
-        this.Dispose(true);
-    }
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        /// <inheritdoc/>
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.disposable.Dispose();
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
         }
     }
 }";
             var testCode = @"
-public class Foo : FooBase
+namespace RoslynSandbox
 {
-    ↓protected override void Dispose(bool disposing)
+    public class Foo : FooBase
     {
+        ↓protected override void Dispose(bool disposing)
+        {
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -1376,11 +1468,14 @@ public class Foo : FooBase
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooBaseCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-public class Foo : FooBase
+namespace RoslynSandbox
 {
-    protected override void Dispose(bool disposing)
+    public class Foo : FooBase
     {
-        base.Dispose(disposing);
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode }).ConfigureAwait(false);
@@ -1390,17 +1485,20 @@ public class Foo : FooBase
         public async Task WhenNotCallingBaseDisposeWithoutBaseCode()
         {
             var testCode = @"
-using System.IO;
-
-public class Foo : StreamReader
+namespace RoslynSandbox
 {
-    public Foo(Stream stream)
-        : base(stream)
-    {
-    }
+    using System.IO;
 
-    ↓protected override void Dispose(bool disposing)
+    public class Foo : StreamReader
     {
+        public Foo(Stream stream)
+            : base(stream)
+        {
+        }
+
+        ↓protected override void Dispose(bool disposing)
+        {
+        }
     }
 }";
             var expected = this.CSharpDiagnostic()
@@ -1409,18 +1507,21 @@ public class Foo : StreamReader
             await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System.IO;
-
-public class Foo : StreamReader
+namespace RoslynSandbox
 {
-    public Foo(Stream stream)
-        : base(stream)
-    {
-    }
+    using System.IO;
 
-    protected override void Dispose(bool disposing)
+    public class Foo : StreamReader
     {
-        base.Dispose(disposing);
+        public Foo(Stream stream)
+            : base(stream)
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
     }
 }";
             await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
