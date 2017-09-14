@@ -118,9 +118,9 @@ GROUP Analyzers
 NUGET
   remote: http://www.nuget.org/api/v2
     AsyncUsageAnalyzers (1.0.0-alpha003)
+    Gu.Analyzers (0.1.11.25-dev)
     JetBrains.Annotations (11.0)
       System.Runtime (>= 4.1) - restriction: && (< net10) (>= netstandard1.0)
-    Microsoft.CodeAnalysis.Analyzers (1.1)
     Microsoft.NETCore.Platforms (2.0) - restriction: || (&& (< net10) (>= netstandard1.0) (< netstandard1.2) (< monoandroid) (< win8) (< wp8)) (&& (< net10) (>= netstandard1.2) (< netstandard1.3) (< monoandroid) (< win8) (< wpa81)) (&& (< net10) (>= netstandard1.3) (< netstandard1.5) (< monoandroid) (< win8) (< wpa81)) (&& (< net10) (>= netstandard1.5) (< monotouch) (< xamarintvos) (< xamarinwatchos) (< xamarinios) (< xamarinmac)) (&& (>= dnxcore50) (>= netstandard1.0))
     Microsoft.NETCore.Targets (2.0) - restriction: || (&& (< net10) (>= netstandard1.0) (< netstandard1.2) (< monoandroid) (< win8) (< wp8)) (&& (< net10) (>= netstandard1.2) (< netstandard1.3) (< monoandroid) (< win8) (< wpa81)) (&& (< net10) (>= netstandard1.3) (< netstandard1.5) (< monoandroid) (< win8) (< wpa81)) (&& (< net10) (>= netstandard1.5) (< monotouch) (< xamarintvos) (< xamarinwatchos) (< xamarinios) (< xamarinmac)) (&& (>= dnxcore50) (>= netstandard1.0))
     StyleCop.Analyzers (1.0.2)

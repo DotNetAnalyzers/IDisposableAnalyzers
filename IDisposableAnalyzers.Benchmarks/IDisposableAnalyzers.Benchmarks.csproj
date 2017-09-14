@@ -83,6 +83,7 @@
       <Name>IDisposableAnalyzers.CodeFixes</Name>
     </ProjectReference>
   </ItemGroup>
+  <Import Project="..\.paket\paket.targets" />
   <Choose>
     <When Condition="$(TargetFrameworkIdentifier) == '.NETFramework' And $(TargetFrameworkVersion) == 'v4.6.1'">
       <ItemGroup>
@@ -582,5 +583,4 @@
   </Choose>
   <Import Project="..\packages\benchmarks\Microsoft.Diagnostics.Tracing.TraceEvent\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets" Condition="Exists('..\packages\benchmarks\Microsoft.Diagnostics.Tracing.TraceEvent\build\Microsoft.Diagnostics.Tracing.TraceEvent.targets')" Label="Paket" />
   <Import Project="..\packages\benchmarks\NETStandard.Library\build\NETStandard.Library.targets" Condition="Exists('..\packages\benchmarks\NETStandard.Library\build\NETStandard.Library.targets')" Label="Paket" />
-  <Import Project="..\.paket\paket.targets" />
 </Project>

@@ -188,16 +188,9 @@
   <ItemGroup>
     <Content Include="Documentation\DiagnosticDocTemplate.txt" />
   </ItemGroup>
+  <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
     <Analyzer Include="..\packages\analyzers\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
-      <Paket>True</Paket>
-    </Analyzer>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\analyzers\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll">
-      <Paket>True</Paket>
-    </Analyzer>
-    <Analyzer Include="..\packages\analyzers\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
@@ -206,6 +199,14 @@
       <Paket>True</Paket>
     </Analyzer>
     <Analyzer Include="..\packages\analyzers\StyleCop.Analyzers\analyzers\dotnet\cs\StyleCop.Analyzers.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll">
+      <Paket>True</Paket>
+    </Analyzer>
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>
   </ItemGroup>
@@ -819,5 +820,4 @@
       </ItemGroup>
     </When>
   </Choose>
-  <Import Project="..\.paket\paket.targets" />
 </Project>
