@@ -12,6 +12,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoreAssignedWithCtorArgument()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -22,7 +24,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.bar = bar;
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -31,6 +34,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoreAssignedWithCtorArgumentIndexer()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -41,7 +46,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.bar = bars[0];
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -149,6 +155,8 @@ namespace RoslynSandbox
             public async Task IgnorePassedInViaCtorUnderscore()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -159,7 +167,8 @@ namespace RoslynSandbox
         {
             _bar = bar;
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -168,6 +177,8 @@ namespace RoslynSandbox
             public async Task IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -182,7 +193,8 @@ namespace RoslynSandbox
         public void Dispose()
         {
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }

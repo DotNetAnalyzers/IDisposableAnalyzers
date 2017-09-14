@@ -12,6 +12,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -22,7 +24,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.RecursiveProperty.Dispose();
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -31,6 +34,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -40,7 +45,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         public void Dispose()
         {
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -49,6 +55,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -66,7 +74,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.disposable.Dispose();
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -75,6 +84,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -91,7 +102,8 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         public void Dispose()
         {
         }
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -100,15 +112,18 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable RecursiveMethod() => RecursiveMethod();
+    using System;
 
-    public void Dispose()
+    public class Foo
     {
-        this.RecursiveMethod().Dispose();
+        public IDisposable RecursiveMethod() => RecursiveMethod();
+
+        public void Dispose()
+        {
+            this.RecursiveMethod().Dispose();
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)
@@ -119,17 +134,20 @@ public class Foo
             public async Task IgnoresWhenDisposingRecursiveMethodChain()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable Recursive1() => Recursive2();
+    using System;
 
-    public IDisposable Recursive2() => Recursive1();
-
-    public void Dispose()
+    public class Foo
     {
-        this.Recursive1().Dispose();
+        public IDisposable Recursive1() => Recursive2();
+
+        public IDisposable Recursive2() => Recursive1();
+
+        public void Dispose()
+        {
+            this.Recursive1().Dispose();
+        }
     }
 }";
                 await this.VerifyHappyPathAsync(testCode)

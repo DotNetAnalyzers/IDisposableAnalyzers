@@ -5,12 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 
     internal partial class HappyPath
     {
-        public class Returns : NestedHappyPathVerifier<HappyPath>
+        public class Returns
         {
             [Test]
             public void SimpleStatementBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -19,7 +21,8 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         {
             return File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -27,12 +30,15 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             public void SimpleExpressionBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar() => File.OpenRead(string.Empty);
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -40,6 +46,8 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             public void LocalFileOpenRead()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -49,7 +57,8 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var stream = File.OpenRead(string.Empty);
             return stream;
         }
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -57,6 +66,8 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             public void LocalFileOpenReadAfterAccessingLength()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -67,7 +78,8 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var length = stream.Length;
             return stream;
         }
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -143,15 +155,18 @@ namespace RoslynSandbox
             public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
             {
                 var testCode = @"
-using System.IO;
-using System.Reactive.Disposables;
-
-public static class Foo
+namespace RoslynSandbox
 {
-    public static CompositeDisposable Bar()
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public static class Foo
     {
-        var stream = File.OpenRead(string.Empty);
-        return new CompositeDisposable { stream };
+        public static CompositeDisposable Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return new CompositeDisposable { stream };
+        }
     }
 }";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
@@ -161,6 +176,8 @@ public static class Foo
             public void WhenDisposableIsReturnedPropertySimple()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -172,7 +189,8 @@ public static class Foo
                 return File.OpenRead(string.Empty);;
             }
         }
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -180,6 +198,8 @@ public static class Foo
             public void WhenDisposableIsReturnedPropertyBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -192,7 +212,8 @@ public static class Foo
                 return stream;
             }
         }
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
 
@@ -200,12 +221,15 @@ public static class Foo
             public void WhenDisposableIsReturnedPropertyExpressionBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar => File.OpenRead(string.Empty);
-    }";
+    }
+}";
                 AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
             }
         }

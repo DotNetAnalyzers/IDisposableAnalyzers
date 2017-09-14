@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
-        public class Cached : NestedHappyPathVerifier<HappyPath>
+        public class Cached
         {
             [Test]
             public void DontUseUsingWhenGettingFromStaticFieldConcurrentDictionaryGetOrAdd()

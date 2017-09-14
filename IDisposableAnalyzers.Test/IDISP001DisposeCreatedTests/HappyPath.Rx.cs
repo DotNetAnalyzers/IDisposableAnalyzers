@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
-        internal class Rx : NestedHappyPathVerifier<HappyPath>
+        internal class Rx
         {
             [Test]
             public void CompositeDisposableInitializer()

@@ -12,22 +12,25 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public async Task SerialDisposable()
             {
                 var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly SerialDisposable disposable = new SerialDisposable();
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    public void Update()
+    public sealed class Foo : IDisposable
     {
-        this.disposable.Disposable = File.OpenRead(string.Empty);
-    }
+        private readonly SerialDisposable disposable = new SerialDisposable();
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public void Update()
+        {
+            this.disposable.Disposable = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
 

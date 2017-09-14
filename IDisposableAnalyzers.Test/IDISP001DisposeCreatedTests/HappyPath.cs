@@ -1,9 +1,9 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox
@@ -33,14 +33,14 @@ namespace RoslynSandbox
         [TestCase("(IDisposable)null")]
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
-        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => 1)")]
         [TestCase("await Task.Run(() => new object())")]
-        [TestCase("await Task.Run(() => new object()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
-        [TestCase("await Task.Run(() => Type.GetType(string.Empty)).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
         [TestCase("await Task.Run(() => this.GetType())")]
-        [TestCase("await Task.Run(() => this.GetType()).ConfigureAwait(false)")]
-        public async Task LanguageConstructs(string code)
+        [TestCase("await Task.Run(() => this.GetType())")]
+        public void LanguageConstructs(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,11 +58,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new string(' ', 1)", code);
-            await this.VerifyHappyPathAsync(DisposableCode, testCode).ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task WhenDisposingVariable()
+        public void WhenDisposingVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -77,12 +77,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task UsingFileStream()
+        public void UsingFileStream()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -100,12 +99,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task UsingNewDisposable()
+        public void UsingNewDisposable()
         {
             var disposableCode = @"
 namespace RoslynSandbox
@@ -136,12 +134,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode, disposableCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode, disposableCode);
         }
 
         [Test]
-        public async Task Awaiting()
+        public void Awaiting()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -164,7 +161,7 @@ namespace RoslynSandbox
             using (var fileStream = File.OpenRead(file))
             {
                 await fileStream.CopyToAsync(stream)
-                                .ConfigureAwait(false);
+                                ;
             }
 
             stream.Position = 0;
@@ -173,12 +170,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-            .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task AwaitingMethodReturningString()
+        public void AwaitingMethodReturningString()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -200,12 +196,11 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task AwaitDownloadDataTaskAsync()
+        public void AwaitDownloadDataTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -224,12 +219,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task FactoryMethod()
+        public void FactoryMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -267,8 +261,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [TestCase("disposables.First();")]
@@ -276,7 +269,7 @@ namespace RoslynSandbox
         [TestCase("disposables.Where(x => x != null);")]
         [TestCase("disposables.Single();")]
         [TestCase("Enumerable.Empty<IDisposable>();")]
-        public async Task IgnoreLinq(string linq)
+        public void IgnoreLinq(string linq)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -293,12 +286,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("disposables.First();", linq);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task InjectedDbConnectionCreateCommand()
+        public void InjectedDbConnectionCreateCommand()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -315,12 +307,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task InjectedMemberDbConnectionCreateCommand()
+        public void InjectedMemberDbConnectionCreateCommand()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -344,8 +335,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
         }
     }
 }

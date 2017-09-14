@@ -7,12 +7,15 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     internal partial class HappyPath : HappyPathVerifier<IDISP002DisposeMember>
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
@@ -63,6 +66,8 @@ namespace RoslynSandbox
         public async Task DisposingFieldInVirtualDispose()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -98,7 +103,8 @@ namespace RoslynSandbox
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -107,46 +113,52 @@ namespace RoslynSandbox
         public async Task DisposingFieldInVirtualDispose2()
         {
             var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
             var testCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable _disposable = new Disposable();
-    private bool _disposed;
+    using System;
 
-    public void Dispose()
+    public class Foo : IDisposable
     {
-        if (_disposed)
+        private readonly IDisposable _disposable = new Disposable();
+        private bool _disposed;
+
+        public void Dispose()
         {
-            return;
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            Dispose(true);
         }
 
-        _disposed = true;
-        Dispose(true);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            _disposable.Dispose();
+            if (disposing)
+            {
+                _disposable.Dispose();
+            }
         }
-    }
 
-    protected void VerifyDisposed()
-    {
-        if (_disposed)
+        protected void VerifyDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";
@@ -158,17 +170,23 @@ public class Foo : IDisposable
         public async Task DisposingFieldInExpressionBodyDispose()
         {
             var disposableCode = @"
-using System;
-class Disposable : IDisposable {
-    public void Dispose() { }
+namespace RoslynSandbox
+{
+    using System;
+    class Disposable : IDisposable {
+        public void Dispose() { }
+    }
 }";
 
             var testCode = @"
-using System;
-class Goof : IDisposable {
-    IDisposable _disposable;
-    public void Create()  => _disposable = new Disposable();
-    public void Dispose() => _disposable.Dispose();
+namespace RoslynSandbox
+{
+    using System;
+    class Goof : IDisposable {
+        IDisposable _disposable;
+        public void Create()  => _disposable = new Disposable();
+        public void Dispose() => _disposable.Dispose();
+    }
 }";
             await this.VerifyHappyPathAsync(disposableCode, testCode)
                       .ConfigureAwait(false);
@@ -178,6 +196,8 @@ class Goof : IDisposable {
         public async Task DisposingFieldAsCast()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -190,7 +210,8 @@ class Goof : IDisposable {
             var disposable = this.stream as IDisposable;
             disposable?.Dispose();
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -199,6 +220,8 @@ class Goof : IDisposable {
         public async Task DisposingFieldInlineAsCast()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -210,7 +233,8 @@ class Goof : IDisposable {
         {
             (this.stream as IDisposable)?.Dispose();
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -219,6 +243,8 @@ class Goof : IDisposable {
         public async Task DisposingFieldExplicitCast()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -231,7 +257,8 @@ class Goof : IDisposable {
             var disposable = (IDisposable)this.stream;
             disposable.Dispose();
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -240,6 +267,8 @@ class Goof : IDisposable {
         public async Task DisposingFieldInlineExplicitCast()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -251,7 +280,8 @@ class Goof : IDisposable {
         {
             ((IDisposable)this.stream).Dispose();
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -260,6 +290,8 @@ class Goof : IDisposable {
         public async Task DisposingPropertyWhenInitializedInProperty()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -276,7 +308,8 @@ class Goof : IDisposable {
         {
             this.Stream.Dispose();
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -286,6 +319,8 @@ class Goof : IDisposable {
         public async Task DisposingPropertyWhenInitializedInline()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -297,7 +332,8 @@ class Goof : IDisposable {
         {
             this.Stream.Dispose();
         }
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
@@ -307,6 +343,8 @@ class Goof : IDisposable {
         public async Task DisposingPropertyInBaseClass()
         {
             var baseClassCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -318,16 +356,20 @@ class Goof : IDisposable {
         {
             this.Stream.Dispose();
         }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
     public sealed class Foo : FooBase
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
-    }";
+    }
+}";
 
             await this.VerifyHappyPathAsync(baseClassCode, testCode)
                       .ConfigureAwait(false);
@@ -399,16 +441,19 @@ namespace RoslynSandbox
         public async Task IgnoreLinq(string linq)
         {
             var testCode = @"
-using System;
-using System.Linq;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    private readonly IDisposable _bar;
-        
-    public Foo(IDisposable[] disposables)
+    using System;
+    using System.Linq;
+
+    public sealed class Foo
     {
-        _bar = disposables.First();
+        private readonly IDisposable _bar;
+        
+        public Foo(IDisposable[] disposables)
+        {
+            _bar = disposables.First();
+        }
     }
 }";
             testCode = testCode.AssertReplace("disposables.First();", linq);
@@ -420,13 +465,16 @@ public sealed class Foo
         public async Task IgnoredWhenNotAssigned()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
     public sealed class Foo
     {
         private readonly IDisposable bar;
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -435,6 +483,8 @@ public sealed class Foo
         public async Task IgnoredWhenBackingField()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public sealed class Foo
@@ -446,7 +496,8 @@ public sealed class Foo
             get { return this.stream; }
             set { this.stream = value; }
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -455,23 +506,26 @@ public sealed class Foo
         public async Task IgnoredWhenBackingFieldWithMethodSettingPropertyToNull()
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System.IO;
 
-    public Stream Stream
+    public sealed class Foo
     {
-        get { return this.stream; }
-        set { this.stream = value; }
-    }
+        private Stream stream;
 
-    public void Meh()
-    {
-        var temp = this.Stream;
-        this.Stream = null;
-        this.stream = temp;
+        public Stream Stream
+        {
+            get { return this.stream; }
+            set { this.stream = value; }
+        }
+
+        public void Meh()
+        {
+            var temp = this.Stream;
+            this.Stream = null;
+            this.stream = temp;
+        }
     }
 }";
             await this.VerifyHappyPathAsync(testCode)
@@ -482,10 +536,13 @@ public sealed class Foo
         public async Task IgnoreFieldThatIsNotDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly object bar = new object();
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -494,12 +551,15 @@ public sealed class Foo
         public async Task IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly object bar = Meh();
 
         private static object Meh() => new object();
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -508,10 +568,13 @@ public sealed class Foo
         public async Task IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly object bar = string.Copy(string.Empty);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -520,12 +583,15 @@ public sealed class Foo
         public async Task IgnoredStaticField()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public sealed class Foo
     {
         private static Stream stream = File.OpenRead(string.Empty);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -534,12 +600,15 @@ public sealed class Foo
         public async Task IgnoreTask()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Threading.Tasks;
 
     public sealed class Foo
     {
         private readonly Task stream = Task.Delay(0);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -548,12 +617,15 @@ public sealed class Foo
         public async Task IgnoreTaskOfInt()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Threading.Tasks;
 
     public sealed class Foo
     {
         private readonly Task<int> stream = Task.FromResult(0);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -562,10 +634,13 @@ public sealed class Foo
         public async Task FieldOfTypeArrayOfInt()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public sealed class Foo
     {
         private readonly int[] ints = new[] { 1, 2, 3 };
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -574,6 +649,8 @@ public sealed class Foo
         public async Task PropertyWithBackingFieldOfTypeArrayOfInt()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     public sealed class Foo
     {
         private int[] ints;
@@ -592,7 +669,8 @@ public sealed class Foo
         }
 
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -601,6 +679,8 @@ public sealed class Foo
         public async Task HandlesRecursion()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -611,7 +691,8 @@ public sealed class Foo
         {
             return Forever();
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -620,6 +701,8 @@ public sealed class Foo
         public async Task InjectedListOfInt()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -631,7 +714,8 @@ public sealed class Foo
         {
             this.ints = ints;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -640,6 +724,8 @@ public sealed class Foo
         public async Task InjectedListOfT()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -651,7 +737,8 @@ public sealed class Foo
         {
             this.values = values;
         }
-    }";
+    }
+}";
             await this.VerifyHappyPathAsync(testCode)
                       .ConfigureAwait(false);
         }
@@ -660,48 +747,54 @@ public sealed class Foo
         public async Task DisposingPropertyInBase()
         {
             var fooCode = @"
-using System;
-using System.IO;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
-    private bool disposed;
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public class Foo : IDisposable
     {
-        if (this.disposed)
+        public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public void Dispose()
         {
-            return;
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        this.Dispose(true);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.Stream.Dispose();
+            if (disposing)
+            {
+                this.Stream.Dispose();
+            }
         }
-    }
 
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
+        protected void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(this.GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
         }
     }
 }";
 
             var barCode = @"
-using System.IO;
-
-public class Bar : Foo
+namespace RoslynSandbox
 {
-    public override Stream Stream { get; }
+    using System.IO;
+
+    public class Bar : Foo
+    {
+        public override Stream Stream { get; }
+    }
 }";
             await this.VerifyHappyPathAsync(fooCode, barCode)
                       .ConfigureAwait(false);
@@ -711,39 +804,45 @@ public class Bar : Foo
         public async Task WhenCallingBaseDispose()
         {
             var fooBaseCode = @"
-using System;
-
-public abstract class FooBase : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable = new Disposable();
-    private bool disposed;
+    using System;
 
-    /// <inheritdoc/>
-    public void Dispose()
+    public abstract class FooBase : IDisposable
     {
-        this.Dispose(true);
-    }
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        /// <inheritdoc/>
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.disposable.Dispose();
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
         }
     }
 }";
             var testCode = @"
-public class Foo : FooBase
+namespace RoslynSandbox
 {
-    protected override void Dispose(bool disposing)
+    public class Foo : FooBase
     {
-        base.Dispose(disposing);
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
     }
 }";
 
