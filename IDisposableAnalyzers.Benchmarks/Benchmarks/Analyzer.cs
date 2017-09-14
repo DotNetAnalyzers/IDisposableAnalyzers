@@ -22,7 +22,9 @@
         }
 
         [Benchmark]
+#pragma warning disable AvoidAsyncSuffix // Avoid Async suffix
         public object GetAnalyzerDiagnosticsAsync()
+#pragma warning restore AvoidAsyncSuffix // Avoid Async suffix
         {
             return this.compilation.WithAnalyzers(
                            ImmutableArray.Create(this.analyzer),

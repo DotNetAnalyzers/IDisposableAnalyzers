@@ -27,6 +27,7 @@ namespace IDisposableAnalyzers.Test
                 .Parent
                 .Parent
                 .Parent
+                .Parent
                 .EnumerateFiles("IDisposableAnalyzers.Analyzers.csproj", SearchOption.AllDirectories)
                 .Single();
             Console.WriteLine(projFile.FullName);

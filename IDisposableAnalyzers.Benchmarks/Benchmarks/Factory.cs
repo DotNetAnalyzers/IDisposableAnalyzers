@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         internal static Project CreateProject(DiagnosticAnalyzer analyzer)
         {
-            var projFile = ProjFile(analyzer.GetType()).FullName; 
+            var projFile = ProjFile(analyzer.GetType()).FullName;
             var projectName = Path.GetFileNameWithoutExtension(projFile);
             var projectId = ProjectId.CreateNewId(projectName);
             var solution = CreateSolution(projectId, projectName);

@@ -9,9 +9,9 @@ namespace IDisposableAnalyzers.Benchmarks
 
     public class Program
     {
-        // ReSharper disable PossibleNullReferenceException
+        //// ReSharper disable PossibleNullReferenceException
         private static readonly string DestinationDirectory = Path.Combine(new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.FullName, "Benchmarks");
-        // ReSharper restore PossibleNullReferenceException
+        //// ReSharper restore PossibleNullReferenceException
 
         public static void Main()
         {
