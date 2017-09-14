@@ -11,33 +11,43 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
             public async Task Generic()
             {
                 var factoryCode = @"
+namespace RoslynSandbox
+{
     public class Factory
     {
         public static T Create<T>() where T : new() => new T();
-    }";
+    }
+}";
 
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public void Bar()
         {
             Factory.Create<int>();
         }
-    }";
-                await this.VerifyHappyPathAsync(factoryCode, testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(factoryCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task Operator()
             {
                 var mehCode = @"
+namespace RoslynSandbox
+{
     public class Meh
     {
         public static Meh operator +(Meh left, Meh right) => new Meh();
-    }";
+    }
+}";
 
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public object Bar()
@@ -46,21 +56,26 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
             var meh2 = new Meh();
             return meh1 + meh2;
         }
-    }";
-                await this.VerifyHappyPathAsync(mehCode, testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task OperatorNestedCall()
             {
                 var mehCode = @"
+namespace RoslynSandbox
+{
     public class Meh
     {
         public static Meh operator +(Meh left, Meh right) => new Meh();
-    }";
+    }
+}";
 
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public object Bar()
@@ -74,20 +89,25 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
         {
             return meh1 + meh2;
         }
-    }";
-                await this.VerifyHappyPathAsync(mehCode, testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task OperatorEquals()
             {
                 var mehCode = @"
+namespace RoslynSandbox
+{
     public class Meh
     {
-    }";
+    }
+}";
 
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public bool Bar()
@@ -96,15 +116,17 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
             var meh2 = new Meh();
             return meh1 == meh2;
         }
-    }";
-                await this.VerifyHappyPathAsync(mehCode, testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task MethodReturningObject()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public void Bar()
@@ -113,7 +135,8 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
         }
 
         private static object Meh() => new object();
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -122,6 +145,8 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
             public async Task MethodWithArgReturningObject()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public void Bar()
@@ -130,7 +155,8 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
         }
 
         private static object Meh(string arg) => new object();
-    }";
+    }
+}";
                 await this.VerifyHappyPathAsync(testCode)
                           .ConfigureAwait(false);
             }
@@ -139,6 +165,8 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
             public async Task MethodWithObjArgReturningObject()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public void Bar()
@@ -147,9 +175,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
         }
 
         private static object Id(object arg) => arg;
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
 
             [Test]
@@ -214,67 +242,77 @@ namespace RoslynSandbox
             public async Task ReturningNewAssigningAndDisposing()
             {
                 var fooCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo(IDisposable disposable)
+    public class Foo : IDisposable
     {
-        this.disposable = disposable;
-    }
+        private readonly IDisposable disposable;
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
                 var testCode = @"
-public class Meh
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Meh
     {
-        return new Foo(new Disposable());
+        public Foo Bar()
+        {
+            return new Foo(new Disposable());
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
-                          .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task ReturningNewAssigningAndDisposingParams()
             {
                 var fooCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable[] disposables;
+    using System;
 
-    public Foo(params IDisposable[] disposables)
+    public class Foo : IDisposable
     {
-        this.disposables = disposables;
-    }
+        private readonly IDisposable[] disposables;
 
-    public void Dispose()
-    {
-        foreach (var disposable in this.disposables)
+        public Foo(params IDisposable[] disposables)
         {
-            disposable.Dispose();
+            this.disposables = disposables;
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }";
                 var testCode = @"
-public class Meh
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Meh
     {
-        return new Foo(new Disposable(), new Disposable());
+        public Foo Bar()
+        {
+            return new Foo(new Disposable(), new Disposable());
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
-                          .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
@@ -315,8 +353,7 @@ namespace RoslynSandbox
         private static Foo Create(IDisposable disposable) => new Foo(disposable);
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
-                          .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
@@ -337,51 +374,57 @@ namespace RoslynSandbox
         private static StreamReader Create(Stream stream) => new StreamReader(stream);
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task ReturningAssigningPrivateChained()
             {
                 var fooCode = @"
-using System;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
 
-    public Foo(int value, IDisposable disposable)
-        : this(disposable)
+    public class Foo : IDisposable
     {
-    }
+        private readonly IDisposable disposable;
 
-    private Foo(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
+        public Foo(int value, IDisposable disposable)
+            : this(disposable)
+        {
+        }
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
                 var testCode = @"
-public class Meh
+namespace RoslynSandbox
 {
-    public Foo Bar()
+    public class Meh
     {
-        return new Foo(1, new Disposable());
+        public Foo Bar()
+        {
+            return new Foo(1, new Disposable());
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode)
-                          .ConfigureAwait(false);
+                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task StreamInStreamReader()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -390,15 +433,17 @@ public class Meh
         {
             return new StreamReader(File.OpenRead(string.Empty));
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
 
             [Test]
             public async Task StreamInStreamReaderLocal()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -408,9 +453,9 @@ public class Meh
             var reader = new StreamReader(File.OpenRead(string.Empty));
             return reader;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
             }
         }
     }

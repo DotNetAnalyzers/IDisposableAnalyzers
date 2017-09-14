@@ -1,14 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath
     {
-        internal class Using : NestedHappyPathVerifier<HappyPath>
+        internal class Using
         {
             [Test]
-            public async Task FileOpenRead()
+            public void FileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -25,12 +25,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task NewStreamReader()
+            public void NewStreamReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -47,14 +46,15 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task SampleWithAwait()
+            public void SampleWithAwait()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Threading;
     using System.Threading.Tasks;
@@ -74,9 +74,9 @@ namespace RoslynSandbox
 
             return await task.ConfigureAwait(false);
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
         }
     }
