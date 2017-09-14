@@ -1,7 +1,6 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class CodeFix : CodeFixVerifier<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>
@@ -9,58 +8,60 @@
         internal class RefAndOut : NestedCodeFixVerifier<CodeFix>
         {
             [Test]
-            public async Task AssigningFieldViaOutParameterInPublicMethod()
+            public void AssigningFieldViaOutParameterInPublicMethod()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public void Update()
+    public class Foo
     {
-        TryGetStream(↓out stream);
-    }
+        private Stream stream;
 
-    public bool TryGetStream(out Stream outValue)
-    {
-        outValue = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream outValue)
+        {
+            outValue = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public void Update()
+    public class Foo
     {
-        stream?.Dispose();
-        TryGetStream(out stream);
-    }
+        private Stream stream;
 
-    public bool TryGetStream(out Stream outValue)
-    {
-        outValue = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream outValue)
+        {
+            outValue = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaOutParameterBefore()
+            public void AssigningVariableViaOutParameterBefore()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -87,11 +88,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -117,111 +113,116 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaOutParameterAfter()
+            public void AssigningVariableViaOutParameterAfter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Update()
-    {
-        Stream stream = File.OpenRead(string.Empty);
-        TryGetStream(↓out stream);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream stream)
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Update()
-    {
-        Stream stream = File.OpenRead(string.Empty);
-        stream?.Dispose();
-        TryGetStream(out stream);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream stream)
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public void Update()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaOutParameterTwice()
+            public void AssigningVariableViaOutParameterTwice()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
-    {
-        Stream stream;
-        TryGetStream(out stream);
-        TryGetStream(↓out stream);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream stream)
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public void Bar()
+        {
+            Stream stream;
+            TryGetStream(out stream);
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
                 var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
-    {
-        Stream stream;
-        TryGetStream(out stream);
-        stream?.Dispose();
-        TryGetStream(out stream);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream stream)
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        return true;
+        public void Bar()
+        {
+            Stream stream;
+            TryGetStream(out stream);
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task CallPrivateMethodRefParameter()
+            public void CallPrivateMethodRefParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -250,11 +251,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -282,11 +278,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task CallPrivateMethodRefParameterTwice()
+            public void CallPrivateMethodRefParameterTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -316,11 +313,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -349,11 +341,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task CallPrivateMethodRefParameterTwiceDifferentMethods()
+            public void CallPrivateMethodRefParameterTwiceDifferentMethods()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -388,11 +381,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -426,11 +414,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
-            public async Task CallPublicMethodRefParameter()
+            public void CallPublicMethodRefParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -459,11 +448,6 @@ namespace RoslynSandbox
     }
 }";
 
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose previous before re-assigning.");
-                await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-
                 var fixedCode = @"
 namespace RoslynSandbox
 {
@@ -491,7 +475,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true).ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
         }
     }

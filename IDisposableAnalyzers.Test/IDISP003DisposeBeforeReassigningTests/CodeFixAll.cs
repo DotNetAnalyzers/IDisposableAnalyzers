@@ -1,76 +1,87 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAll : CodeFixVerifier<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>
+    internal class CodeFixAll
     {
         [Test]
-        public async Task NotDisposingVariable()
+        public void NotDisposingVariable()
         {
             var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        var stream = File.OpenRead(string.Empty);
-        stream = File.OpenRead(string.Empty);
+        public void Meh()
+        {
+            var stream = File.OpenRead(string.Empty);
+            ↓stream = File.OpenRead(string.Empty);
+        }
     }
 }";
 
             var fixedCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        var stream = File.OpenRead(string.Empty);
-        stream?.Dispose();
-        stream = File.OpenRead(string.Empty);
+        public void Meh()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task NotDisposingVariables()
+        public void NotDisposingVariables()
         {
             var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        var stream1 = File.OpenRead(string.Empty);
-        var stream2 = File.OpenRead(string.Empty);
-        stream1 = File.OpenRead(string.Empty);
-        stream2 = File.OpenRead(string.Empty);
+        public void Meh()
+        {
+            var stream1 = File.OpenRead(string.Empty);
+            var stream2 = File.OpenRead(string.Empty);
+            ↓stream1 = File.OpenRead(string.Empty);
+            ↓stream2 = File.OpenRead(string.Empty);
+        }
     }
 }";
 
             var fixedCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        var stream1 = File.OpenRead(string.Empty);
-        var stream2 = File.OpenRead(string.Empty);
-        stream1?.Dispose();
-        stream1 = File.OpenRead(string.Empty);
-        stream2?.Dispose();
-        stream2 = File.OpenRead(string.Empty);
+        public void Meh()
+        {
+            var stream1 = File.OpenRead(string.Empty);
+            var stream2 = File.OpenRead(string.Empty);
+            stream1?.Dispose();
+            stream1 = File.OpenRead(string.Empty);
+            stream2?.Dispose();
+            stream2 = File.OpenRead(string.Empty);
+        }
     }
 }";
-            await this.VerifyCSharpFixAllFixAsync(testCode, fixedCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

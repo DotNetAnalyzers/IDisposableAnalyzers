@@ -1,17 +1,18 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        public class Recursion : NestedHappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposableTests.HappyPath>
+        public class Recursion
         {
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveProperty()
+            public void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -22,15 +23,17 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         {
             this.RecursiveProperty.Dispose();
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenNotDisposingRecursiveProperty()
+            public void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -40,15 +43,17 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public void Dispose()
         {
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -66,15 +71,17 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         {
             this.disposable.Dispose();
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo : IDisposable
@@ -91,28 +98,30 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public void Dispose()
         {
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.NoDiagnostics<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task IgnoresWhenDisposingRecursiveMethod()
+            public void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable RecursiveMethod() => RecursiveMethod();
+    using System;
 
-    public void Dispose()
+    public class Foo
     {
-        this.RecursiveMethod().Dispose();
+        public IDisposable RecursiveMethod() => RecursiveMethod();
+
+        public void Dispose()
+        {
+            this.RecursiveMethod().Dispose();
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.NoDiagnostics<IDISP003DisposeBeforeReassigning>(testCode);
             }
         }
     }
