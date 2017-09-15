@@ -1,14 +1,17 @@
 namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
-    internal partial class HappyPath : HappyPathVerifier<IDISP006ImplementIDisposable>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
     }

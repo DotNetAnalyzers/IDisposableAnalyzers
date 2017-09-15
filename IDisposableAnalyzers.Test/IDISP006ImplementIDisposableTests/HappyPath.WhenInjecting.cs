@@ -1,17 +1,18 @@
 namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP006ImplementIDisposable>
+    internal partial class HappyPath
     {
-        internal class WhenInjecting : NestedHappyPathVerifier<HappyPath>
+        internal class WhenInjecting
         {
             [Test]
-            public async Task FactoryMethodCallingPrivateCtor()
+            public void FactoryMethodCallingPrivateCtor()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         private readonly bool value;
@@ -22,31 +23,33 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
         }
 
         public static Foo Create() => new Foo(true);
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
             }
 
             [Test]
-            public async Task FactoryMethodCallingPrivateCtorWithCachedDisposable()
+            public void FactoryMethodCallingPrivateCtorWithCachedDisposable()
             {
                 var testCode = @"
-using System;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    private static readonly IDisposable Cached = new Disposable();
-    private readonly IDisposable value;
+    using System;
 
-    private Foo(IDisposable value)
+    public sealed class Foo
     {
-        this.value = value;
-    }
+        private static readonly IDisposable Cached = new Disposable();
+        private readonly IDisposable value;
 
-    public static Foo Create() => new Foo(Cached);
+        private Foo(IDisposable value)
+        {
+            this.value = value;
+        }
+
+        public static Foo Create() => new Foo(Cached);
+    }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(DisposableCode, testCode);
             }
         }
     }
