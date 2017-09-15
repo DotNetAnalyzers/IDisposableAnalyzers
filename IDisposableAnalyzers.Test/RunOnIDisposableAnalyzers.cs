@@ -59,6 +59,7 @@ namespace IDisposableAnalyzers.Test
             // A warmup so that the timings for the tests are more relevant.
             foreach (var project in Sln.Projects)
             {
+                CollectionAssert.IsNotEmpty(project.Documents);
                 var compilation = project.GetCompilationAsync(CancellationToken.None)
                                          .Result
                                          .WithAnalyzers(
@@ -72,8 +73,10 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public async Task GetAnalyzerDiagnosticsAsync(DiagnosticAnalyzer analyzer)
         {
+            CollectionAssert.IsNotEmpty(Sln.Projects);
             foreach (var project in Sln.Projects)
             {
+                CollectionAssert.IsNotEmpty(project.Documents);
                 var compilation = project.GetCompilationAsync(CancellationToken.None)
                                          .Result
                                          .WithAnalyzers(
