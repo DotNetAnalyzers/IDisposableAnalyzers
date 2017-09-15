@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test
     using Microsoft.CodeAnalysis.Text;
     using NUnit.Framework;
 
-    public class RunOnGuAnalyzers
+    public class RunOnIDisposableAnalyzers
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly.GetTypes()
                                                                                                      .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
@@ -25,7 +25,7 @@ namespace IDisposableAnalyzers.Test
 
         private static readonly Project Project = Factory.CreateProject(AllAnalyzers);
 
-        public RunOnGuAnalyzers()
+        public RunOnIDisposableAnalyzers()
         {
             // A warmup so that the timings for the tests are more relevant.
             var compilation = Project.GetCompilationAsync(CancellationToken.None)

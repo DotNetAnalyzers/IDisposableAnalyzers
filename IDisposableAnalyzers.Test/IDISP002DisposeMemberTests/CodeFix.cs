@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
@@ -846,51 +845,57 @@ namespace RoslynSandbox
         public void NotDisposingGetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private Stream _stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+        ↓private Stream _stream;
 
-    public Stream Stream
-    {
-        get { return _stream; }
-        private set { _stream = value; }
-    }
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
 
-    public void Dispose()
-    {
+        public Stream Stream
+        {
+            get { return _stream; }
+            private set { _stream = value; }
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private Stream _stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+        private Stream _stream;
 
-    public Stream Stream
-    {
-        get { return _stream; }
-        private set { _stream = value; }
-    }
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
 
-    public void Dispose()
-    {
-        _stream?.Dispose();
+        public Stream Stream
+        {
+            get { return _stream; }
+            private set { _stream = value; }
+        }
+
+        public void Dispose()
+        {
+            _stream?.Dispose();
+        }
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
@@ -898,42 +903,48 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task NotDisposingGetOnlyPropertyWhenInitializedInCtor()
+        public void NotDisposingGetOnlyPropertyWhenInitializedInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    ↓public Stream Stream { get; }
-
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        ↓public Stream Stream { get; }
+
+        public void Dispose()
+        {
+        }
     }
 }";
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    public Stream Stream { get; }
-
-    public void Dispose()
+    public sealed class Foo : IDisposable
     {
-        this.Stream?.Dispose();
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; }
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
@@ -941,91 +952,92 @@ public sealed class Foo : IDisposable
         }
 
         [Test]
-        public async Task DisposeMemberWhenVirtualDisposeMethod()
+        public void DisposeMemberWhenVirtualDisposeMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed;
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public class Foo : IDisposable
     {
-        this.Dispose(true);
-    }
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-        }
-    }
+            if (this.disposed)
+            {
+                return;
+            }
 
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";
-            var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected)
-                      .ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly Stream stream = File.OpenRead(string.Empty);
-    private bool disposed;
+    using System;
+    using System.IO;
 
-    public void Dispose()
+    public class Foo : IDisposable
     {
-        this.Dispose(true);
-    }
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
 
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public void Dispose()
         {
-            return;
+            this.Dispose(true);
         }
 
-        this.disposed = true;
-        if (disposing)
+        protected virtual void Dispose(bool disposing)
         {
-            this.stream?.Dispose();
-        }
-    }
+            if (this.disposed)
+            {
+                return;
+            }
 
-    protected void ThrowIfDisposed()
-    {
-        if (this.disposed)
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream?.Dispose();
+            }
+        }
+
+        protected void ThrowIfDisposed()
         {
-            throw new ObjectDisposedException(GetType().FullName);
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode, allowNewCompilerDiagnostics: true, codeFixIndex: 0)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
+        public void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1065,11 +1077,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
-                      .ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1110,12 +1117,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
         }
 
         [Test]
-        public async Task DisposeFirstMemberWhenOverriddenDisposeMethod()
+        public void DisposeFirstMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
 namespace RoslynSandbox
@@ -1179,11 +1186,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
-                      .ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1212,12 +1214,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, new[] { baseCode, fixedCode });
         }
 
         [Test]
-        public async Task DisposeSecondMemberWhenOverriddenDisposeMethod()
+        public void DisposeSecondMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
 namespace RoslynSandbox
@@ -1284,11 +1286,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic(IDISP002DisposeMember.DiagnosticId)
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { baseCode, testCode }, expected)
-                      .ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1320,12 +1317,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { baseCode, testCode }, new[] { baseCode, fixedCode })
-                      .ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, new[] { baseCode, fixedCode });
         }
 
         [Test]
-        public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
+        public void NotDisposingPrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
         {
             var subclassCode = @"
 namespace RoslynSandbox
@@ -1348,10 +1345,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1368,11 +1361,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode });
         }
 
         [Test]
-        public async Task NotDisposingPrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
+        public void NotDisposingPrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
         {
             var subclassCode = @"
 namespace RoslynSandbox
@@ -1395,10 +1389,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, subclassCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1415,11 +1405,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode });
         }
 
         [Test]
-        public async Task WhenNotCallingBaseDisposeWithBaseCode()
+        public void WhenNotCallingBaseDisposeWithBaseCode()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -1462,10 +1453,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooBaseCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1478,11 +1465,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode });
         }
 
         [Test]
-        public async Task WhenNotCallingBaseDisposeWithoutBaseCode()
+        public void WhenNotCallingBaseDisposeWithoutBaseCode()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1501,10 +1489,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Dispose member.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -1524,7 +1508,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode }).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
         }
     }
 }

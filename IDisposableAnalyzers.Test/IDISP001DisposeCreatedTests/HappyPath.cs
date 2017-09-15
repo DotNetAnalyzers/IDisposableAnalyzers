@@ -58,7 +58,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new string(' ', 1)", code);
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode, disposableCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode, disposableCode);
         }
 
         [Test]
@@ -170,7 +170,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -219,7 +219,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -261,7 +261,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [TestCase("disposables.First();")]
@@ -286,7 +286,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("disposables.First();", linq);
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -307,7 +307,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
@@ -335,7 +335,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.NoDiagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
     }
 }

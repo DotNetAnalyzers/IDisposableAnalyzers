@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixCreateAndAssignField : CodeFixVerifier<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>
+    internal class CodeFixCreateAndAssignField
     {
         [Test]
         public void LocalExplictTypeToFieldInCtor()

@@ -7,7 +7,6 @@ nuget Gu.Roslyn.Asserts
 nuget System.Reactive
 nuget System.Reactive.Linq
 nuget System.Reactive.PlatformServices
-nuget Microsoft.CodeAnalysis.CSharp.Workspaces
 
 group Build
   storage: none

@@ -1,15 +1,14 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix : CodeFixVerifier<IDISP002DisposeMember, DisposeMemberCodeFixProvider>
+    internal partial class CodeFix
     {
-        internal class InjectedCreated : NestedCodeFixVerifier<CodeFix>
+        internal class InjectedCreated
         {
             [Test]
-            public async Task CtorPassingCreatedIntoPrivateCtor()
+            public void CtorPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -35,11 +34,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -66,12 +60,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
             }
 
             [Test]
-            public async Task FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
+            public void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,11 +91,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -128,12 +117,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode })
-                          .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
             }
 
             [Test]
-            public async Task FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
+            public void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -168,11 +157,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, factoryCode, testCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -194,12 +178,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
-              .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode });
             }
 
             [Test]
-            public async Task FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
+            public void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -234,11 +218,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Dispose member.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, factoryCode, testCode }, expected)
-                          .ConfigureAwait(false);
 
                 var fixedCode = @"
 namespace RoslynSandbox
@@ -260,12 +239,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyCSharpFixAsync(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode })
-              .ConfigureAwait(false);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode });
             }
 
             [Test]
-            public async Task FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
+            public void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox

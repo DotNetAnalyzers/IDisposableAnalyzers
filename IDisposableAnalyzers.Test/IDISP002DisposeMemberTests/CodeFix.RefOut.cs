@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
@@ -76,7 +75,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public async Task AssigningFieldViaRefParameterInCtor()
+            public void AssigningFieldViaRefParameterInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
