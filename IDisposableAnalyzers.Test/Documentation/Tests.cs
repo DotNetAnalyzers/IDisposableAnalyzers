@@ -6,7 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Text;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
@@ -70,19 +70,19 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            var expected = new CodeReader(GetTable(CreateStub(descriptorInfo)));
+            var expected = GetTable(CreateStub(descriptorInfo));
             DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetTable(File.ReadAllText(descriptorInfo.DocFileName)));
-            Assert.AreEqual(expected, actual);
+            var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void ConfigSeverity(DescriptorInfo descriptorInfo)
         {
-            var expected = new CodeReader(GetConfigSeverity(CreateStub(descriptorInfo)));
+            var expected = GetConfigSeverity(CreateStub(descriptorInfo));
             DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName)));
-            Assert.AreEqual(expected, actual);
+            var actual = GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -109,10 +109,10 @@
 
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
-            var expected = new CodeReader(builder.ToString());
+            var expected = builder.ToString();
             DumpIfDebug(expected.ToString());
-            var actual = new CodeReader(GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md"))));
-            Assert.AreEqual(expected, actual);
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md")));
+            CodeAssert.AreEqual(expected, actual);
         }
 
         ////[Test, Explicit] // commenting this out so that it does not show up as excluded.

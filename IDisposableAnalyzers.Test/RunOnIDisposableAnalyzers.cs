@@ -33,25 +33,6 @@ namespace IDisposableAnalyzers.Test
             MetadataReference.CreateFromFile(typeof(NUnit.Framework.Assert).Assembly.Location),
         };
 
-        private static readonly FileInfo SlnFile = GetSlnFile();
-
-        private static FileInfo GetSlnFile()
-        {
-            if (Gu.Roslyn.Asserts.CodeFactory.TryFindFileInParentDirectory(
-                new FileInfo(
-                    new Uri(
-                        Assembly.GetExecutingAssembly()
-                                .CodeBase,
-                        UriKind.Absolute).LocalPath).Directory,
-                "IDisposableAnalyzers.sln",
-                out FileInfo solutionFile))
-            {
-                return solutionFile;
-            }
-
-            throw new InvalidOperationException("Did not find sln file.");
-        }
-
         private static readonly Solution Sln = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(SlnFile, AllAnalyzers, MetadataReferences);
 
         public RunOnIDisposableAnalyzers()
@@ -66,6 +47,26 @@ namespace IDisposableAnalyzers.Test
                                              project.AnalyzerOptions,
                                              CancellationToken.None);
                 compilation.GetAnalyzerDiagnosticsAsync(CancellationToken.None).Wait();
+            }
+        }
+
+        private static FileInfo SlnFile
+        {
+            get
+            {
+                if (Gu.Roslyn.Asserts.CodeFactory.TryFindFileInParentDirectory(
+                    new FileInfo(
+                        new Uri(
+                            Assembly.GetExecutingAssembly()
+                                    .CodeBase,
+                            UriKind.Absolute).LocalPath).Directory,
+                    "IDisposableAnalyzers.sln",
+                    out FileInfo solutionFile))
+                {
+                    return solutionFile;
+                }
+
+                throw new InvalidOperationException("Did not find sln file.");
             }
         }
 
