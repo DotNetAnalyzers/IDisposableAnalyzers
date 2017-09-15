@@ -1,12 +1,12 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAddToCompositeDisposable : CodeFixVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>
+    internal class CodeFixAddToCompositeDisposable
     {
         [Test]
-        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtor()
+        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -23,10 +23,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -45,11 +41,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
+        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -73,10 +70,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -100,11 +93,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
+        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -128,10 +122,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -155,11 +145,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
+        public void AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -178,10 +169,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -199,16 +186,16 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
+        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -223,15 +210,10 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -249,16 +231,16 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
+        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -276,15 +258,10 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
     using System.Reactive.Disposables;
 
@@ -303,12 +280,13 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Explicit("Fix later.")]
         [Test]
-        public async Task AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
+        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -331,10 +309,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -358,11 +332,12 @@ namespace RoslynSandbox
     }
 }";
 
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToExistingCompositeDisposableCtor()
+        public void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -381,10 +356,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -403,11 +374,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
+        public void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -426,10 +398,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -448,11 +416,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddIgnoredReturnValueToCompositeDisposableInitializer()
+        public void AddIgnoredReturnValueToCompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -471,10 +440,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -492,7 +457,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

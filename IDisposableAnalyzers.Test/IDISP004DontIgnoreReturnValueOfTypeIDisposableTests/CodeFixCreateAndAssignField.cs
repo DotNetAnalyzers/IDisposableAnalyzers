@@ -1,12 +1,12 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixCreateAndAssignField : CodeFixVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>
+    internal class CodeFixCreateAndAssignField
     {
         [Test]
-        public async Task AssignIgnoredReturnValueToFieldInCtor()
+        public void AssignIgnoredReturnValueToFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -22,10 +22,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -43,7 +39,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
         }
     }
 }
