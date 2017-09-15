@@ -69,17 +69,32 @@ namespace IDisposableAnalyzers.Test
             }
         }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public async Task GetAnalyzerDiagnosticsAsync(DiagnosticAnalyzer analyzer)
+        [Test]
+        public void CeckSln()
         {
-            CollectionAssert.IsNotEmpty(Sln.Projects);
+            var expected = new[]
+            {
+                "IDisposableAnalyzers.Analyzers",
+                "IDisposableAnalyzers.Benchmarks",
+                "IDisposableAnalyzers.CodeFixes",
+                "IDisposableAnalyzers.Test",
+                "IDisposableAnalyzers.Vsix",
+            };
+            CollectionAssert.AreEquivalent(expected, Sln.Projects.Select(x => x.Name));
             foreach (var project in Sln.Projects)
             {
-                if (!project.Name.EndsWith("Vsix"))
+                if (project.Name != "IDisposableAnalyzers.Vsix")
                 {
                     CollectionAssert.IsNotEmpty(project.Documents);
                 }
+            }
+        }
 
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public async Task GetAnalyzerDiagnosticsAsync(DiagnosticAnalyzer analyzer)
+        {
+            foreach (var project in Sln.Projects)
+            {
                 var compilation = project.GetCompilationAsync(CancellationToken.None)
                                          .Result
                                          .WithAnalyzers(
