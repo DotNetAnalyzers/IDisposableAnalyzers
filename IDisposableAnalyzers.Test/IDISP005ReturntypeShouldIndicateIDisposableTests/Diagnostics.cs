@@ -1,156 +1,155 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldIndicateIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<IDISP005ReturntypeShouldIndicateIDisposable>
+    internal class Diagnostics
     {
         [Test]
-        public async Task ReturnFileOpenReadAsObject()
+        public void ReturnFileOpenReadAsObject()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public object Meh()
+    using System;
+    using System.IO;
+
+    public sealed class Foo
     {
-        return ↓File.OpenRead(string.Empty);
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task ReturnFileOpenReadAsDynamic()
-        {
-            var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
-{
-    public dynamic Meh()
-    {
-        return ↓File.OpenRead(string.Empty);
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
-        {
-            var testCode = @"
-using System.Windows.Controls;
-
-public sealed class Foo
-{
-    private static readonly PasswordBox PasswordBox = new PasswordBox();
-
-    public object Meh()
-    {
-        return ↓PasswordBox.SecurePassword;
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task ReturnFieldPasswordBoxSecurePasswordAsObject()
-        {
-            var testCode = @"
-using System.Windows.Controls;
-
-public sealed class Foo
-{
-    private readonly PasswordBox PasswordBox = new PasswordBox();
-
-    public object Meh()
-    {
-        return ↓PasswordBox.SecurePassword;
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task IndexerReturningObject()
-        {
-            var testCode = @"
-using System.IO;
-
-public class Foo
-{
-    public void Bar()
-    {
-        var meh = this[0];
-    }
-
-    public object this[int index]
-    {
-        get
+        public object Meh()
         {
             return ↓File.OpenRead(string.Empty);
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
 
         [Test]
-        public async Task ReturnFileOpenReadAsObjectExpressionBody()
+        public void ReturnFileOpenReadAsDynamic()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public object Meh() => ↓File.OpenRead(string.Empty);
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public dynamic Meh()
+        {
+            return ↓File.OpenRead(string.Empty);
+        }
+    }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
 
         [Test]
-        public async Task PropertyReturnFileOpenReadAsObjectExpressionBody()
+        public void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public object Meh => ↓File.OpenRead(string.Empty);
+    using System.Windows.Controls;
+
+    public sealed class Foo
+    {
+        private static readonly PasswordBox PasswordBox = new PasswordBox();
+
+        public object Meh()
+        {
+            return ↓PasswordBox.SecurePassword;
+        }
+    }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
 
         [Test]
-        public async Task StatementLambda()
+        public void ReturnFieldPasswordBoxSecurePasswordAsObject()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Windows.Controls;
+
+    public sealed class Foo
+    {
+        private readonly PasswordBox PasswordBox = new PasswordBox();
+
+        public object Meh()
+        {
+            return ↓PasswordBox.SecurePassword;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+        }
+
+        [Test]
+        public void IndexerReturningObject()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            var meh = this[0];
+        }
+
+        public object this[int index]
+        {
+            get
+            {
+                return ↓File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+        }
+
+        [Test]
+        public void ReturnFileOpenReadAsObjectExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public object Meh() => ↓File.OpenRead(string.Empty);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+        }
+
+        [Test]
+        public void PropertyReturnFileOpenReadAsObjectExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public object Meh => ↓File.OpenRead(string.Empty);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+        }
+
+        [Test]
+        public void StatementLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -169,14 +168,11 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
 
         [Test]
-        public async Task ParenthesizedLambdaExpression()
+        public void ParenthesizedLambdaExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -192,14 +188,11 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
 
         [Test]
-        public async Task SimpleLambdaExpression()
+        public void SimpleLambdaExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -215,10 +208,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Return type should indicate that the value should be disposed.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
         }
     }
 }
