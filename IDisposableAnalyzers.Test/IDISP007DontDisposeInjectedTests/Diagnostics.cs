@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<IDISP007DontDisposeInjected>
+    internal class Diagnostics
     {
         [TestCase("stream ?? File.OpenRead(string.Empty)")]
         [TestCase("Stream ?? File.OpenRead(string.Empty)")]
