@@ -1,15 +1,14 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        public class Rx : NestedHappyPathVerifier<HappyPath>
+        public class Rx
         {
             [Test]
-            public async Task InjectedSubscribe()
+            public void InjectedSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -33,12 +32,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task ChainedCtorInjectedSubscribe()
+            public void ChainedCtorInjectedSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -73,12 +71,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task InjectedConditionalSubscribe()
+            public void InjectedConditionalSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -102,12 +99,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposable()
+            public void SingleAssignmentDisposable()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -131,12 +127,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposableAssignedWithObservableSubscribe()
+            public void SingleAssignmentDisposableAssignedWithObservableSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -160,12 +155,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposableAssignedInAction()
+            public void SingleAssignmentDisposableAssignedInAction()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -197,8 +191,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
         }
     }

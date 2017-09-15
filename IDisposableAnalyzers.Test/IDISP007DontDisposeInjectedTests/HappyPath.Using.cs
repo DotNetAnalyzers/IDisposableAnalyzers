@@ -1,17 +1,18 @@
 namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP007DontDisposeInjected>
+    internal partial class HappyPath
     {
-        public class Using : NestedHappyPathVerifier<HappyPath>
+        public class Using
         {
             [Test]
-            public async Task FileOpenRead()
+            public void FileOpenRead()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -22,15 +23,17 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             {
             }
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task FileOpenReadVariable()
+            public void FileOpenReadVariable()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -41,80 +44,84 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             {
             }
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task AwaitedStream()
-            {
-                var testCode = @"
-using System.IO;
-using System.Threading.Tasks;
-
-public static class Foo
-{
-    public static async Task Bar()
-    {
-        using (await ReadAsync(string.Empty).ConfigureAwait(false))
-        {
-        }
-    }
-
-    private static async Task<MemoryStream> ReadAsync(string fileName)
-    {
-        var stream = new MemoryStream();
-        using (var fileStream = File.OpenRead(fileName))
-        {
-            await fileStream.CopyToAsync(stream)
-                            .ConfigureAwait(false);
-        }
-
-        stream.Position = 0;
-        return stream;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task AwaitedStreamVariable()
+            public void AwaitedStream()
             {
                 var testCode = @"
-using System.IO;
-using System.Threading.Tasks;
-
-public static class Foo
+namespace RoslynSandbox
 {
-    public static async Task<long> Bar()
-    {
-        using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
-        {
-            return stream.Length;
-        }
-    }
+    using System.IO;
+    using System.Threading.Tasks;
 
-    private static async Task<MemoryStream> ReadAsync(string fileName)
+    public static class Foo
     {
-        var stream = new MemoryStream();
-        using (var fileStream = File.OpenRead(fileName))
+        public static async Task Bar()
         {
-            await fileStream.CopyToAsync(stream)
-                            .ConfigureAwait(false);
+            using (await ReadAsync(string.Empty).ConfigureAwait(false))
+            {
+            }
         }
 
-        stream.Position = 0;
-        return stream;
+        private static async Task<MemoryStream> ReadAsync(string fileName)
+        {
+            var stream = new MemoryStream();
+            using (var fileStream = File.OpenRead(fileName))
+            {
+                await fileStream.CopyToAsync(stream)
+                                ;
+            }
+
+            stream.Position = 0;
+            return stream;
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task InjectedIEnumerableOfTGetEnumerator()
+            public void AwaitedStreamVariable()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public static class Foo
+    {
+        public static async Task<long> Bar()
+        {
+            using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
+            {
+                return stream.Length;
+            }
+        }
+
+        private static async Task<MemoryStream> ReadAsync(string fileName)
+        {
+            var stream = new MemoryStream();
+            using (var fileStream = File.OpenRead(fileName))
+            {
+                await fileStream.CopyToAsync(stream)
+                                ;
+            }
+
+            stream.Position = 0;
+            return stream;
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            }
+
+            [Test]
+            public void InjectedIEnumerableOfTGetEnumerator()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -135,49 +142,56 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedConcreteFactory()
+            public void CreatedUsingInjectedConcreteFactory()
             {
                 var factoryCode = @"
-using System;
-
-public class Factory
+namespace RoslynSandbox
 {
-    public IDisposable Create()
+    using System;
+
+    public class Factory
     {
-        return new Disposable();
+        public IDisposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(Factory factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(factoryCode, disposableCode, testCode)
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(Factory factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(factoryCode, disposableCode, testCode);
             }
 
             [Test]
-            public async Task InjectedPasswordBoxSecurePassword()
+            public void InjectedPasswordBoxSecurePassword()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -197,299 +211,359 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedInterfaceFactory()
+            public void CreatedUsingInjectedInterfaceFactory()
             {
                 var iFactoryCode = @"
-using System;
-
-public interface IFactory
+namespace RoslynSandbox
 {
-    IDisposable Create();
+    using System;
+
+    public interface IFactory
+    {
+        IDisposable Create();
+    }
 }";
                 var factoryCode = @"
-using System;
-
-public class Factory : IFactory
+namespace RoslynSandbox
 {
-    public IDisposable Create()
+    using System;
+
+    public class Factory : IFactory
     {
-        return new Disposable();
+        public IDisposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(IFactory factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(iFactoryCode, factoryCode, disposableCode, testCode)
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(IFactory factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(iFactoryCode, factoryCode, disposableCode, testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedAbstractFactoryWIthImplementation()
+            public void CreatedUsingInjectedAbstractFactoryWIthImplementation()
             {
                 var abstractFactoryCode = @"
-using System;
-
-public abstract class FactoryBase
+namespace RoslynSandbox
 {
-    public abstract IDisposable Create();
+    using System;
+
+    public abstract class FactoryBase
+    {
+        public abstract IDisposable Create();
+    }
 }";
                 var factoryCode = @"
-using System;
-
-public class Factory : FactoryBase
+namespace RoslynSandbox
 {
-    public override IDisposable Create()
+    using System;
+
+    public class Factory : FactoryBase
     {
-        return new Disposable();
+        public override IDisposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(FactoryBase factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(abstractFactoryCode, factoryCode, disposableCode, testCode)
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(FactoryBase factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, factoryCode, disposableCode, testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
+            public void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
             {
                 var abstractFactoryCode = @"
-using System;
-
-public abstract class FactoryBase<T>
+namespace RoslynSandbox
 {
-    public abstract IDisposable Create();
+    using System;
+
+    public abstract class FactoryBase<T>
+    {
+        public abstract IDisposable Create();
+    }
 }";
                 var factoryCode = @"
-using System;
-
-public class Factory : FactoryBase<int>
+namespace RoslynSandbox
 {
-    public override IDisposable Create()
+    using System;
+
+    public class Factory : FactoryBase<int>
     {
-        return new Disposable();
+        public override IDisposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
 
                 var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public static void Bar<T>(FactoryBase<T> factory)
+    public class Foo
     {
-        using (factory.Create())
+        public static void Bar<T>(FactoryBase<T> factory)
         {
+            using (factory.Create())
+            {
+            }
         }
     }
 }";
-                await this.VerifyHappyPathAsync(abstractFactoryCode, factoryCode, DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, factoryCode, DisposableCode, testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedAbstractFactoryNoImplementation()
+            public void CreatedUsingInjectedAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
-using System;
-
-public abstract class FactoryBase
+namespace RoslynSandbox
 {
-    public abstract IDisposable Create();
+    using System;
+
+    public abstract class FactoryBase
+    {
+        public abstract IDisposable Create();
+    }
 }";
 
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(FactoryBase factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(abstractFactoryCode, disposableCode, testCode)
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(FactoryBase factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, disposableCode, testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
+            public void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
-using System;
-
-public abstract class FactoryBase<T>
+namespace RoslynSandbox
 {
-    public abstract IDisposable Create();
+    using System;
+
+    public abstract class FactoryBase<T>
+    {
+        public abstract IDisposable Create();
+    }
 }";
 
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(FactoryBase<int> factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(abstractFactoryCode, disposableCode, testCode)
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(FactoryBase<int> factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, disposableCode, testCode);
             }
 
             [Test]
-            public async Task CreatedUsingInjectedVirtualFactory()
+            public void CreatedUsingInjectedVirtualFactory()
             {
                 var abstractFactoryCode = @"
-using System;
-
-public class FactoryBase
+namespace RoslynSandbox
 {
-    public virtual IDisposable Create() => new Disposable();
+    using System;
+
+    public class FactoryBase
+    {
+        public virtual IDisposable Create() => new Disposable();
+    }
 }";
                 var factoryCode = @"
-using System;
-
-public class Factory : FactoryBase
+namespace RoslynSandbox
 {
-    public override IDisposable Create()
+    using System;
+
+    public class Factory : FactoryBase
     {
-        return new Disposable();
+        public override IDisposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
                 var disposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
-    {
-    }
-}";
+    using System;
 
-                var testCode = @"
-public class Foo
-{
-    public Foo(FactoryBase factory)
+    public class Disposable : IDisposable
     {
-        using (factory.Create())
+        public void Dispose()
         {
         }
     }
 }";
-                await this.VerifyHappyPathAsync(new[] { abstractFactoryCode, factoryCode, disposableCode, testCode })
-                          .ConfigureAwait(false);
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(FactoryBase factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(new[] { abstractFactoryCode, factoryCode, disposableCode, testCode });
             }
 
             [Test]
-            public async Task IgnoresRecursiveProperty()
+            public void IgnoresRecursiveProperty()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable RecursiveProperty => RecursiveProperty;
+    using System;
 
-    public void Meh()
+    public class Foo
     {
-        var item = RecursiveProperty;
+        public IDisposable RecursiveProperty => RecursiveProperty;
 
-        using(var meh = RecursiveProperty)
+        public void Meh()
         {
-        }
+            var item = RecursiveProperty;
 
-        using(RecursiveProperty)
-        {
+            using(var meh = RecursiveProperty)
+            {
+            }
+
+            using(RecursiveProperty)
+            {
+            }
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
 
             [Test]
-            public async Task IgnoresRecursiveMethod()
+            public void IgnoresRecursiveMethod()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable RecursiveMethod() => RecursiveMethod();
+    using System;
 
-    public void Meh()
+    public class Foo
     {
-        var meh = RecursiveMethod();
+        public IDisposable RecursiveMethod() => RecursiveMethod();
 
-        using(var item = RecursiveMethod())
+        public void Meh()
         {
-        }
+            var meh = RecursiveMethod();
 
-        using(RecursiveMethod())
-        {
+            using(var item = RecursiveMethod())
+            {
+            }
+
+            using(RecursiveMethod())
+            {
+            }
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
             }
         }
     }
