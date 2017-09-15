@@ -1,16 +1,15 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class Diagnostics
     {
         [Explicit("Fix later")]
-        internal class Collections : NestedDiagnosticVerifier<Diagnostics>
+        internal class Collections
         {
             [Test]
-            public async Task ListInitializer()
+            public void ListInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -28,10 +27,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var expected = this.CSharpDiagnostic()
-                                   .WithLocationIndicated(ref testCode)
-                                   .WithMessage("Don't assign member with injected and created disposables.");
-                await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+                AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(DisposableCode, testCode);
             }
         }
     }

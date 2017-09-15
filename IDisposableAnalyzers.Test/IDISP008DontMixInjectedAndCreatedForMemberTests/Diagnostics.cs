@@ -1,18 +1,20 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
-    using System.Threading.Tasks;
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class Diagnostics : DiagnosticVerifier<IDISP008DontMixInjectedAndCreatedForMember>
+    internal partial class Diagnostics
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
@@ -24,7 +26,7 @@ public class Disposable : IDisposable
         [TestCase("true ? arg : File.OpenRead(string.Empty)")]
         [TestCase("true ? File.OpenRead(string.Empty) : arg")]
         [TestCase("true ? File.OpenRead(string.Empty) : arg")]
-        public async Task InjectedAndCreatedField(string code)
+        public void InjectedAndCreatedField(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -44,144 +46,141 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedAndCreatedFieldCtorAndInitializer()
+        public void InjectedAndCreatedFieldCtorAndInitializer()
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    using System.IO;
 
-    public Foo(Stream stream)
+    public sealed class Foo
     {
-        this.stream = stream;
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+        public Foo(Stream stream)
+        {
+            this.stream = stream;
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedAndCreatedFieldTwoCtors()
+        public void InjectedAndCreatedFieldTwoCtors()
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    ↓private readonly Stream stream;
+    using System.IO;
 
-    public Foo()
+    public sealed class Foo
     {
-        this.stream = File.OpenRead(string.Empty);
-    }
+        ↓private readonly Stream stream;
 
-    public Foo(Stream stream)
-    {
-        this.stream = stream;
+        public Foo()
+        {
+            this.stream = File.OpenRead(string.Empty);
+        }
+
+        public Foo(Stream stream)
+        {
+            this.stream = stream;
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
         [TestCase("public Stream Stream { get; private set; }")]
         [TestCase("public Stream Stream { get; protected set; }")]
         [TestCase("public Stream Stream { get; set; }")]
-        public async Task InjectedAndCreatedProperty(string property)
+        public void InjectedAndCreatedProperty(string property)
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo(Stream stream)
-    {
-        this.Stream = stream;
-    }
+    using System.IO;
 
-    ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
+    public sealed class Foo
+    {
+        public Foo(Stream stream)
+        {
+            this.Stream = stream;
+        }
+
+        ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
+    }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedAndCreatedPropertyTwoCtors()
+        public void InjectedAndCreatedPropertyTwoCtors()
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo()
+    using System.IO;
+
+    public sealed class Foo
     {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
 
-    public Foo(Stream stream)
+        public Foo(Stream stream)
+        {
+            this.Stream = stream;
+        }
+
+        ↓public Stream Stream { get; }
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
+        }
+
+        [Test]
+        public void ProtectedMutableField()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
     {
-        this.Stream = stream;
+        ↓protected Stream stream = File.OpenRead(string.Empty);
     }
-
-    ↓public Stream Stream { get; }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task ProtectedMutableField()
+        public void ProtectedMutableProperty()
         {
             var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    ↓protected Stream stream = File.OpenRead(string.Empty);
+    using System.IO;
+
+    public class Foo
+    {
+        ↓public Stream Stream { get; protected set; } = File.OpenRead(string.Empty);
+    }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task ProtectedMutableProperty()
-        {
-            var testCode = @"
-using System.IO;
-
-public class Foo
-{
-    ↓public Stream Stream { get; protected set; } = File.OpenRead(string.Empty);
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task BackingFieldAssignedWithCreatedAndPropertyWithInjected()
+        public void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -204,14 +203,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task BackingFieldAssignedWithInjectedAndPropertyWithCreated()
+        public void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -235,32 +231,29 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task PublicMethodRefParameter()
+        public void PublicMethodRefParameter()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public bool TryGetStream(ref Stream stream)
+    using System;
+    using System.IO;
+
+    public class Foo
     {
-        ↓stream = File.OpenRead(string.Empty);
-        return true;
+        public bool TryGetStream(ref Stream stream)
+        {
+            ↓stream = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
 
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't assign member with injected and created disposables.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
     }
 }
