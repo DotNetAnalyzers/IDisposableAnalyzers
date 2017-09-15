@@ -1,39 +1,41 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP003DisposeBeforeReassigning>
+    internal partial class HappyPath
     {
-        internal class RefAndOut : NestedHappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposableTests.HappyPath>
+        internal class RefAndOut
         {
             [Test]
-            public async Task AssigningVariableViaOutParameter()
+            public void AssigningVariableViaOutParameter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public bool Update()
-    {
-        Stream stream;
-        return TryGetStream(out stream);
-    }
+    using System;
+    using System.IO;
 
-    public bool TryGetStream(out Stream result)
+    public class Foo
     {
-        result = File.OpenRead(string.Empty);
-        return true;
+        public bool Update()
+        {
+            Stream stream;
+            return TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
+            public void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -57,11 +59,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningFieldViaConcurrentDictionaryTryGetValue()
+            public void AssigningFieldViaConcurrentDictionaryTryGetValue()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -81,11 +83,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
+            public void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -106,81 +108,90 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningFieldWithCahcedViaOutParameter()
+            public void AssigningFieldWithCahcedViaOutParameter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public bool Update()
+    public class Foo
     {
-        return TryGetStream(out stream);
-    }
+        private Stream stream;
 
-    public bool TryGetStream(out Stream result)
-    {
-        result = this.stream;
-        return true;
+        public bool Update()
+        {
+            return TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = this.stream;
+            return true;
+        }
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaRefParameter()
+            public void AssigningVariableViaRefParameter()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
-    {
-        Stream stream = null;
-        Assign(ref stream);
-    }
+    using System;
+    using System.IO;
 
-    public void Assign(ref Stream result)
+    public class Foo
     {
-        result = File.OpenRead(string.Empty);
+        public void Bar()
+        {
+            Stream stream = null;
+            Assign(ref stream);
+        }
+
+        public void Assign(ref Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
             [Test]
-            public async Task AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
+            public void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
             {
                 var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar()
-    {
-        Stream stream = null;
-        Assign(ref stream);
-        stream?.Dispose();
-        Assign(ref stream);
-    }
+    using System;
+    using System.IO;
 
-    public void Assign(ref Stream result)
+    public class Foo
     {
-        result = File.OpenRead(string.Empty);
+        public void Bar()
+        {
+            Stream stream = null;
+            Assign(ref stream);
+            stream?.Dispose();
+            Assign(ref stream);
+        }
+
+        public void Assign(ref Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
         }
     }

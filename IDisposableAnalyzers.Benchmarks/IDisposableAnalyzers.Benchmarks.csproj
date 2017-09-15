@@ -4,8 +4,8 @@
     <TargetFramework>net461</TargetFramework>
     <OutputType>Exe</OutputType>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Benchmarks.ruleset</CodeAnalysisRuleSet>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
-  <Import Project="..\.paket\Paket.Restore.targets" />
   <ItemGroup>
     <Content Include="TraceEvent.ReadMe.txt">
       <Paket>True</Paket>
@@ -21,4 +21,5 @@
     <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
     <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
   </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

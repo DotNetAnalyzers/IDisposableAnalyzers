@@ -1,250 +1,271 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
         [Test]
-        public async Task AssigningLocal()
+        public void AssigningLocal()
         {
             var testCode = @"
-using System;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo()
+    using System;
+
+    public sealed class Foo
     {
-        var disposable = new Disposable();
+        public Foo()
+        {
+            var disposable = new Disposable();
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task ChainedCtor()
+        public void ChainedCtor()
         {
             var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-        : this(new Disposable())
-    {
-    }
+    using System;
 
-    private Foo(IDisposable disposable)
+    public sealed class Foo : IDisposable
     {
-        this.Disposable = disposable;
-    }
-
-    public IDisposable Disposable { get; }
-
-    public void Dispose()
-    {
-        this.Disposable.Dispose();
-    }
-}";
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                      .ConfigureAwait(false);
+        public Foo()
+            : this(new Disposable())
+        {
         }
 
-        [Test]
-        public async Task ChainedCtors()
+        private Foo(IDisposable disposable)
         {
-            var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
-{
-    private readonly int meh;
-
-    public Foo()
-        : this(new Disposable())
-    {
-    }
-
-    private Foo(IDisposable disposable)
-        : this(disposable, 1)
-    {
-    }
-
-    private Foo(IDisposable disposable, int meh)
-    {
-        this.meh = meh;
-        this.Disposable = disposable;
-    }
-
-    public IDisposable Disposable { get; }
-
-    public void Dispose()
-    {
-        this.Disposable.Dispose();
-    }
-}";
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                      .ConfigureAwait(false);
+            this.Disposable = disposable;
         }
 
-        [Test]
-        public async Task ChainedCtorCallsBaseCtorDisposedInThis()
-        {
-            var baseCode = @"
-using System;
+        public IDisposable Disposable { get; }
 
-public class FooBase : IDisposable
-{
-    private readonly IDisposable disposable;
-    private bool disposed;
-
-    protected FooBase(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
-
-    public IDisposable Disposable => this.disposable;
-
-    public void Dispose()
-    {
-        this.Dispose(true);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
-        {
-            return;
-        }
-
-        this.disposed = true;
-    }
-}";
-
-            var testCode = @"
-using System;
-
-public sealed class Foo : FooBase
-{
-    private bool disposed;
-
-    public Foo()
-        : this(new Disposable())
-    {
-    }
-
-    private Foo(IDisposable disposable)
-        : base(disposable)
-    {
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (this.disposed)
-        {
-            return;
-        }
-
-        this.disposed = true;
-        if (disposing)
+        public void Dispose()
         {
             this.Disposable.Dispose();
         }
-
-        base.Dispose(disposing);
     }
 }";
-            await this.VerifyHappyPathAsync(DisposableCode, baseCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task ChainedBaseCtorDisposedInThis()
+        public void ChainedCtors()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly int meh;
+
+        public Foo()
+            : this(new Disposable())
+        {
+        }
+
+        private Foo(IDisposable disposable)
+            : this(disposable, 1)
+        {
+        }
+
+        private Foo(IDisposable disposable, int meh)
+        {
+            this.meh = meh;
+            this.Disposable = disposable;
+        }
+
+        public IDisposable Disposable { get; }
+
+        public void Dispose()
+        {
+            this.Disposable.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
+        }
+
+        [Test]
+        public void ChainedCtorCallsBaseCtorDisposedInThis()
         {
             var baseCode = @"
-using System;
-
-public class FooBase : IDisposable
+namespace RoslynSandbox
 {
-    private readonly object disposable;
-    private bool disposed;
+    using System;
 
-    protected FooBase(IDisposable disposable)
+    public class FooBase : IDisposable
     {
-        this.disposable = disposable;
-    }
+        private readonly IDisposable disposable;
+        private bool disposed;
 
-    public object Bar
-    {
-        get
+        protected FooBase(IDisposable disposable)
         {
-            return this.disposable;
-        }
-    }
-
-    public void Dispose()
-    {
-        this.Dispose(true);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (this.disposed)
-        {
-            return;
+            this.disposable = disposable;
         }
 
-        this.disposed = true;
+        public IDisposable Disposable => this.disposable;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
     }
 }";
 
             var testCode = @"
-using System;
-
-public sealed class Foo : FooBase
+namespace RoslynSandbox
 {
-    private bool disposed;
+    using System;
 
-    public Foo()
-        : base(new Disposable())
+    public sealed class Foo : FooBase
     {
-    }
+        private bool disposed;
 
-    protected override void Dispose(bool disposing)
-    {
-        if (this.disposed)
+        public Foo()
+            : this(new Disposable())
         {
-            return;
         }
 
-        this.disposed = true;
-        if (disposing)
+        private Foo(IDisposable disposable)
+            : base(disposable)
         {
-            (this.Bar as IDisposable)?.Dispose();
         }
 
-        base.Dispose(disposing);
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.Disposable.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(DisposableCode, baseCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, baseCode, testCode);
         }
 
         [Test]
-        public async Task RealisticExtensionMethodClass()
+        public void ChainedBaseCtorDisposedInThis()
+        {
+            var baseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class FooBase : IDisposable
+    {
+        private readonly object disposable;
+        private bool disposed;
+
+        protected FooBase(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public object Bar
+        {
+            get
+            {
+                return this.disposable;
+            }
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }
+}";
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : FooBase
+    {
+        private bool disposed;
+
+        public Foo()
+            : base(new Disposable())
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                (this.Bar as IDisposable)?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, baseCode, testCode);
+        }
+
+        [Test]
+        public void RealisticExtensionMethodClass()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -355,79 +376,85 @@ public sealed class Foo : FooBase
             result = default(TItem);
             return false;
         }
-    }";
-
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task IfTry()
-        {
-            var testCode = @"
-public class Foo
-{
-    private void Bar()
-    {
-        int value;
-        if(Try(out value))
-        {
-        }
-    }
-
-    private bool Try(out int value)
-    {
-        value = 1;
-        return true;
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
         }
 
         [Test]
-        public async Task MatehodWithFuncTaskAsParameter()
+        public void IfTry()
         {
             var testCode = @"
-using System;
-using System.Threading.Tasks;
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    public class Foo
     {
-        this.Bar(() => Task.Delay(0));
-    }
-    public void Bar(Func<Task> func)
-    {
+        private void Bar()
+        {
+            int value;
+            if(Try(out value))
+            {
+            }
+        }
+
+        private bool Try(out int value)
+        {
+            value = 1;
+            return true;
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
         }
 
         [Test]
-        public async Task MethodWithFuncStreamAsParameter()
+        public void MatehodWithFuncTaskAsParameter()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System;
+    using System.Threading.Tasks;
+    public class Foo
     {
-        this.Bar(() => File.OpenRead(string.Empty));
-    }
-
-    public void Bar(Func<Stream> func)
-    {
+        public void Meh()
+        {
+            this.Bar(() => Task.Delay(0));
+        }
+        public void Bar(Func<Task> func)
+        {
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+        }
+
+        [Test]
+        public void MethodWithFuncStreamAsParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            this.Bar(() => File.OpenRead(string.Empty));
+        }
+
+        public void Bar(Func<Stream> func)
+        {
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
         }
     }
 }

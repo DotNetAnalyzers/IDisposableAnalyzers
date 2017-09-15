@@ -1,41 +1,43 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
-        public class Recursion : NestedHappyPathVerifier<HappyPath>
+        public class Recursion
         {
             [Test]
-            public async Task IgnoresRecursiveCalculatedProperty()
+            public void IgnoresRecursiveCalculatedProperty()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable RecursiveProperty => RecursiveProperty;
+    using System;
 
-    public void Meh()
+    public class Foo
     {
-        var item = RecursiveProperty;
+        public IDisposable RecursiveProperty => RecursiveProperty;
 
-        using(var meh = RecursiveProperty)
+        public void Meh()
         {
-        }
+            var item = RecursiveProperty;
 
-        using(RecursiveProperty)
-        {
+            using(var meh = RecursiveProperty)
+            {
+            }
+
+            using(RecursiveProperty)
+            {
+            }
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task IgnoresRecursiveGetSetProperty()
+            public void IgnoresRecursiveGetSetProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -63,12 +65,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task MethodStatementBody()
+            public void MethodStatementBody()
             {
                 var testCode = @"
     using System;
@@ -93,36 +94,37 @@ namespace RoslynSandbox
             return Forever();
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task MethodExpressionBody()
+            public void MethodExpressionBody()
             {
                 var testCode = @"
-using System;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public IDisposable Forever() => Forever();
+    using System;
 
-    public void Meh()
+    public class Foo
     {
-        var meh = Forever();
-        Forever();
+        public IDisposable Forever() => Forever();
 
-        using(var item = Forever())
+        public void Meh()
         {
-        }
+            var meh = Forever();
+            Forever();
 
-        using(Forever())
-        {
+            using(var item = Forever())
+            {
+            }
+
+            using(Forever())
+            {
+            }
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
         }
     }

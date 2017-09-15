@@ -1,16 +1,18 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        public class Returns : NestedHappyPathVerifier<HappyPath>
+        public class Returns
         {
             [Test]
-            public async Task SimpleStatementBody()
+            public void SimpleStatementBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -19,29 +21,33 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         {
             return File.OpenRead(string.Empty);
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task SimpleExpressionBody()
+            public void SimpleExpressionBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar() => File.OpenRead(string.Empty);
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalFileOpenRead()
+            public void LocalFileOpenRead()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -51,15 +57,17 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var stream = File.OpenRead(string.Empty);
             return stream;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalFileOpenReadAfterAccessingLength()
+            public void LocalFileOpenReadAfterAccessingLength()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -70,13 +78,13 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var length = stream.Length;
             return stream;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInIfAndEnd()
+            public void LocalInIfAndEnd()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,12 +105,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInIf()
+            public void LocalInIf()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -124,12 +131,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task LocalInStreamReaderMethodBody()
+            public void LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
     using System.IO;
@@ -142,33 +148,36 @@ namespace RoslynSandbox
             return new StreamReader(stream);
         }
     }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task FileOpenReadIsReturnedInCompositeDisposableMethodBody()
+            public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
             {
                 var testCode = @"
-using System.IO;
-using System.Reactive.Disposables;
-
-public static class Foo
+namespace RoslynSandbox
 {
-    public static CompositeDisposable Bar()
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public static class Foo
     {
-        var stream = File.OpenRead(string.Empty);
-        return new CompositeDisposable { stream };
+        public static CompositeDisposable Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return new CompositeDisposable { stream };
+        }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertySimple()
+            public void WhenDisposableIsReturnedPropertySimple()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -180,15 +189,17 @@ public static class Foo
                 return File.OpenRead(string.Empty);;
             }
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertyBody()
+            public void WhenDisposableIsReturnedPropertyBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -201,23 +212,25 @@ public static class Foo
                 return stream;
             }
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task WhenDisposableIsReturnedPropertyExpressionBody()
+            public void WhenDisposableIsReturnedPropertyExpressionBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
     {
         public static Stream Bar => File.OpenRead(string.Empty);
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
         }
     }

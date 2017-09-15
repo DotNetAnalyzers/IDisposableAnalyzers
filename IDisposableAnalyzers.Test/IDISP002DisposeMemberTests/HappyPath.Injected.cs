@@ -1,17 +1,18 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        internal class Injected : NestedHappyPathVerifier<HappyPath>
+        internal class Injected
         {
             [Test]
-            public async Task IgnoreAssignedWithCtorArgument()
+            public void IgnoreAssignedWithCtorArgument()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -22,15 +23,17 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.bar = bar;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoreAssignedWithCtorArgumentIndexer()
+            public void IgnoreAssignedWithCtorArgumentIndexer()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -41,13 +44,13 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         {
             this.bar = bars[0];
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnoreInjectedAndCreatedField()
+            public void IgnoreInjectedAndCreatedField()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -66,12 +69,11 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(new Disposable());
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task IgnoreInjectedAndCreatedProperty()
+            public void IgnoreInjectedAndCreatedProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -90,12 +92,11 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(new Disposable());
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
+            public void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -118,12 +119,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
             }
 
             [Test]
-            public async Task IgnoreDictionaryPassedInViaCtor()
+            public void IgnoreDictionaryPassedInViaCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -141,14 +141,15 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnorePassedInViaCtorUnderscore()
+            public void IgnorePassedInViaCtorUnderscore()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -159,15 +160,17 @@ namespace RoslynSandbox
         {
             _bar = bar;
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
             }
 
             [Test]
-            public async Task IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
+            public void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -182,9 +185,9 @@ namespace RoslynSandbox
         public void Dispose()
         {
         }
-    }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+    }
+}";
+                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
             }
         }
     }

@@ -1,84 +1,90 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAddUsing : CodeFixVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>
+    internal class CodeFixAddUsing
     {
         [Test]
-        public async Task AddUsingForIgnoredReturn()
+        public void AddUsingForIgnoredReturn()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
-    {
-        ↓File.OpenRead(string.Empty);
-        var i = 1;
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+    using System;
+    using System.IO;
 
-            var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
-{
-    public void Meh()
+    public sealed class Foo
     {
-        using (File.OpenRead(string.Empty))
+        public void Meh()
         {
+            ↓File.OpenRead(string.Empty);
             var i = 1;
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task AddUsingForIgnoredReturnEmpty()
-        {
-            var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
-{
-    public void Meh()
-    {
-        ↓File.OpenRead(string.Empty);
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System;
+    using System.IO;
+
+    public sealed class Foo
     {
-        using (File.OpenRead(string.Empty))
+        public void Meh()
         {
+            using (File.OpenRead(string.Empty))
+            {
+                var i = 1;
+            }
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
         }
 
         [Test]
-        public async Task AddUsingForIgnoredReturnManyStatements()
+        public void AddUsingForIgnoredReturnEmpty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            using (File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+        }
+
+        [Test]
+        public void AddUsingForIgnoredReturnManyStatements()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -102,10 +108,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
 
             var fixedCode = @"
 namespace RoslynSandbox
@@ -131,7 +133,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyCSharpFixAsync(testCode, fixedCode).ConfigureAwait(false);
+            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
         }
     }
 }

@@ -1,190 +1,186 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class Diagnostics : DiagnosticVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal class Diagnostics
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
         [Test]
-        public async Task IgnoringFileOpenRead()
+        public void IgnoringFileOpenRead()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System;
+    using System.IO;
+
+    public sealed class Foo
     {
-        ↓File.OpenRead(string.Empty);
+        public void Meh()
+        {
+            ↓File.OpenRead(string.Empty);
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
         }
 
         [Test]
-        public async Task IgnoringNewDisposable()
+        public void IgnoringNewDisposable()
         {
-            var disposableCode = @"
-using System;
-class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
-}";
-
             var testCode = @"
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    public sealed class Foo
     {
-        ↓new Disposable();
+        public void Meh()
+        {
+            ↓new Disposable();
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task FactoryMethodNewDisposable()
+        public void FactoryMethodNewDisposable()
         {
-            var disposableCode = @"
-using System;
-
-class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
-}";
-
             var testCode = @"
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    public sealed class Foo
     {
-        ↓Create();
-    }
+        public void Meh()
+        {
+            ↓Create();
+        }
 
-    private static Disposable Create()
-    {
-        return new Disposable();
+        private static Disposable Create()
+        {
+            return new Disposable();
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task IgnoringFileOpenReadPassedIntoCtor()
+        public void IgnoringFileOpenReadPassedIntoCtor()
         {
-            var testCode = @"
-using System;
-using System.IO;
-
-public class Bar
-{
-    private readonly Stream stream;
-
-    public Bar(Stream stream)
-    {
-       this.stream = stream;
-    }
-}
-
-public sealed class Foo
-{
-    public Bar Meh()
-    {
-        return new Bar(↓File.OpenRead(string.Empty));
-    }
-}";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(testCode, expected).ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task IgnoringNewDisposabledPassedIntoCtor()
-        {
-            var disposableCode = @"
-using System;
-class Disposable : IDisposable
-{
-    public void Dispose()
-    {
-    }
-}";
             var barCode = @"
-using System;
-
-public class Bar
+namespace RoslynSandbox
 {
-    private readonly IDisposable disposable;
+    using System;
+    using System.IO;
 
-    public Bar(IDisposable disposable)
+    public class Bar
     {
-       this.disposable = disposable;
+        private readonly Stream stream;
+
+        public Bar(Stream stream)
+        {
+           this.stream = stream;
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public Bar Meh()
+        {
+            return new Bar(↓File.OpenRead(string.Empty));
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(barCode, testCode);
+        }
+
+        [Test]
+        public void IgnoringNewDisposabledPassedIntoCtor()
+        {
+            var barCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Bar
+    {
+        private readonly IDisposable disposable;
+
+        public Bar(IDisposable disposable)
+        {
+           this.disposable = disposable;
+        }
     }
 }";
 
             var testCode = @"
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Bar Meh()
+    public sealed class Foo
     {
-        return new Bar(↓new Disposable());
+        public Bar Meh()
+        {
+            return new Bar(↓new Disposable());
+        }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { disposableCode, barCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, barCode, testCode);
         }
 
         [Test]
-        public async Task Generic()
+        public void Generic()
         {
             var interfaceCode = @"
+namespace RoslynSandbox
+{
     using System;
+ 
     public interface IDisposable<T> : IDisposable
     {
-    }";
+    }
+}";
 
             var disposableCode = @"
+namespace RoslynSandbox
+{
     public sealed class Disposable<T> : IDisposable<T>
     {
         public void Dispose()
         {
         }
-    }";
+    }
+}";
 
             var factoryCode = @"
+namespace RoslynSandbox
+{
     public class Factory
     {
         public static IDisposable<T> Create<T>() => new Disposable<T>();
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public class Foo
@@ -193,40 +189,41 @@ public sealed class Foo
         {
             ↓Factory.Create<int>();
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { interfaceCode, disposableCode, factoryCode, testCode }, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(interfaceCode, disposableCode, factoryCode, testCode);
         }
 
         [Test]
-        public async Task ConstrainedGeneric()
+        public void ConstrainedGeneric()
         {
             var factoryCode = @"
-using System;
-
-public class Factory
+namespace RoslynSandbox
 {
-    public static T Create<T>() where T : IDisposable, new() => new T();
+    using System;
+
+    public class Factory
+    {
+        public static T Create<T>() where T : IDisposable, new() => new T();
+    }
 }";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     public class Foo
     {
         public void Bar()
         {
             ↓Factory.Create<Disposable>();
         }
-    }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { factoryCode, DisposableCode, testCode }, expected).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(factoryCode, DisposableCode, testCode);
         }
 
         [Test]
-        public async Task WithOptionalParameter()
+        public void WithOptionalParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -258,14 +255,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task ReturningNewAssigningNotDisposing()
+        public void ReturningNewAssigningNotDisposing()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -297,14 +291,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
         }
 
         [Test]
-        public async Task ReturningNewNotAssigning()
+        public void ReturningNewNotAssigning()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -333,10 +324,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            var expected = this.CSharpDiagnostic()
-                               .WithLocationIndicated(ref testCode)
-                               .WithMessage("Don't ignore return value of type IDisposable.");
-            await this.VerifyCSharpDiagnosticAsync(new[] { DisposableCode, fooCode, testCode }, expected).ConfigureAwait(false);
+            AnalyzerAssert.Diagnostics<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
         }
     }
 }

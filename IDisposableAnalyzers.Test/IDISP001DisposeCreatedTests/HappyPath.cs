@@ -1,26 +1,29 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public Disposable(string meh)
-        : this()
-    {
-    }
+    using System;
 
-    public Disposable()
+    public class Disposable : IDisposable
     {
-    }
+        public Disposable(string meh)
+            : this()
+        {
+        }
 
-    public void Dispose()
-    {
+        public Disposable()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
 
@@ -30,14 +33,14 @@ public class Disposable : IDisposable
         [TestCase("(IDisposable)null")]
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
-        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => 1)")]
         [TestCase("await Task.Run(() => new object())")]
-        [TestCase("await Task.Run(() => new object()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
-        [TestCase("await Task.Run(() => Type.GetType(string.Empty)).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
         [TestCase("await Task.Run(() => this.GetType())")]
-        [TestCase("await Task.Run(() => this.GetType()).ConfigureAwait(false)")]
-        public async Task LanguageConstructs(string code)
+        [TestCase("await Task.Run(() => this.GetType())")]
+        public void LanguageConstructs(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -55,30 +58,34 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new string(' ', 1)", code);
-            await this.VerifyHappyPathAsync(DisposableCode, testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task WhenDisposingVariable()
+        public void WhenDisposingVariable()
         {
             var testCode = @"
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    public class Foo
     {
-        var item = new Disposable();
-        item.Dispose();
+        public void Meh()
+        {
+            var item = new Disposable();
+            item.Dispose();
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(DisposableCode, testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
         }
 
         [Test]
-        public async Task UsingFileStream()
+        public void UsingFileStream()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -90,15 +97,17 @@ public class Foo
                 return stream.Length;
             }
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task UsingNewDisposable()
+        public void UsingNewDisposable()
         {
             var disposableCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Disposable : IDisposable
@@ -106,9 +115,12 @@ public class Foo
         public void Dispose()
         {
         }
-    }";
+    }
+}";
 
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -120,71 +132,75 @@ public class Foo
                 return 1;
             }
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode, disposableCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode, disposableCode);
         }
 
         [Test]
-        public async Task Awaiting()
+        public void Awaiting()
         {
             var testCode = @"
-using System.IO;
-using System.Threading.Tasks;
-  
-internal static class Foo
+namespace RoslynSandbox
 {
-    internal static async Task Bar()
+    using System.IO;
+    using System.Threading.Tasks;
+  
+    internal static class Foo
     {
-        using (var stream = await ReadAsync(string.Empty))
+        internal static async Task Bar()
         {
-        }
-    }
-
-    internal static async Task<Stream> ReadAsync(string file)
-    {
-        var stream = new MemoryStream();
-        using (var fileStream = File.OpenRead(file))
-        {
-            await fileStream.CopyToAsync(stream)
-                            .ConfigureAwait(false);
+            using (var stream = await ReadAsync(string.Empty))
+            {
+            }
         }
 
-        stream.Position = 0;
-        return stream;
+        internal static async Task<Stream> ReadAsync(string file)
+        {
+            var stream = new MemoryStream();
+            using (var fileStream = File.OpenRead(file))
+            {
+                await fileStream.CopyToAsync(stream)
+                                ;
+            }
+
+            stream.Position = 0;
+            return stream;
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-            .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task AwaitingMethodReturningString()
+        public void AwaitingMethodReturningString()
         {
             var testCode = @"
-using System.IO;
-using System.Threading.Tasks;
-  
-internal static class Foo
+namespace RoslynSandbox
 {
-    internal static async Task Bar()
+    using System.IO;
+    using System.Threading.Tasks;
+  
+    internal static class Foo
     {
-        var text = await ReadAsync(string.Empty);
-    }
+        internal static async Task Bar()
+        {
+            var text = await ReadAsync(string.Empty);
+        }
 
-    internal static async Task<string> ReadAsync(string text)
-    {
-        return text;
+        internal static async Task<string> ReadAsync(string text)
+        {
+            return text;
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task AwaitDownloadDataTaskAsync()
+        public void AwaitDownloadDataTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -203,48 +219,49 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task FactoryMethod()
+        public void FactoryMethod()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Disposal : IDisposable
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public Disposal() :
-        this(File.OpenRead(string.Empty))
+    public class Disposal : IDisposable
     {
-    }
+        private Stream stream;
 
-    private Disposal(Stream stream)
-    {
-        this.stream = stream;
-    }
-
-    public static Disposal CreateNew()
-    {
-        Stream stream = File.OpenRead(string.Empty);
-        return new Disposal(stream);
-    }
-
-    public void Dispose()
-    {
-        if (stream != null)
+        public Disposal() :
+            this(File.OpenRead(string.Empty))
         {
-            stream.Dispose();
-            stream = null;
+        }
+
+        private Disposal(Stream stream)
+        {
+            this.stream = stream;
+        }
+
+        public static Disposal CreateNew()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            return new Disposal(stream);
+        }
+
+        public void Dispose()
+        {
+            if (stream != null)
+            {
+                stream.Dispose();
+                stream = null;
+            }
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [TestCase("disposables.First();")]
@@ -252,67 +269,73 @@ public class Disposal : IDisposable
         [TestCase("disposables.Where(x => x != null);")]
         [TestCase("disposables.Single();")]
         [TestCase("Enumerable.Empty<IDisposable>();")]
-        public async Task IgnoreLinq(string linq)
+        public void IgnoreLinq(string linq)
         {
             var testCode = @"
-using System;
-using System.Linq;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo(IDisposable[] disposables)
+    using System;
+    using System.Linq;
+
+    public sealed class Foo
     {
-        var first = disposables.First();
+        public Foo(IDisposable[] disposables)
+        {
+            var first = disposables.First();
+        }
     }
 }";
             testCode = testCode.AssertReplace("disposables.First();", linq);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task InjectedDbConnectionCreateCommand()
+        public void InjectedDbConnectionCreateCommand()
         {
             var testCode = @"
-using System.Data.Common;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public static void Bar(DbConnection conn)
+    using System.Data.Common;
+
+    public class Foo
     {
-        using(var command = conn.CreateCommand())
+        public static void Bar(DbConnection conn)
         {
+            using(var command = conn.CreateCommand())
+            {
+            }
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
 
         [Test]
-        public async Task InjectedMemberDbConnectionCreateCommand()
+        public void InjectedMemberDbConnectionCreateCommand()
         {
             var testCode = @"
-using System.Data.Common;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly DbConnection connection;
+    using System.Data.Common;
 
-    public Foo(DbConnection connection)
+    public class Foo
     {
-        this.connection = connection;
-    }
+        private readonly DbConnection connection;
 
-    public void Bar()
-    {
-        using(var command = this.connection.CreateCommand())
+        public Foo(DbConnection connection)
         {
+            this.connection = connection;
+        }
+
+        public void Bar()
+        {
+            using(var command = this.connection.CreateCommand())
+            {
+            }
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
         }
     }
 }

@@ -1,31 +1,28 @@
 source http://www.nuget.org/api/v2/
-framework: net461, portable-net45+win8
+storage: none
 
-nuget Microsoft.CodeAnalysis.CSharp.Workspaces 1.2.2
+nuget Microsoft.CodeAnalysis.CSharp.Workspaces 1.3.2
+nuget NUnit
+nuget Gu.Roslyn.Asserts
+nuget System.Reactive
+nuget System.Reactive.Linq
+nuget System.Reactive.PlatformServices
 
 group Build
+  storage: none
   source http://www.nuget.org/api/v2/
-  framework: net461
   nuget Microsoft.VSSDK.BuildTools
 
 group Analyzers
+  storage: none
   source http://www.nuget.org/api/v2/
   nuget StyleCop.Analyzers
   nuget Gu.Analyzers
   nuget AsyncUsageAnalyzers
-  nuget JetBrains.Annotations
-
-group Test
-  source http://www.nuget.org/api/v2/
-  framework: net461
-  nuget NUnit
-  nuget System.Reactive
-  nuget System.Reactive.Linq
-  nuget System.Reactive.PlatformServices
 
 group Benchmarks
+  storage: none
   source http://www.nuget.org/api/v2/
-  framework: net461
   nuget BenchmarkDotNet.Diagnostics.Windows
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   

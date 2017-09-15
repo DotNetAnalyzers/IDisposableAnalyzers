@@ -1,121 +1,132 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath
     {
-        internal class Rx : NestedHappyPathVerifier<HappyPath>
+        internal class Rx
         {
             [Test]
-            public async Task SerialDisposable()
+            public void SerialDisposable()
             {
                 var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly SerialDisposable disposable = new SerialDisposable();
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    public void Update()
+    public sealed class Foo : IDisposable
     {
-        this.disposable.Disposable = File.OpenRead(string.Empty);
-    }
+        private readonly SerialDisposable disposable = new SerialDisposable();
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
-    }
-}";
-
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task SingleAssignmentDisposable()
-            {
-                var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
-{
-    private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
-
-    public void Update()
-    {
-        this.disposable.Disposable = File.OpenRead(string.Empty);
-    }
-
-    public void Dispose()
-    {
-        this.disposable.Dispose();
-    }
-}";
-
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
-            }
-
-            [Test]
-            public async Task CompositeDisposableInitializer()
-            {
-                var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
-{
-    private readonly CompositeDisposable disposable;
-
-    public Foo()
-    {
-        this.disposable = new CompositeDisposable
+        public void Update()
         {
-            File.OpenRead(string.Empty),
-            File.OpenRead(string.Empty),
-        };
-    }
+            this.disposable.Disposable = File.OpenRead(string.Empty);
+        }
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task CompositeDisposableCtor()
+            public void SingleAssignmentDisposable()
             {
                 var testCode = @"
-using System;
-using System.IO;
-using System.Reactive.Disposables;
-
-public sealed class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly CompositeDisposable disposable;
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
 
-    public Foo()
+    public sealed class Foo : IDisposable
     {
-        this.disposable = new CompositeDisposable(
-            File.OpenRead(string.Empty),
-            File.OpenRead(string.Empty));
-    }
+        private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
 
-    public void Dispose()
-    {
-        this.disposable.Dispose();
+        public void Update()
+        {
+            this.disposable.Disposable = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+            }
+
+            [Test]
+            public void CompositeDisposableInitializer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly CompositeDisposable disposable;
+
+        public Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+                File.OpenRead(string.Empty),
+            };
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+            }
+
+            [Test]
+            public void CompositeDisposableCtor()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly CompositeDisposable disposable;
+
+        public Foo()
+        {
+            this.disposable = new CompositeDisposable(
+                File.OpenRead(string.Empty),
+                File.OpenRead(string.Empty));
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
         }
     }

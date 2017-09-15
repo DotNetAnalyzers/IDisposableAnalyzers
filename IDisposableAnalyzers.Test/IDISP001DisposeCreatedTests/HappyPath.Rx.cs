@@ -1,14 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP001DisposeCreated>
+    internal partial class HappyPath
     {
-        internal class Rx : NestedHappyPathVerifier<HappyPath>
+        internal class Rx
         {
             [Test]
-            public async Task CompositeDisposableInitializer()
+            public void CompositeDisposableInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,11 +33,11 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task CompositeDisposableAdd()
+            public void CompositeDisposableAdd()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -62,11 +62,11 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task SerialDisposable()
+            public void SerialDisposable()
             {
                 var testCode = @"
 using System;
@@ -88,11 +88,11 @@ public sealed class Foo : IDisposable
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task SerialDisposableObjectInitializer()
+            public void SerialDisposableObjectInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -117,11 +117,11 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposable()
+            public void SingleAssignmentDisposable()
             {
                 var testCode = @"
 using System;
@@ -143,11 +143,11 @@ public sealed class Foo : IDisposable
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DisposableCreateClosure()
+            public void DisposableCreateClosure()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -171,11 +171,11 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
 
             [Test]
-            public async Task DisposableCreateClosureStatementBody()
+            public void DisposableCreateClosureStatementBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -202,7 +202,7 @@ namespace RoslynSandbox
     }
 }";
 
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.26730.15
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,15 +37,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\IDISP008.md = documentation\IDISP008.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDisposableAnalyzers.CodeFixes", "IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj", "{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.CodeFixes", "IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj", "{CDC7833B-5008-4B6C-AD98-DC6ED9DA8398}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDisposableAnalyzers.Test", "IDisposableAnalyzers.Test\IDisposableAnalyzers.Test.csproj", "{3EB54B68-A7AA-45E8-A97B-A0746712140B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Test", "IDisposableAnalyzers.Test\IDisposableAnalyzers.Test.csproj", "{3EB54B68-A7AA-45E8-A97B-A0746712140B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDisposableAnalyzers.Test.ruleset.Vsix", "IDisposableAnalyzers.Vsix\IDisposableAnalyzers.Test.ruleset.Vsix.csproj", "{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Vsix", "IDisposableAnalyzers.Vsix\IDisposableAnalyzers.Vsix.csproj", "{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IDisposableAnalyzers.Analyzers", "IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Analyzers", "IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

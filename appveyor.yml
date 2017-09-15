@@ -1,8 +1,8 @@
 image: Visual Studio 2017
-cache: packages -> paket.lock
 
-before_build:  
-- ps: dotnet restore -v d
+before_build:
+- ps: dotnet restore
+
  
 configuration: Release
 platform: Any CPU

@@ -1,25 +1,29 @@
 namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP007DontDisposeInjected>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
-using System;
-
-public class Disposable : IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+
+    public class Disposable : IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
         [Test]
-        public async Task DisposingArrayItem()
+        public void DisposingArrayItem()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -35,15 +39,17 @@ public class Disposable : IDisposable
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task DisposingDictionaryItem()
+        public void DisposingDictionaryItem()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -60,15 +66,17 @@ public class Disposable : IDisposable
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task DisposingWithBaseClass()
+        public void DisposingWithBaseClass()
         {
             var fooBaseCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -96,9 +104,12 @@ public class Disposable : IDisposable
                 this.stream.Dispose();
             }
         }
-    }";
+    }
+}";
 
             var fooImplCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -122,14 +133,17 @@ public class Disposable : IDisposable
 
             base.Dispose(disposing);
         }
-    }";
-            await this.VerifyHappyPathAsync(fooBaseCode, fooImplCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
         }
 
         [Test]
-        public async Task DisposingInjectedPropertyInBaseClass()
+        public void DisposingInjectedPropertyInBaseClass()
         {
             var fooBaseCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class FooBase : IDisposable
@@ -162,9 +176,12 @@ public class Disposable : IDisposable
 
             this.disposed = true;
         }
-    }";
+    }
+}";
 
             var fooImplCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -189,14 +206,17 @@ public class Disposable : IDisposable
 
             base.Dispose(disposing);
         }
-    }";
-            await this.VerifyHappyPathAsync(fooBaseCode, fooImplCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
         }
 
         [Test]
-        public async Task DisposingInjectedPropertyInBaseClassFieldExpressionBody()
+        public void DisposingInjectedPropertyInBaseClassFieldExpressionBody()
         {
             var fooBaseCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class FooBase : IDisposable
@@ -230,9 +250,12 @@ public class Disposable : IDisposable
 
             this.disposed = true;
         }
-    }";
+    }
+}";
 
             var fooImplCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -257,14 +280,17 @@ public class Disposable : IDisposable
 
             base.Dispose(disposing);
         }
-    }";
-            await this.VerifyHappyPathAsync(fooBaseCode, fooImplCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
         }
 
         [Test]
-        public async Task DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
+        public void DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
         {
             var fooBaseCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class FooBase : IDisposable
@@ -300,9 +326,12 @@ public class Disposable : IDisposable
 
             this.disposed = true;
         }
-    }";
+    }
+}";
 
             var fooImplCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -322,14 +351,17 @@ public class Disposable : IDisposable
 
             base.Dispose(disposing);
         }
-    }";
-            await this.VerifyHappyPathAsync(DisposableCode, fooBaseCode, fooImplCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(DisposableCode, fooBaseCode, fooImplCode);
         }
 
         [Test]
-        public async Task InjectedInClassThatIsNotIDisposable()
+        public void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -340,15 +372,17 @@ public class Disposable : IDisposable
         {
             this.disposable = disposable;
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task InjectedInClassThatIsIDisposable()
+        public void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -363,53 +397,57 @@ public class Disposable : IDisposable
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
-        }
-
-        [Test]
-        public async Task InjectedInClassThatIsIDisposableManyCtors()
-        {
-            var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
-{
-    private readonly IDisposable disposable;
-
-    public Foo(IDisposable disposable)
-        : this(disposable, ""meh"")
-    {
-    }
-
-    public Foo(IDisposable disposable, IDisposable gah, int meh)
-        : this(disposable, meh)
-    {
-    }
-
-    private Foo(IDisposable disposable, int meh)
-        : this(disposable, meh.ToString())
-    {
-    }
-
-    private Foo(IDisposable disposable, string meh)
-    {
-        this.disposable = disposable;
-    }
-
-    public void Dispose()
-    {
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
+        public void InjectedInClassThatIsIDisposableManyCtors()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo(IDisposable disposable)
+            : this(disposable, ""meh"")
+        {
+        }
+
+        public Foo(IDisposable disposable, IDisposable gah, int meh)
+            : this(disposable, meh)
+        {
+        }
+
+        private Foo(IDisposable disposable, int meh)
+            : this(disposable, meh.ToString())
+        {
+        }
+
+        private Foo(IDisposable disposable, string meh)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+        }
+
+        [Test]
+        public void InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -425,15 +463,17 @@ public sealed class Foo : IDisposable
         {
             meh = null;
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task NotDisposingFieldInVirtualDispose()
+        public void NotDisposingFieldInVirtualDispose()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -472,15 +512,17 @@ public sealed class Foo : IDisposable
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task InjectingIntoPrivateCtor()
+        public void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Disposable : IDisposable
@@ -488,38 +530,43 @@ public sealed class Foo : IDisposable
         public void Dispose()
         {
         }
-    }";
-
-            var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
-{
-    private readonly IDisposable disposable;
-
-    public Foo()
-        : this(new Disposable())
-    {
-    }
-
-    private Foo(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
-
-    public void Dispose()
-    {
-        this.disposable.Dispose();
     }
 }";
-            await this.VerifyHappyPathAsync(disposableCode, testCode)
-                      .ConfigureAwait(false);
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo()
+            : this(new Disposable())
+        {
+        }
+
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(disposableCode, testCode);
         }
 
         [Test]
-        public async Task BoolProperty()
+        public void BoolProperty()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.ComponentModel;
 
@@ -556,15 +603,17 @@ public sealed class Foo : IDisposable
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task InjectedInMethod()
+        public void InjectedInMethod()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -582,13 +631,13 @@ public sealed class Foo : IDisposable
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task IgnoreLambdaCreation()
+        public void IgnoreLambdaCreation()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -603,13 +652,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [TestCase("action(stream)")]
         [TestCase("action.Invoke(stream)")]
-        public async Task IgnoreLambdaUsageOnLocal(string invokeCode)
+        public void IgnoreLambdaUsageOnLocal(string invokeCode)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -628,12 +676,11 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("action(stream)", invokeCode);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
 
         [Test]
-        public async Task IgnoreInLambdaMethod()
+        public void IgnoreInLambdaMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -653,8 +700,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
         }
     }
 }

@@ -1,14 +1,16 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP003DisposeBeforeReassigning>
+    internal partial class HappyPath
     {
         [Test]
-        public async Task CreateVariable()
+        public void CreateVariable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -18,15 +20,18 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         {
             var stream = File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssignVariableInitializedWithNull()
+        public void AssignVariableInitializedWithNull()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -37,16 +42,17 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
             Stream stream = null;
             stream = File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [TestCase("(stream as IDisposable)?.Dispose()")]
         [TestCase("(stream as IDisposable).Dispose()")]
         [TestCase("((IDisposable)stream).Dispose()")]
         [TestCase("((IDisposable)stream)?.Dispose()")]
-        public async Task NotDisposingVariableOfTypeObject(string disposeCode)
+        public void NotDisposingVariableOfTypeObject(string disposeCode)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,253 +71,287 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("(stream as IDisposable)?.Dispose()", disposeCode);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningPropertyInCtor()
+        public void AssigningPropertyInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    public Stream Stream { get; }
+    public class Foo
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; }
+    }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningPropertyInCtorInDisposableType()
+        public void AssigningPropertyInCtorInDisposableType()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System;
+    using System.IO;
 
-    public Stream Stream { get; }
-
-    public void Dispose()
+    public class Foo : IDisposable
     {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningIndexerInCtor()
+        public void AssigningIndexerInCtor()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly List<int> ints = new List<int>();
+    using System;
+    using System.Collections.Generic;
 
-    public Foo()
+    public class Foo
     {
-        this[1] = 1;
-    }
+        private readonly List<int> ints = new List<int>();
 
-    public int this[int index]
-    {
-        get { return this.ints[index]; }
-        set { this.ints[index] = value; }
+        public Foo()
+        {
+            this[1] = 1;
+        }
+
+        public int this[int index]
+        {
+            get { return this.ints[index]; }
+            set { this.ints[index] = value; }
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningIndexerInCtorInDisposableType()
+        public void AssigningIndexerInCtorInDisposableType()
         {
             var testCode = @"
-using System;
-using System.Collections.Generic;
-
-public class Foo : IDisposable
+namespace RoslynSandbox
 {
-    private readonly List<int> ints = new List<int>();
+    using System;
+    using System.Collections.Generic;
 
-    public Foo()
+    public class Foo : IDisposable
     {
-        this[1] = 1;
-    }
+        private readonly List<int> ints = new List<int>();
 
-    public int this[int index]
-    {
-        get { return this.ints[index]; }
-        set { this.ints[index] = value; }
-    }
+        public Foo()
+        {
+            this[1] = 1;
+        }
 
-    public void Dispose()
-    {
+        public int this[int index]
+        {
+            get { return this.ints[index]; }
+            set { this.ints[index] = value; }
+        }
+
+        public void Dispose()
+        {
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningPropertyWithBackingFieldInCtor()
+        public void AssigningPropertyWithBackingFieldInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public class Foo
     {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+        private Stream stream;
 
-    public Stream Stream
-    {
-        get { return this.stream; }
-        set { this.stream = value; }
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            set { this.stream = value; }
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningFieldInCtor()
+        public void AssigningFieldInCtor()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public class Foo
     {
-        this.stream = File.OpenRead(string.Empty);
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            this.stream = File.OpenRead(string.Empty);
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task FieldSwapCached()
+        public void FieldSwapCached()
         {
             var testCode = @"
-using System.Collections.Generic;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+    using System.Collections.Generic;
+    using System.IO;
 
-    private Stream current;
-
-    public void SetCurrent(int number)
+    public class Foo
     {
-        this.current = this.Cache[number];
+        private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+        private Stream current;
+
+        public void SetCurrent(int number)
+        {
+            this.current = this.Cache[number];
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task LocalSwapCached()
+        public void LocalSwapCached()
         {
             var testCode = @"
-using System.Collections.Generic;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+    using System.Collections.Generic;
+    using System.IO;
 
-    public void SetCurrent(int number)
+    public class Foo
     {
-        var current = this.Cache[number];
-        current = this.Cache[number + 1];
+        private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+        public void SetCurrent(int number)
+        {
+            var current = this.Cache[number];
+            current = this.Cache[number + 1];
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task LocalSwapCachedDisposableDictionary()
+        public void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
-using System;
-using System.Collections.Generic;
-
-public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+    using System.Collections.Generic;
+
+    public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
             var testCode = @"
-using System.Collections.Generic;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+    using System.Collections.Generic;
+    using System.IO;
 
-    public void SetCurrent(int number)
+    public class Foo
     {
-        var current = this.Cache[number];
-        current = this.Cache[number + 1];
+        private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+
+        public void SetCurrent(int number)
+        {
+            var current = this.Cache[number];
+            current = this.Cache[number + 1];
+        }
     }
 }";
-
-            await this.VerifyHappyPathAsync(disposableDictionaryCode, testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(disposableDictionaryCode, testCode);
         }
 
         [Test]
-        public async Task LocalSwapCachedTryGetValue()
+        public void LocalSwapCachedTryGetValue()
         {
             var testCode = @"
-using System.Collections.Generic;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+    using System.Collections.Generic;
+    using System.IO;
 
-    public void SetCurrent(int number)
+    public class Foo
     {
-        Stream current = this.Cache[number];
-        this.Cache.TryGetValue(1, out current);
-        Stream temp;
-        this.Cache.TryGetValue(2, out temp);
-        current = temp;
-        current = this.Cache[number + 1];
+        private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
+
+        public void SetCurrent(int number)
+        {
+            Stream current = this.Cache[number];
+            this.Cache.TryGetValue(1, out current);
+            Stream temp;
+            this.Cache.TryGetValue(2, out temp);
+            current = temp;
+            current = this.Cache[number + 1];
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task DisposingVariable()
+        public void DisposingVariable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -323,87 +363,99 @@ public class Foo
             stream.Dispose();
             stream = File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task AssigningInIfElse()
+        public void AssigningInIfElse()
         {
             var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        Stream stream;
-        if (true)
+        public void Meh()
         {
-            stream = File.OpenRead(string.Empty);
-        }
-        else
-        {
-            stream = File.OpenRead(string.Empty);
+            Stream stream;
+            if (true)
+            {
+                stream = File.OpenRead(string.Empty);
+            }
+            else
+            {
+                stream = File.OpenRead(string.Empty);
+            }
         }
     }
 }";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public async Task DisposeBeforeAssigningInIfElse(string dispose)
+        public void DisposeBeforeAssigningInIfElse(string dispose)
         {
             var testCode = @"
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Meh()
+    using System.IO;
+
+    public class Foo
     {
-        Stream stream = File.OpenRead(string.Empty);
-        if (true)
+        public void Meh()
         {
-            stream.Dispose();
-            stream = File.OpenRead(string.Empty);
-        }
-        else
-        {
-            stream.Dispose();
-            stream = File.OpenRead(string.Empty);
+            Stream stream = File.OpenRead(string.Empty);
+            if (true)
+            {
+                stream.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+            else
+            {
+                stream.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
         }
     }
 }";
             testCode = testCode.AssertReplace("stream.Dispose();", dispose);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task DisposingParameter()
+        public void DisposingParameter()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    public void Bar(Stream stream)
+    using System;
+    using System.IO;
+
+    public class Foo
     {
-        stream = File.OpenRead(string.Empty);
-        stream?.Dispose();
-        stream = File.OpenRead(string.Empty);
+        public void Bar(Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task OutParameterInCtor()
+        public void OutParameterInCtor()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -421,15 +473,18 @@ public class Foo
             stream = File.OpenRead(string.Empty);
             return true;
         }
-    }";
+    }
+}";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task OutParameter()
+        public void OutParameter()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -440,17 +495,20 @@ public class Foo
             stream = File.OpenRead(string.Empty);
             return true;
         }
-    }";
+    }
+}";
 
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [TestCase("Stream stream;")]
         [TestCase("Stream stream = null;")]
         [TestCase("var stream = (Stream)null;")]
-        public async Task VariableSplitDeclarationAndAssignment(string declaration)
+        public void VariableSplitDeclarationAndAssignment(string declaration)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -461,16 +519,19 @@ public class Foo
             Stream stream;
             stream = File.OpenRead(string.Empty);
         }
-    }";
+    }
+}";
 
             testCode = testCode.AssertReplace("Stream stream;", declaration);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task DisposingFieldInCtor()
+        public void DisposingFieldInCtor()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -482,14 +543,17 @@ public class Foo
             stream.Dispose();
             stream = File.OpenRead(string.Empty);
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task DisposingFieldInMethod()
+        public void DisposingFieldInMethod()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -502,14 +566,17 @@ public class Foo
             this.stream.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task ConditionallyDisposingFieldInMethod()
+        public void ConditionallyDisposingFieldInMethod()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -522,14 +589,17 @@ public class Foo
             this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task ConditionallyDisposingUnderscoreFieldInMethod()
+        public void ConditionallyDisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -542,14 +612,17 @@ public class Foo
             _stream?.Dispose();
             _stream = File.OpenRead(string.Empty);
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task DisposingUnderscoreFieldInMethod()
+        public void DisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -562,12 +635,13 @@ public class Foo
             _stream.Dispose();
             _stream = File.OpenRead(string.Empty);
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task WithOptionalParameter()
+        public void WithOptionalParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -595,11 +669,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task ChainedCalls()
+        public void ChainedCalls()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -632,11 +706,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
 
         [Test]
-        public async Task ChainedCallsWithHelper()
+        public void ChainedCallsWithHelper()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -678,11 +752,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            await this.VerifyHappyPathAsync(helperCode, testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(helperCode, testCode);
         }
 
         [Test]
-        public async Task ReproIssue71()
+        public void ReproIssue71()
         {
             var code = @"
 using System;
@@ -797,37 +871,40 @@ namespace TaxonomyWpf
         }
     }
 }";
-            await this.VerifyHappyPathAsync(code).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(code);
         }
 
         [Test]
-        public async Task DisposingBackingFieldInSetter()
+        public void DisposingBackingFieldInSetter()
         {
             var testCode = @"
-using System;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private Stream stream;
+    using System;
+    using System.IO;
 
-    public Foo()
+    public class Foo
     {
-        this.Stream = File.OpenRead(string.Empty);
-        this.Stream = File.OpenRead(string.Empty);
-    }
+        private Stream stream;
 
-    public Stream Stream
-    {
-        get { return this.stream; }
-        private set 
-        { 
-            this.stream?.Dispose();
-            this.stream = value; 
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set 
+            { 
+                this.stream?.Dispose();
+                this.stream = value; 
+            }
         }
     }
 }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
         }
     }
 }
