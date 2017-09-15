@@ -796,7 +796,6 @@ namespace RoslynSandbox
             }
 
             this.disposed = true;
-            this.value?.Dispose();
         }
 
         private void ThrowIfDisposed()
@@ -832,10 +831,10 @@ namespace RoslynSandbox
     using System;
     using System.Windows.Controls;
 
-    public sealed partial class CodeTabView : UserControl, IDisposable
+    public partial sealed class CodeTabView : UserControl, IDisposable
     {
-        ↓private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
-
+        private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
+        private bool disposed;
 
         public void Dispose()
         {
@@ -845,7 +844,6 @@ namespace RoslynSandbox
             }
 
             this.disposed = true;
-            this.disposable.Dispose();
         }
 
         private void ThrowIfDisposed()

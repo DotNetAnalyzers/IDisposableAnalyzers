@@ -266,7 +266,7 @@
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
             var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            TypeDeclarationSyntax updated = typeDeclaration;
+            var updated = typeDeclaration;
 
             if (!type.TryGetMethod("Dispose", out IMethodSymbol _))
             {
@@ -302,7 +302,14 @@
 
             if (!IsSealed(typeDeclaration))
             {
-                updated = (TypeDeclarationSyntax)syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
+                if (updated.Modifiers.Any())
+                {
+                    updated = ((ClassDeclarationSyntax)updated).WithModifiers(updated.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.SealedKeyword)));
+                }
+                else
+                {
+                    updated = (TypeDeclarationSyntax)syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
+                }
                 updated = (TypeDeclarationSyntax)MakeSealedRewriter.Default.Visit(updated);
             }
 
