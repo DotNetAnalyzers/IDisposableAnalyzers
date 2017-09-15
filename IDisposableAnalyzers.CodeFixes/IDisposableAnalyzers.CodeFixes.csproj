@@ -6,6 +6,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.CodeFixes.ruleset</CodeAnalysisRuleSet>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>IDisposableAnalyzers</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />

@@ -6,6 +6,7 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Analyzers.ruleset</CodeAnalysisRuleSet>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <RootNamespace>IDisposableAnalyzers</RootNamespace>
   </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
