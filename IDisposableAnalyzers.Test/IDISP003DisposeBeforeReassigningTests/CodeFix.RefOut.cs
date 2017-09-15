@@ -3,9 +3,9 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix : CodeFixVerifier<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>
+    internal partial class CodeFix
     {
-        internal class RefAndOut : NestedCodeFixVerifier<CodeFix>
+        internal class RefAndOut
         {
             [Test]
             public void AssigningFieldViaOutParameterInPublicMethod()

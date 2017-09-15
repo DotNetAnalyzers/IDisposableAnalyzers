@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox

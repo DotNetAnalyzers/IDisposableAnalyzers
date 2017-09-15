@@ -1,14 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP004DontIgnoreReturnValueOfTypeIDisposable>
+    internal partial class HappyPath
     {
-        internal class Returned : NestedHappyPathVerifier<HappyPath>
+        internal class Returned
         {
             [Test]
-            public async Task Generic()
+            public void Generic()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -30,11 +30,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(factoryCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(factoryCode, testCode);
             }
 
             [Test]
-            public async Task Operator()
+            public void Operator()
             {
                 var mehCode = @"
 namespace RoslynSandbox
@@ -58,11 +58,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(mehCode, testCode);
             }
 
             [Test]
-            public async Task OperatorNestedCall()
+            public void OperatorNestedCall()
             {
                 var mehCode = @"
 namespace RoslynSandbox
@@ -91,11 +91,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(mehCode, testCode);
             }
 
             [Test]
-            public async Task OperatorEquals()
+            public void OperatorEquals()
             {
                 var mehCode = @"
 namespace RoslynSandbox
@@ -118,11 +118,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(mehCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(mehCode, testCode);
             }
 
             [Test]
-            public async Task MethodReturningObject()
+            public void MethodReturningObject()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -137,12 +137,11 @@ namespace RoslynSandbox
         private static object Meh() => new object();
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task MethodWithArgReturningObject()
+            public void MethodWithArgReturningObject()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -157,12 +156,11 @@ namespace RoslynSandbox
         private static object Meh(string arg) => new object();
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task MethodWithObjArgReturningObject()
+            public void MethodWithObjArgReturningObject()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -177,11 +175,11 @@ namespace RoslynSandbox
         private static object Id(object arg) => arg;
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task ReturningStatementBody()
+            public void ReturningStatementBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -196,12 +194,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task ReturningLocalStatementBody()
+            public void ReturningLocalStatementBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -217,12 +214,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task ReturningExpressionBody()
+            public void ReturningExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -234,12 +230,11 @@ namespace RoslynSandbox
         public Stream Bar() => File.OpenRead(string.Empty);
     }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task ReturningNewAssigningAndDisposing()
+            public void ReturningNewAssigningAndDisposing()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -272,11 +267,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
             }
 
             [Test]
-            public async Task ReturningNewAssigningAndDisposingParams()
+            public void ReturningNewAssigningAndDisposingParams()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -312,11 +307,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
             }
 
             [Test]
-            public async Task ReturningCreateNewAssigningAndDisposing()
+            public void ReturningCreateNewAssigningAndDisposing()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -353,11 +348,11 @@ namespace RoslynSandbox
         private static Foo Create(IDisposable disposable) => new Foo(disposable);
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
             }
 
             [Test]
-            public async Task ReturningCreateNewStreamReader()
+            public void ReturningCreateNewStreamReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -374,11 +369,11 @@ namespace RoslynSandbox
         private static StreamReader Create(Stream stream) => new StreamReader(stream);
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task ReturningAssigningPrivateChained()
+            public void ReturningAssigningPrivateChained()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -416,11 +411,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(DisposableCode, fooCode, testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(DisposableCode, fooCode, testCode);
             }
 
             [Test]
-            public async Task StreamInStreamReader()
+            public void StreamInStreamReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -435,11 +430,11 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
 
             [Test]
-            public async Task StreamInStreamReaderLocal()
+            public void StreamInStreamReaderLocal()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -455,7 +450,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
             }
         }
     }

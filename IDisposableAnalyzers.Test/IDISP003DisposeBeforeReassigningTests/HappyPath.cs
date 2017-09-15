@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP003DisposeBeforeReassigning>
+    internal partial class HappyPath
     {
         [Test]
         public void CreateVariable()
