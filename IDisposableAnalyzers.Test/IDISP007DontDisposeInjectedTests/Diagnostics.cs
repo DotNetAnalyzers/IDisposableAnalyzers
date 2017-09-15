@@ -1,7 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal class Diagnostics : DiagnosticVerifier<IDISP007DontDisposeInjected>

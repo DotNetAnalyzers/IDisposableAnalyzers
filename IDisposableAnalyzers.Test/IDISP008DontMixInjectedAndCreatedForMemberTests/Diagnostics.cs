@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class Diagnostics : DiagnosticVerifier<IDISP008DontMixInjectedAndCreatedForMember>

@@ -1,17 +1,19 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
-    using System.Threading.Tasks;
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath : HappyPathVerifier<IDISP008DontMixInjectedAndCreatedForMember>
+    internal partial class HappyPath
     {
         [TestCase("this.stream.Dispose();")]
         [TestCase("this.stream?.Dispose();")]
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public async Task DisposingCreatedField(string disposeCall)
+        public void DisposingCreatedField(string disposeCall)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -23,60 +25,64 @@
         {
             this.stream.Dispose();
         }
-    }";
+    }
+}";
             testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task DisposingCreatedFieldInVirtualDispose()
+        public void DisposingCreatedFieldInVirtualDispose()
         {
             var testCode = @"
-            using System;
-            using System.IO;
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
 
-            public class Foo : IDisposable
+    public class Foo : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
             {
-                private readonly Stream stream = File.OpenRead(string.Empty);
-                private bool disposed;
+                return;
+            }
 
-                public void Dispose()
-                {
-                    if (this.disposed)
-                    {
-                        return;
-                    }
+            this.disposed = true;
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
-                    this.disposed = true;
-                    this.Dispose(true);
-                    GC.SuppressFinalize(this);
-                }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+        }
 
-                protected virtual void Dispose(bool disposing)
-                {
-                    if (disposing)
-                    {
-                        this.stream.Dispose();
-                    }
-                }
-
-                protected void ThrowIfDisposed()
-                {
-                    if (this.disposed)
-                    {
-                        throw new ObjectDisposedException(this.GetType().FullName);
-                    }
-                }
-            }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+        protected void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task HandlesRecursion()
+        public void HandlesRecursion()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Foo
@@ -87,35 +93,41 @@
         {
             return Forever();
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode)
+                      ;
         }
 
         [TestCase("public Stream Stream { get; }")]
         [TestCase("public Stream Stream { get; private set; }")]
-        public async Task PropertyWithCreatedValue(string property)
+        public void PropertyWithCreatedValue(string property)
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo()
-    {
-        this.Stream = File.OpenRead(string.Empty);
-    }
+    using System.IO;
 
-    public Stream Stream { get; } = File.OpenRead(string.Empty);
+    public sealed class Foo
+    {
+        public Foo()
+        {
+            this.Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; } = File.OpenRead(string.Empty);
+    }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task PropertyWithBackingFieldCreatedValue()
+        public void PropertyWithBackingFieldCreatedValue()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public sealed class Foo
@@ -132,36 +144,42 @@ public sealed class Foo
             get { return this.stream; }
             private set { this.stream = value; }
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
         [TestCase("public Stream Stream { get; private set; }")]
         [TestCase("public Stream Stream { get; protected set; }")]
         [TestCase("public Stream Stream { get; set; }")]
-        public async Task PropertyWithInjectedValue(string property)
+        public void PropertyWithInjectedValue(string property)
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    public Foo(Stream stream)
-    {
-        this.Stream = stream;
-    }
+    using System.IO;
 
-    public Stream Stream { get; }
+    public sealed class Foo
+    {
+        public Foo(Stream stream)
+        {
+            this.Stream = stream;
+        }
+
+        public Stream Stream { get; }
+    }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedListOfInt()
+        public void InjectedListOfInt()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -173,15 +191,17 @@ public sealed class Foo
         {
             this.ints = ints;
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedListOfT()
+        public void InjectedListOfT()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.Collections.Generic;
 
@@ -193,15 +213,17 @@ public sealed class Foo
         {
             this.values = values;
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedInClassThatIsNotIDisposable()
+        public void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo
@@ -212,15 +234,17 @@ public sealed class Foo
         {
             this.disposable = disposable;
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectedInClassThatIsIDisposable()
+        public void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public sealed class Foo : IDisposable
@@ -235,15 +259,17 @@ public sealed class Foo
         public void Dispose()
         {
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode)
-                      .ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task InjectingIntoPrivateCtor()
+        public void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
+namespace RoslynSandbox
+{
     using System;
 
     public class Disposable : IDisposable
@@ -251,69 +277,77 @@ public sealed class Foo
         public void Dispose()
         {
         }
-    }";
-
-            var testCode = @"
-using System;
-
-public sealed class Foo : IDisposable
-{
-    private readonly IDisposable disposable;
-
-    public Foo()
-        : this(new Disposable())
-    {
-    }
-
-    private Foo(IDisposable disposable)
-    {
-        this.disposable = disposable;
-    }
-
-    public void Dispose()
-    {
-        this.disposable.Dispose();
     }
 }";
-            await this.VerifyHappyPathAsync(disposableCode, testCode)
-                      .ConfigureAwait(false);
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo()
+            : this(new Disposable())
+        {
+        }
+
+        private Foo(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(disposableCode, testCode);
         }
 
         [TestCase("private set")]
         [TestCase("protected set")]
         [TestCase("set")]
-        public async Task PropertyWithBackingFieldInjectedValue(string setter)
+        public void PropertyWithBackingFieldInjectedValue(string setter)
         {
             var testCode = @"
-using System.IO;
-
-public sealed class Foo
+namespace RoslynSandbox
 {
-    private static readonly Stream StaticStream = File.OpenRead(string.Empty);
-    private Stream stream;
+    using System.IO;
 
-    public Foo(Stream stream)
+    public sealed class Foo
     {
-        this.stream = stream;
-        this.stream = StaticStream;
-        this.Stream = stream;
-        this.Stream = StaticStream;
-    }
+        private static readonly Stream StaticStream = File.OpenRead(string.Empty);
+        private Stream stream;
 
-    public Stream Stream
-    {
-        get { return this.stream; }
-        private set { this.stream = value; }
+        public Foo(Stream stream)
+        {
+            this.stream = stream;
+            this.stream = StaticStream;
+            this.Stream = stream;
+            this.Stream = StaticStream;
+        }
+
+        public Stream Stream
+        {
+            get { return this.stream; }
+            private set { this.stream = value; }
+        }
     }
 }";
             testCode = testCode.AssertReplace("private set", setter);
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task GenericTypeWithPropertyAndIndexer()
+        public void GenericTypeWithPropertyAndIndexer()
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System.Collections.Generic;
 
     public sealed class Foo<T>
@@ -326,7 +360,6 @@ public sealed class Foo
             get { return this.value; }
             private set { this.value = value; }
         }
-
 
         /// <inheritdoc/>
         public T this[int index]
@@ -341,42 +374,49 @@ public sealed class Foo
                 this.values[index] = value;
             }
         }
-    }";
-            await this.VerifyHappyPathAsync(testCode).ConfigureAwait(false);
+    }
+}";
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
         }
 
         [Test]
-        public async Task LocalSwapCachedDisposableDictionary()
+        public void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
-using System;
-using System.Collections.Generic;
-
-public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+namespace RoslynSandbox
 {
-    public void Dispose()
+    using System;
+    using System.Collections.Generic;
+
+    public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
     {
+        public void Dispose()
+        {
+        }
     }
 }";
 
             var testCode = @"
-using System.Collections.Generic;
-using System.IO;
-
-public class Foo
+namespace RoslynSandbox
 {
-    private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+    using System.Collections.Generic;
+    using System.IO;
 
-    private Stream current;
-
-    public void SetCurrent(int number)
+    public class Foo
     {
-        this.current = this.Cache[number];
-        this.current = this.Cache[number + 1];
+        private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+
+        private Stream current;
+
+        public void SetCurrent(int number)
+        {
+            this.current = this.Cache[number];
+            this.current = this.Cache[number + 1];
+        }
     }
 }";
 
-            await this.VerifyHappyPathAsync(disposableDictionaryCode, testCode).ConfigureAwait(false);
+            AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(disposableDictionaryCode, testCode);
         }
     }
 }

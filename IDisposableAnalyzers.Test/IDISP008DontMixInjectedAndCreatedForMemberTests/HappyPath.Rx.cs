@@ -1,15 +1,14 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
-    using System.Threading.Tasks;
-
+    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        public class Rx : NestedHappyPathVerifier<HappyPath>
+        public class Rx
         {
             [Test]
-            public async Task SingleAssignmentDisposable()
+            public void SingleAssignmentDisposable()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -33,12 +32,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposableAssignedWithObservableSubscribe()
+            public void SingleAssignmentDisposableAssignedWithObservableSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -62,12 +60,11 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
             }
 
             [Test]
-            public async Task SingleAssignmentDisposableAssignedInAction()
+            public void SingleAssignmentDisposableAssignedInAction()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -99,8 +96,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                await this.VerifyHappyPathAsync(testCode)
-                          .ConfigureAwait(false);
+                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
             }
         }
     }
