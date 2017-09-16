@@ -18,6 +18,23 @@
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
         private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
+        private static readonly ParameterMethodTemplate SealedDisposeMethod = new ParameterMethodTemplate(@"public void Dispose()
+                                                                                                            {
+                                                                                                                if (<FIELDACCESS>)
+                                                                                                                {
+                                                                                                                    return;
+                                                                                                                }
+                                                                                            
+                                                                                                                <FIELDACCESS> = true;
+                                                                                                            }");
+
+        private static readonly ParameterMethodTemplate ThrowIfDisposedMethod = new ParameterMethodTemplate(@"<ACCESSIBILITY> void ThrowIfDisposed()
+                                                                                                            {
+                                                                                                                if (<FIELDACCESS>)
+                                                                                                                {
+                                                                                                                    throw new ObjectDisposedException(this.GetType().FullName);
+                                                                                                                }
+                                                                                                            }");
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -51,13 +68,13 @@
                     continue;
                 }
 
-                var typeDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                if (typeDeclaration == null)
+                var classDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
+                if (classDeclaration == null)
                 {
                     continue;
                 }
 
-                var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
+                var type = semanticModel.GetDeclaredSymbolSafe(classDeclaration, context.CancellationToken);
 
                 if (Disposable.IsAssignableTo(type) &&
                     Disposable.BaseTypeHasVirtualDisposeMethod(type))
@@ -71,7 +88,7 @@
                                     semanticModel,
                                     cancellationToken,
                                     syntaxRoot,
-                                    typeDeclaration),
+                                    classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider)),
                         diagnostic);
                     continue;
@@ -88,7 +105,7 @@
                                     semanticModel,
                                     cancellationToken,
                                     syntaxRoot,
-                                    typeDeclaration),
+                                    classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                         diagnostic);
                     continue;
@@ -105,7 +122,7 @@
                                     semanticModel,
                                     cancellationToken,
                                      syntaxRoot,
-                                    typeDeclaration),
+                                    classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                         diagnostic);
                     continue;
@@ -120,7 +137,7 @@
                                 semanticModel,
                                 cancellationToken,
                                  syntaxRoot,
-                                typeDeclaration),
+                                classDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                     diagnostic);
 
@@ -133,7 +150,7 @@
                                 semanticModel,
                                 cancellationToken,
                                  syntaxRoot,
-                                typeDeclaration),
+                                classDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                     diagnostic);
             }
@@ -262,63 +279,52 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
         }
 
-        private static Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, CompilationUnitSyntax syntaxRoot, TypeDeclarationSyntax typeDeclaration)
+        private static async Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclaration)
         {
-            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(typeDeclaration, cancellationToken);
-            var syntaxGenerator = SyntaxGenerator.GetGenerator(context.Document);
-            var updated = typeDeclaration;
+            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
+            var usesUnderscoreNames = classDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
+                                             .ConfigureAwait(false);
 
-            if (!type.TryGetMethod("Dispose", out IMethodSymbol _))
+            var tempFieldName = usesUnderscoreNames
+                ? "_disposed"
+                : "disposed";
+            string fieldAccess;
+            if (type.TryGetField(tempFieldName, out var field))
             {
-                var usesUnderscoreNames = typeDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
-                updated = updated.WithDisposedField(type, syntaxGenerator, usesUnderscoreNames);
-
-                var disposeMethod = syntaxGenerator.MethodDeclaration(
-                    "Dispose",
-                    accessibility: Accessibility.Public,
-                    statements: new[]
-                    {
-                        syntaxGenerator.IfDisposedReturn(usesUnderscoreNames),
-                        syntaxGenerator.SetDisposedTrue(usesUnderscoreNames)
-                    });
-
-                if (updated.Members.TryGetLast(
-                       x => (x as MethodDeclarationSyntax)?.Modifiers.Any(SyntaxKind.PublicKeyword) == true,
-                       out MemberDeclarationSyntax method))
-                {
-                    updated = updated.InsertNodesAfter(method, new[] { disposeMethod });
-                }
-                else if (updated.Members.TryGetFirst(x => x.IsKind(SyntaxKind.MethodDeclaration), out method))
-                {
-                    updated = updated.InsertNodesBefore(method, new[] { disposeMethod });
-                }
-                else
-                {
-                    updated = (TypeDeclarationSyntax)syntaxGenerator.AddMembers(updated, disposeMethod);
-                }
-
-                updated = updated.WithThrowIfDisposed(type, syntaxGenerator, usesUnderscoreNames);
+                fieldAccess = usesUnderscoreNames
+                    ? field.Name
+                    : $"this.{field.Name}";
+            }
+            else
+            {
+                var fieldDeclaration = editor.AddField(
+                    tempFieldName,
+                    classDeclaration,
+                    Accessibility.Private,
+                    DeclarationModifiers.None,
+                    SyntaxFactory.ParseTypeName("bool"),
+                    cancellationToken);
+                fieldAccess = usesUnderscoreNames
+                    ? fieldDeclaration.Name()
+                    : $"this.{fieldDeclaration.Name()}";
             }
 
-            if (!IsSealed(typeDeclaration))
+            if (!type.TryGetMethod("Dispose", out _))
             {
-                if (updated.Modifiers.Any())
-                {
-                    updated = ((ClassDeclarationSyntax)updated).WithModifiers(updated.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.SealedKeyword)));
-                }
-                else
-                {
-                    updated = (TypeDeclarationSyntax)syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
-                }
-
-                updated = (TypeDeclarationSyntax)MakeSealedRewriter.Default.Visit(updated);
+                editor.AddMethod(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
             }
 
-            updated = updated.WithIDisposableInterface(syntaxGenerator, type);
-            var newRoot = syntaxRoot.ReplaceNode(typeDeclaration, updated);
-            newRoot = newRoot.WithUsingSystem();
+            if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
+            {
+                editor.AddMethod(classDeclaration, ThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
+            }
 
-            return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
+            editor.MakeSealed(classDeclaration);
+            //updated = updated.WithIDisposableInterface(syntaxGenerator, type);
+            //newRoot = newRoot.WithUsingSystem();
+
+            return editor.GetChangedDocument();
         }
 
         private static bool IsSealed(TypeDeclarationSyntax type)
