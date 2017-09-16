@@ -97,7 +97,7 @@ namespace RoslynSandbox
         private int NewMethod() => 1;
     }
 }";
-            editor.AddMethod(containingType, method);
+            editor.AddSorted(containingType, method);
             CodeAssert.AreEqual(expected, editor.GetChangedDocument());
         }
 

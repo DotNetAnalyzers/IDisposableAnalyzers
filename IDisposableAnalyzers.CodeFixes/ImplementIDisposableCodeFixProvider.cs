@@ -12,6 +12,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableCodeFixProvider))]
     [Shared]
@@ -28,13 +29,21 @@
                                                                                                                 <FIELDACCESS> = true;
                                                                                                             }");
 
-        private static readonly ParameterMethodTemplate ThrowIfDisposedMethod = new ParameterMethodTemplate(@"<ACCESSIBILITY> void ThrowIfDisposed()
-                                                                                                            {
-                                                                                                                if (<FIELDACCESS>)
-                                                                                                                {
-                                                                                                                    throw new ObjectDisposedException(this.GetType().FullName);
-                                                                                                                }
-                                                                                                            }");
+        private static readonly ParameterMethodTemplate ProtectedThrowIfDisposedMethod = new ParameterMethodTemplate(@"protected void ThrowIfDisposed()
+                                                                                                                       {
+                                                                                                                           if (<FIELDACCESS>)
+                                                                                                                           {
+                                                                                                                               throw new ObjectDisposedException(this.GetType().FullName);
+                                                                                                                           }
+                                                                                                                       }");
+
+        private static readonly ParameterMethodTemplate PrivateThrowIfDisposedMethod = new ParameterMethodTemplate(@"private void ThrowIfDisposed()
+                                                                                                                     {
+                                                                                                                         if (<FIELDACCESS>)
+                                                                                                                         {
+                                                                                                                             throw new ObjectDisposedException(this.GetType().FullName);
+                                                                                                                         }
+                                                                                                                     }");
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -312,17 +321,19 @@
 
             if (!type.TryGetMethod("Dispose", out _))
             {
-                editor.AddMethod(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddSorted(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
             }
 
             if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
             {
-                editor.AddMethod(classDeclaration, ThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddSorted(classDeclaration, PrivateThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
             }
 
             editor.MakeSealed(classDeclaration);
-            //updated = updated.WithIDisposableInterface(syntaxGenerator, type);
-            //newRoot = newRoot.WithUsingSystem();
+            if (classDeclaration.BaseList?.Types.TryGetSingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
+            {
+                editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation));
+            }
 
             return editor.GetChangedDocument();
         }

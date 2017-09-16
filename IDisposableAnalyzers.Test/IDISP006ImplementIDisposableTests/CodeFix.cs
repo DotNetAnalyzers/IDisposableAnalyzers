@@ -49,10 +49,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -303,10 +302,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;

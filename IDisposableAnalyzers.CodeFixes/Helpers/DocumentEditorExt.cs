@@ -6,7 +6,6 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    using Microsoft.CodeAnalysis.Formatting;
 
     internal static class DocumentEditorExt
     {
@@ -70,7 +69,7 @@
             }
         }
 
-        internal static void AddMethod(this DocumentEditor editor, TypeDeclarationSyntax containingType, MethodDeclarationSyntax method)
+        internal static void AddSorted(this DocumentEditor editor, TypeDeclarationSyntax containingType, MethodDeclarationSyntax method)
         {
             MethodDeclarationSyntax existing = null;
             foreach (var member in containingType.Members)
@@ -187,14 +186,14 @@
         {
             int SubIndex(SyntaxTokenList ms, int i)
             {
-                if (modifiers.Any(SyntaxKind.ConstKeyword))
+                if (ms.Any(SyntaxKind.ConstKeyword))
                 {
                     return i;
                 }
 
-                if (modifiers.Any(SyntaxKind.StaticKeyword))
+                if (ms.Any(SyntaxKind.StaticKeyword))
                 {
-                    if (modifiers.Any(SyntaxKind.ReadOnlyKeyword))
+                    if (ms.Any(SyntaxKind.ReadOnlyKeyword))
                     {
                         return i + 1;
                     }

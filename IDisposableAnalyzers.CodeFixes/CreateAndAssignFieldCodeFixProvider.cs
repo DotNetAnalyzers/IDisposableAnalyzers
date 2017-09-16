@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
