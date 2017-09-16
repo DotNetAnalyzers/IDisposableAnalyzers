@@ -6,6 +6,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
 
     internal static class DocumentEditorExt
     {
@@ -96,32 +97,20 @@
             }
         }
 
-        internal static DocumentEditor MakeSealed(this DocumentEditor editor, TypeDeclarationSyntax type)
+        internal static DocumentEditor MakeSealed(this DocumentEditor editor, ClassDeclarationSyntax type)
         {
-            if (type.Modifiers.Any())
-            {
-                editor.ReplaceNode(
-                    type,
-                    type.WithModifiers(type.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.SealedKeyword))));
-            }
-            else
-            {
-                editor.SetModifiers(type, DeclarationModifiers.Sealed);
-            }
-
+            editor.SetModifiers(type, DeclarationModifiers.From(editor.SemanticModel.GetDeclaredSymbol(type)).WithIsSealed(isSealed: true));
             foreach (var member in type.Members)
             {
                 var modifiers = member.Modifiers();
                 if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out SyntaxToken modifier))
                 {
-                    editor.ReplaceNode(
-                        member,
-                        member.WithModifiers(modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword))));
+                    editor.SetAccessibility(member, Accessibility.Private);
                 }
 
                 if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
                 {
-                    editor.ReplaceNode(member, member.WithModifiers(modifiers.Remove(modifier)));
+                    editor.SetModifiers(member, DeclarationModifiers.None);
                 }
 
                 if (member is BasePropertyDeclarationSyntax prop &&
@@ -132,14 +121,12 @@
                         modifiers = accessor.Modifiers;
                         if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
                         {
-                            editor.ReplaceNode(
-                                accessor,
-                                accessor.WithModifiers(modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword))));
+                            editor.SetAccessibility(member, Accessibility.Private);
                         }
 
                         if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
                         {
-                            editor.ReplaceNode(accessor, accessor.WithModifiers(modifiers.Remove(modifier)));
+                            editor.SetModifiers(member, DeclarationModifiers.None);
                         }
                     }
                 }
