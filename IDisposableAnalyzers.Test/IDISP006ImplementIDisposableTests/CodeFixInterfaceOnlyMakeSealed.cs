@@ -5,7 +5,7 @@
 
     internal partial class CodeFix
     {
-        public class InterfaceOnly
+        public class InterfaceOnlyMakeSealed
         {
             [Test]
             public void ImplementIDisposableDisposeMethod()
@@ -198,58 +198,6 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode, "Implement IDisposable and make class sealed.");
-            }
-
-            [Test]
-            public void VirtualDispose()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo : ↓IDisposable
-    {
-    }
-}";
-
-                var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo : IDisposable
-    {
-        private bool disposed;
-
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-            }
-        }
-
-        protected void ThrowIfDisposed()
-        {
-            if (this.disposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
-        }
-    }
-}";
-                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
             }
         }
     }

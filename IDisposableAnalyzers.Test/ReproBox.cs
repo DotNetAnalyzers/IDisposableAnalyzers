@@ -8,7 +8,6 @@ namespace IDisposableAnalyzers.Test
 
     using NUnit.Framework;
 
-    [Explicit]
     public class ReproBox
     {
         // ReSharper disable once UnusedMember.Local
@@ -21,6 +20,7 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
         {
+            Assert.Pass();
             var testCode = @"
 namespace IDisposableAnalyzers
 {

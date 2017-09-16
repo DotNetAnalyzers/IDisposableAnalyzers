@@ -80,38 +80,20 @@ namespace IDisposableAnalyzers
             var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
             var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
             var identifier = statement.Declaration.Variables[0].Identifier;
-            var name = usesUnderscoreNames
-                ? "_" + identifier.ValueText
-                : identifier.ValueText;
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
-            while (declaredSymbol.MemberNames.Contains(name))
-            {
-                name += "_";
-            }
-
-            var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
-                name,
-                accessibility: Accessibility.Private,
-                modifiers: DeclarationModifiers.ReadOnly,
-                type: SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)));
-            var members = containingType.Members;
-            if (members.TryGetFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else if (members.TryGetFirst(out field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else
-            {
-                editor.AddMember(containingType, newField);
-            }
+            var field = editor.AddField(
+                usesUnderscoreNames
+                    ? "_" + identifier.ValueText
+                    : identifier.ValueText,
+                containingType,
+                Accessibility.Private,
+                DeclarationModifiers.ReadOnly,
+                type,
+                CancellationToken.None);
 
             var fieldAccess = usesUnderscoreNames
-                ? SyntaxFactory.IdentifierName(name)
-                : SyntaxFactory.ParseExpression($"this.{name}");
+                ? SyntaxFactory.IdentifierName(field.Name())
+                : SyntaxFactory.ParseExpression($"this.{field.Name()}");
             editor.ReplaceNode(
                 statement,
                 SyntaxFactory.ExpressionStatement(
@@ -127,38 +109,21 @@ namespace IDisposableAnalyzers
         {
             var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
             var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
-            var name = usesUnderscoreNames
-                ? "_disposable"
-                : "disposable";
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var declaredSymbol = editor.SemanticModel.GetDeclaredSymbol(containingType);
-            while (declaredSymbol.MemberNames.Contains(name))
-            {
-                name += "_";
-            }
 
-            var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
-                name,
-                accessibility: Accessibility.Private,
-                modifiers: DeclarationModifiers.ReadOnly,
-                type: SyntaxFactory.ParseTypeName("IDisposable"));
-            var members = containingType.Members;
-            if (members.TryGetFirst(x => x is FieldDeclarationSyntax, out MemberDeclarationSyntax field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else if (members.TryGetFirst(out field))
-            {
-                editor.InsertBefore(field, new[] { newField });
-            }
-            else
-            {
-                editor.AddMember(containingType, newField);
-            }
+            var field = editor.AddField(
+                usesUnderscoreNames
+                    ? "_disposable"
+                    : "disposable",
+                containingType,
+                Accessibility.Private,
+                DeclarationModifiers.ReadOnly,
+                SyntaxFactory.ParseTypeName("IDisposable"),
+                CancellationToken.None);
 
             var fieldAccess = usesUnderscoreNames
-                ? SyntaxFactory.IdentifierName(name)
-                : SyntaxFactory.ParseExpression($"this.{name}");
+                ? SyntaxFactory.IdentifierName(field.Name())
+                : SyntaxFactory.ParseExpression($"this.{field.Name()}");
             editor.ReplaceNode(
                 statement,
                 SyntaxFactory.ExpressionStatement(

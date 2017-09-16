@@ -138,26 +138,21 @@ namespace IDisposableAnalyzers
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-            var name = usesUnderscoreNames
-                           ? "_disposable"
-                           : "disposable";
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var declaredSymbol = (INamedTypeSymbol)editor.SemanticModel.GetDeclaredSymbolSafe(containingType, cancellationToken);
-            while (declaredSymbol.MemberNames.Contains(name))
-            {
-                name += "_";
-            }
 
-            var newField = (FieldDeclarationSyntax)editor.Generator.FieldDeclaration(
-                name,
-                accessibility: Accessibility.Private,
-                modifiers: DeclarationModifiers.ReadOnly,
-                type: CompositeDisposableType);
-            editor.AddField(containingType, newField);
+            var field = editor.AddField(
+                usesUnderscoreNames
+                    ? "_disposable"
+                    : "disposable",
+                containingType,
+                Accessibility.Private,
+                DeclarationModifiers.ReadOnly,
+                CompositeDisposableType,
+                cancellationToken);
 
             var fieldAccess = usesUnderscoreNames
-                                  ? SyntaxFactory.IdentifierName(name)
-                                  : SyntaxFactory.ParseExpression($"this.{name}");
+                                  ? SyntaxFactory.IdentifierName(field.Name())
+                                  : SyntaxFactory.ParseExpression($"this.{field.Name()}");
 
             editor.ReplaceNode(
                 statement,
