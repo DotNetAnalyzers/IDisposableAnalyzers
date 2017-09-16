@@ -210,7 +210,7 @@ namespace IDisposableAnalyzers
                                          .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
             var expressions = objectCreation.Initializer.Expressions;
             var initializer = SyntaxFactory.InitializerExpression(
-                                               SyntaxKind.ObjectInitializerExpression,
+                                               SyntaxKind.CollectionInitializerExpression,
                                                expressions.Replace(expressions.Last(), expressions.Last().WithoutTrailingTrivia()).Add(newExpression))
                                            .WithOpenBraceToken(openBrace);
 

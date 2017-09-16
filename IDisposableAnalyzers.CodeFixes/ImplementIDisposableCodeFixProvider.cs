@@ -310,6 +310,7 @@
                 {
                     updated = (TypeDeclarationSyntax)syntaxGenerator.WithModifiers(updated, DeclarationModifiers.Sealed);
                 }
+
                 updated = (TypeDeclarationSyntax)MakeSealedRewriter.Default.Visit(updated);
             }
 

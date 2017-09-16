@@ -279,7 +279,6 @@ namespace RoslynSandbox
         }
     }
 }";
-
             AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
             AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
         }
