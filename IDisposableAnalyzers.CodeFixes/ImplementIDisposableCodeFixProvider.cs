@@ -321,12 +321,12 @@
 
             if (!type.TryGetMethod("Dispose", out _))
             {
-                editor.AddSorted(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddMethod(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
             }
 
             if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
             {
-                editor.AddSorted(classDeclaration, PrivateThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddMethod(classDeclaration, PrivateThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
             }
 
             editor.MakeSealed(classDeclaration);

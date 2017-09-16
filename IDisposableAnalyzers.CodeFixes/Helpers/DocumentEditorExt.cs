@@ -44,7 +44,7 @@
             editor.ReplaceNode(containingType, (node, generator) => AddSorted(generator, (TypeDeclarationSyntax)node, field));
         }
 
-        internal static void AddSorted(this DocumentEditor editor, TypeDeclarationSyntax containingType, MethodDeclarationSyntax method)
+        internal static void AddMethod(this DocumentEditor editor, TypeDeclarationSyntax containingType, MethodDeclarationSyntax method)
         {
             editor.ReplaceNode(containingType, (node, generator) => AddSorted(generator, (TypeDeclarationSyntax)node, method));
         }
@@ -55,12 +55,12 @@
             foreach (var member in type.Members)
             {
                 var modifiers = member.Modifiers();
-                if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out SyntaxToken modifier))
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword))
                 {
                     editor.SetAccessibility(member, Accessibility.Private);
                 }
 
-                if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (modifiers.Any(SyntaxKind.VirtualKeyword))
                 {
                     editor.SetModifiers(member, DeclarationModifiers.None);
                 }
@@ -70,15 +70,14 @@
                 {
                     foreach (var accessor in prop.AccessorList.Accessors)
                     {
-                        modifiers = accessor.Modifiers;
-                        if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                        if (modifiers.Any(SyntaxKind.ProtectedKeyword))
                         {
-                            editor.SetAccessibility(member, Accessibility.Private);
+                            editor.SetModifiers(accessor, DeclarationModifiers.None);
                         }
 
-                        if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                        if (accessor.Modifiers.Any(SyntaxKind.ProtectedKeyword))
                         {
-                            editor.SetModifiers(member, DeclarationModifiers.None);
+                            editor.SetAccessibility(accessor, Accessibility.Private);
                         }
                     }
                 }
