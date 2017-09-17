@@ -153,7 +153,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableDisposeMethodWithProtectedPrivateSetProperty()
+            public void WithProtectedPrivateSetProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -200,7 +200,75 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableDisposeMethodWithPublicVirtualMethod()
+            public void WithOverridingProperties()
+            {
+                var baseCode = @"
+namespace RoslynSandbox
+{
+    public abstract class FooBase
+    {
+        public virtual int Value1 { get; protected set; }
+
+        public abstract int Value2 { get; set; }
+
+        protected virtual int Value3 { get; set; }
+    }
+}";
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : FooBase, ↓IDisposable
+    {
+        public override int Value1 { get; protected set; }
+
+        public override int Value2 { get; set; }
+
+        protected override int Value3 { get; set; }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : FooBase, IDisposable
+    {
+        private bool disposed;
+
+        public override int Value1 { get; protected set; }
+
+        public override int Value2 { get; set; }
+
+        protected override int Value3 { get; set; }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", new[] { baseCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+            }
+
+            [Test]
+            public void WithPublicVirtualMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -251,7 +319,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableDisposeMethodWithProtectedVirtualMethod()
+            public void WithProtectedVirtualMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox

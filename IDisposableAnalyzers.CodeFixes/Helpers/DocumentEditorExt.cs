@@ -63,43 +63,6 @@
             editor.ReplaceNode(containingType, (node, generator) => AddSorted(generator, (TypeDeclarationSyntax)node, method));
         }
 
-        internal static DocumentEditor MakeSealed(this DocumentEditor editor, ClassDeclarationSyntax type)
-        {
-            editor.SetModifiers(type, DeclarationModifiers.From(editor.SemanticModel.GetDeclaredSymbol(type)).WithIsSealed(isSealed: true));
-            foreach (var member in type.Members)
-            {
-                var modifiers = member.Modifiers();
-                if (modifiers.Any(SyntaxKind.ProtectedKeyword))
-                {
-                    editor.SetAccessibility(member, Accessibility.Private);
-                }
-
-                if (modifiers.Any(SyntaxKind.VirtualKeyword))
-                {
-                    editor.SetModifiers(member, DeclarationModifiers.None);
-                }
-
-                if (member is BasePropertyDeclarationSyntax prop &&
-                    prop.AccessorList != null)
-                {
-                    foreach (var accessor in prop.AccessorList.Accessors)
-                    {
-                        if (modifiers.Any(SyntaxKind.ProtectedKeyword))
-                        {
-                            editor.SetModifiers(accessor, DeclarationModifiers.None);
-                        }
-
-                        if (accessor.Modifiers.Any(SyntaxKind.ProtectedKeyword))
-                        {
-                            editor.SetAccessibility(accessor, Accessibility.Private);
-                        }
-                    }
-                }
-            }
-
-            return editor;
-        }
-
         private static SyntaxNode AddSorted(SyntaxGenerator generator, TypeDeclarationSyntax containingType, MemberDeclarationSyntax memberDeclaration)
         {
             var memberIndex = MemberIndex(memberDeclaration);

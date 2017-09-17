@@ -21,6 +21,7 @@
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
         private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
+        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("System.IDisposable").WithTrailingTrivia(SyntaxFactory.ElasticMarker).WithAdditionalAnnotations(Simplifier.Annotation, SyntaxAnnotation.ElasticAnnotation);
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -32,7 +33,7 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false) as CompilationUnitSyntax;
+                                          .ConfigureAwait(false);
             if (syntaxRoot == null)
             {
                 return;
@@ -188,7 +189,7 @@
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-            editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation));
+            editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             return editor.GetChangedDocument();
         }
 
@@ -334,7 +335,7 @@
 
             if (classDeclaration.BaseList?.Types.TryGetSingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
             {
-                editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation));
+                editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
 
             return editor.GetChangedDocument();
@@ -347,7 +348,6 @@
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
 
-            editor.MakeSealed(classDeclaration);
             var field = editor.AddField(
                 classDeclaration,
                 usesUnderscoreNames
@@ -394,17 +394,20 @@
                          ?.Identifier.ValueText.Contains("IDisposable") == true,
                     out BaseTypeSyntax _) != true)
             {
-                editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable")
-                                                                       .WithAdditionalAnnotations(
-                                                                           Simplifier.Annotation));
+                editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
 
-            return editor.GetChangedDocument();
-        }
+            var updated = editor.GetChangedDocument();
+            if (type.IsSealed)
+            {
+                return updated;
+            }
 
-        private static bool IsSealed(TypeDeclarationSyntax type)
-        {
-            return type.Modifiers.Any(SyntaxKind.SealedKeyword);
+            editor.TrackNode(classDeclaration);
+            var updatedRoot = await updated.GetSyntaxRootAsync(context.CancellationToken)
+                                           .ConfigureAwait(false);
+            var updatedClassDeclaration = updatedRoot.GetCurrentNode(classDeclaration);
+            return updated.WithSyntaxRoot(MakeSealedRewriter.Default.Visit(updatedRoot, updatedClassDeclaration));
         }
 
         private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, FieldDeclarationSyntax field = null)
@@ -433,6 +436,28 @@
         {
             public static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
 
+            private static readonly ThreadLocal<ClassDeclarationSyntax> CurrentClass = new ThreadLocal<ClassDeclarationSyntax>();
+
+            public SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
+            {
+                CurrentClass.Value = classDeclaration;
+                var updated = this.Visit(node);
+                CurrentClass.Value = null;
+                return updated;
+            }
+
+            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                // We only want to make the top level class sealed.
+                if (ReferenceEquals(CurrentClass.Value, node))
+                {
+                    var updated = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
+                    return updated.WithModifiers(updated.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.SealedKeyword)));
+                }
+
+                return node;
+            }
+
             public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
                 if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
@@ -455,7 +480,8 @@
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
@@ -470,7 +496,8 @@
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
@@ -485,13 +512,14 @@
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                var parentModifiers = node.FirstAncestor<BasePropertyDeclarationSyntax>()?.Modifiers;
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                    parentModifiers?.Any(SyntaxKind.OverrideKeyword) == false)
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
 
-                if (node.FirstAncestor<PropertyDeclarationSyntax>()
-                        ?.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
+                if (parentModifiers?.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
                 {
                     if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
                     {
@@ -509,7 +537,8 @@
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
