@@ -29,12 +29,10 @@
 
         private static readonly Solution Sln = CodeFactory.CreateSolution(SlnFile, new DiagnosticAnalyzer[0], MetadataReferences);
 
-        private readonly DiagnosticAnalyzer analyzer;
-        private ProjectAndCompliation analyzersProject;
+        private readonly ProjectAndCompliation analyzersProject;
 
         protected Analyzer(DiagnosticAnalyzer analyzer)
         {
-            this.analyzer = analyzer;
             this.analyzersProject = new ProjectAndCompliation(
                 Sln.Projects.First(x => x.Name == "IDisposableAnalyzers.Analyzers"),
                 analyzer);

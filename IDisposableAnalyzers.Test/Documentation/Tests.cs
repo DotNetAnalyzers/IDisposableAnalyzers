@@ -71,7 +71,7 @@
         public void Table(DescriptorInfo descriptorInfo)
         {
             var expected = GetTable(CreateStub(descriptorInfo));
-            DumpIfDebug(expected.ToString());
+            DumpIfDebug(expected);
             var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
             CodeAssert.AreEqual(expected, actual);
         }
@@ -80,7 +80,7 @@
         public void ConfigSeverity(DescriptorInfo descriptorInfo)
         {
             var expected = GetConfigSeverity(CreateStub(descriptorInfo));
-            DumpIfDebug(expected.ToString());
+            DumpIfDebug(expected);
             var actual = GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName));
             CodeAssert.AreEqual(expected, actual);
         }
@@ -110,7 +110,7 @@
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
             var expected = builder.ToString();
-            DumpIfDebug(expected.ToString());
+            DumpIfDebug(expected);
             var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md")));
             CodeAssert.AreEqual(expected, actual);
         }
