@@ -82,48 +82,54 @@ namespace IDisposableAnalyzers
 
             public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
-                if (!node.IsMissing &&
-                    !(node.Modifiers.Any(SyntaxKind.StaticKeyword) || node.Modifiers.Any(SyntaxKind.ConstKeyword)) &&
-                     node.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                if (node.IsMissing ||
+                    node.Modifiers.Any(SyntaxKind.StaticKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.ConstKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.PublicKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.ProtectedKeyword) ||
+                    node.Modifiers.Any(SyntaxKind.InternalKeyword))
                 {
-                    foreach (var variable in node.Declaration.Variables)
+                    base.VisitFieldDeclaration(node);
+                    return;
+                }
+
+                foreach (var variable in node.Declaration.Variables)
+                {
+                    var name = variable.Identifier.ValueText;
+                    if (name.StartsWith("_"))
                     {
-                        var name = variable.Identifier.ValueText;
-                        if (name.StartsWith("_"))
+                        switch (this.UsesUnderScore)
                         {
-                            switch (this.UsesUnderScore)
-                            {
-                                case Result.Unknown:
-                                    this.UsesUnderScore = Result.Yes;
-                                    break;
-                                case Result.Yes:
-                                    break;
-                                case Result.No:
-                                    this.UsesUnderScore = Result.Maybe;
-                                    break;
-                                case Result.Maybe:
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
+                            case Result.Unknown:
+                                this.UsesUnderScore = Result.Yes;
+                                break;
+                            case Result.Yes:
+                                break;
+                            case Result.No:
+                                this.UsesUnderScore = Result.Maybe;
+                                break;
+                            case Result.Maybe:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
-                        else
+                    }
+                    else
+                    {
+                        switch (this.UsesUnderScore)
                         {
-                            switch (this.UsesUnderScore)
-                            {
-                                case Result.Unknown:
-                                    this.UsesUnderScore = Result.No;
-                                    break;
-                                case Result.Yes:
-                                    this.UsesUnderScore = Result.Maybe;
-                                    break;
-                                case Result.No:
-                                    break;
-                                case Result.Maybe:
-                                    break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
-                            }
+                            case Result.Unknown:
+                                this.UsesUnderScore = Result.No;
+                                break;
+                            case Result.Yes:
+                                this.UsesUnderScore = Result.Maybe;
+                                break;
+                            case Result.No:
+                                break;
+                            case Result.Maybe:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
