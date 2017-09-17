@@ -52,6 +52,64 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void EmptyClassFigureOutUnderscoreFromOtherClass()
+            {
+                var barCode = @"
+namespace RoslynSandbox
+{
+    public class Bar
+    {
+        private int _value;
+
+        public Bar(int value)
+        {
+            _value = value;
+        }
+    }
+}";
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : ↓IDisposable
+    {
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool _disposed;
+
+        public void Dispose()
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", new[] { barCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+            }
+
+            [Test]
             public void WithThrowIfDisposed()
             {
                 var testCode = @"

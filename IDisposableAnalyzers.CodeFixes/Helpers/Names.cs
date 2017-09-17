@@ -13,8 +13,34 @@ namespace IDisposableAnalyzers
         {
             using (var pooled = Walker.Create(node, semanticModel, cancellationToken))
             {
-                return pooled.Item.UsesUnderScore == Result.Yes || pooled.Item.UsesThis == Result.No;
+                if (pooled.Item.UsesThis == Result.Yes)
+                {
+                    return false;
+                }
+
+                if (pooled.Item.UsesUnderScore == Result.Yes)
+                {
+                    return true;
+                }
             }
+
+            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+            {
+                using (var pooled = Walker.Create(tree.GetRoot(cancellationToken), semanticModel, cancellationToken))
+                {
+                    if (pooled.Item.UsesThis == Result.Yes)
+                    {
+                        return false;
+                    }
+
+                    if (pooled.Item.UsesUnderScore == Result.Yes)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         internal sealed class Walker : CSharpSyntaxWalker

@@ -3,6 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
+    [TestFixture]
     internal partial class CodeFix
     {
         private static readonly string DisposableCode = @"
