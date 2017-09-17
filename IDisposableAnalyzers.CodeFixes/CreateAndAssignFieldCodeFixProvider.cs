@@ -46,13 +46,12 @@ namespace IDisposableAnalyzers
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                                   .ConfigureAwait(false);
-                        var type = semanticModel.GetSymbolInfo(statement.Declaration.Type).Symbol as ITypeSymbol;
-                        if (type != null)
+                        if (semanticModel.GetSymbolInfo(statement.Declaration.Type).Symbol is ITypeSymbol type)
                         {
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Create and assign field.",
-                                    _ => ApplyAddUsingFixAsync(context, statement, type),
+                                    cancellationToken => ApplyAddUsingFixAsync(context, statement, type, cancellationToken),
                                     nameof(CreateAndAssignFieldCodeFixProvider)),
                                 diagnostic);
                         }
@@ -75,12 +74,13 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, LocalDeclarationStatementSyntax statement, ITypeSymbol type)
+        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, LocalDeclarationStatementSyntax statement, ITypeSymbol type, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
-            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
-            var identifier = statement.Declaration.Variables[0].Identifier;
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
+            var usesUnderscoreNames = containingType.UsesUnderscoreNames(editor.SemanticModel, cancellationToken);
+            var variableDeclarator = statement.Declaration.Variables[0];
+            var identifier = variableDeclarator.Identifier;
             var field = editor.AddField(
                 containingType,
                 usesUnderscoreNames
@@ -97,11 +97,12 @@ namespace IDisposableAnalyzers
             editor.ReplaceNode(
                 statement,
                 SyntaxFactory.ExpressionStatement(
-                    (ExpressionSyntax)editor.Generator.AssignmentStatement(
-                        fieldAccess,
-                        statement.Declaration.Variables[0].Initializer.Value))
+                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
+                                     fieldAccess,
+                                     variableDeclarator.Initializer.Value))
                              .WithLeadingTrivia(statement.GetLeadingTrivia())
                              .WithTrailingTrivia(statement.GetTrailingTrivia()));
+
             return editor.GetChangedDocument();
         }
 
@@ -127,9 +128,11 @@ namespace IDisposableAnalyzers
             editor.ReplaceNode(
                 statement,
                 SyntaxFactory.ExpressionStatement(
-                    (ExpressionSyntax)editor.Generator.AssignmentStatement(fieldAccess, statement.Expression))
-                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
+                                     fieldAccess,
+                                     statement.Expression))
+                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
             return editor.GetChangedDocument();
         }
     }
