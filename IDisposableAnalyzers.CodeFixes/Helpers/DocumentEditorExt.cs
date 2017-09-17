@@ -10,19 +10,33 @@
 
     internal static class DocumentEditorExt
     {
-        internal static FieldDeclarationSyntax AddField(this DocumentEditor editor, string name, TypeDeclarationSyntax containingType, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
+        internal static FieldDeclarationSyntax AddField(
+            this DocumentEditor editor,
+            TypeDeclarationSyntax containingType,
+            string name,
+            Accessibility accessibility,
+            DeclarationModifiers modifiers,
+            ITypeSymbol type,
+            CancellationToken cancellationToken)
         {
             return AddField(
                 editor,
-                name,
                 containingType,
+                name,
                 accessibility,
                 modifiers,
                 SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)),
                 cancellationToken);
         }
 
-        internal static FieldDeclarationSyntax AddField(this DocumentEditor editor, string name, TypeDeclarationSyntax containingType, Accessibility accessibility, DeclarationModifiers modifiers, TypeSyntax type, CancellationToken cancellationToken)
+        internal static FieldDeclarationSyntax AddField(
+            this DocumentEditor editor,
+            TypeDeclarationSyntax containingType,
+            string name,
+            Accessibility accessibility,
+            DeclarationModifiers modifiers,
+            TypeSyntax type,
+            CancellationToken cancellationToken)
         {
             var declaredSymbol = (INamedTypeSymbol)editor.SemanticModel.GetDeclaredSymbolSafe(containingType, cancellationToken);
             while (declaredSymbol.MemberNames.Contains(name))
@@ -88,10 +102,11 @@
 
         private static SyntaxNode AddSorted(SyntaxGenerator generator, TypeDeclarationSyntax containingType, MemberDeclarationSyntax memberDeclaration)
         {
+            var memberIndex = MemberIndex(memberDeclaration);
             for (var i = 0; i < containingType.Members.Count; i++)
             {
                 var member = containingType.Members[i];
-                if (MemberIndex(member) > MemberIndex(memberDeclaration))
+                if (memberIndex < MemberIndex(member))
                 {
                     return generator.InsertMembers(containingType, i, memberDeclaration);
                 }
@@ -119,12 +134,17 @@
                     return 2;
                 }
 
-                return 3;
+                if (modifiers.Any(SyntaxKind.ReadOnlyKeyword))
+                {
+                    return 3;
+                }
+
+                return 4;
             }
 
             int AccessOffset(Accessibility accessibility)
             {
-                const int step = 4;
+                const int step = 5;
                 switch (accessibility)
                 {
                     case Accessibility.Public:
@@ -173,7 +193,7 @@
 
             int TypeOffset(SyntaxKind kind)
             {
-                const int step = 5 * 4;
+                const int step = 5 * 6;
                 switch (kind)
                 {
                     case SyntaxKind.FieldDeclaration:

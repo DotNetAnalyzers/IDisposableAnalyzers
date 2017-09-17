@@ -3,6 +3,7 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Globalization;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -12,6 +13,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
     using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableCodeFixProvider))]
@@ -19,31 +21,6 @@
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
         private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
-        private static readonly ParameterMethodTemplate SealedDisposeMethod = new ParameterMethodTemplate(@"public void Dispose()
-                                                                                                            {
-                                                                                                                if (<FIELDACCESS>)
-                                                                                                                {
-                                                                                                                    return;
-                                                                                                                }
-                                                                                            
-                                                                                                                <FIELDACCESS> = true;
-                                                                                                            }");
-
-        private static readonly ParameterMethodTemplate ProtectedThrowIfDisposedMethod = new ParameterMethodTemplate(@"protected void ThrowIfDisposed()
-                                                                                                                       {
-                                                                                                                           if (<FIELDACCESS>)
-                                                                                                                           {
-                                                                                                                               throw new ObjectDisposedException(this.GetType().FullName);
-                                                                                                                           }
-                                                                                                                       }");
-
-        private static readonly ParameterMethodTemplate PrivateThrowIfDisposedMethod = new ParameterMethodTemplate(@"private void ThrowIfDisposed()
-                                                                                                                     {
-                                                                                                                         if (<FIELDACCESS>)
-                                                                                                                         {
-                                                                                                                             throw new ObjectDisposedException(this.GetType().FullName);
-                                                                                                                         }
-                                                                                                                     }");
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -113,7 +90,6 @@
                                     context,
                                     semanticModel,
                                     cancellationToken,
-                                    syntaxRoot,
                                     classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                         diagnostic);
@@ -145,7 +121,6 @@
                                 context,
                                 semanticModel,
                                 cancellationToken,
-                                 syntaxRoot,
                                 classDeclaration),
                         nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                     diagnostic);
@@ -288,48 +263,58 @@
             return Task.FromResult(context.Document.WithSyntaxRoot(newRoot));
         }
 
-        private static async Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, CompilationUnitSyntax syntaxRoot, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> ApplyImplementIDisposableSealedFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
             var usesUnderscoreNames = classDeclaration.UsesUnderscoreNames(semanticModel, cancellationToken);
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
 
-            var tempFieldName = usesUnderscoreNames
-                ? "_disposed"
-                : "disposed";
-            string fieldAccess;
-            if (type.TryGetField(tempFieldName, out var field))
-            {
-                fieldAccess = usesUnderscoreNames
-                    ? field.Name
-                    : $"this.{field.Name}";
-            }
-            else
-            {
-                var fieldDeclaration = editor.AddField(
-                    tempFieldName,
-                    classDeclaration,
-                    Accessibility.Private,
-                    DeclarationModifiers.None,
-                    SyntaxFactory.ParseTypeName("bool"),
-                    cancellationToken);
-                fieldAccess = usesUnderscoreNames
-                    ? fieldDeclaration.Name()
-                    : $"this.{fieldDeclaration.Name()}";
-            }
+            editor.MakeSealed(classDeclaration);
+            var fieldDeclaration = editor.AddField(
+                classDeclaration,
+                usesUnderscoreNames
+                    ? "_disposed"
+                    : "disposed",
+                Accessibility.Private,
+                DeclarationModifiers.None,
+                SyntaxFactory.ParseTypeName("bool"),
+                cancellationToken);
 
             if (!type.TryGetMethod("Dispose", out _))
             {
-                editor.AddMethod(classDeclaration, SealedDisposeMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddMethod(
+                    classDeclaration,
+                    ParseMethod(
+                        @"public void Dispose()
+                          {
+                              if (this.disposed)
+                              {
+                                  return;
+                              }
+
+                              this.disposed = true;
+                          }",
+                        fieldDeclaration.Name(),
+                        usesUnderscoreNames));
             }
 
             if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
             {
-                editor.AddMethod(classDeclaration, PrivateThrowIfDisposedMethod.MethodDeclarationSyntax(fieldAccess));
+                editor.AddMethod(
+                    classDeclaration,
+                    ParseMethod(
+                        @"private void ThrowIfDisposed()
+                          {
+                              if (this.disposed)
+                              {
+                                  throw new System.ObjectDisposedException(this.GetType().FullName);
+                              }
+                          }",
+                        fieldDeclaration.Name(),
+                        usesUnderscoreNames));
             }
 
-            editor.MakeSealed(classDeclaration);
             if (classDeclaration.BaseList?.Types.TryGetSingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
             {
                 editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation));
@@ -341,6 +326,27 @@
         private static bool IsSealed(TypeDeclarationSyntax type)
         {
             return type.Modifiers.Any(SyntaxKind.SealedKeyword);
+        }
+
+        private static MethodDeclarationSyntax ParseMethod(string code, string fieldName, bool usesUnderscoreNames)
+        {
+            if (fieldName != "disposed")
+            {
+                code = code.Replace("disposed", fieldName);
+            }
+
+            if (usesUnderscoreNames)
+            {
+                code = code.Replace("this.", string.Empty);
+            }
+
+            return (MethodDeclarationSyntax)SyntaxFactory.ParseCompilationUnit(code)
+                                                         .Members
+                                                         .Single()
+                                                         .WithSimplifiedNames()
+                                                         .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                         .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                                         .WithAdditionalAnnotations(Formatter.Annotation);
         }
 
         private class MakeSealedRewriter : CSharpSyntaxRewriter

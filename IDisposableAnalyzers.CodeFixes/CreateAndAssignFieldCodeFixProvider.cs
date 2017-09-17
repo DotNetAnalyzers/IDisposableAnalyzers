@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CreateAndAssignFieldCodeFixProvider))]
     [Shared]
@@ -81,10 +82,10 @@ namespace IDisposableAnalyzers
             var identifier = statement.Declaration.Variables[0].Identifier;
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
             var field = editor.AddField(
+                containingType,
                 usesUnderscoreNames
                     ? "_" + identifier.ValueText
                     : identifier.ValueText,
-                containingType,
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
                 type,
@@ -111,13 +112,13 @@ namespace IDisposableAnalyzers
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(
+                containingType,
                 usesUnderscoreNames
                     ? "_disposable"
                     : "disposable",
-                containingType,
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
-                SyntaxFactory.ParseTypeName("IDisposable"),
+                SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation),
                 CancellationToken.None);
 
             var fieldAccess = usesUnderscoreNames
