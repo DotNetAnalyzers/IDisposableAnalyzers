@@ -20,8 +20,10 @@
     [Shared]
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
-        private static readonly ParameterSyntax DisposingParameter = SyntaxFactory.Parameter(SyntaxFactory.Identifier("disposing")).WithType(SyntaxFactory.ParseTypeName("bool"));
-        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("System.IDisposable").WithTrailingTrivia(SyntaxFactory.ElasticMarker).WithAdditionalAnnotations(Simplifier.Annotation, SyntaxAnnotation.ElasticAnnotation);
+        // ReSharper disable once InconsistentNaming
+        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("System.IDisposable")
+                                                                               .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                                                               .WithAdditionalAnnotations(Simplifier.Annotation, SyntaxAnnotation.ElasticAnnotation);
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
