@@ -10,6 +10,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeBeforeAssignCodeFixProvider))]
     [Shared]
@@ -45,13 +46,12 @@
 
                 if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is AssignmentExpressionSyntax assignment)
                 {
-                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
+                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out var disposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose before assigning.",
-                                cancellationToken =>
-                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, assignment, diposeStatement),
+                                cancellationToken => ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, assignment, disposeStatement),
                                 nameof(DisposeBeforeAssignCodeFixProvider)),
                             diagnostic);
                     }
@@ -62,13 +62,13 @@
                 var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ArgumentSyntax>();
                 if (argument != null)
                 {
-                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out StatementSyntax diposeStatement))
+                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out var disposeStatement))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Dispose before assigning.",
                                 cancellationToken =>
-                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, argument, diposeStatement),
+                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, argument, disposeStatement),
                                 nameof(DisposeBeforeAssignCodeFixProvider)),
                             diagnostic);
                     }
@@ -88,11 +88,6 @@
 
             var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
             var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock);
-            if (disposeStatement.ToString().Contains("as IDisposable"))
-            {
-                syntaxNode = syntaxNode.WithUsingSystem();
-            }
-
             return Task.FromResult(context.Document.WithSyntaxRoot(syntaxNode));
         }
 
@@ -104,7 +99,7 @@
                 return false;
             }
 
-            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out ISymbol assignedSymbol)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return false;
@@ -116,23 +111,24 @@
                              : string.Empty;
             if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
             {
-                result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as IDisposable)?.Dispose();")
+                result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as System.IDisposable)?.Dispose();")
                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithAdditionalAnnotations(Simplifier.Annotation);
                 return true;
             }
 
             if (IsAlwaysAssigned(assignedSymbol))
             {
                 result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
             result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
-                                .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                                  .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                  .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
             return true;
         }
 
@@ -147,9 +143,10 @@
 
             if (!Disposable.IsAssignableTo(MemberType(symbol)))
             {
-                result = SyntaxFactory.ParseStatement($"({argument.Expression} as IDisposable)?.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                result = SyntaxFactory.ParseStatement($"({argument.Expression} as System.IDisposable)?.Dispose();")
+                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithAdditionalAnnotations(Simplifier.Annotation);
                 return true;
             }
 
@@ -170,8 +167,7 @@
         // ReSharper disable once UnusedParameter.Local
         private static bool IsAlwaysAssigned(ISymbol member)
         {
-            var symbol = member as ILocalSymbol;
-            if (symbol == null)
+            if (member is ILocalSymbol)
             {
                 return false;
             }

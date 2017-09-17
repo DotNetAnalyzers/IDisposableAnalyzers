@@ -65,7 +65,6 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
     public class Foo
@@ -73,7 +72,7 @@ namespace RoslynSandbox
         public void Meh()
         {
             object stream = File.OpenRead(string.Empty);
-            (stream as IDisposable)?.Dispose();
+            (stream as System.IDisposable)?.Dispose();
             stream = File.OpenRead(string.Empty);
         }
     }
