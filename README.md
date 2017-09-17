@@ -39,6 +39,10 @@ Roslyn analysers for the use of types implementing IDisposable
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP008.md">IDISP008</a></td>
   <td>Don't assign member with injected and created disposables.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP009.md">IDISP009</a></td>
+  <td>Add IDisposable interface.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

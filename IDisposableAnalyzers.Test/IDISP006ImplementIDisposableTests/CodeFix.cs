@@ -497,7 +497,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ImplementIDisposableWhenInterfaceIsMissing()
+        public void WhenInterfaceIsMissing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -514,21 +514,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public sealed class Foo : System.IDisposable
-    {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-            AnalyzerAssert.CodeFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(testCode, fixedCode, "Implement IDisposable and make class sealed.");
+            AnalyzerAssert.NoFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(testCode);
         }
 
         [Test]

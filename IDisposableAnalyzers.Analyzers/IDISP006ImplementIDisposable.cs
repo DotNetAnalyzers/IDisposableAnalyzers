@@ -11,18 +11,15 @@
     internal class IDISP006ImplementIDisposable : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "IDISP006";
-        private const string Title = "Implement IDisposable.";
-        private const string MessageFormat = "Implement IDisposable.";
-        private const string Description = "The member is assigned with a created `IDisposable`s within the type. Implement IDisposable and dispose it.";
 
         private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: Title,
-            messageFormat: MessageFormat,
+            title: "Implement IDisposable.",
+            messageFormat: "Implement IDisposable.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: Description,
+            description: "The member is assigned with a created `IDisposable`s within the type. Implement IDisposable and dispose it.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 
         /// <inheritdoc/>
@@ -77,7 +74,7 @@
             }
 
             if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
-    setter.Body != null)
+                setter.Body != null)
             {
                 // Handle the backing field
                 return;

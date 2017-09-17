@@ -25,6 +25,7 @@
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP006ImplementIDisposable.DiagnosticId,
+            IDISP009IsIDisposable.DiagnosticId,
             "CS0535");
 
         /// <inheritdoc/>
@@ -62,6 +63,21 @@
 
                 var type = semanticModel.GetDeclaredSymbolSafe(classDeclaration, context.CancellationToken);
 
+                if (diagnostic.Id == IDISP009IsIDisposable.DiagnosticId)
+                {
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Add IDisposable interface",
+                            cancellationToken =>
+                                ApplyAddInterfaceFixAsync(
+                                    context,
+                                    cancellationToken,
+                                    classDeclaration),
+                            nameof(ImplementIDisposableCodeFixProvider) + "add interface"),
+                        diagnostic);
+                    continue;
+                }
+
                 if (Disposable.IsAssignableTo(type) &&
                     Disposable.BaseTypeHasVirtualDisposeMethod(type))
                 {
@@ -75,8 +91,16 @@
                                     cancellationToken,
                                     syntaxRoot,
                                     classDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider)),
+                            nameof(ImplementIDisposableCodeFixProvider) + "override"),
                         diagnostic);
+                    continue;
+                }
+
+                if (type.TryGetMethod("Dispose", out var disposeMethod) &&
+                    !disposeMethod.IsStatic &&
+                    disposeMethod.ReturnsVoid &&
+                    disposeMethod.Parameters.Length == 0)
+                {
                     continue;
                 }
 
@@ -142,7 +166,8 @@
 
         private static bool IsSupportedDiagnostic(Diagnostic diagnostic)
         {
-            if (diagnostic.Id == IDISP006ImplementIDisposable.DiagnosticId)
+            if (diagnostic.Id == IDISP006ImplementIDisposable.DiagnosticId ||
+                diagnostic.Id == IDISP009IsIDisposable.DiagnosticId)
             {
                 return true;
             }
@@ -154,6 +179,14 @@
             }
 
             return false;
+        }
+
+        private static async Task<Document> ApplyAddInterfaceFixAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        {
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
+                                             .ConfigureAwait(false);
+            editor.AddInterfaceType(classDeclaration, SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation));
+            return editor.GetChangedDocument();
         }
 
         private static Task<Document> ApplyOverrideDisposeFixAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, SyntaxNode syntaxRoot, TypeDeclarationSyntax typeDeclaration)
