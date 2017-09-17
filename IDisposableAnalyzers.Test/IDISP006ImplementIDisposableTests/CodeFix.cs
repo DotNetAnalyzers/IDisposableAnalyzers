@@ -628,7 +628,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]

@@ -133,7 +133,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -170,7 +170,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -319,7 +319,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1118,7 +1118,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1215,7 +1215,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, new[] { baseCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1318,7 +1318,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, new[] { baseCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1362,7 +1362,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1406,7 +1406,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, new[] { DisposableCode, subclassCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, subclassCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1466,7 +1466,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, new[] { DisposableCode, fooBaseCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -1509,7 +1509,7 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
     }
 }

@@ -61,7 +61,7 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -118,7 +118,7 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, new[] { DisposableCode, fixedCode });
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -179,7 +179,7 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode });
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -240,7 +240,7 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, new[] { DisposableCode, factoryCode, fixedCode });
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
