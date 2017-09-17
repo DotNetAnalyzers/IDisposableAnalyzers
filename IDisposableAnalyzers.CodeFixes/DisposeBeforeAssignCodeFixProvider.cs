@@ -114,7 +114,7 @@
                 result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as System.IDisposable)?.Dispose();")
                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                       .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithAdditionalAnnotations(Simplifier.Annotation);
+                                      .WithSimplifiedNames();
                 return true;
             }
 
@@ -146,7 +146,7 @@
                 result = SyntaxFactory.ParseStatement($"({argument.Expression} as System.IDisposable)?.Dispose();")
                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                       .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithAdditionalAnnotations(Simplifier.Annotation);
+                                      .WithSimplifiedNames();
                 return true;
             }
 

@@ -13,6 +13,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Simplification;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeMemberCodeFixProvider))]
     [Shared]
@@ -173,9 +174,10 @@
             var prefix = usesUnderScoreNames ? string.Empty : "this.";
             if (!Disposable.IsAssignableTo(MemberType(member)))
             {
-                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as IDisposable)?.Dispose();")
+                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                             .WithSimplifiedNames();
             }
 
             if (IsReadOnly(member) &&
