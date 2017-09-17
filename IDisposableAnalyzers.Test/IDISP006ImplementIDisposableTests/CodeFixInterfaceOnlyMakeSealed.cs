@@ -8,7 +8,7 @@
         public class InterfaceOnlyMakeSealed
         {
             [Test]
-            public void ImplementIDisposableDisposeMethod()
+            public void EmptyClass()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -45,6 +45,49 @@ namespace RoslynSandbox
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode, "Implement IDisposable and make class sealed.");
+            }
+
+            [Test]
+            public void WithThrowIfDisposed()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : ↓IDisposable
+    {
+        private void ThrowIfDisposed()
+        {
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
         }
     }
 }";

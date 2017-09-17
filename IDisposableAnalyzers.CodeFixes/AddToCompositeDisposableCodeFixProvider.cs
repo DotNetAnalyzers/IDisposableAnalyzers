@@ -141,10 +141,10 @@ namespace IDisposableAnalyzers
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(
+                containingType,
                 usesUnderscoreNames
                     ? "_disposable"
                     : "disposable",
-                containingType,
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
                 CompositeDisposableType,

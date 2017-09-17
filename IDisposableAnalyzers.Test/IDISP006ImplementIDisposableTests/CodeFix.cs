@@ -49,10 +49,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -77,16 +76,16 @@ namespace RoslynSandbox
         {
         }
 
+        private void Meh()
+        {
+        }
+
         private void ThrowIfDisposed()
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
-        }
-
-        private void Meh()
-        {
         }
     }
 }";
@@ -133,10 +132,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -160,6 +158,10 @@ namespace RoslynSandbox
             this.Dispose(true);
         }
 
+        protected virtual void Bar()
+        {
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (this.disposed)
@@ -173,15 +175,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected virtual void Bar()
-        {
-        }
-
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
 
@@ -210,10 +208,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -232,7 +229,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -246,6 +243,7 @@ namespace RoslynSandbox
         {
             var testCode = @"
 using System.IO;
+
 namespace RoslynSandbox
 {
     public sealed class Foo
@@ -254,11 +252,12 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"using System;
+            var fixedCode = @"
 using System.IO;
+
 namespace RoslynSandbox
 {
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -277,7 +276,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -303,10 +302,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -325,7 +323,7 @@ namespace RoslynSandbox
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new System.ObjectDisposedException(GetType().FullName);
             }
         }
     }
@@ -353,10 +351,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         public const int Value = 2;
 
@@ -377,7 +374,7 @@ namespace RoslynSandbox
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new System.ObjectDisposedException(GetType().FullName);
             }
         }
     }
@@ -403,10 +400,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public abstract class Foo : IDisposable
+    public abstract class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -429,11 +425,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -459,10 +455,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public abstract class Foo : IDisposable
+    public abstract class Foo : System.IDisposable
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -485,11 +480,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new System.ObjectDisposedException(GetType().FullName);
             }
         }
     }
@@ -499,7 +494,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ImplementIDisposableWhenInterfaceIsMissing()
+        public void WhenInterfaceIsMissing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -516,22 +511,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public sealed class Foo : IDisposable
-    {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-            AnalyzerAssert.CodeFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(testCode, fixedCode, "Implement IDisposable and make class sealed.");
+            AnalyzerAssert.NoFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(testCode);
         }
 
         [Test]
@@ -555,10 +535,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class Foo : System.IDisposable
     {
         private bool disposed;
 
@@ -582,7 +561,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -828,10 +807,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.Windows.Controls;
 
-    public partial sealed class CodeTabView : UserControl, IDisposable
+    public partial sealed class CodeTabView : UserControl, System.IDisposable
     {
         private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
         private bool disposed;
@@ -850,7 +828,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }

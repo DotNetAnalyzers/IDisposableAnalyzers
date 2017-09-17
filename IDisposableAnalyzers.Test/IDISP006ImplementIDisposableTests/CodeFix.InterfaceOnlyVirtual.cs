@@ -47,7 +47,7 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
@@ -196,7 +196,7 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
@@ -253,7 +253,7 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {

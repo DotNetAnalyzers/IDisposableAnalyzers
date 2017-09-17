@@ -1,28 +1,42 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    using Microsoft.CodeAnalysis.Formatting;
 
     internal static class DocumentEditorExt
     {
-        internal static FieldDeclarationSyntax AddField(this DocumentEditor editor, string name, TypeDeclarationSyntax containingType, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
+        internal static FieldDeclarationSyntax AddField(
+            this DocumentEditor editor,
+            TypeDeclarationSyntax containingType,
+            string name,
+            Accessibility accessibility,
+            DeclarationModifiers modifiers,
+            ITypeSymbol type,
+            CancellationToken cancellationToken)
         {
             return AddField(
                 editor,
-                name,
                 containingType,
+                name,
                 accessibility,
                 modifiers,
                 SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)),
                 cancellationToken);
         }
 
-        internal static FieldDeclarationSyntax AddField(this DocumentEditor editor, string name, TypeDeclarationSyntax containingType, Accessibility accessibility, DeclarationModifiers modifiers, TypeSyntax type, CancellationToken cancellationToken)
+        internal static FieldDeclarationSyntax AddField(
+            this DocumentEditor editor,
+            TypeDeclarationSyntax containingType,
+            string name,
+            Accessibility accessibility,
+            DeclarationModifiers modifiers,
+            TypeSyntax type,
+            CancellationToken cancellationToken)
         {
             var declaredSymbol = (INamedTypeSymbol)editor.SemanticModel.GetDeclaredSymbolSafe(containingType, cancellationToken);
             while (declaredSymbol.MemberNames.Contains(name))
@@ -41,60 +55,12 @@
 
         internal static void AddField(this DocumentEditor editor, TypeDeclarationSyntax containingType, FieldDeclarationSyntax field)
         {
-            FieldDeclarationSyntax existing = null;
-            foreach (var member in containingType.Members)
-            {
-                if (member is FieldDeclarationSyntax candidate)
-                {
-                    if (field.IsInsertBefore(candidate))
-                    {
-                        editor.InsertBefore(candidate, field);
-                        return;
-                    }
-
-                    existing = candidate;
-                    continue;
-                }
-
-                editor.InsertBefore(member, field);
-                return;
-            }
-
-            if (existing != null)
-            {
-                editor.InsertAfter(existing, field);
-            }
-            else
-            {
-                editor.AddMember(containingType, field);
-            }
+            editor.ReplaceNode(containingType, (node, generator) => AddSorted(generator, (TypeDeclarationSyntax)node, field));
         }
 
         internal static void AddMethod(this DocumentEditor editor, TypeDeclarationSyntax containingType, MethodDeclarationSyntax method)
         {
-            MethodDeclarationSyntax existing = null;
-            foreach (var member in containingType.Members)
-            {
-                if (member is MethodDeclarationSyntax candidate)
-                {
-                    if (method.IsInsertBefore(candidate))
-                    {
-                        editor.InsertBefore(candidate, method);
-                        return;
-                    }
-
-                    existing = candidate;
-                }
-            }
-
-            if (existing != null)
-            {
-                editor.InsertAfter(existing, method);
-            }
-            else
-            {
-                editor.AddMember(containingType, method);
-            }
+            editor.ReplaceNode(containingType, (node, generator) => AddSorted(generator, (TypeDeclarationSyntax)node, method));
         }
 
         internal static DocumentEditor MakeSealed(this DocumentEditor editor, ClassDeclarationSyntax type)
@@ -103,12 +69,12 @@
             foreach (var member in type.Members)
             {
                 var modifiers = member.Modifiers();
-                if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out SyntaxToken modifier))
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword))
                 {
                     editor.SetAccessibility(member, Accessibility.Private);
                 }
 
-                if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                if (modifiers.Any(SyntaxKind.VirtualKeyword))
                 {
                     editor.SetModifiers(member, DeclarationModifiers.None);
                 }
@@ -118,15 +84,14 @@
                 {
                     foreach (var accessor in prop.AccessorList.Accessors)
                     {
-                        modifiers = accessor.Modifiers;
-                        if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                        if (modifiers.Any(SyntaxKind.ProtectedKeyword))
                         {
-                            editor.SetAccessibility(member, Accessibility.Private);
+                            editor.SetModifiers(accessor, DeclarationModifiers.None);
                         }
 
-                        if (modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out modifier))
+                        if (accessor.Modifiers.Any(SyntaxKind.ProtectedKeyword))
                         {
-                            editor.SetModifiers(member, DeclarationModifiers.None);
+                            editor.SetAccessibility(accessor, Accessibility.Private);
                         }
                     }
                 }
@@ -135,14 +100,120 @@
             return editor;
         }
 
-        private static bool IsInsertBefore(this FieldDeclarationSyntax toAdd, FieldDeclarationSyntax existing)
+        private static SyntaxNode AddSorted(SyntaxGenerator generator, TypeDeclarationSyntax containingType, MemberDeclarationSyntax memberDeclaration)
         {
-            return Index(existing.Modifiers) > Index(toAdd.Modifiers);
+            var memberIndex = MemberIndex(memberDeclaration);
+            for (var i = 0; i < containingType.Members.Count; i++)
+            {
+                var member = containingType.Members[i];
+                if (memberIndex < MemberIndex(member))
+                {
+                    return generator.InsertMembers(containingType, i, memberDeclaration);
+                }
+            }
+
+            return generator.AddMembers(containingType, memberDeclaration);
         }
 
-        private static bool IsInsertBefore(this MethodDeclarationSyntax toAdd, MethodDeclarationSyntax existing)
+        private static int MemberIndex(MemberDeclarationSyntax member)
         {
-            return Index(existing.Modifiers) > Index(toAdd.Modifiers);
+            int ModifierOffset(SyntaxTokenList modifiers)
+            {
+                if (modifiers.Any(SyntaxKind.ConstKeyword))
+                {
+                    return 0;
+                }
+
+                if (modifiers.Any(SyntaxKind.StaticKeyword))
+                {
+                    if (modifiers.Any(SyntaxKind.ReadOnlyKeyword))
+                    {
+                        return 1;
+                    }
+
+                    return 2;
+                }
+
+                if (modifiers.Any(SyntaxKind.ReadOnlyKeyword))
+                {
+                    return 3;
+                }
+
+                return 4;
+            }
+
+            int AccessOffset(Accessibility accessibility)
+            {
+                const int step = 5;
+                switch (accessibility)
+                {
+                    case Accessibility.Public:
+                        return 0 * step;
+                    case Accessibility.Internal:
+                        return 1 * step;
+                    case Accessibility.ProtectedAndInternal:
+                        return 2 * step;
+                    case Accessibility.ProtectedOrInternal:
+                        return 3 * step;
+                    case Accessibility.Protected:
+                        return 4 * step;
+                    case Accessibility.Private:
+                        return 5 * step;
+                    case Accessibility.NotApplicable:
+                        return int.MinValue;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, null);
+                }
+            }
+
+            Accessibility Accessability(SyntaxTokenList modifiers)
+            {
+                if (modifiers.Any(SyntaxKind.PublicKeyword))
+                {
+                    return Accessibility.Public;
+                }
+
+                if (modifiers.Any(SyntaxKind.InternalKeyword))
+                {
+                    return Accessibility.Public;
+                }
+
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword))
+                {
+                    return Accessibility.Protected;
+                }
+
+                if (modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    return Accessibility.Private;
+                }
+
+                return Accessibility.Private;
+            }
+
+            int TypeOffset(SyntaxKind kind)
+            {
+                const int step = 5 * 6;
+                switch (kind)
+                {
+                    case SyntaxKind.FieldDeclaration:
+                        return 0 * step;
+                    case SyntaxKind.ConstructorDeclaration:
+                        return 1 * step;
+                    case SyntaxKind.EventDeclaration:
+                    case SyntaxKind.EventFieldDeclaration:
+                        return 2 * step;
+                    case SyntaxKind.PropertyDeclaration:
+                        return 3 * step;
+                    case SyntaxKind.MethodDeclaration:
+                        return 4 * step;
+                    default:
+                        return int.MinValue;
+                }
+            }
+
+            var mfs = member.Modifiers();
+            return TypeOffset(member.Kind()) + AccessOffset(Accessability(mfs)) + ModifierOffset(mfs);
         }
 
         private static SyntaxTokenList Modifiers(this MemberDeclarationSyntax member)
@@ -160,72 +231,6 @@
                 default:
                     return default(SyntaxTokenList);
             }
-        }
-
-        private static MemberDeclarationSyntax WithModifiers(this MemberDeclarationSyntax member, SyntaxTokenList modifiers)
-        {
-            switch (member)
-            {
-                case FieldDeclarationSyntax field:
-                    return field.WithModifiers(modifiers);
-                case ConstructorDeclarationSyntax ctor:
-                    return ctor.WithModifiers(modifiers);
-                case EventDeclarationSyntax @event:
-                    return @event.WithModifiers(modifiers);
-                case PropertyDeclarationSyntax prop:
-                    return prop.WithModifiers(modifiers);
-                case MethodDeclarationSyntax method:
-                    return method.WithModifiers(modifiers);
-                case ClassDeclarationSyntax type:
-                    return type.WithModifiers(modifiers);
-                default:
-                    return member;
-            }
-        }
-
-        private static int Index(SyntaxTokenList modifiers)
-        {
-            int SubIndex(SyntaxTokenList ms, int i)
-            {
-                if (modifiers.Any(SyntaxKind.ConstKeyword))
-                {
-                    return i;
-                }
-
-                if (modifiers.Any(SyntaxKind.StaticKeyword))
-                {
-                    if (modifiers.Any(SyntaxKind.ReadOnlyKeyword))
-                    {
-                        return i + 1;
-                    }
-
-                    return i + 2;
-                }
-
-                return i + 3;
-            }
-
-            if (modifiers.Any(SyntaxKind.PublicKeyword))
-            {
-                return SubIndex(modifiers, 0);
-            }
-
-            if (modifiers.Any(SyntaxKind.InternalKeyword))
-            {
-                return SubIndex(modifiers, 4);
-            }
-
-            if (modifiers.Any(SyntaxKind.ProtectedKeyword))
-            {
-                return SubIndex(modifiers, 8);
-            }
-
-            if (modifiers.Any(SyntaxKind.PrivateKeyword))
-            {
-                return SubIndex(modifiers, 12);
-            }
-
-            return SubIndex(modifiers, 0);
         }
     }
 }
