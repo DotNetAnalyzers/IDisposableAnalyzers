@@ -175,7 +175,13 @@
 
                 if (modifiers.Any(SyntaxKind.InternalKeyword))
                 {
-                    return Accessibility.Public;
+                    return Accessibility.Internal;
+                }
+
+                if (modifiers.Any(SyntaxKind.ProtectedKeyword) &&
+                    modifiers.Any(SyntaxKind.InternalKeyword))
+                {
+                    return Accessibility.ProtectedAndInternal;
                 }
 
                 if (modifiers.Any(SyntaxKind.ProtectedKeyword))

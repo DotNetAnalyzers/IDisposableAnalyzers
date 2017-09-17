@@ -379,7 +379,7 @@ namespace RoslynSandbox
 
         public void Meh()
         {
-            ↓stream = File.OpenRead(string.Empty);
+            ↓this.stream = File.OpenRead(string.Empty);
         }
     }
 }";
@@ -396,8 +396,8 @@ namespace RoslynSandbox
 
         public void Meh()
         {
-            stream?.Dispose();
-            stream = File.OpenRead(string.Empty);
+            this.stream?.Dispose();
+            this.stream = File.OpenRead(string.Empty);
         }
     }
 }";
