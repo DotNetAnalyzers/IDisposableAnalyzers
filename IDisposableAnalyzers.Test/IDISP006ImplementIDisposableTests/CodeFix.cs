@@ -132,10 +132,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -159,6 +158,10 @@ namespace RoslynSandbox
             this.Dispose(true);
         }
 
+        protected virtual void Bar()
+        {
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (this.disposed)
@@ -172,15 +175,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected virtual void Bar()
-        {
-        }
-
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
 
@@ -401,10 +400,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public abstract class Foo : IDisposable
+    public abstract class Foo : System.IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -427,11 +425,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (this.disposed)
             {
-                throw new ObjectDisposedException(this.GetType().FullName);
+                throw new System.ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -457,10 +455,9 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
-    public abstract class Foo : IDisposable
+    public abstract class Foo : System.IDisposable
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -483,11 +480,11 @@ namespace RoslynSandbox
             }
         }
 
-        protected void ThrowIfDisposed()
+        protected virtual void ThrowIfDisposed()
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new System.ObjectDisposedException(GetType().FullName);
             }
         }
     }
