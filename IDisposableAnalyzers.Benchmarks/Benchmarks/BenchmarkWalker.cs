@@ -17,10 +17,13 @@
 
         public BenchmarkWalker(Project project, DiagnosticAnalyzer analyzer)
         {
+            this.Analyzer = analyzer;
             this.project = project;
             analyzer.Initialize(this.context);
             this.walker = new Walker(this.context.Actions);
         }
+
+        public DiagnosticAnalyzer Analyzer { get; }
 
         public void Run()
         {
@@ -32,6 +35,11 @@
                     this.walker.Visit(root);
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(this.project)}: {this.project.Name}, {nameof(this.Analyzer)}: {this.Analyzer.GetType().Name}";
         }
 
         private class Walker : CSharpSyntaxWalker

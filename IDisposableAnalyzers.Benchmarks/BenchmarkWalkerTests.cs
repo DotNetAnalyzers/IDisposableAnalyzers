@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using IDisposableAnalyzers.Benchmarks.Benchmarks;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -9,19 +10,32 @@
 
     internal class BenchmarkWalkerTests
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly.GetTypes()
-                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                               .ToArray();
+        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
+                                                                                                    .GetTypes()
+                                                                                                    .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+                                                                                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                                                    .ToArray();
 
-        private static readonly IReadOnlyList<Type> AllBenchmarkTypes = typeof(AnalyzerBenchmarks).Assembly.GetTypes()
+        private static IReadOnlyList<Type> AllBenchmarkTypes { get; } = typeof(AnalyzerBenchmarks).Assembly.GetTypes()
                                                                                                   .Where(typeof(AnalyzerBenchmarks).IsAssignableFrom)
                                                                                                   .ToArray();
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public void Run(DiagnosticAnalyzer analyzer)
+        private static IReadOnlyList<BenchmarkWalker> AllBenchmarkWalkers { get; } = AllAnalyzers
+            .Select(x => new BenchmarkWalker(Code.AnalyzersProject, x))
+            .ToArray();
+
+        [OneTimeSetUp]
+        public void OneTimeSetUp()
         {
-            var walker = new BenchmarkWalker(Code.AnalyzersProject, analyzer);
+            foreach (var walker in AllBenchmarkWalkers)
+            {
+                walker.Run();
+            }
+        }
+
+        [TestCaseSource(nameof(AllBenchmarkWalkers))]
+        public void Run(BenchmarkWalker walker)
+        {
             walker.Run();
         }
 
@@ -31,6 +45,19 @@
             var expectedName = analyzer.GetType().Name + "Benchmarks";
             var match = AllBenchmarkTypes.SingleOrDefault(x => x.Name == expectedName);
             Assert.NotNull(match, expectedName);
+        }
+
+        [Test]
+        public void ProjectFileExists()
+        {
+            var projectFile = Path.Combine(Program.ProjectDirectory, "IDisposableAnalyzers.Benchmarks.csproj");
+            Assert.AreEqual(true, File.Exists(projectFile), projectFile);
+        }
+
+        [Test]
+        public void BenchmarksDirectoryExists()
+        {
+            Assert.AreEqual(true, Directory.Exists(Program.BenchmarksDirectory), Program.BenchmarksDirectory);
         }
     }
 }

@@ -33,6 +33,16 @@
         {
             get
             {
+                var directory = new DirectoryInfo(
+                    Path.Combine(
+                        Path.GetTempPath(),
+                        "IDisposableAnalyzers"));
+                if (directory.Exists)
+                {
+                    // Run at 1f8febc0999f6720c8c068a649a6e2831616b15d
+                    return new FileInfo(Path.Combine(directory.FullName, "IDisposableAnalyzers.sln"));
+                }
+
                 if (CodeFactory.TryFindFileInParentDirectory(
                     new FileInfo(new Uri(Assembly.GetExecutingAssembly().CodeBase, UriKind.Absolute).LocalPath).Directory,
                     "IDisposableAnalyzers.sln",

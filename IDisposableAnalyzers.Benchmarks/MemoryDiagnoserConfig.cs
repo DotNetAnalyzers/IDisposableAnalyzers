@@ -1,3 +1,4 @@
+[assembly: BenchmarkDotNet.Attributes.Config(typeof(IDisposableAnalyzers.Benchmarks.MemoryDiagnoserConfig))]
 namespace IDisposableAnalyzers.Benchmarks
 {
     using BenchmarkDotNet.Configs;
