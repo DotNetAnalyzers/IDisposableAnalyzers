@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
     {
         internal static bool TryGetReturnExpression(this BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
-            return ReturnValueWalker.TrygetSingle(body, semanticModel, cancellationToken, out returnValue);
+            return ReturnValueWalker.TryGetSingle(body, semanticModel, cancellationToken, out returnValue);
         }
 
         internal static bool TryGetAssignment(this BlockSyntax body, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax result)

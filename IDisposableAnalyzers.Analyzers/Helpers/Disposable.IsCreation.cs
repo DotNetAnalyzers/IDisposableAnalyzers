@@ -137,6 +137,11 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
+            if (candidate is ObjectCreationExpressionSyntax)
+            {
+                return Result.Yes;
+            }
+
             using (var pooled = ReturnValueWalker.Create(candidate, Search.Recursive, semanticModel, cancellationToken))
             {
                 if (pooled.Item.Count == 0)

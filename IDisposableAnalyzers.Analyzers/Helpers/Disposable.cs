@@ -16,6 +16,11 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
+            if (candidate is ObjectCreationExpressionSyntax objectCreation)
+            {
+                return IsAssignableTo(semanticModel.GetTypeInfoSafe(objectCreation, cancellationToken).Type);
+            }
+
             return IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type);
         }
 

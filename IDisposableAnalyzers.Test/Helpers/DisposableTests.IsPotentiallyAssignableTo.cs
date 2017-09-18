@@ -1,10 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.Helpers
 {
-    using System;
     using System.Threading;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Moq;
     using NUnit.Framework;
 
     internal partial class DisposableTests
@@ -13,7 +14,6 @@
         {
             [TestCase("1", false)]
             [TestCase("null", false)]
-            [TestCase("System.StringComparison.CurrentCulture", false)]
             [TestCase("\"abc\"", false)]
             public void ShortCircuit(string code, bool expected)
             {
@@ -31,10 +31,11 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, null, CancellationToken.None));
+                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, new Mock<SemanticModel>(MockBehavior.Strict).Object, CancellationToken.None));
             }
 
             [TestCase("new string(' ', 1)", false)]
+            [TestCase("new System.Text.StringBuilder()", false)]
             public void ObjectCreation(string code, bool expected)
             {
                 var testCode = @"
@@ -42,14 +43,10 @@ namespace RoslynSandbox
 {
     internal class Foo
     {
-        private const int ConstInt = 1;
-
         internal Foo()
         {
             var value = PLACEHOLDER;
         }
-
-        public int Value { get; } = 2;
     }
 }";
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);

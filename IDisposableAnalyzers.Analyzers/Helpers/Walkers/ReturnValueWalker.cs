@@ -64,7 +64,7 @@
             this.AddReturnValue(node.Expression);
         }
 
-        internal static bool TrygetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
+        internal static bool TryGetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
             using (var pooled = Create(body, Search.TopLevel, semanticModel, cancellationToken))
             {
