@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.Helpers
     using System;
     using System.Linq;
     using System.Threading;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
