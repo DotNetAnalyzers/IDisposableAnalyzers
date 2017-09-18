@@ -51,7 +51,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, semanticModel, CancellationToken.None));

@@ -29,7 +29,7 @@ internal class Foo
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var text = await CreateAsync()").Value;
             using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
@@ -118,7 +118,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
@@ -292,7 +292,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
@@ -340,7 +340,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("Func<int> temp = () => 1", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
@@ -472,7 +472,7 @@ namespace RoslynSandbox
 }";
             testCode = testCode.AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
             using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))

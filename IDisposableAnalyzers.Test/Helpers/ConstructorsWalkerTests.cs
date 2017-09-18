@@ -29,7 +29,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))

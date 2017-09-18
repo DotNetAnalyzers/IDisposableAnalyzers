@@ -40,7 +40,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
                 var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
@@ -101,7 +101,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
                 var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
@@ -163,7 +163,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code1);
                 var other = syntaxTree.BestMatch<ConstructorDeclarationSyntax>(code2);
@@ -196,7 +196,7 @@ internal class Foo
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -228,7 +228,7 @@ internal class Foo
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -278,7 +278,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -332,7 +332,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);
@@ -386,7 +386,7 @@ internal class Foo : FooBase
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.ConstructorDeclarationSyntax(firstSignature);
                 var other = syntaxTree.ConstructorDeclarationSyntax(otherSignature);

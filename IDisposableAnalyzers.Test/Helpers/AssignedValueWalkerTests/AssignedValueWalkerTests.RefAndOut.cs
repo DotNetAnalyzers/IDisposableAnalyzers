@@ -26,7 +26,7 @@ internal class Foo
         outValue = arg;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause("var temp = value").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -68,7 +68,7 @@ internal class Foo
         outValue = arg;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -96,7 +96,7 @@ internal class Foo<T>
         outValue = default(T);
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause("var temp = value;").Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -171,7 +171,7 @@ internal class Foo
         value2 = 1;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -201,7 +201,7 @@ internal class Foo
         value = 1;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -244,7 +244,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -287,7 +287,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -330,7 +330,7 @@ namespace RoslynSandbox
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))

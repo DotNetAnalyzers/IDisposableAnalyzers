@@ -1,7 +1,7 @@
 namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
-
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -29,7 +29,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.value");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
@@ -61,7 +61,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.value");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo()");
@@ -102,7 +102,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.number");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo(int arg)");
@@ -139,7 +139,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.BestMatch<MemberAccessExpressionSyntax>("this.number");
                 var ctor = syntaxTree.BestMatch<ConstructorDeclarationSyntax>("Foo()");

@@ -51,7 +51,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var symbol = semanticModel.GetSymbolSafe(member, CancellationToken.None);
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);
@@ -105,7 +105,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var symbol = semanticModel.GetSymbolSafe(member, CancellationToken.None);
                 Assert.AreEqual(expected.Split('.').Last(), symbol.Name);

@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
@@ -28,7 +29,7 @@ public sealed class Foo
         var temp3 = this.Bar;
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -60,7 +61,7 @@ public sealed class Foo
         var temp3 = this.Bar;
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -104,7 +105,7 @@ public sealed class Foo
         var temp6 = this.Bar;
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code1).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -151,7 +152,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -183,7 +184,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause("var temp = this.bar").Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -217,7 +218,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause("var temp = this.bar").Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -261,7 +262,7 @@ public sealed class Foo
         var temp6 = this.Bar;
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -305,7 +306,7 @@ public sealed class Foo
         var temp6 = this.Bar;
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -365,7 +366,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -404,7 +405,7 @@ namespace RoslynSandbox
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.EqualsValueClause(code).Value;
             using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))

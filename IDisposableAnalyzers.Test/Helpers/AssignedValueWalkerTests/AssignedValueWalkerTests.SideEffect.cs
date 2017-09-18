@@ -40,7 +40,7 @@ internal class Foo
         this.value = arg;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -80,7 +80,7 @@ internal class Foo
         this.value = arg;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))
@@ -120,7 +120,7 @@ internal class Foo
         this.text = textArg;
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.All);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.EqualsValueClause(code).Value;
                 using (var pooled = AssignedValueWalker.Create(value, semanticModel, CancellationToken.None))

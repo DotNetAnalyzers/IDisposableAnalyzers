@@ -33,10 +33,7 @@
         {
             get
             {
-                var directory = new DirectoryInfo(
-                    Path.Combine(
-                        Path.GetTempPath(),
-                        "IDisposableAnalyzers"));
+                var directory = new DirectoryInfo(Path.Combine(Path.GetTempPath(), "IDisposableAnalyzers"));
                 if (directory.Exists)
                 {
                     // Run at 1f8febc0999f6720c8c068a649a6e2831616b15d
