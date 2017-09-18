@@ -6,7 +6,7 @@ authors Johan Larsson, milleniumbug
 owners Johan Larsson
 copyright Copyright Johan Larsson 2017
 developmentDependency true
-description Roslyn analyzers.
+description Roslyn analyzers for IDisposable.
 tags Roslyn Diagnostic Analyzer DotnetAnalyzers IDisposable
 
 projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers

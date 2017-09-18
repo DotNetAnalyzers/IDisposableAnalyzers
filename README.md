@@ -1,5 +1,5 @@
 # IDisposableAnalyzers
-Roslyn analysers for the use of types implementing IDisposable
+Roslyn analyzers for IDisposable
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.md)
 [![Gitter](https://badges.gitter.im/DotNetAnalyzers/IDisposableAnalyzers.svg)](https://gitter.im/DotNetAnalyzers/IDisposableAnalyzers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
