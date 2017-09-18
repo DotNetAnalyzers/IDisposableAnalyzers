@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Benchmarks
 
         public static void Main()
         {
-            foreach (var summary in RunSingle<Benchmarks.IDISP002DisposeMember>())
+            foreach (var summary in RunAll())
             {
                 CopyResult(summary.Title);
             }

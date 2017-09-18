@@ -27,6 +27,8 @@
 
         public static Solution Solution { get; } = CodeFactory.CreateSolution(SlnFile, new DiagnosticAnalyzer[0], MetadataReferences);
 
+        public static Project AnalyzersProject { get; } = Solution.Projects.First(x => x.Name == "IDisposableAnalyzers.Analyzers");
+
         private static FileInfo SlnFile
         {
             get

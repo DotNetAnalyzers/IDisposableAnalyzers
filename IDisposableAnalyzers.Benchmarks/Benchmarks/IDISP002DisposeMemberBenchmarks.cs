@@ -1,8 +1,8 @@
 namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
-    public class IDISP002DisposeMember : Analyzer
+    public class IDISP002DisposeMemberBenchmarks : AnalyzerBenchmarks
     {
-        public IDISP002DisposeMember()
+        public IDISP002DisposeMemberBenchmarks()
             : base(new IDisposableAnalyzers.IDISP002DisposeMember())
         {
         }

@@ -16,7 +16,7 @@
     <Rule Id="GU0003" Action="Warning" />
     <Rule Id="GU0004" Action="Warning" />
     <Rule Id="GU0006" Action="Warning" />
-    <Rule Id="GU0007" Action="Warning" />
+    <Rule Id="GU0007" Action="None" />
     <Rule Id="GU0008" Action="Warning" />
     <Rule Id="GU0010" Action="Warning" />
     <Rule Id="GU0011" Action="Warning" />
@@ -104,5 +104,8 @@
     <Rule Id="SA1615" Action="None" />
     <Rule Id="SA1633" Action="None" />
     <Rule Id="SA1652" Action="None" />
+  </Rules>
+  <Rules AnalyzerId="Gu.Analyzers.Analyzers" RuleNamespace="Gu.Analyzers.Analyzers">
+    <Rule Id="GU0007" Action="None" />
   </Rules>
 </RuleSet>
