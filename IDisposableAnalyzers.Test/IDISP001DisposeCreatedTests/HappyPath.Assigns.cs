@@ -41,11 +41,11 @@ namespace RoslynSandbox
     {
         private readonly Stream stream;
 
-        public Foo()
+        public Foo(bool flag)
         {
             var temp = File.OpenRead(string.Empty);
-            this.stream = true 
-                ? temp
+            this.stream = flag 
+                ? null
                 : temp;
         }
     }

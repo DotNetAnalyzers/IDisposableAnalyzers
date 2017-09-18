@@ -118,6 +118,16 @@
             {
                 foreach (var candidate in pooledAssignments.Item.Assignments)
                 {
+                    if (candidate.Right is ConditionalExpressionSyntax conditional)
+                    {
+                        if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(conditional.WhenTrue, cancellationToken)) ||
+                            SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(conditional.WhenFalse, cancellationToken)))
+                        {
+                            assignment = candidate;
+                            return true;
+                        }
+                    }
+
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Right, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
                     {
