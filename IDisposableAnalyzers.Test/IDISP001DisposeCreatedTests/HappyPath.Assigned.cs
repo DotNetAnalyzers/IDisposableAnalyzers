@@ -8,6 +8,24 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Assigned
         {
             [Test]
+            public void AssignLocalWithInt()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            var temp = 1;
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid<IDISP001DisposeCreated>(DisposableCode, testCode);
+            }
+
+            [Test]
             public void AssignField()
             {
                 var testCode = @"

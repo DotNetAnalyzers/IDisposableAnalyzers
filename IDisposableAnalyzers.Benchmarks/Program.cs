@@ -32,13 +32,22 @@ namespace IDisposableAnalyzers.Benchmarks
 
         public static void Main()
         {
-            if (true)
+            if (false)
             {
                 var walker = new BenchmarkWalker(Code.AnalyzersProject, new IDISP001DisposeCreated());
+
+                // Warmup
                 walker.Run();
                 Console.WriteLine("Attach profiler and press any key to continue...");
                 Console.ReadKey();
                 walker.Run();
+            }
+            else if (true)
+            {
+                foreach (var summary in RunSingle<IDISP001DisposeCreatedBenchmarks>())
+                {
+                    CopyResult(summary.Title);
+                }
             }
             else
             {
