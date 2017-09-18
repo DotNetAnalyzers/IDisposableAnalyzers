@@ -300,7 +300,7 @@
                     for (var i = before; i < this.values.Count; i++)
                     {
                         if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
-    parameter.RefKind != RefKind.Out)
+                            parameter.RefKind != RefKind.Out)
                         {
                             if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out ExpressionSyntax arg))
                             {

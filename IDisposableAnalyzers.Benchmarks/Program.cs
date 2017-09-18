@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
     using Gu.Roslyn.Asserts;
+    using IDisposableAnalyzers.Benchmarks.Benchmarks;
 
     public class Program
     {
@@ -31,9 +32,20 @@ namespace IDisposableAnalyzers.Benchmarks
 
         public static void Main()
         {
-            foreach (var summary in RunAll())
+            if (true)
             {
-                CopyResult(summary.Title);
+                var walker = new BenchmarkWalker(Code.AnalyzersProject, new IDISP001DisposeCreated());
+                walker.Run();
+                Console.WriteLine("Attach profiler and press any key to continue...");
+                Console.ReadKey();
+                walker.Run();
+            }
+            else
+            {
+                foreach (var summary in RunAll())
+                {
+                    CopyResult(summary.Title);
+                }
             }
         }
 
