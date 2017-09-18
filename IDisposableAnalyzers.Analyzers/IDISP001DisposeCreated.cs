@@ -43,14 +43,13 @@
             var variableDeclaration = (VariableDeclarationSyntax)context.Node;
             foreach (var declarator in variableDeclaration.Variables)
             {
-                var local = context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) as ILocalSymbol;
-                if (local == null ||
-                    !Disposable.IsPotentiallyAssignableTo(local.Type))
+                var value = declarator.Initializer?.Value;
+                if (value == null ||
+                    !Disposable.IsPotentiallyAssignableTo(value, context.SemanticModel, context.CancellationToken))
                 {
-                    return;
+                    continue;
                 }
 
-                var value = declarator.Initializer?.Value;
                 if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
                               .IsEither(Result.Yes, Result.Maybe))
                 {
@@ -66,24 +65,27 @@
                         return;
                     }
 
-                    if (IsReturned(local, block, context.SemanticModel, context.CancellationToken))
+                    if (context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local)
                     {
-                        return;
-                    }
+                        if (IsReturned(local, block, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
 
-                    if (IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
+                        if (IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
 
-                    if (IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
+                        if (IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
 
-                    if (IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
+                        if (IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
+                        {
+                            return;
+                        }
                     }
 
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));

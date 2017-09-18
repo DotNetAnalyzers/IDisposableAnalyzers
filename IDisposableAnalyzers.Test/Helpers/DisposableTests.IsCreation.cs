@@ -6,7 +6,7 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
-    internal class DisposableTests
+    internal partial class DisposableTests
     {
         internal class IsCreation
         {

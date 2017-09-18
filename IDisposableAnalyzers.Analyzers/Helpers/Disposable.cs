@@ -7,11 +7,16 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static bool IsPotentiallyAssignableTo(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsPotentiallyAssignableTo(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return disposable != null &&
-                   !disposable.IsMissing &&
-                   IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type);
+            if (candidate == null ||
+                candidate.IsMissing ||
+                candidate is LiteralExpressionSyntax)
+            {
+                return false;
+            }
+
+            return IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type);
         }
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
