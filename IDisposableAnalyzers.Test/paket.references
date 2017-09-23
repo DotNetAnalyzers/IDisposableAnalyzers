@@ -1,11 +1,11 @@
-group Test
-  Microsoft.CodeAnalysis.CSharp.Workspaces
-  NUnit
-  Moq
-  Gu.Roslyn.Asserts
-  System.Reactive
-  System.Reactive.Linq
-  System.Reactive.PlatformServices
+Microsoft.CodeAnalysis.CSharp.Workspaces
+NUnit
+Moq
+Gu.Roslyn.Asserts
+System.Reactive
+System.Reactive.Linq
+System.Reactive.PlatformServices
+
 
 group Analyzers
   StyleCop.Analyzers

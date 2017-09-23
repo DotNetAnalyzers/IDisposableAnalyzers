@@ -7,8 +7,6 @@
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Analyzers.ruleset</CodeAnalysisRuleSet>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

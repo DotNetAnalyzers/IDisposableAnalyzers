@@ -391,10 +391,7 @@
                         field));
             }
 
-            if (classDeclaration.BaseList?.Types.TryGetSingle(
-                    x => (x.Type as IdentifierNameSyntax)
-                         ?.Identifier.ValueText.Contains("IDisposable") == true,
-                    out BaseTypeSyntax _) != true)
+            if (classDeclaration.BaseList?.Types.TryGetFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
             {
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
