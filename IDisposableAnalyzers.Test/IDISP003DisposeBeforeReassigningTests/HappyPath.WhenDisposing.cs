@@ -61,6 +61,67 @@ namespace RoslynSandbox
                 AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
             }
 
+            [TestCase("stream.Dispose();")]
+            [TestCase("stream?.Dispose();")]
+            public void DisposeBeforeAssigningBeforeIfElse(string dispose)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            stream.Dispose();
+            if (true)
+            {
+                stream = null;
+            }
+            else
+            {
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
+            }
+
+            [TestCase("stream.Dispose();")]
+            [TestCase("stream?.Dispose();")]
+            public void DisposeFieldBeforeIfElseReassigning(string dispose)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private Stream stream = File.OpenRead(string.Empty);
+
+        public void Meh()
+        {
+            this.stream.Dispose();
+            if (true)
+            {
+                this.stream = null;
+            }
+            else
+            {
+                this.stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+                AnalyzerAssert.Valid<IDISP003DisposeBeforeReassigning>(testCode);
+            }
+
             [Test]
             public void DisposingParameter()
             {
