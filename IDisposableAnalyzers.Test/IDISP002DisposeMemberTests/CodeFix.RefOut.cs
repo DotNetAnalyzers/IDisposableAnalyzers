@@ -22,7 +22,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            if(TryGetStream(out this.stream))
+            if (TryGetStream(out this.stream))
             {
             }
         }
@@ -52,7 +52,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            if(TryGetStream(out this.stream))
+            if (TryGetStream(out this.stream))
             {
             }
         }

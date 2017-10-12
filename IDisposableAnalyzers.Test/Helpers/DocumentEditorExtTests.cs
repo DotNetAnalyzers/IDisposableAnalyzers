@@ -28,7 +28,7 @@ namespace RoslynSandbox
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
@@ -66,12 +66,13 @@ namespace RoslynSandbox
     {
         public int Filed1 = 1;
         private int filed1;
-privatebooldisposable;
+        private bool disposable;
+
         public Foo()
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
@@ -118,7 +119,7 @@ namespace RoslynSandbox
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
@@ -167,7 +168,7 @@ namespace RoslynSandbox
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
@@ -215,7 +216,7 @@ namespace RoslynSandbox
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
@@ -264,7 +265,7 @@ namespace RoslynSandbox
         {
         }
 
-        private Foo( int i)
+        private Foo(int i)
         {
         }
 
