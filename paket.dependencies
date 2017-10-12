@@ -1,7 +1,7 @@
 source http://www.nuget.org/api/v2/
 storage: none
 
-nuget Microsoft.CodeAnalysis.CSharp.Workspaces 1.3.1 lowest_matching: true
+nuget Microsoft.CodeAnalysis.CSharp.Workspaces 1.2.1 strategy: min
 nuget NUnit
 nuget Moq
 nuget Gu.Roslyn.Asserts
