@@ -89,7 +89,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            if(TryGetStream(ref this.stream))
+            if (TryGetStream(ref this.stream))
             {
             }
         }
@@ -119,7 +119,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            if(TryGetStream(ref this.stream))
+            if (TryGetStream(ref this.stream))
             {
             }
         }

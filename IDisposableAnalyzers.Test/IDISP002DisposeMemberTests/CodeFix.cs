@@ -147,7 +147,7 @@ namespace RoslynSandbox
     class Foo : IDisposable
     {
         ↓IDisposable _disposable;
-        public void Create()  => _disposable = new Disposable();
+        public void Create() => _disposable = new Disposable();
         public void Dispose()
         {
         }
@@ -162,7 +162,7 @@ namespace RoslynSandbox
     class Foo : IDisposable
     {
         IDisposable _disposable;
-        public void Create()  => _disposable = new Disposable();
+        public void Create() => _disposable = new Disposable();
         public void Dispose()
         {
             _disposable?.Dispose();
@@ -337,7 +337,7 @@ namespace RoslynSandbox
 
         public Foo(bool condition)
         {
-            if(condition)
+            if (condition)
             {
                 this.stream = File.OpenRead(string.Empty);
             }
@@ -361,7 +361,7 @@ namespace RoslynSandbox
 
         public Foo(bool condition)
         {
-            if(condition)
+            if (condition)
             {
                 this.stream = File.OpenRead(string.Empty);
             }
@@ -487,7 +487,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓protected Stream stream = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -503,7 +503,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         protected Stream stream = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             this.stream?.Dispose();
@@ -527,7 +527,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             stream1.Dispose();
@@ -545,7 +545,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             stream1.Dispose();
@@ -570,7 +570,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
+
         public void Dispose() => this.stream1.Dispose();
     }
 }";
@@ -585,7 +585,7 @@ namespace RoslynSandbox
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             this.stream1.Dispose();
@@ -609,7 +609,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓private readonly object stream = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -625,7 +625,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         private readonly object stream = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             (this.stream as IDisposable)?.Dispose();
@@ -648,7 +648,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -664,7 +664,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         public Stream Stream { get; set; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             this.Stream?.Dispose();
@@ -687,7 +687,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -703,7 +703,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         public Stream Stream { get; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             this.Stream?.Dispose();
@@ -726,7 +726,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓public object Stream { get; set; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -742,7 +742,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         public object Stream { get; set; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             (this.Stream as IDisposable)?.Dispose();
@@ -765,7 +765,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         ↓public object Stream { get; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
         }
@@ -781,7 +781,7 @@ namespace RoslynSandbox
     public sealed class Foo : IDisposable
     {
         public object Stream { get; } = File.OpenRead(string.Empty);
-        
+
         public void Dispose()
         {
             (this.Stream as IDisposable)?.Dispose();
