@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Threading;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,29 +10,31 @@ namespace IDisposableAnalyzers
     {
         internal static bool UsesUnderscoreNames(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = Walker.Create(node, semanticModel, cancellationToken))
+            using (var walker = Walker.Borrow(node, semanticModel, cancellationToken))
             {
-                if (pooled.Item.UsesThis == Result.Yes)
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
                 {
                     return false;
                 }
 
-                if (pooled.Item.UsesUnderScore == Result.Yes)
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
                 {
                     return true;
                 }
-            }
 
-            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
-            {
-                using (var pooled = Walker.Create(tree.GetRoot(cancellationToken), semanticModel, cancellationToken))
+                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
-                    if (pooled.Item.UsesThis == Result.Yes)
+                    walker.Visit(tree.GetRoot(cancellationToken));
+                    if (walker.UsesThis == Result.Yes ||
+                        walker.UsesUnderScore == Result.No)
                     {
                         return false;
                     }
 
-                    if (pooled.Item.UsesUnderScore == Result.Yes)
+                    if (walker.UsesUnderScore == Result.Yes ||
+                        walker.UsesThis == Result.No)
                     {
                         return true;
                     }
@@ -43,18 +44,8 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal sealed class Walker : CSharpSyntaxWalker
+        internal sealed class Walker : PooledWalker<Walker>
         {
-            private static readonly Pool<Walker> Cache = new Pool<Walker>(
-                () => new Walker(),
-                x =>
-                {
-                    x.UsesThis = Result.Unknown;
-                    x.UsesUnderScore = Result.Unknown;
-                    x.semanticModel = null;
-                    x.cancellationToken = CancellationToken.None;
-                });
-
             private SemanticModel semanticModel;
             private CancellationToken cancellationToken;
 
@@ -66,18 +57,18 @@ namespace IDisposableAnalyzers
 
             public Result UsesUnderScore { get; private set; }
 
-            public static Pool<Walker>.Pooled Create(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+            public static Walker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                var pooled = Cache.GetOrCreate();
+                var walker = Borrow(() => new Walker());
+                walker.semanticModel = semanticModel;
+                walker.cancellationToken = cancellationToken;
                 while (node.Parent != null)
                 {
                     node = node.Parent;
                 }
 
-                pooled.Item.semanticModel = semanticModel;
-                pooled.Item.cancellationToken = cancellationToken;
-                pooled.Item.Visit(node);
-                return pooled;
+                walker.Visit(node);
+                return walker;
             }
 
             public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
@@ -182,6 +173,14 @@ namespace IDisposableAnalyzers
                 base.VisitConditionalAccessExpression(node);
             }
 
+            protected override void Clear()
+            {
+                this.UsesThis = Result.Unknown;
+                this.UsesUnderScore = Result.Unknown;
+                this.semanticModel = null;
+                this.cancellationToken = CancellationToken.None;
+            }
+
             private void CheckUsesThis(ExpressionSyntax expression)
             {
                 if (expression == null)
@@ -210,7 +209,9 @@ namespace IDisposableAnalyzers
 
                 if (expression is IdentifierNameSyntax)
                 {
-                    if (this.semanticModel.GetSymbolSafe(expression, this.cancellationToken)?.IsStatic == false)
+                    if (this.semanticModel.GetSymbolSafe(expression, this.cancellationToken)
+                            ?.IsStatic ==
+                        false)
                     {
                         switch (this.UsesThis)
                         {
