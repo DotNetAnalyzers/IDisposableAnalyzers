@@ -26,6 +26,11 @@ namespace IDisposableAnalyzers
 
                 foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
+                    if (tree.FilePath.EndsWith(".g.i.cs"))
+                    {
+                        continue;
+                    }
+
                     walker.Visit(tree.GetRoot(cancellationToken));
                     if (walker.UsesThis == Result.Yes ||
                         walker.UsesUnderScore == Result.No)

@@ -12,7 +12,7 @@ NUGET
       System.Reflection.Emit (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Reflection.TypeExtensions (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Xml.XmlDocument (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
-    Gu.Roslyn.Asserts (0.3.2)
+    Gu.Roslyn.Asserts (0.3.6)
       Microsoft.CodeAnalysis.CSharp.Workspaces  - restriction: || (>= net461) (>= netstandard2.0)
     Microsoft.CodeAnalysis.Analyzers (1.1)
     Microsoft.CodeAnalysis.Common (1.2.1)
