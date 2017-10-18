@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP005ReturntypeShouldIndicateIDisposable());
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void RunOnPropertyChangedAnalyzers()
+        public void RunOnIDisposableAnalyzers()
         {
             Benchmark.Run();
         }
