@@ -1,5 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
+#pragma warning disable GU0011 // Don't ignore the returnvalue.
+#pragma warning disable CS0162 // Unreachable code detected
 namespace IDisposableAnalyzers.Benchmarks
 {
     using System;
@@ -34,17 +36,19 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             if (false)
             {
-                var walker = new BenchmarkWalker(Code.AnalyzersProject, new IDISP001DisposeCreated());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(
+                    Code.AnalyzersProject,
+                    new IDISP001DisposeCreated());
 
                 // Warmup
-                walker.Run();
+                benchmark.Run();
                 Console.WriteLine("Attach profiler and press any key to continue...");
                 Console.ReadKey();
-                walker.Run();
+                benchmark.Run();
             }
             else if (true)
             {
-                foreach (var summary in RunSingle<IDISP001DisposeCreatedBenchmarks>())
+                foreach (var summary in RunSingle<IDISP001Benchmarks>())
                 {
                     CopyResult(summary.Title);
                 }
