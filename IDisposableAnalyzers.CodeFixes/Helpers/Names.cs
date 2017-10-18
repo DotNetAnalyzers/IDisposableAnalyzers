@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal static class Names
     {
-        internal static bool UsesUnderscoreNames(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool UsesUnderscore(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var walker = Walker.Borrow(node, semanticModel, cancellationToken))
             {

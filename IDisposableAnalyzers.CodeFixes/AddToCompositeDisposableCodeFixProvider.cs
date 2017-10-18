@@ -46,7 +46,7 @@ namespace IDisposableAnalyzers
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
                     if (statement != null)
                     {
-                        var usesUnderscoreNames = statement.UsesUnderscoreNames(semanticModel, context.CancellationToken);
+                        var usesUnderscoreNames = statement.UsesUnderscore(semanticModel, context.CancellationToken);
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out IFieldSymbol field))
                         {
                             context.RegisterCodeFix(

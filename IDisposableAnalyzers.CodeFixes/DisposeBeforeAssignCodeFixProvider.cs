@@ -105,7 +105,7 @@
             }
 
             var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
-                         !assignment.UsesUnderscoreNames(semanticModel, cancellationToken)
+                         !assignment.UsesUnderscore(semanticModel, cancellationToken)
                              ? "this."
                              : string.Empty;
             if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))

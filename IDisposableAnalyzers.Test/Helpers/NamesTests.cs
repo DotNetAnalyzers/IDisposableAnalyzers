@@ -28,7 +28,7 @@ namespace RoslynSandbox
 
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscoreNames(semanticModel, CancellationToken.None));
+            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscore(semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace RoslynSandbox
 
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            Assert.AreEqual(true, syntaxTree.GetRoot().UsesUnderscoreNames(semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, syntaxTree.GetRoot().UsesUnderscore(semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace RoslynSandbox
 
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscoreNames(semanticModel, CancellationToken.None));
+            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscore(semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace RoslynSandbox
 
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscoreNames(semanticModel, CancellationToken.None));
+            Assert.AreEqual(false, syntaxTree.GetRoot().UsesUnderscore(semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -112,7 +112,7 @@ namespace RoslynSandbox
             foreach (var tree in compilation.SyntaxTrees)
             {
                 var semanticModel = compilation.GetSemanticModel(tree);
-                Assert.AreEqual(true, tree.GetRoot().UsesUnderscoreNames(semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, tree.GetRoot().UsesUnderscore(semanticModel, CancellationToken.None));
             }
         }
     }

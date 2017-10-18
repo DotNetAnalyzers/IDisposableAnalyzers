@@ -33,7 +33,7 @@
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
 
-            var usesUnderscoreNames = syntaxRoot.UsesUnderscoreNames(semanticModel, context.CancellationToken);
+            var usesUnderscoreNames = syntaxRoot.UsesUnderscore(semanticModel, context.CancellationToken);
 
             foreach (var diagnostic in context.Diagnostics)
             {
@@ -307,7 +307,7 @@
                                               .ConfigureAwait(false);
                 var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                  .ConfigureAwait(false);
-                var usesUnderscoreNames = syntaxRoot.UsesUnderscoreNames(semanticModel, context.CancellationToken);
+                var usesUnderscoreNames = syntaxRoot.UsesUnderscore(semanticModel, context.CancellationToken);
 
                 var diagnostics = await context.GetDocumentDiagnosticsAsync(context.Document).ConfigureAwait(false);
                 var fixes = new List<Fix>();

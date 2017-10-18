@@ -78,7 +78,7 @@ namespace IDisposableAnalyzers
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = containingType.UsesUnderscoreNames(editor.SemanticModel, cancellationToken);
+            var usesUnderscoreNames = containingType.UsesUnderscore(editor.SemanticModel, cancellationToken);
             var variableDeclarator = statement.Declaration.Variables[0];
             var identifier = variableDeclarator.Identifier;
             var field = editor.AddField(
@@ -109,7 +109,7 @@ namespace IDisposableAnalyzers
         private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, ExpressionStatementSyntax statement)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
-            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscoreNames(editor.SemanticModel, CancellationToken.None);
+            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscore(editor.SemanticModel, CancellationToken.None);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(
