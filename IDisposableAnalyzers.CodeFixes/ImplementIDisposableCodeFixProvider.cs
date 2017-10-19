@@ -232,7 +232,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetMethod("ThrowIfDisposed", out _))
+            if (type.GetMembers("ThrowIfDisposed").Length == 0)
             {
                 if (type.BaseType.TryGetMethod("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
