@@ -1,16 +1,8 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
-
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -130,7 +122,7 @@
             while (type != null &&
                    type != KnownSymbol.Object)
             {
-                foreach (var symbol in type.GetMembers())
+                foreach (var symbol in type.GetMembers(name))
                 {
                     if (symbol is TMember candidate &&
                         predicate(candidate))
@@ -164,7 +156,7 @@
             while (type != null &&
                    type != KnownSymbol.Object)
             {
-                foreach (var symbol in type.GetMembers())
+                foreach (var symbol in type.GetMembers(name))
                 {
                     if (symbol is TMember candidate &&
                         predicate(candidate))
