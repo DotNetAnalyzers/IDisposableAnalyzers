@@ -72,11 +72,11 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            using (var pooled = AssignedValueWalker.Create(disposable, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    assignedSymbol = pooled.Item.CurrentSymbol;
+                    assignedSymbol = assignedValues.CurrentSymbol;
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }
             }
@@ -89,9 +89,9 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            using (var pooled = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }
@@ -105,9 +105,9 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            using (var pooled = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }
@@ -116,9 +116,9 @@ namespace IDisposableAnalyzers
 
         internal static Result IsAssignedWithCreated(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = AssignedValueWalker.Create(symbol, context, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(symbol, context, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }

@@ -8,21 +8,8 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : CSharpSyntaxWalker, IReadOnlyList<ExpressionSyntax>
+    internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
-        private static readonly Pool<AssignedValueWalker> Pool = new Pool<AssignedValueWalker>(
-            () => new AssignedValueWalker(),
-            x =>
-            {
-                x.values.Clear();
-                x.visitedLocations.Clear();
-                x.refParameters.Clear();
-                x.CurrentSymbol = null;
-                x.Context = null;
-                x.semanticModel = null;
-                x.cancellationToken = CancellationToken.None;
-            });
-
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
@@ -206,21 +193,21 @@
             base.VisitArgument(node);
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled Create(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return Create(property, null, semanticModel, cancellationToken);
+            return Borrow(property, null, semanticModel, cancellationToken);
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled Create(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return Create(field, null, semanticModel, cancellationToken);
+            return Borrow(field, null, semanticModel, cancellationToken);
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled Create(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (value is ElementAccessExpressionSyntax elementAccess)
             {
-                return Create(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
+                return Borrow(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
             }
 
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
@@ -229,51 +216,51 @@
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return Create(symbol, value, semanticModel, cancellationToken);
+                return Borrow(symbol, value, semanticModel, cancellationToken);
             }
 
-            return Pool.GetOrCreate();
+            return Borrow(() => new AssignedValueWalker());
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol is IFieldSymbol ||
                 symbol is IPropertySymbol ||
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return Create(symbol, null, semanticModel, cancellationToken);
+                return Borrow(symbol, null, semanticModel, cancellationToken);
             }
 
-            return Pool.GetOrCreate();
+            return Borrow(() => new AssignedValueWalker());
         }
 
-        internal static Pool<AssignedValueWalker>.Pooled Create(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
             {
-                return Pool.GetOrCreate();
+                return Borrow(() => new AssignedValueWalker());
             }
 
-            var pooled = Pool.GetOrCreate();
-            pooled.Item.CurrentSymbol = symbol;
-            pooled.Item.Context = context;
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
+            var pooled = Borrow(() => new AssignedValueWalker());
+            pooled.CurrentSymbol = symbol;
+            pooled.Context = context;
+            pooled.semanticModel = semanticModel;
+            pooled.cancellationToken = cancellationToken;
             if (context != null)
             {
-                pooled.Item.Run();
+                pooled.Run();
             }
             else
             {
                 foreach (var reference in symbol.DeclaringSyntaxReferences)
                 {
-                    pooled.Item.Context = symbol is IFieldSymbol || symbol is IPropertySymbol
+                    pooled.Context = symbol is IFieldSymbol || symbol is IPropertySymbol
                                               ? reference.GetSyntax(cancellationToken)
                                                          .FirstAncestor<TypeDeclarationSyntax>()
                                               : reference.GetSyntax(cancellationToken)
                                                          .FirstAncestor<MemberDeclarationSyntax>();
-                    pooled.Item.Run();
+                    pooled.Run();
                 }
             }
 
@@ -310,6 +297,17 @@
                     }
                 }
             }
+        }
+
+        protected override void Clear()
+        {
+            this.values.Clear();
+            this.visitedLocations.Clear();
+            this.refParameters.Clear();
+            this.CurrentSymbol = null;
+            this.Context = null;
+            this.semanticModel = null;
+            this.cancellationToken = CancellationToken.None;
         }
 
         private void Run()

@@ -167,15 +167,15 @@
                 else if (this.recursionLoop.Add(value) &&
                          this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(value, this.cancellationToken))
                 {
-                    using (var pooled = AssignedValueWalker.Create(value, this.semanticModel, this.cancellationToken))
+                    using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
                     {
-                        if (pooled.Item.Count == 0)
+                        if (assignedValues.Count == 0)
                         {
                             this.values.Add(value);
                         }
                         else
                         {
-                            foreach (var assignment in pooled.Item)
+                            foreach (var assignment in assignedValues)
                             {
                                 this.AddReturnValue(assignment);
                             }

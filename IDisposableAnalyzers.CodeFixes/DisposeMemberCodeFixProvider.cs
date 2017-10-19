@@ -220,9 +220,9 @@
                 return false;
             }
 
-            using (var sources = AssignedValueWalker.Create(member, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(member, semanticModel, cancellationToken))
             {
-                foreach (var value in sources.Item)
+                foreach (var value in assignedValues)
                 {
                     if (value is ObjectCreationExpressionSyntax)
                     {

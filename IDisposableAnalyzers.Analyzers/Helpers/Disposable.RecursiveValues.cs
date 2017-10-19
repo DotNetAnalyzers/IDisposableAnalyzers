@@ -121,10 +121,10 @@ namespace IDisposableAnalyzers
                         var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
                         if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameter))
                         {
-                            using (var pooled = AssignedValueWalker.Create(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
+                            using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                             {
-                                pooled.Item.HandleInvoke(invokedMethod, invocation.ArgumentList);
-                                return this.AddManyRecursively(pooled.Item);
+                                assignedValues.HandleInvoke(invokedMethod, invocation.ArgumentList);
+                                return this.AddManyRecursively(assignedValues);
                             }
                         }
                     }
@@ -188,17 +188,17 @@ namespace IDisposableAnalyzers
                 if (symbol is IParameterSymbol)
                 {
                     this.values.Add(assignedValue);
-                    using (var pooled = AssignedValueWalker.Create(assignedValue, this.semanticModel, this.cancellationToken))
+                    using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(pooled.Item);
+                        return this.AddManyRecursively(assignedValues);
                     }
                 }
 
                 if (symbol is ILocalSymbol)
                 {
-                    using (var pooled = AssignedValueWalker.Create(assignedValue, this.semanticModel, this.cancellationToken))
+                    using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(pooled.Item);
+                        return this.AddManyRecursively(assignedValues);
                     }
                 }
 

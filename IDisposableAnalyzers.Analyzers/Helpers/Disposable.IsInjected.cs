@@ -15,9 +15,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
                            !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
@@ -33,9 +33,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
                            !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
@@ -51,9 +51,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var sources = AssignedValueWalker.Create(field, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
                            IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
@@ -69,9 +69,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var sources = AssignedValueWalker.Create(property, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
                            IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
@@ -95,9 +95,9 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            using (var sources = AssignedValueWalker.Create(symbol, disposeCall, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(symbol, disposeCall, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                 }
@@ -145,9 +145,9 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            using (var sources = AssignedValueWalker.Create(value, semanticModel, cancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
                 }
@@ -179,9 +179,9 @@ namespace IDisposableAnalyzers
                         result = Result.Maybe;
                     }
 
-                    using (var sources = AssignedValueWalker.Create(values.Current, semanticModel, cancellationToken))
+                    using (var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken))
                     {
-                        using (var recursive = RecursiveValues.Create(sources.Item, semanticModel, cancellationToken))
+                        using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                         {
                             isInjected = IsInjectedCore(recursive, semanticModel, cancellationToken);
                             if (isInjected == Result.Yes)
