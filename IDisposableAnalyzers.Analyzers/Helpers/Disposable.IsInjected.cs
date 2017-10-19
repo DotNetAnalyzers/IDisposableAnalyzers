@@ -135,9 +135,9 @@ namespace IDisposableAnalyzers
             if (symbol is IPropertySymbol property &&
                 !property.IsAutoProperty(cancellationToken))
             {
-                using (var returnValues = ReturnValueWalker.Create(value, Search.TopLevel, semanticModel, cancellationToken))
+                using (var returnValues = ReturnValueWalker.Borrow(value, Search.TopLevel, semanticModel, cancellationToken))
                 {
-                    using (var recursive = RecursiveValues.Create(returnValues.Item, semanticModel, cancellationToken))
+                    using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
                     {
                         return IsInjectedCore(recursive, semanticModel, cancellationToken)
                             .IsEither(Result.Yes, Result.Maybe);

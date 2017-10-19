@@ -32,9 +32,9 @@ internal class Foo
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>("var text = await CreateAsync()").Value;
-            using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
+            using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item);
+                var actual = string.Join(", ", pooled);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -121,9 +121,9 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-            using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item);
+                var actual = string.Join(", ", returnValues);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -295,9 +295,9 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-            using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item);
+                var actual = string.Join(", ", returnValues);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -343,9 +343,9 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-            using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item);
+                var actual = string.Join(", ", returnValues);
                 Assert.AreEqual(expected, actual);
             }
         }
@@ -475,9 +475,9 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
-            using (var pooled = ReturnValueWalker.Create(value, search, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual(expected, string.Join(", ", pooled.Item));
+                Assert.AreEqual(expected, string.Join(", ", returnValues));
             }
         }
     }

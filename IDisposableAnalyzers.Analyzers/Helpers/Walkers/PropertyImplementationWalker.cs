@@ -3,21 +3,10 @@
     using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class PropertyImplementationWalker : CSharpSyntaxWalker
+    internal sealed class PropertyImplementationWalker : PooledWalker<PropertyImplementationWalker>
     {
-        private static readonly Pool<PropertyImplementationWalker> Cache = new Pool<PropertyImplementationWalker>(
-            () => new PropertyImplementationWalker(),
-            x =>
-            {
-                x.implementations.Clear();
-                x.semanticModel = null;
-                x.cancellationToken = CancellationToken.None;
-                x.property = null;
-            });
-
         private readonly List<PropertyDeclarationSyntax> implementations = new List<PropertyDeclarationSyntax>();
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -29,12 +18,12 @@
 
         public IReadOnlyList<PropertyDeclarationSyntax> Implementations => this.implementations;
 
-        public static Pool<PropertyImplementationWalker>.Pooled Create(IPropertySymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static PropertyImplementationWalker Create(IPropertySymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Cache.GetOrCreate();
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.property = symbol;
+            var pooled = Borrow(() => new PropertyImplementationWalker());
+            pooled.semanticModel = semanticModel;
+            pooled.cancellationToken = cancellationToken;
+            pooled.property = symbol;
             foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
                 if (tree.FilePath.EndsWith(".g.cs"))
@@ -42,9 +31,9 @@
                     continue;
                 }
 
-                if (tree.TryGetRoot(out SyntaxNode root))
+                if (tree.TryGetRoot(out var root))
                 {
-                    pooled.Item.Visit(root);
+                    pooled.Visit(root);
                 }
             }
 
@@ -69,6 +58,14 @@
                     this.implementations.Add(node);
                 }
             }
+        }
+
+        protected override void Clear()
+        {
+            this.implementations.Clear();
+            this.semanticModel = null;
+            this.cancellationToken = CancellationToken.None;
+            this.property = null;
         }
     }
 }

@@ -142,9 +142,9 @@ namespace IDisposableAnalyzers
                 return Result.Yes;
             }
 
-            using (var pooled = ReturnValueWalker.Create(candidate, Search.Recursive, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(candidate, Search.Recursive, semanticModel, cancellationToken))
             {
-                if (pooled.Item.Count == 0)
+                if (walker.Count == 0)
                 {
                     var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
                     if (symbol != null && symbol.DeclaringSyntaxReferences.Length == 0)
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                using (var recursive = RecursiveValues.Create(pooled.Item, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Create(walker, semanticModel, cancellationToken))
                 {
                     return IsCreationCore(recursive, semanticModel, cancellationToken);
                 }

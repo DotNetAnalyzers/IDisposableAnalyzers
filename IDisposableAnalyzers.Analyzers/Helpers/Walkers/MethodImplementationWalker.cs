@@ -3,21 +3,10 @@
     using System.Collections.Generic;
     using System.Threading;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class MethodImplementationWalker : CSharpSyntaxWalker
+    internal sealed class MethodImplementationWalker : PooledWalker<MethodImplementationWalker>
     {
-        private static readonly Pool<MethodImplementationWalker> Cache = new Pool<MethodImplementationWalker>(
-            () => new MethodImplementationWalker(),
-            x =>
-            {
-                x.implementations.Clear();
-                x.semanticModel = null;
-                x.cancellationToken = CancellationToken.None;
-                x.method = null;
-            });
-
         private readonly List<MethodDeclarationSyntax> implementations = new List<MethodDeclarationSyntax>();
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -29,12 +18,12 @@
 
         public IReadOnlyList<MethodDeclarationSyntax> Implementations => this.implementations;
 
-        public static Pool<MethodImplementationWalker>.Pooled Create(IMethodSymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static MethodImplementationWalker Create(IMethodSymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Cache.GetOrCreate();
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.method = symbol;
+            var walker = Borrow(() => new MethodImplementationWalker());
+            walker.semanticModel = semanticModel;
+            walker.cancellationToken = cancellationToken;
+            walker.method = symbol;
             if (symbol != null)
             {
                 foreach (var tree in semanticModel.Compilation.SyntaxTrees)
@@ -46,12 +35,12 @@
 
                     if (tree.TryGetRoot(out SyntaxNode root))
                     {
-                        pooled.Item.Visit(root);
+                        walker.Visit(root);
                     }
                 }
             }
 
-            return pooled;
+            return walker;
         }
 
         public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
@@ -69,6 +58,14 @@
                     this.implementations.Add(node);
                 }
             }
+        }
+
+        protected override void Clear()
+        {
+            this.implementations.Clear();
+            this.semanticModel = null;
+            this.cancellationToken = CancellationToken.None;
+            this.method = null;
         }
 
         private bool IsMatch(IMethodSymbol other)

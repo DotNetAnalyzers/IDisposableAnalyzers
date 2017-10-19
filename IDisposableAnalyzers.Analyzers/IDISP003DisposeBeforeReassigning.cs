@@ -136,9 +136,9 @@
                     var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
                     if (statement != null)
                     {
-                        using (var pooledNames = IdentifierNameWalker.Create(statement))
+                        using (var names = IdentifierNameWalker.Borrow(statement))
                         {
-                            foreach (var identifierName in pooledNames.Item.IdentifierNames)
+                            foreach (var identifierName in names.IdentifierNames)
                             {
                                 var otherSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
                                 if (symbol.Equals(otherSymbol))

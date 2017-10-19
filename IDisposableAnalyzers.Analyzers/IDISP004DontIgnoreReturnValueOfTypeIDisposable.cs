@@ -100,9 +100,9 @@
             {
                 if (argument.Parent.Parent is InvocationExpressionSyntax invocation)
                 {
-                    using (var returnWalker = ReturnValueWalker.Create(invocation, Search.Recursive, semanticModel, cancellationToken))
+                    using (var returnWalker = ReturnValueWalker.Borrow(invocation, Search.Recursive, semanticModel, cancellationToken))
                     {
-                        foreach (var returnValue in returnWalker.Item)
+                        foreach (var returnValue in returnWalker)
                         {
                             if (MustBeHandled(returnValue, semanticModel, cancellationToken))
                             {

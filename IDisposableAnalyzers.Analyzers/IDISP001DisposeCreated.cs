@@ -95,9 +95,9 @@
 
         private static bool IsReturned(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = ReturnValueWalker.Create(block, Search.TopLevel, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(block, Search.TopLevel, semanticModel, cancellationToken))
             {
-                foreach (var value in pooled.Item)
+                foreach (var value in walker)
                 {
                     var returnedSymbol = semanticModel.GetSymbolSafe(value, cancellationToken);
                     if (SymbolComparer.Equals(symbol, returnedSymbol))
@@ -136,9 +136,10 @@
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TryGetSingle(out ArgumentSyntax argument))
+                            invocation.ArgumentList.Arguments.TryGetSingle(out ArgumentSyntax argument) &&
+                            argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
-                            var body = (argument.Expression as ParenthesizedLambdaExpressionSyntax)?.Body;
+                            var body = lambda.Body;
                             using (var pooledInvocations = InvocationWalker.Create(body))
                             {
                                 foreach (var candidate in pooledInvocations.Item.Invocations)
@@ -179,9 +180,9 @@
                     var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
                     if (method?.Name == "Add")
                     {
-                        using (var pooledIdentifiers = IdentifierNameWalker.Create(invocation.ArgumentList))
+                        using (var nameWalker = IdentifierNameWalker.Borrow(invocation.ArgumentList))
                         {
-                            foreach (var identifierName in pooledIdentifiers.Item.IdentifierNames)
+                            foreach (var identifierName in nameWalker.IdentifierNames)
                             {
                                 var argSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
                                 if (symbol.Equals(argSymbol))

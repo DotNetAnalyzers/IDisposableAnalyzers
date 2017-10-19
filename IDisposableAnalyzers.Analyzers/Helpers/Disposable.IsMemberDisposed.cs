@@ -51,9 +51,9 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                using (var pooled = IdentifierNameWalker.Create(node))
+                using (var walker = IdentifierNameWalker.Borrow(node))
                 {
-                    foreach (var identifier in pooled.Item.IdentifierNames)
+                    foreach (var identifier in walker.IdentifierNames)
                     {
                         var memberAccess = identifier.Parent as MemberAccessExpressionSyntax;
                         if (memberAccess?.Expression is BaseExpressionSyntax)
@@ -125,14 +125,14 @@ namespace IDisposableAnalyzers
                 foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(cancellationToken);
-                    using (var pooled = ReturnValueWalker.Create(node, Search.TopLevel, semanticModel, cancellationToken))
+                    using (var pooled = ReturnValueWalker.Borrow(node, Search.TopLevel, semanticModel, cancellationToken))
                     {
-                        if (pooled.Item.Count == 0)
+                        if (pooled.Count == 0)
                         {
                             return false;
                         }
 
-                        return MemberPath.TryFindRootMember(pooled.Item[0], out disposedMember);
+                        return MemberPath.TryFindRootMember(pooled[0], out disposedMember);
                     }
                 }
             }

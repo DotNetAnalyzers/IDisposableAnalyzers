@@ -7,19 +7,8 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ReturnValueWalker : CSharpSyntaxWalker, IReadOnlyList<ExpressionSyntax>
+    internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
-        private static readonly Pool<ReturnValueWalker> Pool = new Pool<ReturnValueWalker>(
-            () => new ReturnValueWalker(),
-            x =>
-            {
-                x.values.Clear();
-                x.recursionLoop.Clear();
-                x.awaits = false;
-                x.semanticModel = null;
-                x.cancellationToken = CancellationToken.None;
-            });
-
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly RecursionLoop recursionLoop = new RecursionLoop();
 
@@ -66,43 +55,65 @@
 
         internal static bool TryGetSingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
         {
-            using (var pooled = Create(body, Search.TopLevel, semanticModel, cancellationToken))
+            if (body == null ||
+                body.Statements.Count == 0)
             {
-                if (pooled.Item.values.Count != 1)
+                returnValue = null;
+                return false;
+            }
+
+            if (body.Statements.Count == 1)
+            {
+                returnValue = (body.Statements[0] as ReturnStatementSyntax)?.Expression;
+                return returnValue != null;
+            }
+
+            using (var walker = Borrow(body, Search.TopLevel, semanticModel, cancellationToken))
+            {
+                if (walker.values.Count != 1)
                 {
                     returnValue = null;
                     return false;
                 }
 
-                returnValue = pooled.Item.values[0];
+                returnValue = walker.values[0];
                 return returnValue != null;
             }
         }
 
-        internal static Pool<ReturnValueWalker>.Pooled Create(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ReturnValueWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Pool.GetOrCreate();
+            var walker = Borrow(() => new ReturnValueWalker());
             if (node == null)
             {
-                return pooled;
+                return walker;
             }
 
-            pooled.Item.search = search;
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.Run(node);
-            return pooled;
+            walker.search = search;
+            walker.semanticModel = semanticModel;
+            walker.cancellationToken = cancellationToken;
+            walker.Run(node);
+            return walker;
         }
 
-        private Pool<ReturnValueWalker>.Pooled GetRecursive(SyntaxNode node)
+        protected override void Clear()
         {
-            var pooled = Pool.GetOrCreate();
-            pooled.Item.search = this.search;
-            pooled.Item.awaits = this.awaits;
-            pooled.Item.semanticModel = this.semanticModel;
-            pooled.Item.cancellationToken = this.cancellationToken;
-            pooled.Item.recursionLoop.Add(this.recursionLoop);
-            pooled.Item.Run(node);
+            this.values.Clear();
+            this.recursionLoop.Clear();
+            this.awaits = false;
+            this.semanticModel = null;
+            this.cancellationToken = CancellationToken.None;
+        }
+
+        private ReturnValueWalker GetRecursive(SyntaxNode node)
+        {
+            var pooled = Borrow(() => new ReturnValueWalker());
+            pooled.search = this.search;
+            pooled.awaits = this.awaits;
+            pooled.semanticModel = this.semanticModel;
+            pooled.cancellationToken = this.cancellationToken;
+            pooled.recursionLoop.Add(this.recursionLoop);
+            pooled.Run(node);
             return pooled;
         }
 
@@ -112,15 +123,15 @@
             {
                 if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out ExpressionSyntax awaited))
                 {
-                    using (var pooled = this.GetRecursive(awaited))
+                    using (var walker = this.GetRecursive(awaited))
                     {
-                        if (pooled.Item.values.Count == 0)
+                        if (walker.values.Count == 0)
                         {
                             this.values.Add(awaited);
                         }
                         else
                         {
-                            foreach (var returnValue in pooled.Item.values)
+                            foreach (var returnValue in walker.values)
                             {
                                 this.AddReturnValue(returnValue);
                             }
@@ -155,9 +166,9 @@
                     }
                     else
                     {
-                        using (var pooled = this.GetRecursive(value))
+                        using (var walker = this.GetRecursive(value))
                         {
-                            foreach (var returnValue in pooled.Item.values)
+                            foreach (var returnValue in walker.values)
                             {
                                 this.AddReturnValue(returnValue);
                             }

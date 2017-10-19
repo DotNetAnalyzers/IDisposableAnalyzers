@@ -161,9 +161,9 @@ namespace IDisposableAnalyzers
 
                 if (assignedValue is AwaitExpressionSyntax @await)
                 {
-                    using (var pooled = ReturnValueWalker.Create(@await, Search.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var walker = ReturnValueWalker.Borrow(@await, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(pooled.Item);
+                        return this.AddManyRecursively(walker);
                     }
                 }
 
@@ -210,9 +210,9 @@ namespace IDisposableAnalyzers
                         return true;
                     }
 
-                    using (var returnValues = ReturnValueWalker.Create(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var returnValues = ReturnValueWalker.Borrow(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(returnValues.Item);
+                        return this.AddManyRecursively(returnValues);
                     }
                 }
 
@@ -224,9 +224,9 @@ namespace IDisposableAnalyzers
                         return true;
                     }
 
-                    using (var pooled = ReturnValueWalker.Create(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
+                    using (var walker = ReturnValueWalker.Borrow(assignedValue, Search.Recursive, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(pooled.Item);
+                        return this.AddManyRecursively(walker);
                     }
                 }
 
