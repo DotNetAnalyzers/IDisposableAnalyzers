@@ -10,12 +10,12 @@ Frequency=3410126 Hz, Resolution=293.2443 ns, Timer=TSC
 ```
  |                                         Method |         Mean |         Error |       StdDev |     Gen 0 |    Gen 1 |  Allocated |
  |----------------------------------------------- |-------------:|--------------:|-------------:|----------:|---------:|-----------:|
- |                         IDISP001DisposeCreated | 514,152.0 us | 10,212.517 us | 22,841.76 us | 6812.5000 | 312.5000 | 43059898 B |
- |                          IDISP002DisposeMember | 159,134.1 us |  3,182.401 us |  6,642.86 us |  750.0000 |        - |  5151549 B |
- |               IDISP003DisposeBeforeReassigning | 537,771.3 us | 10,174.380 us |  9,019.32 us | 5500.0000 | 125.0000 | 34773210 B |
- | IDISP004DontIgnoreReturnValueOfTypeIDisposable |  12,098.6 us |    309.770 us |    913.36 us |   93.7500 |        - |   701445 B |
- |    IDISP005ReturntypeShouldIndicateIDisposable |   1,308.7 us |     29.785 us |     87.82 us |    1.9531 |        - |    22576 B |
- |                   IDISP006ImplementIDisposable | 154,670.3 us |  3,049.079 us |  7,363.87 us |  750.0000 |        - |  5151545 B |
- |                    IDISP007DontDisposeInjected |   5,353.6 us |    120.551 us |    355.45 us |   54.6875 |        - |   363011 B |
- |     IDISP008DontMixInjectedAndCreatedForMember | 148,303.5 us |  2,934.939 us |  6,442.26 us |  750.0000 |        - |  5179441 B |
- |                          IDISP009IsIDisposable |     318.6 us |      6.364 us |     17.42 us |         - |        - |      100 B |
+ |                         IDISP001DisposeCreated | 520,298.1 us | 10,407.559 us | 22,844.84 us | 6812.5000 | 250.0000 | 43083002 B |
+ |                          IDISP002DisposeMember | 156,210.4 us |  3,102.335 us |  8,063.38 us |  812.5000 |        - |  5213267 B |
+ |               IDISP003DisposeBeforeReassigning | 500,195.4 us |  9,808.254 us | 17,934.95 us | 5500.0000 | 125.0000 | 34766670 B |
+ | IDISP004DontIgnoreReturnValueOfTypeIDisposable |  12,378.3 us |    339.989 us |  1,002.47 us |   93.7500 |        - |   698503 B |
+ |    IDISP005ReturntypeShouldIndicateIDisposable |   1,314.3 us |     37.413 us |    109.14 us |    1.9531 |        - |    22128 B |
+ |                   IDISP006ImplementIDisposable | 155,596.6 us |  3,088.417 us |  8,506.40 us |  812.5000 |        - |  5213267 B |
+ |                    IDISP007DontDisposeInjected |   5,936.2 us |    215.664 us |    632.51 us |   54.6875 |        - |   361156 B |
+ |     IDISP008DontMixInjectedAndCreatedForMember | 167,447.8 us |  3,701.021 us | 10,796.05 us |  812.5000 |        - |  5241435 B |
+ |                          IDISP009IsIDisposable |     318.3 us |      9.550 us |     28.16 us |         - |        - |      100 B |
