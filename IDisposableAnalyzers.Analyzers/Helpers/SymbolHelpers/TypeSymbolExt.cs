@@ -30,17 +30,32 @@
             return type.TryGetSingleMember(name, out property);
         }
 
-        internal static bool TryGetMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
+        internal static bool TryGetFirstMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
+        {
+            return type.TryGetFirstMember(name, out property);
+        }
+
+        internal static bool TryGetFirstMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        {
+            return type.TryGetFirstMember(predicate, out property);
+        }
+
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
         {
             return type.TryGetSingleMember(name, out property);
         }
 
-        internal static bool TryGetMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
         {
             return type.TryGetSingleMember(predicate, out property);
         }
 
-        internal static bool TryGetMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        {
+            return type.TryGetSingleMember(name, predicate, out property);
+        }
+
+        internal static bool TryGetFirstMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
         {
             return type.TryGetSingleMember(name, predicate, out property);
         }
@@ -141,6 +156,62 @@
             }
 
             return member != null;
+        }
+
+        internal static bool TryGetFirstMember<TMember>(this ITypeSymbol type, Func<TMember, bool> predicate, out TMember member)
+            where TMember : class, ISymbol
+        {
+            member = null;
+            if (type == null ||
+                predicate == null)
+            {
+                return false;
+            }
+
+            while (type != null &&
+                   type != KnownSymbol.Object)
+            {
+                foreach (var symbol in type.GetMembers())
+                {
+                    if (symbol is TMember candidate &&
+                        predicate(candidate))
+                    {
+                        member = candidate;
+                        return true;
+                    }
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
+        }
+
+        internal static bool TryGetFirstMember<TMember>(this ITypeSymbol type, string name, out TMember member)
+            where TMember : class, ISymbol
+        {
+            member = null;
+            if (type == null)
+            {
+                return false;
+            }
+
+            while (type != null &&
+                   type != KnownSymbol.Object)
+            {
+                foreach (var symbol in type.GetMembers(name))
+                {
+                    if (symbol is TMember candidate)
+                    {
+                        member = candidate;
+                        return true;
+                    }
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
         }
 
         internal static bool TryGetFirstMember<TMember>(this ITypeSymbol type, string name, Func<TMember, bool> predicate, out TMember member)

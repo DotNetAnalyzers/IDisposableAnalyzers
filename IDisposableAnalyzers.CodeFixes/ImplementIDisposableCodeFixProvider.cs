@@ -98,7 +98,7 @@
                     continue;
                 }
 
-                if (type.TryGetMethod("Dispose", out var disposeMethod) &&
+                if (type.TryGetSingleMethod("Dispose", out var disposeMethod) &&
                     !disposeMethod.IsStatic &&
                     disposeMethod.ReturnsVoid &&
                     disposeMethod.Parameters.Length == 0)
@@ -234,7 +234,7 @@
 
             if (type.GetMembers("ThrowIfDisposed").Length == 0)
             {
-                if (type.BaseType.TryGetMethod("ThrowIfDisposed", out var baseThrow) &&
+                if (type.BaseType.TryGetSingleMethod("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
                 {
                     if (baseThrow.IsVirtual)
@@ -319,7 +319,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetMethod("ThrowIfDisposed", out _))
+            if (!type.TryGetSingleMethod("ThrowIfDisposed", out _))
             {
                 editor.AddMethod(
                     classDeclaration,
@@ -375,7 +375,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetMethod("ThrowIfDisposed", out IMethodSymbol _))
+            if (!type.TryGetSingleMethod("ThrowIfDisposed", out IMethodSymbol _))
             {
                 editor.AddMethod(
                     classDeclaration,

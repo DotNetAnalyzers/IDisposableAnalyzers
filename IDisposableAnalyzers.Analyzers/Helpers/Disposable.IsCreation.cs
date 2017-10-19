@@ -24,7 +24,7 @@ namespace IDisposableAnalyzers
             if (semanticModel.GetSymbolSafe(disposable, cancellationToken) is IPropertySymbol property &&
                 property.TryGetSetter(cancellationToken, out AccessorDeclarationSyntax setter))
             {
-                using (var pooledSet = SetPool<ISymbol>.Create())
+                using (var pooledSet = PooledHashSet<ISymbol>.Borrow())
                 {
                     using (var pooledAssigned = AssignmentWalker.Create(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
@@ -35,14 +35,14 @@ namespace IDisposableAnalyzers
                                 (symbol is IFieldSymbol ||
                                 symbol is IPropertySymbol))
                             {
-                                pooledSet.Item.Add(symbol).IgnoreReturnValue();
+                                pooledSet.Add(symbol).IgnoreReturnValue();
                             }
                         }
                     }
 
                     assignedSymbol = null;
                     var result = Result.No;
-                    foreach (var symbol in pooledSet.Item)
+                    foreach (var symbol in pooledSet)
                     {
                         switch (IsAssignedWithCreated(symbol, disposable, semanticModel, cancellationToken))
                         {
