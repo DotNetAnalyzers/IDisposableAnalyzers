@@ -5,16 +5,8 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class InvocationWalker : ExecutionWalker, IReadOnlyList<InvocationExpressionSyntax>
+    internal sealed class InvocationWalker : ExecutionWalker<InvocationWalker>, IReadOnlyList<InvocationExpressionSyntax>
     {
-        private static readonly Pool<InvocationWalker> Pool = new Pool<InvocationWalker>(
-            () => new InvocationWalker(),
-            x =>
-            {
-                x.invocations.Clear();
-                x.Clear();
-            });
-
         private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
 
         private InvocationWalker()
@@ -38,15 +30,12 @@
             base.VisitInvocationExpression(node);
         }
 
-        internal static Pool<InvocationWalker>.Pooled Create(SyntaxNode node)
-        {
-            var pooled = Pool.GetOrCreate();
-            if (node != null)
-            {
-                pooled.Item.Visit(node);
-            }
+        internal static InvocationWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new InvocationWalker());
 
-            return pooled;
+        protected override void Clear()
+        {
+            this.invocations.Clear();
+            base.Clear();
         }
     }
 }

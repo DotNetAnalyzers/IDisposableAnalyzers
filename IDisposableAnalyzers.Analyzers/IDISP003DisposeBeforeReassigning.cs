@@ -118,9 +118,9 @@
 
         private static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
-                foreach (var invocation in pooled.Item.Invocations)
+                foreach (var invocation in pooled.Invocations)
                 {
                     if (invocation.IsBeforeInScope(assignment) != Result.Yes)
                     {

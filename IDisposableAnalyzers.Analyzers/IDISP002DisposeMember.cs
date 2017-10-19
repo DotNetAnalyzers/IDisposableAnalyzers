@@ -112,9 +112,9 @@
                     return;
                 }
 
-                using (var invocations = InvocationWalker.Create(context.Node))
+                using (var invocations = InvocationWalker.Borrow(context.Node))
                 {
-                    foreach (var invocation in invocations.Item)
+                    foreach (var invocation in invocations)
                     {
                         if (
                             SymbolComparer.Equals(
@@ -132,9 +132,9 @@
                 }
 
                 using (
-                    var disposeWalker = Disposable.DisposeWalker.Create(overridden, context.SemanticModel, context.CancellationToken))
+                    var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var disposeCall in disposeWalker.Item)
+                    foreach (var disposeCall in disposeWalker)
                     {
                         if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out ExpressionSyntax disposed))
                         {

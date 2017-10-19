@@ -140,9 +140,9 @@
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;
-                            using (var pooledInvocations = InvocationWalker.Create(body))
+                            using (var pooledInvocations = InvocationWalker.Borrow(body))
                             {
-                                foreach (var candidate in pooledInvocations.Item.Invocations)
+                                foreach (var candidate in pooledInvocations.Invocations)
                                 {
                                     if (Disposable.IsDisposing(candidate, symbol, semanticModel, cancellationToken))
                                     {
@@ -173,9 +173,9 @@
 
         private static bool IsAddedToFieldOrProperty(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledInvocations = InvocationWalker.Create(block))
+            using (var pooledInvocations = InvocationWalker.Borrow(block))
             {
-                foreach (var invocation in pooledInvocations.Item.Invocations)
+                foreach (var invocation in pooledInvocations.Invocations)
                 {
                     var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
                     if (method?.Name == "Add")
@@ -200,9 +200,9 @@
 
         private static bool IsDisposedAfter(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Create(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
             {
-                foreach (var invocation in pooled.Item.Invocations)
+                foreach (var invocation in pooled.Invocations)
                 {
                     if (!IsAfter(invocation, assignment))
                     {

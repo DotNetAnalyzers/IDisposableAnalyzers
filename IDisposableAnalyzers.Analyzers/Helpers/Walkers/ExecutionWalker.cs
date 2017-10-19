@@ -4,13 +4,13 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     /// <summary>
     /// Walks code as it is executed.
     /// </summary>
-    internal abstract class ExecutionWalker : CSharpSyntaxWalker
+    internal abstract class ExecutionWalker<T> : PooledWalker<T>
+        where T : ExecutionWalker<T>
     {
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
@@ -79,7 +79,7 @@
             this.VisitChained(node);
         }
 
-        protected void Clear()
+        protected override void Clear()
         {
             this.visited.Clear();
             this.SemanticModel = null;

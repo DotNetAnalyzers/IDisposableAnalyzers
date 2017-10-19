@@ -23,9 +23,9 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            using (var pooled = DisposeWalker.Create(context, semanticModel, cancellationToken))
+            using (var pooled = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
             {
-                return pooled.Item.IsMemberDisposed(member);
+                return pooled.IsMemberDisposed(member);
             }
         }
 
@@ -40,9 +40,9 @@ namespace IDisposableAnalyzers
             foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
             {
                 var node = reference.GetSyntax(cancellationToken) as MethodDeclarationSyntax;
-                using (var pooled = DisposeWalker.Create(disposeMethod, semanticModel, cancellationToken))
+                using (var pooled = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken))
                 {
-                    foreach (var invocation in pooled.Item)
+                    foreach (var invocation in pooled)
                     {
                         if (IsDisposing(invocation, member, semanticModel, cancellationToken))
                         {
@@ -140,17 +140,8 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal sealed class DisposeWalker : ExecutionWalker, IReadOnlyList<InvocationExpressionSyntax>
+        internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>, IReadOnlyList<InvocationExpressionSyntax>
         {
-            private static readonly Pool<DisposeWalker> Pool = new Pool<DisposeWalker>(
-                () => new DisposeWalker(),
-                x =>
-                    {
-                        x.invocations.Clear();
-                        x.identifiers.Clear();
-                        x.Clear();
-                    });
-
             private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
             private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
 
@@ -184,32 +175,32 @@ namespace IDisposableAnalyzers
                 base.VisitIdentifierName(node);
             }
 
-            internal static Pool<DisposeWalker>.Pooled Create(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 if (!IsAssignableTo(type))
                 {
-                    return Create(semanticModel, cancellationToken);
+                    return Borrow(semanticModel, cancellationToken);
                 }
 
                 if (TryGetDisposeMethod(type, Search.Recursive, out IMethodSymbol disposeMethod))
                 {
-                    return Create(disposeMethod, semanticModel, cancellationToken);
+                    return Borrow(disposeMethod, semanticModel, cancellationToken);
                 }
 
-                return Create(semanticModel, cancellationToken);
+                return Borrow(semanticModel, cancellationToken);
             }
 
-            internal static Pool<DisposeWalker>.Pooled Create(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static DisposeWalker Borrow(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 if (disposeMethod != KnownSymbol.IDisposable.Dispose)
                 {
-                    return Create(semanticModel, cancellationToken);
+                    return Borrow(semanticModel, cancellationToken);
                 }
 
-                var pooled = Create(semanticModel, cancellationToken);
+                var pooled = Borrow(semanticModel, cancellationToken);
                 foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
                 {
-                    pooled.Item.Visit(reference.GetSyntax(cancellationToken));
+                    pooled.Visit(reference.GetSyntax(cancellationToken));
                 }
 
                 return pooled;
@@ -237,11 +228,18 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            private static Pool<DisposeWalker>.Pooled Create(SemanticModel semanticModel, CancellationToken cancellationToken)
+            protected override void Clear()
             {
-                var pooled = Pool.GetOrCreate();
-                pooled.Item.SemanticModel = semanticModel;
-                pooled.Item.CancellationToken = cancellationToken;
+                this.invocations.Clear();
+                this.identifiers.Clear();
+                base.Clear();
+            }
+
+            private static DisposeWalker Borrow(SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                var pooled = Borrow(() => new DisposeWalker());
+                pooled.SemanticModel = semanticModel;
+                pooled.CancellationToken = cancellationToken;
                 return pooled;
             }
         }
