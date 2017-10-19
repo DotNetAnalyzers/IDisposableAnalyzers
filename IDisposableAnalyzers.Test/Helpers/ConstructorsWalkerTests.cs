@@ -32,11 +32,11 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
-            using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
+            using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
+                var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
                 Assert.AreEqual("internal Foo(), internal Foo(string text)", actual);
-                Assert.AreEqual(0, pooled.Item.ObjectCreations.Count);
+                Assert.AreEqual(0, walker.ObjectCreations.Count);
             }
         }
 
@@ -61,11 +61,11 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
-            using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
+            using (var pooled = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
+                var actual = string.Join(", ", pooled.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
                 Assert.AreEqual("internal Foo(string text)", actual);
-                Assert.AreEqual(0, pooled.Item.ObjectCreations.Count);
+                Assert.AreEqual(0, pooled.ObjectCreations.Count);
             }
         }
 
@@ -90,11 +90,11 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
-            using (var pooled = ConstructorsWalker.Create(type, semanticModel, CancellationToken.None))
+            using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
-                var actual = string.Join(", ", pooled.Item.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));
+                var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));
                 Assert.AreEqual(string.Empty, actual);
-                Assert.AreEqual("new Foo()", string.Join(", ", pooled.Item.ObjectCreations));
+                Assert.AreEqual("new Foo()", string.Join(", ", walker.ObjectCreations));
             }
         }
     }

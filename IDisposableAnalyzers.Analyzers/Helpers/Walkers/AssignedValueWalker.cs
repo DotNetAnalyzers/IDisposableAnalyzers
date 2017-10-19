@@ -355,15 +355,15 @@
                 var contextCtor = this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
-                    using (var pooled = ConstructorsWalker.Create((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
+                    using (var walker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
                         if (this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
-                            pooled.Item.Default != null)
+                            walker.Default != null)
                         {
-                            this.Visit(pooled.Item.Default);
+                            this.Visit(walker.Default);
                         }
 
-                        foreach (var creation in pooled.Item.ObjectCreations)
+                        foreach (var creation in walker.ObjectCreations)
                         {
                             if (contextCtor == null ||
                                 creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
@@ -377,7 +377,7 @@
                             }
                         }
 
-                        foreach (var ctor in pooled.Item.NonPrivateCtors)
+                        foreach (var ctor in walker.NonPrivateCtors)
                         {
                             if (contextCtor == null ||
                                 ctor == contextCtor ||

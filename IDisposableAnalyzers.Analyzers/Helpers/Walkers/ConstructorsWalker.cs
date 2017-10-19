@@ -4,23 +4,10 @@
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ConstructorsWalker : CSharpSyntaxWalker
+    internal sealed class ConstructorsWalker : PooledWalker<ConstructorsWalker>
     {
-        private static readonly Pool<ConstructorsWalker> Pool = new Pool<ConstructorsWalker>(
-            () => new ConstructorsWalker(),
-            x =>
-            {
-                x.nonPrivateCtors.Clear();
-                x.objectCreations.Clear();
-                x.Default = null;
-                x.semanticModel = null;
-                x.cancellationToken = CancellationToken.None;
-                x.type = null;
-            });
-
         private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new List<ConstructorDeclarationSyntax>();
         private readonly List<ObjectCreationExpressionSyntax> objectCreations = new List<ObjectCreationExpressionSyntax>();
 
@@ -68,37 +55,47 @@
             base.VisitObjectCreationExpression(node);
         }
 
-        internal static Pool<ConstructorsWalker>.Pooled Create(TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ConstructorsWalker Borrow(TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Pool.GetOrCreate();
-            pooled.Item.semanticModel = semanticModel;
-            pooled.Item.cancellationToken = cancellationToken;
-            pooled.Item.Visit(context);
-            pooled.Item.type = semanticModel.GetDeclaredSymbolSafe(context, cancellationToken) as INamedTypeSymbol;
-            if (pooled.Item.type == null)
+            var walker = Borrow(() => new ConstructorsWalker());
+            walker.semanticModel = semanticModel;
+            walker.cancellationToken = cancellationToken;
+            walker.Visit(context);
+            walker.type = semanticModel.GetDeclaredSymbolSafe(context, cancellationToken) as INamedTypeSymbol;
+            if (walker.type == null)
             {
-                return pooled;
+                return walker;
             }
 
-            foreach (var reference in pooled.Item.type.DeclaringSyntaxReferences)
+            foreach (var reference in walker.type.DeclaringSyntaxReferences)
             {
-                pooled.Item.Visit(reference.GetSyntax(cancellationToken));
+                walker.Visit(reference.GetSyntax(cancellationToken));
             }
 
-            if (pooled.Item.nonPrivateCtors.Count == 0 &&
-                pooled.Item.Default == null)
+            if (walker.nonPrivateCtors.Count == 0 &&
+                walker.Default == null)
             {
-                if (Constructor.TryGetDefault(pooled.Item.type, out IMethodSymbol @default))
+                if (Constructor.TryGetDefault(walker.type, out var @default))
                 {
                     foreach (var reference in @default.DeclaringSyntaxReferences)
                     {
-                        pooled.Item.Default = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                        pooled.Item.Visit(pooled.Item.Default);
+                        walker.Default = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
+                        walker.Visit(walker.Default);
                     }
                 }
             }
 
-            return pooled;
+            return walker;
+        }
+
+        protected override void Clear()
+        {
+            this.nonPrivateCtors.Clear();
+            this.objectCreations.Clear();
+            this.Default = null;
+            this.semanticModel = null;
+            this.cancellationToken = CancellationToken.None;
+            this.type = null;
         }
     }
 }

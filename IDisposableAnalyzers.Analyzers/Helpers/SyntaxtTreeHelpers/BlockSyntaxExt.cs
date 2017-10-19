@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            return Assignment.FirstWith(symbol, body, Search.TopLevel, semanticModel, cancellationToken, out result);
+            return AssignmentWalker.FirstWith(symbol, body, Search.TopLevel, semanticModel, cancellationToken, out result);
         }
     }
 }
