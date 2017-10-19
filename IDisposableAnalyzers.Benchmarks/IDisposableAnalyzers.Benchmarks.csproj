@@ -6,6 +6,10 @@
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Benchmarks.ruleset</CodeAnalysisRuleSet>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>   
   <ItemGroup>
     <Content Include="TraceEvent.ReadMe.txt">
       <Paket>True</Paket>
