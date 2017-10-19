@@ -1,10 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+<Project>
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <AssemblyName>IDisposableAnalyzers.Vsix</AssemblyName>
   </PropertyGroup>
+
   <PropertyGroup>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
@@ -14,10 +15,12 @@
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <VSSDKTargetPlatformRegRootSuffix>Roslyn</VSSDKTargetPlatformRegRootSuffix>
   </PropertyGroup>
+
   <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- This property disables extension deployment for command line builds; required for AppVeyor and the build script -->
     <DeployExtension>False</DeployExtension>
   </PropertyGroup>
+
   <ItemGroup>
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
@@ -25,5 +28,19 @@
     <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
     <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- https://github.com/dotnet/sdk/issues/433 -->
+    <ProjectReference Update="@(ProjectReference)" AdditionalProperties="TargetFramework=netstandard1.3" />
+
+    <!-- https://github.com/Microsoft/extendvs/issues/57 -->
+    <ProjectReference Update="@(ProjectReference)" Name="%(Filename)" />
+  </ItemGroup>
+
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
+  <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.targets" />
+
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
+
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
