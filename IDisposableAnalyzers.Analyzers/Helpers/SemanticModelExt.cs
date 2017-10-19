@@ -23,18 +23,6 @@
                    semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
         }
 
-        internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
-        {
-            if (node is AwaitExpressionSyntax awaitExpression)
-            {
-                return GetSymbolSafe(semanticModel, awaitExpression, cancellationToken);
-            }
-
-            return semanticModel.SemanticModelFor(node)
-                                ?.GetSymbolInfo(node, cancellationToken)
-                                 .Symbol;
-        }
-
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
         {
             return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
@@ -48,6 +36,18 @@
         internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, ConstructorInitializerSyntax node, CancellationToken cancellationToken)
         {
             return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
+        }
+
+        internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
+        {
+            if (node is AwaitExpressionSyntax awaitExpression)
+            {
+                return GetSymbolSafe(semanticModel, awaitExpression, cancellationToken);
+            }
+
+            return semanticModel.SemanticModelFor(node)
+                                ?.GetSymbolInfo(node, cancellationToken)
+                                .Symbol;
         }
 
         internal static IFieldSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, FieldDeclarationSyntax node, CancellationToken cancellationToken)
@@ -92,15 +92,15 @@
                                              ?.GetDeclaredSymbol(node, cancellationToken);
         }
 
+        internal static IParameterSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, ParameterSyntax node, CancellationToken cancellationToken)
+        {
+            return (IParameterSymbol)GetDeclaredSymbolSafe(semanticModel, (SyntaxNode)node, cancellationToken);
+        }
+
         internal static ISymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
             return semanticModel.SemanticModelFor(node)
                                 ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static IParameterSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, ParameterSyntax node, CancellationToken cancellationToken)
-        {
-            return (IParameterSymbol)GetDeclaredSymbolSafe(semanticModel, (SyntaxNode)node, cancellationToken);
         }
 
         internal static Optional<object> GetConstantValueSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
