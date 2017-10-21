@@ -1,6 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project>
-  <Import Project="..\..\..\Users\Johan\.nuget\packages\microsoft.vssdk.buildtools\15.1.192\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('..\..\..\Users\Johan\.nuget\packages\microsoft.vssdk.buildtools\15.1.192\build\Microsoft.VSSDK.BuildTools.props')" Label="Paket" />
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
