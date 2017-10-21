@@ -71,7 +71,7 @@
         internal static IMethodSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, MethodDeclarationSyntax node, CancellationToken cancellationToken)
         {
             return (IMethodSymbol)semanticModel.SemanticModelFor(node)
-                                               .GetDeclaredSymbol(node, cancellationToken);
+                                              ?.GetDeclaredSymbol(node, cancellationToken);
         }
 
         internal static ITypeSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, TypeDeclarationSyntax node, CancellationToken cancellationToken)
