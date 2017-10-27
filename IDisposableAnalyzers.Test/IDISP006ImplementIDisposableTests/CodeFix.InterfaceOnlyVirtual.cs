@@ -7,6 +7,8 @@
     {
         public class InterfaceOnlyVirtual
         {
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS0535");
+
             [Test]
             public void AbstractClass()
             {
@@ -15,7 +17,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : ↓IDisposable
+    public abstract class Foo : IDisposable
     {
     }
 }";
@@ -56,8 +58,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
-                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -68,7 +70,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : ↓IDisposable
+    public abstract class Foo : IDisposable
     {
         public const int Value1 = 1;
         private const int Value2 = 2;
@@ -125,8 +127,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
-                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -137,7 +139,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : ↓IDisposable
+    public abstract class Foo : IDisposable
     {
         public void Bar1()
         {
@@ -209,8 +211,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
-                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -221,7 +223,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : ↓IDisposable
+    public class Foo : IDisposable
     {
     }
 }";
@@ -262,7 +264,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>("CS0535", testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
+                AnalyzerAssert.CodeFix<ImplementIDisposableCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
             }
         }
     }
