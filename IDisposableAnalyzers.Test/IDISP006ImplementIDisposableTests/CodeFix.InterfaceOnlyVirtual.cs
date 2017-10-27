@@ -8,7 +8,7 @@
         public class InterfaceOnlyVirtual
         {
             // ReSharper disable once InconsistentNaming
-            private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create("CS0535");
+            private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
             [Test]
             public void AbstractClass()
