@@ -3,7 +3,6 @@ group Test
   Gu.Roslyn.Asserts
   NUnit
   Moq
-  Gu.Roslyn.Asserts
   System.Reactive
   System.Reactive.Linq
   System.Reactive.PlatformServices

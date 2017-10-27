@@ -13,7 +13,6 @@ group Test
   nuget Gu.Roslyn.Asserts ~> 1
   nuget NUnit
   nuget Moq
-  nuget Gu.Roslyn.Asserts
   nuget System.Reactive
   nuget System.Reactive.Linq
   nuget System.Reactive.PlatformServices
