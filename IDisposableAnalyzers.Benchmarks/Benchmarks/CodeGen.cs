@@ -22,7 +22,8 @@
             var id = analyzer.SupportedDiagnostics.Single().Id;
             var expectedName = id + (id.Contains("_") ? "_" : string.Empty) + "Benchmarks";
             var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
-            var code = new StringBuilder().AppendLine($"namespace {this.GetType().Namespace}")
+            var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
+                                          .AppendLine($"namespace {this.GetType().Namespace}")
                                           .AppendLine("{")
                                           .AppendLine($"    public class {expectedName}")
                                           .AppendLine("    {")
@@ -49,7 +50,8 @@
         {
             var fileName = Path.Combine(Program.BenchmarksDirectory, "AllBenchmarks.cs");
             var builder = new StringBuilder();
-            builder.AppendLine($"namespace {this.GetType().Namespace}")
+            builder.AppendLine("// ReSharper disable RedundantNameQualifier")
+                   .AppendLine($"namespace {this.GetType().Namespace}")
                    .AppendLine("{")
                    .AppendLine("    public class AllBenchmarks")
                    .AppendLine("    {");

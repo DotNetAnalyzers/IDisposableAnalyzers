@@ -17,14 +17,14 @@ namespace IDisposableAnalyzers.Test
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
             .ToImmutableArray();
 
-        private static readonly Solution Solution = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
-            Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln"),
+        private static readonly Solution Solution = CodeFactory.CreateSolution(
+            CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
         // ReSharper disable once InconsistentNaming
-        private static readonly Solution IDisposableAnalyzersAnalyzersProjectSln = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
-            Gu.Roslyn.Asserts.CodeFactory.FindProjectFile("IDisposableAnalyzers.Analyzers.csproj"),
+        private static readonly Solution IDisposableAnalyzersAnalyzersProjectSln = CodeFactory.CreateSolution(
+            CodeFactory.FindProjectFile("IDisposableAnalyzers.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 

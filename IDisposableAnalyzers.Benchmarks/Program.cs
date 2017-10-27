@@ -1,5 +1,6 @@
 ﻿// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
+// ReSharper disable HeuristicUnreachableCode
 #pragma warning disable GU0011 // Don't ignore the returnvalue.
 #pragma warning disable CS0162 // Unreachable code detected
 namespace IDisposableAnalyzers.Benchmarks
@@ -14,9 +15,9 @@ namespace IDisposableAnalyzers.Benchmarks
 
     public class Program
     {
-        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
-
         public static string ProjectDirectory => CodeFactory.FindProjectFile("IDisposableAnalyzers.Benchmarks.csproj").DirectoryName;
+
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
         private static string ArtifactsDirectory { get; } = Path.Combine(ProjectDirectory, "BenchmarkDotNet.Artifacts", "results");
 
