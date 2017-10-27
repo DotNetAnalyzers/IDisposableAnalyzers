@@ -32,7 +32,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -60,7 +60,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -96,7 +96,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

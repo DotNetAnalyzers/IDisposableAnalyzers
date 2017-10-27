@@ -1,3 +1,4 @@
+#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
@@ -5,7 +6,9 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 
     internal partial class HappyPath
     {
-        private static readonly string DisposableCode = @"
+        private static readonly IDISP002DisposeMember Analyzer = new IDISP002DisposeMember();
+
+        private const string DisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -57,7 +60,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -103,7 +106,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -159,7 +162,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(disposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -184,7 +187,7 @@ namespace RoslynSandbox
         public void Dispose() => _disposable.Dispose();
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(disposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -207,7 +210,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -229,7 +232,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -252,7 +255,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -274,7 +277,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -302,7 +305,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -325,7 +328,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -360,7 +363,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(baseClassCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, baseClassCode, testCode);
         }
 
         [Test]
@@ -420,7 +423,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(baseClassCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, baseClassCode, testCode);
         }
 
         [TestCase("disposables.First();")]
@@ -444,7 +447,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("disposables.First();", linq);
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -461,7 +464,7 @@ namespace RoslynSandbox
         private readonly IDisposable bar;
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -483,7 +486,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -512,7 +515,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -526,7 +529,7 @@ namespace RoslynSandbox
         private readonly object bar = new object();
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -542,7 +545,7 @@ namespace RoslynSandbox
         private static object Meh() => new object();
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -556,7 +559,7 @@ namespace RoslynSandbox
         private readonly object bar = string.Copy(string.Empty);
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -572,7 +575,7 @@ namespace RoslynSandbox
         private static Stream stream = File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -588,7 +591,7 @@ namespace RoslynSandbox
         private readonly Task stream = Task.Delay(0);
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -604,7 +607,7 @@ namespace RoslynSandbox
         private readonly Task<int> stream = Task.FromResult(0);
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -618,7 +621,7 @@ namespace RoslynSandbox
         private readonly int[] ints = new[] { 1, 2, 3 };
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -647,7 +650,7 @@ namespace RoslynSandbox
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -668,7 +671,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -690,7 +693,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -712,7 +715,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -768,7 +771,7 @@ namespace RoslynSandbox
         public override Stream Stream { get; }
     }
 }";
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(fooCode, barCode);
+            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [Test]
@@ -817,7 +820,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, fooBaseCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
         }
     }
 }

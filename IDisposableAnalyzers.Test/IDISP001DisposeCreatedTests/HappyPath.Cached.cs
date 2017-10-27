@@ -24,7 +24,7 @@ public static class Foo
         return stream.Length;
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -44,7 +44,7 @@ public class Foo
         return stream.Length;
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -69,7 +69,7 @@ public static class Foo
         return 0;
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -94,7 +94,7 @@ public static class Foo
         return 0;
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

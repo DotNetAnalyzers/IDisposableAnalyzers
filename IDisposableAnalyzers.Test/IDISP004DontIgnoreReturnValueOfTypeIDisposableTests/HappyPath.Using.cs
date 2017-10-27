@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP004DontIgnoreReturnValueOfTypeIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

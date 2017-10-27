@@ -33,7 +33,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

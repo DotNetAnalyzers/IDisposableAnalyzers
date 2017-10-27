@@ -30,7 +30,7 @@ namespace RoslynSandbox
     }
 }";
                 testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         public void Dispose() => _disposable.Dispose();
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -182,7 +182,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -205,7 +205,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -227,7 +227,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -255,7 +255,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -278,7 +278,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -299,7 +299,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -320,7 +320,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -345,7 +345,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [TestCase("disposables.First();")]
@@ -369,7 +369,7 @@ namespace RoslynSandbox
     }
 }";
                 testCode = testCode.AssertReplace("disposables.First();", linq);
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -386,7 +386,7 @@ namespace RoslynSandbox
         private readonly IDisposable bar;
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -408,7 +408,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -422,7 +422,7 @@ namespace RoslynSandbox
         private readonly object bar = new object();
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -438,7 +438,7 @@ namespace RoslynSandbox
         private static object Meh() => new object();
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -452,7 +452,7 @@ namespace RoslynSandbox
         private readonly object bar = string.Copy(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -468,7 +468,7 @@ namespace RoslynSandbox
         private static Stream stream = File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -484,7 +484,7 @@ namespace RoslynSandbox
         private readonly Task stream = Task.Delay(0);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -500,7 +500,7 @@ namespace RoslynSandbox
         private readonly Task<int> stream = Task.FromResult(0);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -514,7 +514,7 @@ namespace RoslynSandbox
         private readonly int[] ints = new[] { 1, 2, 3 };
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -543,7 +543,7 @@ namespace RoslynSandbox
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

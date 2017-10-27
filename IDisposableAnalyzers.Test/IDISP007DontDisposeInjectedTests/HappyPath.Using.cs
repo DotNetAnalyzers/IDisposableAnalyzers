@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -142,7 +142,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(factoryCode, disposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, factoryCode, disposableCode, testCode);
             }
 
             [Test]
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -266,7 +266,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(iFactoryCode, factoryCode, disposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, iFactoryCode, factoryCode, disposableCode, testCode);
             }
 
             [Test]
@@ -321,7 +321,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, factoryCode, disposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, disposableCode, testCode);
             }
 
             [Test]
@@ -364,7 +364,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, factoryCode, DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, DisposableCode, testCode);
             }
 
             [Test]
@@ -407,7 +407,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, disposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, testCode);
             }
 
             [Test]
@@ -450,7 +450,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(abstractFactoryCode, disposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, testCode);
             }
 
             [Test]
@@ -505,7 +505,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(new[] { abstractFactoryCode, factoryCode, disposableCode, testCode });
+                AnalyzerAssert.Valid(Analyzer, new[] { abstractFactoryCode, factoryCode, disposableCode, testCode });
             }
 
             [Test]
@@ -534,7 +534,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -563,7 +563,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

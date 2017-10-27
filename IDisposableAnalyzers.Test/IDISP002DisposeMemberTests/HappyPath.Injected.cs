@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(new Disposable());
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(new Disposable());
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -141,7 +141,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -162,7 +162,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP002DisposeMember>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }

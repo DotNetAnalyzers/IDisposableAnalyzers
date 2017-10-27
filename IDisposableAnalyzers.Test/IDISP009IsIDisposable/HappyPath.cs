@@ -6,6 +6,8 @@
 
     internal class HappyPath
     {
+        private static readonly IDISP009IsIDisposable Analyzer = new IDISP009IsIDisposable();
+
         [Test]
         public void DisposingCreatedFieldInVirtualDispose()
         {
@@ -49,7 +51,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -70,7 +72,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode)
+            AnalyzerAssert.Valid(Analyzer, testCode)
                       ;
         }
 
@@ -94,7 +96,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -121,7 +123,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
@@ -146,7 +148,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -168,7 +170,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -190,7 +192,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -211,7 +213,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -236,7 +238,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -280,7 +282,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(disposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [TestCase("private set")]
@@ -314,7 +316,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("private set", setter);
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -351,7 +353,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -391,7 +393,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid<IDISP009IsIDisposable>(disposableDictionaryCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
         }
     }
 }

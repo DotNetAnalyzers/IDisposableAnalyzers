@@ -1,3 +1,4 @@
+#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
@@ -5,7 +6,9 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 
     internal partial class HappyPath
     {
-        private static readonly string DisposableCode = @"
+        private static readonly IDISP007DontDisposeInjected Analyzer = new IDISP007DontDisposeInjected();
+
+        private const string DisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -41,7 +44,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -68,7 +71,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -135,7 +138,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
+            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -208,7 +211,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
+            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -282,7 +285,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
+            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -353,7 +356,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(DisposableCode, fooBaseCode, fooImplCode);
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -374,7 +377,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -399,7 +402,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -439,7 +442,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -465,7 +468,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -514,7 +517,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -558,7 +561,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(disposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -605,7 +608,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -633,7 +636,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -652,7 +655,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("action(stream)")]
@@ -676,7 +679,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("action(stream)", invokeCode);
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -700,7 +703,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

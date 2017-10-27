@@ -25,7 +25,7 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(true);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static Foo Create() => new Foo(Cached);
     }
 }";
-                AnalyzerAssert.Valid<IDISP006ImplementIDisposable>(DisposableCode, testCode);
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
         }
     }

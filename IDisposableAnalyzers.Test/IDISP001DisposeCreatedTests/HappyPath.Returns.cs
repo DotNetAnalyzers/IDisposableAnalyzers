@@ -23,7 +23,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         public static Stream Bar() => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -105,7 +105,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -131,7 +131,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -148,7 +148,7 @@ namespace RoslynSandbox
             return new StreamReader(stream);
         }
     }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -169,7 +169,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -191,7 +191,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -214,7 +214,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static Stream Bar => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Valid(Analyzer, testCode);
             }
         }
     }
