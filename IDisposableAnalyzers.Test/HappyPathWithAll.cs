@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers.Test
     using System.Collections.Immutable;
     using System.Linq;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -15,6 +16,36 @@ namespace IDisposableAnalyzers.Test
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
             .ToImmutableArray();
+
+        private static readonly Solution Solution = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
+            Gu.Roslyn.Asserts.CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
+        // ReSharper disable once InconsistentNaming
+        private static readonly Solution IDisposableAnalyzersAnalyzersProjectSln = Gu.Roslyn.Asserts.CodeFactory.CreateSolution(
+            Gu.Roslyn.Asserts.CodeFactory.FindProjectFile("IDisposableAnalyzers.Analyzers.csproj"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
+        [Test]
+        public void NotEmpty()
+        {
+            CollectionAssert.IsNotEmpty(AllAnalyzers);
+            Assert.Pass($"Count: {AllAnalyzers.Length}");
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void PropertyChangedAnalyzersSln(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, Solution);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void PropertyChangedAnalyzersProject(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, IDisposableAnalyzersAnalyzersProjectSln);
+        }
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void SomewhatRealisticSample(DiagnosticAnalyzer analyzer)
