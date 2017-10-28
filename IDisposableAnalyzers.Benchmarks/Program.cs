@@ -35,9 +35,9 @@ namespace IDisposableAnalyzers.Benchmarks
                 Console.ReadKey();
                 benchmark.Run();
             }
-            else if (false)
+            else if (true)
             {
-                foreach (var summary in RunSingle<IDISP001Benchmarks>())
+                foreach (var summary in RunSingle<AllBenchmarks>())
                 {
                     CopyResult(summary.Title);
                 }
