@@ -42,7 +42,8 @@
             if (method.IsStatic ||
                 method.Name != "Dispose" ||
                 !method.ReturnsVoid ||
-                method.Parameters.Length != 0)
+                method.Parameters.Length != 0 ||
+                method.GetAttributes().Length != 0)
             {
                 return;
             }

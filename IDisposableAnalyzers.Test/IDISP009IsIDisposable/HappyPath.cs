@@ -395,5 +395,25 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
         }
+
+        [Test]
+        public void IgnoreTestMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public class Foo
+    {
+        [Test]
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
