@@ -35,8 +35,7 @@
 
         private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis() ||
-                !IsPotentiallyDisposable(context))
+            if (context.IsExcludedFromAnalysis())
             {
                 return;
             }
@@ -94,31 +93,6 @@
                     }
                 }
             }
-        }
-
-        private static bool IsPotentiallyDisposable(SyntaxNodeAnalysisContext context)
-        {
-            if (context.ContainingSymbol is IFieldSymbol field)
-            {
-                return Disposable.IsPotentiallyAssignableTo(field.Type);
-            }
-
-            if (context.ContainingSymbol is IPropertySymbol property)
-            {
-                return Disposable.IsPotentiallyAssignableTo(property.Type);
-            }
-
-            if (context.ContainingSymbol is ILocalSymbol local)
-            {
-                return Disposable.IsPotentiallyAssignableTo(local.Type);
-            }
-
-            if (context.ContainingSymbol is IParameterSymbol parameter)
-            {
-                return Disposable.IsPotentiallyAssignableTo(parameter.Type);
-            }
-
-            return false;
         }
 
         private static bool IsReturned(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
