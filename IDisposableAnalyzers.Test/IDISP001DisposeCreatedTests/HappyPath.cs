@@ -267,31 +267,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [TestCase("disposables.First();")]
-        [TestCase("disposables.First(x => x != null);")]
-        [TestCase("disposables.Where(x => x != null);")]
-        [TestCase("disposables.Single();")]
-        [TestCase("Enumerable.Empty<IDisposable>();")]
-        public void IgnoreLinq(string linq)
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.Linq;
-
-    public sealed class Foo
-    {
-        public Foo(IDisposable[] disposables)
-        {
-            var first = disposables.First();
-        }
-    }
-}";
-            testCode = testCode.AssertReplace("disposables.First();", linq);
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
-
         [Test]
         public void InjectedDbConnectionCreateCommand()
         {

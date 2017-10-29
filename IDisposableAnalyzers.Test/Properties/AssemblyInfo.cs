@@ -16,4 +16,5 @@
     typeof(System.Xaml.XamlLanguage),
     typeof(Microsoft.CodeAnalysis.CSharp.CSharpCompilation),
     typeof(Microsoft.CodeAnalysis.Compilation),
+    typeof(Moq.Mock<>),
     typeof(NUnit.Framework.Assert))]
