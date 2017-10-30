@@ -12,7 +12,7 @@
             [TestCase("disposables.Where(x => x != null);")]
             [TestCase("disposables.Single();")]
             [TestCase("Enumerable.Empty<IDisposable>();")]
-            public void IgnoreLinq(string linq)
+            public void Linq(string linq)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreMoq()
+            public void MockOf()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -48,6 +48,26 @@ namespace RoslynSandbox
         public void Test()
         {
             var mocked = Mock.Of<IDisposable>();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void Ninject()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Ninject;
+
+    public sealed class Foo
+    {
+        public Foo(IKernel kernel)
+        {
+            var mocked = kernel.Get<IDisposable>();
         }
     }
 }";

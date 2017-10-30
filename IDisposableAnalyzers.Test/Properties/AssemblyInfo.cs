@@ -17,4 +17,5 @@
     typeof(Microsoft.CodeAnalysis.CSharp.CSharpCompilation),
     typeof(Microsoft.CodeAnalysis.Compilation),
     typeof(Moq.Mock<>),
+    typeof(Ninject.StandardKernel),
     typeof(NUnit.Framework.Assert))]
