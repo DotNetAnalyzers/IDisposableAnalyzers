@@ -148,9 +148,10 @@ namespace IDisposableAnalyzers
                 if (walker.Count == 0)
                 {
                     var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-                    if (symbol != null && symbol.DeclaringSyntaxReferences.Length == 0)
+                    if (symbol != null &&
+                        symbol.DeclaringSyntaxReferences.Length == 0)
                     {
-                        return IsCreationCore(candidate, semanticModel, cancellationToken);
+                        return IsCreationCore(symbol);
                     }
 
                     using (var recursive = RecursiveValues.Create(new[] { candidate }, semanticModel, cancellationToken))
@@ -239,7 +240,9 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            if (!IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
+            if (!IsPotentiallyAssignableTo(
+                semanticModel.GetTypeInfoSafe(candidate, cancellationToken)
+                             .Type))
             {
                 return Result.No;
             }
@@ -256,7 +259,9 @@ namespace IDisposableAnalyzers
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
+                if (IsAssignableTo(
+                    semanticModel.GetTypeInfoSafe(candidate, cancellationToken)
+                                 .Type))
                 {
                     return Result.Yes;
                 }
@@ -265,18 +270,23 @@ namespace IDisposableAnalyzers
             }
 
             var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-            if (symbol == null ||
-                symbol is ILocalSymbol)
+            return IsCreationCore(symbol);
+        }
+
+        private static Result IsCreationCore(ISymbol candidate)
+        {
+            if (candidate == null ||
+                candidate is ILocalSymbol)
             {
                 return Result.Unknown;
             }
 
-            if (symbol is IFieldSymbol)
+            if (candidate is IFieldSymbol)
             {
                 return Result.No;
             }
 
-            if (symbol is IPropertySymbol property)
+            if (candidate is IPropertySymbol property)
             {
                 if (property.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -288,7 +298,7 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            if (symbol is IMethodSymbol method)
+            if (candidate is IMethodSymbol method)
             {
                 if (method.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -344,6 +354,12 @@ namespace IDisposableAnalyzers
                         IsAssignableTo(method.ReturnType))
                     {
                         return Result.Yes;
+                    }
+
+                    if (method.IsGenericMethod &&
+                        ReferenceEquals(method.TypeArguments[0], method.ReturnType))
+                    {
+                        return Result.AssumeNo;
                     }
 
                     return IsAssignableTo(method.ReturnType)

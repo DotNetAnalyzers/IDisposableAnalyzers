@@ -61,6 +61,7 @@ namespace RoslynSandbox
             [TestCase("new Queue<IDisposable>().Peek()", Result.No)]
             [TestCase("ImmutableQueue<IDisposable>.Empty.Peek()", Result.No)]
             [TestCase("new List<IDisposable>()[0]", Result.No)]
+            [TestCase("Mock.Of<IDisposable>()", Result.AssumeNo)]
             [TestCase("ImmutableList<IDisposable>.Empty[0]", Result.Unknown)]
             public void Ignored(string code, Result expected)
             {
@@ -73,6 +74,7 @@ namespace RoslynSandbox
     using System.Collections.Immutable;
     using System.IO;
     using System.Linq;
+    using Moq;
 
     public class Disposable : IDisposable
     {

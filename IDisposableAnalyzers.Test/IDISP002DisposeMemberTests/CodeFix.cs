@@ -856,7 +856,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Stream = File.OpenRead(string.Empty);
+            Stream = File.OpenRead(string.Empty);
         }
 
         public Stream Stream
@@ -883,7 +883,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Stream = File.OpenRead(string.Empty);
+            Stream = File.OpenRead(string.Empty);
         }
 
         public Stream Stream
