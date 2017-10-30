@@ -120,7 +120,7 @@
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.Yes, Result.Maybe))
+                          .IsEither(Result.Yes, Result.AssumeYes))
             {
                 var symbol = context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken);
                 if (symbol == null)

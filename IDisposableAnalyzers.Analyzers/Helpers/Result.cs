@@ -4,7 +4,8 @@ namespace IDisposableAnalyzers
     {
         Unknown,
         Yes,
+        AssumeYes,
         No,
-        Maybe
+        AssumeNo,
     }
 }

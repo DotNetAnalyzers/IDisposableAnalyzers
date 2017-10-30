@@ -221,7 +221,7 @@ namespace IDisposableAnalyzers
                 {
                     if (SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(name, this.CancellationToken)))
                     {
-                        return Result.Maybe;
+                        return Result.AssumeYes;
                     }
                 }
 

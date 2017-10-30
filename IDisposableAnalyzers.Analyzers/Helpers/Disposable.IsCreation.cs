@@ -57,11 +57,12 @@ namespace IDisposableAnalyzers
                             case Result.Yes:
                                 assignedSymbol = symbol;
                                 return Result.Yes;
-                            case Result.No:
-                                break;
-                            case Result.Maybe:
+                            case Result.AssumeYes:
                                 assignedSymbol = symbol;
-                                result = Result.Maybe;
+                                result = Result.AssumeYes;
+                                break;
+                            case Result.No:
+                            case Result.AssumeNo:
                                 break;
                             default:
                                 throw new ArgumentOutOfRangeException();
@@ -212,11 +213,13 @@ namespace IDisposableAnalyzers
                         break;
                     case Result.Yes:
                         return Result.Yes;
+                    case Result.AssumeYes:
+                        result = Result.AssumeYes;
+                        break;
                     case Result.No:
+                    case Result.AssumeNo:
                         break;
-                    case Result.Maybe:
-                        result = Result.Maybe;
-                        break;
+
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
@@ -333,7 +336,7 @@ namespace IDisposableAnalyzers
                     if (method.ReturnType == KnownSymbol.TaskOfT)
                     {
                         return IsAssignableTo(((INamedTypeSymbol)method.ReturnType).TypeArguments[0])
-                            ? Result.Maybe
+                            ? Result.AssumeYes
                             : Result.No;
                     }
 
@@ -344,7 +347,7 @@ namespace IDisposableAnalyzers
                     }
 
                     return IsAssignableTo(method.ReturnType)
-                               ? Result.Maybe
+                               ? Result.AssumeYes
                                : Result.No;
                 }
 

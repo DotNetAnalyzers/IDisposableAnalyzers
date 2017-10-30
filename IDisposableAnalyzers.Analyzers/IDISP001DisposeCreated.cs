@@ -52,7 +52,7 @@
                     }
 
                     if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
-                                  .IsEither(Result.Yes, Result.Maybe))
+                                  .IsEither(Result.Yes, Result.AssumeYes))
                     {
                         if (variableDeclaration.Parent is UsingStatementSyntax ||
                             variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)

@@ -63,7 +63,7 @@
             if (statement == null ||
                 otherStatement == null)
             {
-                return Result.Maybe;
+                return Result.AssumeNo;
             }
 
             if (statement.SpanStart >= otherStatement.SpanStart)

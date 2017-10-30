@@ -51,7 +51,7 @@
             if (field.DeclaredAccessibility != Accessibility.Private &&
                 !field.IsReadOnly)
             {
-                if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.Maybe))
+                if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
@@ -93,7 +93,7 @@
                 property.SetMethod.DeclaredAccessibility != Accessibility.Private)
             {
                 if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.Yes, Result.Maybe))
+                              .IsEither(Result.Yes, Result.AssumeYes))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }

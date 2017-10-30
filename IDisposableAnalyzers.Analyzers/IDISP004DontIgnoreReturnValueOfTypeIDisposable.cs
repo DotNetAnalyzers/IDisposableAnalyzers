@@ -133,7 +133,7 @@
                         }
 
                         if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
-                                      .IsEither(Result.Yes, Result.Maybe))
+                                      .IsEither(Result.Yes, Result.AssumeYes))
                         {
                             return false;
                         }

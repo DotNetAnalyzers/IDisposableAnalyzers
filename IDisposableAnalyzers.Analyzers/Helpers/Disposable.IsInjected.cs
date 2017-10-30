@@ -19,8 +19,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -37,8 +37,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -55,8 +55,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -73,8 +73,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace IDisposableAnalyzers
             }
 
             var symbol = semanticModel.GetSymbolSafe(member, cancellationToken);
-            if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.Maybe))
+            if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
             {
                 return true;
             }
@@ -99,7 +99,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -140,7 +140,7 @@ namespace IDisposableAnalyzers
                     using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
                     {
                         return IsInjectedCore(recursive, semanticModel, cancellationToken)
-                            .IsEither(Result.Yes, Result.Maybe);
+                            .IsEither(Result.Yes, Result.AssumeYes);
                     }
                 }
             }
@@ -149,7 +149,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.Maybe);
+                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -174,9 +174,9 @@ namespace IDisposableAnalyzers
                         return Result.Yes;
                     }
 
-                    if (isInjected == Result.Maybe)
+                    if (isInjected == Result.AssumeYes)
                     {
-                        result = Result.Maybe;
+                        result = Result.AssumeYes;
                     }
 
                     using (var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken))
@@ -189,9 +189,9 @@ namespace IDisposableAnalyzers
                                 return Result.Yes;
                             }
 
-                            if (isInjected == Result.Maybe)
+                            if (isInjected == Result.AssumeYes)
                             {
-                                result = Result.Maybe;
+                                result = Result.AssumeYes;
                             }
                         }
                     }
@@ -205,9 +205,9 @@ namespace IDisposableAnalyzers
                         return Result.Yes;
                     }
 
-                    if (isInjected == Result.Maybe)
+                    if (isInjected == Result.AssumeYes)
                     {
-                        result = Result.Maybe;
+                        result = Result.AssumeYes;
                     }
                 }
             }
@@ -247,7 +247,7 @@ namespace IDisposableAnalyzers
                 }
 
                 return field.DeclaredAccessibility != Accessibility.Private
-                           ? Result.Maybe
+                           ? Result.AssumeYes
                            : Result.No;
             }
 
@@ -268,7 +268,7 @@ namespace IDisposableAnalyzers
 
                 return property.DeclaredAccessibility != Accessibility.Private &&
                        property.SetMethod.DeclaredAccessibility != Accessibility.Private
-                           ? Result.Maybe
+                           ? Result.AssumeYes
                            : Result.No;
             }
 
