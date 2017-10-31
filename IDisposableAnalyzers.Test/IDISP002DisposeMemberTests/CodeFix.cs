@@ -19,7 +19,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void NotDisposingPrivateReadonlyFieldInitializedWithFileOpenReadInDisposeMethod()
+        public void PrivateReadonlyFieldInitializedWithFileOpenReadInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingPrivateReadonlyFieldInitializedWithNewInDisposeMethod()
+        public void PrivateReadonlyFieldInitializedWithNewInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInExpressionBody()
+        public void FieldAssignedInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingPrivateFieldThatCanBeNullInDisposeMethod()
+        public void PrivateFieldThatCanBeNullInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -225,7 +225,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedWithFileOpenReadInCtor()
+        public void FieldAssignedWithFileOpenReadInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -274,7 +274,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedWithNewDisposableInCtor()
+        public void FieldAssignedWithNewDisposableInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -323,7 +323,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldWhenConditionallyAssignedInCtor()
+        public void FieldWhenConditionallyAssignedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -378,7 +378,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInCtorNullCoalescing()
+        public void FieldAssignedInCtorNullCoalescing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -427,7 +427,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInCtorTernary()
+        public void FieldAssignedInCtorTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -476,7 +476,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingProtectedFieldInDisposeMethod()
+        public void ProtectedFieldInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -515,7 +515,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldInDisposeMethod2()
+        public void FieldInDisposeMethod2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -558,7 +558,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldInDisposeMethodExpressionBody()
+        public void FieldInDisposeMethodExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -598,7 +598,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldOfTypeObjectInDisposeMethod()
+        public void FieldOfTypeObjectInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -637,7 +637,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingPropertyWhenInitializedInline()
+        public void PropertyWhenInitializedInline()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -676,7 +676,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetOnlyPropertyWhenInitializedInline()
+        public void GetOnlyPropertyWhenInitializedInline()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -715,7 +715,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetSetPropertyOfTypeObjectWhenInitializedInline()
+        public void GetSetPropertyOfTypeObjectWhenInitializedInline()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -754,7 +754,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetOnlyPropertyOfTypeObjectWhenInitializedInline()
+        public void GetOnlyPropertyOfTypeObjectWhenInitializedInline()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -793,7 +793,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetSetPropertyWhenInitializedInCtor()
+        public void GetSetPropertyWhenInitializedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -842,7 +842,104 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
+        public void GetOnlyPropertyWhenInitializedInCtorVirtualDisposeUnderscoreNames()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo : IDisposable
+    {
+        private bool _disposed;
+
+        public Foo()
+        {
+            Stream = File.OpenRead(string.Empty);
+        }
+
+        ↓public Stream Stream { get; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo : IDisposable
+    {
+        private bool _disposed;
+
+        public Foo()
+        {
+            Stream = File.OpenRead(string.Empty);
+        }
+
+        public Stream Stream { get; }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+                Stream?.Dispose();
+            }
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+        }
+
+        [Test]
+        public void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -903,7 +1000,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingGetOnlyPropertyWhenInitializedInCtor()
+        public void GetOnlyPropertyWhenInitializedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1322,7 +1419,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingPrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
+        public void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
         {
             var subclassCode = @"
 namespace RoslynSandbox
@@ -1366,7 +1463,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingPrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
+        public void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
         {
             var subclassCode = @"
 namespace RoslynSandbox
