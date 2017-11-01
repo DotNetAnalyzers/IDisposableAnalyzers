@@ -41,11 +41,11 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                    if (statement?.FirstAncestor<BlockSyntax>() != null)
+                    if (statement.Parent is BlockSyntax)
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
-                                "Add using.",
+                                "Add using to end of block.",
                                 _ => ApplyAddUsingFixAsync(context, statement),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);
@@ -55,11 +55,11 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement?.FirstAncestor<BlockSyntax>() != null)
+                    if (statement.Parent is BlockSyntax)
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
-                                "Add using.",
+                                "Add using to end of block.",
                                 _ => ApplyAddUsingFixAsync(context, statement),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);

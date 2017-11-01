@@ -3,12 +3,14 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAddUsing
+    internal partial class CodeFix
     {
-        [Test]
-        public void AddUsingForLocal()
+        internal class AddUsing
         {
-            var testCode = @"
+            [Test]
+            public void AddUsingForLocal()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -24,7 +26,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -41,15 +43,15 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Explicit("Poor formatting.")]
-        [Test]
-        public void AddUsingForLocalManyStatements()
-        {
-            var testCode = @"
+            [Explicit("Poor formatting.")]
+            [Test]
+            public void AddUsingForLocalManyStatements()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -70,7 +72,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -92,8 +94,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
         }
     }
 }

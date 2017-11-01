@@ -3,12 +3,14 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixCreateAndAssignField
+    internal partial class CodeFix
     {
-        [Test]
-        public void LocalExplictTypeToFieldInCtor()
+        internal class CreateAndAssignField
         {
-            var testCode = @"
+            [Test]
+            public void LocalExplictTypeToFieldInCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -23,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -39,14 +41,16 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(
+                    testCode,
+                    fixedCode);
+                AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void LocalVarToFieldInCtor()
-        {
-            var testCode = @"
+            [Test]
+            public void LocalVarToFieldInCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -61,7 +65,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -77,8 +81,11 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(
+                    testCode,
+                    fixedCode);
+                AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            }
         }
     }
 }
