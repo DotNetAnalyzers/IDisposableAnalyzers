@@ -3,12 +3,14 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAddUsing
+    internal partial class CodeFix
     {
-        [Test]
-        public void AddUsingForIgnoredReturn()
+        internal class AddUsing
         {
-            var testCode = @"
+            [Test]
+            public void AddUsingForIgnoredReturn()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -24,7 +26,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -41,14 +43,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddUsingForIgnoredReturnEmpty()
-        {
-            var testCode = @"
+            [Test]
+            public void AddUsingForIgnoredReturnEmpty()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -63,7 +65,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -79,14 +81,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddUsingForIgnoredReturnManyStatements()
-        {
-            var testCode = @"
+            [Test]
+            public void AddUsingForIgnoredReturnManyStatements()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -109,7 +111,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -133,8 +135,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
         }
     }
 }

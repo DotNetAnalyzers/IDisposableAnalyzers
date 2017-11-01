@@ -3,12 +3,14 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixCreateAndAssignField
+    internal partial class CodeFix
     {
-        [Test]
-        public void AssignIgnoredReturnValueToFieldInCtor()
+        internal class CreateAndAssignField
         {
-            var testCode = @"
+            [Test]
+            public void AssignIgnoredReturnValueToFieldInCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -23,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -39,8 +41,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+            }
         }
     }
 }

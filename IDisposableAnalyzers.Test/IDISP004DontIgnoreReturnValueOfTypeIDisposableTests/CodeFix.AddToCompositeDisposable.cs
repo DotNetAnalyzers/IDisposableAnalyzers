@@ -3,12 +3,14 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAddToCompositeDisposable
+    internal partial class CodeFix
     {
-        [Test]
-        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtor()
+        internal class AddToCompositeDisposable
         {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -24,7 +26,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -41,14 +43,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -71,7 +73,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -93,14 +95,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -123,7 +125,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -145,14 +147,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -170,7 +172,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -186,14 +188,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -211,7 +213,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -231,14 +233,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -259,7 +261,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -279,15 +281,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Explicit("Fix later.")]
-        [Test]
-        public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -309,7 +310,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -331,14 +332,14 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -356,7 +357,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -373,14 +374,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -398,7 +399,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -415,14 +416,14 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-        }
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
 
-        [Test]
-        public void AddIgnoredReturnValueToCompositeDisposableInitializer()
-        {
-            var testCode = @"
+            [Test]
+            public void AddIgnoredReturnValueToCompositeDisposableInitializer()
+            {
+                var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -440,7 +441,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+                var fixedCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -456,8 +457,9 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
         }
     }
 }
