@@ -41,9 +41,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(
-                    testCode,
-                    fixedCode);
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
                 AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
             }
 
@@ -81,9 +79,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(
-                    testCode,
-                    fixedCode);
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
                 AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
             }
         }

@@ -419,23 +419,10 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Bar += (o, e) => ↓this.Stream = File.OpenRead(string.Empty);
+            this.Bar += (o, e) => ↓this.stream = File.OpenRead(string.Empty);
         }
 
         public event EventHandler Bar;
-
-        public Stream Stream
-        {
-            get
-            {
-                return this.stream;
-            }
-
-            private set
-            {
-                this.stream = value;
-            }
-        }
     }
 }";
 
@@ -451,23 +438,10 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Bar += (o, e) => this.Stream = File.OpenRead(string.Empty);
+            this.Bar += (o, e) => this.stream = File.OpenRead(string.Empty);
         }
 
         public event EventHandler Bar;
-
-        public Stream Stream
-        {
-            get
-            {
-                return this.stream;
-            }
-
-            private set
-            {
-                this.stream = value;
-            }
-        }
     }
 }";
             AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
