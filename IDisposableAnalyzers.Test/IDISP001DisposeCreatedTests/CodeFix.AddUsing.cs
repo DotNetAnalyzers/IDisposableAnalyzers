@@ -21,6 +21,44 @@ namespace RoslynSandbox
         public void Meh()
         {
             ↓var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void AddUsingForLocalOneStatementAfter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            ↓var stream = File.OpenRead(string.Empty);
             var i = 1;
         }
     }
@@ -47,7 +85,6 @@ namespace RoslynSandbox
                 AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
             }
 
-            [Explicit("Poor formatting.")]
             [Test]
             public void AddUsingForLocalManyStatements()
             {

@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using System.Composition;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
@@ -41,12 +42,12 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                    if (statement.Parent is BlockSyntax)
+                    if (statement.Parent is BlockSyntax block)
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Add using to end of block.",
-                                _ => ApplyAddUsingFixAsync(context, statement),
+                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement,cancellationToken),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);
                     }
@@ -55,12 +56,12 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement.Parent is BlockSyntax)
+                    if (statement.Parent is BlockSyntax block)
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Add using to end of block.",
-                                _ => ApplyAddUsingFixAsync(context, statement),
+                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement,cancellationToken),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);
                     }
@@ -69,10 +70,12 @@ namespace IDisposableAnalyzers
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, LocalDeclarationStatementSyntax statement)
+        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, BlockSyntax block, LocalDeclarationStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
-            var statements = statement.FirstAncestor<BlockSyntax>().Statements.Where(s => s.SpanStart > statement.SpanStart);
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
+            var statements = block.Statements
+                                  .Where(s => s.SpanStart > statement.SpanStart)
+                                  .ToArray();
             foreach (var statementSyntax in statements)
             {
                 editor.RemoveNode(statementSyntax);
@@ -83,15 +86,18 @@ namespace IDisposableAnalyzers
                 SyntaxFactory.UsingStatement(
                     declaration: statement.Declaration,
                     expression: null,
-                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))));
+                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
+                                            .WithAdditionalAnnotations(Formatter.Annotation)));
             return editor.GetChangedDocument();
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, ExpressionStatementSyntax statement)
+        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, BlockSyntax block, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
-            var statements = statement.FirstAncestor<BlockSyntax>().Statements.Where(s => s.SpanStart > statement.SpanStart);
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
+            var statements = block.Statements
+                                  .Where(s => s.SpanStart > statement.SpanStart)
+                                  .ToArray();
             foreach (var statementSyntax in statements)
             {
                 editor.RemoveNode(statementSyntax);
