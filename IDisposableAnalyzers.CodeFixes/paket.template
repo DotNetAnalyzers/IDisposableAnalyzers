@@ -1,5 +1,5 @@
 ﻿type file
-version 0.1.1.0-dev
+version 0.1.2.0-dev
 title IDisposableAnalyzers
 id IDisposableAnalyzers
 authors Johan Larsson, milleniumbug
@@ -11,6 +11,10 @@ tags Roslyn Diagnostic Analyzer DotnetAnalyzers IDisposable
 
 projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
+
+releasenotes
+  BUGFIXES: whitespace in codegen.
+  BUGFIX: Override public virtual Dispose
 
 files
   ../IDisposableAnalyzers.Analyzers/bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs
