@@ -30,29 +30,29 @@
             return type.TryGetSingleMember(name, out property);
         }
 
-        internal static bool TryGetFirstMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
+        internal static bool TryGetFirstMethod(this ITypeSymbol type, string name, out IMethodSymbol result)
         {
-            return type.TryGetFirstMember(name, out property);
+            return type.TryGetFirstMember(name, out result);
         }
 
-        internal static bool TryGetFirstMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryGetFirstMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
-            return type.TryGetFirstMember(predicate, out property);
+            return type.TryGetFirstMember(predicate, out result);
         }
 
-        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, out IMethodSymbol property)
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, out IMethodSymbol result)
         {
-            return type.TryGetSingleMember(name, out property);
+            return type.TryGetSingleMember(name, out result);
         }
 
-        internal static bool TryGetSingleMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
-            return type.TryGetSingleMember(predicate, out property);
+            return type.TryGetSingleMember(predicate, out result);
         }
 
-        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryGetSingleMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
-            return type.TryGetSingleMember(name, predicate, out property);
+            return type.TryGetSingleMember(name, predicate, out result);
         }
 
         internal static bool TryGetFirstMethod(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)

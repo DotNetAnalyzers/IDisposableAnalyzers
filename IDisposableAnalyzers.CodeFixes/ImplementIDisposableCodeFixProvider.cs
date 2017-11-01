@@ -82,7 +82,7 @@
                 }
 
                 if (Disposable.IsAssignableTo(type) &&
-                    Disposable.BaseTypeHasVirtualDisposeMethod(type))
+                    Disposable.TryGetBaseVirtualDisposeMethod(type, out var baseDispose))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
@@ -91,8 +91,9 @@
                                 OverrideDisposeAsync(
                                     context,
                                     semanticModel,
-                                    cancellationToken,
-                                    classDeclaration),
+                                    classDeclaration,
+                                    baseDispose,
+                                    cancellationToken),
                             nameof(ImplementIDisposableCodeFixProvider) + "override"),
                         diagnostic);
                     continue;
@@ -195,7 +196,7 @@
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> OverrideDisposeAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> OverrideDisposeAsync(CodeFixContext context, SemanticModel semanticModel, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
             var usesUnderscoreNames = classDeclaration.UsesUnderscore(semanticModel, cancellationToken);
@@ -212,47 +213,47 @@
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
+            var code = StringBuilderPool.Borrow()
+                                        .AppendLine($"{baseDispose.DeclaredAccessibility.ToCodeString()} override void Dispose(bool disposing)")
+                                        .AppendLine("{")
+                                        .AppendLine("    if (this.disposed)")
+                                        .AppendLine("    {")
+                                        .AppendLine("        return;")
+                                        .AppendLine("    }")
+                                        .AppendLine()
+                                        .AppendLine("     this.disposed = true;")
+                                        .AppendLine("     if (disposing)")
+                                        .AppendLine("     {")
+                                        .AppendLine("     }")
+                                        .AppendLine()
+                                        .AppendLine("     base.Dispose(disposing);")
+                                        .AppendLine("}")
+                                        .Return();
             editor.AddMethod(
                 classDeclaration,
-                ParseMethod(
-                    @"protected override void Dispose(bool disposing)
-                      {
-                          if (this.disposed)
-                          {
-                              return;
-                          }
-              
-                          this.disposed = true;
-                          if (disposing)
-                          {
-                          }
-              
-                          base.Dispose(disposing);
-                      }",
-                    usesUnderscoreNames,
-                    field));
+                ParseMethod(code, usesUnderscoreNames, field));
 
-            if (type.GetMembers("ThrowIfDisposed").Length == 0)
+            if (!type.GetMembers().TryGetFirst(x => x.Name == "ThrowIfDisposed", out _))
             {
                 if (type.BaseType.TryGetSingleMethod("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
                 {
                     if (baseThrow.IsVirtual)
                     {
+                        code = StringBuilderPool.Borrow()
+                                                .AppendLine($"{baseThrow.DeclaredAccessibility.ToCodeString()} override void ThrowIfDisposed()")
+                                                .AppendLine("{")
+                                                .AppendLine("    if (this.disposed)")
+                                                .AppendLine("    {")
+                                                .AppendLine("        throw new System.ObjectDisposedException(this.GetType().FullName);")
+                                                .AppendLine("    }")
+                                                .AppendLine()
+                                                .AppendLine("     base.ThrowIfDisposed();")
+                                                .AppendLine("}")
+                                                .Return();
                         editor.AddMethod(
                             classDeclaration,
-                            ParseMethod(
-                                @"protected override void ThrowIfDisposed()
-                                  {
-                                      if (this.disposed)
-                                      {
-                                          throw new System.ObjectDisposedException(this.GetType().FullName);
-                                      }
-                                 
-                                      base.ThrowIfDisposed();
-                                  }",
-                                usesUnderscoreNames,
-                                field));
+                            ParseMethod(code, usesUnderscoreNames, field));
                     }
                 }
                 else

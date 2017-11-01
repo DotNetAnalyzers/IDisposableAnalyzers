@@ -121,31 +121,28 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool BaseTypeHasVirtualDisposeMethod(ITypeSymbol type)
+        internal static bool TryGetBaseVirtualDisposeMethod(ITypeSymbol type, out IMethodSymbol result)
         {
+            bool IsVirtualDispose(IMethodSymbol m)
+            {
+                return m.IsVirtual &&
+                       m.ReturnsVoid &&
+                       m.Parameters.Length == 1 &&
+                       m.Parameters[0].Type == KnownSymbol.Boolean;
+            }
+
             var baseType = type.BaseType;
             while (baseType != null)
             {
-                foreach (var member in baseType.GetMembers("Dispose"))
+                if (baseType.TryGetSingleMethod("Dispose", IsVirtualDispose, out result))
                 {
-                    var method = member as IMethodSymbol;
-                    if (method == null)
-                    {
-                        continue;
-                    }
-
-                    if (member.DeclaredAccessibility == Accessibility.Protected &&
-                        member.IsVirtual &&
-                        method.Parameters.Length == 1 &&
-                        method.Parameters[0].Type == KnownSymbol.Boolean)
-                    {
-                        return true;
-                    }
+                    return true;
                 }
 
                 baseType = baseType.BaseType;
             }
 
+            result = null;
             return false;
         }
     }

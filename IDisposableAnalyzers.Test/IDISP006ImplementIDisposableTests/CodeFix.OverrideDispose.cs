@@ -328,6 +328,70 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
                 AnalyzerAssert.FixAll<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
             }
+
+            [Test]
+            public void SubclassingNinjectModule()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Ninject.Modules;
+
+    internal class Foo : NinjectModule
+    {
+        ↓private readonly IDisposable disposable = new Disposable();
+
+        public override void Load()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Ninject.Modules;
+
+    internal class Foo : NinjectModule
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        public override void Load()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+
+            base.Dispose(disposing);
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP006ImplementIDisposable, ImplementIDisposableCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            }
         }
     }
 }
