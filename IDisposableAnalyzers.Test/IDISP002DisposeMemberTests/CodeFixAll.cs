@@ -104,14 +104,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            try
-            {
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-            }
-            catch (AssertException)
-            {
-                Assert.Inconclusive("Need to fix order here");
-            }
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
         }
     }
 }
