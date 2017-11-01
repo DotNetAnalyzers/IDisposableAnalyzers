@@ -115,15 +115,8 @@ namespace IDisposableAnalyzers
             }
 
             var memberAccessExpressionSyntax = usesUnderscoreNames
-                                                   ? (MemberAccessExpressionSyntax)editor
-                                                       .Generator.MemberAccessExpression(
-                                                           SyntaxFactory.IdentifierName(field.Name),
-                                                           "Add")
-                                                   : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(
-                                                           editor.Generator.MemberAccessExpression(
-                                                               SyntaxFactory.ThisExpression(),
-                                                               SyntaxFactory.IdentifierName(field.Name)),
-                                                           "Add");
+                                                   ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
+                                                   : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
 
             editor.ReplaceNode(
                 statement,
@@ -159,8 +152,8 @@ namespace IDisposableAnalyzers
                 SyntaxFactory.ExpressionStatement(
                                  (ExpressionSyntax)editor.Generator.AssignmentStatement(
                                      fieldAccess,
-                                     ((ObjectCreationExpressionSyntax)editor.Generator.ObjectCreationExpression(
-                                             CompositeDisposableType))
+                                     ((ObjectCreationExpressionSyntax)editor.Generator.ObjectCreationExpression(CompositeDisposableType))
+                                     .WithArgumentList(null)
                                      .WithInitializer(
                                          SyntaxFactory.InitializerExpression(
                                              SyntaxKind.CollectionInitializerExpression,
@@ -201,20 +194,26 @@ namespace IDisposableAnalyzers
 
         private static ObjectCreationExpressionSyntax GetNewObjectCreation(ObjectCreationExpressionSyntax objectCreation, ExpressionSyntax newExpression)
         {
-            var openBrace = SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
-                                         .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
-            var expressions = objectCreation.Initializer.Expressions;
-            var initializer = SyntaxFactory.InitializerExpression(
-                                               SyntaxKind.CollectionInitializerExpression,
-                                               expressions.Replace(expressions.Last(), expressions.Last().WithoutTrailingTrivia()).Add(newExpression))
-                                           .WithOpenBraceToken(openBrace);
-
             if (objectCreation.ArgumentList != null &&
                 objectCreation.ArgumentList.Arguments.Count == 0)
             {
-                objectCreation = objectCreation.WithType(objectCreation.Type.WithTrailingTrivia(objectCreation.ArgumentList.GetTrailingTrivia()))
-                                               .WithArgumentList(null);
+                objectCreation = objectCreation.RemoveNode(objectCreation.ArgumentList, SyntaxRemoveOptions.KeepTrailingTrivia);
             }
+
+            var openBrace = SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
+                                         .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
+            var expressions = objectCreation.Initializer.Expressions;
+            var last = expressions.Last();
+            var updatedExpressions = expressions.Remove(last)
+                                                .Add(last.WithoutTrailingTrivia())
+                                                .GetWithSeparators()
+                                                .Add(SyntaxFactory.Token(SyntaxKind.CommaToken).WithTrailingTrivia(last.GetTrailingTrivia()))
+                                                .Add(newExpression.WithoutTrailingTrivia())
+                                                .Add(SyntaxFactory.Token(SyntaxKind.CommaToken).WithTrailingTrivia(newExpression.GetTrailingTrivia()));
+            var initializer = SyntaxFactory.InitializerExpression(
+                                               SyntaxKind.CollectionInitializerExpression,
+                                               SyntaxFactory.SeparatedList<ExpressionSyntax>(updatedExpressions))
+                                           .WithOpenBraceToken(openBrace);
 
             return objectCreation.WithInitializer(initializer);
         }
