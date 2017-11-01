@@ -58,48 +58,6 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ArrayOfStreamsFieldInitializer()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public sealed class Foo : IDisposable
-    {
-        ↓private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public sealed class Foo : IDisposable
-    {
-        private readonly Stream[] streams = new[] { File.OpenRead(string.Empty) };
-
-        public void Dispose()
-        {
-            foreach(var stream in this.streams)
-            {
-                stream.Dispose();
-            }
-        }
-    }
-}";
-            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-        }
-
-        [Test]
         public void PrivateReadonlyFieldInitializedWithNewInDisposeMethod()
         {
             var testCode = @"
