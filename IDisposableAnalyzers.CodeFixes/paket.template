@@ -17,7 +17,7 @@ releasenotes
   BUGFIX: Override public virtual Dispose
 
 files
-  ../IDisposableAnalyzers.Analyzers/bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs
-  ../IDisposableAnalyzers.CodeFixes/bin/Release/netstandard1.3/IDisposableAnalyzers.CodeFixes.dll ==> analyzers/dotnet/cs
+  bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs
+  bin/Release/netstandard1.3/IDisposableAnalyzers.CodeFixes.dll ==> analyzers/dotnet/cs
   ../.paket/tools/*.ps1 ==> tools
 
