@@ -8,7 +8,7 @@
         internal class AddToCompositeDisposable
         {
             [Test]
-            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtor()
+            public void CreateNewCompositeDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,50 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFields()
+            public void CreateNewCompositeDisposableWithTrivia()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        internal Foo()
+        {
+            ↓File.OpenRead(string.Empty); // trivia
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty), // trivia
+            };
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void CreateNewCompositeDisposableWhenUsingsAndFields()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -100,7 +143,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToCreatedCompositeDisposableCtorUsingsAndFieldsUnderscoreNames()
+            public void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -152,7 +195,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToCreatedCompositeDisposableInitializer()
+            public void AddToExistingCompositeDisposableInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -184,7 +227,7 @@ namespace RoslynSandbox
 
         internal Foo()
         {
-            this.disposable = new CompositeDisposable() { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
         }
     }
 }";
@@ -193,7 +236,92 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerOneLine()
+            public void AddToExistingCompositeDisposableInitializerWithCtorArg()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable(1);
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable(1) { File.OpenRead(string.Empty) };
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void AddToExistingCompositeDisposableInitializerWithTrivia()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable(); // trivia1
+            ↓File.OpenRead(string.Empty); // trivia2
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty), // trivia2
+            }; // trivia1
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void AddToExistingCompositeDisposableWithInitializerOneLine()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -229,6 +357,51 @@ namespace RoslynSandbox
             {
                 File.OpenRead(string.Empty),
                 File.OpenRead(string.Empty),
+            };
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            ↓File.OpenRead(string.Empty); // trivia
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+                File.OpenRead(string.Empty), // trivia
             };
         }
     }
@@ -501,7 +674,51 @@ namespace RoslynSandbox
 
         internal Foo()
         {
-            this.disposable = new CompositeDisposable() { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, AddToCompositeDisposableCodeFixProvider>(testCode, fixedCode);
+            }
+
+            [Test]
+            public void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            var i = 1;
+            ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    internal sealed class Foo
+    {
+        private readonly CompositeDisposable disposable;
+
+        internal Foo()
+        {
+            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            var i = 1;
+            this.disposable.Add(File.OpenRead(string.Empty));
         }
     }
 }";

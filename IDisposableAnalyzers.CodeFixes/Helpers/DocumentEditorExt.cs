@@ -8,7 +8,7 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    internal static class DocumentEditorExt
+    internal static partial class DocumentEditorExt
     {
         internal static FieldDeclarationSyntax AddField(
             this DocumentEditor editor,

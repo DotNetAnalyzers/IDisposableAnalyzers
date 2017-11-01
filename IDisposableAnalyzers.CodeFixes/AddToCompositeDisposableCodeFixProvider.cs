@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System.Collections.Immutable;
     using System.Composition;
     using System.Linq;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -46,13 +47,12 @@ namespace IDisposableAnalyzers
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
                     if (statement != null)
                     {
-                        var usesUnderscoreNames = statement.UsesUnderscore(semanticModel, context.CancellationToken);
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out IFieldSymbol field))
                         {
                             context.RegisterCodeFix(
                                 CodeAction.Create(
                                     "Add to CompositeDisposable.",
-                                    cancellationToken => ApplyFixAsync(context, cancellationToken, statement, field, usesUnderscoreNames),
+                                    cancellationToken => AddAsync(context.Document, statement, field, cancellationToken),
                                     nameof(AddToCompositeDisposableCodeFixProvider)),
                                 diagnostic);
                         }
@@ -64,7 +64,7 @@ namespace IDisposableAnalyzers
                                 context.RegisterCodeFix(
                                     CodeAction.Create(
                                         "Add to new CompositeDisposable.",
-                                        cancellationToken => ApplyFixAsync(context, cancellationToken, statement, usesUnderscoreNames),
+                                        cancellationToken => CreateAndInitializeAsync(context.Document, statement, cancellationToken),
                                         nameof(AddToCompositeDisposableCodeFixProvider)),
                                     diagnostic);
                             }
@@ -74,46 +74,59 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static async Task<Document> ApplyFixAsync(CodeFixContext context, CancellationToken cancellationToken, ExpressionStatementSyntax statement, IFieldSymbol field, bool usesUnderscoreNames)
+        private static async Task<Document> AddAsync(Document document, ExpressionStatementSyntax statement, IFieldSymbol field, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
-                                             .ConfigureAwait(false);
-            var block = statement.FirstAncestor<BlockSyntax>();
-            if (block?.Statements != null)
+            bool TryGetPreviousStatement(StatementSyntax s, out StatementSyntax result)
             {
-                var index = block.Statements.IndexOf(statement);
-                if (index > 0 &&
-                    block.Statements[index - 1] is ExpressionStatementSyntax expressionStatement &&
+                result = null;
+                if (s.Parent is BlockSyntax block)
+                {
+                    var index = block.Statements.IndexOf(statement);
+                    if (index > 0)
+                    {
+                        result = block.Statements[index - 1];
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            bool TryGetCreateCompositeDisposable(StatementSyntax s, IFieldSymbol f, out ObjectCreationExpressionSyntax result)
+            {
+                if (s is ExpressionStatementSyntax expressionStatement &&
                     expressionStatement.Expression is AssignmentExpressionSyntax assignment &&
                     assignment.Right is ObjectCreationExpressionSyntax objectCreation)
                 {
                     if ((assignment.Left is IdentifierNameSyntax identifierName &&
-                         identifierName.Identifier.ValueText == field.Name) ||
+                         identifierName.Identifier.ValueText == f.Name) ||
                         (assignment.Left is MemberAccessExpressionSyntax memberAccess &&
                          memberAccess.Expression is ThisExpressionSyntax &&
-                         memberAccess.Name.Identifier.ValueText == field.Name))
+                         memberAccess.Name.Identifier.ValueText == f.Name))
                     {
-                        editor.RemoveNode(statement);
-                        if (objectCreation.Initializer != null)
-                        {
-                            editor.ReplaceNode(
-                                objectCreation,
-                                GetNewObjectCreation(objectCreation, statement.Expression));
-                            return editor.GetChangedDocument();
-                        }
-
-                        editor.ReplaceNode(
-                            objectCreation,
-                            objectCreation.WithInitializer(
-                                SyntaxFactory.InitializerExpression(
-                                    SyntaxKind.CollectionInitializerExpression,
-                                    SyntaxFactory.SingletonSeparatedList(statement.Expression))
-                                          .WithAdditionalAnnotations(Simplifier.Annotation, Formatter.Annotation)));
-                        return editor.GetChangedDocument();
+                        result = objectCreation;
+                        return true;
                     }
                 }
+
+                result = null;
+                return false;
             }
 
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken)
+                                             .ConfigureAwait(false);
+            if (TryGetPreviousStatement(statement, out var previous) &&
+                TryGetCreateCompositeDisposable(previous, field, out var compositeDisposableCreation))
+            {
+                editor.RemoveNode(statement);
+                editor.AddItemToCollectionInitializer(
+                    compositeDisposableCreation,
+                    statement.Expression,
+                    statement.GetTrailingTrivia());
+                return editor.GetChangedDocument();
+            }
+
+            var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
             var memberAccessExpressionSyntax = usesUnderscoreNames
                                                    ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
                                                    : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
@@ -127,12 +140,12 @@ namespace IDisposableAnalyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ApplyFixAsync(CodeFixContext context, CancellationToken cancellationToken, ExpressionStatementSyntax statement, bool usesUnderscoreNames)
+        private static async Task<Document> CreateAndInitializeAsync(Document document, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
+            var editor = await DocumentEditor.CreateAsync(document, cancellationToken)
                                              .ConfigureAwait(false);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-
+            var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
             var field = editor.AddField(
                 containingType,
                 usesUnderscoreNames
@@ -147,20 +160,31 @@ namespace IDisposableAnalyzers
                                   ? SyntaxFactory.IdentifierName(field.Name())
                                   : SyntaxFactory.ParseExpression($"this.{field.Name()}");
 
-            editor.ReplaceNode(
-                statement,
-                SyntaxFactory.ExpressionStatement(
-                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
-                                     fieldAccess,
-                                     ((ObjectCreationExpressionSyntax)editor.Generator.ObjectCreationExpression(CompositeDisposableType))
-                                     .WithArgumentList(null)
-                                     .WithInitializer(
-                                         SyntaxFactory.InitializerExpression(
-                                             SyntaxKind.CollectionInitializerExpression,
-                                             SyntaxFactory.SingletonSeparatedList(
-                                                 statement.Expression)))))
-                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+            var trailingTrivia = statement.GetTrailingTrivia();
+            if (trailingTrivia.Any(SyntaxKind.SingleLineCommentTrivia))
+            {
+                var padding = new string(' ', statement.GetLeadingTrivia().Span.Length);
+                var code = StringBuilderPool.Borrow()
+                                            .AppendLine($"{padding}{fieldAccess} = new System.Reactive.Disposables.CompositeDisposable")
+                                            .AppendLine($"{padding}{{")
+                                            .AppendLine($"    {statement.GetLeadingTrivia()}{statement.Expression},{trailingTrivia.ToString().Trim('\r', '\n')}")
+                                            .AppendLine($"{padding}}};")
+                                            .Return();
+
+                editor.ReplaceNode(
+                    statement,
+                    SyntaxFactory.ParseStatement(code)
+                                 .WithSimplifiedNames());
+            }
+            else
+            {
+                editor.ReplaceNode(
+                    statement,
+                    SyntaxFactory.ParseStatement($"{fieldAccess} = new System.Reactive.Disposables.CompositeDisposable {{ {statement.Expression} }};")
+                                 .WithAdditionalAnnotations(Formatter.Annotation)
+                                 .WithSimplifiedNames());
+            }
+
             return editor.GetChangedDocument();
         }
 
@@ -190,32 +214,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-        }
-
-        private static ObjectCreationExpressionSyntax GetNewObjectCreation(ObjectCreationExpressionSyntax objectCreation, ExpressionSyntax newExpression)
-        {
-            if (objectCreation.ArgumentList != null &&
-                objectCreation.ArgumentList.Arguments.Count == 0)
-            {
-                objectCreation = objectCreation.RemoveNode(objectCreation.ArgumentList, SyntaxRemoveOptions.KeepTrailingTrivia);
-            }
-
-            var openBrace = SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
-                                         .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed);
-            var expressions = objectCreation.Initializer.Expressions;
-            var last = expressions.Last();
-            var updatedExpressions = expressions.Remove(last)
-                                                .Add(last.WithoutTrailingTrivia())
-                                                .GetWithSeparators()
-                                                .Add(SyntaxFactory.Token(SyntaxKind.CommaToken).WithTrailingTrivia(last.GetTrailingTrivia()))
-                                                .Add(newExpression.WithoutTrailingTrivia())
-                                                .Add(SyntaxFactory.Token(SyntaxKind.CommaToken).WithTrailingTrivia(newExpression.GetTrailingTrivia()));
-            var initializer = SyntaxFactory.InitializerExpression(
-                                               SyntaxKind.CollectionInitializerExpression,
-                                               SyntaxFactory.SeparatedList<ExpressionSyntax>(updatedExpressions))
-                                           .WithOpenBraceToken(openBrace);
-
-            return objectCreation.WithInitializer(initializer);
         }
     }
 }

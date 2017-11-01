@@ -47,7 +47,7 @@ namespace IDisposableAnalyzers
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Add using to end of block.",
-                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement,cancellationToken),
+                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement, cancellationToken),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);
                     }
@@ -61,7 +61,7 @@ namespace IDisposableAnalyzers
                         context.RegisterCodeFix(
                             CodeAction.Create(
                                 "Add using to end of block.",
-                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement,cancellationToken),
+                                cancellationToken => ApplyAddUsingFixAsync(context, block, statement, cancellationToken),
                                 nameof(AddUsingCodeFixProvider)),
                             diagnostic);
                     }
