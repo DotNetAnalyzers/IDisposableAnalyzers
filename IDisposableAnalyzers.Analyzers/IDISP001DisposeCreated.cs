@@ -30,7 +30,7 @@
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.VariableDeclaration);
+            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.LocalDeclarationStatement);
         }
 
         private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
@@ -40,9 +40,9 @@
                 return;
             }
 
-            if (context.Node is VariableDeclarationSyntax variableDeclaration)
+            if (context.Node is LocalDeclarationStatementSyntax localDeclaration)
             {
-                foreach (var declarator in variableDeclaration.Variables)
+                foreach (var declarator in localDeclaration.Declaration.Variables)
                 {
                     var value = declarator.Initializer?.Value;
                     if (value == null ||
@@ -54,8 +54,8 @@
                     if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
                                   .IsEither(Result.Yes, Result.AssumeYes))
                     {
-                        if (variableDeclaration.Parent is UsingStatementSyntax ||
-                            variableDeclaration.Parent is AnonymousFunctionExpressionSyntax)
+                        if (localDeclaration.Parent is UsingStatementSyntax ||
+                            localDeclaration.Parent is AnonymousFunctionExpressionSyntax)
                         {
                             return;
                         }
@@ -89,7 +89,7 @@
                             }
                         }
 
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, variableDeclaration.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
                     }
                 }
             }
