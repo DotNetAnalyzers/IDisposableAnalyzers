@@ -53,6 +53,11 @@
                 if (Disposable.IsMemberDisposed(field, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
                               .IsEither(Result.No, Result.Unknown))
                 {
+                    if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(field, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
             }
@@ -79,7 +84,7 @@
             }
 
             if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
-    setter.Body != null)
+                setter.Body != null)
             {
                 // Handle the backing field
                 return;
@@ -90,6 +95,11 @@
                 if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
                               .IsEither(Result.No, Result.Unknown))
                 {
+                    if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(property, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                    {
+                        return;
+                    }
+
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                 }
             }

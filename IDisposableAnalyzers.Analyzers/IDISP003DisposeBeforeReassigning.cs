@@ -66,6 +66,11 @@
                 return;
             }
 
+            if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(assignedSymbol, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+            {
+                return;
+            }
+
             context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
         }
 
