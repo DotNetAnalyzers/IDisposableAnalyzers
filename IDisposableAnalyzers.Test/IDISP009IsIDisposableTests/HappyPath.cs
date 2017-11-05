@@ -1,8 +1,7 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP009IsIDisposable
+﻿namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
-    using IDISP009IsIDisposable = IDisposableAnalyzers.IDISP009IsIDisposable;
 
     internal class HappyPath
     {

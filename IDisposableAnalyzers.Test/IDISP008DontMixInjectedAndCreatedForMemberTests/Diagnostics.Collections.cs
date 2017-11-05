@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
             }
         }
     }

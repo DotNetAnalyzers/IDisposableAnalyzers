@@ -24,7 +24,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -94,7 +94,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -127,7 +127,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, testCode);
             }
         }
     }

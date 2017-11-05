@@ -5,6 +5,8 @@
 
     internal class Diagnostics
     {
+        private static readonly IDISP005ReturntypeShouldIndicateIDisposable Analyzer = new IDISP005ReturntypeShouldIndicateIDisposable();
+
         [Test]
         public void ReturnFileOpenReadAsObject()
         {
@@ -22,7 +24,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -42,7 +44,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -63,7 +65,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -84,7 +86,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -111,7 +113,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -128,7 +130,7 @@ namespace RoslynSandbox
         public object Meh() => ↓File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -145,7 +147,7 @@ namespace RoslynSandbox
         public object Meh => ↓File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -168,7 +170,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -188,7 +190,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -208,7 +210,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP005ReturntypeShouldIndicateIDisposable>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
 }

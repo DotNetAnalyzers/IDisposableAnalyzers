@@ -5,6 +5,8 @@
 
     internal class Diagnostics
     {
+        private static readonly IDISP007DontDisposeInjected Analyzer = new IDISP007DontDisposeInjected();
+
         [TestCase("stream ?? File.OpenRead(string.Empty)")]
         [TestCase("Stream ?? File.OpenRead(string.Empty)")]
         [TestCase("File.OpenRead(string.Empty) ?? stream")]
@@ -43,7 +45,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("this.disposable.Dispose();")]
@@ -73,7 +75,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("this.disposable.Dispose();")]
@@ -103,7 +105,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("Disposable.Dispose();")]
@@ -126,7 +128,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("Disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -169,7 +171,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("this.Disposable.Dispose();")]
@@ -199,7 +201,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("public abstract Stream Stream { get; }")]
@@ -243,7 +245,7 @@ namespace RoslynSandbox
 }";
 
             testCode = testCode.AssertReplace("public abstract Stream Stream { get; }", property);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("this.Disposable.Dispose();")]
@@ -298,7 +300,7 @@ namespace RoslynSandbox
 }";
 
             testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(fooCode, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, fooCode, testCode);
         }
 
         [TestCase("this.Disposable.Dispose();")]
@@ -347,7 +349,7 @@ namespace RoslynSandbox
 }";
 
             testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(fooCode, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, fooCode, testCode);
         }
 
         [TestCase("this.foo.Disposable.Dispose()")]
@@ -394,7 +396,7 @@ namespace RoslynSandbox
 }";
 
             testCode = testCode.AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(fooCode, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, fooCode, testCode);
         }
 
         [TestCase("this.Disposable.Dispose();")]
@@ -419,7 +421,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -439,7 +441,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -459,7 +461,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -527,7 +529,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(fooBaseCode, fooImplCode);
+            AnalyzerAssert.Diagnostics(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -553,7 +555,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -603,7 +605,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -627,7 +629,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -651,7 +653,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [TestCase("this.disposable.Dispose();")]
@@ -689,7 +691,7 @@ namespace Gu.Reactive
      }
 }";
             testCode = testCode.AssertReplace("this.disposable.Dispose();", dispose);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Explicit("Don't think this is very useful.")]
@@ -712,7 +714,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("action(disposable)", disposeCode);
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -739,7 +741,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -761,7 +763,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -790,7 +792,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -814,7 +816,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP007DontDisposeInjected>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
 }

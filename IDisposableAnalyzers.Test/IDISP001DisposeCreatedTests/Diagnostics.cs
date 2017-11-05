@@ -5,6 +5,8 @@
 
     internal partial class Diagnostics
     {
+        private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox
 {
@@ -42,7 +44,7 @@ namespace RoslynSandbox
     }
 }";
             testCode = testCode.AssertReplace("new Disposable()", code);
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -65,7 +67,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -88,7 +90,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -109,7 +111,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -127,7 +129,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(DisposableCode, testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -152,7 +154,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -178,7 +180,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -200,7 +202,7 @@ namespace RoslynSandbox
         public static Stream GetStream() => File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -225,7 +227,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -254,7 +256,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
         [Test]
@@ -276,7 +278,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics<IDISP001DisposeCreated>(testCode);
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
 }
