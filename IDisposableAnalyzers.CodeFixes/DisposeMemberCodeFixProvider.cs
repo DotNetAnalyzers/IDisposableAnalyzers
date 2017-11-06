@@ -30,131 +30,109 @@
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                              .ConfigureAwait(false);
 
-            var usesUnderscoreNames = syntaxRoot.UsesUnderscore(semanticModel, context.CancellationToken);
-
             foreach (var diagnostic in context.Diagnostics)
             {
-                var fix = CreateFix(diagnostic, syntaxRoot, semanticModel, context.CancellationToken, usesUnderscoreNames);
-                if (fix.DisposeStatement != null)
+                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
+                if (string.IsNullOrEmpty(token.ValueText) ||
+                    token.IsMissing)
                 {
-                    context.RegisterDocumentEditorFix(
-                        "Dispose member.",
-                        (editor, _) => ApplyFix(editor, fix),
-                        diagnostic);
+                    continue;
+                }
+
+                var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                if (member is MethodDeclarationSyntax disposeMethod)
+                {
+                    if (disposeMethod.ParameterList != null &&
+                        disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
+                    {
+                        context.RegisterDocumentEditorFix(
+                            $"Call base.Dispose({parameter.Identifier.ValueText})",
+                            (editor, _) => AddBaseCall(editor, disposeMethod),
+                            "Call base.Dispose()",
+                            diagnostic);
+                    }
+
+                    continue;
+                }
+
+                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol) &&
+                    Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
+                    disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                {
+                    if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
+                        disposeMethodSymbol.ContainingType == memberSymbol.ContainingType &&
+                        disposeMethodSymbol.Parameters.Length == 0)
+                    {
+                        context.RegisterDocumentEditorFix(
+                            "Dispose member.",
+                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                            diagnostic);
+                    }
+
+                    if (disposeMethodSymbol.Parameters.Length == 1 &&
+                        disposeMethodSymbol.Parameters[0].Type == KnownSymbol.Boolean &&
+                        TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
+                    {
+                        context.RegisterDocumentEditorFix(
+                            "Dispose member.",
+                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
+                            diagnostic);
+                    }
                 }
             }
         }
 
-        private static Fix CreateFix(Diagnostic diagnostic, SyntaxNode syntaxRoot, SemanticModel semanticModel, CancellationToken cancellationToken, bool usesUnderscoreNames)
+        private static void DisposeInDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax disposeMethod, CancellationToken cancellationToken)
         {
-            var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-            if (string.IsNullOrEmpty(token.ValueText) ||
-                token.IsMissing)
+            var usesUnderscoreNames = editor.OriginalRoot.UsesUnderscore(editor.SemanticModel, cancellationToken);
+            var disposeStatement = CreateDisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken, usesUnderscoreNames);
+            var statements = CreateStatements(disposeMethod, disposeStatement);
+            if (disposeMethod.Body != null)
             {
-                return default(Fix);
+                var updatedBody = disposeMethod.Body.WithStatements(statements);
+                editor.ReplaceNode(disposeMethod.Body, updatedBody);
             }
-
-            var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-            if (member is MethodDeclarationSyntax methodDeclaration)
+            else if (disposeMethod.ExpressionBody != null)
             {
-                var method = semanticModel.GetDeclaredSymbolSafe(methodDeclaration, cancellationToken);
-                if (method.Parameters.Length != 1)
-                {
-                    return default(Fix);
-                }
-
-                var overridden = method.OverriddenMethod;
-                var baseCall = SyntaxFactory.ParseStatement($"base.{overridden.Name}({method.Parameters[0].Name});")
-                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                return new Fix(baseCall, methodDeclaration);
+                var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
+                                             .WithExpressionBody(null)
+                                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
+                editor.ReplaceNode(disposeMethod, newMethod);
             }
-
-            if (!TryGetMemberSymbol(member, semanticModel, cancellationToken, out ISymbol memberSymbol))
-            {
-                return default(Fix);
-            }
-
-            if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out IMethodSymbol disposeMethodSymbol))
-            {
-                if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
-                    disposeMethodSymbol.Parameters.Length == 0 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
-                {
-                    var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
-                    return new Fix(disposeStatement, disposeMethodDeclaration);
-                }
-
-                if (disposeMethodSymbol.Parameters.Length == 1 &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(cancellationToken, out disposeMethodDeclaration))
-                {
-                    var parameterType = semanticModel.GetTypeInfoSafe(disposeMethodDeclaration.ParameterList.Parameters[0]?.Type, cancellationToken).Type;
-                    if (parameterType == KnownSymbol.Boolean)
-                    {
-                        var disposeStatement = CreateDisposeStatement(memberSymbol, semanticModel, cancellationToken, usesUnderscoreNames);
-                        return new Fix(disposeStatement, disposeMethodDeclaration);
-                    }
-                }
-            }
-
-            return default(Fix);
         }
 
-        private static void ApplyFix(DocumentEditor editor, Fix fix)
+        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, IfStatementSyntax ifStatement, CancellationToken cancellationToken)
         {
-            var disposeMethod = fix.DisposeMethod;
-
-            if (disposeMethod.Modifiers.Any(SyntaxKind.PublicKeyword) && disposeMethod.ParameterList.Parameters.Count == 0)
+            var usesUnderscoreNames = editor.OriginalRoot.UsesUnderscore(editor.SemanticModel, cancellationToken);
+            var disposeStatement = CreateDisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken, usesUnderscoreNames);
+            if (ifStatement.Statement is BlockSyntax block)
             {
-                var statements = CreateStatements(disposeMethod, fix.DisposeStatement);
-                if (disposeMethod.Body != null)
-                {
-                    var updatedBody = disposeMethod.Body.WithStatements(statements);
-                    editor.ReplaceNode(disposeMethod.Body, updatedBody);
-                }
-                else if (disposeMethod.ExpressionBody != null)
-                {
-                    var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
-                                                 .WithExpressionBody(null)
-                                                 .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
-                    editor.ReplaceNode(disposeMethod, newMethod);
-                }
-
-                return;
+                var statements = block.Statements.Add(disposeStatement);
+                var newBlock = block.WithStatements(statements);
+                editor.ReplaceNode(block, newBlock);
             }
-
-            if (disposeMethod.ParameterList.Parameters.Count == 1 && disposeMethod.Body != null)
+            else if (ifStatement.Statement is StatementSyntax statement)
             {
-                if (fix.DisposeStatement is ExpressionStatementSyntax expressionStatement &&
-                    expressionStatement.Expression is InvocationExpressionSyntax invocation &&
-                    invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                    memberAccess.Expression is BaseExpressionSyntax)
-                {
-                    var statements = disposeMethod.Body.Statements.Add(fix.DisposeStatement);
-                    var newBlock = disposeMethod.Body.WithStatements(statements);
-                    editor.ReplaceNode(disposeMethod.Body, newBlock);
-                    return;
-                }
+                editor.ReplaceNode(
+                    ifStatement,
+                    ifStatement.WithStatement(SyntaxFactory.Block(statement, disposeStatement)));
+            }
+            else
+            {
+                editor.ReplaceNode(
+                    ifStatement,
+                    ifStatement.WithStatement(SyntaxFactory.Block(disposeStatement)));
+            }
+        }
 
-                foreach (var statement in disposeMethod.Body.Statements)
-                {
-                    var ifStatement = statement as IfStatementSyntax;
-                    if (ifStatement == null)
-                    {
-                        continue;
-                    }
-
-                    if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
-                    {
-                        if (ifStatement.Statement is BlockSyntax block)
-                        {
-                            var statements = block.Statements.Add(fix.DisposeStatement);
-                            var newBlock = block.WithStatements(statements);
-                            editor.ReplaceNode(block, newBlock);
-                            return;
-                        }
-                    }
-                }
+        private static void AddBaseCall(DocumentEditor editor, MethodDeclarationSyntax disposeMethod)
+        {
+            if (disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
+            {
+                var baseCall = SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
+                                            .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                            .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                editor.SetStatements(disposeMethod, disposeMethod.Body.Statements.Add(baseCall));
             }
         }
 
@@ -228,10 +206,31 @@
 
         private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
 
+        private static bool TryGetIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
+        {
+            foreach (var statement in disposeMethod.Body.Statements)
+            {
+                var ifStatement = statement as IfStatementSyntax;
+                if (ifStatement == null)
+                {
+                    continue;
+                }
+
+                if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
+                {
+                    result = ifStatement;
+                    return true;
+                }
+            }
+
+            result = null;
+            return false;
+        }
+
         private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
             if (member is FieldDeclarationSyntax field &&
-                field.Declaration.Variables.TryGetSingle(out VariableDeclaratorSyntax declarator))
+                field.Declaration.Variables.TryGetSingle(out var declarator))
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
                 return symbol != null;
@@ -245,18 +244,6 @@
 
             symbol = null;
             return false;
-        }
-
-        private struct Fix
-        {
-            internal readonly StatementSyntax DisposeStatement;
-            internal readonly MethodDeclarationSyntax DisposeMethod;
-
-            public Fix(StatementSyntax disposeStatement, MethodDeclarationSyntax disposeMethod)
-            {
-                this.DisposeStatement = disposeStatement;
-                this.DisposeMethod = disposeMethod;
-            }
         }
     }
 }

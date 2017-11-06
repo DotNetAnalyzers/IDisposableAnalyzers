@@ -1274,6 +1274,103 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
+        {
+            var baseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class BaseClass : IDisposable
+    {
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo : BaseClass
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo : BaseClass
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+        }
+
+        [Test]
         public void DisposeSecondMemberWhenOverriddenDisposeMethod()
         {
             var baseCode = @"
@@ -1336,6 +1433,107 @@ namespace RoslynSandbox
             {
                 this.stream1.Dispose();
             }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo : BaseClass
+    {
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        private readonly Stream stream2 = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream1.Dispose();
+                this.stream2?.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { baseCode, testCode }, fixedCode);
+        }
+
+        [Test]
+        public void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
+        {
+            var baseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class BaseClass : IDisposable
+    {
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo : BaseClass
+    {
+        private readonly Stream stream1 = File.OpenRead(string.Empty);
+        ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+                this.stream1.Dispose();
 
             base.Dispose(disposing);
         }

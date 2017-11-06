@@ -34,7 +34,7 @@
             bool IsMatch(SimpleNameSyntax sn, QualifiedType qt)
             {
                 return sn.Identifier.ValueText == qt.Type ||
-                       StringHelper.IsParts(qt.Type, sn.Identifier.ValueText, "Attribute");
+                       qt.Type.IsParts(sn.Identifier.ValueText, "Attribute");
             }
 
             if (attribute == null)
