@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -10,6 +11,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeMemberCodeFixProvider))]
     [Shared]
@@ -55,28 +57,51 @@
                     continue;
                 }
 
-                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol) &&
-                    Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
-                    disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
-                    if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
-                        disposeMethodSymbol.ContainingType == memberSymbol.ContainingType &&
-                        disposeMethodSymbol.Parameters.Length == 0)
+                    if (TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose member.",
-                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
-                            diagnostic);
-                    }
+                        if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDownMethodDeclaration))
+                        {
+                            context.RegisterDocumentEditorFix(
+                                $"Dispose member in {tearDownMethodDeclaration.Identifier.ValueText}.",
+                                (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, tearDownMethodDeclaration, cancellationToken),
+                                diagnostic);
+                        }
+                        else if (setupAttribute.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax setupMethod)
+                        {
+                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == IDisposableAnalyzers.KnownSymbol.NUnitSetUpAttribute
+                                ? IDisposableAnalyzers.KnownSymbol.NUnitTearDownAttribute
+                                : IDisposableAnalyzers.KnownSymbol.NUnitOneTimeTearDownAttribute;
 
-                    if (disposeMethodSymbol.Parameters.Length == 1 &&
-                        disposeMethodSymbol.Parameters[0].Type == KnownSymbol.Boolean &&
-                        TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
+                            context.RegisterDocumentEditorFix(
+                                $"Create {tearDownType} and dispose member.",
+                                (editor, cancellationToken) => CreateTearDownMethod(editor, memberSymbol, setupMethod, tearDownType, cancellationToken),
+                                diagnostic);
+                        }
+                    }
+                    else if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
+                             disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose member.",
-                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
-                            diagnostic);
+                        if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
+                            disposeMethodSymbol.ContainingType == memberSymbol.ContainingType &&
+                            disposeMethodSymbol.Parameters.Length == 0)
+                        {
+                            context.RegisterDocumentEditorFix(
+                                "Dispose member.",
+                                (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                                diagnostic);
+                        }
+
+                        if (disposeMethodSymbol.Parameters.Length == 1 &&
+                            disposeMethodSymbol.Parameters[0].Type == KnownSymbol.Boolean &&
+                            TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
+                        {
+                            context.RegisterDocumentEditorFix(
+                                "Dispose member.",
+                                (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
+                                diagnostic);
+                        }
                     }
                 }
             }
@@ -134,6 +159,26 @@
                                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 editor.SetStatements(disposeMethod, disposeMethod.Body.Statements.Add(baseCall));
             }
+        }
+
+        private static void CreateTearDownMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax setupMethod, QualifiedType tearDownType, CancellationToken cancellationToken)
+        {
+            var usesUnderscoreNames = editor.OriginalRoot.UsesUnderscore(editor.SemanticModel, cancellationToken);
+            var code = StringBuilderPool.Borrow()
+                                        .AppendLine($"[{tearDownType.FullName}]")
+                                        .AppendLine($"public void {tearDownType.Type.Replace("Attribute", string.Empty)}()")
+                                        .AppendLine("{")
+                                        .AppendLine($"    {(usesUnderscoreNames ? string.Empty : "this.")}{memberSymbol.Name}.Dispose();")
+                                        .AppendLine("}")
+                                        .Return();
+            var tearDownMethod = (MethodDeclarationSyntax)SyntaxFactory.ParseCompilationUnit(code)
+                                                                       .Members
+                                                                       .Single()
+                                                                       .WithSimplifiedNames()
+                                                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                                       .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                                                       .WithAdditionalAnnotations(Formatter.Annotation);
+            editor.InsertAfter(setupMethod, tearDownMethod);
         }
 
         private static StatementSyntax CreateDisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken, bool usesUnderScoreNames)

@@ -17,12 +17,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        private Disposable disposable;
+        ↓private Disposable disposable;
 
         [SetUp]
         public void SetUp()
         {
-            ↓this.disposable = new Disposable();
+            this.disposable = new Disposable();
         }
 
         [Test]
@@ -59,8 +59,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -73,12 +73,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        private Disposable disposable;
+        ↓private Disposable disposable;
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            ↓this.disposable = new Disposable();
+            this.disposable = new Disposable();
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace RoslynSandbox
         }
 
         [OneTimeTearDown]
-        public void TearDown()
+        public void OneTimeTearDown()
         {
             this.disposable.Dispose();
         }
@@ -115,8 +115,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -129,12 +129,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        private Disposable disposable;
+        ↓private Disposable disposable;
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            ↓this.disposable = new Disposable();
+            this.disposable = new Disposable();
         }
 
         [OneTimeTearDown]
@@ -167,7 +167,7 @@ namespace RoslynSandbox
         [OneTimeTearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
 
         [Test]
@@ -176,8 +176,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }
