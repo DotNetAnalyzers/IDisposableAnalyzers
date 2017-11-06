@@ -78,23 +78,32 @@
                 return;
             }
 
-            var invocation = context.Node as InvocationExpressionSyntax;
-            if (invocation == null ||
-                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() != null)
+            if (context.Node is InvocationExpressionSyntax invocation &&
+                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() == null)
             {
-                return;
-            }
+                if (invocation.TryGetInvokedMethodName(out var name) &&
+                    name != "Dispose")
+                {
+                    return;
+                }
 
-            var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-            if (call != KnownSymbol.IDisposable.Dispose ||
-                call?.Parameters.Length != 0)
-            {
-                return;
-            }
+                if (invocation.ArgumentList != null &&
+                    invocation.ArgumentList.Arguments.Count > 0)
+                {
+                    return;
+                }
 
-            if (Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
+                var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
+                if (call != KnownSymbol.IDisposable.Dispose ||
+                    call?.Parameters.Length != 0)
+                {
+                    return;
+                }
+
+                if (Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
+                }
             }
         }
     }
