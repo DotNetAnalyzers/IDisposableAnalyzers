@@ -26,7 +26,8 @@ namespace IDisposableAnalyzers
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
         {
-            if (type == null)
+            if (type == null ||
+                type is IErrorTypeSymbol)
             {
                 return false;
             }

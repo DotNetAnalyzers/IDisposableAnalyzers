@@ -62,7 +62,7 @@ namespace RoslynSandbox
             [TestCase("ImmutableQueue<IDisposable>.Empty.Peek()", Result.No)]
             [TestCase("new List<IDisposable>()[0]", Result.No)]
             [TestCase("Moq.Mock.Of<IDisposable>()", Result.AssumeNo)]
-            [TestCase("ImmutableList<IDisposable>.Empty[0]", Result.Unknown)]
+            [TestCase("ImmutableList<IDisposable>.Empty[0]", Result.No)]
             public void Ignored(string code, Result expected)
             {
                 var testCode = @"

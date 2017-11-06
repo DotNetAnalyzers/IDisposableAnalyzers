@@ -2,6 +2,7 @@
 
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
+[assembly:TransitiveMetadataReferences(typeof(Microsoft.CodeAnalysis.CSharp.CSharpCompilation))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),
     typeof(System.Net.WebClient),
@@ -14,8 +15,6 @@
     typeof(System.Windows.Controls.Control),
     typeof(System.Windows.Media.Matrix),
     typeof(System.Xaml.XamlLanguage),
-    typeof(Microsoft.CodeAnalysis.CSharp.CSharpCompilation),
-    typeof(Microsoft.CodeAnalysis.Compilation),
     typeof(Moq.Mock<>),
     typeof(Ninject.StandardKernel),
     typeof(NUnit.Framework.Assert))]
