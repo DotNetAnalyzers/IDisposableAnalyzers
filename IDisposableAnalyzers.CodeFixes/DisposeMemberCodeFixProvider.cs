@@ -70,9 +70,9 @@
                         }
                         else if (setupAttribute.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax setupMethod)
                         {
-                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == IDisposableAnalyzers.KnownSymbol.NUnitSetUpAttribute
-                                ? IDisposableAnalyzers.KnownSymbol.NUnitTearDownAttribute
-                                : IDisposableAnalyzers.KnownSymbol.NUnitOneTimeTearDownAttribute;
+                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
+                                ? KnownSymbol.NUnitTearDownAttribute
+                                : KnownSymbol.NUnitOneTimeTearDownAttribute;
 
                             context.RegisterDocumentEditorFix(
                                 $"Create {tearDownType} and dispose member.",
