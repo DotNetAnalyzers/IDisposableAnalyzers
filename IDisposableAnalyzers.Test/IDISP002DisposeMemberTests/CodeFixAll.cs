@@ -55,6 +55,7 @@ namespace RoslynSandbox
         }
 
         [Test]
+        [Explicit("Order is random due to async.")]
         public void NotDisposingFieldsAssignedInCtor()
         {
             var testCode = @"

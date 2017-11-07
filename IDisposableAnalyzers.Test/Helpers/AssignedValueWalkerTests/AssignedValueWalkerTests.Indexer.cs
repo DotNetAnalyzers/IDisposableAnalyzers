@@ -26,7 +26,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -52,7 +52,7 @@ internal class Foo
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -83,7 +83,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -114,7 +114,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -149,7 +149,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -184,7 +184,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
@@ -219,7 +219,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.EqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(code)
                                       .Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {

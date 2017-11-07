@@ -31,7 +31,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -60,7 +60,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
             using (var pooled = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -89,7 +89,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.BestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));

@@ -52,7 +52,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -94,7 +94,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -164,7 +164,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                var value = syntaxTree.FindBestMatch<InvocationExpressionSyntax>(code);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -258,7 +258,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                var value = syntaxTree.FindBestMatch<InvocationExpressionSyntax>(code);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -313,7 +313,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<InvocationExpressionSyntax>(code);
+                var value = syntaxTree.FindBestMatch<InvocationExpressionSyntax>(code);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -366,7 +366,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -417,7 +417,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
         }

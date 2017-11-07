@@ -50,7 +50,7 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out ISymbol assignedSymbol)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return;

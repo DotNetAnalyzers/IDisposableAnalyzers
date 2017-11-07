@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers
 {
+    using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
 
     using NUnit.Framework;
@@ -21,8 +22,8 @@ internal class Foo
         temp = 2;
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
@@ -53,8 +54,8 @@ namespace RoslynSandbox
         }
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
@@ -83,8 +84,8 @@ namespace RoslynSandbox
         }
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
@@ -115,8 +116,8 @@ namespace RoslynSandbox
         }
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
@@ -148,8 +149,8 @@ namespace RoslynSandbox
         }
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
@@ -182,8 +183,8 @@ namespace RoslynSandbox
         public event EventHandler E;
     }
 }");
-                var first = syntaxTree.Statement(firstStatement);
-                var other = syntaxTree.Statement(otherStatement);
+                var first = syntaxTree.FindStatement(firstStatement);
+                var other = syntaxTree.FindStatement(otherStatement);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
         }

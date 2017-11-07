@@ -30,7 +30,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, new Mock<SemanticModel>(MockBehavior.Strict).Object, CancellationToken.None));
             }
 
@@ -53,7 +53,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.BestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, semanticModel, CancellationToken.None));
             }
         }
