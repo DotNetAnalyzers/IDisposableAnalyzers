@@ -38,12 +38,7 @@ namespace RoslynSandbox
                                          .ArgumentList.Arguments[index];
                 var method = syntaxTree.FindBestMatch<MethodDeclarationSyntax>("internal void Meh(int v1, int v2, int v3)");
 
-                Assert.AreEqual(
-                    true,
-                    BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
-                        method,
-                        argument,
-                        out ParameterSyntax parameter));
+                Assert.AreEqual(true, BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(method, argument, out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -80,7 +75,7 @@ namespace RoslynSandbox
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -117,7 +112,7 @@ namespace RoslynSandbox
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
 
@@ -154,7 +149,7 @@ namespace RoslynSandbox
                     BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(
                         method,
                         argument,
-                        out ParameterSyntax parameter));
+                        out var parameter));
                 Assert.AreEqual(expected, parameter.ToString());
             }
         }
