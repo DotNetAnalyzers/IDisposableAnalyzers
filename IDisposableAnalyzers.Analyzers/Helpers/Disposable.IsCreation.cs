@@ -33,7 +33,7 @@ namespace IDisposableAnalyzers
                             var symbol = semanticModel.GetSymbolSafe(assigned.Left, cancellationToken);
                             if (IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
                                 (symbol is IFieldSymbol ||
-                                symbol is IPropertySymbol))
+                                 symbol is IPropertySymbol))
                             {
                                 pooledSet.Add(symbol).IgnoreReturnValue();
                             }

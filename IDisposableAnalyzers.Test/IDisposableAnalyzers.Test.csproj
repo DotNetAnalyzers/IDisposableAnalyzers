@@ -9,7 +9,12 @@
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>   
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="TestHelpers\**" />
+    <EmbeddedResource Remove="TestHelpers\**" />
+    <None Remove="TestHelpers\**" />
+  </ItemGroup>   
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
     <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
@@ -21,9 +26,6 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TestHelpers\" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
