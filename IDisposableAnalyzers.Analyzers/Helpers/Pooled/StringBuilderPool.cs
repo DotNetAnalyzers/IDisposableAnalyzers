@@ -29,8 +29,6 @@
         {
             private readonly StringBuilder inner = new StringBuilder();
 
-            public void Clear() => this.inner.Clear();
-
             public PooledStringBuilder AppendLine(string text)
             {
                 this.inner.AppendLine(text);

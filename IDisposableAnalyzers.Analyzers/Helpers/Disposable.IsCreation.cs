@@ -257,7 +257,8 @@ namespace IDisposableAnalyzers
 
             if (candidate is LiteralExpressionSyntax ||
                 candidate is DefaultExpressionSyntax ||
-                candidate is TypeOfExpressionSyntax)
+                candidate is TypeOfExpressionSyntax ||
+                candidate is ElementAccessExpressionSyntax)
             {
                 return Result.No;
             }
@@ -289,7 +290,8 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            if (candidate is IFieldSymbol)
+            if (candidate is IFieldSymbol ||
+                candidate is IParameterSymbol)
             {
                 return Result.No;
             }
