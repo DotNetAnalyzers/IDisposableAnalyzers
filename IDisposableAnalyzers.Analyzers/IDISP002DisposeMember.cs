@@ -42,13 +42,9 @@
                 return;
             }
 
-            var field = (IFieldSymbol)context.ContainingSymbol;
-            if (field.IsStatic)
-            {
-                return;
-            }
-
-            if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
+            if (context.ContainingSymbol is IFieldSymbol field &&
+                !field.IsStatic &&
+                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
             {
                 if (Disposable.IsMemberDisposed(field, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
                               .IsEither(Result.No, Result.Unknown))
@@ -83,7 +79,7 @@
                 return;
             }
 
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
+            if (propertyDeclaration.TryGetSetAccessorDeclaration(out var setter) &&
                 setter.Body != null)
             {
                 // Handle the backing field
@@ -126,9 +122,7 @@
                 {
                     foreach (var invocation in invocations)
                     {
-                        if (
-                            SymbolComparer.Equals(
-                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
+                        if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
                         {
                             return;
                         }
@@ -141,16 +135,14 @@
                     return;
                 }
 
-                using (
-                    var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
                 {
                     foreach (var disposeCall in disposeWalker)
                     {
-                        if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out ExpressionSyntax disposed))
+                        if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed))
                         {
                             var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
-                            if (
-                                !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                            if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
                                 return;

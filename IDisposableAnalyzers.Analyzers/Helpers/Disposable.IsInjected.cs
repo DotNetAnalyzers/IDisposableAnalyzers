@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
         internal static bool IsAssignedWithCreatedAndNotCachedOrInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (property == null ||
-                 !IsPotentiallyAssignableTo(property.Type))
+                !IsPotentiallyAssignableTo(property.Type))
             {
                 return false;
             }

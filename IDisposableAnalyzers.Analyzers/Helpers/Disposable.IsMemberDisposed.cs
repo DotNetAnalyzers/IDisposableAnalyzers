@@ -210,6 +210,12 @@ namespace IDisposableAnalyzers
             {
                 foreach (var invocation in this.invocations)
                 {
+                    if (invocation.TryGetInvokedMethodName(out var name) &&
+                        name != "Dispose")
+                    {
+                        continue;
+                    }
+
                     if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out ExpressionSyntax disposed) &&
                         SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(disposed, this.CancellationToken)))
                     {
