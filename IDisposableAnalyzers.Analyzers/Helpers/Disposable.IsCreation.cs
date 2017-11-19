@@ -138,6 +138,14 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
+            if (candidate is IdentifierNameSyntax identifierName &&
+                identifierName.Identifier.ValueText == "value" &&
+                candidate.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+                accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
+            {
+                return Result.No;
+            }
+
             if (candidate is ObjectCreationExpressionSyntax)
             {
                 return Result.Yes;

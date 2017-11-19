@@ -116,8 +116,14 @@
             {
                 base.VisitInvocationExpression(node);
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
+                if (method == null)
+                {
+                    return;
+                }
+
                 if (this.context is ElementAccessExpressionSyntax &&
-                    SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe((node.Expression as MemberAccessExpressionSyntax)?.Expression, this.cancellationToken)))
+                    node.Expression is MemberAccessExpressionSyntax memberAccess &&
+                    SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(memberAccess.Expression, this.cancellationToken)))
                 {
                     if (method.Name == "Add")
                     {
