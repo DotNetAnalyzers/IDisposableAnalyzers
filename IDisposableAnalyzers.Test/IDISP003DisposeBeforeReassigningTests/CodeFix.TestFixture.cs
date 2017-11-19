@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,12 +17,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        private Disposable disposable;
 
         [SetUp]
         public void SetUp()
         {
-            this.disposable = new Disposable();
+            ↓this.disposable = new Disposable();
         }
 
         [Test]
@@ -59,8 +59,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -73,12 +73,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        private Disposable disposable;
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            this.disposable = new Disposable();
+            ↓this.disposable = new Disposable();
         }
 
         [Test]
@@ -115,8 +115,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -129,12 +129,12 @@ namespace RoslynSandbox
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        private Disposable disposable;
 
         [OneTimeSetUp]
         public void SetUp()
         {
-            this.disposable = new Disposable();
+            ↓this.disposable = new Disposable();
         }
 
         [OneTimeTearDown]
@@ -176,8 +176,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }
