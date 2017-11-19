@@ -123,34 +123,67 @@
 
         private static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol current)
             {
-                foreach (var invocation in pooled.Invocations)
+                if (invocation.TryGetInvokedMethodName(out var name) &&
+                    name != "Dispose")
+                {
+                    return false;
+                }
+
+                var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                if (invokedSymbol?.Name != "Dispose")
+                {
+                    return false;
+                }
+
+                var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
+                if (statement != null)
+                {
+                    using (var names = IdentifierNameWalker.Borrow(statement))
+                    {
+                        foreach (var identifierName in names.IdentifierNames)
+                        {
+                            if (identifierName.Identifier.ValueText == current.Name &&
+                                SymbolComparer.Equals(current, semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            using (var walker = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var invocation in walker.Invocations)
                 {
                     if (invocation.IsBeforeInScope(assignment) != Result.Yes)
                     {
                         continue;
                     }
 
-                    var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-                    if (invokedSymbol?.Name != "Dispose")
+                    if (IsDisposing(invocation, symbol))
                     {
-                        continue;
+                        return true;
                     }
+                }
+            }
 
-                    var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
-                    if (statement != null)
+            if (assignment is AssignmentExpressionSyntax assignmentExpression &&
+                semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
+                property.TryGetSetter(cancellationToken, out var setter))
+            {
+                using (var pooled = InvocationWalker.Borrow(setter))
+                {
+                    foreach (var invocation in pooled.Invocations)
                     {
-                        using (var names = IdentifierNameWalker.Borrow(statement))
+                        if (IsDisposing(invocation, symbol) ||
+                            IsDisposing(invocation, property))
                         {
-                            foreach (var identifierName in names.IdentifierNames)
-                            {
-                                var otherSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
-                                if (symbol.Equals(otherSymbol))
-                                {
-                                    return true;
-                                }
-                            }
+                            return true;
                         }
                     }
                 }
