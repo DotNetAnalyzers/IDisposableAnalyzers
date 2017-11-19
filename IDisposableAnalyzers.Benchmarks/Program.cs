@@ -20,8 +20,6 @@ namespace IDisposableAnalyzers.Benchmarks
 
         public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
 
-        private static string ArtifactsDirectory { get; } = Path.Combine(ProjectDirectory, "BenchmarkDotNet.Artifacts", "results");
-
         public static void Main()
         {
             if (false)
@@ -36,18 +34,18 @@ namespace IDisposableAnalyzers.Benchmarks
                 Console.ReadKey();
                 benchmark.Run();
             }
-            else if (true)
+            else if (false)
             {
                 foreach (var summary in RunSingle<IDISP001Benchmarks>())
                 {
-                    CopyResult(summary.Title);
+                    CopyResult(summary);
                 }
             }
             else
             {
                 foreach (var summary in RunAll())
                 {
-                    CopyResult(summary.Title);
+                    CopyResult(summary);
                 }
             }
         }
@@ -65,13 +63,14 @@ namespace IDisposableAnalyzers.Benchmarks
             return summaries;
         }
 
-        private static void CopyResult(string name)
+        private static void CopyResult(Summary summary)
         {
             Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
             if (Directory.Exists(BenchmarksDirectory))
             {
-                var sourceFileName = Directory.EnumerateFiles(ArtifactsDirectory).Single(x => x.EndsWith(name + "-report-github.md"));
-                var destinationFileName = Path.Combine(BenchmarksDirectory, name + ".md");
+                var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath)
+                                              .Single(x => x.EndsWith(summary.Title + "-report-github.md"));
+                var destinationFileName = Path.Combine(BenchmarksDirectory, summary + ".md");
                 Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
                 File.Copy(sourceFileName, destinationFileName, overwrite: true);
             }
