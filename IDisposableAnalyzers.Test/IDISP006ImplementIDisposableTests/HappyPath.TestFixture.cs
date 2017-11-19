@@ -7,7 +7,6 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     {
         internal class TestFixture
         {
-
             [Test]
             public void DisposingFieldInTearDown()
             {
