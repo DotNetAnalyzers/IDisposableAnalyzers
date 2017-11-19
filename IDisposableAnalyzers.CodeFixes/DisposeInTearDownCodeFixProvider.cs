@@ -43,7 +43,9 @@
                     continue;
                 }
 
-                var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                var member = node as MemberDeclarationSyntax ??
+                             (SyntaxNode)(node as AssignmentExpressionSyntax)?.Left;
                 if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
                     if (TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
@@ -201,23 +203,23 @@
             return false;
         }
 
-        private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
+        private static bool TryGetMemberSymbol(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
-            if (member is FieldDeclarationSyntax field &&
+            if (node is FieldDeclarationSyntax field &&
                 field.Declaration.Variables.TryGetSingle(out var declarator))
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
                 return symbol != null;
             }
 
-            if (member is PropertyDeclarationSyntax property)
+            if (node is PropertyDeclarationSyntax property)
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(property, cancellationToken);
                 return symbol != null;
             }
 
-            symbol = null;
-            return false;
+            symbol = semanticModel.GetSymbolSafe(node, cancellationToken);
+            return symbol != null && symbol.IsEither<IFieldSymbol, IPropertySymbol>();
         }
     }
 }
