@@ -47,7 +47,7 @@
                 Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
             {
                 if (Disposable.IsMemberDisposed(field, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.Unknown))
+                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
                 {
                     if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(field, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                     {
@@ -89,7 +89,7 @@
             if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
             {
                 if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.Unknown))
+                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
                 {
                     if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(property, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
                     {

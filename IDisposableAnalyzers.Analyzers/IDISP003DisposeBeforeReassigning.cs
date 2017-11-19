@@ -45,13 +45,13 @@
 
             var assignment = (AssignmentExpressionSyntax)context.Node;
             if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.Unknown))
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
             {
                 return;
             }
 
             if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
-                          .IsEither(Result.No, Result.Unknown))
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
             {
                 return;
             }
@@ -101,14 +101,14 @@
             }
 
             if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.Unknown))
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
             {
                 return;
             }
 
             var symbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
             if (Disposable.IsAssignedWithCreated(symbol, argument.FirstAncestor<InvocationExpressionSyntax>(), context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.Unknown))
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
             {
                 return;
             }
