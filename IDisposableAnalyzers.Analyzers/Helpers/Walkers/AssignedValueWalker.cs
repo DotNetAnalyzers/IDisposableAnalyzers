@@ -15,6 +15,7 @@
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly MemberWalker memberWalker;
 
+        private SyntaxNode context;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -26,8 +27,6 @@
         public int Count => this.values.Count;
 
         internal ISymbol CurrentSymbol { get; private set; }
-
-        internal SyntaxNode Context { get; private set; }
 
         public ExpressionSyntax this[int index] => this.values[index];
 
@@ -70,7 +69,7 @@
                 }
             }
 
-            var contextCtor = this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+            var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
             if (contextCtor != null)
             {
                 if (contextCtor == node ||
@@ -117,7 +116,7 @@
             {
                 base.VisitInvocationExpression(node);
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (this.Context is ElementAccessExpressionSyntax &&
+                if (this.context is ElementAccessExpressionSyntax &&
                     SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe((node.Expression as MemberAccessExpressionSyntax)?.Expression, this.cancellationToken)))
                 {
                     if (method.Name == "Add")
@@ -142,7 +141,7 @@
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
                 this.visitedLocations.Add(node) &&
-                this.Context is ElementAccessExpressionSyntax &&
+                this.context is ElementAccessExpressionSyntax &&
                 SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
             {
                 this.values.Add(assignment.Right);
@@ -244,7 +243,7 @@
 
             var pooled = Borrow(() => new AssignedValueWalker());
             pooled.CurrentSymbol = symbol;
-            pooled.Context = context;
+            pooled.context = context;
             pooled.semanticModel = semanticModel;
             pooled.cancellationToken = cancellationToken;
             if (context != null)
@@ -255,7 +254,7 @@
             {
                 foreach (var reference in symbol.DeclaringSyntaxReferences)
                 {
-                    pooled.Context = symbol is IFieldSymbol || symbol is IPropertySymbol
+                    pooled.context = symbol is IFieldSymbol || symbol is IPropertySymbol
                                               ? reference.GetSyntax(cancellationToken)
                                                          .FirstAncestor<TypeDeclarationSyntax>()
                                               : reference.GetSyntax(cancellationToken)
@@ -305,7 +304,7 @@
             this.visitedLocations.Clear();
             this.refParameters.Clear();
             this.CurrentSymbol = null;
-            this.Context = null;
+            this.context = null;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
         }
@@ -317,7 +316,7 @@
                 return;
             }
 
-            var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.Context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
+            var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
             if (type == null)
             {
                 return;
@@ -352,12 +351,12 @@
                     }
                 }
 
-                var contextCtor = this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
+                var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
                     using (var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
-                        if (this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
+                        if (this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
                             ctorWalker.Default != null)
                         {
                             this.Visit(ctorWalker.Default);
@@ -390,7 +389,7 @@
                 }
             }
 
-            var contextMember = this.Context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+            var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
             if (contextMember != null &&
                 (this.CurrentSymbol is ILocalSymbol ||
                  this.CurrentSymbol is IParameterSymbol))
@@ -447,7 +446,7 @@
                 return;
             }
 
-            if (this.Context is ElementAccessExpressionSyntax)
+            if (this.context is ElementAccessExpressionSyntax)
             {
                 switch (value)
                 {
@@ -524,9 +523,9 @@
                 return;
             }
 
-            if (assignedSymbol is IPropertySymbol property &&
+            if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>() &&
+                assignedSymbol is IPropertySymbol property &&
                 !SymbolComparer.Equals(this.CurrentSymbol, property) &&
-                (this.CurrentSymbol is IFieldSymbol || this.CurrentSymbol is IPropertySymbol) &&
                 Property.AssignsSymbolInSetter(property, this.CurrentSymbol, this.semanticModel, this.cancellationToken))
             {
                 var before = this.values.Count;
@@ -566,16 +565,16 @@
                 switch (node.Kind())
                 {
                     case SyntaxKind.ExpressionStatement:
-                        return this.Context.SharesAncestor<ConstructorDeclarationSyntax>(node)
-                                   ? node.IsBeforeInScope(this.Context)
+                        return this.context.SharesAncestor<ConstructorDeclarationSyntax>(node)
+                                   ? node.IsBeforeInScope(this.context)
                                    : Result.Yes;
                     default:
                         return Result.Yes;
                 }
             }
 
-            if (this.Context is InvocationExpressionSyntax &&
-                ReferenceEquals(node, this.Context))
+            if (this.context is InvocationExpressionSyntax &&
+                ReferenceEquals(node, this.context))
             {
                 return Result.No;
             }
@@ -583,8 +582,8 @@
             switch (node.Kind())
             {
                 case SyntaxKind.ExpressionStatement:
-                    return this.Context.SharesAncestor<MemberDeclarationSyntax>(node)
-                               ? node.IsBeforeInScope(this.Context)
+                    return this.context.SharesAncestor<MemberDeclarationSyntax>(node)
+                               ? node.IsBeforeInScope(this.context)
                                : Result.Yes;
                 default:
                     return Result.Yes;

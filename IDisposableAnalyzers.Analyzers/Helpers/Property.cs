@@ -16,7 +16,7 @@
                 return false;
             }
 
-            if (TryGetSetter(property, cancellationToken, out AccessorDeclarationSyntax setter))
+            if (TryGetSetter(property, cancellationToken, out var setter))
             {
                 if (AssignmentWalker.FirstForSymbol(symbol, setter, Search.Recursive, semanticModel, cancellationToken))
                 {
@@ -62,7 +62,7 @@
                     return false;
                 }
 
-                if (declaration.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) &&
+                if (declaration.TryGetGetAccessorDeclaration(out var getter) &&
                     getter.Body == null)
                 {
                     return true;
