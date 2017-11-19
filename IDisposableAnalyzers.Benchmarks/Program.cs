@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
     using Gu.Roslyn.Asserts;
@@ -37,7 +38,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (true)
             {
-                foreach (var summary in RunSingle<AllBenchmarks>())
+                foreach (var summary in RunSingle<IDISP001Benchmarks>())
                 {
                     CopyResult(summary.Title);
                 }
@@ -69,7 +70,7 @@ namespace IDisposableAnalyzers.Benchmarks
             Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
             if (Directory.Exists(BenchmarksDirectory))
             {
-                var sourceFileName = Path.Combine(ArtifactsDirectory, name + "-report-github.md");
+                var sourceFileName = Directory.EnumerateFiles(ArtifactsDirectory).Single(x => x.EndsWith(name + "-report-github.md"));
                 var destinationFileName = Path.Combine(BenchmarksDirectory, name + ".md");
                 Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
                 File.Copy(sourceFileName, destinationFileName, overwrite: true);
