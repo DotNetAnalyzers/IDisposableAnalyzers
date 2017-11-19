@@ -66,6 +66,13 @@
                 return Result.AssumeNo;
             }
 
+            if (statement.SpanStart == otherStatement.SpanStart)
+            {
+                return other.FirstAncestor<AnonymousFunctionExpressionSyntax>() != null
+                    ? Result.Yes
+                    : Result.No;
+            }
+
             if (statement.SpanStart >= otherStatement.SpanStart)
             {
                 return Result.No;

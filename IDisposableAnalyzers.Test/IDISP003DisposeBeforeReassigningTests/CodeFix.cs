@@ -438,7 +438,11 @@ namespace RoslynSandbox
 
         public Foo()
         {
-            this.Bar += (o, e) => this.stream = File.OpenRead(string.Empty);
+            this.Bar += (o, e) =>
+            {
+                this.stream?.Dispose();
+                this.stream = File.OpenRead(string.Empty);
+            };
         }
 
         public event EventHandler Bar;

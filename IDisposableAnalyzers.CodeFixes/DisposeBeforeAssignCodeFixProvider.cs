@@ -10,6 +10,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeBeforeAssignCodeFixProvider))]
     [Shared]
@@ -19,7 +20,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP003DisposeBeforeReassigning.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
@@ -43,92 +44,98 @@
                     continue;
                 }
 
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is AssignmentExpressionSyntax assignment)
+                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
+                if (node is AssignmentExpressionSyntax assignment)
                 {
                     if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out var disposeStatement))
                     {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Dispose before assigning.",
-                                cancellationToken => ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, assignment, disposeStatement),
-                                nameof(DisposeBeforeAssignCodeFixProvider)),
+                        context.RegisterDocumentEditorFix(
+                            "Dispose before re-assigning.",
+                            (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, assignment, disposeStatement),
                             diagnostic);
                     }
 
                     continue;
                 }
 
-                var argument = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ArgumentSyntax>();
+                var argument = node.FirstAncestorOrSelf<ArgumentSyntax>();
                 if (argument != null)
                 {
                     if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out var disposeStatement))
                     {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Dispose before assigning.",
-                                cancellationToken =>
-                                        ApplyDisposeBeforeAssignFixAsync(context, syntaxRoot, argument, disposeStatement),
-                                nameof(DisposeBeforeAssignCodeFixProvider)),
+                        context.RegisterDocumentEditorFix(
+                                "Dispose before re-assigning.",
+                                (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, argument, disposeStatement),
                             diagnostic);
                     }
                 }
             }
         }
 
-        private static Task<Document> ApplyDisposeBeforeAssignFixAsync(CodeFixContext context, CompilationUnitSyntax syntaxRoot, SyntaxNode assignment, StatementSyntax disposeStatement)
+        private static void ApplyDisposeBeforeAssign(DocumentEditor editor, SyntaxNode assignment, StatementSyntax disposeStatement)
         {
-            var block = assignment.FirstAncestorOrSelf<BlockSyntax>();
-            var statement = assignment.FirstAncestorOrSelf<StatementSyntax>();
-            if (block == null ||
-                statement == null)
+            if (assignment.Parent is StatementSyntax statement &&
+                statement.Parent is BlockSyntax)
             {
-                return Task.FromResult(context.Document);
+                editor.InsertBefore(statement, new[] { disposeStatement });
             }
-
-            var newBlock = block.InsertNodesBefore(statement, new[] { disposeStatement });
-            var syntaxNode = syntaxRoot.ReplaceNode(block, newBlock);
-            return Task.FromResult(context.Document.WithSyntaxRoot(syntaxNode));
+            else if (assignment.Parent is ArgumentListSyntax argumentList &&
+                     argumentList.Parent is InvocationExpressionSyntax invocation &&
+                     invocation.Parent is StatementSyntax invocationStatement &&
+                     invocationStatement.Parent is BlockSyntax)
+            {
+                editor.InsertBefore(invocationStatement, new[] { disposeStatement });
+            }
+            else if (assignment.Parent is AnonymousFunctionExpressionSyntax anonymousFunction)
+            {
+                editor.ReplaceNode(
+                    anonymousFunction.Body,
+                    (x, _) => SyntaxFactory.Block(
+                        disposeStatement,
+                        SyntaxFactory.ExpressionStatement((ExpressionSyntax)x)));
+            }
         }
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
             result = null;
-            if (!(assignment.Parent is StatementSyntax && assignment.Parent.Parent is BlockSyntax))
+            if (assignment.Parent is StatementSyntax ||
+                assignment.Parent is AnonymousFunctionExpressionSyntax)
             {
-                return false;
-            }
+                if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
+                              .IsEither(Result.No, Result.Unknown))
+                {
+                    return false;
+                }
 
-            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
-                          .IsEither(Result.No, Result.Unknown))
-            {
-                return false;
-            }
+                var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
+                             !assignment.UsesUnderscore(semanticModel, cancellationToken)
+                    ? "this."
+                    : string.Empty;
+                if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
+                {
+                    result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as System.IDisposable)?.Dispose();")
+                                          .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                          .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                          .WithSimplifiedNames();
+                    return true;
+                }
 
-            var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
-                         !assignment.UsesUnderscore(semanticModel, cancellationToken)
-                             ? "this."
-                             : string.Empty;
-            if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
-            {
-                result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as System.IDisposable)?.Dispose();")
-                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithSimplifiedNames();
-                return true;
-            }
+                if (IsAlwaysAssigned(assignedSymbol))
+                {
+                    result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
+                                          .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                          .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                    return true;
+                }
 
-            if (IsAlwaysAssigned(assignedSymbol))
-            {
-                result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
+                result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                       .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
                 return true;
             }
 
-            result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
-                                  .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                  .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-            return true;
+            return false;
         }
 
         private static bool TryCreateDisposeStatement(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
