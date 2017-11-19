@@ -182,27 +182,6 @@
 
         private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
 
-        private static bool TryGetIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
-        {
-            foreach (var statement in disposeMethod.Body.Statements)
-            {
-                var ifStatement = statement as IfStatementSyntax;
-                if (ifStatement == null)
-                {
-                    continue;
-                }
-
-                if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
-                {
-                    result = ifStatement;
-                    return true;
-                }
-            }
-
-            result = null;
-            return false;
-        }
-
         private static bool TryGetMemberSymbol(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
             if (node is FieldDeclarationSyntax field &&
