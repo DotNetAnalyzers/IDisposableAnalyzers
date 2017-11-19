@@ -425,6 +425,20 @@
                     return true;
                 }
 
+                //if (n is IdentifierNameSyntax identifierName)
+                //{
+                //    name = identifierName.Identifier.ValueText;
+                //    return true;
+                //}
+
+                //if (n is MemberAccessExpressionSyntax memberAccess &&
+                //    memberAccess.Expression is InstanceExpressionSyntax &&
+                //    memberAccess.Name is SimpleNameSyntax simpleName)
+                //{
+                //    name = simpleName.Identifier.ValueText;
+                //    return true;
+                //}
+
                 return false;
             }
 
@@ -510,15 +524,10 @@
                 return;
             }
 
-            var property = assignedSymbol as IPropertySymbol;
-            if (!SymbolComparer.Equals(this.CurrentSymbol, property) &&
+            if (assignedSymbol is IPropertySymbol property &&
+                !SymbolComparer.Equals(this.CurrentSymbol, property) &&
                 (this.CurrentSymbol is IFieldSymbol || this.CurrentSymbol is IPropertySymbol) &&
-                property != null &&
-                Property.AssignsSymbolInSetter(
-                    property,
-                    this.CurrentSymbol,
-                    this.semanticModel,
-                    this.cancellationToken))
+                Property.AssignsSymbolInSetter(property, this.CurrentSymbol, this.semanticModel, this.cancellationToken))
             {
                 var before = this.values.Count;
                 foreach (var reference in property.DeclaringSyntaxReferences)
