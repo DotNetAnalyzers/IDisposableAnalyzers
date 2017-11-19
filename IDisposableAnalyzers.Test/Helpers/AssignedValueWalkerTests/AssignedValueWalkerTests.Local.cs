@@ -50,12 +50,15 @@ namespace RoslynSandbox
             public void InitializedWithDefaultGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo<T>
+namespace RoslynSandbox
 {
-    internal Foo()
+    internal class Foo<T>
     {
-        var value = default(T);
-        var temp = value;
+        internal Foo()
+        {
+            var value = default(T);
+            var temp = value;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -73,14 +76,17 @@ internal class Foo<T>
             public void NotInitialized(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+namespace RoslynSandbox
 {
-    internal Foo()
+    internal class Foo
     {
-        int value;
-        var temp1 = value;
-        value = 1;
-        var temp2 = value;
+        internal Foo()
+        {
+            int value;
+            var temp1 = value;
+            value = 1;
+            var temp2 = value;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -97,12 +103,15 @@ internal class Foo
             public void AssignedWithArg()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+namespace RoslynSandbox
 {
-    internal Foo(int meh)
+    internal class Foo
     {
-        var temp = meh;
-        var value = temp;
+        internal Foo(int meh)
+        {
+            var temp = meh;
+            var value = temp;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -116,15 +125,43 @@ internal class Foo
             }
 
             [Test]
+            public void VerbatimIdentifierAssignedWithArg()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        internal Foo(int meh)
+        {
+            var @operator = meh;
+            var value = @operator;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var value = @operator").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual("meh", actual);
+                }
+            }
+
+            [Test]
             public void AssignedWithArgGenericMethod()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+namespace RoslynSandbox
 {
-    internal Foo<T>(T meh)
+    internal class Foo
     {
-        var temp = meh;
-        var value = temp;
+        internal void Bar<T>(T meh)
+        {
+            var temp = meh;
+            var value = temp;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -141,12 +178,15 @@ internal class Foo
             public void AssignedWithArgGenericClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo<T>
+namespace RoslynSandbox
 {
-    internal Foo(T meh)
+    internal class Foo<T>
     {
-        var temp = meh;
-        var value = temp;
+        internal Foo(T meh)
+        {
+            var temp = meh;
+            var value = temp;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());

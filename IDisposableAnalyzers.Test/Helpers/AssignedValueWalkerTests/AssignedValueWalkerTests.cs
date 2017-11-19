@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     internal partial class AssignedValueWalkerTests
     {
         [TestCase("var temp1 = this.value;", "")]
-        [TestCase("var temp2 = this.value;", "")]
+        [TestCase("var temp2 = this.value;", "1")]
         [TestCase("var temp3 = this.value;", "1")]
         public void LambdaInCtor(string code, string expected)
         {

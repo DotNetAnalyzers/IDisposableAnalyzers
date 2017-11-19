@@ -64,7 +64,7 @@
             else
             {
                 var ctor = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out IMethodSymbol baseCtor))
+                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out var baseCtor))
                 {
                     this.HandleInvoke(baseCtor, null);
                 }
@@ -169,7 +169,7 @@
                         foreach (var reference in method.DeclaringSyntaxReferences)
                         {
                             var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                            if (methodDeclaration.TryGetMatchingParameter(node, out ParameterSyntax parameterSyntax))
+                            if (methodDeclaration.TryGetMatchingParameter(node, out var parameterSyntax))
                             {
                                 var parameterSymbol = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken);
                                 if (parameterSymbol != null)
@@ -289,7 +289,7 @@
                         if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
                             parameter.RefKind != RefKind.Out)
                         {
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out ExpressionSyntax arg))
+                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
                             {
                                 this.values[i] = arg;
                             }
@@ -355,15 +355,15 @@
                 var contextCtor = this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
-                    using (var walker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
+                    using (var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
                         if (this.Context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
-                            walker.Default != null)
+                            ctorWalker.Default != null)
                         {
-                            this.Visit(walker.Default);
+                            this.Visit(ctorWalker.Default);
                         }
 
-                        foreach (var creation in walker.ObjectCreations)
+                        foreach (var creation in ctorWalker.ObjectCreations)
                         {
                             if (contextCtor == null ||
                                 creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
@@ -377,7 +377,7 @@
                             }
                         }
 
-                        foreach (var ctor in walker.NonPrivateCtors)
+                        foreach (var ctor in ctorWalker.NonPrivateCtors)
                         {
                             if (contextCtor == null ||
                                 ctor == contextCtor ||
@@ -416,14 +416,19 @@
 
         private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
         {
-            if (value == null)
+            bool TryGetName(SyntaxNode n, out string name)
             {
-                return;
+                name = null;
+                if (n is VariableDeclaratorSyntax declarator)
+                {
+                    name = declarator.Identifier.ValueText;
+                    return true;
+                }
+
+                return false;
             }
 
-            var assignedSymbol = this.semanticModel.GetSymbolSafe(assignee, this.cancellationToken) ??
-                                 this.semanticModel.GetDeclaredSymbolSafe(assignee, this.cancellationToken);
-            if (assignedSymbol == null)
+            if (value == null)
             {
                 return;
             }
@@ -492,6 +497,19 @@
                 return;
             }
 
+            if (TryGetName(assignee, out var assigneName) &&
+                assigneName != this.CurrentSymbol.Name)
+            {
+                return;
+            }
+
+            var assignedSymbol = this.semanticModel.GetSymbolSafe(assignee, this.cancellationToken) ??
+                                 this.semanticModel.GetDeclaredSymbolSafe(assignee, this.cancellationToken);
+            if (assignedSymbol == null)
+            {
+                return;
+            }
+
             var property = assignedSymbol as IPropertySymbol;
             if (!SymbolComparer.Equals(this.CurrentSymbol, property) &&
                 (this.CurrentSymbol is IFieldSymbol || this.CurrentSymbol is IPropertySymbol) &&
@@ -506,7 +524,7 @@
                 foreach (var reference in property.DeclaringSyntaxReferences)
                 {
                     var declaration = (PropertyDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                    if (declaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter))
+                    if (declaration.TryGetSetAccessorDeclaration(out var setter))
                     {
                         this.Visit(setter);
                     }
