@@ -395,24 +395,33 @@
                 }
             }
 
-            var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-            if (contextMember != null &&
-                (this.CurrentSymbol is ILocalSymbol ||
-                 this.CurrentSymbol is IParameterSymbol))
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
             {
-                this.Visit(contextMember);
-            }
-            else if (!(contextMember is ConstructorDeclarationSyntax))
-            {
-                while (type.Is(this.CurrentSymbol.ContainingType))
+                var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (contextMember != null)
                 {
-                    foreach (var reference in type.DeclaringSyntaxReferences)
+                    this.Visit(contextMember);
+                }
+            }
+            else if ((this.CurrentSymbol is IFieldSymbol field &&
+                     !field.IsReadOnly) ||
+                     (this.CurrentSymbol is IPropertySymbol property &&
+                     !property.IsReadOnly))
+            {
+                var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (contextMember != null &&
+                    !(contextMember is ConstructorDeclarationSyntax))
+                {
+                    while (type.Is(this.CurrentSymbol.ContainingType))
                     {
-                        var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                        this.memberWalker.Visit(typeDeclaration);
-                    }
+                        foreach (var reference in type.DeclaringSyntaxReferences)
+                        {
+                            var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                            this.memberWalker.Visit(typeDeclaration);
+                        }
 
-                    type = type.BaseType;
+                        type = type.BaseType;
+                    }
                 }
             }
 
@@ -428,6 +437,12 @@
 
             if (assignee is VariableDeclaratorSyntax declarator &&
                 declarator.Identifier.ValueText != this.CurrentSymbol.Name)
+            {
+                return;
+            }
+
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
+                assignee is MemberAccessExpressionSyntax)
             {
                 return;
             }
