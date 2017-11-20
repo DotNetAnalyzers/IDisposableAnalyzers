@@ -122,6 +122,12 @@
                 {
                     foreach (var invocation in invocations)
                     {
+                        if (invocation.TryGetInvokedMethodName(out var name) &&
+                            name != overridden.Name)
+                        {
+                            continue;
+                        }
+
                         if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
                         {
                             return;
