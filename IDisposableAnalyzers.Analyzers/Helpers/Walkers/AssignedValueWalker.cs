@@ -404,9 +404,9 @@
                 }
             }
             else if ((this.CurrentSymbol is IFieldSymbol field &&
-                     !field.IsReadOnly) ||
+                      !field.IsReadOnly) ||
                      (this.CurrentSymbol is IPropertySymbol property &&
-                     !property.IsReadOnly))
+                      !property.IsReadOnly))
             {
                 var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                 if (contextMember != null &&
