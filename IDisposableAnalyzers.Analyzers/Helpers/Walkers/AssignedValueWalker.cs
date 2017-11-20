@@ -421,33 +421,13 @@
 
         private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
         {
-            bool TryGetName(SyntaxNode n, out string name)
+            if (value == null)
             {
-                name = null;
-                if (n is VariableDeclaratorSyntax declarator)
-                {
-                    name = declarator.Identifier.ValueText;
-                    return true;
-                }
-
-                //if (n is IdentifierNameSyntax identifierName)
-                //{
-                //    name = identifierName.Identifier.ValueText;
-                //    return true;
-                //}
-
-                //if (n is MemberAccessExpressionSyntax memberAccess &&
-                //    memberAccess.Expression is InstanceExpressionSyntax &&
-                //    memberAccess.Name is SimpleNameSyntax simpleName)
-                //{
-                //    name = simpleName.Identifier.ValueText;
-                //    return true;
-                //}
-
-                return false;
+                return;
             }
 
-            if (value == null)
+            if (assignee is VariableDeclaratorSyntax declarator &&
+                declarator.Identifier.ValueText != this.CurrentSymbol.Name)
             {
                 return;
             }
@@ -513,12 +493,6 @@
                         return;
                 }
 
-                return;
-            }
-
-            if (TryGetName(assignee, out var assigneName) &&
-                assigneName != this.CurrentSymbol.Name)
-            {
                 return;
             }
 
