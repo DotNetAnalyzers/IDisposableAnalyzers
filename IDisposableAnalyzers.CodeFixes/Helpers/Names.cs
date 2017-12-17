@@ -16,6 +16,26 @@ namespace IDisposableAnalyzers
             Maybe
         }
 
+        internal static bool UsesUnderscore(this SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var walker = Walker.Borrow())
+            {
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
+                {
+                    return false;
+                }
+
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
+                {
+                    return true;
+                }
+
+                return UsesUnderscore(semanticModel, cancellationToken, walker);
+            }
+        }
+
         internal static bool UsesUnderscore(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var walker = Walker.Borrow(node))
@@ -32,25 +52,30 @@ namespace IDisposableAnalyzers
                     return true;
                 }
 
-                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+                return UsesUnderscore(semanticModel, cancellationToken, walker);
+            }
+        }
+
+        private static bool UsesUnderscore(this SemanticModel semanticModel, CancellationToken cancellationToken, Walker walker)
+        {
+            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+            {
+                if (tree.FilePath.EndsWith(".g.i.cs"))
                 {
-                    if (tree.FilePath.EndsWith(".g.i.cs"))
-                    {
-                        continue;
-                    }
+                    continue;
+                }
 
-                    walker.Visit(tree.GetRoot(cancellationToken));
-                    if (walker.UsesThis == Result.Yes ||
-                        walker.UsesUnderScore == Result.No)
-                    {
-                        return false;
-                    }
+                walker.Visit(tree.GetRoot(cancellationToken));
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
+                {
+                    return false;
+                }
 
-                    if (walker.UsesUnderScore == Result.Yes ||
-                        walker.UsesThis == Result.No)
-                    {
-                        return true;
-                    }
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
+                {
+                    return true;
                 }
             }
 
@@ -66,6 +91,8 @@ namespace IDisposableAnalyzers
             public Result UsesThis { get; private set; }
 
             public Result UsesUnderScore { get; private set; }
+
+            public static Walker Borrow() => Borrow(() => new Walker());
 
             public static Walker Borrow(SyntaxNode node)
             {

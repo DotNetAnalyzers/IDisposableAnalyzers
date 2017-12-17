@@ -25,7 +25,7 @@
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false) as CompilationUnitSyntax;
+                                          .ConfigureAwait(false);
             if (syntaxRoot == null)
             {
                 return;
@@ -107,30 +107,10 @@
                     return false;
                 }
 
-                var prefix = (assignedSymbol is IPropertySymbol || assignedSymbol is IFieldSymbol) &&
-                             !assignment.UsesUnderscore(semanticModel, cancellationToken)
-                    ? "this."
-                    : string.Empty;
-                if (!Disposable.IsAssignableTo(MemberType(assignedSymbol)))
-                {
-                    result = SyntaxFactory.ParseStatement($"({prefix}{assignment.Left} as System.IDisposable)?.Dispose();")
-                                          .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                          .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                          .WithSimplifiedNames();
-                    return true;
-                }
-
-                if (IsAlwaysAssigned(assignedSymbol))
-                {
-                    result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}.Dispose();")
-                                          .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                          .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                    return true;
-                }
-
-                result = SyntaxFactory.ParseStatement($"{prefix}{assignedSymbol.Name}?.Dispose();")
-                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+                result = Snippet.DisposeStatement(
+                    assignedSymbol,
+                    semanticModel,
+                    cancellationToken);
                 return true;
             }
 
@@ -146,44 +126,11 @@
                 return false;
             }
 
-            if (!Disposable.IsAssignableTo(MemberType(symbol)))
-            {
-                result = SyntaxFactory.ParseStatement($"({argument.Expression} as System.IDisposable)?.Dispose();")
-                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                      .WithSimplifiedNames();
-                return true;
-            }
-
-            if (IsAlwaysAssigned(symbol))
-            {
-                result = SyntaxFactory.ParseStatement($"{argument.Expression}.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                return true;
-            }
-
-            result = SyntaxFactory.ParseStatement($"{argument.Expression}?.Dispose();")
-                                .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+            result = Snippet.DisposeStatement(
+                symbol,
+                semanticModel,
+                cancellationToken);
             return true;
         }
-
-        // ReSharper disable once UnusedParameter.Local
-        private static bool IsAlwaysAssigned(ISymbol member)
-        {
-            if (member is ILocalSymbol)
-            {
-                return false;
-            }
-
-            return false;
-        }
-
-        private static ITypeSymbol MemberType(ISymbol member) =>
-            (member as IFieldSymbol)?.Type ??
-            (member as IPropertySymbol)?.Type ??
-            (member as ILocalSymbol)?.Type ??
-            (member as IParameterSymbol)?.Type;
     }
 }

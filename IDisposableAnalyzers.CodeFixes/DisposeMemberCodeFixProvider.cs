@@ -86,8 +86,7 @@
 
         private static void DisposeInDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax disposeMethod, CancellationToken cancellationToken)
         {
-            var usesUnderscoreNames = editor.OriginalRoot.UsesUnderscore(editor.SemanticModel, cancellationToken);
-            var disposeStatement = CreateDisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken, usesUnderscoreNames);
+            var disposeStatement = Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
             var statements = CreateStatements(disposeMethod, disposeStatement);
             if (disposeMethod.Body != null)
             {
@@ -105,8 +104,7 @@
 
         private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, IfStatementSyntax ifStatement, CancellationToken cancellationToken)
         {
-            var usesUnderscoreNames = editor.OriginalRoot.UsesUnderscore(editor.SemanticModel, cancellationToken);
-            var disposeStatement = CreateDisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken, usesUnderscoreNames);
+            var disposeStatement = Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
             if (ifStatement.Statement is BlockSyntax block)
             {
                 var statements = block.Statements.Add(disposeStatement);
@@ -138,30 +136,6 @@
             }
         }
 
-        private static StatementSyntax CreateDisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken, bool usesUnderScoreNames)
-        {
-            var prefix = usesUnderScoreNames ? string.Empty : "this.";
-            if (!Disposable.IsAssignableTo(MemberType(member)))
-            {
-                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
-                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithSimplifiedNames();
-            }
-
-            if (IsReadOnly(member) &&
-                IsNeverNull(member, semanticModel, cancellationToken))
-            {
-                return SyntaxFactory.ParseStatement($"{prefix}{member.Name}.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-            }
-
-            return SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
-                                .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-        }
-
         private static SyntaxList<StatementSyntax> CreateStatements(MethodDeclarationSyntax method, StatementSyntax newStatement)
         {
             if (method.ExpressionBody != null)
@@ -171,54 +145,6 @@
 
             return method.Body.Statements.Add(newStatement);
         }
-
-        private static bool IsReadOnly(ISymbol member)
-        {
-            var isReadOnly = (member as IFieldSymbol)?.IsReadOnly ?? (member as IPropertySymbol)?.IsReadOnly;
-            if (isReadOnly == null)
-            {
-                throw new InvalidOperationException($"Could not figure out if member: {member} is readonly.");
-            }
-
-            return isReadOnly.Value;
-        }
-
-        private static bool IsNeverNull(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!(member is IFieldSymbol || member is IPropertySymbol))
-            {
-                return false;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(member, semanticModel, cancellationToken))
-            {
-                foreach (var value in assignedValues)
-                {
-                    if (value is ObjectCreationExpressionSyntax objectCreation)
-                    {
-                        if (objectCreation.Parent is EqualsValueClauseSyntax equalsValueClause &&
-                            equalsValueClause.Parent is VariableDeclaratorSyntax)
-                        {
-                            continue;
-                        }
-
-                        if (objectCreation.Parent is AssignmentExpressionSyntax assignment &&
-                            assignment.Parent is ExpressionStatementSyntax statement &&
-                            statement.Parent is BlockSyntax block &&
-                            block.Parent is ConstructorDeclarationSyntax)
-                        {
-                            continue;
-                        }
-                    }
-
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        private static ITypeSymbol MemberType(ISymbol member) => (member as IFieldSymbol)?.Type ?? (member as IPropertySymbol)?.Type;
 
         private static bool TryGetIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
         {
