@@ -21,7 +21,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void IgnoringFileOpenRead()
+        public void FileOpenRead()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoringNewDisposable()
+        public void NewDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoringFileOpenReadPassedIntoCtor()
+        public void FileOpenReadPassedIntoCtor()
         {
             var barCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoringNewDisposabledPassedIntoCtor()
+        public void NewDisposabledPassedIntoCtor()
         {
             var barCode = @"
 namespace RoslynSandbox
