@@ -788,5 +788,35 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void LazyProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private IDisposable disposable;
+        private bool disposed;
+
+        public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }

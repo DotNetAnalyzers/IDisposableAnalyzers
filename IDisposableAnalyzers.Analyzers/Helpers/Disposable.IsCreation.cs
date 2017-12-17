@@ -75,9 +75,18 @@ namespace IDisposableAnalyzers
 
             using (var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken))
             {
+                assignedSymbol = assignedValues.CurrentSymbol;
+                if (assignedValues.Count == 1 &&
+                    disposable.Parent is AssignmentExpressionSyntax assignment &&
+                    assignment.Parent is ParenthesizedExpressionSyntax parenthesizedExpression &&
+                    parenthesizedExpression.Parent is BinaryExpressionSyntax binary &&
+                    binary.IsKind(SyntaxKind.CoalesceExpression))
+                {
+                    return Result.No;
+                }
+
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    assignedSymbol = assignedValues.CurrentSymbol;
                     return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
                 }
             }

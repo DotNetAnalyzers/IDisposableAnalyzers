@@ -1764,5 +1764,60 @@ namespace RoslynSandbox
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
+
+        [Test]
+        public void LazyPropertyBackingField()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓private IDisposable disposable;
+        private bool disposed;
+
+        public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private IDisposable disposable;
+        private bool disposed;
+
+        public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+        }
     }
 }
