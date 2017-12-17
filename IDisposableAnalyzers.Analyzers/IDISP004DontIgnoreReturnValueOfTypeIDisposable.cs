@@ -96,25 +96,26 @@
                 return true;
             }
 
-            if (node.Parent is ArgumentSyntax argument)
+            if (node.Parent is ArgumentSyntax argument &&
+                argument.Parent is ArgumentListSyntax argumentList)
             {
-                if (argument.Parent.Parent is InvocationExpressionSyntax invocation)
+                if (argumentList.Parent is InvocationExpressionSyntax invocation)
                 {
                     using (var returnWalker = ReturnValueWalker.Borrow(invocation, Search.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var returnValue in returnWalker)
                         {
-                            if (MustBeHandled(returnValue, semanticModel, cancellationToken))
+                            if (!MustBeHandled(returnValue, semanticModel, cancellationToken))
                             {
-                                return true;
+                                return false;
                             }
                         }
                     }
 
-                    return false;
+                    return true;
                 }
 
-                if (argument.Parent.Parent is ObjectCreationExpressionSyntax)
+                if (argumentList.Parent is ObjectCreationExpressionSyntax)
                 {
                     if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
                         member != null)

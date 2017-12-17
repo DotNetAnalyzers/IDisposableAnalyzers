@@ -115,7 +115,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NewDisposabledPassedIntoCtor()
+        public void NewDisposablePassedIntoCtor()
         {
             var barCode = @"
 namespace RoslynSandbox
@@ -327,6 +327,23 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, fooCode, testCode);
+        }
+
+        [Test]
+        public void StringFormatArgument()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public void Bar()
+        {
+            string.Format(""{0}"", ↓new Disposable());
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
         }
     }
 }
