@@ -1819,5 +1819,70 @@ namespace RoslynSandbox
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
+
+        [Test]
+        public void AssignedInCoalesce()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓private readonly IDisposable created;
+        private bool disposed;
+
+        public Foo(IDisposable injected)
+        {
+            this.Disposable = injected ?? (this.created = new Disposable());
+        }
+
+        public IDisposable Disposable { get; }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable created;
+        private bool disposed;
+
+        public Foo(IDisposable injected)
+        {
+            this.Disposable = injected ?? (this.created = new Disposable());
+        }
+
+        public IDisposable Disposable { get; }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.created?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+        }
     }
 }

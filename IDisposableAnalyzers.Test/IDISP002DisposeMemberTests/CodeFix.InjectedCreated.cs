@@ -56,7 +56,7 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -113,7 +113,7 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";

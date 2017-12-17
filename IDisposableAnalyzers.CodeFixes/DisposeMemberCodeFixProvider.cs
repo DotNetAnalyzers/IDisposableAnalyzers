@@ -194,9 +194,21 @@
             {
                 foreach (var value in assignedValues)
                 {
-                    if (value is ObjectCreationExpressionSyntax)
+                    if (value is ObjectCreationExpressionSyntax objectCreation)
                     {
-                        continue;
+                        if (objectCreation.Parent is EqualsValueClauseSyntax equalsValueClause &&
+                            equalsValueClause.Parent is VariableDeclaratorSyntax)
+                        {
+                            continue;
+                        }
+
+                        if (objectCreation.Parent is AssignmentExpressionSyntax assignment &&
+                            assignment.Parent is ExpressionStatementSyntax statement &&
+                            statement.Parent is BlockSyntax block &&
+                            block.Parent is ConstructorDeclarationSyntax)
+                        {
+                            continue;
+                        }
                     }
 
                     return false;
