@@ -2,6 +2,7 @@
 {
     using System.Threading;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class SymbolExt
     {
@@ -21,9 +22,16 @@
                 return false;
             }
 
-            if (symbol.DeclaringSyntaxReferences.TryGetSingle(out SyntaxReference syntaxReference))
+            if (symbol.DeclaringSyntaxReferences.TryGetSingle(out var reference))
             {
-                declaration = syntaxReference.GetSyntax(cancellationToken) as T;
+                var syntax = reference.GetSyntax(cancellationToken);
+                if (symbol is IFieldSymbol &&
+                    syntax is VariableDeclaratorSyntax declarator)
+                {
+                    syntax = declarator.FirstAncestor<FieldDeclarationSyntax>();
+                }
+
+                declaration = syntax as T;
                 return declaration != null;
             }
 
