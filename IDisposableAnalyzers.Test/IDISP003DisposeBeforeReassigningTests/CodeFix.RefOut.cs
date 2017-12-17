@@ -45,7 +45,7 @@ namespace RoslynSandbox
 
         public void Update()
         {
-            stream?.Dispose();
+            this.stream?.Dispose();
             TryGetStream(out stream);
         }
 
