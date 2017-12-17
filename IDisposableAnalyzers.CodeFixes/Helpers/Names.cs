@@ -20,18 +20,6 @@ namespace IDisposableAnalyzers
         {
             using (var walker = Walker.Borrow())
             {
-                if (walker.UsesThis == Result.Yes ||
-                    walker.UsesUnderScore == Result.No)
-                {
-                    return false;
-                }
-
-                if (walker.UsesUnderScore == Result.Yes ||
-                    walker.UsesThis == Result.No)
-                {
-                    return true;
-                }
-
                 return UsesUnderscore(semanticModel, cancellationToken, walker);
             }
         }
