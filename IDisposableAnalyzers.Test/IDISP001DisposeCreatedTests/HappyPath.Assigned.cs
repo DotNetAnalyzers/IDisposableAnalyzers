@@ -203,6 +203,30 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void Ternary()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            var temp = File.OpenRead(string.Empty);
+            this.stream = true
+                ? temp
+                : temp;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }

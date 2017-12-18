@@ -1884,5 +1884,60 @@ namespace RoslynSandbox
             AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
         }
+
+        [Test]
+        public void AssignedInTernary()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓private readonly Stream stream;
+
+        public Foo()
+        {
+            var temp = File.OpenRead(string.Empty);
+            this.stream = true
+                ? temp
+                : temp;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Stream stream;
+
+        public Foo()
+        {
+            var temp = File.OpenRead(string.Empty);
+            this.stream = true
+                ? temp
+                : temp;
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+        }
     }
 }
