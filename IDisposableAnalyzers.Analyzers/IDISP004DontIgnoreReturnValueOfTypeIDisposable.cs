@@ -42,8 +42,8 @@
                 return;
             }
 
-            var objectCreation = (ObjectCreationExpressionSyntax)context.Node;
-            if (MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
+            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
+                MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -56,16 +56,11 @@
                 return;
             }
 
-            var invocation = (InvocationExpressionSyntax)context.Node;
-            var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-            if (method == null ||
-                method.ReturnsVoid ||
-                !Disposable.IsPotentiallyAssignableTo(method.ReturnType))
-            {
-                return;
-            }
-
-            if (MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
+            if (context.Node is InvocationExpressionSyntax invocation &&
+                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
+                !method.ReturnsVoid &&
+                Disposable.IsPotentiallyAssignableTo(method.ReturnType) &&
+                MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }

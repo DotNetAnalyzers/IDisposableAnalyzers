@@ -354,13 +354,73 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        public Foo(string text)
+        public Foo()
         {
             var text = ↓new Disposable().ToString();
         }
     }
 }";
             AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void ReturnNewDisposableToString()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public static string Bar()
+        {
+            return ↓new Disposable().ToString();
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void MethodCreatingDisposableExpressionBodyToString()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Stream() => File.OpenRead(string.Empty);
+
+        public static long Bar()
+        {
+            return ↓Stream().Length;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
+        }
+
+        [Explicit("Fix later")]
+        [Test]
+        public void PropertyCreatingDisposableExpressionBodyToString()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static Stream Stream => File.OpenRead(string.Empty);
+
+        public static long Bar()
+        {
+            return ↓Stream.Length;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
 }
