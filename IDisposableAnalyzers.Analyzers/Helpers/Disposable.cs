@@ -135,7 +135,7 @@ namespace IDisposableAnalyzers
             var baseType = type.BaseType;
             while (baseType != null)
             {
-                if (baseType.TryGetSingleMethod("Dispose", IsVirtualDispose, out result))
+                if (baseType.TryGetSingleMethodRecursive("Dispose", IsVirtualDispose, out result))
                 {
                     return true;
                 }

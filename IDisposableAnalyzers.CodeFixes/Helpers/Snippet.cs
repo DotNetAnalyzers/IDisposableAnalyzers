@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -43,7 +42,7 @@
                 return !type.Is(KnownSymbol.IDisposable);
             }
 
-            return !type.TryGetFirstMethod("Dispose", m => m.Parameters.Length == 0, out _);
+            return !type.TryGetFirstMethodRecursive("Dispose", m => m.Parameters.Length == 0, out _);
         }
 
         private static ITypeSymbol MemberType(ISymbol member) =>

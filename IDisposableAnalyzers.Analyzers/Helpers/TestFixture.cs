@@ -19,7 +19,7 @@
             {
                 if (Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
                 {
-                    if (fieldOrProperty.ContainingType.TryGetFirstMethod(
+                    if (fieldOrProperty.ContainingType.TryGetFirstMethodRecursive(
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute),
                         out var tearDown))
                     {
@@ -29,7 +29,7 @@
 
                 if (Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _))
                 {
-                    if (fieldOrProperty.ContainingType.TryGetFirstMethod(
+                    if (fieldOrProperty.ContainingType.TryGetFirstMethodRecursive(
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitOneTimeTearDownAttribute),
                         out var tearDown))
                     {

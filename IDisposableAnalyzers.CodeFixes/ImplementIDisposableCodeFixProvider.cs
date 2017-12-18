@@ -99,7 +99,7 @@
                     continue;
                 }
 
-                if (type.TryGetSingleMethod("Dispose", out var disposeMethod) &&
+                if (type.TryGetSingleMethodRecursive("Dispose", out var disposeMethod) &&
                     !disposeMethod.IsStatic &&
                     disposeMethod.ReturnsVoid &&
                     disposeMethod.Parameters.Length == 0)
@@ -107,8 +107,8 @@
                     continue;
                 }
 
-                if (type.TryGetField("disposed", out _) ||
-                    type.TryGetField("_disposed", out _))
+                if (type.TryGetFieldRecursive("disposed", out _) ||
+                    type.TryGetFieldRecursive("_disposed", out _))
                 {
                     return;
                 }
@@ -235,7 +235,7 @@
 
             if (!type.GetMembers().TryGetFirst(x => x.Name == "ThrowIfDisposed", out _))
             {
-                if (type.BaseType.TryGetSingleMethod("ThrowIfDisposed", out var baseThrow) &&
+                if (type.BaseType.TryGetSingleMethodRecursive("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
                 {
                     if (baseThrow.IsVirtual)
@@ -320,7 +320,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetSingleMethod("ThrowIfDisposed", out _))
+            if (!type.TryGetSingleMethodRecursive("ThrowIfDisposed", out _))
             {
                 editor.AddMethod(
                     classDeclaration,
@@ -376,7 +376,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetSingleMethod("ThrowIfDisposed", out IMethodSymbol _))
+            if (!type.TryGetSingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
             {
                 editor.AddMethod(
                     classDeclaration,
