@@ -21,7 +21,7 @@
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {
             var id = analyzer.SupportedDiagnostics.Single().Id;
-            var expectedName = id + (id.Contains("_") ? "_" : string.Empty) + "Benchmarks";
+            var expectedName = analyzer.GetType().Name + "Benchmarks";
             var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine($"namespace {this.GetType().Namespace}")

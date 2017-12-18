@@ -1,9 +1,9 @@
 // ReSharper disable RedundantNameQualifier
 namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
-    public class IDISP006Benchmarks
+    public class IDISP003DisposeBeforeReassigningBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP006ImplementIDisposable());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP003DisposeBeforeReassigning());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnIDisposableAnalyzers()

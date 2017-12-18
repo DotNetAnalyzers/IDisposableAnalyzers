@@ -16,9 +16,9 @@
         private static readonly IReadOnlyList<DescriptorInfo> Descriptors =
             typeof(AnalyzerCategory).Assembly.GetTypes()
                                     .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-                                    .Select(t => (DiagnosticAnalyzer) Activator.CreateInstance(t))
+                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                     .SelectMany(DescriptorInfo.Create)
-                                    .OrderBy(x => x.DiagnosticDescriptor.Id)
+                                    .OrderBy(x => x.Descriptor.Id)
                                     .ToArray();
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
@@ -35,7 +35,7 @@
                 Assert.Pass();
             }
 
-            var descriptor = descriptorInfo.DiagnosticDescriptor;
+            var descriptor = descriptorInfo.Descriptor;
             var id = descriptor.Id;
             DumpIfDebug(CreateStub(descriptorInfo));
             File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
@@ -45,13 +45,13 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void TitleId(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual($"# {descriptorInfo.DiagnosticDescriptor.Id}", File.ReadLines(descriptorInfo.DocFileName).First());
+            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", File.ReadLines(descriptorInfo.DocFileName).First());
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Title(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual(File.ReadLines(descriptorInfo.DocFileName).Skip(1).First(), $"## {descriptorInfo.DiagnosticDescriptor.Title}");
+            Assert.AreEqual(File.ReadLines(descriptorInfo.DocFileName).Skip(1).First(), $"## {descriptorInfo.Descriptor.Title}");
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -61,7 +61,7 @@
                                .SkipWhile(l => !l.StartsWith("## Description"))
                                .Skip(1)
                                .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l));
-            var actual = descriptorInfo.DiagnosticDescriptor.Description.ToString();
+            var actual = descriptorInfo.Descriptor.Description.ToString();
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -89,9 +89,9 @@
         [Test]
         public void UniqueIds()
         {
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Id));
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Title));
-            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.DiagnosticDescriptor.Description));
+            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.Descriptor.Id));
+            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.Descriptor.Title));
+            CollectionAssert.AllItemsAreUnique(Descriptors.Select(x => x.Descriptor.Description));
         }
 
         [Test]
@@ -100,11 +100,11 @@
             var builder = new StringBuilder();
             builder.AppendLine("<!-- start generated table -->")
                    .AppendLine("<table>");
-            foreach (var info in DescriptorsWithDocs.OrderBy(x => x.DiagnosticDescriptor.Id))
+            foreach (var info in DescriptorsWithDocs.OrderBy(x => x.Descriptor.Id))
             {
                 builder.AppendLine("<tr>");
-                builder.AppendLine($@"  <td><a href=""{info.DiagnosticDescriptor.HelpLinkUri}"">{info.DiagnosticDescriptor.Id}</a></td>");
-                builder.AppendLine($"  <td>{info.DiagnosticDescriptor.Title}</td>");
+                builder.AppendLine($@"  <td><a href=""{info.Descriptor.HelpLinkUri}"">{info.Descriptor.Id}</a></td>");
+                builder.AppendLine($"  <td>{info.Descriptor.Title}</td>");
                 builder.AppendLine("</tr>");
             }
 
@@ -134,14 +134,14 @@
 
         private static string CreateStub(DescriptorInfo descriptorInfo)
         {
-            var descriptor = descriptorInfo.DiagnosticDescriptor;
+            var descriptor = descriptorInfo.Descriptor;
             return CreateStub(
                 id: descriptor.Id,
                 title: descriptor.Title.ToString(),
                 severity: descriptor.DefaultSeverity,
                 codeFileUrl: descriptorInfo.CodeFileUri,
                 category: descriptor.Category,
-                typeName: descriptorInfo.DiagnosticAnalyzer.GetType().Name,
+                typeName: descriptorInfo.Analyzer.GetType().Name,
                 description: descriptor.Description.ToString());
         }
 
@@ -192,14 +192,14 @@
 
         public class DescriptorInfo
         {
-            public DescriptorInfo(DiagnosticAnalyzer diagnosticAnalyzer, DiagnosticDescriptor descriptor)
+            public DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
             {
-                this.DiagnosticAnalyzer = diagnosticAnalyzer;
-                this.DiagnosticDescriptor = descriptor;
-                this.DocFileName = Path.Combine(DocumentsDirectory, this.DiagnosticDescriptor.Id + ".md");
+                this.Analyzer = analyzer;
+                this.Descriptor = descriptor;
+                this.DocFileName = Path.Combine(DocumentsDirectory, this.Descriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory,
-                                                 diagnosticAnalyzer.GetType().Name + ".cs",
+                                                 analyzer.GetType().Name + ".cs",
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null
@@ -208,7 +208,7 @@
                     : "missing";
             }
 
-            public DiagnosticAnalyzer DiagnosticAnalyzer { get; }
+            public DiagnosticAnalyzer Analyzer { get; }
 
             public string DocFileName { get; }
 
@@ -216,13 +216,13 @@
 
             public string CodeFileUri { get; }
 
-            public DiagnosticDescriptor DiagnosticDescriptor { get; }
+            public DiagnosticDescriptor Descriptor { get; }
 
             public bool DocExists => File.Exists(this.DocFileName);
 
             public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer) => analyzer.SupportedDiagnostics.Select(d => new DescriptorInfo(analyzer, d));
 
-            public override string ToString() => this.DiagnosticDescriptor.Id;
+            public override string ToString() => this.Descriptor.Id;
         }
     }
 }
