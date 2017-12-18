@@ -17,7 +17,7 @@
             title: "Don't ignore return value of type IDisposable.",
             messageFormat: "Don't ignore return value of type IDisposable.",
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Hidden,
+            defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: "Don't ignore return value of type IDisposable.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
@@ -66,10 +66,7 @@
             }
         }
 
-        private static bool MustBeHandled(
-            ExpressionSyntax node,
-            SemanticModel semanticModel,
-            CancellationToken cancellationToken)
+        private static bool MustBeHandled(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
                 node.Parent is UsingStatementSyntax ||

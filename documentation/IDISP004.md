@@ -9,7 +9,7 @@
 </tr>
 <tr>
   <td>Severity</td>
-  <td>Hidden</td>
+  <td>Warning</td>
 </tr>
 <tr>
   <td>Category</td>
