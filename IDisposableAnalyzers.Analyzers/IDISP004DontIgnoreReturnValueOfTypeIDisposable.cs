@@ -91,7 +91,8 @@
                 return false;
             }
 
-            if (node.Parent is StatementSyntax)
+            if (node.Parent is StatementSyntax ||
+                node.Parent is MemberAccessExpressionSyntax)
             {
                 return true;
             }

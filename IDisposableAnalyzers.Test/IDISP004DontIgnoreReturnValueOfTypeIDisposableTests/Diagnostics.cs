@@ -7,7 +7,7 @@
     {
         private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
 
-        private static readonly string DisposableCode = @"
+        private const string DisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -340,6 +340,23 @@ namespace RoslynSandbox
         public void Bar()
         {
             string.Format(""{0}"", ↓new Disposable());
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void NewDisposableToString()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo(string text)
+        {
+            var text = ↓new Disposable().ToString();
         }
     }
 }";
