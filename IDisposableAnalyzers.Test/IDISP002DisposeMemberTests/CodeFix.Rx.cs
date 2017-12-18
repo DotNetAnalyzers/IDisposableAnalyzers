@@ -54,8 +54,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -101,8 +101,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
         }
     }

@@ -60,8 +60,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -117,8 +117,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -178,8 +178,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -239,8 +239,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -288,8 +288,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
             }
         }
     }

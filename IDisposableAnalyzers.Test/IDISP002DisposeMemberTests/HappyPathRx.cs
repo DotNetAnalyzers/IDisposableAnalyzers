@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
         internal class Rx
         {

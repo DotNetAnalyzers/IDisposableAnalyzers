@@ -2,18 +2,18 @@
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class IDISP002DisposeMember
+    internal static class IDISP010CallBaseDispose
     {
-        public const string DiagnosticId = "IDISP002";
+        public const string DiagnosticId = "IDISP0010";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Dispose member.",
-            messageFormat: "Dispose member.",
+            title: "Call base.Dispose(true)",
+            messageFormat: "Call base.Dispose(true)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Dispose the member as it is assigned with a created `IDisposable`.",
+            description: "Call base.Dispose(true)",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }

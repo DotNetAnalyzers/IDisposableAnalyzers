@@ -59,8 +59,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -115,8 +115,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -176,8 +176,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }

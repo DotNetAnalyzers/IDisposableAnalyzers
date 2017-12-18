@@ -59,7 +59,7 @@
             foreach (var analyzer in AllAnalyzers)
             {
                 builder.AppendLine(
-                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)} = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
+                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.GetType().Name}Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
                        .AppendLine();
             }
 
@@ -68,7 +68,7 @@
                 builder.AppendLine($"        [BenchmarkDotNet.Attributes.Benchmark]")
                        .AppendLine($"        public void {analyzer.GetType().Name}()")
                        .AppendLine("        {")
-                       .AppendLine($"            {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)}.Run();")
+                       .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
                        .AppendLine("        }");
                 if (!ReferenceEquals(analyzer, AllAnalyzers.Last()))
                 {

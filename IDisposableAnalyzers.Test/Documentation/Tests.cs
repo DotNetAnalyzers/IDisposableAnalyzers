@@ -16,8 +16,9 @@
         private static readonly IReadOnlyList<DescriptorInfo> Descriptors =
             typeof(AnalyzerCategory).Assembly.GetTypes()
                                     .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                    .Select(DescriptorInfo.Create)
+                                    .Select(t => (DiagnosticAnalyzer) Activator.CreateInstance(t))
+                                    .SelectMany(DescriptorInfo.Create)
+                                    .OrderBy(x => x.DiagnosticDescriptor.Id)
                                     .ToArray();
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
@@ -191,9 +192,10 @@
 
         public class DescriptorInfo
         {
-            public DescriptorInfo(DiagnosticAnalyzer diagnosticAnalyzer)
+            public DescriptorInfo(DiagnosticAnalyzer diagnosticAnalyzer, DiagnosticDescriptor descriptor)
             {
                 this.DiagnosticAnalyzer = diagnosticAnalyzer;
+                this.DiagnosticDescriptor = descriptor;
                 this.DocFileName = Path.Combine(DocumentsDirectory, this.DiagnosticDescriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory,
@@ -214,11 +216,11 @@
 
             public string CodeFileUri { get; }
 
+            public DiagnosticDescriptor DiagnosticDescriptor { get; }
+
             public bool DocExists => File.Exists(this.DocFileName);
 
-            public DiagnosticDescriptor DiagnosticDescriptor => this.DiagnosticAnalyzer.SupportedDiagnostics.Single();
-
-            public static DescriptorInfo Create(DiagnosticAnalyzer analyzer) => new DescriptorInfo(analyzer);
+            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer) => analyzer.SupportedDiagnostics.Select(d => new DescriptorInfo(analyzer, d));
 
             public override string ToString() => this.DiagnosticDescriptor.Id;
         }

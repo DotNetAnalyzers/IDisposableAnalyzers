@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2006
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
 	ProjectSection(SolutionItems) = preProject
@@ -36,6 +36,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\IDISP007.md = documentation\IDISP007.md
 		documentation\IDISP008.md = documentation\IDISP008.md
 		documentation\IDISP009.md = documentation\IDISP009.md
+		documentation\IDISP010.md = documentation\IDISP010.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
