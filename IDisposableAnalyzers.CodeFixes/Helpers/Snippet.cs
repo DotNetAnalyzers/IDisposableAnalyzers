@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Linq;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -13,7 +14,9 @@
                          !semanticModel.UsesUnderscore(cancellationToken)
                     ? "this."
                     : string.Empty;
-            if (!Disposable.IsAssignableTo(MemberType(member)))
+            var type = MemberType(member);
+            if (!Disposable.IsAssignableTo(type) ||
+                IsExplicit(type))
             {
                 return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
@@ -31,6 +34,16 @@
             return SyntaxFactory.ParseStatement($"{prefix}{member.Name}?.Dispose();")
                                 .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                 .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
+        }
+
+        private static bool IsExplicit(ITypeSymbol type)
+        {
+            if (type.IsInterface())
+            {
+                return !type.Is(KnownSymbol.IDisposable);
+            }
+
+            return !type.TryGetFirstMethod("Dispose", m => m.Parameters.Length == 0, out _);
         }
 
         private static ITypeSymbol MemberType(ISymbol member) =>

@@ -5,7 +5,7 @@
 
     internal partial class CodeFix
     {
-        private static readonly string DisposableCode = @"
+        private const string DisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -13,6 +13,19 @@ namespace RoslynSandbox
     public class Disposable : IDisposable
     {
         public void Dispose()
+        {
+        }
+    }
+}";
+
+        private const string ExplicitDisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class ExplicitDisposable : IDisposable
+    {
+        void IDisposable.Dispose()
         {
         }
     }

@@ -50,7 +50,7 @@ namespace RoslynSandbox
         [TearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace RoslynSandbox
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
 
         [Test]
