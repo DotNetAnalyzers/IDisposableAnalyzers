@@ -6,7 +6,6 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -48,11 +47,9 @@ namespace IDisposableAnalyzers
                     {
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out IFieldSymbol field))
                         {
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Add to CompositeDisposable.",
-                                    cancellationToken => AddAsync(context.Document, statement, field, cancellationToken),
-                                    nameof(AddToCompositeDisposableCodeFixProvider)),
+                            context.RegisterDocumentEditorFix(
+                                "Add to CompositeDisposable.",
+                                (editor, cancellationToken) => AddToExisting(editor, statement, field, cancellationToken),
                                 diagnostic);
                         }
                         else
@@ -60,11 +57,9 @@ namespace IDisposableAnalyzers
                             if (semanticModel.Compilation.ReferencedAssemblyNames.Any(
                                 x => x.Name.Contains("System.Reactive")))
                             {
-                                context.RegisterCodeFix(
-                                    CodeAction.Create(
-                                        "Add to new CompositeDisposable.",
-                                        cancellationToken => CreateAndInitializeAsync(context.Document, statement, cancellationToken),
-                                        nameof(AddToCompositeDisposableCodeFixProvider)),
+                                context.RegisterDocumentEditorFix(
+                                    "Add to new CompositeDisposable.",
+                                    (editor, cancellationToken) => CreateAndInitialize(editor, statement, cancellationToken),
                                     diagnostic);
                             }
                         }
@@ -73,7 +68,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static async Task<Document> AddAsync(Document document, ExpressionStatementSyntax statement, IFieldSymbol field, CancellationToken cancellationToken)
+        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, IFieldSymbol field, CancellationToken cancellationToken)
         {
             bool TryGetPreviousStatement(StatementSyntax s, out StatementSyntax result)
             {
@@ -112,8 +107,6 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken)
-                                             .ConfigureAwait(false);
             if (TryGetPreviousStatement(statement, out var previous) &&
                 TryGetCreateCompositeDisposable(previous, field, out var compositeDisposableCreation))
             {
@@ -122,27 +115,25 @@ namespace IDisposableAnalyzers
                     compositeDisposableCreation,
                     statement.Expression,
                     statement.GetTrailingTrivia());
-                return editor.GetChangedDocument();
             }
+            else
+            {
+                var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
+                var memberAccessExpressionSyntax = usesUnderscoreNames
+                    ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
+                    : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
 
-            var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
-            var memberAccessExpressionSyntax = usesUnderscoreNames
-                                                   ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
-                                                   : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
-
-            editor.ReplaceNode(
-                statement,
-                SyntaxFactory.ExpressionStatement(
-                    (InvocationExpressionSyntax)editor.Generator.InvocationExpression(
-                        memberAccessExpressionSyntax,
-                        statement.Expression)));
-            return editor.GetChangedDocument();
+                editor.ReplaceNode(
+                    statement,
+                    SyntaxFactory.ExpressionStatement(
+                        (InvocationExpressionSyntax)editor.Generator.InvocationExpression(
+                            memberAccessExpressionSyntax,
+                            statement.Expression)));
+            }
         }
 
-        private static async Task<Document> CreateAndInitializeAsync(Document document, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
+        private static void CreateAndInitialize(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(document, cancellationToken)
-                                             .ConfigureAwait(false);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
             var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
             var field = editor.AddField(
@@ -183,8 +174,6 @@ namespace IDisposableAnalyzers
                                  .WithAdditionalAnnotations(Formatter.Annotation)
                                  .WithSimplifiedNames());
             }
-
-            return editor.GetChangedDocument();
         }
 
         private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out IFieldSymbol field)

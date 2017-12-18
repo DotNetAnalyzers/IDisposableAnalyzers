@@ -5,7 +5,6 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -48,11 +47,9 @@ namespace IDisposableAnalyzers
                                                                   .ConfigureAwait(false);
                         if (semanticModel.GetSymbolInfo(statement.Declaration.Type).Symbol is ITypeSymbol type)
                         {
-                            context.RegisterCodeFix(
-                                CodeAction.Create(
-                                    "Create and assign field.",
-                                    cancellationToken => ApplyAddUsingFixAsync(context, statement, type, cancellationToken),
-                                    nameof(CreateAndAssignFieldCodeFixProvider)),
+                            context.RegisterDocumentEditorFix(
+                                "Create and assign field.",
+                                (editor, cancellationToken) => CreateAndAssignField(editor, statement, type, cancellationToken),
                                 diagnostic);
                         }
                     }
@@ -63,20 +60,17 @@ namespace IDisposableAnalyzers
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
                     if (statement?.FirstAncestor<ConstructorDeclarationSyntax>() != null)
                     {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Create and assign field.",
-                                _ => ApplyAddUsingFixAsync(context, statement),
-                                nameof(CreateAndAssignFieldCodeFixProvider)),
+                        context.RegisterDocumentEditorFix(
+                            "Create and assign field.",
+                            (editor, cancellationToken) => CreateAndAssignField(editor, statement, cancellationToken),
                             diagnostic);
                     }
                 }
             }
         }
 
-        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, LocalDeclarationStatementSyntax statement, ITypeSymbol type, CancellationToken cancellationToken)
+        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken).ConfigureAwait(false);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
             var usesUnderscoreNames = containingType.UsesUnderscore(editor.SemanticModel, cancellationToken);
             var variableDeclarator = statement.Declaration.Variables[0];
@@ -102,14 +96,11 @@ namespace IDisposableAnalyzers
                                      variableDeclarator.Initializer.Value))
                              .WithLeadingTrivia(statement.GetLeadingTrivia())
                              .WithTrailingTrivia(statement.GetTrailingTrivia()));
-
-            return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ApplyAddUsingFixAsync(CodeFixContext context, ExpressionStatementSyntax statement)
+        private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var editor = await DocumentEditor.CreateAsync(context.Document).ConfigureAwait(false);
-            var usesUnderscoreNames = editor.SemanticModel.SyntaxTree.GetRoot().UsesUnderscore(editor.SemanticModel, CancellationToken.None);
+            var usesUnderscoreNames = editor.SemanticModel.UsesUnderscore(cancellationToken);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(
@@ -133,7 +124,6 @@ namespace IDisposableAnalyzers
                                      statement.Expression))
                              .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                              .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
-            return editor.GetChangedDocument();
         }
     }
 }

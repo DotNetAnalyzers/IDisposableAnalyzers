@@ -3,7 +3,6 @@ namespace IDisposableAnalyzers
     using System.Collections.Immutable;
     using System.Composition;
     using System.Linq;
-    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -44,7 +43,7 @@ namespace IDisposableAnalyzers
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
-                            (editor, cancellationToken) => AddUsing(editor, block, statement, cancellationToken),
+                            (editor, _) => AddUsing(editor, block, statement),
                             diagnostic);
                     }
                 }
@@ -56,14 +55,14 @@ namespace IDisposableAnalyzers
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
-                            (editor, cancellationToken) => AddUsing(editor, block, statement, cancellationToken),
+                            (editor, _) => AddUsing(editor, block, statement),
                             diagnostic);
                     }
                 }
             }
         }
 
-        private static void AddUsing(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax statement, CancellationToken cancellationToken)
+        private static void AddUsing(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax statement)
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
@@ -82,7 +81,7 @@ namespace IDisposableAnalyzers
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
         }
 
-        private static void AddUsing(DocumentEditor editor, BlockSyntax block, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
+        private static void AddUsing(DocumentEditor editor, BlockSyntax block, ExpressionStatementSyntax statement)
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
