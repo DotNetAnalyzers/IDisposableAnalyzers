@@ -46,8 +46,6 @@
                             "Call base.Dispose()",
                             diagnostic);
                     }
-
-                    continue;
                 }
             }
         }

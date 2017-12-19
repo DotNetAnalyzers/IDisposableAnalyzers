@@ -1,8 +1,9 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
+    // ReSharper disable once UnusedTypeParameter
     internal partial class HappyPath<T>
     {
         public class Recursion

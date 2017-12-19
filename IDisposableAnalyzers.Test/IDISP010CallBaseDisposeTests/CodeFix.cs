@@ -3,7 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    internal class CodeFix
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox

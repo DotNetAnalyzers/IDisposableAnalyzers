@@ -119,22 +119,6 @@
             CodeAssert.AreEqual(expected, actual);
         }
 
-        ////[Test, Explicit] // commenting this out so that it does not show up as excluded.
-        public void DumpStub()
-        {
-            var stub = CreateStub(
-                id: "WPF0041",
-                title: "Avoid side effects in CLR accessor.",
-                severity: DiagnosticSeverity.Warning,
-                codeFileUrl: "https://github.com/DotNetAnalyzers/IDisposableAnalyzers",
-                category: AnalyzerCategory.Correctness,
-                typeName: "AvoidSideEffectsInClrAccessor.",
-                description: "Bindings do not call accessor when updating value. Use callbacks.");
-
-            File.WriteAllText(Path.Combine(DocumentsDirectory, "Generated.md"), stub);
-            Console.Write(stub);
-        }
-
         private static string CreateStub(DescriptorInfo descriptorInfo)
         {
             var descriptor = descriptorInfo.Descriptor;
