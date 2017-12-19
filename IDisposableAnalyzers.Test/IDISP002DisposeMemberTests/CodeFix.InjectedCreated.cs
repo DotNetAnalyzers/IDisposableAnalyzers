@@ -7,6 +7,10 @@
     {
         internal class InjectedCreated
         {
+            private static readonly FieldDeclarationAnalyzer Analyzer = new FieldDeclarationAnalyzer();
+            private static readonly DisposeMemberCodeFixProvider CodeFix = new DisposeMemberCodeFixProvider();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
+
             [Test]
             public void CtorPassingCreatedIntoPrivateCtor()
             {
@@ -60,8 +64,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -117,8 +121,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -178,8 +182,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -239,8 +243,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, factoryCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, factoryCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -288,8 +292,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<FieldDeclarationAnalyzer, DisposeMemberCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

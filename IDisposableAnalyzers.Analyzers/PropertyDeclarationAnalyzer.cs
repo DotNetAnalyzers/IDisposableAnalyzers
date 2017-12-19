@@ -11,7 +11,8 @@
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP002DisposeMember.Descriptor);
+            IDISP002DisposeMember.Descriptor,
+            IDISP006ImplementIDisposable.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -58,7 +59,20 @@
                         return;
                     }
 
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
+                    if (Disposable.IsAssignableTo(property.ContainingType) &&
+                        Disposable.TryGetDisposeMethod(property.ContainingType, Search.TopLevel, out IMethodSymbol _))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
+                    }
+                    else
+                    {
+                        if (TestFixture.IsAssignedInSetUp(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken, out _))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
+                        }
+
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
+                    }
                 }
             }
         }

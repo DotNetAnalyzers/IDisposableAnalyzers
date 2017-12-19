@@ -1,4 +1,4 @@
-// ReSharper disable RedundantNameQualifier
+﻿// ReSharper disable RedundantNameQualifier
 namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks
@@ -14,8 +14,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreReturnValueOfTypeIDisposableBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP004DontIgnoreReturnValueOfTypeIDisposable());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP005ReturntypeShouldIndicateIDisposableBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP005ReturntypeShouldIndicateIDisposable());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP006ImplementIDisposableBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP006ImplementIDisposable());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP007DontDisposeInjectedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP007DontDisposeInjected());
 
@@ -59,12 +57,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void IDISP005ReturntypeShouldIndicateIDisposable()
         {
             IDISP005ReturntypeShouldIndicateIDisposableBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP006ImplementIDisposable()
-        {
-            IDISP006ImplementIDisposableBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
