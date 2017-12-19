@@ -3,7 +3,8 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    // ReSharper disable once UnusedTypeParameter
+    internal partial class HappyPath<T>
     {
         public class Rx
         {

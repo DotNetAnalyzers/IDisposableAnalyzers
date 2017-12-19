@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+                AnalyzerAssert.Diagnostics(new FieldDeclarationAnalyzer(), DisposableCode, testCode);
             }
         }
     }

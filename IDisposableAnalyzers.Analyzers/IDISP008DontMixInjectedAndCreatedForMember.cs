@@ -11,7 +11,7 @@
     {
         public const string DiagnosticId = "IDISP008";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Don't assign member with injected and created disposables.",
             messageFormat: "Don't assign member with injected and created disposables.",
@@ -30,78 +30,7 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
             context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
-        }
-
-        private static void HandleField(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var field = (IFieldSymbol)context.ContainingSymbol;
-            if (field.IsStatic || field.IsConst)
-            {
-                return;
-            }
-
-            if (field.DeclaredAccessibility != Accessibility.Private &&
-                !field.IsReadOnly)
-            {
-                if (Disposable.IsAssignedWithCreated(field, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                }
-            }
-            else if (Disposable.IsAssignedWithCreatedAndInjected(field, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-            }
-        }
-
-        private static void HandleProperty(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var property = (IPropertySymbol)context.ContainingSymbol;
-            if (property.IsStatic ||
-                property.IsIndexer)
-            {
-                return;
-            }
-
-            var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
-            if (propertyDeclaration.ExpressionBody != null)
-            {
-                return;
-            }
-
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out AccessorDeclarationSyntax setter) &&
-    setter.Body != null)
-            {
-                // Handle the backing field
-                return;
-            }
-
-            if (property.SetMethod != null &&
-                property.SetMethod.DeclaredAccessibility != Accessibility.Private)
-            {
-                if (Disposable.IsAssignedWithCreated(property, context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.Yes, Result.AssumeYes))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                }
-            }
-            else if (Disposable.IsAssignedWithCreatedAndInjected(property, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-            }
         }
 
         private static void HandleAssignment(SyntaxNodeAnalysisContext context)

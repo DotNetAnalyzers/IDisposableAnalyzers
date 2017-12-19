@@ -1,11 +1,65 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    [TestFixture(typeof(FieldDeclarationAnalyzer))]
+    [TestFixture(typeof(PropertyDeclarationAnalyzer))]
+    [TestFixture(typeof(IDISP008DontMixInjectedAndCreatedForMember))]
+    internal partial class HappyPath<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly IDISP008DontMixInjectedAndCreatedForMember Analyzer = new IDISP008DontMixInjectedAndCreatedForMember();
+        private static readonly T Analyzer = new T();
+
+        [TestCase("public Stream Stream")]
+        [TestCase("internal Stream Stream")]
+        public void MutableFieldInSealed(string property)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Stream Stream = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("public Stream Stream", property);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("public Stream Stream { get; protected set; }")]
+        [TestCase("public Stream Stream { get; set; }")]
+        [TestCase("protected Stream Stream { get; set; }")]
+        public void MutablePropertyInSealed(string property)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
         [TestCase("this.stream.Dispose();")]
         [TestCase("this.stream?.Dispose();")]
@@ -108,9 +162,10 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class Foo : IDisposable
     {
         public Foo()
         {
@@ -118,6 +173,11 @@ namespace RoslynSandbox
         }
 
         public Stream Stream { get; } = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
     }
 }";
             testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
@@ -130,9 +190,10 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class Foo : IDisposable
     {
         private Stream stream = File.OpenRead(string.Empty);
 
@@ -145,6 +206,11 @@ namespace RoslynSandbox
         {
             get { return this.stream; }
             private set { this.stream = value; }
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
         }
     }
 }";
@@ -406,7 +472,7 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
+        private static readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
 
         private Stream current;
 

@@ -431,7 +431,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ProtectedInitialized()
+            public void ProtectedSealedInitialized()
             {
                 var testCode = @"
 namespace RoslynSandbox

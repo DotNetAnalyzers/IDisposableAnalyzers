@@ -90,7 +90,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetSetPropertyOfTypeObjectWhenInitializedInline()
+            public void GetSetPropertyInSealedOfTypeObjectWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox

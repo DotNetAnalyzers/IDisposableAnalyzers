@@ -19,8 +19,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           !IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -37,8 +37,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           !IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           !IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -55,8 +55,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -73,8 +73,8 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                           IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -99,7 +99,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }
             }
         }
@@ -124,37 +124,7 @@ namespace IDisposableAnalyzers
             return IsPotentiallyCachedOrInjectedCore(disposable, semanticModel, cancellationToken);
         }
 
-        private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-            if (IsInjectedCore(symbol) == Result.Yes)
-            {
-                return true;
-            }
-
-            if (symbol is IPropertySymbol property &&
-                !property.IsAutoProperty(cancellationToken))
-            {
-                using (var returnValues = ReturnValueWalker.Borrow(value, Search.TopLevel, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
-                    {
-                        return IsInjectedCore(recursive, semanticModel, cancellationToken)
-                            .IsEither(Result.Yes, Result.AssumeYes);
-                    }
-                }
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsInjectedCore(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
-        private static Result IsInjectedCore(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAnyCachedOrInjected(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (values.Count == 0)
             {
@@ -183,7 +153,7 @@ namespace IDisposableAnalyzers
                     {
                         using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                         {
-                            isInjected = IsInjectedCore(recursive, semanticModel, cancellationToken);
+                            isInjected = IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
                             if (isInjected == Result.Yes)
                             {
                                 return Result.Yes;
@@ -213,6 +183,36 @@ namespace IDisposableAnalyzers
             }
 
             return result;
+        }
+
+        private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+            if (IsInjectedCore(symbol) == Result.Yes)
+            {
+                return true;
+            }
+
+            if (symbol is IPropertySymbol property &&
+                !property.IsAutoProperty(cancellationToken))
+            {
+                using (var returnValues = ReturnValueWalker.Borrow(value, Search.TopLevel, semanticModel, cancellationToken))
+                {
+                    using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
+                    {
+                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)
+                            .IsEither(Result.Yes, Result.AssumeYes);
+                    }
+                }
+            }
+
+            using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                {
+                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                }
+            }
         }
 
         private static Result IsInjectedCore(ISymbol symbol)

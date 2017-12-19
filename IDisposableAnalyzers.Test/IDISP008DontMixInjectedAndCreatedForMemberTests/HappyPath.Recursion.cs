@@ -1,9 +1,10 @@
-namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    // ReSharper disable once UnusedTypeParameter
+    internal partial class HappyPath<T>
     {
         public class Recursion
         {

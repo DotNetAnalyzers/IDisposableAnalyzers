@@ -87,7 +87,7 @@ namespace IDisposableAnalyzers
 
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
             }
         }
@@ -119,7 +119,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
             }
         }
@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
                 {
-                    return IsAssignedWithCreated(recursive, semanticModel, cancellationToken);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
             }
         }
@@ -204,7 +204,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        private static Result IsAssignedWithCreated(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAnyCreation(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (walker.Count == 0)
             {

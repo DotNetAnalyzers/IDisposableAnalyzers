@@ -12,7 +12,8 @@
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP002DisposeMember.Descriptor,
-            IDISP006ImplementIDisposable.Descriptor);
+            IDISP006ImplementIDisposable.Descriptor,
+            IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -49,29 +50,53 @@
                 return;
             }
 
-            if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
+            if (Disposable.IsPotentiallyAssignableTo(property.Type))
             {
-                if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+                using (var assignedValues = AssignedValueWalker.Borrow(property, context.SemanticModel, context.CancellationToken))
                 {
-                    if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(property, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                    using (var recursive = RecursiveValues.Create(assignedValues, context.SemanticModel, context.CancellationToken))
                     {
-                        return;
-                    }
-
-                    if (Disposable.IsAssignableTo(property.ContainingType) &&
-                        Disposable.TryGetDisposeMethod(property.ContainingType, Search.TopLevel, out IMethodSymbol _))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
-                    }
-                    else
-                    {
-                        if (TestFixture.IsAssignedInSetUp(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken, out _))
+                        if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
-                        }
+                            if (property.DeclaredAccessibility != Accessibility.Private &&
+                                !property.IsReadOnly &&
+                                !property.ContainingType.IsSealed)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                            }
+                            else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken) == Result.Yes)
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                            }
+                            else if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
+                                               .IsEither(Result.No, Result.AssumeNo, Result.Unknown) &&
+                                     !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(property, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                            {
+                                if (Disposable.IsAssignableTo(property.ContainingType) &&
+                                    Disposable.TryGetDisposeMethod(property.ContainingType, Search.TopLevel, out IMethodSymbol _))
+                                {
+                                    context.ReportDiagnostic(
+                                        Diagnostic.Create(
+                                            IDISP002DisposeMember.Descriptor,
+                                            context.Node.GetLocation()));
+                                }
+                                else
+                                {
+                                    if (TestFixture.IsAssignedInSetUp(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken, out _))
+                                    {
+                                        context.ReportDiagnostic(
+                                            Diagnostic.Create(
+                                                IDISP002DisposeMember.Descriptor,
+                                                context.Node.GetLocation()));
+                                    }
 
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
+                                    context.ReportDiagnostic(
+                                        Diagnostic.Create(
+                                            IDISP006ImplementIDisposable.Descriptor,
+                                            context.Node.GetLocation()));
+                                }
+                            }
+                        }
                     }
                 }
             }
