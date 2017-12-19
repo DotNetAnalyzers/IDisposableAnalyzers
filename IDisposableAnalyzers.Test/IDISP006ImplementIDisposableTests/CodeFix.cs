@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
-    using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     [TestFixture]
