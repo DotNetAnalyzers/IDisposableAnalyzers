@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Threading;
@@ -17,6 +17,7 @@ namespace IDisposableAnalyzers
             RegisterDocumentEditorFix(context, title, action, title, diagnostic);
         }
 
+        // ReSharper disable once UnusedMember.Global
         internal static void RegisterDocumentEditorFix(
             this CodeFixContext context,
             string title,

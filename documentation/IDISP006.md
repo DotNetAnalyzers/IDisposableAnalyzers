@@ -17,7 +17,7 @@
 </tr>
 <tr>
   <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/IDISP006ImplementIDisposable.cs">IDISP006ImplementIDisposable</a></td>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/FieldDeclarationAnalyzer.cs">FieldDeclarationAnalyzer</a></td>
 </tr>
 </table>
 <!-- end generated table -->

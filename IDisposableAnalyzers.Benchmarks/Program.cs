@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (false)
             {
-                foreach (var summary in RunSingle<IDISP001Benchmarks>())
+                foreach (var summary in RunSingle<FieldDeclarationAnalyzerBenchmarks>())
                 {
                     CopyResult(summary);
                 }

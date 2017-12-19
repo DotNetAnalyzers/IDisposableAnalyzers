@@ -7,6 +7,10 @@
     {
         internal class TestFixture
         {
+            private static readonly FieldDeclarationAnalyzer Analyzer = new FieldDeclarationAnalyzer();
+            private static readonly DisposeInTearDownCodeFixProvider CodeFix = new DisposeInTearDownCodeFixProvider();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
+
             [Test]
             public void AssigningFieldInSetUp()
             {
@@ -59,8 +63,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -115,8 +119,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -176,8 +180,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP002DisposeMember, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }

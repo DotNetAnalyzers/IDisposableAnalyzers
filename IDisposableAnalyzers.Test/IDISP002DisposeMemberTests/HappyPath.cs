@@ -2,11 +2,15 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    [TestFixture(typeof(FieldDeclarationAnalyzer))]
+    [TestFixture(typeof(PropertyDeclarationAnalyzer))]
+    internal partial class HappyPath<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly IDISP002DisposeMember Analyzer = new IDISP002DisposeMember();
+        private static readonly T Analyzer = new T();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

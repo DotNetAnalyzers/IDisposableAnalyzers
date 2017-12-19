@@ -1,9 +1,10 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    // ReSharper disable once UnusedTypeParameter
+    internal partial class HappyPath<T>
     {
         internal class TestFixture
         {

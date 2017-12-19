@@ -39,21 +39,6 @@
                 }
 
                 var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (member is MethodDeclarationSyntax disposeMethod)
-                {
-                    if (disposeMethod.ParameterList != null &&
-                        disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
-                    {
-                        context.RegisterDocumentEditorFix(
-                            $"Call base.Dispose({parameter.Identifier.ValueText})",
-                            (editor, _) => AddBaseCall(editor, disposeMethod),
-                            "Call base.Dispose()",
-                            diagnostic);
-                    }
-
-                    continue;
-                }
-
                 if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
                     if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
@@ -121,17 +106,6 @@
                 editor.ReplaceNode(
                     ifStatement,
                     ifStatement.WithStatement(SyntaxFactory.Block(disposeStatement)));
-            }
-        }
-
-        private static void AddBaseCall(DocumentEditor editor, MethodDeclarationSyntax disposeMethod)
-        {
-            if (disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
-            {
-                var baseCall = SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
-                                            .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                            .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                editor.SetStatements(disposeMethod, disposeMethod.Body.Statements.Add(baseCall));
             }
         }
 

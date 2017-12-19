@@ -20,8 +20,7 @@
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {
-            var id = analyzer.SupportedDiagnostics.Single().Id;
-            var expectedName = id + (id.Contains("_") ? "_" : string.Empty) + "Benchmarks";
+            var expectedName = analyzer.GetType().Name + "Benchmarks";
             var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine($"namespace {this.GetType().Namespace}")
@@ -59,7 +58,7 @@
             foreach (var analyzer in AllAnalyzers)
             {
                 builder.AppendLine(
-                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)} = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
+                           $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.GetType().Name}Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new {analyzer.GetType().FullName}());")
                        .AppendLine();
             }
 
@@ -68,7 +67,7 @@
                 builder.AppendLine($"        [BenchmarkDotNet.Attributes.Benchmark]")
                        .AppendLine($"        public void {analyzer.GetType().Name}()")
                        .AppendLine("        {")
-                       .AppendLine($"            {analyzer.SupportedDiagnostics[0].Id.Replace("_", string.Empty)}.Run();")
+                       .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
                        .AppendLine("        }");
                 if (!ReferenceEquals(analyzer, AllAnalyzers.Last()))
                 {

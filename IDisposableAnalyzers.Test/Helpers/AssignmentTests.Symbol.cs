@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.value");
-                var ctor = syntaxTree.FindConstructorDeclarationSyntax("Foo(int arg)");
+                var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 Assert.AreEqual(true, AssignmentWalker.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
@@ -64,7 +64,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.value");
-                var ctor = syntaxTree.FindConstructorDeclarationSyntax("Foo()");
+                var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)
@@ -105,7 +105,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.number");
-                var ctor = syntaxTree.FindConstructorDeclarationSyntax("Foo(int arg)");
+                var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)
@@ -142,7 +142,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.number");
-                var ctor = syntaxTree.FindConstructorDeclarationSyntax("Foo()");
+                var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 if (search == Search.Recursive)

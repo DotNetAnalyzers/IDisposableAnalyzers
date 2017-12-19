@@ -1,18 +1,12 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Collections.Immutable;
-
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Diagnostics;
 
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class IDISP002DisposeMember : DiagnosticAnalyzer
+    internal static class IDISP002DisposeMember
     {
         public const string DiagnosticId = "IDISP002";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Dispose member.",
             messageFormat: "Dispose member.",
@@ -21,142 +15,5 @@
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
             description: "Dispose the member as it is assigned with a created `IDisposable`.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
-
-        /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(Descriptor);
-
-        /// <inheritdoc/>
-        public override void Initialize(AnalysisContext context)
-        {
-            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
-            context.RegisterSyntaxNodeAction(HandleDisposeMethod, SyntaxKind.MethodDeclaration);
-        }
-
-        private static void HandleField(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.ContainingSymbol is IFieldSymbol field &&
-                !field.IsStatic &&
-                Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(field, context.SemanticModel, context.CancellationToken))
-            {
-                if (Disposable.IsMemberDisposed(field, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-                {
-                    if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(field, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                }
-            }
-        }
-
-        private static void HandleProperty(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var property = (IPropertySymbol)context.ContainingSymbol;
-            if (property.IsStatic ||
-                property.IsIndexer)
-            {
-                return;
-            }
-
-            var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
-            if (propertyDeclaration.ExpressionBody != null)
-            {
-                return;
-            }
-
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out var setter) &&
-                setter.Body != null)
-            {
-                // Handle the backing field
-                return;
-            }
-
-            if (Disposable.IsAssignedWithCreatedAndNotCachedOrInjected(property, context.SemanticModel, context.CancellationToken))
-            {
-                if (Disposable.IsMemberDisposed(property, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-                {
-                    if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(property, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
-                    {
-                        return;
-                    }
-
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                }
-            }
-        }
-
-        private static void HandleDisposeMethod(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.ContainingSymbol is IMethodSymbol method &&
-                method.IsOverride &&
-                method.Name == "Dispose")
-            {
-                var overridden = method.OverriddenMethod;
-                if (overridden == null)
-                {
-                    return;
-                }
-
-                using (var invocations = InvocationWalker.Borrow(context.Node))
-                {
-                    foreach (var invocation in invocations)
-                    {
-                        if (invocation.TryGetInvokedMethodName(out var name) &&
-                            name != overridden.Name)
-                        {
-                            continue;
-                        }
-
-                        if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
-                        {
-                            return;
-                        }
-                    }
-                }
-
-                if (overridden.DeclaringSyntaxReferences.Length == 0)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                    return;
-                }
-
-                using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
-                {
-                    foreach (var disposeCall in disposeWalker)
-                    {
-                        if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed))
-                        {
-                            var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
-                            if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-                                return;
-                            }
-                        }
-                    }
-                }
-            }
-        }
     }
 }
