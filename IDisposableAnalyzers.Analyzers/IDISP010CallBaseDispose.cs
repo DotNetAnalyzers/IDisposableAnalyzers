@@ -4,7 +4,7 @@
 
     internal static class IDISP010CallBaseDispose
     {
-        public const string DiagnosticId = "IDISP0010";
+        public const string DiagnosticId = "IDISP010";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

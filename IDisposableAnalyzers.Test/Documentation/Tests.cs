@@ -100,11 +100,11 @@
             var builder = new StringBuilder();
             builder.AppendLine("<!-- start generated table -->")
                    .AppendLine("<table>");
-            foreach (var info in DescriptorsWithDocs.OrderBy(x => x.Descriptor.Id))
+            foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor).Distinct().OrderBy(x => x.Id))
             {
                 builder.AppendLine("<tr>");
-                builder.AppendLine($@"  <td><a href=""{info.Descriptor.HelpLinkUri}"">{info.Descriptor.Id}</a></td>");
-                builder.AppendLine($"  <td>{info.Descriptor.Title}</td>");
+                builder.AppendLine($@"  <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>");
+                builder.AppendLine($"  <td>{descriptor.Title}</td>");
                 builder.AppendLine("</tr>");
             }
 

@@ -1,11 +1,11 @@
-# IDISP0010
+# IDISP010
 ## Call base.Dispose(true)
 
 <!-- start generated table -->
 <table>
 <tr>
   <td>CheckId</td>
-  <td>IDISP0010</td>
+  <td>IDISP010</td>
 </tr>
 <tr>
   <td>Severity</td>
@@ -43,21 +43,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP0010 // Call base.Dispose(true)
+#pragma warning disable IDISP010 // Call base.Dispose(true)
 Code violating the rule here
-#pragma warning restore IDISP0010 // Call base.Dispose(true)
+#pragma warning restore IDISP010 // Call base.Dispose(true)
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP0010 // Call base.Dispose(true)
+#pragma warning disable IDISP010 // Call base.Dispose(true)
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP0010:Call base.Dispose(true)", 
+    "IDISP010:Call base.Dispose(true)", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

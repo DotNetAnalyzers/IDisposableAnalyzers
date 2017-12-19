@@ -20,7 +20,6 @@
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {
-            var id = analyzer.SupportedDiagnostics.Single().Id;
             var expectedName = analyzer.GetType().Name + "Benchmarks";
             var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
