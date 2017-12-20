@@ -5,6 +5,10 @@
 
     internal class CodeFix
     {
+        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
+        private static readonly ImplementIDisposableCodeFixProvider CodeFixProvider = new ImplementIDisposableCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP009");
+
         [Test]
         public void AddInterfaceSimple()
         {
@@ -54,7 +58,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.CodeFix<IDISP009IsIDisposable, ImplementIDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -150,7 +154,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.CodeFix<IDISP009IsIDisposable, ImplementIDisposableCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

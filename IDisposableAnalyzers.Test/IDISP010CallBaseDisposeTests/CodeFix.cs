@@ -5,7 +5,11 @@
 
     internal class CodeFix
     {
-        private static readonly string DisposableCode = @"
+        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
+        private static readonly AddBaseCallCodeFixProvider CodeFixProvider = new AddBaseCallCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP010");
+
+        private const string DisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -74,8 +78,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<DisposeMethodAnalyzer, AddBaseCallCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<DisposeMethodAnalyzer, AddBaseCallCodeFixProvider>(new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -117,8 +121,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<DisposeMethodAnalyzer, AddBaseCallCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<DisposeMethodAnalyzer, AddBaseCallCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
         }
     }
 }

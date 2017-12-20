@@ -9,7 +9,9 @@
     internal class DisposeMethodAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP009IsIDisposable.Descriptor,
+            IDISP010CallBaseDispose.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -27,49 +29,65 @@
             }
 
             if (context.ContainingSymbol is IMethodSymbol method &&
-                method.IsOverride &&
-                method.Name == "Dispose")
+                method.Name == "Dispose" &&
+                method.ReturnsVoid)
             {
-                var overridden = method.OverriddenMethod;
-                if (overridden == null)
+                if (method.Parameters.Length == 0 &&
+                    method.GetAttributes().Length == 0 &&
+                    !Disposable.IsAssignableTo(method.ContainingType))
                 {
-                    return;
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
                 }
 
-                using (var invocations = InvocationWalker.Borrow(context.Node))
+                if (method.Parameters.Length == 1 &&
+                    method.Parameters[0].Type == KnownSymbol.Boolean &&
+                    method.IsOverride &&
+                    method.OverriddenMethod is IMethodSymbol overridden)
                 {
-                    foreach (var invocation in invocations)
+                    using (var invocations = InvocationWalker.Borrow(context.Node))
                     {
-                        if (invocation.TryGetInvokedMethodName(out var name) &&
-                            name != overridden.Name)
+                        foreach (var invocation in invocations)
                         {
-                            continue;
-                        }
+                            if (invocation.TryGetInvokedMethodName(out var name) &&
+                                name != overridden.Name)
+                            {
+                                continue;
+                            }
 
-                        if (SymbolComparer.Equals(context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken), overridden))
-                        {
-                            return;
+                            if (SymbolComparer.Equals(
+                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken),
+                                overridden))
+                            {
+                                return;
+                            }
                         }
                     }
-                }
 
-                if (overridden.DeclaringSyntaxReferences.Length == 0)
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
-                    return;
-                }
-
-                using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
-                {
-                    foreach (var disposeCall in disposeWalker)
+                    if (overridden.DeclaringSyntaxReferences.Length == 0)
                     {
-                        if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed))
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
+                        return;
+                    }
+
+                    using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                    {
+                        foreach (var disposeCall in disposeWalker)
                         {
-                            var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
-                            if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                            if (Disposable.TryGetDisposedRootMember(
+                                disposeCall,
+                                context.SemanticModel,
+                                context.CancellationToken,
+                                out var disposed))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
-                                return;
+                                var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
+                                if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                                {
+                                    context.ReportDiagnostic(
+                                        Diagnostic.Create(
+                                            IDISP010CallBaseDispose.Descriptor,
+                                            context.Node.GetLocation()));
+                                    return;
+                                }
                             }
                         }
                     }

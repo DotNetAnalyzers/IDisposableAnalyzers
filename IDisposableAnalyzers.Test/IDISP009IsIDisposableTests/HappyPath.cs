@@ -5,7 +5,7 @@
 
     internal class HappyPath
     {
-        private static readonly IDISP009IsIDisposable Analyzer = new IDISP009IsIDisposable();
+        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         [Test]
         public void DisposingCreatedFieldInVirtualDispose()
