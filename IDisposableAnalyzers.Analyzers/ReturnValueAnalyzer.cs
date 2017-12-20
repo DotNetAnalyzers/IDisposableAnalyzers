@@ -13,7 +13,8 @@
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
-            IDISP011DontReturnDisposed.Descriptor);
+            IDISP011DontReturnDisposed.Descriptor,
+            IDISP012PropertyShouldNotReturnCreated.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -94,9 +95,24 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                 }
-                else if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+                else
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                    if (returnValue.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+                        accessor.IsKind(SyntaxKind.GetAccessorDeclaration))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
+                    }
+
+                    if (returnValue.FirstAncestor<ArrowExpressionClauseSyntax>() is ArrowExpressionClauseSyntax arrow &&
+                        arrow.Parent is PropertyDeclarationSyntax)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
+                    }
+
+                    if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                    }
                 }
             }
         }
