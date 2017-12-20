@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -88,26 +89,22 @@
                           .IsEither(Result.Yes, Result.AssumeYes) &&
                 context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol symbol)
             {
-                foreach (var reference in symbol.DeclaringSyntaxReferences)
-                {
-                    var node = reference.GetSyntax(context.CancellationToken);
-                    if (node?.Parent?.Parent is UsingStatementSyntax)
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
-                        return;
-                    }
-                }
-
-                if (Disposable.IsDisposedBefore(symbol, returnValue, context.SemanticModel, context.CancellationToken))
+                if (IsInUsing(symbol, context.CancellationToken) ||
+                    Disposable.IsDisposedBefore(symbol, returnValue, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                 }
-
-                if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+                else if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
                 }
             }
+        }
+
+        private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
+        {
+            return symbol.TryGetSingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
+                   declaration.Parent?.Parent is UsingStatementSyntax;
         }
 
         private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type)
