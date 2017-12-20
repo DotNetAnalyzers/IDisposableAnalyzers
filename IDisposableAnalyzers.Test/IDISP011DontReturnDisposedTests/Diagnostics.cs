@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadAsObjectExpressionBody()
+        public void ReturnFileOpenReadDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
