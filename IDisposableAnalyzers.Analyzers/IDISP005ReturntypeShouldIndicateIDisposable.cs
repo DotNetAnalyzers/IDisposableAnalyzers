@@ -42,24 +42,17 @@
                 return;
             }
 
-            var symbol = context.ContainingSymbol;
-            if (IsIgnored(symbol))
+            if (IsIgnored(context.ContainingSymbol) ||
+                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
             {
                 return;
             }
 
-            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (context.Node is ReturnStatementSyntax returnStatement &&
+                returnStatement.Expression is ExpressionSyntax expression)
             {
-                return;
+                HandleReturnValue(context, expression);
             }
-
-            var returnStatement = (ReturnStatementSyntax)context.Node;
-            if (returnStatement.Expression == null)
-            {
-                return;
-            }
-
-            HandleReturnValue(context, returnStatement.Expression);
         }
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
@@ -69,24 +62,17 @@
                 return;
             }
 
-            var symbol = context.ContainingSymbol;
-            if (IsIgnored(symbol))
+            if (IsIgnored(context.ContainingSymbol) ||
+                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
             {
                 return;
             }
 
-            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (context.Node is ArrowExpressionClauseSyntax arrowExpressionClause &&
+                arrowExpressionClause.Expression is ExpressionSyntax expression)
             {
-                return;
+                HandleReturnValue(context, expression);
             }
-
-            var arrowClause = (ArrowExpressionClauseSyntax)context.Node;
-            if (arrowClause.Expression == null)
-            {
-                return;
-            }
-
-            HandleReturnValue(context, arrowClause.Expression);
         }
 
         private static void HandleLamdba(SyntaxNodeAnalysisContext context)
@@ -96,25 +82,17 @@
                 return;
             }
 
-            var symbol = context.ContainingSymbol;
-            if (IsIgnored(symbol))
+            if (IsIgnored(context.ContainingSymbol) ||
+                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
             {
                 return;
             }
 
-            if (IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (context.Node is LambdaExpressionSyntax lambda &&
+                lambda.Body is ExpressionSyntax expression)
             {
-                return;
+                HandleReturnValue(context, expression);
             }
-
-            var lambda = context.Node as LambdaExpressionSyntax;
-            var returnValue = lambda?.Body as ExpressionSyntax;
-            if (returnValue == null)
-            {
-                return;
-            }
-
-            HandleReturnValue(context, returnValue);
         }
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
