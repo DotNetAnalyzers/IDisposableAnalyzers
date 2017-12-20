@@ -32,8 +32,7 @@
                 return;
             }
 
-            if (IsIgnored(context.ContainingSymbol) ||
-                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (IsIgnored(context.ContainingSymbol))
             {
                 return;
             }
@@ -52,8 +51,7 @@
                 return;
             }
 
-            if (IsIgnored(context.ContainingSymbol) ||
-                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (IsIgnored(context.ContainingSymbol))
             {
                 return;
             }
@@ -72,8 +70,7 @@
                 return;
             }
 
-            if (IsIgnored(context.ContainingSymbol) ||
-                IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+            if (IsIgnored(context.ContainingSymbol))
             {
                 return;
             }
@@ -106,7 +103,10 @@
                     context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                 }
 
-                context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                }
             }
         }
 
