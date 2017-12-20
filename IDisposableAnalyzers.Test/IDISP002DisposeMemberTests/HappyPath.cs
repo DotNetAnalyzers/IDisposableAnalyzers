@@ -1,16 +1,12 @@
-#pragma warning disable SA1203 // Constants must appear before fields
+﻿#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(FieldDeclarationAnalyzer))]
-    [TestFixture(typeof(PropertyDeclarationAnalyzer))]
-    internal partial class HappyPath<T>
-        where T : DiagnosticAnalyzer, new()
+    internal partial class HappyPath
     {
-        private static readonly T Analyzer = new T();
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox
@@ -300,7 +296,7 @@ namespace RoslynSandbox
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream { get; set; }
+        public Stream Stream { get; private set; }
         
         public void Dispose()
         {
@@ -323,7 +319,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        public Stream Stream { get; private set; } = File.OpenRead(string.Empty);
         
         public void Dispose()
         {

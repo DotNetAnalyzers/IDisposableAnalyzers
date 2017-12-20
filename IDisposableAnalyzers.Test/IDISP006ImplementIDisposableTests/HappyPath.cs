@@ -1,15 +1,9 @@
 ﻿#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
-
-    [TestFixture(typeof(FieldDeclarationAnalyzer))]
-    [TestFixture(typeof(PropertyDeclarationAnalyzer))]
-    internal partial class HappyPath<T>
-        where T : DiagnosticAnalyzer, new()
+    internal partial class HappyPath
     {
-        private static readonly T Analyzer = new T();
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

@@ -7,7 +7,7 @@
     {
         internal class Property
         {
-            private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
@@ -105,6 +105,54 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [TestCase("internal Stream Stream { get; set; }")]
+            [TestCase("public Stream Stream { get; set; }")]
+            [TestCase("public Stream Stream { get; internal set; }")]
+            public void MutablePropertyInSealed(string property)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void InjectedAndCreatedInFactory()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        public Foo(IDisposable bar)
+        {
+            this.Bar = bar;
+        }
+
+        ↓public IDisposable Bar { get; }
+
+        public static Foo Create() => new Foo(new Disposable());
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
         }
     }

@@ -7,7 +7,7 @@
     {
         internal class Property
         {
-            private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly DisposeMemberCodeFixProvider CodeFix = new DisposeMemberCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
@@ -22,7 +22,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        ↓public Stream Stream { get; private set; } = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -38,7 +38,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        public Stream Stream { get; private set; } = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -100,7 +100,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        ↓public object Stream { get; set; } = File.OpenRead(string.Empty);
+        ↓public object Stream { get; private set; } = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        public object Stream { get; set; } = File.OpenRead(string.Empty);
+        public object Stream { get; private set; } = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -183,7 +183,7 @@ namespace RoslynSandbox
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        ↓public Stream Stream { get; set; }
+        ↓public Stream Stream { get; private set; }
 
         public void Dispose()
         {
@@ -204,7 +204,7 @@ namespace RoslynSandbox
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream { get; set; }
+        public Stream Stream { get; private set; }
 
         public void Dispose()
         {

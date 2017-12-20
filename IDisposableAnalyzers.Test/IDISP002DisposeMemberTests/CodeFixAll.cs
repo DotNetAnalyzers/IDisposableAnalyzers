@@ -5,7 +5,7 @@
 
     internal class CodeFixAll
     {
-        private static readonly FieldDeclarationAnalyzer Analyzer = new FieldDeclarationAnalyzer();
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
         private static readonly DisposeMemberCodeFixProvider CodeFix = new DisposeMemberCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 

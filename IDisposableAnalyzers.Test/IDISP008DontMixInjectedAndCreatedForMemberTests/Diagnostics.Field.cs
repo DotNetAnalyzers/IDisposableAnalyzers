@@ -7,7 +7,7 @@
     {
         internal class Field
         {
-            private static readonly FieldDeclarationAnalyzer Analyzer = new FieldDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
@@ -38,6 +38,30 @@ namespace RoslynSandbox
     }
 }";
                 testCode = testCode.AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [TestCase("public Stream Stream")]
+            [TestCase("internal Stream Stream")]
+            public void MutableFieldInSealed(string property)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo : IDisposable
+    {
+        ↓public Stream Stream = File.OpenRead(string.Empty);
+
+        public void Dispose()
+        {
+            this.Stream?.Dispose();
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("public Stream Stream", property);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -157,6 +181,29 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void InjectedAndCreatedViaFactory()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        ↓private readonly IDisposable bar;
+
+        public Foo(IDisposable bar)
+        {
+            this.bar = bar;
+        }
+
+        public static Foo Create() => new Foo(new Disposable());
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
         }
     }

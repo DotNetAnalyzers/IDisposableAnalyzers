@@ -3,8 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    // ReSharper disable once UnusedTypeParameter
-    internal partial class HappyPath<T>
+    internal partial class HappyPath
     {
         internal class Injected
         {
@@ -48,52 +47,6 @@ namespace RoslynSandbox
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
-            }
-
-            [Test]
-            public void IgnoreInjectedAndCreatedField()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public sealed class Foo
-    {
-        private readonly IDisposable bar;
-
-        public Foo(IDisposable bar)
-        {
-            this.bar = bar;
-        }
-
-        public static Foo Create() => new Foo(new Disposable());
-    }
-}";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
-
-            [Test]
-            public void IgnoreInjectedAndCreatedProperty()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public sealed class Foo
-    {
-        public Foo(IDisposable bar)
-        {
-            this.Bar = bar;
-        }
-
-        public IDisposable Bar { get; }
-
-        public static Foo Create() => new Foo(new Disposable());
-    }
-}";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]

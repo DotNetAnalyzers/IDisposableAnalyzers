@@ -7,7 +7,7 @@
     {
         internal class Property
         {
-            private static readonly PropertyDeclarationAnalyzer Analyzer = new PropertyDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly ImplementIDisposableCodeFixProvider CodeFix = new ImplementIDisposableCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 

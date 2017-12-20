@@ -3,8 +3,7 @@
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    // ReSharper disable once UnusedTypeParameter
-    internal partial class HappyPath<T>
+    internal partial class HappyPath
     {
         public class WhenDisposing
         {
@@ -247,7 +246,7 @@ namespace RoslynSandbox
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream { get; set; }
+        public Stream Stream { get; }
         
         public void Dispose()
         {
@@ -270,7 +269,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
+        public Stream Stream { get; private set; } = File.OpenRead(string.Empty);
         
         public void Dispose()
         {

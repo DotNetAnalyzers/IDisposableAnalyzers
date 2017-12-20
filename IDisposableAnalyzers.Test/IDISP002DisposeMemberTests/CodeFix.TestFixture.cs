@@ -7,7 +7,7 @@
     {
         internal class TestFixture
         {
-            private static readonly FieldDeclarationAnalyzer Analyzer = new FieldDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly DisposeInTearDownCodeFixProvider CodeFix = new DisposeInTearDownCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 

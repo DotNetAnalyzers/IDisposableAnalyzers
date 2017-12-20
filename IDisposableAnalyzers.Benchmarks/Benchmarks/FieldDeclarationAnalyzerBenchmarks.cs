@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class FieldDeclarationAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.FieldDeclarationAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.FieldAndPropertyDeclarationAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void RunOnIDisposableAnalyzers()

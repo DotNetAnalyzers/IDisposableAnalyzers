@@ -4,16 +4,15 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(FieldDeclarationAnalyzer))]
-    [TestFixture(typeof(PropertyDeclarationAnalyzer))]
+    [TestFixture(typeof(FieldAndPropertyDeclarationAnalyzer))]
     [TestFixture(typeof(IDISP008DontMixInjectedAndCreatedForMember))]
     internal partial class HappyPath<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
 
-        [TestCase("public Stream Stream")]
-        [TestCase("internal Stream Stream")]
+        [TestCase("private Stream Stream")]
+        [TestCase("protected Stream Stream")]
         public void MutableFieldInSealed(string property)
         {
             var testCode = @"
@@ -24,7 +23,7 @@ namespace RoslynSandbox
 
     public sealed class Foo : IDisposable
     {
-        public Stream Stream = File.OpenRead(string.Empty);
+        private Stream Stream = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -32,12 +31,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("public Stream Stream", property);
+            testCode = testCode.AssertReplace("private Stream Stream", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; protected set; }")]
-        [TestCase("public Stream Stream { get; set; }")]
+        [TestCase("public Stream Stream { get; private set; }")]
         [TestCase("protected Stream Stream { get; set; }")]
         public void MutablePropertyInSealed(string property)
         {

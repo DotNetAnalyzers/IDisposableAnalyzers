@@ -71,8 +71,7 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.Analyzer is PropertyDeclarationAnalyzer ||
-                descriptorInfo.Analyzer is IDISP008DontMixInjectedAndCreatedForMember)
+            if (descriptorInfo.Analyzer is IDISP008DontMixInjectedAndCreatedForMember)
             {
                 return;
             }
