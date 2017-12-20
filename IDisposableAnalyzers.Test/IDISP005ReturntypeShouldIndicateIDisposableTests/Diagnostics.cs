@@ -5,7 +5,7 @@
 
     internal class Diagnostics
     {
-        private static readonly IDISP005ReturntypeShouldIndicateIDisposable Analyzer = new IDISP005ReturntypeShouldIndicateIDisposable();
+        private static readonly ReturnValueAnalyzer Analyzer = new ReturnValueAnalyzer();
 
         [Test]
         public void ReturnFileOpenReadAsObject()
