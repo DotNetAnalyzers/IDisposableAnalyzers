@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -133,6 +133,77 @@ namespace IDisposableAnalyzers
                         }
 
                         return MemberPath.TryFindRootMember(pooled[0], out disposedMember);
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol current)
+            {
+                if (invocation.TryGetInvokedMethodName(out var name) &&
+                    name != "Dispose")
+                {
+                    return false;
+                }
+
+                var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
+                if (invokedSymbol?.Name != "Dispose")
+                {
+                    return false;
+                }
+
+                var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
+                if (statement != null)
+                {
+                    using (var names = IdentifierNameWalker.Borrow(statement))
+                    {
+                        foreach (var identifierName in names.IdentifierNames)
+                        {
+                            if (identifierName.Identifier.ValueText == current.Name &&
+                                SymbolComparer.Equals(current, semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            using (var walker = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            {
+                foreach (var invocation in walker.Invocations)
+                {
+                    if (invocation.IsBeforeInScope(assignment) != Result.Yes)
+                    {
+                        continue;
+                    }
+
+                    if (IsDisposing(invocation, symbol))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            if (assignment is AssignmentExpressionSyntax assignmentExpression &&
+                semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
+                property.TryGetSetter(cancellationToken, out var setter))
+            {
+                using (var pooled = InvocationWalker.Borrow(setter))
+                {
+                    foreach (var invocation in pooled.Invocations)
+                    {
+                        if (IsDisposing(invocation, symbol) ||
+                            IsDisposing(invocation, property))
+                        {
+                            return true;
+                        }
                     }
                 }
             }

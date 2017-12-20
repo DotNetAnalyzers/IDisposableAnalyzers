@@ -11,7 +11,8 @@
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP005ReturntypeShouldIndicateIDisposable.Descriptor);
+            IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
+            IDISP011DontReturnDisposed.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -87,21 +88,22 @@
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.Yes, Result.AssumeYes))
+                          .IsEither(Result.Yes, Result.AssumeYes) &&
+                context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol symbol)
             {
-                var symbol = context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken);
-                if (symbol == null)
-                {
-                    return;
-                }
-
                 foreach (var reference in symbol.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(context.CancellationToken);
                     if (node?.Parent?.Parent is UsingStatementSyntax)
                     {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                         return;
                     }
+                }
+
+                if (Disposable.IsDisposedBefore(symbol, returnValue, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                 }
 
                 context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));

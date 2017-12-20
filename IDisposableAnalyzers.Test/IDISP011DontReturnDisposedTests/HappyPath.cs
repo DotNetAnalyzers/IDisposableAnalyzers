@@ -1,6 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 #pragma warning disable SA1203 // Constants must appear before fields
-namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -948,27 +948,6 @@ namespace RoslynSandbox
 }";
 
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-        }
-
-        [Test]
-        public void ReturningDisposedFromUsing()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        public static object Meh()
-        {
-            using (var disposable = new Disposable())
-            {
-                return disposable;
-            }
-        }
-    }
-}";
-
-            AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic.Create("IDISP005"), DisposableCode, testCode);
         }
     }
 }

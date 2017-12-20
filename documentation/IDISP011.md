@@ -1,11 +1,11 @@
-# IDISP0010
-## Call base.Dispose(true)
+# IDISP011
+## Don't return diposed instance.
 
 <!-- start generated table -->
 <table>
 <tr>
   <td>CheckId</td>
-  <td>IDISP0010</td>
+  <td>IDISP011</td>
 </tr>
 <tr>
   <td>Severity</td>
@@ -17,14 +17,14 @@
 </tr>
 <tr>
   <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/ReturnValueAnalyzer.cs">ReturnValueAnalyzer</a></td>
 </tr>
 </table>
 <!-- end generated table -->
 
 ## Description
 
-Call base.Dispose(true)
+Don't return diposed instance.
 
 ## Motivation
 
@@ -43,21 +43,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP0010 // Call base.Dispose(true)
+#pragma warning disable IDISP011 // Don't return diposed instance.
 Code violating the rule here
-#pragma warning restore IDISP0010 // Call base.Dispose(true)
+#pragma warning restore IDISP011 // Don't return diposed instance.
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP0010 // Call base.Dispose(true)
+#pragma warning disable IDISP011 // Don't return diposed instance.
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP0010:Call base.Dispose(true)", 
+    "IDISP011:Don't return diposed instance.", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

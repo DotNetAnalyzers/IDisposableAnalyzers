@@ -48,6 +48,10 @@ Roslyn analyzers for IDisposable
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP010.md">IDISP010</a></td>
   <td>Call base.Dispose(true)</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP011.md">IDISP011</a></td>
+  <td>Don't return diposed instance.</td>
+</tr>
 <table>
 <!-- end generated table -->
 
