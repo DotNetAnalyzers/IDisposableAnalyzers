@@ -84,6 +84,46 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void PropertyReturningNewTimespan()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        public TimeSpan Value
+        {
+            get
+            {
+                return new TimeSpan(1);
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void PropertyReturningNewTimespanExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        public TimeSpan Value => new TimeSpan(1);
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void PropertyReturningBackingFieldExpressionBody()
         {
             var testCode = @"
