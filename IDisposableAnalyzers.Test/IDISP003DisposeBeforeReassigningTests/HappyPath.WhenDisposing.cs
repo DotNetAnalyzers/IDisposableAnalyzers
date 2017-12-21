@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -257,6 +257,147 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void AssigningFieldInLambda()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private Disposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable?.Dispose();
+                this.disposable = new Disposable();
+            });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void AssigningBackingFieldInLambda()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private IDisposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable?.Dispose();
+                this.Disposable = new Disposable();
+            });
+        }
+
+        public IDisposable Disposable
+        {
+            get { return this.disposable; }
+            private set { this.disposable = value; }
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void AssigningSerialDisposableBackingFieldInLambda()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private readonly SerialDisposable disposable = new SerialDisposable();
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.Disposable = new Disposable();
+            });
+        }
+
+        public IDisposable Disposable
+        {
+            get { return this.disposable.Disposable; }
+            private set { this.disposable.Disposable = value; }
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void AssigningSerialDisposableFieldInLambda()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private readonly SerialDisposable disposable = new SerialDisposable();
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable.Disposable = new Disposable();
+            });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
         }
     }
 }
