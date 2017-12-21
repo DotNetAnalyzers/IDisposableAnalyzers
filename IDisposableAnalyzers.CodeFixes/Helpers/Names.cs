@@ -1,6 +1,7 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
+    using System.Diagnostics;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -48,7 +49,8 @@ namespace IDisposableAnalyzers
         {
             foreach (var tree in semanticModel.Compilation.SyntaxTrees)
             {
-                if (tree.FilePath.EndsWith(".g.i.cs"))
+                if (tree.FilePath.EndsWith(".g.i.cs") ||
+                    tree.FilePath.EndsWith(".g.cs"))
                 {
                     continue;
                 }
