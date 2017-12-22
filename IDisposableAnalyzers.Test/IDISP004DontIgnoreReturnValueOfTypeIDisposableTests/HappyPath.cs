@@ -200,7 +200,7 @@ namespace RoslynSandbox
 
     public static class Foo
     {
-        public async Task<string> BarAsync()
+        public static async Task<string> BarAsync()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -241,7 +241,7 @@ namespace RoslynSandbox
 
     public static class Foo
     {
-        public async Task<string> BarAsync()
+        public static async Task<string> BarAsync()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
