@@ -105,6 +105,18 @@
                         }
                     }
 
+                    var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
+                    if (method == null)
+                    {
+                        return false;
+                    }
+
+                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        return method.ReturnsVoid ||
+                               !Disposable.IsAssignableTo(method.ReturnType);
+                    }
+
                     return true;
                 }
 
