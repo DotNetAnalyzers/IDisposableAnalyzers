@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -812,6 +812,39 @@ namespace RoslynSandbox
             }
 
             this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void LazyAssigningSingleAssignmentDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Lazy<int> lazy;
+        private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
+
+        public Foo(IObservable<object> observable)
+        {
+            this.lazy = new Lazy<int>(
+                () =>
+                {
+                    disposable.Disposable = new Disposable();
+                    return 1;
+                });
+        }
+
+        public void Dispose()
+        {
             this.disposable?.Dispose();
         }
     }

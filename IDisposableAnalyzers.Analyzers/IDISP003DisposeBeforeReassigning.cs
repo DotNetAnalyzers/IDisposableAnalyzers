@@ -55,7 +55,8 @@
                 return;
             }
 
-            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable)
+            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable ||
+                assignedSymbol == KnownSymbol.SingleAssignmentDisposable.Disposable)
             {
                 return;
             }
