@@ -409,62 +409,6 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
-
-            [Test]
-            public void ChainedExtensionMethod()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo
-    {
-        public void Bar(int i)
-        {
-            using (i.AsDisposable().AsDisposable())
-            {
-            }
-        }
-    }
-}";
-                var extCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public static class Ext
-    {
-        public static IDisposable AsDisposable(this int i) => new Disposable();
-
-        public static IDisposable AsDisposable(this IDisposable d) => new WrappingDisposable(d);
-    }
-}";
-
-                var wrappingDisposableCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public sealed class WrappingDisposable : IDisposable
-    {
-        private readonly IDisposable inner;
-
-        public WrappingDisposable(IDisposable inner)
-        {
-            this.inner = inner;
-        }
-
-        public void Dispose()
-        {
-#pragma warning disable IDISP007 // Don't dispose injected.
-            this.inner.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
-        }
-    }
-}";
-                AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
-            }
         }
     }
 }

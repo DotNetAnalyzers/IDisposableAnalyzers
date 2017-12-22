@@ -96,13 +96,8 @@
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
             {
-                if (memberAccess.Expression is InvocationExpressionSyntax invocation)
-                {
-                    return Disposable.IsArgumentDisposedByExtensionMethodReturnValue(invocation, semanticModel, cancellationToken)
-                                     .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
-                }
-
-                return true;
+                return Disposable.IsArgumentDisposedByExtensionMethodReturnValue(memberAccess, semanticModel, cancellationToken)
+                                 .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
             }
 
             return false;

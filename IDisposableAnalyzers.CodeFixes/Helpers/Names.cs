@@ -1,7 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
-    using System.Diagnostics;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;

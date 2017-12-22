@@ -6,10 +6,11 @@
 
     internal static partial class Disposable
     {
-        internal static Result IsArgumentDisposedByExtensionMethodReturnValue(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        internal static Result IsArgumentDisposedByExtensionMethodReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
         {
-            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
-                method.IsExtensionMethod)
+            if (semanticModel.GetSymbolSafe(memberAccess, cancellationToken) is IMethodSymbol method &&
+                method.IsExtensionMethod &&
+                method.ReducedFrom is IMethodSymbol reducedFrom)
             {
                 if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -19,16 +20,16 @@
                         : Result.AssumeYes;
                 }
 
-                using (var returnWalker = ReturnValueWalker.Borrow(invocation, Search.Recursive, semanticModel, cancellationToken))
+                using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
                 {
                     using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
                     {
-                        if (!visited.Add(invocation))
+                        if (!visited.Add(memberAccess))
                         {
                             return Result.Unknown;
                         }
 
-                        var parameter = method.Parameters[0];
+                        var parameter = reducedFrom.Parameters[0];
                         foreach (var returnValue in returnWalker)
                         {
                             if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
@@ -43,10 +44,9 @@
                                 return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                             }
 
-                            if (returnValue is MemberAccessExpressionSyntax memberAccess &&
-                                memberAccess.Expression is InvocationExpressionSyntax extensionInvocation)
+                            if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
                             {
-                                return IsArgumentDisposedByExtensionMethodReturnValue(extensionInvocation, semanticModel, cancellationToken, visited);
+                                return IsArgumentDisposedByExtensionMethodReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
                             }
                         }
                     }
@@ -98,10 +98,9 @@
                                     return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                                 }
 
-                                if (returnValue is MemberAccessExpressionSyntax memberAccess &&
-                                    memberAccess.Expression is InvocationExpressionSyntax extensionInvocation)
+                                if (returnValue is MemberAccessExpressionSyntax memberAccess)
                                 {
-                                    return IsArgumentDisposedByExtensionMethodReturnValue(extensionInvocation, semanticModel, cancellationToken, visited);
+                                    return IsArgumentDisposedByExtensionMethodReturnValue(memberAccess, semanticModel, cancellationToken, visited);
                                 }
                             }
                         }
