@@ -641,5 +641,134 @@ namespace RoslynSandbox
             // Not implementing the fix for now, not a common case.
             AnalyzerAssert.NoFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode);
         }
+
+        [Test]
+        public void AssigningFieldInLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private Disposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                ↓this.disposable = new Disposable();
+            });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private Disposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable?.Dispose();
+                this.disposable = new Disposable();
+            });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+        }
+
+        [Test]
+        public void AssigningBackingFieldInLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private IDisposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                ↓this.Disposable = new Disposable();
+            });
+        }
+
+        public IDisposable Disposable
+        {
+            get { return this.disposable; }
+            private set { this.disposable = value; }
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private IDisposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable?.Dispose();
+                this.Disposable = new Disposable();
+            });
+        }
+
+        public IDisposable Disposable
+        {
+            get { return this.disposable; }
+            private set { this.disposable = value; }
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+        }
     }
 }
