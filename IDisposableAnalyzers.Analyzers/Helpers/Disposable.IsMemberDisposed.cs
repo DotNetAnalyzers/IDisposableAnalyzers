@@ -213,7 +213,6 @@
                 }
             }
 
-
             if (assignment is AssignmentExpressionSyntax assignmentExpression &&
                 semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
                 property.TryGetSetter(cancellationToken, out var setter))

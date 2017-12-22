@@ -110,7 +110,7 @@
 
                 if (argumentList.Parent is ObjectCreationExpressionSyntax)
                 {
-                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out ISymbol member, out IMethodSymbol ctor) &&
+                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out var member, out var ctor) &&
                         member != null)
                     {
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
@@ -119,7 +119,7 @@
                             if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
-                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out IMethodSymbol disposeMethod))
+                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out var disposeMethod))
                                 {
                                     return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
                                 }
@@ -135,8 +135,17 @@
                         return true;
                     }
 
-                    return ctor?.ContainingType != KnownSymbol.StreamReader &&
-                           ctor?.ContainingType != KnownSymbol.CompositeDisposable;
+                    if (ctor == null)
+                    {
+                        return false;
+                    }
+
+                    if (ctor.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        return !Disposable.IsAssignableTo(ctor.ContainingType);
+                    }
+
+                    return true;
                 }
             }
 
@@ -190,13 +199,13 @@
                     continue;
                 }
 
-                if (!methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax paremeter))
+                if (!methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
                 {
                     continue;
                 }
 
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
-                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out AssignmentExpressionSyntax assignment))
+                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out var assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||
