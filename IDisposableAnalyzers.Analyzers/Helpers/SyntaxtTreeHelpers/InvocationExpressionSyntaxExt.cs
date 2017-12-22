@@ -53,6 +53,18 @@
                    name == "nameof";
         }
 
+        internal static bool TryGetMatchingArgument(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, out ArgumentSyntax argument)
+        {
+            if (invocation?.ArgumentList == null ||
+                parameter == null)
+            {
+                argument = null;
+                return false;
+            }
+
+            return invocation.ArgumentList.TryGetMatchingArgument(parameter, out argument);
+        }
+
         internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
         {
             if (invocation?.ArgumentList == null ||
@@ -75,17 +87,15 @@
 
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
             {
-                foreach (var reference in method.DeclaringSyntaxReferences)
+                if (argument.NameColon is NameColonSyntax nameColon &&
+                    nameColon.Name is IdentifierNameSyntax name)
                 {
-                    if (reference.GetSyntax(cancellationToken) is MethodDeclarationSyntax methodDeclaration)
-                    {
-                        if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameterSyntax))
-                        {
-                            parameter = semanticModel.GetDeclaredSymbolSafe(parameterSyntax, cancellationToken);
-                            return parameter != null;
-                        }
-                    }
+                    return method.Parameters.TryGetSingle(x => x.Name == name.Identifier.ValueText, out parameter);
                 }
+
+                return method.Parameters.TryGetAtIndex(
+                    invocation.ArgumentList.Arguments.IndexOf(argument),
+                    out parameter);
             }
 
             return false;

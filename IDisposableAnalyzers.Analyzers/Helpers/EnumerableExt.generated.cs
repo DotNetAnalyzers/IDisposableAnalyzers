@@ -15,7 +15,8 @@
                 return false;
             }
 
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -145,7 +146,8 @@
         internal static bool TryGetAtIndex<T>(this ImmutableArray<T> source, int index, out T result)
         {
             result = default(T);
-            if (source.Length <= index)
+            if (index < 0 ||
+                source.Length <= index)
             {
                 return false;
             }
@@ -245,7 +247,8 @@
         internal static bool TryGetAtIndex(this ChildSyntaxList source, int index, out SyntaxNodeOrToken result)
         {
             result = default(SyntaxNodeOrToken);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -346,7 +349,8 @@
             where T : SyntaxNode
         {
             result = default(T);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -453,7 +457,8 @@
             where T : SyntaxNode
         {
             result = default(T);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -559,7 +564,8 @@
         internal static bool TryGetAtIndex(this SyntaxNodeOrTokenList source, int index, out SyntaxNodeOrToken result)
         {
             result = default(SyntaxNodeOrToken);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -659,7 +665,8 @@
         internal static bool TryGetAtIndex(this SyntaxTokenList source, int index, out SyntaxToken result)
         {
             result = default(SyntaxToken);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }
@@ -759,7 +766,8 @@
         internal static bool TryGetAtIndex(this SyntaxTriviaList source, int index, out SyntaxTrivia result)
         {
             result = default(SyntaxTrivia);
-            if (source.Count <= index)
+            if (index < 0 ||
+                source.Count <= index)
             {
                 return false;
             }

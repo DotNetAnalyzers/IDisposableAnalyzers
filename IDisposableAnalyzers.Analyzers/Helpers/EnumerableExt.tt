@@ -36,7 +36,8 @@ namespace IDisposableAnalyzers
         {
             result = default(<#= itemName #>);
 <# this.WriteLineIfNullReturnFalse(types); #>
-            if (source.<#= count #> <= index)
+            if (index < 0 ||
+                source.<#= count #> <= index)
             {
                 return false;
             }

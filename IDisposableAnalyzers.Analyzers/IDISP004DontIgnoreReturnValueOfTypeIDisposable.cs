@@ -83,163 +83,26 @@
                 return false;
             }
 
-            if (node.Parent is StatementSyntax ||
-                node.Parent is MemberAccessExpressionSyntax)
+            if (node.Parent is StatementSyntax)
             {
                 return true;
             }
 
-            if (node.Parent is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList)
+            if (node.Parent is ArgumentSyntax argument)
             {
-                if (argumentList.Parent is InvocationExpressionSyntax invocation)
-                {
-                    using (var returnWalker = ReturnValueWalker.Borrow(invocation, Search.Recursive, semanticModel, cancellationToken))
-                    {
-                        foreach (var returnValue in returnWalker)
-                        {
-                            if (!MustBeHandled(returnValue, semanticModel, cancellationToken))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
-                    var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
-                    if (method == null)
-                    {
-                        return false;
-                    }
-
-                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        return method.ReturnsVoid ||
-                               !Disposable.IsAssignableTo(method.ReturnType);
-                    }
-
-                    return true;
-                }
-
-                if (argumentList.Parent is ObjectCreationExpressionSyntax)
-                {
-                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out var member, out var ctor) &&
-                        member != null)
-                    {
-                        var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
-                        if (initializer != null)
-                        {
-                            if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
-                                chainedCtor.ContainingType != member.ContainingType)
-                            {
-                                if (Disposable.TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out var disposeMethod))
-                                {
-                                    return !Disposable.IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken);
-                                }
-                            }
-                        }
-
-                        if (Disposable.IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken)
-                                      .IsEither(Result.Yes, Result.AssumeYes))
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    }
-
-                    if (ctor == null)
-                    {
-                        return false;
-                    }
-
-                    if (ctor.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        return !Disposable.IsAssignableTo(ctor.ContainingType);
-                    }
-
-                    return true;
-                }
+                return Disposable.IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken)
+                                 .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
             }
 
-            return false;
-        }
-
-        private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
-        {
-            var objectCreation = argument.FirstAncestor<ObjectCreationExpressionSyntax>();
-            if (objectCreation != null)
+            if (node.Parent is MemberAccessExpressionSyntax memberAccess)
             {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
-                return ctor != null;
-            }
-
-            var initializer = argument.FirstAncestor<ConstructorInitializerSyntax>();
-            if (initializer != null)
-            {
-                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken);
-                return ctor != null;
-            }
-
-            ctor = null;
-            return false;
-        }
-
-        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member, out IMethodSymbol ctor)
-        {
-            if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor))
-            {
-                return TryGetAssignedFieldOrProperty(argument, ctor, semanticModel, cancellationToken, out member);
-            }
-
-            member = null;
-            return false;
-        }
-
-        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member)
-        {
-            member = null;
-            if (method == null)
-            {
-                return false;
-            }
-
-            foreach (var reference in method.DeclaringSyntaxReferences)
-            {
-                var methodDeclaration = reference.GetSyntax(cancellationToken) as BaseMethodDeclarationSyntax;
-                if (methodDeclaration == null)
+                if (memberAccess.Expression is InvocationExpressionSyntax invocation)
                 {
-                    continue;
+                    return Disposable.IsArgumentDisposedByExtensionMethodReturnValue(invocation, semanticModel, cancellationToken)
+                                     .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
                 }
 
-                if (!methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
-                {
-                    continue;
-                }
-
-                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
-                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out var assignment))
-                {
-                    member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-                    if (member is IFieldSymbol ||
-                        member is IPropertySymbol)
-                    {
-                        return true;
-                    }
-                }
-
-                var ctor = reference.GetSyntax(cancellationToken) as ConstructorDeclarationSyntax;
-                if (ctor?.Initializer != null)
-                {
-                    foreach (var arg in ctor.Initializer.ArgumentList.Arguments)
-                    {
-                        var argSymbol = semanticModel.GetSymbolSafe(arg.Expression, cancellationToken);
-                        if (parameterSymbol.Equals(argSymbol))
-                        {
-                            var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
-                            return TryGetAssignedFieldOrProperty(arg, chained, semanticModel, cancellationToken, out member);
-                        }
-                    }
-                }
+                return true;
             }
 
             return false;

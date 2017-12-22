@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
 
@@ -45,7 +45,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (TryGetMatchingArgument(arguments, parameter, out ArgumentSyntax argument))
+            if (TryGetMatchingArgument(arguments, parameter, out var argument))
             {
                 value = argument.Expression;
                 return value != null;
