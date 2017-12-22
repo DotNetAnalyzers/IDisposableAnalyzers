@@ -6,53 +6,60 @@
 
     internal static partial class Disposable
     {
-        internal static Result IsArgumentDisposedByExtensionMethodReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
         {
-            if (semanticModel.GetSymbolSafe(memberAccess, cancellationToken) is IMethodSymbol method &&
-                method.IsExtensionMethod &&
-                method.ReducedFrom is IMethodSymbol reducedFrom)
+            if (semanticModel.GetSymbolSafe(memberAccess, cancellationToken) is IMethodSymbol method)
             {
-                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                if (method.IsExtensionMethod &&
+                    method.ReducedFrom is IMethodSymbol reducedFrom)
                 {
-                    return method.ReturnsVoid ||
-                           !IsAssignableTo(method.ReturnType)
-                        ? Result.No
-                        : Result.AssumeYes;
-                }
-
-                using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
-                {
-                    using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
-                        if (!visited.Add(memberAccess))
-                        {
-                            return Result.Unknown;
-                        }
+                        return method.ReturnsVoid ||
+                               !IsAssignableTo(method.ReturnType)
+                            ? Result.No
+                            : Result.AssumeYes;
+                    }
 
-                        var parameter = reducedFrom.Parameters[0];
-                        foreach (var returnValue in returnWalker)
+                    using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
+                    {
+                        using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
                         {
-                            if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
-                                nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                            if (!visited.Add(memberAccess))
                             {
-                                return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                                return Result.Unknown;
                             }
 
-                            if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                                nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
+                            var parameter = reducedFrom.Parameters[0];
+                            foreach (var returnValue in returnWalker)
                             {
-                                return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                            }
+                                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
+                                    nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                                {
+                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                                }
 
-                            if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
-                            {
-                                return IsArgumentDisposedByExtensionMethodReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                                if (returnValue is InvocationExpressionSyntax nestedInvocation &&
+                                    nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
+                                {
+                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                                }
+
+                                if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
+                                {
+                                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                                }
                             }
                         }
                     }
+
+                    return Result.No;
                 }
 
-                return Result.No;
+                if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
+                {
+                    return Result.Yes;
+                }
             }
 
             return Result.Unknown;
@@ -100,7 +107,7 @@
 
                                 if (returnValue is MemberAccessExpressionSyntax memberAccess)
                                 {
-                                    return IsArgumentDisposedByExtensionMethodReturnValue(memberAccess, semanticModel, cancellationToken, visited);
+                                    return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken, visited);
                                 }
                             }
                         }
