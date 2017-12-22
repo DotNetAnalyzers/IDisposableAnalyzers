@@ -310,6 +310,59 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void MatehodReturningStreamReader()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public string Bar()
+        {
+            using (var reader = GetReader(File.OpenRead(string.Empty)))
+            {
+                return reader.ReadLine();
+            }
+        }
+
+        private static StreamReader GetReader(Stream stream)
+        {
+            return new StreamReader(stream);
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void MatehodReturningStreamReaderExpressionBody()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public string Bar()
+        {
+            using (var reader = GetReader(File.OpenRead(string.Empty)))
+            {
+                return reader.ReadLine();
+            }
+        }
+
+        private static StreamReader GetReader(Stream stream) => new StreamReader(stream);
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
             public void MatehodWithFuncTaskAsParameter()
             {
                 var testCode = @"
