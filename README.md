@@ -87,15 +87,16 @@ Install-Package IDisposableAnalyzers
 
 ## Updating
 
-The ruleset editor does not handle changes IDs well, if things get out of sync you can try:
+The ruleset editor does not handle changed IDs well, if things get out of sync you can try:
 
 1) Close visual studio.
 2) Edit the ProjectName.rulset file and remove the IDisposableAnalyzers element.
 3) Start visual studio and add back the desired configuration.
 
-Above is not ideal, sorry about this. Not sure this is our bug.
+Above is not ideal, sorry about this. Not sure if this is our bug.
 
 
 ## Current status
 
-Early alpha, names and IDs may change.
+Early alpha, finds bugs in the code but there are also bugs in the analyzer. The analyzer will probably never be perfect as it is a pretty hard problem to solve but we can imporve it one testcase at the time.
+Write issues for places where it should warn but does not or where it warns where there is no bug.
