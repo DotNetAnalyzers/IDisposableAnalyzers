@@ -1,9 +1,10 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed class AssignmentWalker : ExecutionWalker<AssignmentWalker>
@@ -112,6 +113,17 @@
                     {
                         if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(conditional.WhenTrue, cancellationToken)) ||
                             SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(conditional.WhenFalse, cancellationToken)))
+                        {
+                            assignment = candidate;
+                            return true;
+                        }
+                    }
+
+                    if (candidate.Right is BinaryExpressionSyntax binary &&
+                        binary.IsKind(SyntaxKind.CoalesceExpression))
+                    {
+                        if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(binary.Left, cancellationToken)) ||
+                            SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(binary.Right, cancellationToken)))
                         {
                             assignment = candidate;
                             return true;

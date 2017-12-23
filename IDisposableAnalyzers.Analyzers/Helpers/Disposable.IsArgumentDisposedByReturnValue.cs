@@ -236,11 +236,6 @@ namespace IDisposableAnalyzers
                     initializer.ArgumentList.Arguments.TryGetSingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == paremeter.Identifier.ValueText, out var chainedArgument))
                 {
                     var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
-                    if (!IsAssignableTo(chained.ContainingType))
-                    {
-                        return false;
-                    }
-
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
                 }
             }

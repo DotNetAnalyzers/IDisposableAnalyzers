@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -25,6 +25,37 @@ namespace RoslynSandbox
         private Foo(IDisposable disposable)
         {
             this.Disposable = disposable;
+        }
+
+        public IDisposable Disposable { get; }
+
+        public void Dispose()
+        {
+            this.Disposable.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            }
+
+            [Test]
+            public void ChainedCtorCoalesce()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        public Foo()
+            : this(new Disposable())
+        {
+        }
+
+        private Foo(IDisposable disposable)
+        {
+            this.Disposable = disposable ?? disposable;
         }
 
         public IDisposable Disposable { get; }
