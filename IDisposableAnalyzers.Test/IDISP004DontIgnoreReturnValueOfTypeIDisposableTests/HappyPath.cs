@@ -1,4 +1,4 @@
-﻿#pragma warning disable SA1203 // Constants must appear before fields
+#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
@@ -190,7 +190,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReadAsync()
+        public void ReadAsyncCall()
         {
             var testCode = @"
 namespace RoslynSandbox
