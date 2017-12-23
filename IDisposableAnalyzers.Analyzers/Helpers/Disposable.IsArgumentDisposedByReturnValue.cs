@@ -151,24 +151,24 @@ namespace IDisposableAnalyzers
                     {
                         switch (CheckReturnValue(returnValue))
                         {
-                            case Result.Unknown:
-                                return Result.Unknown;
-                            case Result.Yes:
-                                if (result == Result.No)
-                                {
-                                    result = Result.Yes;
-                                }
+                        case Result.Unknown:
+                            return Result.Unknown;
+                        case Result.Yes:
+                            if (result == Result.No)
+                            {
+                                result = Result.Yes;
+                            }
 
-                                break;
-                            case Result.AssumeYes:
-                                result = Result.AssumeYes;
-                                break;
-                            case Result.No:
-                                return Result.No;
-                            case Result.AssumeNo:
-                                return Result.AssumeNo;
-                            default:
-                                throw new ArgumentOutOfRangeException();
+                            break;
+                        case Result.AssumeYes:
+                            result = Result.AssumeYes;
+                            break;
+                        case Result.No:
+                            return Result.No;
+                        case Result.AssumeNo:
+                            return Result.AssumeNo;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
@@ -216,19 +216,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            foreach (var reference in method.DeclaringSyntaxReferences)
+            if (method.TryGetSingleDeclaration<BaseMethodDeclarationSyntax>(cancellationToken, out var methodDeclaration) &&
+                methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
             {
-                var methodDeclaration = reference.GetSyntax(cancellationToken) as BaseMethodDeclarationSyntax;
-                if (methodDeclaration == null)
-                {
-                    continue;
-                }
-
-                if (!methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
-                {
-                    continue;
-                }
-
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
                 if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out var assignment))
                 {
@@ -240,10 +230,10 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                var ctor = reference.GetSyntax(cancellationToken) as ConstructorDeclarationSyntax;
-                if (ctor?.Initializer != null)
+                if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
+                    ctor.Initializer is ConstructorInitializerSyntax initializer)
                 {
-                    foreach (var arg in ctor.Initializer.ArgumentList.Arguments)
+                    foreach (var arg in initializer.ArgumentList.Arguments)
                     {
                         var argSymbol = semanticModel.GetSymbolSafe(arg.Expression, cancellationToken);
                         if (parameterSymbol.Equals(argSymbol))
