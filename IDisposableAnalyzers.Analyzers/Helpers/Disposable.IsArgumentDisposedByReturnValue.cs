@@ -9,27 +9,33 @@ namespace IDisposableAnalyzers
     {
         internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
         {
-            if (semanticModel.GetSymbolSafe(memberAccess, cancellationToken) is IMethodSymbol method)
+            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            if (symbol is IMethodSymbol method)
             {
-                if (method.IsExtensionMethod &&
-                    method.ReducedFrom is IMethodSymbol reducedFrom)
-                {
-                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        return method.ReturnsVoid ||
-                               !IsAssignableTo(method.ReturnType)
-                            ? Result.No
-                            : Result.AssumeYes;
-                    }
-
-                    var parameter = reducedFrom.Parameters[0];
-                    return CheckReturnValues(parameter, memberAccess, semanticModel, cancellationToken, visited);
-                }
-
                 if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
                 {
                     return Result.Yes;
                 }
+
+                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                {
+                    return method.ReturnsVoid ||
+                           !IsAssignableTo(method.ReturnType)
+                        ? Result.No
+                        : Result.AssumeYes;
+                }
+
+                if (method.IsExtensionMethod &&
+                    method.ReducedFrom is IMethodSymbol reducedFrom)
+                {
+                    var parameter = reducedFrom.Parameters[0];
+                    return CheckReturnValues(parameter, memberAccess, semanticModel, cancellationToken, visited);
+                }
+            }
+
+            if (symbol.IsEither<IFieldSymbol, IPropertySymbol>())
+            {
+                return Result.No;
             }
 
             return Result.Unknown;
@@ -103,16 +109,24 @@ namespace IDisposableAnalyzers
         {
             Result CheckReturnValue(ExpressionSyntax returnValue)
             {
-                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
-                    nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
                 {
-                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    {
+                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    }
+
+                    return Result.No;
                 }
 
-                if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                    nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
+                if (returnValue is InvocationExpressionSyntax nestedInvocation)
                 {
-                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    {
+                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    }
+
+                    return Result.No;
                 }
 
                 if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)

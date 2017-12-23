@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-            context.EnableConcurrentExecution();
+            //context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression);
         }
 
@@ -82,13 +82,13 @@ namespace IDisposableAnalyzers
             if (node.Parent is ArgumentSyntax argument)
             {
                 return Disposable.IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken)
-                                 .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
+                                 .IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
             {
                 return Disposable.IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken)
-                                 .IsEither(Result.No, Result.AssumeNo, Result.Unknown);
+                                 .IsEither(Result.No, Result.AssumeNo);
             }
 
             return false;

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -420,6 +420,28 @@ namespace RoslynSandbox
         }
     }
 }";
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
+        }
+
+        [Test]
+        public void NoFixForArgument()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        internal static string Bar()
+        {
+            return Meh(↓File.OpenRead(string.Empty));
+        }
+
+        private static string Meh(Stream stream) => stream.ToString();
+    }
+}";
+
             AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
     }
