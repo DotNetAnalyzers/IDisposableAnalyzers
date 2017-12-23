@@ -204,6 +204,28 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void ReturnsCompositeDisposableInitializer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public class Foo
+    {
+        internal static IDisposable Create()
+        {
+            var disposable1 = new Disposable();
+            var disposable2 = new Disposable();
+            return new CompositeDisposable(2) { disposable1, disposable2 };
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
