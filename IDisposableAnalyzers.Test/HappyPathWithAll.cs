@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test
+namespace IDisposableAnalyzers.Test
 {
     using System;
     using System.Collections.Immutable;
@@ -110,6 +110,7 @@ namespace RoslynSandbox
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
+        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
 
         private IDisposable meh1;
         private IDisposable meh2;
@@ -181,6 +182,12 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.subscription.Dispose();
+            this.compositeDisposable.Dispose();
+        }
+
+        internal string AddAndReturnToString()
+        {
+            return this.compositeDisposable.AddAndReturn(new Disposable()).ToString();
         }
     }
 }";
@@ -388,6 +395,26 @@ namespace RoslynSandbox
         }
     }
 }";
+            var compositeDisposableExtCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public static class CompositeDisposableExt
+    {
+        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+            where T : IDisposable
+        {
+            if (item != null)
+            {
+                disposable.Add(item);
+            }
+
+            return item;
+        }
+    }
+}";
             var sources = new[]
                           {
                               disposableCode,
@@ -399,6 +426,7 @@ namespace RoslynSandbox
                               reactiveCode,
                               lazyCode,
                               asyncCode,
+                              compositeDisposableExtCode,
                           };
             AnalyzerAssert.Valid(analyzer, sources);
         }
