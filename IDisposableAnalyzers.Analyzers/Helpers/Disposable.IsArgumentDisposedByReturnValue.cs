@@ -151,24 +151,24 @@ namespace IDisposableAnalyzers
                     {
                         switch (CheckReturnValue(returnValue))
                         {
-                        case Result.Unknown:
-                            return Result.Unknown;
-                        case Result.Yes:
-                            if (result == Result.No)
-                            {
-                                result = Result.Yes;
-                            }
+                            case Result.Unknown:
+                                return Result.Unknown;
+                            case Result.Yes:
+                                if (result == Result.No)
+                                {
+                                    result = Result.Yes;
+                                }
 
-                            break;
-                        case Result.AssumeYes:
-                            result = Result.AssumeYes;
-                            break;
-                        case Result.No:
-                            return Result.No;
-                        case Result.AssumeNo:
-                            return Result.AssumeNo;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                                break;
+                            case Result.AssumeYes:
+                                result = Result.AssumeYes;
+                                break;
+                            case Result.No:
+                                return Result.No;
+                            case Result.AssumeNo:
+                                return Result.AssumeNo;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 }
@@ -231,17 +231,17 @@ namespace IDisposableAnalyzers
                 }
 
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
-                    ctor.Initializer is ConstructorInitializerSyntax initializer)
+                    ctor.Initializer is ConstructorInitializerSyntax initializer &&
+                    initializer.ArgumentList != null &&
+                    initializer.ArgumentList.Arguments.TryGetSingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == paremeter.Identifier.ValueText, out var chainedArgument))
                 {
-                    foreach (var arg in initializer.ArgumentList.Arguments)
+                    var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
+                    if (!IsAssignableTo(chained.ContainingType))
                     {
-                        var argSymbol = semanticModel.GetSymbolSafe(arg.Expression, cancellationToken);
-                        if (parameterSymbol.Equals(argSymbol))
-                        {
-                            var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
-                            return TryGetAssignedFieldOrProperty(arg, chained, semanticModel, cancellationToken, out member);
-                        }
+                        return false;
                     }
+
+                    return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
                 }
             }
 
