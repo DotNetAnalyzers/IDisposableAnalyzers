@@ -39,7 +39,7 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                    if (statement.Parent is BlockSyntax block)
+                    if (statement?.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
@@ -51,7 +51,7 @@ namespace IDisposableAnalyzers
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
                 {
                     var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement.Parent is BlockSyntax block)
+                    if (statement?.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
