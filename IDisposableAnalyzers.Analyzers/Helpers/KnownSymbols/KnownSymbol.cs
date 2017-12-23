@@ -44,6 +44,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType FlagsAttribute = Create("System.FlagsAttribute");
 
         internal static readonly StringBuilderType StringBuilder = new StringBuilderType();
+        internal static readonly ResourceManagerType ResourceManager = new ResourceManagerType();
 
         internal static readonly TextReaderType TextReader = new TextReaderType();
         internal static readonly QualifiedType StreamReader = new QualifiedType("System.IO.StreamReader");

@@ -348,6 +348,7 @@ namespace IDisposableAnalyzers
                         method.ContainingType == KnownSymbol.ImmutableSortedDictionaryOfTKeyTValue ||
 
                         method.ContainingType == KnownSymbol.ConditionalWeakTable ||
+                        method.ContainingType == KnownSymbol.ResourceManager ||
                         method == KnownSymbol.IEnumerable.GetEnumerator ||
                         method == KnownSymbol.Task.Run ||
                         method == KnownSymbol.Task.RunOfT ||

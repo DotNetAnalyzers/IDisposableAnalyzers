@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
+namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -380,6 +380,9 @@ namespace RoslynSandbox
             [TestCase("new PasswordBox().SecurePassword", Result.Yes)]
             [TestCase("passwordBox.SecurePassword", Result.Yes)]
             [TestCase("PasswordBox.SecurePassword", Result.Yes)]
+            [TestCase("((System.Resources.ResourceManager)null).GetStream(null)", Result.No)]
+            [TestCase("((System.Resources.ResourceManager)null).GetStream(null, null)", Result.No)]
+            [TestCase("((System.Resources.ResourceManager)null).GetResourceSet(null, true, true)", Result.No)]
             public void CallExternal(string code, Result expected)
             {
                 var testCode = @"
