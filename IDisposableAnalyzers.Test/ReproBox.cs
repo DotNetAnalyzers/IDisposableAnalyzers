@@ -2,12 +2,15 @@ namespace IDisposableAnalyzers.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     using NUnit.Framework;
 
+    [Explicit("For harvesting testcases only.")]
     public class ReproBox
     {
         // ReSharper disable once UnusedMember.Local
@@ -17,10 +20,14 @@ namespace IDisposableAnalyzers.Test
                                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                .ToArray();
 
+        private static readonly Solution Solution = CodeFactory.CreateSolution(
+            new FileInfo("C:\\Git\\Gu.Reactive\\Gu.Reactive\\Gu.Reactive.csproj"),
+            AllAnalyzers,
+            AnalyzerAssert.MetadataReferences);
+
         [TestCaseSource(nameof(AllAnalyzers))]
         public void Repro(DiagnosticAnalyzer analyzer)
         {
-            Assert.Pass();
             var testCode = @"
 namespace IDisposableAnalyzers
 {
@@ -415,6 +422,12 @@ namespace IDisposableAnalyzers
     }
     }";
             AnalyzerAssert.Valid(analyzer, testCode);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public void SolutionRepro(DiagnosticAnalyzer analyzer)
+        {
+            AnalyzerAssert.Valid(analyzer, Solution);
         }
     }
 }

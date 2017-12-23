@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -31,11 +31,10 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleCreation, SyntaxKind.ObjectCreationExpression);
-            context.RegisterSyntaxNodeAction(HandleInvocation, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression);
         }
 
-        private static void HandleCreation(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -46,14 +45,6 @@
                 MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
-            }
-        }
-
-        private static void HandleInvocation(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
             }
 
             if (context.Node is InvocationExpressionSyntax invocation &&

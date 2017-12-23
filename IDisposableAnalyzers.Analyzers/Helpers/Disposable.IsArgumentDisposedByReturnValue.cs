@@ -1,5 +1,6 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,39 +22,8 @@
                             : Result.AssumeYes;
                     }
 
-                    using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
-                    {
-                        using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
-                        {
-                            if (!visited.Add(memberAccess))
-                            {
-                                return Result.Unknown;
-                            }
-
-                            var parameter = reducedFrom.Parameters[0];
-                            foreach (var returnValue in returnWalker)
-                            {
-                                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
-                                    nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
-                                {
-                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                                }
-
-                                if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                                    nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
-                                {
-                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                                }
-
-                                if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
-                                {
-                                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
-                                }
-                            }
-                        }
-                    }
-
-                    return Result.No;
+                    var parameter = reducedFrom.Parameters[0];
+                    return CheckReturnValues(parameter, memberAccess, semanticModel, cancellationToken, visited);
                 }
 
                 if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
@@ -80,40 +50,12 @@
                             : Result.AssumeYes;
                     }
 
-                    using (var returnWalker = ReturnValueWalker.Borrow(invocation, Search.Recursive, semanticModel, cancellationToken))
+                    if (invocation.TryGetMatchingParameter(argument, semanticModel, cancellationToken, out var parameter))
                     {
-                        using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
-                        {
-                            if (!visited.Add(argument))
-                            {
-                                return Result.Unknown;
-                            }
-
-                            foreach (var returnValue in returnWalker)
-                            {
-                                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
-                                    invocation.TryGetMatchingParameter(argument, semanticModel, cancellationToken, out var parameter) &&
-                                    nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
-                                {
-                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                                }
-
-                                if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                                    invocation.TryGetMatchingParameter(argument, semanticModel, cancellationToken, out parameter) &&
-                                    nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
-                                {
-                                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                                }
-
-                                if (returnValue is MemberAccessExpressionSyntax memberAccess)
-                                {
-                                    return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken, visited);
-                                }
-                            }
-                        }
+                        return CheckReturnValues(parameter, invocation, semanticModel, cancellationToken, visited);
                     }
 
-                    return Result.No;
+                    return Result.Unknown;
                 }
 
                 if (argumentList.Parent is ObjectCreationExpressionSyntax ||
@@ -155,6 +97,70 @@
             }
 
             return Result.Unknown;
+        }
+
+        private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)
+        {
+            Result CheckReturnValue(ExpressionSyntax returnValue)
+            {
+                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation &&
+                    nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                {
+                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                }
+
+                if (returnValue is InvocationExpressionSyntax nestedInvocation &&
+                    nestedInvocation.TryGetMatchingArgument(parameter, out nestedArgument))
+                {
+                    return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                }
+
+                if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
+                {
+                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                }
+
+                return Result.Unknown;
+            }
+
+            var result = Result.No;
+            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
+            {
+                using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+                {
+                    if (!visited.Add(memberAccess))
+                    {
+                        return Result.Unknown;
+                    }
+
+                    foreach (var returnValue in returnWalker)
+                    {
+                        switch (CheckReturnValue(returnValue))
+                        {
+                            case Result.Unknown:
+                                return Result.Unknown;
+                            case Result.Yes:
+                                if (result == Result.No)
+                                {
+                                    result = Result.Yes;
+                                }
+
+                                break;
+                            case Result.AssumeYes:
+                                result = Result.AssumeYes;
+                                break;
+                            case Result.No:
+                                return Result.No;
+                            case Result.AssumeNo:
+                                return Result.AssumeNo;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+            }
+
+            return result;
         }
 
         private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member, out IMethodSymbol ctor)
