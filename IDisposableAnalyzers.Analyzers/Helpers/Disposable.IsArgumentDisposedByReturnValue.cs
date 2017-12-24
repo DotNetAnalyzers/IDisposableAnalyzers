@@ -50,6 +50,11 @@ namespace IDisposableAnalyzers
                 {
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
+                        if (method == KnownSymbol.CompositeDisposable.Add)
+                        {
+                            return Result.Yes;
+                        }
+
                         return method.ReturnsVoid ||
                                !IsAssignableTo(method.ReturnType)
                             ? Result.No
