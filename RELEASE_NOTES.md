@@ -1,3 +1,6 @@
+#### 0.1.4.3
+* BUGFIX: IDISP004 handle CompositeDisposable.Add.
+
 #### 0.1.4
 * PERFORMANCE: Merged many analyzers doing the same expensive analysis to fewer.
 * BUGFIX: IDISP004 nag on argument to invcation.
