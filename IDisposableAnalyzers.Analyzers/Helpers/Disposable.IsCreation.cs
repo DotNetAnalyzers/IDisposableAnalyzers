@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers
             }
 
             if (semanticModel.GetSymbolSafe(disposable, cancellationToken) is IPropertySymbol property &&
-                property.TryGetSetter(cancellationToken, out AccessorDeclarationSyntax setter))
+                property.TryGetSetter(cancellationToken, out var setter))
             {
                 using (var pooledSet = PooledHashSet<ISymbol>.Borrow())
                 {
@@ -196,7 +196,7 @@ namespace IDisposableAnalyzers
 
             Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
             var invocation = candidate.FirstAncestor<InvocationExpressionSyntax>();
-            if (invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out IParameterSymbol parameter))
+            if (invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out var parameter))
             {
                 return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
             }

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -37,7 +37,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<IDISP008DontMixInjectedAndCreatedForMember>(testCode);
+            AnalyzerAssert.Diagnostics<AssignmentAnalyzer>(testCode);
         }
     }
 }

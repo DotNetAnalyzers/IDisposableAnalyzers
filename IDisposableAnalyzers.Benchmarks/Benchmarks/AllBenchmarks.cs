@@ -3,6 +3,8 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks
     {
+        private static readonly Gu.Roslyn.Asserts.Benchmark AssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.AssignmentAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark DisposeMethodAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.DisposeMethodAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark FieldAndPropertyDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.FieldAndPropertyDeclarationAnalyzer());
@@ -15,9 +17,13 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP007DontDisposeInjectedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP007DontDisposeInjected());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP008DontMixInjectedAndCreatedForMemberBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP008DontMixInjectedAndCreatedForMember());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark ReturnValueAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ReturnValueAnalyzer());
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void AssignmentAnalyzer()
+        {
+            AssignmentAnalyzerBenchmark.Run();
+        }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void DisposeMethodAnalyzer()
@@ -53,12 +59,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void IDISP007DontDisposeInjected()
         {
             IDISP007DontDisposeInjectedBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP008DontMixInjectedAndCreatedForMember()
-        {
-            IDISP008DontMixInjectedAndCreatedForMemberBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

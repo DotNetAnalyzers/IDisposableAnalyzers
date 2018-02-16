@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.Documentation
+namespace IDisposableAnalyzers.Test.Documentation
 {
     using System;
     using System.Collections.Generic;
@@ -71,7 +71,8 @@
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.Analyzer is IDISP008DontMixInjectedAndCreatedForMember)
+            if (descriptorInfo.Analyzer is IDISP008DontMixInjectedAndCreatedForMember ||
+                descriptorInfo.Analyzer is AssignmentAnalyzer)
             {
                 return;
             }
