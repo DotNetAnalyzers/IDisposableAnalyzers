@@ -1,11 +1,11 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     [TestFixture(typeof(FieldAndPropertyDeclarationAnalyzer))]
-    [TestFixture(typeof(IDISP008DontMixInjectedAndCreatedForMember))]
+    [TestFixture(typeof(AssignmentAnalyzer))]
     internal partial class HappyPath<T>
         where T : DiagnosticAnalyzer, new()
     {
