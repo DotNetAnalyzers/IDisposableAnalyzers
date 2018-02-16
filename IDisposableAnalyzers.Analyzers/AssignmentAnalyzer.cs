@@ -10,8 +10,9 @@ namespace IDisposableAnalyzers
     internal class AssignmentAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP003DisposeBeforeReassigning.Descriptor,
+            IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -37,7 +38,60 @@ namespace IDisposableAnalyzers
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                 }
+
+                if (IsReassignedWithCreated(assignment, context))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, assignment.GetLocation()));
+                }
             }
+        }
+
+        private static bool IsReassignedWithCreated(AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
+        {
+            if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken)
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+            {
+                return false;
+            }
+
+            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
+                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+            {
+                return false;
+            }
+
+            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable ||
+                assignedSymbol == KnownSymbol.SingleAssignmentDisposable.Disposable)
+            {
+                return false;
+            }
+
+            if (Disposable.IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
+            {
+                return false;
+            }
+
+            if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(assignedSymbol, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+            {
+                return false;
+            }
+
+            if (IsNullChecked(assignedSymbol, assignment))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsNullChecked(ISymbol symbol, SyntaxNode context)
+        {
+            if (context.Parent is IfStatementSyntax ifStatement)
+            {
+
+            }
+
+            return false;
         }
     }
 }

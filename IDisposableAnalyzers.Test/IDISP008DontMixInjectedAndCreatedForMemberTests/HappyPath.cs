@@ -168,6 +168,7 @@ namespace RoslynSandbox
     {
         public Foo()
         {
+            this.Stream.Dispose();
             this.Stream = File.OpenRead(string.Empty);
         }
 
@@ -198,6 +199,7 @@ namespace RoslynSandbox
 
         public Foo()
         {
+            this.stream.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
 

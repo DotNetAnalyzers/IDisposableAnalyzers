@@ -1,11 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
+    [TestFixture(typeof(AssignmentAnalyzer))]
+    internal partial class HappyPath<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly IDISP003DisposeBeforeReassigning Analyzer = new IDISP003DisposeBeforeReassigning();
+        private static readonly T Analyzer = new T();
 
 #pragma warning disable SA1203 // Constants must appear before fields
         private const string DisposableCode = @"

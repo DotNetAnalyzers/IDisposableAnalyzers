@@ -71,8 +71,7 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.Analyzer is IDISP008DontMixInjectedAndCreatedForMember ||
-                descriptorInfo.Analyzer is AssignmentAnalyzer)
+            if (descriptorInfo.Analyzer is AssignmentAnalyzer)
             {
                 return;
             }

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -113,8 +113,9 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                var expectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(expectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(expectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]

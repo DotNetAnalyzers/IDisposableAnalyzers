@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,6 +7,8 @@
     {
         internal class TestFixture
         {
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = Gu.Roslyn.Asserts.ExpectedDiagnostic.Create("IDISP003");
+
             [Test]
             public void AssigningFieldInSetUpCreatesTearDownAndDisposes()
             {
@@ -59,8 +61,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -115,8 +117,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { ExplicitDisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -176,8 +178,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -237,8 +239,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { ExplicitDisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -293,8 +295,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -354,8 +356,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeInTearDownCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }

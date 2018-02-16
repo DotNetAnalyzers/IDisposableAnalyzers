@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -30,6 +30,8 @@ namespace RoslynSandbox
         }
     }
 }";
+
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = Gu.Roslyn.Asserts.ExpectedDiagnostic.Create("IDISP003");
 
         [Test]
         public void NotDisposingVariable()
@@ -66,8 +68,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -103,8 +105,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -142,8 +144,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -195,8 +197,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -236,8 +238,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -277,8 +279,8 @@ namespace RoslynSandbox
         public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -330,8 +332,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -385,8 +387,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -426,8 +428,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -474,8 +476,8 @@ namespace RoslynSandbox
         public event EventHandler Bar;
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -515,8 +517,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -536,22 +538,25 @@ namespace RoslynSandbox
     }
 }";
 
-            ////            var fixedCode = @"
-            ////using System;
-            ////using System.IO;
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
 
-            ////public class Foo
-            ////{
-            ////    private Stream stream;
+    public class Foo
+    {
+        private Stream stream;
 
-            ////    public IDisposable Meh()
-            ////    {
-            ////        this.stream?.Dispose();
-            ////        return this.stream = File.OpenRead(string.Empty);
-            ////    }
-            ////}";
-            // Not implementing the fix for now, not a common case.
-            AnalyzerAssert.NoFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode);
+        public IDisposable Meh()
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -597,8 +602,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -618,28 +623,28 @@ namespace RoslynSandbox
     }
 }";
 
-            ////            var fixedCode = @"
-            ////namespace RoslynSandbox
-            ////{
-            ////    using System;
-            ////    using System.IO;
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
 
-            ////    public class Foo
-            ////    {
-            ////        private Stream stream;
+    public class Foo
+    {
+        private Stream stream;
 
-            ////        public IDisposable Meh
-            ////        {
-            ////            get
-            ////            {
-            ////                this.stream?.Dispose();
-            ////                return this.stream = File.OpenRead(string.Empty);
-            ////            }
-            ////        }
-            ////    }
-            ////}";
-            // Not implementing the fix for now, not a common case.
-            AnalyzerAssert.NoFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode);
+        public IDisposable Meh
+        {
+            get
+            {
+                this.stream?.Dispose();
+                return this.stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -697,8 +702,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -767,8 +772,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
         }
     }
 }

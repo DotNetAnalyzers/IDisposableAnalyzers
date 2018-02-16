@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
 
@@ -12,7 +12,7 @@
     {
         public const string DiagnosticId = "IDISP003";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Dispose previous before re-assigning.",
             messageFormat: "Dispose previous before re-assigning.",
@@ -31,47 +31,7 @@
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
             context.RegisterSyntaxNodeAction(HandleArgument, SyntaxKind.Argument);
-        }
-
-        private static void HandleAssignment(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var assignment = (AssignmentExpressionSyntax)context.Node;
-            if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-            {
-                return;
-            }
-
-            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-            {
-                return;
-            }
-
-            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable ||
-                assignedSymbol == KnownSymbol.SingleAssignmentDisposable.Disposable)
-            {
-                return;
-            }
-
-            if (Disposable.IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
-            {
-                return;
-            }
-
-            if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(assignedSymbol, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
-            {
-                return;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
         }
 
         private static void HandleArgument(SyntaxNodeAnalysisContext context)

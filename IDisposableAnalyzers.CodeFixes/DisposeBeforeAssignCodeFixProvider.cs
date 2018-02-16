@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -73,48 +73,85 @@
 
         private static void ApplyDisposeBeforeAssign(DocumentEditor editor, SyntaxNode assignment, StatementSyntax disposeStatement)
         {
-            if (assignment.Parent is StatementSyntax statement &&
-                statement.Parent is BlockSyntax)
+            switch (assignment.Parent)
             {
-                editor.InsertBefore(statement, new[] { disposeStatement });
-            }
-            else if (assignment.Parent is ArgumentListSyntax argumentList &&
-                     argumentList.Parent is InvocationExpressionSyntax invocation &&
-                     invocation.Parent is StatementSyntax invocationStatement &&
-                     invocationStatement.Parent is BlockSyntax)
-            {
-                editor.InsertBefore(invocationStatement, new[] { disposeStatement });
-            }
-            else if (assignment.Parent is AnonymousFunctionExpressionSyntax anonymousFunction)
-            {
-                editor.ReplaceNode(
-                    anonymousFunction.Body,
-                    (x, _) => SyntaxFactory.Block(
-                        disposeStatement,
-                        SyntaxFactory.ExpressionStatement((ExpressionSyntax)x)));
+                case StatementSyntax statement when statement.Parent is BlockSyntax:
+                    editor.InsertBefore(statement, new[] { disposeStatement });
+                    break;
+                case AnonymousFunctionExpressionSyntax anonymousFunction:
+                    editor.ReplaceNode(
+                        anonymousFunction.Body,
+                        (x, _) => SyntaxFactory.Block(
+                            disposeStatement,
+                            SyntaxFactory.ExpressionStatement((ExpressionSyntax)x)));
+                    break;
+                case ArgumentListSyntax argumentList:
+                    {
+                        if (argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                 invocation.Parent is StatementSyntax invocationStatement &&
+                                 invocationStatement.Parent is BlockSyntax)
+                        {
+                            editor.InsertBefore(invocationStatement, new[] { disposeStatement });
+                        }
+
+                        break;
+                    }
+
+                case ArrowExpressionClauseSyntax arrow:
+                    {
+                        if (arrow.Parent is MethodDeclarationSyntax method)
+                        {
+                            editor.ReplaceNode(
+                                method,
+                                (x, _) =>
+                                {
+                                    var old = (MethodDeclarationSyntax)x;
+                                    return old.WithExpressionBody(null)
+                                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                                              .WithBody(
+                                                  SyntaxFactory.Block(
+                                                      disposeStatement,
+                                                      SyntaxFactory.ReturnStatement(old.ExpressionBody.Expression)));
+                                });
+                        }
+
+                        if (arrow.Parent is PropertyDeclarationSyntax property)
+                        {
+                            editor.ReplaceNode(
+                                property,
+                                (x, _) =>
+                                {
+                                    var old = (PropertyDeclarationSyntax)x;
+                                    return old.WithExpressionBody(null)
+                                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                                              .WithAccessorList(
+                                                  SyntaxFactory.AccessorList(
+                                                      SyntaxFactory.SingletonList(
+                                                          SyntaxFactory.AccessorDeclaration(
+                                                              SyntaxKind.GetAccessorDeclaration,
+                                                              SyntaxFactory.Block(
+                                                                  disposeStatement,
+                                                                  SyntaxFactory.ReturnStatement(
+                                                                      old.ExpressionBody.Expression))))));
+                                });
+                        }
+
+                        break;
+                    }
             }
         }
 
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
             result = null;
-            if (assignment.Parent is StatementSyntax ||
-                assignment.Parent is AnonymousFunctionExpressionSyntax)
+            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
+                          .IsEither(Result.No, Result.Unknown))
             {
-                if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
-                              .IsEither(Result.No, Result.Unknown))
-                {
-                    return false;
-                }
-
-                result = Snippet.DisposeStatement(
-                    assignedSymbol,
-                    semanticModel,
-                    cancellationToken);
-                return true;
+                return false;
             }
 
-            return false;
+            result = Snippet.DisposeStatement(assignedSymbol, semanticModel, cancellationToken);
+            return true;
         }
 
         private static bool TryCreateDisposeStatement(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
