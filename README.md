@@ -50,7 +50,7 @@ Roslyn analyzers for IDisposable
 </tr>
 <tr>
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP011.md">IDISP011</a></td>
-  <td>Don't return diposed instance.</td>
+  <td>Don't return disposed instance.</td>
 </tr>
 <tr>
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP012.md">IDISP012</a></td>

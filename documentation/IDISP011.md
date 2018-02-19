@@ -1,5 +1,5 @@
 # IDISP011
-## Don't return diposed instance.
+## Don't return disposed instance.
 
 <!-- start generated table -->
 <table>
@@ -24,7 +24,7 @@
 
 ## Description
 
-Don't return diposed instance.
+Don't return disposed instance.
 
 ## Motivation
 
@@ -43,21 +43,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP011 // Don't return diposed instance.
+#pragma warning disable IDISP011 // Don't return disposed instance.
 Code violating the rule here
-#pragma warning restore IDISP011 // Don't return diposed instance.
+#pragma warning restore IDISP011 // Don't return disposed instance.
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP011 // Don't return diposed instance.
+#pragma warning disable IDISP011 // Don't return disposed instance.
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP011:Don't return diposed instance.", 
+    "IDISP011:Don't return disposed instance.", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->
