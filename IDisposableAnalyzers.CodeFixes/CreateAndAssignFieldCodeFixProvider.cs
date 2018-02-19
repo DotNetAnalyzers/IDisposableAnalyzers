@@ -20,6 +20,8 @@ namespace IDisposableAnalyzers
             IDISP001DisposeCreated.DiagnosticId,
             IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
 
+        public override FixAllProvider GetFixAllProvider() => null;
+
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {

@@ -23,6 +23,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
 
+        public override FixAllProvider GetFixAllProvider() => null;
+
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
