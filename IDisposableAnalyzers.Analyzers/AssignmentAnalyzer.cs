@@ -48,8 +48,10 @@ namespace IDisposableAnalyzers
 
         private static bool IsReassignedWithCreated(AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
         {
-            if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+            if (assignment.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+                accessor.IsKind(SyntaxKind.SetAccessorDeclaration) &&
+                assignment.Right is IdentifierNameSyntax assignedIdentifier &&
+                assignedIdentifier.Identifier.ValueText == "value")
             {
                 return false;
             }

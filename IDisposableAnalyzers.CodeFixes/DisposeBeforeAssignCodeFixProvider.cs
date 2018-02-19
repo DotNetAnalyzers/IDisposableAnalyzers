@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
+    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeBeforeAssignCodeFixProvider))]
     [Shared]
@@ -80,16 +81,23 @@ namespace IDisposableAnalyzers
                     break;
                 case AnonymousFunctionExpressionSyntax anonymousFunction:
                     editor.ReplaceNode(
-                        anonymousFunction.Body,
-                        (x, _) => SyntaxFactory.Block(
-                            disposeStatement,
-                            SyntaxFactory.ExpressionStatement((ExpressionSyntax)x)));
+                        anonymousFunction,
+                        (x, _) =>
+                        {
+                            var old = (AnonymousFunctionExpressionSyntax)x;
+                            return old.ReplaceNode(
+                                           old.Body,
+                                           SyntaxFactory.Block(
+                                               disposeStatement.WithTrailingTrivia(SyntaxFactory.ElasticLineFeed),
+                                               SyntaxFactory.ExpressionStatement((ExpressionSyntax)old.Body)))
+                                       .WithAdditionalAnnotations(Formatter.Annotation);
+                        });
                     break;
                 case ArgumentListSyntax argumentList:
                     {
                         if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                 invocation.Parent is StatementSyntax invocationStatement &&
-                                 invocationStatement.Parent is BlockSyntax)
+                            invocation.Parent is StatementSyntax invocationStatement &&
+                            invocationStatement.Parent is BlockSyntax)
                         {
                             editor.InsertBefore(invocationStatement, new[] { disposeStatement });
                         }

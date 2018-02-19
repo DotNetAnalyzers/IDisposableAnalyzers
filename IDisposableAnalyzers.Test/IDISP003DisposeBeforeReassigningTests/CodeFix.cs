@@ -73,6 +73,43 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void SettingToNull()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            var stream = File.OpenRead(string.Empty);
+            ↓stream = null;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            stream = null;
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void NotDisposingVariableOfTypeObject()
         {
             var testCode = @"
@@ -648,7 +685,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldInLambda()
+        public void AssigningFieldInLambdaBlock()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -666,6 +703,62 @@ namespace RoslynSandbox
             {
                 ↓this.disposable = new Disposable();
             });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private Disposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ =>
+            {
+                this.disposable?.Dispose();
+                this.disposable = new Disposable();
+            });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+            this.subscription?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+        }
+
+        [Test]
+        public void AssigningFieldInLambdaExpression()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable subscription;
+        private Disposable disposable;
+
+        public Foo(IObservable<object> observable)
+        {
+            this.subscription = observable.Subscribe(_ => ↓this.disposable = new Disposable());
         }
 
         public void Dispose()
