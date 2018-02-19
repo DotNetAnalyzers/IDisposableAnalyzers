@@ -857,9 +857,11 @@ namespace RoslynSandbox
         }
 
         [TestCase("this.disposable == null")]
-        [TestCase("this.disposable is null")]
+        ////[TestCase("this.disposable is null")]
         [TestCase("ReferenceEquals(this.disposable, null)")]
         [TestCase("Equals(this.disposable, null)")]
+        [TestCase("object.ReferenceEquals(this.disposable, null)")]
+        [TestCase("object.Equals(this.disposable, null)")]
         public void WhenNullCheckBefore(string nullCheck)
         {
             var testCode = @"

@@ -130,7 +130,34 @@ namespace IDisposableAnalyzers
                     return true;
                 }
             }
-
+            else if (ifStatement.Condition is InvocationExpressionSyntax invocation)
+            {
+                if (invocation.Expression is IdentifierNameSyntax identifierName &&
+                    invocation.ArgumentList != null &&
+                    invocation.ArgumentList.Arguments.Count == 2 &&
+                    (identifierName.Identifier.ValueText == "ReferenceEquals" ||
+                     identifierName.Identifier.ValueText == "Equals"))
+                {
+                    if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                        invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
+                    {
+                        return true;
+                    }
+                }
+                else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                         memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
+                        invocation.ArgumentList != null &&
+                        invocation.ArgumentList.Arguments.Count == 2 &&
+                        (memberIdentifier.Identifier.ValueText == "ReferenceEquals" ||
+                         memberIdentifier.Identifier.ValueText == "Equals"))
+                {
+                    if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                        invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
+                    {
+                        return true;
+                    }
+                }
+            }
 
             return IsNullChecked(symbol, ifStatement);
         }
