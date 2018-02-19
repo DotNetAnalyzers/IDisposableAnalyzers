@@ -57,14 +57,15 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System.Collections.Generic;
     using System.IO;
 
     public class Foo
     {
         public IEnumerable<string> F()
         {
-            using(var streamReader = File.OpenText(""))
-                ↓return Use(streamReader);
+            using(var reader = File.OpenText(string.Empty))
+                return Use(↓reader);
         }
 
         IEnumerable<string> Use(TextReader reader)

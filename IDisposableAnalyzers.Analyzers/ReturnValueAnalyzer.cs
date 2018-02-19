@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -112,6 +112,30 @@
                     if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                    }
+                }
+            }
+            else if (returnValue is InvocationExpressionSyntax invocation &&
+                     invocation.ArgumentList != null &&
+                     context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type is INamedTypeSymbol returnType)
+            {
+                foreach (var argument in invocation.ArgumentList.Arguments)
+                {
+                    if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken)
+                                  .IsEither(Result.Yes, Result.AssumeYes) &&
+                        context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
+                    {
+                        if (IsInUsing(argumentSymbol, context.CancellationToken) ||
+                            Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                        {
+                            if (returnType.Is(KnownSymbol.IEnumerable) &&
+                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
+                                method.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax methodDeclaration) &&
+                                YieldStatementWalker.Any(methodDeclaration))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
+                            }
+                        }
                     }
                 }
             }
