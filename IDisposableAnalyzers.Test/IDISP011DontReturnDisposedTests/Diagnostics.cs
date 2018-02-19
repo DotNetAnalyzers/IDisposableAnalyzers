@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
+namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;

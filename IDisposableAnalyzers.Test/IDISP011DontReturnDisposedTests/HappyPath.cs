@@ -1,4 +1,4 @@
-﻿// ReSharper disable InconsistentNaming
+// ReSharper disable InconsistentNaming
 namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
 {
     using Gu.Roslyn.Asserts;
@@ -947,6 +947,32 @@ namespace RoslynSandbox
 }";
 
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void YieldReturnFromUsing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public IEnumerable<string> F()
+        {
+            using(var reader = File.OpenText(""))
+            {
+                string line;
+                while((line = reader.ReadLine()) != null)
+                {
+                    yield return line;
+                }
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }
