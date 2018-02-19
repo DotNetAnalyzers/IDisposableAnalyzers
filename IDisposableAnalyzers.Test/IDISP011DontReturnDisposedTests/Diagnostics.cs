@@ -80,5 +80,46 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [Test]
+        public void ReturnLazyFromUsingNested()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class Foo
+    {
+        public IEnumerable<string> F()
+        {
+            using (var reader = File.OpenText(string.Empty))
+                return Use(reader);
+        }
+
+        private IEnumerable<string> Use(TextReader reader)
+        {
+            if (reader == null)
+            {
+                throw new ArgumentNullException();
+            }
+
+            return UseCore(reader);
+        }
+
+        private IEnumerable<string> UseCore(TextReader reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                yield return line;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

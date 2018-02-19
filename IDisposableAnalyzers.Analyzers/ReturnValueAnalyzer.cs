@@ -116,8 +116,7 @@ namespace IDisposableAnalyzers
                 }
             }
             else if (returnValue is InvocationExpressionSyntax invocation &&
-                     invocation.ArgumentList != null &&
-                     context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type is INamedTypeSymbol returnType)
+                     invocation.ArgumentList != null)
             {
                 foreach (var argument in invocation.ArgumentList.Arguments)
                 {
@@ -128,10 +127,7 @@ namespace IDisposableAnalyzers
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
                         {
-                            if (returnType.Is(KnownSymbol.IEnumerable) &&
-                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                                method.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax methodDeclaration) &&
-                                YieldStatementWalker.Any(methodDeclaration))
+                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
                             }
@@ -145,6 +141,35 @@ namespace IDisposableAnalyzers
         {
             return symbol.TryGetSingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
                    declaration.Parent?.Parent is UsingStatementSyntax;
+        }
+
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> set = null)
+        {
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
+                method.ReturnType.Is(KnownSymbol.IEnumerable) &&
+                method.TryGetSingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
+            {
+                if (YieldStatementWalker.Any(methodDeclaration))
+                {
+                    return true;
+                }
+
+                using (var walker = ReturnValueWalker.Borrow(methodDeclaration, Search.TopLevel, semanticModel, cancellationToken))
+                {
+                    set = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(set);
+                    foreach (var returnValue in walker)
+                    {
+                        if (returnValue is InvocationExpressionSyntax nestedInvocation &&
+                            set.Add(returnValue) &&
+                            IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type)
