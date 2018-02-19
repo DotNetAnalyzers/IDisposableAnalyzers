@@ -50,5 +50,34 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [Test]
+        public void ReturnLazyFromUsing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public IEnumerable<string> F()
+        {
+            using(var streamReader = File.OpenText(""))
+                ↓return Use(streamReader);
+        }
+
+        IEnumerable<string> Use(TextReader reader)
+        {
+            string line;
+            while((line = reader.ReadLine()) != null)
+            {
+                yield return line;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

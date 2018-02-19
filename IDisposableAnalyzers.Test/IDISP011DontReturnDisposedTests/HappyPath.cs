@@ -961,7 +961,7 @@ namespace RoslynSandbox
     {
         public IEnumerable<string> F()
         {
-            using(var reader = File.OpenText(""))
+            using(var reader = File.OpenText(string.Empty))
             {
                 string line;
                 while((line = reader.ReadLine()) != null)
@@ -969,6 +969,40 @@ namespace RoslynSandbox
                     yield return line;
                 }
             }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ReturnGreedyFromUsing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public IEnumerable<string> F()
+        {
+            using (var streamReader = File.OpenText(string.Empty))
+            {
+                return Use(streamReader);
+            }
+        }
+
+        IEnumerable<string> Use(TextReader reader)
+        {
+            List<string> lines = new List<string>();
+            string line;
+            while((line = reader.ReadLine()) != null)
+            {
+                lines.Add(line);
+            }
+
+            return lines;
         }
     }
 }";
