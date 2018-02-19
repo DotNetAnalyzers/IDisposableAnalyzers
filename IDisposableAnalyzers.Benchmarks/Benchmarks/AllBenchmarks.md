@@ -1,20 +1,20 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.11, OS=Windows 7 SP1 (6.1.7601.0)
-Processor=Intel Xeon CPU E5-2637 v4 3.50GHzIntel Xeon CPU E5-2637 v4 3.50GHz, ProcessorCount=16
+BenchmarkDotNet=v0.10.12, OS=Windows 7 SP1 (6.1.7601.0)
+Intel Xeon CPU E5-2637 v4 3.50GHz, 2 CPU, 16 logical cores and 8 physical cores
 Frequency=3410126 Hz, Resolution=293.2443 ns, Timer=TSC
-  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2117.0
-  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2117.0
+  [Host]     : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
+  DefaultJob : .NET Framework 4.7 (CLR 4.0.30319.42000), 64bit RyuJIT-v4.7.2558.0
 
 
 ```
-|                                         Method |         Mean |         Error |       StdDev |       Median |     Gen 0 |    Gen 1 |  Allocated |
-|----------------------------------------------- |-------------:|--------------:|-------------:|-------------:|----------:|---------:|-----------:|
-|                          DisposeMethodAnalyzer |     391.7 us |      7.793 us |     14.64 us |     391.9 us |         - |        - |      836 B |
-|            FieldAndPropertyDeclarationAnalyzer | 119,906.9 us |  2,392.264 us |  6,588.99 us | 118,615.1 us |  625.0000 |        - |  4241461 B |
-|                         IDISP001DisposeCreated |   4,048.1 us |     80.628 us |    230.04 us |   3,985.1 us |   31.2500 |        - |   221188 B |
-|               IDISP003DisposeBeforeReassigning | 527,654.5 us | 10,452.289 us | 21,817.82 us | 523,980.7 us | 6187.5000 | 187.5000 | 39216815 B |
-| IDISP004DontIgnoreReturnValueOfTypeIDisposable |  14,265.9 us |    456.105 us |  1,344.84 us |  14,061.8 us |  140.6250 |        - |   928906 B |
-|                    IDISP007DontDisposeInjected |   2,522.2 us |     49.832 us |    128.63 us |   2,501.4 us |         - |        - |    23388 B |
-|     IDISP008DontMixInjectedAndCreatedForMember |   1,421.2 us |     38.428 us |    112.70 us |   1,394.7 us |    5.8594 |        - |    44992 B |
-|                            ReturnValueAnalyzer |   8,784.8 us |    221.953 us |    650.95 us |   8,649.3 us |   46.8750 |        - |   358147 B |
+|                                         Method |         Mean |        Error |       StdDev |       Median |     Gen 0 |    Gen 1 |  Allocated |
+|----------------------------------------------- |-------------:|-------------:|-------------:|-------------:|----------:|---------:|-----------:|
+|                             AssignmentAnalyzer | 158,822.9 us | 3,306.576 us |  8,416.29 us | 157,178.0 us |  937.5000 |        - |  6082546 B |
+|                          DisposeMethodAnalyzer |     409.8 us |     8.087 us |     17.75 us |     406.8 us |         - |        - |      836 B |
+|            FieldAndPropertyDeclarationAnalyzer | 124,107.7 us | 2,495.092 us |  7,238.72 us | 122,517.3 us |  625.0000 |        - |  4328904 B |
+|                         IDISP001DisposeCreated |   4,101.4 us |   121.302 us |    353.84 us |   3,970.6 us |   31.2500 |        - |   223350 B |
+|               IDISP003DisposeBeforeReassigning | 508,695.2 us | 9,962.769 us | 14,603.30 us | 504,292.6 us | 6375.0000 | 187.5000 | 40482964 B |
+| IDISP004DontIgnoreReturnValueOfTypeIDisposable |  17,534.7 us |   362.352 us |    967.19 us |  17,298.9 us |  187.5000 |        - |  1320669 B |
+|                    IDISP007DontDisposeInjected |   2,551.8 us |    50.857 us |    127.59 us |   2,526.5 us |         - |        - |    23396 B |
+|                            ReturnValueAnalyzer |   8,333.0 us |   174.165 us |    420.63 us |   8,084.2 us |   46.8750 |        - |   366058 B |

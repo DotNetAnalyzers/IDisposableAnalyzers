@@ -110,6 +110,51 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void WhenNullCheckAndAssignedTwice()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            Stream stream = null;
+            if (stream == null)
+            {
+                stream = File.OpenRead(string.Empty);
+                ↓stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Meh()
+        {
+            Stream stream = null;
+            if (stream == null)
+            {
+                stream = File.OpenRead(string.Empty);
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void NotDisposingVariableOfTypeObject()
         {
             var testCode = @"

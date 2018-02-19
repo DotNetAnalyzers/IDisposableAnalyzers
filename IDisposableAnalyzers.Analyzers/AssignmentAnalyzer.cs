@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -78,7 +79,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (IsNullChecked(assignedSymbol, assignment))
+            if (IsNullChecked(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
             {
                 return false;
             }
@@ -86,7 +87,7 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        private static bool IsNullChecked(ISymbol symbol, SyntaxNode context)
+        private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             bool IsSymbol(ExpressionSyntax expression)
             {
@@ -101,6 +102,23 @@ namespace IDisposableAnalyzers
                     memberAccess.Name is IdentifierNameSyntax identifier)
                 {
                     return identifier.Identifier.ValueText == symbol.Name;
+                }
+
+                return false;
+            }
+
+            bool IsAssignedBefore(IfStatementSyntax nullCheck)
+            {
+                using (var walker = AssignmentWalker.Borrow(nullCheck, Search.TopLevel, semanticModel, cancellationToken))
+                {
+                    foreach (var assignment in walker.Assignments)
+                    {
+                        if (IsSymbol(assignment.Left) &&
+                            assignment.SpanStart < context.SpanStart)
+                        {
+                            return true;
+                        }
+                    }
                 }
 
                 return false;
@@ -123,13 +141,13 @@ namespace IDisposableAnalyzers
                 if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
                     IsSymbol(binary.Right))
                 {
-                    return true;
+                    return !IsAssignedBefore(ifStatement);
                 }
 
                 if (IsSymbol(binary.Left) &&
                     binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
                 {
-                    return true;
+                    return !IsAssignedBefore(ifStatement);
                 }
             }
             else if (ifStatement.Condition is InvocationExpressionSyntax invocation)
@@ -143,7 +161,7 @@ namespace IDisposableAnalyzers
                     if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                         invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
                     {
-                        return true;
+                        return !IsAssignedBefore(ifStatement);
                     }
                 }
                 else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
@@ -156,12 +174,12 @@ namespace IDisposableAnalyzers
                     if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                         invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
                     {
-                        return true;
+                        return !IsAssignedBefore(ifStatement);
                     }
                 }
             }
 
-            return IsNullChecked(symbol, ifStatement);
+            return IsNullChecked(symbol, ifStatement, semanticModel, cancellationToken);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿// ReSharper disable UnusedMember.Local
+// ReSharper disable UnusedMember.Local
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable HeuristicUnreachableCode
 #pragma warning disable GU0011 // Don't ignore the returnvalue.
@@ -26,7 +26,7 @@ namespace IDisposableAnalyzers.Benchmarks
             {
                 var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(
                     Code.AnalyzersProject,
-                    new IDISP001DisposeCreated());
+                    new AssignmentAnalyzer());
 
                 // Warmup
                 benchmark.Run();
@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (false)
             {
-                foreach (var summary in RunSingle<FieldDeclarationAnalyzerBenchmarks>())
+                foreach (var summary in RunSingle<AllBenchmarks>())
                 {
                     CopyResult(summary);
                 }
