@@ -1,4 +1,9 @@
 #### 0.1.4.3
+* BUGFIX: IDISP011 handle recursion.
+* BUGFIX: IDISP011 handle yield return.
+* BUGFIX: IDISP003 handle lambda.
+
+#### 0.1.4.3
 * BUGFIX: IDISP004 handle CompositeDisposable.Add.
 
 #### 0.1.4
