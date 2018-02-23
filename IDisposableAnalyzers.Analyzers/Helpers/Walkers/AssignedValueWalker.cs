@@ -335,15 +335,15 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
-            if (type == null)
-            {
-                return;
-            }
-
             if (this.CurrentSymbol is IFieldSymbol ||
                 this.CurrentSymbol is IPropertySymbol)
             {
+                var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
+                if (type == null)
+                {
+                    return;
+                }
+
                 if (this.CurrentSymbol is IFieldSymbol)
                 {
                     foreach (var reference in this.CurrentSymbol.DeclaringSyntaxReferences)
@@ -375,18 +375,12 @@ namespace IDisposableAnalyzers
                 {
                     using (var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
-                        if (this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() == null &&
-                            ctorWalker.Default != null)
-                        {
-                            this.Visit(ctorWalker.Default);
-                        }
-
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
-                            if (contextCtor == null ||
-                                creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
+                            if (this.visitedLocations.Add(creation))
                             {
-                                if (this.visitedLocations.Add(creation))
+                                if (contextCtor == null ||
+                                    creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
                                 {
                                     this.VisitObjectCreationExpression(creation);
                                     var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
@@ -395,38 +389,57 @@ namespace IDisposableAnalyzers
                             }
                         }
 
+                        if (contextCtor != null)
+                        {
+                            foreach (var initializer in ctorWalker.Initializers)
+                            {
+                                var other = (ConstructorDeclarationSyntax)initializer.Parent;
+                                if (Constructor.IsRunBefore(contextCtor, other, this.semanticModel, this.cancellationToken))
+                                {
+                                    this.Visit(other);
+                                }
+                            }
+
+                            if (!contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                            {
+                                this.Visit(contextCtor);
+                            }
+
+                            return;
+                        }
+
+                        if (ctorWalker.Default != null)
+                        {
+                            this.Visit(ctorWalker.Default);
+                        }
+
                         foreach (var ctor in ctorWalker.NonPrivateCtors)
                         {
-                            if (contextCtor == null ||
-                                ctor == contextCtor ||
-                                contextCtor.IsRunBefore(ctor, this.semanticModel, this.cancellationToken))
-                            {
-                                this.Visit(ctor);
-                            }
+                            this.Visit(ctor);
                         }
                     }
                 }
-            }
 
-            if ((this.CurrentSymbol is IFieldSymbol field &&
-                      !field.IsReadOnly) ||
-                     (this.CurrentSymbol is IPropertySymbol property &&
-                      !property.IsReadOnly))
-            {
-                var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                        this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                if (scope != null &&
-                    !(scope is ConstructorDeclarationSyntax))
+                if ((this.CurrentSymbol is IFieldSymbol field &&
+                     !field.IsReadOnly) ||
+                    (this.CurrentSymbol is IPropertySymbol property &&
+                     !property.IsReadOnly))
                 {
-                    while (type.Is(this.CurrentSymbol.ContainingType))
+                    var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                    if (scope != null &&
+                        !(scope is ConstructorDeclarationSyntax))
                     {
-                        foreach (var reference in type.DeclaringSyntaxReferences)
+                        while (type.Is(this.CurrentSymbol.ContainingType))
                         {
-                            var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                            this.memberWalker.Visit(typeDeclaration);
-                        }
+                            foreach (var reference in type.DeclaringSyntaxReferences)
+                            {
+                                var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
+                                this.memberWalker.Visit(typeDeclaration);
+                            }
 
-                        type = type.BaseType;
+                            type = type.BaseType;
+                        }
                     }
                 }
             }
