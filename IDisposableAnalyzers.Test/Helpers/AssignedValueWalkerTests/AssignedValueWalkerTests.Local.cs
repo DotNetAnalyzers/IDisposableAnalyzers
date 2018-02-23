@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
@@ -41,8 +42,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(code, actual);
+                    Assert.AreEqual(code, assignedValues.Single().ToString());
                 }
             }
 
@@ -86,6 +86,39 @@ namespace RoslynSandbox
             var temp1 = value;
             value = 1;
             var temp2 = value;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [TestCase("var temp1 = value;", "")]
+            [TestCase("var temp2 = value;", "1")]
+            public void NotInitializedInLambda(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += (o, e) =>
+            {
+                int value;
+                var temp1 = value;
+                value = 1;
+                var temp2 = value;
+            };
         }
     }
 }");
@@ -144,8 +177,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var value = @operator").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("meh", actual);
+                    Assert.AreEqual("meh", assignedValues.Single().ToString());
                 }
             }
 

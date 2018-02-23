@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -269,6 +269,7 @@
                 }
             }
 
+            pooled.values.PurgeDuplicates();
             return pooled;
         }
 
@@ -319,6 +320,18 @@
         {
             if (this.CurrentSymbol == null)
             {
+                return;
+            }
+
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+            {
+                var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                        this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (scope != null)
+                {
+                    this.Visit(scope);
+                }
+
                 return;
             }
 
@@ -395,22 +408,15 @@
                 }
             }
 
-            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
-            {
-                var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                if (contextMember != null)
-                {
-                    this.Visit(contextMember);
-                }
-            }
-            else if ((this.CurrentSymbol is IFieldSymbol field &&
+            if ((this.CurrentSymbol is IFieldSymbol field &&
                       !field.IsReadOnly) ||
                      (this.CurrentSymbol is IPropertySymbol property &&
                       !property.IsReadOnly))
             {
-                var contextMember = this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                if (contextMember != null &&
-                    !(contextMember is ConstructorDeclarationSyntax))
+                var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                        this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (scope != null &&
+                    !(scope is ConstructorDeclarationSyntax))
                 {
                     while (type.Is(this.CurrentSymbol.ContainingType))
                     {
@@ -424,8 +430,6 @@
                     }
                 }
             }
-
-            this.values.PurgeDuplicates();
         }
 
         private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
@@ -554,8 +558,7 @@
 
         private Result ShouldVisit(SyntaxNode node)
         {
-            if (this.CurrentSymbol is IPropertySymbol ||
-                this.CurrentSymbol is IFieldSymbol)
+            if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
                 switch (node.Kind())
                 {
@@ -566,6 +569,33 @@
                     default:
                         return Result.Yes;
                 }
+            }
+
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+            {
+                if (node is StatementSyntax &&
+                    node.SharesAncestor<MemberDeclarationSyntax>(this.context))
+                {
+                    var statement = node.FirstAncestorOrSelf<StatementSyntax>();
+                    var contextStatement = this.context?.FirstAncestorOrSelf<StatementSyntax>();
+                    if (statement == null ||
+                        contextStatement == null)
+                    {
+                        return Result.AssumeNo;
+                    }
+
+                    if (!statement.Parent.Contains(contextStatement) &&
+                        !contextStatement.Parent.Contains(statement))
+                    {
+                        return Result.No;
+                    }
+
+                    return statement.SpanStart >= contextStatement.SpanStart
+                        ? Result.No
+                        : Result.Yes;
+                }
+
+                return Result.Yes;
             }
 
             if (this.context is InvocationExpressionSyntax &&

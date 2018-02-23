@@ -885,5 +885,48 @@ namespace RoslynSandbox
             testCode = testCode.AssertReplace("this.disposable == null", nullCheck);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void SeparateDeclarationAndAssignment()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            IDisposable disposable;
+            disposable = new Disposable();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void SeparateDeclarationAndAssignmentInLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += (o, e) =>
+            {
+                IDisposable disposable;
+                disposable = new Disposable();
+            };
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }
