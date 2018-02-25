@@ -1,9 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed class YieldStatementWalker : PooledWalker<YieldStatementWalker>

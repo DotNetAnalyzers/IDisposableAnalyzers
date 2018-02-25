@@ -31,7 +31,7 @@ namespace RoslynSandbox
     }
 }";
 
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = Gu.Roslyn.Asserts.ExpectedDiagnostic.Create("IDISP003");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
 
         [Test]
         public void NotDisposingVariable()

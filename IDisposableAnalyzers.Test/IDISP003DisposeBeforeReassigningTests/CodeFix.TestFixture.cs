@@ -7,8 +7,6 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         internal class TestFixture
         {
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = Gu.Roslyn.Asserts.ExpectedDiagnostic.Create("IDISP003");
-
             [Test]
             public void AssigningFieldInSetUpCreatesTearDownAndDisposes()
             {
