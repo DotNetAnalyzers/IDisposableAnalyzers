@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
+namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -67,7 +67,6 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
             }
 
-            [Explicit]
             [TestCase(Search.Recursive)]
             [TestCase(Search.TopLevel)]
             public void ChainedCtorArg(Search search)
@@ -93,18 +92,16 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("arg");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
-                AssignmentExpressionSyntax result;
-                var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
+                var symbol = semanticModel.GetDeclaredSymbolSafe(syntaxTree.FindBestMatch<ParameterSyntax>("arg"), CancellationToken.None);
                 if (search == Search.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentWalker.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentWalker.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out var result));
                     Assert.AreEqual("this.value = chainedArg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentWalker.FirstWith(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentWalker.FirstWith(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out _));
                 }
             }
 

@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers
     internal sealed class AssignmentWalker : ExecutionWalker<AssignmentWalker>
     {
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
+        private readonly List<ArgumentSyntax> arguments = new List<ArgumentSyntax>();
 
         private AssignmentWalker()
         {
@@ -22,8 +23,14 @@ namespace IDisposableAnalyzers
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
-            base.VisitAssignmentExpression(node);
             this.assignments.Add(node);
+            base.VisitAssignmentExpression(node);
+        }
+
+        public override void VisitArgument(ArgumentSyntax node)
+        {
+            this.arguments.Add(node);
+            base.VisitArgument(node);
         }
 
         internal static AssignmentWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -105,9 +112,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var pooledAssignments = Borrow(scope, search, semanticModel, cancellationToken))
+            using (var walker = Borrow(scope, Search.TopLevel, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Assignments)
+                foreach (var candidate in walker.Assignments)
                 {
                     if (candidate.Right is ConditionalExpressionSyntax conditional)
                     {
@@ -145,6 +152,22 @@ namespace IDisposableAnalyzers
                         return true;
                     }
                 }
+
+                if (search == Search.Recursive)
+                {
+                    foreach (var argument in walker.arguments)
+                    {
+                        if (argument.Expression is IdentifierNameSyntax identifierName &&
+                            identifierName.Identifier.ValueText == symbol.Name &&
+                            semanticModel.GetSymbolSafe(argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
+                            method.TryGetSingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
+                            methodDeclaration.TryGetMatchingParameter(argument, out var parameter) &&
+                            FirstWith(semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken), methodDeclaration, search, semanticModel, cancellationToken, out assignment))
+                        {
+                            return true;
+                        }
+                    }
+                }
             }
 
             return false;
@@ -153,6 +176,7 @@ namespace IDisposableAnalyzers
         protected override void Clear()
         {
             this.assignments.Clear();
+            this.arguments.Clear();
             this.SemanticModel = null;
             this.CancellationToken = CancellationToken.None;
             base.Clear();
