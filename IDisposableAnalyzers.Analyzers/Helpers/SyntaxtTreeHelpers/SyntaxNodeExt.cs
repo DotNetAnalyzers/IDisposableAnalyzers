@@ -84,7 +84,7 @@ namespace IDisposableAnalyzers
                     return Result.Yes;
                 }
 
-                return statement.SpanStart <= otherStatement.SpanStart
+                return statement.SpanStart < otherStatement.SpanStart
                     ? Result.Yes
                     : Result.No;
             }

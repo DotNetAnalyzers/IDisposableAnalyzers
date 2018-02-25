@@ -11,6 +11,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         {
             [TestCase("var temp = 1;", "temp = 2;", Result.Yes)]
             [TestCase("temp = 2;", "var temp = 1;", Result.No)]
+            [TestCase("temp = 1;", "var temp = 1;", Result.No)]
             public void SameBlock(string firstStatement, string otherStatement, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
