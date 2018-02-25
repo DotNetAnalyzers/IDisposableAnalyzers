@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
 
@@ -66,41 +66,27 @@
                 return Result.AssumeNo;
             }
 
-            if (statement.SpanStart == otherStatement.SpanStart)
+            var block = statement.Parent as BlockSyntax;
+            var otherBlock = otherStatement.Parent as BlockSyntax;
+            if (block == null && otherBlock == null)
             {
-                return other.FirstAncestor<AnonymousFunctionExpressionSyntax>() != null
+                return Result.No;
+            }
+
+            if (ReferenceEquals(block, otherBlock) ||
+                otherBlock?.Contains(node) == true ||
+                block?.Contains(other) == true)
+            {
+                var firstAnon = node.FirstAncestor<AnonymousFunctionExpressionSyntax>();
+                var otherAnon = other.FirstAncestor<AnonymousFunctionExpressionSyntax>();
+                if (!ReferenceEquals(firstAnon, otherAnon))
+                {
+                    return Result.Yes;
+                }
+
+                return statement.SpanStart <= otherStatement.SpanStart
                     ? Result.Yes
                     : Result.No;
-            }
-
-            if (statement.SpanStart >= otherStatement.SpanStart)
-            {
-                return Result.No;
-            }
-
-            var block = statement.Parent as BlockSyntax;
-            var otherblock = otherStatement.Parent as BlockSyntax;
-            if (block == null || otherblock == null)
-            {
-                if (SharesAncestor<IfStatementSyntax>(statement, otherStatement) ||
-                    SharesAncestor<SwitchStatementSyntax>(statement, otherStatement))
-                {
-                    return Result.No;
-                }
-            }
-
-            block = statement.FirstAncestor<BlockSyntax>();
-            otherblock = otherStatement.FirstAncestor<BlockSyntax>();
-            if (block == null || otherblock == null)
-            {
-                return Result.No;
-            }
-
-            if (ReferenceEquals(block, otherblock) ||
-                otherblock.Span.Contains(block.Span) ||
-                block.Span.Contains(otherblock.Span))
-            {
-                return Result.Yes;
             }
 
             return Result.No;

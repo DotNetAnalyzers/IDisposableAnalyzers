@@ -2,7 +2,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal class SyntaxNodeExtTests
@@ -154,12 +154,11 @@ namespace RoslynSandbox
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
 
-            [Explicit("Not sure here.")]
-            [TestCase("a = 1;", "a = 2;", Result.Yes)]
-            [TestCase("a = 1;", "a = 2;", Result.Yes)]
-            [TestCase("a = 2;", "a = 3;", Result.Yes)]
-            [TestCase("a = 3;", "a = 2;", Result.Yes)]
-            public void Lambda(string firstStatement, string otherStatement, Result expected)
+            [TestCase("1", "2", Result.Yes)]
+            [TestCase("2", "1", Result.No)]
+            [TestCase("2", "3", Result.Yes)]
+            [TestCase("3", "2", Result.Yes)]
+            public void Lambda(string firstInt, string otherInt, Result expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -183,8 +182,8 @@ namespace RoslynSandbox
         public event EventHandler E;
     }
 }");
-                var first = syntaxTree.FindStatement(firstStatement);
-                var other = syntaxTree.FindStatement(otherStatement);
+                var first = syntaxTree.FindBestMatch<LiteralExpressionSyntax>(firstInt);
+                var other = syntaxTree.FindBestMatch<LiteralExpressionSyntax>(otherInt);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
         }
