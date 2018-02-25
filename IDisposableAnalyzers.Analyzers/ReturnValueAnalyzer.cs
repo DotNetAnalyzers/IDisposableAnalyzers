@@ -10,12 +10,14 @@ namespace IDisposableAnalyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ReturnValueAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
+#pragma warning disable GU0001 // Name the arguments.
+                              /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
             IDISP011DontReturnDisposed.Descriptor,
             IDISP012PropertyShouldNotReturnCreated.Descriptor,
             IDISP013AwaitInUsing.Descriptor);
+#pragma warning restore GU0001 // Name the arguments.
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -24,8 +26,8 @@ namespace IDisposableAnalyzers
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(HandleReturnValue, SyntaxKind.ReturnStatement);
             context.RegisterSyntaxNodeAction(HandleArrow, SyntaxKind.ArrowExpressionClause);
-            context.RegisterSyntaxNodeAction(HandleLamdba, SyntaxKind.ParenthesizedLambdaExpression);
-            context.RegisterSyntaxNodeAction(HandleLamdba, SyntaxKind.SimpleLambdaExpression);
+            context.RegisterSyntaxNodeAction(HandleLambda, SyntaxKind.ParenthesizedLambdaExpression);
+            context.RegisterSyntaxNodeAction(HandleLambda, SyntaxKind.SimpleLambdaExpression);
         }
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context)
@@ -66,7 +68,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static void HandleLamdba(SyntaxNodeAnalysisContext context)
+        private static void HandleLambda(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
