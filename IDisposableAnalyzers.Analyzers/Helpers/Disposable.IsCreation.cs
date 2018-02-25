@@ -92,38 +92,6 @@ namespace IDisposableAnalyzers
             }
         }
 
-        internal static Result IsAssignedWithCreated(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!IsPotentiallyAssignableTo(field?.Type))
-            {
-                return Result.No;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                }
-            }
-        }
-
-        internal static Result IsAssignedWithCreated(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!IsPotentiallyAssignableTo(property?.Type))
-            {
-                return Result.No;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                }
-            }
-        }
-
         internal static Result IsAssignedWithCreated(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, context, semanticModel, cancellationToken))
