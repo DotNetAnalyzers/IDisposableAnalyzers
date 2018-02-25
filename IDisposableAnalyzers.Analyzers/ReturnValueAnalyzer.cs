@@ -14,7 +14,8 @@ namespace IDisposableAnalyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
             IDISP011DontReturnDisposed.Descriptor,
-            IDISP012PropertyShouldNotReturnCreated.Descriptor);
+            IDISP012PropertyShouldNotReturnCreated.Descriptor,
+            IDISP013AwaitInUsing.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -88,10 +89,10 @@ namespace IDisposableAnalyzers
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
                           .IsEither(Result.Yes, Result.AssumeYes) &&
-                context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol symbol)
+                context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol returnedSymbol)
             {
-                if (IsInUsing(symbol, context.CancellationToken) ||
-                    Disposable.IsDisposedBefore(symbol, returnValue, context.SemanticModel, context.CancellationToken))
+                if (IsInUsing(returnedSymbol, context.CancellationToken) ||
+                    Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
                 }
@@ -115,22 +116,37 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
-            else if (returnValue is InvocationExpressionSyntax invocation &&
-                     invocation.ArgumentList != null)
+            else if (returnValue is InvocationExpressionSyntax invocation)
             {
-                foreach (var argument in invocation.ArgumentList.Arguments)
+                if (invocation.ArgumentList != null)
                 {
-                    if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken)
-                                  .IsEither(Result.Yes, Result.AssumeYes) &&
-                        context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
+                    foreach (var argument in invocation.ArgumentList.Arguments)
                     {
-                        if (IsInUsing(argumentSymbol, context.CancellationToken) ||
-                            Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                        if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken)
+                                      .IsEither(Result.Yes, Result.AssumeYes) &&
+                            context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
                         {
-                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
+                            if (IsInUsing(argumentSymbol, context.CancellationToken) ||
+                                Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
+                                if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
+                                }
                             }
+                        }
+                    }
+                }
+
+                if (invocation.FirstAncestor<UsingStatementSyntax>() != null &&
+                    invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+                {
+                    var symbol = context.SemanticModel.GetSymbolSafe(memberAccess.Expression, context.CancellationToken);
+                    if (IsInUsing(symbol, context.CancellationToken))
+                    {
+                        if (context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
                         }
                     }
                 }

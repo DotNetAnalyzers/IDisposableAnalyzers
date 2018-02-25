@@ -56,6 +56,10 @@ Roslyn analyzers for IDisposable
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP012.md">IDISP012</a></td>
   <td>Property should not return created disposable.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP013.md">IDISP013</a></td>
+  <td>Await in using.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

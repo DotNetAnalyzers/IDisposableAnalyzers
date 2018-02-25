@@ -1008,5 +1008,28 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void AwaitingInUsing()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public async Task<string> Bar()
+        {
+            using (var client = new WebClient())
+            {
+                return await client.DownloadStringTaskAsync(string.Empty);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
