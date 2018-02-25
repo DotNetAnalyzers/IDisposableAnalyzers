@@ -401,9 +401,8 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, testCode);
         }
 
-        [Explicit("Fix later")]
         [Test]
-        public void PropertyCreatingDisposableExpressionBodyToString()
+        public void PropertyCreatingDisposableExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox

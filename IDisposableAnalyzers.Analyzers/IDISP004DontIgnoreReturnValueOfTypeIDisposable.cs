@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -52,6 +52,14 @@ namespace IDisposableAnalyzers
                 !method.ReturnsVoid &&
                 Disposable.IsPotentiallyAssignableTo(method.ReturnType) &&
                 MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
+            {
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
+            }
+
+            if (context.Node is MemberAccessExpressionSyntax memberAccess &&
+                context.SemanticModel.GetSymbolSafe(memberAccess.Expression, context.CancellationToken) is IPropertySymbol property &&
+                Disposable.IsPotentiallyAssignableTo(property.Type) &&
+                MustBeHandled(memberAccess.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
