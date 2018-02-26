@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
+namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -697,7 +697,7 @@ namespace Gu.Reactive
         [Explicit("Don't think this is very useful.")]
         [TestCase("action(disposable)")]
         [TestCase("action.Invoke(disposable)")]
-        public void IgnoreLambdaUsageOnInjected(string disposeCode)
+        public void LambdaUsageOnInjected(string disposeCode)
         {
             var testCode = @"
 namespace RoslynSandbox
