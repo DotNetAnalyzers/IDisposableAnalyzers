@@ -1,4 +1,4 @@
-﻿#pragma warning disable SA1203 // Constants must appear before fields
+#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
@@ -310,6 +310,43 @@ namespace RoslynSandbox
             using(var command = this.connection.CreateCommand())
             {
             }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void DisposedInEventLambda()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Diagnostics;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        static Task RunProcessAsync(string fileName)
+        {
+            // there is no non-generic TaskCompletionSource
+            var tcs = new TaskCompletionSource<bool>();
+
+            var process = new Process
+                          {
+                              StartInfo = { FileName = fileName },
+                              EnableRaisingEvents = true
+                          };
+
+            process.Exited += (sender, args) =>
+            {
+                tcs.SetResult(true);
+                process.Dispose();
+            };
+
+            process.Start();
+
+            return tcs.Task;
         }
     }
 }";

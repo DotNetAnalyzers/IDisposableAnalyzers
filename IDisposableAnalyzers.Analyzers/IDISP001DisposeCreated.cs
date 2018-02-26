@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -200,18 +200,13 @@
             return false;
         }
 
-        private static bool IsDisposedAfter(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsDisposedAfter(ILocalSymbol local, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<MemberDeclarationSyntax>()))
+            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<BlockSyntax>()))
             {
                 foreach (var invocation in pooled.Invocations)
                 {
-                    if (!IsAfter(invocation, assignment))
-                    {
-                        continue;
-                    }
-
-                    if (Disposable.IsDisposing(invocation, symbol, semanticModel, cancellationToken))
+                    if (Disposable.IsDisposing(invocation, local, semanticModel, cancellationToken))
                     {
                         return true;
                     }
@@ -219,32 +214,6 @@
             }
 
             return false;
-        }
-
-        private static bool IsAfter(SyntaxNode node, SyntaxNode other)
-        {
-            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
-            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
-            if (statement == null ||
-                otherStatement == null)
-            {
-                return false;
-            }
-
-            if (statement.SpanStart <= otherStatement.SpanStart)
-            {
-                return false;
-            }
-
-            var block = node.FirstAncestor<BlockSyntax>();
-            var otherBlock = other.FirstAncestor<BlockSyntax>();
-
-            if (block == null || otherBlock == null)
-            {
-                return false;
-            }
-
-            return ReferenceEquals(block, otherBlock);
         }
     }
 }

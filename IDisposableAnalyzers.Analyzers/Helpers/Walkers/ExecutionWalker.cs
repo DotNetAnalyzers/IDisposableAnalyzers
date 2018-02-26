@@ -1,9 +1,10 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     /// <summary>
@@ -24,7 +25,14 @@
         {
             if (node is AnonymousFunctionExpressionSyntax)
             {
-                return;
+                switch (node.Parent.Kind())
+                {
+                    case SyntaxKind.AddAssignmentExpression:
+                    case SyntaxKind.Argument:
+                        break;
+                    default:
+                        return;
+                }
             }
 
             base.Visit(node);

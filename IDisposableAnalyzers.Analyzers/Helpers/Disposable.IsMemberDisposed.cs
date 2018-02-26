@@ -87,15 +87,17 @@ namespace IDisposableAnalyzers
 
         internal static bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
-            if (method == null ||
-                method.Parameters.Length != 0 ||
-                method != KnownSymbol.IDisposable.Dispose)
+            if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                memberAccess.Name is IdentifierNameSyntax methodName &&
+                methodName.Identifier.ValueText != "Dispose")
             {
                 return false;
             }
 
-            if (TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out ExpressionSyntax disposed))
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
+                method.Parameters.Length == 0 &&
+                method == KnownSymbol.IDisposable.Dispose &&
+                TryGetDisposedRootMember(invocation, semanticModel, cancellationToken, out var disposed))
             {
                 if (SymbolComparer.Equals(member, semanticModel.GetSymbolSafe(disposed, cancellationToken)))
                 {
@@ -275,7 +277,7 @@ namespace IDisposableAnalyzers
                     return Borrow(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, Search.Recursive, out IMethodSymbol disposeMethod))
+                if (TryGetDisposeMethod(type, Search.Recursive, out var disposeMethod))
                 {
                     return Borrow(disposeMethod, semanticModel, cancellationToken);
                 }
@@ -309,7 +311,7 @@ namespace IDisposableAnalyzers
                         continue;
                     }
 
-                    if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out ExpressionSyntax disposed) &&
+                    if (TryGetDisposedRootMember(invocation, this.SemanticModel, this.CancellationToken, out var disposed) &&
                         SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(disposed, this.CancellationToken)))
                     {
                         return Result.Yes;
