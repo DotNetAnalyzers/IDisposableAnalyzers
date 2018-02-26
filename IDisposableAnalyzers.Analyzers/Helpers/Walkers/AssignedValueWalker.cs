@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -323,7 +324,20 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+            if (this.CurrentSymbol is ILocalSymbol local)
+            {
+                var declaration = local.DeclaringSyntaxReferences.Single().GetSyntax(this.cancellationToken);
+                var scope = (SyntaxNode)declaration.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                        declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                if (scope != null)
+                {
+                    this.Visit(scope);
+                }
+
+                return;
+            }
+
+            if (this.CurrentSymbol is IParameterSymbol)
             {
                 var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
                                         this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
@@ -585,8 +599,19 @@ namespace IDisposableAnalyzers
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
             {
+                var lambda = node.FirstAncestor<AnonymousFunctionExpressionSyntax>();
                 if (node is ExpressionStatementSyntax &&
-                    node.SharesAncestor<MemberDeclarationSyntax>(this.context))
+                    node.SharesAncestor<MemberDeclarationSyntax>(this.context) &&
+                    lambda == null)
+                {
+                    return node.IsBeforeInScope(this.context);
+                }
+
+                if (lambda != null &&
+                    this.CurrentSymbol is ILocalSymbol local &&
+                    local.TryGetSingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declarator) &&
+                    lambda.Contains(declarator) &&
+                    IsInSameLambda(this.context, node))
                 {
                     return node.IsBeforeInScope(this.context);
                 }
@@ -601,6 +626,13 @@ namespace IDisposableAnalyzers
             }
 
             return Result.Yes;
+
+            bool IsInSameLambda(SyntaxNode node1, SyntaxNode node2)
+            {
+                var lambda1 = node1.FirstAncestor<AnonymousFunctionExpressionSyntax>();
+                return lambda1 != null &&
+                       ReferenceEquals(lambda1, node2.FirstAncestor<AnonymousFunctionExpressionSyntax>());
+            }
         }
 
         private class MemberWalker : CSharpSyntaxWalker

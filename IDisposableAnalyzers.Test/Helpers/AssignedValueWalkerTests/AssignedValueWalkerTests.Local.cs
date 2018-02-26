@@ -132,6 +132,39 @@ namespace RoslynSandbox
                 }
             }
 
+            [TestCase("var temp1 = value;", "1, 2")]
+            [TestCase("var temp2 = value;", "1, 2")]
+            public void LambdaClosure(string code, string expected)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            int value = 1;
+            Console.CancelKeyPress += (o, e) =>
+            {
+                var temp1 = value;
+                value = 2;
+                var temp2 = value;
+            };
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual(expected, actual);
+                }
+            }
+
             [Test]
             public void AssignedWithArg()
             {
