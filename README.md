@@ -60,6 +60,10 @@ Roslyn analyzers for IDisposable
   <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP013.md">IDISP013</a></td>
   <td>Await in using.</td>
 </tr>
+<tr>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP014.md">IDISP014</a></td>
+  <td>Use a single instance of HttpClient.</td>
+</tr>
 <table>
 <!-- end generated table -->
 

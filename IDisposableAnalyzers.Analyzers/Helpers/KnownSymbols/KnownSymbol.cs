@@ -2,6 +2,8 @@
 // ReSharper disable UnusedMember.Global
 namespace IDisposableAnalyzers
 {
+    using Microsoft.CodeAnalysis;
+
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Void = Create("System.Void");
@@ -79,6 +81,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType NUnitOneTimeTearDownAttribute = new QualifiedType("NUnit.Framework.OneTimeTearDownAttribute");
 
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
+        internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
 
         private static QualifiedType Create(string qualifiedName)
         {

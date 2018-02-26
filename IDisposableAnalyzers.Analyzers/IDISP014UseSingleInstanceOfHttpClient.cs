@@ -2,18 +2,18 @@ namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class IDISP013AwaitInUsing
+    internal static class IDISP014UseSingleInstanceOfHttpClient
     {
-        public const string DiagnosticId = "IDISP013";
+        public const string DiagnosticId = "IDISP014";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Await in using.",
-            messageFormat: "Await in using.",
+            title: "Use a single instance of HttpClient.",
+            messageFormat: "Use a single instance of HttpClient.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Await in using.",
+            description: "Use a single instance of HttpClient.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }
