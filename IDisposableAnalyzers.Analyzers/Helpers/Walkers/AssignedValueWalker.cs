@@ -573,39 +573,22 @@ namespace IDisposableAnalyzers
         {
             if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
-                switch (node.Kind())
+                if (node is ExpressionStatementSyntax &&
+                    this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
+                    node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                 {
-                    case SyntaxKind.ExpressionStatement:
-                        return this.context.SharesAncestor<ConstructorDeclarationSyntax>(node)
-                                   ? node.IsBeforeInScope(this.context)
-                                   : Result.Yes;
-                    default:
-                        return Result.Yes;
+                    return node.IsBeforeInScope(this.context);
                 }
+
+                return Result.Yes;
             }
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
             {
-                if (node is StatementSyntax &&
+                if (node is ExpressionStatementSyntax &&
                     node.SharesAncestor<MemberDeclarationSyntax>(this.context))
                 {
-                    var statement = node.FirstAncestorOrSelf<StatementSyntax>();
-                    var contextStatement = this.context?.FirstAncestorOrSelf<StatementSyntax>();
-                    if (statement == null ||
-                        contextStatement == null)
-                    {
-                        return Result.AssumeNo;
-                    }
-
-                    if (!statement.Parent.Contains(contextStatement) &&
-                        !contextStatement.Parent.Contains(statement))
-                    {
-                        return Result.No;
-                    }
-
-                    return statement.SpanStart >= contextStatement.SpanStart
-                        ? Result.No
-                        : Result.Yes;
+                    return node.IsBeforeInScope(this.context);
                 }
 
                 return Result.Yes;
@@ -617,15 +600,7 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            switch (node.Kind())
-            {
-                case SyntaxKind.ExpressionStatement:
-                    return this.context.SharesAncestor<MemberDeclarationSyntax>(node)
-                               ? node.IsBeforeInScope(this.context)
-                               : Result.Yes;
-                default:
-                    return Result.Yes;
-            }
+            return Result.Yes;
         }
 
         private class MemberWalker : CSharpSyntaxWalker

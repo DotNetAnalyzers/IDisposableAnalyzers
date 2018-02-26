@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
@@ -905,6 +906,36 @@ namespace RoslynSandbox
                 {
                     var actual = string.Join(", ", assignedValues);
                     Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [Test]
+            public void FieldAssignedInLambdaCtor()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        private int value;
+
+        public Foo()
+        {
+            Console.CancelKeyPress += (o, e) =>
+            {
+                this.value = 1;
+            };
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("this.value = 1").Left;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    Assert.AreEqual("1", assignedValues.Single().ToString());
                 }
             }
         }
