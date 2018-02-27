@@ -65,11 +65,11 @@ namespace IDisposableAnalyzers.Benchmarks
 
         private static void CopyResult(Summary summary)
         {
-            Console.WriteLine($"DestinationDirectory: {BenchmarksDirectory}");
+            Console.WriteLine($"Start copy {summary.Title}, ResultsDirectory: {summary.ResultsDirectoryPath}, DestinationDirectory: {BenchmarksDirectory}");
             if (Directory.Exists(BenchmarksDirectory))
             {
                 var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath)
-                                              .Single(x => x == summary.Title + "-report-github.md");
+                                              .Single(x => x.EndsWith(summary.Title + "-report-github.md"));
                 var destinationFileName = Path.Combine(BenchmarksDirectory, summary.Title + ".md");
                 Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
                 File.Copy(sourceFileName, destinationFileName, overwrite: true);
