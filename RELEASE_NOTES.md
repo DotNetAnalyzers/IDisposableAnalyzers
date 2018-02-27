@@ -1,4 +1,9 @@
-#### 0.1.4.3
+#### 0.1.4.4
+* FEATÙRE: IDISP014 check that HttpClient is assigned to static field or property.
+* BUGFIX: IDISP001 handle dispose in lambda closure.
+* BUGFIX: IDISP004 handle properties.
+
+#### 0.1.4.4
 * BUGFIX: IDISP011 handle recursion.
 * BUGFIX: IDISP011 handle yield return.
 * BUGFIX: IDISP003 handle lambda.
