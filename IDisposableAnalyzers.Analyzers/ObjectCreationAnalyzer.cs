@@ -33,8 +33,8 @@ namespace IDisposableAnalyzers
             {
                 if (IsHttpClient(objectCreation, context.SemanticModel, context.CancellationToken))
                 {
-                    if(!IsStaticFieldInitializer(objectCreation) &&
-                       !IsStaticPropertyInitializer(objectCreation))
+                    if (!IsStaticFieldInitializer(objectCreation) &&
+                        !IsStaticPropertyInitializer(objectCreation))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
                     }
