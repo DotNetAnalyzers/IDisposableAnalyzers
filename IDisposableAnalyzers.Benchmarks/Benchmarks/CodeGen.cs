@@ -21,6 +21,12 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                     .ToArray();
 
+        [Test]
+        public void BenchmarksDirectoryExists()
+        {
+            Assert.AreEqual(true, Directory.Exists(BenchmarksDirectory), BenchmarksDirectory);
+        }
+
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {

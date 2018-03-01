@@ -1,8 +1,7 @@
-﻿namespace IDisposableAnalyzers.Benchmarks
+namespace IDisposableAnalyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
     using IDisposableAnalyzers.Benchmarks.Benchmarks;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -33,12 +32,6 @@
         public void Run(Gu.Roslyn.Asserts.Benchmark walker)
         {
             walker.Run();
-        }
-
-        [Test]
-        public void BenchmarksDirectoryExists()
-        {
-            Assert.AreEqual(true, Directory.Exists(Program.BenchmarksDirectory), Program.BenchmarksDirectory);
         }
     }
 }
