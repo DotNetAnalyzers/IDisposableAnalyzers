@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Benchmarks.Benchmarks
+namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -11,6 +11,10 @@
 
     public class CodeGen
     {
+        public static string ProjectDirectory => CodeFactory.FindProjectFile("IDisposableAnalyzers.Benchmarks.csproj").DirectoryName;
+
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
+
         private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
                                                                                                     .GetTypes()
                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
@@ -21,7 +25,7 @@
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
         {
             var expectedName = analyzer.GetType().Name + "Benchmarks";
-            var fileName = Path.Combine(Program.BenchmarksDirectory, expectedName + ".cs");
+            var fileName = Path.Combine(BenchmarksDirectory, expectedName + ".cs");
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine($"namespace {this.GetType().Namespace}")
                                           .AppendLine("{")
@@ -48,7 +52,7 @@
         [Test]
         public void AllBenchmarks()
         {
-            var fileName = Path.Combine(Program.BenchmarksDirectory, "AllBenchmarks.cs");
+            var fileName = Path.Combine(BenchmarksDirectory, "AllBenchmarks.cs");
             var builder = new StringBuilder();
             builder.AppendLine("// ReSharper disable RedundantNameQualifier")
                    .AppendLine($"namespace {this.GetType().Namespace}")
