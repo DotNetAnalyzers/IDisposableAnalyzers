@@ -51,7 +51,7 @@
                 return value != null;
             }
 
-            if (parameter.HasExplicitDefaultValue && parameter.TryGetSingleDeclaration(cancellationToken, out SyntaxNode declaration))
+            if (parameter.HasExplicitDefaultValue && parameter.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration))
             {
                 value = (declaration as ParameterSyntax)?.Default.Value;
             }

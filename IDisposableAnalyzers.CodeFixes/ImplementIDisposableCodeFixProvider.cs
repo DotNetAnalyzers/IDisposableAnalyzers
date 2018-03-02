@@ -101,7 +101,7 @@ namespace IDisposableAnalyzers
                     continue;
                 }
 
-                if (type.TryGetSingleMethodRecursive("Dispose", out var disposeMethod) &&
+                if (type.TrySingleMethodRecursive("Dispose", out var disposeMethod) &&
                     !disposeMethod.IsStatic &&
                     disposeMethod.ReturnsVoid &&
                     disposeMethod.Parameters.Length == 0)
@@ -235,9 +235,9 @@ namespace IDisposableAnalyzers
                 classDeclaration,
                 ParseMethod(code, usesUnderscoreNames, field));
 
-            if (!type.GetMembers().TryGetFirst(x => x.Name == "ThrowIfDisposed", out _))
+            if (!type.GetMembers().TryFirst(x => x.Name == "ThrowIfDisposed", out _))
             {
-                if (type.BaseType.TryGetSingleMethodRecursive("ThrowIfDisposed", out var baseThrow) &&
+                if (type.BaseType.TrySingleMethodRecursive("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
                 {
                     if (baseThrow.IsVirtual)
@@ -322,7 +322,7 @@ namespace IDisposableAnalyzers
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetSingleMethodRecursive("ThrowIfDisposed", out _))
+            if (!type.TrySingleMethodRecursive("ThrowIfDisposed", out _))
             {
                 editor.AddMethod(
                     classDeclaration,
@@ -338,7 +338,7 @@ namespace IDisposableAnalyzers
                         field));
             }
 
-            if (classDeclaration.BaseList?.Types.TryGetSingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
+            if (classDeclaration.BaseList?.Types.TrySingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
             {
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
@@ -378,7 +378,7 @@ namespace IDisposableAnalyzers
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryGetSingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
+            if (!type.TrySingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
             {
                 editor.AddMethod(
                     classDeclaration,
@@ -394,7 +394,7 @@ namespace IDisposableAnalyzers
                         field));
             }
 
-            if (classDeclaration.BaseList?.Types.TryGetFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
+            if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
             {
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
@@ -462,12 +462,12 @@ namespace IDisposableAnalyzers
 
             public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
@@ -477,12 +477,12 @@ namespace IDisposableAnalyzers
 
             public override SyntaxNode VisitEventDeclaration(EventDeclarationSyntax node)
             {
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
                     !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
@@ -493,12 +493,12 @@ namespace IDisposableAnalyzers
 
             public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
             {
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
                     !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
@@ -509,21 +509,21 @@ namespace IDisposableAnalyzers
 
             public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
             {
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
                 var parentModifiers = node.FirstAncestor<BasePropertyDeclarationSyntax>()?.Modifiers;
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
                     parentModifiers?.Any(SyntaxKind.OverrideKeyword) == false)
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
                 }
 
-                if (parentModifiers?.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
+                if (parentModifiers?.TrySingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
                 {
-                    if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
+                    if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
                     {
                         node = node.WithModifiers(node.Modifiers.Remove(modifier));
                     }
@@ -534,12 +534,12 @@ namespace IDisposableAnalyzers
 
             public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
             {
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
 
-                if (node.Modifiers.TryGetSingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
                     !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
                 {
                     node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));

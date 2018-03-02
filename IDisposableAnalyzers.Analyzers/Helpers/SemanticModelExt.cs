@@ -48,7 +48,7 @@
                 return null;
             }
 
-            if (node.Declaration.Variables.TryGetSingle(out var variable))
+            if (node.Declaration.Variables.TrySingle(out var variable))
             {
                 return (IFieldSymbol)semanticModel.SemanticModelFor(node)
                                                   ?.GetDeclaredSymbol(variable, cancellationToken);

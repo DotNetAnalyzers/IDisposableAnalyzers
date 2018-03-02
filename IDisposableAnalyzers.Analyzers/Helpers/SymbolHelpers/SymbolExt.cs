@@ -13,7 +13,7 @@
             return symbol is T1 || symbol is T2;
         }
 
-        internal static bool TryGetSingleDeclaration<T>(this ISymbol symbol, CancellationToken cancellationToken, out T declaration)
+        internal static bool TrySingleDeclaration<T>(this ISymbol symbol, CancellationToken cancellationToken, out T declaration)
             where T : SyntaxNode
         {
             declaration = null;
@@ -22,7 +22,7 @@
                 return false;
             }
 
-            if (symbol.DeclaringSyntaxReferences.TryGetSingle(out var reference))
+            if (symbol.DeclaringSyntaxReferences.TrySingle(out var reference))
             {
                 var syntax = reference.GetSyntax(cancellationToken);
                 if (symbol is IFieldSymbol &&

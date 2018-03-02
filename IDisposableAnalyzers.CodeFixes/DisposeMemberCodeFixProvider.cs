@@ -42,7 +42,7 @@
                 if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
                     if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
-                        disposeMethodSymbol.TryGetSingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                        disposeMethodSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                     {
                         if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
                             disposeMethodSymbol.ContainingType == memberSymbol.ContainingType &&
@@ -143,7 +143,7 @@
         private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
             if (member is FieldDeclarationSyntax field &&
-                field.Declaration.Variables.TryGetSingle(out var declarator))
+                field.Declaration.Variables.TrySingle(out var declarator))
             {
                 symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
                 return symbol != null;

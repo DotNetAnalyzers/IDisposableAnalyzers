@@ -33,7 +33,7 @@ namespace RoslynSandbox
 
     internal static class EnumerableExt
     {
-        internal static bool TryGetAtIndex<TCollection, TItem>(this TCollection source, int index, out TItem result)
+        internal static bool TryElementAt<TCollection, TItem>(this TCollection source, int index, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             result = default(TItem);
@@ -51,7 +51,7 @@ namespace RoslynSandbox
             return true;
         }
 
-        internal static bool TryGetSingle<TCollection, TItem>(this TCollection source, out TItem result)
+        internal static bool TrySingle<TCollection, TItem>(this TCollection source, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             if (source.Count == 1)
@@ -64,7 +64,7 @@ namespace RoslynSandbox
             return false;
         }
 
-        internal static bool TryGetSingle<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+        internal static bool TrySingle<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             foreach (var item in source)
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             return false;
         }
 
-        internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, out TItem result)
+        internal static bool TryFirst<TCollection, TItem>(this TCollection source, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             if (source.Count == 0)
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             return true;
         }
 
-        internal static bool TryGetFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+        internal static bool TryFirst<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             foreach (var item in source)
@@ -109,7 +109,7 @@ namespace RoslynSandbox
             return false;
         }
 
-        internal static bool TryGetLast<TCollection, TItem>(this TCollection source, out TItem result)
+        internal static bool TryLast<TCollection, TItem>(this TCollection source, out TItem result)
             where TCollection : IReadOnlyList<TItem>
         {
             if (source.Count == 0)
@@ -122,7 +122,7 @@ namespace RoslynSandbox
             return true;
         }
 
-        internal static bool TryGetLast<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
+        internal static bool TryLast<TCollection, TItem>(this TCollection source, Func<TItem, bool> selector, out TItem result)
              where TCollection : IReadOnlyList<TItem>
         {
             for (var i = source.Count - 1; i >= 0; i--)

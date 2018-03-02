@@ -109,7 +109,7 @@ namespace IDisposableAnalyzers
                            (disposeMethod.Parameters.Length == 1 &&
                             disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
                 case 2:
-                    if (disposers.TryGetSingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
+                    if (disposers.TrySingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
                     {
                         disposeMethod = temp as IMethodSymbol;
                         return disposeMethod != null &&
@@ -135,7 +135,7 @@ namespace IDisposableAnalyzers
             var baseType = type.BaseType;
             while (baseType != null)
             {
-                if (baseType.TryGetSingleMethodRecursive("Dispose", IsVirtualDispose, out result))
+                if (baseType.TrySingleMethodRecursive("Dispose", IsVirtualDispose, out result))
                 {
                     return true;
                 }

@@ -25,7 +25,7 @@
             foreach (var member in type.Members)
             {
                 if (member is FieldDeclarationSyntax declaration &&
-                    declaration.Declaration.Variables.TryGetSingle(x => x.Identifier.ValueText == name, out _))
+                    declaration.Declaration.Variables.TrySingle(x => x.Identifier.ValueText == name, out _))
                 {
                     match = declaration;
                     return true;

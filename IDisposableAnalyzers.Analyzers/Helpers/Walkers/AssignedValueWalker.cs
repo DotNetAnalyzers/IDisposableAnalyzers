@@ -609,7 +609,7 @@ namespace IDisposableAnalyzers
 
                 if (lambda != null &&
                     this.CurrentSymbol is ILocalSymbol local &&
-                    local.TryGetSingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declarator) &&
+                    local.TrySingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declarator) &&
                     lambda.Contains(declarator) &&
                     IsInSameLambda(this.context, node))
                 {

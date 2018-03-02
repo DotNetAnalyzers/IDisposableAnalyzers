@@ -38,7 +38,7 @@
                 if (member is MethodDeclarationSyntax disposeMethod)
                 {
                     if (disposeMethod.ParameterList != null &&
-                        disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
+                        disposeMethod.ParameterList.Parameters.TrySingle(out var parameter))
                     {
                         context.RegisterDocumentEditorFix(
                             $"Call base.Dispose({parameter.Identifier.ValueText})",
@@ -52,7 +52,7 @@
 
         private static void AddBaseCall(DocumentEditor editor, MethodDeclarationSyntax disposeMethod)
         {
-            if (disposeMethod.ParameterList.Parameters.TryGetSingle(out var parameter))
+            if (disposeMethod.ParameterList.Parameters.TrySingle(out var parameter))
             {
                 var baseCall = SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
                                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)

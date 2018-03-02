@@ -19,7 +19,7 @@
             {
                 var index = argument.FirstAncestorOrSelf<ArgumentListSyntax>()
                                     .Arguments.IndexOf(argument);
-                if (method.ParameterList.Parameters.TryGetAtIndex(index, out parameter))
+                if (method.ParameterList.Parameters.TryElementAt(index, out parameter))
                 {
                     return true;
                 }

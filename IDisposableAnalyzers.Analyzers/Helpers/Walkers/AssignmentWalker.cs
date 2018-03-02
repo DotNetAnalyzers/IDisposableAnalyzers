@@ -146,7 +146,7 @@ namespace IDisposableAnalyzers
 
                     if (candidate.Right is ObjectCreationExpressionSyntax objectCreation &&
                         objectCreation.ArgumentList != null &&
-                        objectCreation.ArgumentList.Arguments.TryGetFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _))
+                        objectCreation.ArgumentList.Arguments.TryFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _))
                     {
                         assignment = candidate;
                         return true;
@@ -160,7 +160,7 @@ namespace IDisposableAnalyzers
                         if (argument.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == symbol.Name &&
                             semanticModel.GetSymbolSafe(argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
-                            method.TryGetSingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
+                            method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
                             methodDeclaration.TryGetMatchingParameter(argument, out var parameter) &&
                             FirstWith(semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken), methodDeclaration, search, semanticModel, cancellationToken, out assignment))
                         {

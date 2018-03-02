@@ -42,7 +42,7 @@
                 return !type.Is(KnownSymbol.IDisposable);
             }
 
-            return !type.TryGetFirstMethodRecursive("Dispose", m => m.Parameters.Length == 0, out _);
+            return !type.TryFirstMethodRecursive("Dispose", m => m.Parameters.Length == 0, out _);
         }
 
         private static ITypeSymbol MemberType(ISymbol member) =>

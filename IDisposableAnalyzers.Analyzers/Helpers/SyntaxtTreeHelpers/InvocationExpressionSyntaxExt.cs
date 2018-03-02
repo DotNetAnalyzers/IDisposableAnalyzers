@@ -90,10 +90,10 @@
                 if (argument.NameColon is NameColonSyntax nameColon &&
                     nameColon.Name is IdentifierNameSyntax name)
                 {
-                    return method.Parameters.TryGetSingle(x => x.Name == name.Identifier.ValueText, out parameter);
+                    return method.Parameters.TrySingle(x => x.Name == name.Identifier.ValueText, out parameter);
                 }
 
-                return method.Parameters.TryGetAtIndex(
+                return method.Parameters.TryElementAt(
                     invocation.ArgumentList.Arguments.IndexOf(argument),
                     out parameter);
             }

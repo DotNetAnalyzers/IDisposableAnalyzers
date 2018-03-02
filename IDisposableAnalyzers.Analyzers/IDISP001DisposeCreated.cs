@@ -138,7 +138,7 @@ namespace IDisposableAnalyzers
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TryGetSingle(out ArgumentSyntax argument) &&
+                            invocation.ArgumentList.Arguments.TrySingle(out ArgumentSyntax argument) &&
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;

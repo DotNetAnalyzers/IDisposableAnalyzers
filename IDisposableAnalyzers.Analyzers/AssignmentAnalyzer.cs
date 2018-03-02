@@ -158,8 +158,8 @@ namespace IDisposableAnalyzers
                     (identifierName.Identifier.ValueText == "ReferenceEquals" ||
                      identifierName.Identifier.ValueText == "Equals"))
                 {
-                    if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                        invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
+                    if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                        invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                     {
                         return !IsAssignedBefore(ifStatement);
                     }
@@ -171,8 +171,8 @@ namespace IDisposableAnalyzers
                         (memberIdentifier.Identifier.ValueText == "ReferenceEquals" ||
                          memberIdentifier.Identifier.ValueText == "Equals"))
                 {
-                    if (invocation.ArgumentList.Arguments.TryGetSingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                        invocation.ArgumentList.Arguments.TryGetSingle(x => IsSymbol(x.Expression), out _))
+                    if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                        invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                     {
                         return !IsAssignedBefore(ifStatement);
                     }

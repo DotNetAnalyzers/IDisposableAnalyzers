@@ -221,7 +221,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (method.TryGetSingleDeclaration<BaseMethodDeclarationSyntax>(cancellationToken, out var methodDeclaration) &&
+            if (method.TrySingleDeclaration<BaseMethodDeclarationSyntax>(cancellationToken, out var methodDeclaration) &&
                 methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
             {
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
@@ -238,7 +238,7 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TryGetSingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == paremeter.Identifier.ValueText, out var chainedArgument))
+                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == paremeter.Identifier.ValueText, out var chainedArgument))
                 {
                     var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
