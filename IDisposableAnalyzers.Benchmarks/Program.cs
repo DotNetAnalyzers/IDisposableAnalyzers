@@ -52,8 +52,7 @@ namespace IDisposableAnalyzers.Benchmarks
 
         private static IEnumerable<Summary> RunSingle<T>()
         {
-            var summaries = new[] { BenchmarkRunner.Run<T>() };
-            return summaries;
+            yield return BenchmarkRunner.Run<T>();
         }
 
         private static void CopyResult(Summary summary)
