@@ -23,23 +23,21 @@ namespace IDisposableAnalyzers.Test.Documentation
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\");
+        private static string SolutionDirectory => CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln").DirectoryName;
 
         private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
 
         [TestCaseSource(nameof(Descriptors))]
         public void MissingDocs(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.DocExists)
+            if (!descriptorInfo.DocExists)
             {
-                Assert.Pass();
+                var descriptor = descriptorInfo.Descriptor;
+                var id = descriptor.Id;
+                DumpIfDebug(CreateStub(descriptorInfo));
+                File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
+                Assert.Fail($"Documentation is missing for {id}");
             }
-
-            var descriptor = descriptorInfo.Descriptor;
-            var id = descriptor.Id;
-            DumpIfDebug(CreateStub(descriptorInfo));
-            File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
-            Assert.Fail($"Documentation is missing for {id}");
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -191,7 +189,7 @@ namespace IDisposableAnalyzers.Test.Documentation
                                              .FirstOrDefault();
                 this.CodeFileUri = this.CodeFileName != null
                     ? @"https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/" +
-                      this.CodeFileName.Substring(SolutionDirectory.Length).Replace("\\", "/")
+                      this.CodeFileName.Substring(SolutionDirectory.Length + 1).Replace("\\", "/")
                     : "missing";
             }
 
