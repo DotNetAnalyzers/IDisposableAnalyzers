@@ -12,6 +12,10 @@
   <td>{SEVERITY}</td>
 </tr>
 <tr>
+  <td>Enabled</td>
+  <td>{ENABLED}</td>
+</tr>
+<tr>
   <td>Category</td>
   <td>{CATEGORY}</td>
 </tr>

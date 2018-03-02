@@ -121,19 +121,21 @@ namespace IDisposableAnalyzers.Test.Documentation
         {
             var descriptor = descriptorInfo.Descriptor;
             return CreateStub(
-                id: descriptor.Id,
-                title: descriptor.Title.ToString(),
-                severity: descriptor.DefaultSeverity,
-                codeFileUrl: descriptorInfo.CodeFileUri,
-                category: descriptor.Category,
-                typeName: descriptorInfo.Analyzer.GetType().Name,
-                description: descriptor.Description.ToString());
+                descriptor.Id,
+                descriptor.Title.ToString(),
+                descriptor.DefaultSeverity,
+                descriptor.IsEnabledByDefault,
+                descriptorInfo.CodeFileUri,
+                descriptor.Category,
+                descriptorInfo.Analyzer.GetType().Name,
+                descriptor.Description.ToString());
         }
 
         private static string CreateStub(
             string id,
             string title,
             DiagnosticSeverity severity,
+            bool enabled,
             string codeFileUrl,
             string category,
             string typeName,
@@ -142,8 +144,9 @@ namespace IDisposableAnalyzers.Test.Documentation
             return Properties.Resources.DiagnosticDocTemplate.Replace("{ID}", id)
                              .Replace("## ADD TITLE HERE", $"## {title}")
                              .Replace("{SEVERITY}", severity.ToString())
+                             .Replace("{ENABLED}", enabled ? "true" : "false")
                              .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/IDisposableAnalyzers")
+                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/PropertyChangedAnalyzers")
                              .Replace("{TYPENAME}", typeName)
                              .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
                              .Replace("{TITLE}", title)

@@ -12,6 +12,10 @@
   <td>Warning</td>
 </tr>
 <tr>
+  <td>Enabled</td>
+  <td>true</td>
+</tr>
+<tr>
   <td>Category</td>
   <td>IDisposableAnalyzers.Correctness</td>
 </tr>
