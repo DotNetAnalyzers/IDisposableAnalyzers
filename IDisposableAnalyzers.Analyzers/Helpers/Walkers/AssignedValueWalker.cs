@@ -363,8 +363,7 @@ namespace IDisposableAnalyzers
                 {
                     this.Visit(fieldDeclarationSyntax);
                 }
-
-                if (this.CurrentSymbol is IPropertySymbol &&
+                else if (this.CurrentSymbol is IPropertySymbol &&
                     this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax propertyDeclaration) &&
                     propertyDeclaration.Initializer != null)
                 {
