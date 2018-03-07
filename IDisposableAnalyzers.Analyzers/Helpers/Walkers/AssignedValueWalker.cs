@@ -358,30 +358,17 @@ namespace IDisposableAnalyzers
                     return;
                 }
 
-                if (this.CurrentSymbol is IFieldSymbol)
+                if (this.CurrentSymbol is IFieldSymbol &&
+                    this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax fieldDeclarationSyntax))
                 {
-                    foreach (var reference in this.CurrentSymbol.DeclaringSyntaxReferences)
-                    {
-                        var fieldDeclarationSyntax = reference.GetSyntax(this.cancellationToken)
-                                                              ?.FirstAncestorOrSelf<FieldDeclarationSyntax>();
-                        if (fieldDeclarationSyntax != null)
-                        {
-                            this.Visit(fieldDeclarationSyntax);
-                        }
-                    }
+                    this.Visit(fieldDeclarationSyntax);
                 }
 
-                if (this.CurrentSymbol is IPropertySymbol)
+                if (this.CurrentSymbol is IPropertySymbol &&
+                    this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax propertyDeclaration) &&
+                    propertyDeclaration.Initializer != null)
                 {
-                    foreach (var reference in this.CurrentSymbol.DeclaringSyntaxReferences)
-                    {
-                        var propertyDeclarationSyntax = reference.GetSyntax(this.cancellationToken)
-                                                                 ?.FirstAncestorOrSelf<PropertyDeclarationSyntax>();
-                        if (propertyDeclarationSyntax?.Initializer?.Value != null)
-                        {
-                            this.values.Add(propertyDeclarationSyntax.Initializer.Value);
-                        }
-                    }
+                    this.values.Add(propertyDeclaration.Initializer.Value);
                 }
 
                 var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
