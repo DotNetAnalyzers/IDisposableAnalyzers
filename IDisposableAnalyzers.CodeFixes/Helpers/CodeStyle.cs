@@ -1,12 +1,16 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System;
-    using System.Threading;
+    using System.Collections.Generic;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class Names
+    /// <summary>
+    /// Helper for figuring out if the code uses underscore prefix in field names.
+    /// </summary>
+    internal static class CodeStyle
     {
         private enum Result
         {
@@ -16,64 +20,140 @@
             Maybe
         }
 
-        internal static bool UsesUnderscore(this SemanticModel semanticModel, CancellationToken cancellationToken)
+        /// <summary>
+        /// Figuring out if the code uses underscore prefix in field names.
+        /// </summary>
+        /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
+        /// <returns>True if the code is found to prefix field names with underscore.</returns>
+        internal static bool UnderscoreFields(this SemanticModel semanticModel)
         {
-            using (var walker = Walker.Borrow())
+            using (var walker = FieldWalker.Borrow())
             {
-                return UsesUnderscore(semanticModel, cancellationToken, walker);
-            }
-        }
-
-        internal static bool UsesUnderscore(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var walker = Walker.Borrow(node))
-            {
-                if (walker.UsesThis == Result.Yes ||
-                    walker.UsesUnderScore == Result.No)
+                switch (UnderscoreFields(semanticModel.SyntaxTree, walker))
                 {
-                    return false;
+                    case Result.Unknown:
+                    case Result.Maybe:
+                        break;
+                    case Result.Yes:
+                        return true;
+                    case Result.No:
+                        return false;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
 
-                if (walker.UsesUnderScore == Result.Yes ||
-                    walker.UsesThis == Result.No)
+                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
                 {
-                    return true;
-                }
-
-                return UsesUnderscore(semanticModel, cancellationToken, walker);
-            }
-        }
-
-        private static bool UsesUnderscore(this SemanticModel semanticModel, CancellationToken cancellationToken, Walker walker)
-        {
-            foreach (var tree in semanticModel.Compilation.SyntaxTrees)
-            {
-                if (tree.FilePath.EndsWith(".g.i.cs") ||
-                    tree.FilePath.EndsWith(".g.cs"))
-                {
-                    continue;
-                }
-
-                walker.Visit(tree.GetRoot(cancellationToken));
-                if (walker.UsesThis == Result.Yes ||
-                    walker.UsesUnderScore == Result.No)
-                {
-                    return false;
-                }
-
-                if (walker.UsesUnderScore == Result.Yes ||
-                    walker.UsesThis == Result.No)
-                {
-                    return true;
+                    switch (UnderscoreFields(tree, walker))
+                    {
+                        case Result.Unknown:
+                        case Result.Maybe:
+                            break;
+                        case Result.Yes:
+                            return true;
+                        case Result.No:
+                            return false;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
                 }
             }
 
             return false;
         }
 
-        private sealed class Walker : PooledWalker<Walker>
+        /// <summary>
+        /// Figuring out if the code uses using directives inside namespaces.
+        /// </summary>
+        /// <param name="semanticModel">The <see cref="SemanticModel"/></param>
+        /// <returns>True if the code is found to prefix field names with underscore.</returns>
+        internal static bool UsingDirectivesInsideNamespace(SemanticModel semanticModel)
         {
-            private Walker()
+            using (var walker = UsingDirectiveWalker.Borrow())
+            {
+                switch (UsingDirectivesInsideNamespace(semanticModel.SyntaxTree, walker))
+                {
+                    case Result.Unknown:
+                    case Result.Maybe:
+                        break;
+                    case Result.Yes:
+                        return true;
+                    case Result.No:
+                        return false;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                foreach (var tree in semanticModel.Compilation.SyntaxTrees)
+                {
+                    switch (UsingDirectivesInsideNamespace(tree, walker))
+                    {
+                        case Result.Unknown:
+                        case Result.Maybe:
+                            break;
+                        case Result.Yes:
+                            return true;
+                        case Result.No:
+                            return false;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        private static Result UnderscoreFields(this SyntaxTree tree, FieldWalker walker)
+        {
+            if (IsExcluded(tree))
+            {
+                return Result.Unknown;
+            }
+
+            if (tree.TryGetRoot(out var root))
+            {
+                walker.Visit(root);
+                if (walker.UsesThis == Result.Yes ||
+                    walker.UsesUnderScore == Result.No)
+                {
+                    return Result.No;
+                }
+
+                if (walker.UsesUnderScore == Result.Yes ||
+                    walker.UsesThis == Result.No)
+                {
+                    return Result.Yes;
+                }
+            }
+
+            return Result.Unknown;
+        }
+
+        private static Result UsingDirectivesInsideNamespace(this SyntaxTree tree, UsingDirectiveWalker walker)
+        {
+            if (IsExcluded(tree))
+            {
+                return Result.Unknown;
+            }
+
+            if (tree.TryGetRoot(out var root))
+            {
+                walker.Visit(root);
+            }
+
+            return walker.UsingDirectivesInside();
+        }
+
+        private static bool IsExcluded(SyntaxTree syntaxTree)
+        {
+            return syntaxTree.FilePath.EndsWith(".g.i.cs") ||
+                   syntaxTree.FilePath.EndsWith(".g.cs");
+        }
+
+        private sealed class FieldWalker : PooledWalker<FieldWalker>
+        {
+            private FieldWalker()
             {
             }
 
@@ -81,19 +161,7 @@
 
             public Result UsesUnderScore { get; private set; }
 
-            public static Walker Borrow() => Borrow(() => new Walker());
-
-            public static Walker Borrow(SyntaxNode node)
-            {
-                var walker = Borrow(() => new Walker());
-                while (node.Parent != null)
-                {
-                    node = node.Parent;
-                }
-
-                walker.Visit(node);
-                return walker;
-            }
+            public static FieldWalker Borrow() => Borrow(() => new FieldWalker());
 
             public override void VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
@@ -269,6 +337,51 @@
                             throw new ArgumentOutOfRangeException();
                     }
                 }
+            }
+        }
+
+        private sealed class UsingDirectiveWalker : PooledWalker<UsingDirectiveWalker>
+        {
+            private readonly List<UsingDirectiveSyntax> usingDirectives = new List<UsingDirectiveSyntax>();
+
+            public static UsingDirectiveWalker Borrow() => Borrow(() => new UsingDirectiveWalker());
+
+            public override void VisitUsingDirective(UsingDirectiveSyntax node)
+            {
+                this.usingDirectives.Add(node);
+                base.VisitUsingDirective(node);
+            }
+
+            public override void VisitClassDeclaration(ClassDeclarationSyntax node)
+            {
+                // Stop walking here
+            }
+
+            public override void VisitStructDeclaration(StructDeclarationSyntax node)
+            {
+                // Stop walking here
+            }
+
+            internal Result UsingDirectivesInside()
+            {
+                if (this.usingDirectives.Count == 0)
+                {
+                    return Result.Unknown;
+                }
+
+                if (this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() != null, out _))
+                {
+                    return this.usingDirectives.TryFirst(x => x.FirstAncestor<NamespaceDeclarationSyntax>() == null, out _)
+                        ? Result.Maybe
+                        : Result.Yes;
+                }
+
+                return Result.No;
+            }
+
+            protected override void Clear()
+            {
+                this.usingDirectives.Clear();
             }
         }
     }

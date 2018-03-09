@@ -64,7 +64,7 @@ namespace IDisposableAnalyzers
                     {
                         context.RegisterDocumentEditorFix(
                             "Create and assign field.",
-                            (editor, cancellationToken) => CreateAndAssignField(editor, statement, cancellationToken),
+                            (editor, cancellationToken) => CreateAndAssignField(editor, statement),
                             diagnostic);
                     }
                 }
@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers
         private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type, CancellationToken cancellationToken)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = containingType.UsesUnderscore(editor.SemanticModel, cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
             var variableDeclarator = statement.Declaration.Variables[0];
             var identifier = variableDeclarator.Identifier;
             var field = editor.AddField(
@@ -100,9 +100,9 @@ namespace IDisposableAnalyzers
                              .WithTrailingTrivia(statement.GetTrailingTrivia()));
         }
 
-        private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
+        private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement)
         {
-            var usesUnderscoreNames = editor.SemanticModel.UsesUnderscore(cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(

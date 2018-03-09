@@ -51,7 +51,7 @@ namespace IDisposableAnalyzers
                         {
                             context.RegisterDocumentEditorFix(
                                 "Add to CompositeDisposable.",
-                                (editor, cancellationToken) => AddToExisting(editor, statement, field, cancellationToken),
+                                (editor, cancellationToken) => AddToExisting(editor, statement, field),
                                 diagnostic);
                         }
                         else
@@ -70,7 +70,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, IFieldSymbol field, CancellationToken cancellationToken)
+        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, IFieldSymbol field)
         {
             bool TryGetPreviousStatement(StatementSyntax s, out StatementSyntax result)
             {
@@ -120,7 +120,7 @@ namespace IDisposableAnalyzers
             }
             else
             {
-                var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
+                var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
                 var memberAccessExpressionSyntax = usesUnderscoreNames
                     ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
                     : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
@@ -137,7 +137,7 @@ namespace IDisposableAnalyzers
         private static void CreateAndInitialize(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = statement.UsesUnderscore(editor.SemanticModel, cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
             var field = editor.AddField(
                 containingType,
                 usesUnderscoreNames

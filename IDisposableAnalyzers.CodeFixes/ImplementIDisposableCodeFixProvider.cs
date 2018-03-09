@@ -201,7 +201,7 @@ namespace IDisposableAnalyzers
         private static async Task<Document> OverrideDisposeAsync(CodeFixContext context, SemanticModel semanticModel, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = classDeclaration.UsesUnderscore(semanticModel, cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
 
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
@@ -281,7 +281,7 @@ namespace IDisposableAnalyzers
         private static async Task<Document> ImplementIDisposableVirtualAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = classDeclaration.UsesUnderscore(semanticModel, cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
 
@@ -349,7 +349,7 @@ namespace IDisposableAnalyzers
         private static async Task<Document> ImplementIDisposableSealedAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
         {
             var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = classDeclaration.UsesUnderscore(semanticModel, cancellationToken);
+            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
 

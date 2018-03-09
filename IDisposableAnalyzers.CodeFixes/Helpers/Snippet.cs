@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Microsoft.CodeAnalysis;
@@ -10,7 +10,7 @@
         internal static StatementSyntax DisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var prefix = member.IsEither<IFieldSymbol, IPropertySymbol>() &&
-                         !semanticModel.UsesUnderscore(cancellationToken)
+                         !CodeStyle.UnderscoreFields(semanticModel)
                     ? "this."
                     : string.Empty;
             var type = MemberType(member);
