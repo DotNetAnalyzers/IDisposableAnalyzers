@@ -632,12 +632,12 @@ namespace IDisposableAnalyzers
 
             public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
+                // Don't walk ctor.
             }
 
             public override void VisitPropertyDeclaration(PropertyDeclarationSyntax node)
             {
-                if (this.inner.semanticModel.GetDeclaredSymbolSafe(node, this.inner.cancellationToken)
-                        ?.DeclaredAccessibility != Accessibility.Private)
+                if (!node.Modifiers.Any(SyntaxKind.PrivateKeyword))
                 {
                     base.VisitPropertyDeclaration(node);
                 }
@@ -645,8 +645,7 @@ namespace IDisposableAnalyzers
 
             public override void VisitMethodDeclaration(MethodDeclarationSyntax node)
             {
-                if (this.inner.semanticModel.GetDeclaredSymbolSafe(node, this.inner.cancellationToken)
-                        ?.DeclaredAccessibility != Accessibility.Private)
+                if (!node.Modifiers.Any(SyntaxKind.PrivateKeyword))
                 {
                     this.inner.VisitMethodDeclaration(node);
                 }
@@ -654,8 +653,7 @@ namespace IDisposableAnalyzers
 
             public override void VisitAccessorDeclaration(AccessorDeclarationSyntax node)
             {
-                if (this.inner.semanticModel.GetDeclaredSymbolSafe(node, this.inner.cancellationToken)
-                        ?.DeclaredAccessibility != Accessibility.Private)
+                if (!node.Modifiers.Any(SyntaxKind.PrivateKeyword))
                 {
                     this.inner.VisitAccessorDeclaration(node);
                 }
@@ -663,11 +661,7 @@ namespace IDisposableAnalyzers
 
             public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
             {
-                if (this.inner.semanticModel.GetDeclaredSymbolSafe(node, this.inner.cancellationToken)
-                        ?.DeclaredAccessibility != Accessibility.Private)
-                {
-                    this.inner.VisitArrowExpressionClause(node);
-                }
+                this.inner.VisitArrowExpressionClause(node);
             }
         }
     }

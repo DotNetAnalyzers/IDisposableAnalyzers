@@ -51,7 +51,7 @@ namespace IDisposableAnalyzers
                         {
                             context.RegisterDocumentEditorFix(
                                 "Create and assign field.",
-                                (editor, cancellationToken) => CreateAndAssignField(editor, statement, type, cancellationToken),
+                                (editor, cancellationToken) => CreateAndAssignField(editor, statement, type),
                                 diagnostic);
                         }
                     }
@@ -71,7 +71,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type, CancellationToken cancellationToken)
+        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
             var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);

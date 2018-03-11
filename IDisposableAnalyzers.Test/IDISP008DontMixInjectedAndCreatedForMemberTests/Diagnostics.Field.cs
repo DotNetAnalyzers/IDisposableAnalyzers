@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -8,7 +8,6 @@
         internal class Field
         {
             private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
