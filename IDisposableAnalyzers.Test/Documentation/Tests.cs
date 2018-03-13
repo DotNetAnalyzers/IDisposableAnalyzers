@@ -121,14 +121,14 @@ namespace IDisposableAnalyzers.Test.Documentation
         {
             var descriptor = descriptorInfo.Descriptor;
             return CreateStub(
-                descriptor.Id,
-                descriptor.Title.ToString(),
-                descriptor.DefaultSeverity,
-                descriptor.IsEnabledByDefault,
-                descriptorInfo.CodeFileUri,
-                descriptor.Category,
-                descriptorInfo.Analyzer.GetType().Name,
-                descriptor.Description.ToString());
+                id: descriptor.Id,
+                title: descriptor.Title.ToString(),
+                severity: descriptor.DefaultSeverity,
+                enabled: descriptor.IsEnabledByDefault,
+                codeFileUrl: descriptorInfo.CodeFileUri,
+                category: descriptor.Category,
+                typeName: descriptorInfo.Analyzer.GetType().Name,
+                description: descriptor.Description.ToString());
         }
 
         private static string CreateStub(
