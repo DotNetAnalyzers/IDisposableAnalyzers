@@ -59,7 +59,7 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
                                           .Single();
-            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath, "..\\..\\Benchmarks", summary.Title + ".md");
+            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath,  "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
             Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
         }
