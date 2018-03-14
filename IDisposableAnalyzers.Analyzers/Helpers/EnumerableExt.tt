@@ -8,6 +8,9 @@ namespace IDisposableAnalyzers
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
 
+    /// <summary>
+    /// Extension methods that avoids allocations.
+    /// </summary>
     internal static partial class EnumerableExt
     {
 <#
@@ -32,10 +35,18 @@ namespace IDisposableAnalyzers
         var genericArg = types.GenericArg;
         this.WriteLineIfNotFirst(types, typeNames);
 #>
+        /// <summary>
+        /// Try getting the element at <paramref name="index"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="result">The element at index if found, can be null.</param>
+        /// <returns>True if an element was found.</returns>
         internal static bool TryElementAt<#= genericArg #>(this <#= colName #> source, int index, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             if (index < 0 ||
                 source.<#= count #> <= index)
             {
@@ -46,44 +57,72 @@ namespace IDisposableAnalyzers
             return true;
         }
 
+        /// <summary>
+        /// Try getting the single element in <paramref name="source"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="result">The single element, can be null.</param>
+        /// <returns>True if an element was found.</returns>
         internal static bool TrySingle<#= genericArg #>(this <#= colName #> source, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             if (source.<#= count #> == 1)
             {
                 result = source[0];
                 return true;
             }
 
-            result = default(<#= itemName #>);
             return false;
         }
 
-        internal static bool TrySingle<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> selector, out <#= itemName #> result)<#= constraint #>
+        /// <summary>
+        /// Try getting the single element in <paramref name="source"/> matching <paramref name="predicate"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <param name="result">The single element matching the predicate, can be null.</param>
+        /// <returns>True if an element was found.</returns>
+        internal static bool TrySingle<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> predicate, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
-            foreach (var item in source)
+<# this.WriteIfNullReturnFalse(types); #>
+            for (var i = 0; i < source.<#= count #>; i++)
             {
-                if (selector(item))
+                var item = source[i];
+                if (predicate(item))
                 {
                     result = item;
+                    for (var j = i + 1; j < source.<#= count #>; j++)
+                    {
+                        if (predicate(source[j]))
+                        {
+                            return false;
+                        }
+                    }
+
                     return true;
                 }
             }
 
-            result = default(<#= itemName #>);
             return false;
         }
 
+        /// <summary>
+        /// Try getting the first element in <paramref name="source"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="result">The first element, can be null.</param>
+        /// <returns>True if an element was found.</returns>
         internal static bool TryFirst<#= genericArg #>(this <#= colName #> source, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             if (source.<#= count #> == 0)
             {
-                result = default(<#= itemName #>);
                 return false;
             }
 
@@ -91,27 +130,41 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        internal static bool TryFirst<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> selector, out <#= itemName #> result)<#= constraint #>
+        /// <summary>
+        /// Try getting the first element in <paramref name="source"/> matching <paramref name="predicate"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <param name="result">The first element matching the predicate, can be null.</param>
+        /// <returns>True if an element was found.</returns>
+        internal static bool TryFirst<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> predicate, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             foreach (var item in source)
             {
-                if (selector(item))
+                if (predicate(item))
                 {
                     result = item;
                     return true;
                 }
             }
 
-            result = default(<#= itemName #>);
             return false;
         }
 
+        /// <summary>
+        /// Try getting the last element in <paramref name="source"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="result">The last element if found, can be null.</param>
+        /// <returns>True if an element was found.</returns>
         internal static bool TryLast<#= genericArg #>(this <#= colName #> source, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             if (source.<#= count #> == 0)
             {
                 result = default(<#= itemName #>);
@@ -122,14 +175,22 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        internal static bool TryLast<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> selector, out <#= itemName #> result)<#= constraint #>
+        /// <summary>
+        /// Try getting the last element in <paramref name="source"/> matching <paramref name="predicate"/>
+        /// </summary>
+<# this.WriteTypeDoc(types); #>
+        /// <param name="source">The source collection, can be null.</param>
+        /// <param name="predicate">The predicate.</param>
+        /// <param name="result">The last element matching the predicate, can be null.</param>
+        /// <returns>True if an element was found.</returns>
+        internal static bool TryLast<#= genericArg #>(this <#= colName #> source, Func<<#= itemName #>, bool> predicate, out <#= itemName #> result)<#= constraint #>
         {
             result = default(<#= itemName #>);
-<# this.WriteLineIfNullReturnFalse(types); #>
+<# this.WriteIfNullReturnFalse(types); #>
             for (var i = source.<#= count #> - 1; i >= 0; i--)
             {
                 var item = source[i];
-                if (selector(item))
+                if (predicate(item))
                 {
                     result = item;
                     return true;
@@ -152,7 +213,7 @@ private void WriteLineIfNotFirst<T>(T item, T[] items)
     }
 }
 
-private void WriteLineIfNullReturnFalse(Data item)
+private void WriteIfNullReturnFalse(Data item)
 {
     if (!item.IsValueType)
     {
@@ -161,6 +222,14 @@ private void WriteLineIfNullReturnFalse(Data item)
         this.WriteLine("                return false;");
         this.WriteLine("            }");
         this.WriteLine("");
+    }
+}
+
+private void WriteTypeDoc(Data item)
+{
+    if (item.ItemType == "T")
+    {
+        this.WriteLine("        /// <typeparam name=\"T\">The type of the elements in <paramref name=\"source\"/></typeparam>");
     }
 }
 
