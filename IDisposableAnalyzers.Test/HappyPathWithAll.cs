@@ -484,6 +484,7 @@ namespace RoslynSandbox
     public abstract class Foo
     {
         public Foo()
+            : this()
         {
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
