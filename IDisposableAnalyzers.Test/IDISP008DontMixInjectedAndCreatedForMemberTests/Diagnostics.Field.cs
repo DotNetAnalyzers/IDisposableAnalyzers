@@ -10,12 +10,8 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
-            [TestCase("arg ?? File.OpenRead(string.Empty)")]
-            [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("true ? arg : File.OpenRead(string.Empty)")]
-            [TestCase("true ? arg : File.OpenRead(string.Empty)")]
-            [TestCase("true ? File.OpenRead(string.Empty) : arg")]
             [TestCase("true ? File.OpenRead(string.Empty) : arg")]
             public void InjectedAndCreated(string code)
             {

@@ -36,12 +36,8 @@ namespace RoslynSandbox
         [TestCase("(IDisposable)null")]
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
-        [TestCase("await Task.Run(() => 1)")]
-        [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
-        [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
-        [TestCase("await Task.Run(() => this.GetType())")]
         [TestCase("await Task.Run(() => this.GetType())")]
         public void LanguageConstructs(string code)
         {

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -11,12 +11,8 @@
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
-            [TestCase("arg ?? File.OpenRead(string.Empty)")]
-            [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("true ? arg : File.OpenRead(string.Empty)")]
-            [TestCase("true ? arg : File.OpenRead(string.Empty)")]
-            [TestCase("true ? File.OpenRead(string.Empty) : arg")]
             [TestCase("true ? File.OpenRead(string.Empty) : arg")]
             public void InjectedAndCreated(string code)
             {

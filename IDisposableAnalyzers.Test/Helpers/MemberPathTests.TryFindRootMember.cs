@@ -67,7 +67,6 @@ namespace RoslynSandbox
             [TestCase("this.Inner?.foo.Get<int>(1)", "this.Inner")]
             [TestCase("this.Inner?.foo?.Get<int>(1)", "this.Inner")]
             [TestCase("this.Inner.foo?.Get<int>(1)", "this.Inner")]
-            [TestCase("this.Inner?.foo?.Get<int>(1)", "this.Inner")]
             [TestCase("this.Inner?.foo?.Inner?.Get<int>(1)", "this.Inner")]
             [TestCase("((Foo)meh).Get<int>(1)", "meh")]
             [TestCase("((Foo)this.meh).Get<int>(1)", "this.meh")]

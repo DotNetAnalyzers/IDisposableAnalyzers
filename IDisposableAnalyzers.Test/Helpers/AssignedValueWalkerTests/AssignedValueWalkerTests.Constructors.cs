@@ -628,7 +628,6 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2, 3, arg")]
             [TestCase("var temp4 = this.value;", "1, 2, 3, arg")]
-            [TestCase("var temp4 = this.value;", "1, 2, 3, arg")]
             public void FieldImplicitBase(string code, object expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -674,7 +673,6 @@ namespace RoslynSandbox
             [TestCase("var temp4 = this.value;", "1, 2, 3")]
             [TestCase("var temp5 = this.value;", "1, 2, 3, 4")]
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
-            [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             public void FieldImplicitBaseWhenSubclassHasCtor(string code, object expected)
             {
