@@ -33,6 +33,9 @@ Use a single instance of HttpClient.
 ## Motivation
 
 https://aspnetmonsters.com/2016/08/2016-08-27-httpclientwrong/
+
+And:
+
 http://byterot.blogspot.se/2016/07/singleton-httpclient-dns.html
 
 ## How to fix violations
