@@ -856,33 +856,33 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
-        [TestCase("this.disposable == null")]
+        [TestCase("this.stream == null")]
         ////[TestCase("this.disposable is null")]
-        [TestCase("ReferenceEquals(this.disposable, null)")]
-        [TestCase("Equals(this.disposable, null)")]
-        [TestCase("object.ReferenceEquals(this.disposable, null)")]
-        [TestCase("object.Equals(this.disposable, null)")]
+        [TestCase("ReferenceEquals(this.stream, null)")]
+        [TestCase("Equals(this.stream, null)")]
+        [TestCase("object.ReferenceEquals(this.stream, null)")]
+        [TestCase("object.Equals(this.stream, null)")]
         public void WhenNullCheckBefore(string nullCheck)
         {
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
+    using System.IO;
 
     public class Foo
     {
-        private IDisposable disposable;
+        private Stream stream;
 
-        public void Update()
+        public void Update(string file)
         {
-            if (this.disposable == null)
+            if (this.stream == null)
             {
-                this.disposable = new Disposable();
+                this.stream = File.OpenRead(file);
             }
         }
     }
 }";
-            testCode = testCode.AssertReplace("this.disposable == null", nullCheck);
+            testCode = testCode.AssertReplace("this.stream == null", nullCheck);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
