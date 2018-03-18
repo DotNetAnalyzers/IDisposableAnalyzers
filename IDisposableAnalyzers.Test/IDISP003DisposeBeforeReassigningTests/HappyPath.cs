@@ -857,6 +857,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("this.stream == null")]
+        [TestCase("this.stream == null && file != null")]
         ////[TestCase("this.disposable is null")]
         [TestCase("ReferenceEquals(this.stream, null)")]
         [TestCase("Equals(this.stream, null)")]
