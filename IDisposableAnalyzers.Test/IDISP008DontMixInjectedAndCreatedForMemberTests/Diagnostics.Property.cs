@@ -8,7 +8,6 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
         internal class Property
         {
             private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
             [TestCase("File.OpenRead(string.Empty) ?? arg")]

@@ -153,7 +153,7 @@ NUGET
       BenchmarkDotNet.Core (>= 0.10.13) - restriction: >= net46
       Microsoft.CodeAnalysis.CSharp (>= 2.6.1) - restriction: >= net46
       System.Threading.Tasks (>= 4.3) - restriction: >= net46
-    Gu.Roslyn.Asserts (2.2.8)
+    Gu.Roslyn.Asserts (2.2.9)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0 < 3.0) - restriction: >= net461
     Microsoft.CodeAnalysis.Analyzers (2.6) - restriction: >= netstandard1.3
     Microsoft.CodeAnalysis.Common (2.7)
@@ -843,7 +843,7 @@ NUGET
       System.Reflection.Emit (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Reflection.TypeExtensions (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Xml.XmlDocument (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
-    Gu.Roslyn.Asserts (1.2.8)
+    Gu.Roslyn.Asserts (1.2.9)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 1.0 < 2.0) - restriction: >= net452
     Microsoft.CodeAnalysis.Analyzers (2.6)
     Microsoft.CodeAnalysis.Common (1.2.1)
