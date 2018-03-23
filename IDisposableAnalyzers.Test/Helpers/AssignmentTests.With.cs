@@ -31,7 +31,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("this.value = arg").Right;
+                var value = syntaxTree.FindAssignmentExpression("this.value = arg").Right;
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 var arg = semanticModel.GetSymbolSafe(value, CancellationToken.None);
                 Assert.AreEqual(true, AssignmentWalker.FirstWith(arg, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
@@ -60,7 +60,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("stream");
+                var value = syntaxTree.FindParameter("stream");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(Stream stream)");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, AssignmentWalker.FirstWith(symbol, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
@@ -93,7 +93,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
-                var symbol = semanticModel.GetDeclaredSymbolSafe(syntaxTree.FindBestMatch<ParameterSyntax>("arg"), CancellationToken.None);
+                var symbol = semanticModel.GetDeclaredSymbolSafe(syntaxTree.FindParameter("arg"), CancellationToken.None);
                 if (search == Search.Recursive)
                 {
                     Assert.AreEqual(true, AssignmentWalker.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out var result));
@@ -131,7 +131,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ParameterSyntax>("arg");
+                var value = syntaxTree.FindParameter("arg");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);

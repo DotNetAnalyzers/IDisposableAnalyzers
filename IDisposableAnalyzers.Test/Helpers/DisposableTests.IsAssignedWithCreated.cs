@@ -3,7 +3,6 @@ namespace IDisposableAnalyzers.Test.Helpers
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal partial class DisposableTests
@@ -38,7 +37,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("this.disposable = new Disposable()").Left;
+                var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
                 Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
@@ -73,7 +72,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("disposable = new Disposable()").Left;
+                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
                 Assert.AreEqual(Result.Yes, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
@@ -104,7 +103,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("disposable = new Disposable()").Left;
+                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
                 Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
@@ -138,7 +137,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("disposable = new Disposable()").Left;
+                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
                 Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
@@ -172,7 +171,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<AssignmentExpressionSyntax>("disposable = new Disposable()").Left;
+                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
                 Assert.AreEqual(Result.Yes, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
         }

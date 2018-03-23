@@ -47,7 +47,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("foo.Inner", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>("var temp = ").Value;
+                var value = syntaxTree.FindEqualsValueClause("var temp = ").Value;
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("this.foo.Get<int>(1)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var invocation = syntaxTree.FindBestMatch<InvocationExpressionSyntax>("Get<int>(1)");
+                var invocation = syntaxTree.FindInvocation("Get<int>(1)");
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 
@@ -128,7 +128,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var invocation = syntaxTree.FindBestMatch<MemberAccessExpressionSyntax>("this.Value");
+                var invocation = syntaxTree.FindMemberAccessExpression("this.Value");
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(invocation, out ExpressionSyntax member));
                 Assert.AreEqual("this.Value", member.ToString());
             }

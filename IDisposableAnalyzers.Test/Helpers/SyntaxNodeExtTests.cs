@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers.Test.Helpers
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal class SyntaxNodeExtTests
@@ -183,8 +182,8 @@ namespace RoslynSandbox
         public event EventHandler E;
     }
 }");
-                var first = syntaxTree.FindBestMatch<LiteralExpressionSyntax>(firstInt);
-                var other = syntaxTree.FindBestMatch<LiteralExpressionSyntax>(otherInt);
+                var first = syntaxTree.FindLiteralExpression(firstInt);
+                var other = syntaxTree.FindLiteralExpression(otherInt);
                 Assert.AreEqual(expected, first.IsBeforeInScope(other));
             }
         }

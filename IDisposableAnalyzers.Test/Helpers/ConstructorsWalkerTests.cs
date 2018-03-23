@@ -5,7 +5,6 @@ namespace IDisposableAnalyzers.Test.Helpers
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     using NUnit.Framework;
 
@@ -31,7 +30,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindTypeDeclaration("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -60,7 +59,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindTypeDeclaration("Foo");
             using (var pooled = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
@@ -89,7 +88,7 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindBestMatch<TypeDeclarationSyntax>("Foo");
+            var type = syntaxTree.FindTypeDeclaration("Foo");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));

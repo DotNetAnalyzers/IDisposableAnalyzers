@@ -1,9 +1,8 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
+namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using NUnit.Framework;
 
     internal partial class DisposableTests
@@ -37,7 +36,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ArgumentSyntax>("File.OpenRead(string.Empty)");
+                var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
                 Assert.AreEqual(Result.AssumeYes, Disposable.IsArgumentDisposedByReturnValue(value, semanticModel, CancellationToken.None));
             }
 
@@ -68,7 +67,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<ArgumentSyntax>("File.OpenRead(string.Empty)");
+                var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
                 Assert.AreEqual(Result.No, Disposable.IsArgumentDisposedByReturnValue(value, semanticModel, CancellationToken.None));
             }
         }

@@ -1,10 +1,9 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
+namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Moq;
     using NUnit.Framework;
 
@@ -30,7 +29,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, new Mock<SemanticModel>(MockBehavior.Strict).Object, CancellationToken.None));
             }
 
@@ -53,7 +52,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindBestMatch<EqualsValueClauseSyntax>(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, semanticModel, CancellationToken.None));
             }
         }
