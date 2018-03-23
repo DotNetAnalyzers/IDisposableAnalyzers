@@ -153,7 +153,7 @@ NUGET
       BenchmarkDotNet.Core (>= 0.10.13) - restriction: >= net46
       Microsoft.CodeAnalysis.CSharp (>= 2.6.1) - restriction: >= net46
       System.Threading.Tasks (>= 4.3) - restriction: >= net46
-    Gu.Roslyn.Asserts (2.2.5)
+    Gu.Roslyn.Asserts (2.2.8)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0 < 3.0) - restriction: >= net461
     Microsoft.CodeAnalysis.Analyzers (2.6) - restriction: >= netstandard1.3
     Microsoft.CodeAnalysis.Common (2.7)
@@ -209,7 +209,7 @@ NUGET
       System.ObjectModel (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
       System.Text.RegularExpressions (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
       System.Threading.Tasks.Parallel (>= 4.3) - restriction: && (< net46) (>= netstandard1.3)
-    Microsoft.Diagnostics.Tracing.TraceEvent (2.0.6) - restriction: >= net46
+    Microsoft.Diagnostics.Tracing.TraceEvent (2.0.10) - restriction: >= net46
     Microsoft.DotNet.InternalAbstractions (1.0) - restriction: >= net46
     Microsoft.DotNet.PlatformAbstractions (2.0.4) - restriction: >= net46
     Microsoft.NETCore.Platforms (2.0.1) - restriction: || (&& (>= monoandroid) (>= netstandard1.6)) (&& (>= monoandroid) (>= netstandard2.0)) (>= monotouch) (&& (< net20) (>= net451) (< netstandard1.3) (>= netstandard1.6)) (&& (< net20) (>= net46) (< netstandard1.4) (>= netstandard1.6)) (&& (< net20) (>= net461) (>= netstandard1.6) (< netstandard2.0)) (&& (< net20) (< netstandard1.0) (>= netstandard1.6)) (&& (< net20) (< netstandard1.3) (>= netstandard1.6) (< wpa81)) (&& (< net20) (< netstandard1.4) (>= netstandard1.6) (< wpa81)) (&& (< net20) (< netstandard1.5) (>= netstandard1.6) (< wpa81)) (&& (< net20) (>= netstandard1.6) (< netstandard2.0) (< wpa81)) (&& (< net20) (>= netstandard1.6) (< portable-net45+win8+wpa81)) (&& (< net20) (>= netstandard1.6) (< portable-net451+win81+wpa81)) (&& (< net20) (>= netstandard2.0)) (>= netcoreapp2.0) (&& (< netstandard1.3) (>= netstandard1.6) (>= wpa81)) (&& (< netstandard1.3) (>= netstandard2.0) (>= wpa81)) (&& (< netstandard1.5) (>= netstandard1.6) (>= uap10.0)) (&& (< netstandard1.5) (>= netstandard2.0) (>= uap10.0)) (&& (>= netstandard1.6) (>= uap10.1)) (&& (>= netstandard2.0) (>= uap10.1)) (>= xamarinios) (>= xamarinmac) (>= xamarintvos) (>= xamarinwatchos)
@@ -843,7 +843,7 @@ NUGET
       System.Reflection.Emit (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Reflection.TypeExtensions (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
       System.Xml.XmlDocument (>= 4.3) - restriction: && (< net35) (>= netstandard1.3)
-    Gu.Roslyn.Asserts (1.2.5)
+    Gu.Roslyn.Asserts (1.2.8)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 1.0 < 2.0) - restriction: >= net452
     Microsoft.CodeAnalysis.Analyzers (2.6)
     Microsoft.CodeAnalysis.Common (1.2.1)
