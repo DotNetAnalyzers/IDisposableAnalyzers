@@ -65,7 +65,7 @@ namespace IDisposableAnalyzers
             if (statement == null ||
                 otherStatement == null)
             {
-                return Result.AssumeNo;
+                return Result.Unknown;
             }
 
             var block = statement.Parent as BlockSyntax;

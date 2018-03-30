@@ -3,7 +3,6 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    // ReSharper disable once UnusedTypeParameter
     internal partial class HappyPath<T>
     {
         internal class RefAndOut
@@ -113,7 +112,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldWithCahcedViaOutParameter()
+            public void AssigningFieldWithCachedViaOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -189,6 +188,31 @@ namespace RoslynSandbox
         public void Assign(ref Stream result)
         {
             result = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void ChainedOut()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public static bool TryGetStream(out Stream stream)
+        {
+            return TryGetStreamCore(out stream);
+        }
+
+        private static bool TryGetStreamCore(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
         }
     }
 }";

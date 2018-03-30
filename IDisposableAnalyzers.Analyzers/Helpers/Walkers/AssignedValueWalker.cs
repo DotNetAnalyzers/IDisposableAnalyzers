@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.ShouldVisit(node) != Result.Yes)
+            if (this.ShouldVisit(node).IsEither(Result.AssumeNo, Result.No))
             {
                 return;
             }
