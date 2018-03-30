@@ -30,24 +30,6 @@ namespace IDisposableAnalyzers
             return node.FirstAncestorOrSelf<T>();
         }
 
-        internal static bool IsInExpressionTree(this SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var lambda = node.FirstAncestor<LambdaExpressionSyntax>();
-            while (lambda != null)
-            {
-                var lambdaType = semanticModel.GetTypeInfoSafe(lambda, cancellationToken).ConvertedType;
-                if (lambdaType != null &&
-                    lambdaType.Is(KnownSymbol.Expression))
-                {
-                    return true;
-                }
-
-                lambda = lambda.FirstAncestor<LambdaExpressionSyntax>();
-            }
-
-            return false;
-        }
-
         internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
         {
             var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
