@@ -32,6 +32,23 @@ namespace IDisposableAnalyzers
 
         internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
         {
+            if (node is null ||
+                other is null)
+            {
+                return Result.No;
+            }
+
+            if (node.Contains(other) &&
+                node.SpanStart < other.SpanStart)
+            {
+                return Result.Yes;
+            }
+
+            if (!node.SharesAncestor<MemberDeclarationSyntax>(other))
+            {
+                return Result.Unknown;
+            }
+
             var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
             var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
             if (statement == null ||
