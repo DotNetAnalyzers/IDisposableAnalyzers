@@ -98,7 +98,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fooCode = @"
+            var foo1Code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -106,7 +106,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public class Foo : IDisposable
+    public class Foo1 : IDisposable
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
@@ -254,13 +254,13 @@ namespace RoslynSandbox
     }
 }";
 
-            var withOptionalParameterCode = @"
+            var foo2Code = @"
 namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class Foo2
     {
         private IDisposable disposable;
 
@@ -415,14 +415,54 @@ namespace RoslynSandbox
         }
     }
 }";
+
+            var foo3Code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo3
+    {
+        public static bool TryGetStream(out Stream stream)
+        {
+            return TryGetStreamCore(out stream);
+        }
+
+        public void Bar()
+        {
+            IDisposable disposable;
+            using (disposable = new Disposable())
+            {
+            }
+        }
+
+        public void Baz()
+        {
+            IDisposable disposable;
+            if (TryGet(out disposable))
+            {
+                using (disposable)
+                {
+                }
+            }
+        }
+
+        private static bool TryGetStreamCore(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
             var sources = new[]
                           {
                               disposableCode,
                               fooListCode,
-                              fooCode,
+                              foo1Code,
+                              foo2Code,
+                              //foo3Code,
                               fooBaseCode,
                               fooImplCode,
-                              withOptionalParameterCode,
                               reactiveCode,
                               lazyCode,
                               asyncCode,
