@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,6 +7,10 @@
     {
         internal class AddUsing
         {
+            private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
+            private static readonly AddUsingCodeFixProvider Fix = new AddUsingCodeFixProvider();
+
             [Test]
             public void AddUsingForLocal()
             {
@@ -41,8 +45,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -81,8 +85,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -131,8 +135,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP001DisposeCreated, AddUsingCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

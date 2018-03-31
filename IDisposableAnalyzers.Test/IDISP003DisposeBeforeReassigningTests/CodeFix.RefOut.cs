@@ -114,8 +114,8 @@ namespace RoslynSandbox
     }
 }";
                 var expectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(expectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(expectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, expectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, expectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]

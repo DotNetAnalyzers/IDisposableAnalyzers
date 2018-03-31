@@ -5,7 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     internal class CodeFixAll
     {
+        private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
+        private static readonly DisposeBeforeAssignCodeFixProvider Fix = new DisposeBeforeAssignCodeFixProvider();
 
         [Test]
         public void NotDisposingVariable()
@@ -40,8 +42,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
-            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
 
         [Test]
@@ -82,7 +84,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeBeforeAssignCodeFixProvider>(ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,8 +7,12 @@
     {
         internal class CreateAndAssignField
         {
+            private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
+            private static readonly CreateAndAssignFieldCodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
+
             [Test]
-            public void LocalExplictTypeToFieldInCtor()
+            public void LocalExplicitTypeToFieldInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -41,8 +45,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -79,8 +83,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP001DisposeCreated, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }
