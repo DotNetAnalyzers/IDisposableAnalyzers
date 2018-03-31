@@ -133,27 +133,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
         }
 
-        [Explicit("Temporary")]
-        [Test]
-        public void NewDisposableSplitDeclarationAndAssignment()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            IDisposable disposable;
-            ↓disposable = new Disposable();
-        }
-    }
-}";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
-        }
-
         [Test]
         public void MethodCreatingDisposable1()
         {

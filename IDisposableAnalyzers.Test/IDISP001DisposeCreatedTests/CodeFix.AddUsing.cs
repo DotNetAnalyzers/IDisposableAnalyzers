@@ -248,6 +248,45 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
+
+            [Explicit("Temporary")]
+            [Test]
+            public void NewDisposableSplitDeclarationAndAssignment()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            IDisposable disposable;
+            ↓disposable = new Disposable();
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            IDisposable disposable;
+            using(disposable = new Disposable())
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
         }
     }
 }
