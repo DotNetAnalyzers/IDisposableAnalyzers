@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -126,6 +126,27 @@ namespace RoslynSandbox
         {
             ↓var meh = new Disposable();
             return 1;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+        }
+
+        [Explicit("Temporary")]
+        [Test]
+        public void NewDisposableSplitDeclarationAndAssignment()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            IDisposable disposable;
+            ↓disposable = new Disposable();
         }
     }
 }";
@@ -275,6 +296,35 @@ namespace RoslynSandbox
         {
             ↓var stream = Stream;
             return stream.Length;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, testCode);
+        }
+
+        [Explicit("Temporary")]
+        [Test]
+        public void OutParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Stream stream;
+            if (TryGetStream(out ↓stream))
+            {
+            }
+        }
+
+        private static bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
         }
     }
 }";

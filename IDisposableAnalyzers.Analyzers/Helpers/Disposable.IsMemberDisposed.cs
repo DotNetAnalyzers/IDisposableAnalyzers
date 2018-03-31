@@ -202,7 +202,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (invocation.IsBeforeInScope(assignment) != Result.Yes)
+                        if (invocation.IsExecutedBefore(assignment) != Result.Yes)
                         {
                             continue;
                         }

@@ -1,7 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System.Threading;
-
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -30,7 +28,7 @@ namespace IDisposableAnalyzers
             return node.FirstAncestorOrSelf<T>();
         }
 
-        internal static Result IsBeforeInScope(this SyntaxNode node, SyntaxNode other)
+        internal static Result IsExecutedBefore(this SyntaxNode node, SyntaxNode other)
         {
             if (node is null ||
                 other is null)
@@ -49,8 +47,8 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            var statement = node?.FirstAncestorOrSelf<StatementSyntax>();
-            var otherStatement = other?.FirstAncestorOrSelf<StatementSyntax>();
+            var statement = node.FirstAncestorOrSelf<StatementSyntax>();
+            var otherStatement = other.FirstAncestorOrSelf<StatementSyntax>();
             if (statement == null ||
                 otherStatement == null)
             {
