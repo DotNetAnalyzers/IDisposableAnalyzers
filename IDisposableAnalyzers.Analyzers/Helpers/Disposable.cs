@@ -147,9 +147,9 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsDisposedAfter(ISymbol local, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<BlockSyntax>()))
+            using (var pooled = InvocationWalker.Borrow(location.FirstAncestorOrSelf<BlockSyntax>()))
             {
                 foreach (var invocation in pooled.Invocations)
                 {
@@ -262,6 +262,28 @@ namespace IDisposableAnalyzers
                             }
                         }
                     }
+                }
+            }
+
+            return false;
+        }
+
+        internal static bool ShouldDispose(ILocalSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
+            {
+                if (declaration.Parent is UsingStatementSyntax ||
+                    declaration.Parent is AnonymousFunctionExpressionSyntax)
+                {
+                    return false;
+                }
+
+                if (declaration.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
+                {
+                    return !IsReturned(local, block, semanticModel, cancellationToken) &&
+                           !IsAssignedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
+                           !IsAddedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
+                           !IsDisposedAfter(local, location, semanticModel, cancellationToken);
                 }
             }
 
