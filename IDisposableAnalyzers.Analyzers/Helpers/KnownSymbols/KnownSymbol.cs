@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers
 {
     internal static class KnownSymbol
     {
-        internal static readonly QualifiedType Void = Create("System.Void");
-        internal static readonly QualifiedType Object = Create("System.Object");
-        internal static readonly QualifiedType Boolean = Create("System.Boolean");
+        internal static readonly QualifiedType Void = Create("System.Void", "void");
+        internal static readonly QualifiedType Object = Create("System.Object", "object");
+        internal static readonly QualifiedType Boolean = Create("System.Boolean", "bool");
         internal static readonly StringType String = new StringType();
         internal static readonly QualifiedType Array = Create("System.Array");
         internal static readonly QualifiedType Tuple = Create("System.Tuple");
@@ -81,9 +81,9 @@ namespace IDisposableAnalyzers
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
 
-        private static QualifiedType Create(string qualifiedName)
+        private static QualifiedType Create(string qualifiedName, string alias = null)
         {
-            return new QualifiedType(qualifiedName);
+            return new QualifiedType(qualifiedName, alias);
         }
     }
 }

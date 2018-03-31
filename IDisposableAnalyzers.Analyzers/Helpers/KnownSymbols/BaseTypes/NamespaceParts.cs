@@ -3,8 +3,9 @@ namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [System.Diagnostics.DebuggerDisplay("{System.String.Join(\".\", parts)}")]
+    [System.Diagnostics.DebuggerDisplay("{System.String.Join(\".\", Parts)}")]
     internal class NamespaceParts
     {
         private readonly ImmutableList<string> parts;
@@ -50,8 +51,39 @@ namespace IDisposableAnalyzers
         internal static NamespaceParts Create(string qualifiedName)
         {
             var parts = qualifiedName.Split('.').ToImmutableList();
-            System.Diagnostics.Debug.Assert(parts.Count != 0, "parts.Length != 0");
+            System.Diagnostics.Debug.Assert(parts.Count != 0, "Parts.Length != 0");
             return new NamespaceParts(parts.RemoveAt(parts.Count - 1));
+        }
+
+        internal bool Matches(NameSyntax nameSyntax)
+        {
+            return this.Matches(nameSyntax, this.parts.Count - 1);
+        }
+
+        private bool Matches(NameSyntax nameSyntax, int index)
+        {
+            if (nameSyntax is IdentifierNameSyntax identifier)
+            {
+                return index == 0 &&
+                       identifier.Identifier.ValueText == this.parts[0];
+            }
+
+            if (nameSyntax is QualifiedNameSyntax qns)
+            {
+                if (index < 1)
+                {
+                    return false;
+                }
+
+                if (qns.Right.Identifier.ValueText != this.parts[index])
+                {
+                    return false;
+                }
+
+                return this.Matches(qns.Left, index - 1);
+            }
+
+            return false;
         }
     }
 }

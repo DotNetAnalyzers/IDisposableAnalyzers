@@ -1,7 +1,6 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,31 +30,13 @@ namespace IDisposableAnalyzers
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation)
             {
-                if (IsHttpClient(objectCreation, context.SemanticModel, context.CancellationToken))
+                if (objectCreation.Type == KnownSymbol.HttpClient &&
+                    !IsStaticFieldInitializer(objectCreation) &&
+                    !IsStaticPropertyInitializer(objectCreation))
                 {
-                    if (!IsStaticFieldInitializer(objectCreation) &&
-                        !IsStaticPropertyInitializer(objectCreation))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
                 }
             }
-        }
-
-        private static bool IsHttpClient(ObjectCreationExpressionSyntax objectCreation, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (objectCreation.Type is SimpleNameSyntax name)
-            {
-                return name.Identifier.ValueText == "HttpClient";
-            }
-
-            if (objectCreation.Type is QualifiedNameSyntax qualifiedName)
-            {
-                return qualifiedName.Right.Identifier.ValueText == "HttpClient";
-            }
-
-            return semanticModel.GetSymbolSafe(objectCreation, cancellationToken) is IMethodSymbol method &&
-                  method.ContainingType == KnownSymbol.HttpClient;
         }
 
         private static bool IsStaticFieldInitializer(ObjectCreationExpressionSyntax objectCreation)
