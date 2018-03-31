@@ -221,7 +221,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (method.TrySingleDeclaration<BaseMethodDeclarationSyntax>(cancellationToken, out var methodDeclaration) &&
+            if (method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
                 methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
             {
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);

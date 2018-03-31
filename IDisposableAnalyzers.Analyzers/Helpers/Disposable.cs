@@ -214,7 +214,7 @@ namespace IDisposableAnalyzers
                             {
                                 foreach (var candidate in pooledInvocations.Invocations)
                                 {
-                                    if (Disposable.IsDisposing(candidate, symbol, semanticModel, cancellationToken))
+                                    if (IsDisposing(candidate, symbol, semanticModel, cancellationToken))
                                     {
                                         return true;
                                     }

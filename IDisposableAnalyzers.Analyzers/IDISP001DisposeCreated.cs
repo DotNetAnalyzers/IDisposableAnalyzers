@@ -43,36 +43,13 @@ namespace IDisposableAnalyzers
             {
                 foreach (var declarator in localDeclaration.Declaration.Variables)
                 {
-                    var value = declarator.Initializer?.Value;
-                    if (value == null ||
-                        !Disposable.IsPotentiallyAssignableTo(value, context.SemanticModel, context.CancellationToken))
+                    if (declarator.Initializer is EqualsValueClauseSyntax initializer &&
+                        initializer.Value is ExpressionSyntax value &&
+                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                        context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local &&
+                        Disposable.ShouldDispose(local, declarator, context.SemanticModel, context.CancellationToken))
                     {
-                        continue;
-                    }
-
-                    if (Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)
-                                  .IsEither(Result.Yes, Result.AssumeYes))
-                    {
-                        if (localDeclaration.Parent is UsingStatementSyntax ||
-                            localDeclaration.Parent is AnonymousFunctionExpressionSyntax)
-                        {
-                            return;
-                        }
-
-                        var block = declarator.FirstAncestorOrSelf<BlockSyntax>();
-                        if (block == null)
-                        {
-                            return;
-                        }
-
-                        if (context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local &&
-                            !Disposable.IsReturned(local, block, context.SemanticModel, context.CancellationToken) &&
-                            !Disposable.IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken) &&
-                            !Disposable.IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken) &&
-                            !Disposable.IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
-                        }
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
                     }
                 }
             }

@@ -33,7 +33,7 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 !argument.RefOrOutKeyword.IsKind(SyntaxKind.None) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                method.TrySingleDeclaration<MethodDeclarationSyntax>(context.CancellationToken, out _))
+                method.TrySingleDeclaration(context.CancellationToken, out _))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
                               .IsEither(Result.No, Result.AssumeNo, Result.Unknown))

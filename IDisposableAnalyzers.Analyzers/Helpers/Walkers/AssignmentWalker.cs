@@ -160,7 +160,7 @@ namespace IDisposableAnalyzers
                         if (argument.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == symbol.Name &&
                             semanticModel.GetSymbolSafe(argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
-                            method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
+                            method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
                             methodDeclaration.TryGetMatchingParameter(argument, out var parameter) &&
                             FirstWith(semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken), methodDeclaration, search, semanticModel, cancellationToken, out assignment))
                         {

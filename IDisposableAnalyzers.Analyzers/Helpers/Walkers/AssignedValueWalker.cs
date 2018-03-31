@@ -588,7 +588,7 @@ namespace IDisposableAnalyzers
                 if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
                 {
                     if (this.CurrentSymbol is ILocalSymbol local &&
-                        local.TrySingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declaration) &&
+                        local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                         lambda.Contains(declaration))
                     {
                         return node.IsExecutedBefore(this.context);

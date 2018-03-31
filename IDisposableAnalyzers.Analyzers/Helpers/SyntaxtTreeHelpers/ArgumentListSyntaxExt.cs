@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
 
@@ -51,9 +51,10 @@
                 return value != null;
             }
 
-            if (parameter.HasExplicitDefaultValue && parameter.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration))
+            if (parameter.HasExplicitDefaultValue && parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                declaration.Default is EqualsValueClauseSyntax equalsValueClause)
             {
-                value = (declaration as ParameterSyntax)?.Default.Value;
+                value = equalsValueClause.Value;
             }
 
             return value != null;

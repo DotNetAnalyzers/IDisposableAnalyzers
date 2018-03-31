@@ -460,7 +460,7 @@ namespace RoslynSandbox
                               fooListCode,
                               foo1Code,
                               foo2Code,
-                              //foo3Code,
+                              foo3Code,
                               fooBaseCode,
                               fooImplCode,
                               reactiveCode,
