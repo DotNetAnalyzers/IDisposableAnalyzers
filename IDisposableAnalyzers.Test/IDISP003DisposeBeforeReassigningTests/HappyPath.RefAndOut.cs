@@ -26,7 +26,6 @@ namespace RoslynSandbox
     }
 }";
 
-        [Explicit("Temporary")]
         [Test]
         public void AssigningVariableViaOutParameter()
         {
@@ -160,7 +159,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [Explicit("Temporary")]
         [Test]
         public void AssigningVariableViaRefParameter()
         {
@@ -187,7 +185,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [Explicit("Temporary")]
         [Test]
         public void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
         {
@@ -216,7 +213,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-        [Explicit("Temporary")]
         [Test]
         public void ChainedOut()
         {

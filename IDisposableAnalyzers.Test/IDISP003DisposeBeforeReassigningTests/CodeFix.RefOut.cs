@@ -56,8 +56,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -164,8 +164,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -217,8 +217,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -278,8 +278,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -341,8 +341,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -414,8 +414,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
 
             [Test]
@@ -475,8 +475,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP003DisposeBeforeReassigning, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
             }
         }
     }
