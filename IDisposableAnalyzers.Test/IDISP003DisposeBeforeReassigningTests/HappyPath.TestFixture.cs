@@ -1,16 +1,34 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath<T>
+    [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
+    [TestFixture(typeof(AssignmentAnalyzer))]
+    internal class HappyPathTestFixture<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        internal class TestFixture
+        private static readonly T Analyzer = new T();
+
+#pragma warning disable SA1203 // Constants must appear before fields
+        private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
         {
-            [Test]
-            public void DisposingFieldInTearDown()
-            {
-                var testCode = @"
+        }
+    }
+}";
+
+        [Test]
+        public void DisposingFieldInTearDown()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -32,13 +50,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void DisposingFieldInOneTimeTearDown()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposingFieldInOneTimeTearDown()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using NUnit.Framework;
@@ -60,8 +78,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }

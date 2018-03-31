@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    internal partial class HappyPath<T>
+    internal class HappyPath<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();

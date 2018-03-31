@@ -1,16 +1,34 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath<T>
+    [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
+    [TestFixture(typeof(AssignmentAnalyzer))]
+    internal class HappyPathWhenDisposing<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        internal class WhenDisposing
+        private static readonly T Analyzer = new T();
+
+#pragma warning disable SA1203 // Constants must appear before fields
+        private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
         {
-            [Test]
-            public void DisposingVariable()
-            {
-                var testCode = @"
+        }
+    }
+}";
+
+        [Test]
+        public void DisposingVariable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -27,14 +45,14 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [TestCase("stream.Dispose();")]
-            [TestCase("stream?.Dispose();")]
-            public void DisposeBeforeAssigningInIfElse(string dispose)
-            {
-                var testCode = @"
+        [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
+        public void DisposeBeforeAssigningInIfElse(string dispose)
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -57,15 +75,15 @@ namespace RoslynSandbox
         }
     }
 }";
-                testCode = testCode.AssertReplace("stream.Dispose();", dispose);
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [TestCase("stream.Dispose();")]
-            [TestCase("stream?.Dispose();")]
-            public void DisposeBeforeAssigningBeforeIfElse(string dispose)
-            {
-                var testCode = @"
+        [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
+        public void DisposeBeforeAssigningBeforeIfElse(string dispose)
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -87,15 +105,15 @@ namespace RoslynSandbox
         }
     }
 }";
-                testCode = testCode.AssertReplace("stream.Dispose();", dispose);
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [TestCase("stream.Dispose();")]
-            [TestCase("stream?.Dispose();")]
-            public void DisposeFieldBeforeIfElseReassigning(string dispose)
-            {
-                var testCode = @"
+        [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
+        public void DisposeFieldBeforeIfElseReassigning(string dispose)
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -118,14 +136,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                testCode = testCode.AssertReplace("stream.Dispose();", dispose);
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposingParameter()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposingParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -141,13 +159,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposingFieldInCtor()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposingFieldInCtor()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -163,13 +181,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposingFieldInMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposingFieldInMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -186,13 +204,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConditionallyDisposingFieldInMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void ConditionallyDisposingFieldInMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -209,13 +227,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConditionallyDisposingUnderscoreFieldInMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void ConditionallyDisposingUnderscoreFieldInMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -232,13 +250,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposingUnderscoreFieldInMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposingUnderscoreFieldInMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -255,13 +273,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningFieldInLambda()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningFieldInLambda()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -287,13 +305,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssigningBackingFieldInLambda()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningBackingFieldInLambda()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -325,13 +343,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssigningSerialDisposableBackingFieldInLambda()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningSerialDisposableBackingFieldInLambda()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -363,13 +381,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssigningSerialDisposableFieldInLambda()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningSerialDisposableFieldInLambda()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -395,8 +413,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }

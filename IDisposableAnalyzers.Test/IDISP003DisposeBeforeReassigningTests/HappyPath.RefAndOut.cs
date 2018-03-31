@@ -1,16 +1,36 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath<T>
+    [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
+    [TestFixture(typeof(AssignmentAnalyzer))]
+    internal class HappyPathRefAndOut<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        internal class RefAndOut
+        private static readonly T Analyzer = new T();
+
+#pragma warning disable SA1203 // Constants must appear before fields
+        //// ReSharper disable once UnusedMember.Local
+        private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
         {
-            [Test]
-            public void AssigningVariableViaOutParameter()
-            {
-                var testCode = @"
+        }
+    }
+}";
+
+        [Explicit("Temporary")]
+        [Test]
+        public void AssigningVariableViaOutParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -31,13 +51,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -59,13 +79,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningFieldViaConcurrentDictionaryTryGetValue()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningFieldViaConcurrentDictionaryTryGetValue()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -83,13 +103,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -108,13 +128,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningFieldWithCachedViaOutParameter()
-            {
-                var testCode = @"
+        [Test]
+        public void AssigningFieldWithCachedViaOutParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -137,13 +157,14 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningVariableViaRefParameter()
-            {
-                var testCode = @"
+        [Explicit("Temporary")]
+        [Test]
+        public void AssigningVariableViaRefParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -163,13 +184,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
-            {
-                var testCode = @"
+        [Explicit("Temporary")]
+        [Test]
+        public void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -191,13 +213,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ChainedOut()
-            {
-                var testCode = @"
+        [Explicit("Temporary")]
+        [Test]
+        public void ChainedOut()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -216,8 +239,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }
