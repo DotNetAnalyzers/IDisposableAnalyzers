@@ -176,7 +176,7 @@ namespace RoslynSandbox
             Assign(ref stream);
         }
 
-        public void Assign(ref Stream result)
+        private void Assign(ref Stream result)
         {
             result = File.OpenRead(string.Empty);
         }
@@ -204,7 +204,7 @@ namespace RoslynSandbox
             Assign(ref stream);
         }
 
-        public void Assign(ref Stream result)
+        private void Assign(ref Stream result)
         {
             result = File.OpenRead(string.Empty);
         }

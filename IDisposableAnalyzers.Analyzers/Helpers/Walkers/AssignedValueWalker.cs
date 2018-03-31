@@ -585,24 +585,19 @@ namespace IDisposableAnalyzers
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
             {
-                var lambda = node.FirstAncestor<AnonymousFunctionExpressionSyntax>();
-                if (node is ExpressionStatementSyntax &&
-                    node.SharesAncestor<MemberDeclarationSyntax>(this.context) &&
-                    lambda == null)
+                if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
                 {
-                    return node.IsExecutedBefore(this.context);
+                    if (this.CurrentSymbol is ILocalSymbol local &&
+                        local.TrySingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declaration) &&
+                        lambda.Contains(declaration))
+                    {
+                        return node.IsExecutedBefore(this.context);
+                    }
+
+                    return Result.Yes;
                 }
 
-                if (lambda != null &&
-                    this.CurrentSymbol is ILocalSymbol local &&
-                    local.TrySingleDeclaration(this.cancellationToken, out VariableDeclaratorSyntax declarator) &&
-                    lambda.Contains(declarator) &&
-                    IsInSameLambda(this.context, node))
-                {
-                    return node.IsExecutedBefore(this.context);
-                }
-
-                return Result.Yes;
+                return node.IsExecutedBefore(this.context);
             }
 
             if (this.context is InvocationExpressionSyntax &&
@@ -612,13 +607,6 @@ namespace IDisposableAnalyzers
             }
 
             return Result.Yes;
-
-            bool IsInSameLambda(SyntaxNode node1, SyntaxNode node2)
-            {
-                var lambda1 = node1.FirstAncestor<AnonymousFunctionExpressionSyntax>();
-                return lambda1 != null &&
-                       ReferenceEquals(lambda1, node2.FirstAncestor<AnonymousFunctionExpressionSyntax>());
-            }
         }
 
         private class MemberWalker : CSharpSyntaxWalker

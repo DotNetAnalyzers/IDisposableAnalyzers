@@ -28,44 +28,33 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            var argument = (ArgumentSyntax)context.Node;
-            if (argument.RefOrOutKeyword.IsKind(SyntaxKind.None))
+            if (context.Node is ArgumentSyntax argument &&
+                argument.Parent is ArgumentListSyntax argumentList &&
+                argumentList.Parent is InvocationExpressionSyntax invocation &&
+                !argument.RefOrOutKeyword.IsKind(SyntaxKind.None) &&
+                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
+                method.TrySingleDeclaration<MethodDeclarationSyntax>(context.CancellationToken, out _))
             {
-                return;
-            }
+                if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+                {
+                    return;
+                }
 
-            var invocation = argument.FirstAncestor<InvocationExpressionSyntax>();
-            if (invocation == null)
-            {
-                return;
-            }
+                var symbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
+                if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken)
+                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+                {
+                    return;
+                }
 
-            var method = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken);
-            if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0)
-            {
-                return;
-            }
+                if (Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                {
+                    return;
+                }
 
-            if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-            {
-                return;
+                context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
             }
-
-            var symbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
-            if (Disposable.IsAssignedWithCreated(symbol, argument.FirstAncestor<InvocationExpressionSyntax>(), context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-            {
-                return;
-            }
-
-            if (Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
-            {
-                return;
-            }
-
-            context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
         }
     }
 }
