@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
+namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -6,7 +6,7 @@
     internal class CodeFix
     {
         private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly AddBaseCallCodeFixProvider CodeFixProvider = new AddBaseCallCodeFixProvider();
+        private static readonly AddBaseCallCodeFixProvider Fix = new AddBaseCallCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP010");
 
         private const string DisposableCode = @"
@@ -78,8 +78,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, testCode }, fixedCode);
         }
 
         [Test]
@@ -121,8 +121,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.CodeFix(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-            AnalyzerAssert.FixAll(Analyzer, CodeFixProvider, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
         }
     }
 }

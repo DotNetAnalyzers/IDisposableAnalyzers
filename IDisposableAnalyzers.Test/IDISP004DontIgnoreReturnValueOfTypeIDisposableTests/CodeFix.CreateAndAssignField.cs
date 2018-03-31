@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,6 +7,10 @@
     {
         internal class CreateAndAssignField
         {
+            private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
+            private static readonly CreateAndAssignFieldCodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
+
             [Test]
             public void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()
             {
@@ -41,8 +45,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -86,8 +90,8 @@ namespace RoslynSandbox
         public int Value => this.value;
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -131,8 +135,8 @@ namespace RoslynSandbox
         public int Value => _value;
     }
 }";
-                AnalyzerAssert.CodeFix<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<IDISP004DontIgnoreReturnValueOfTypeIDisposable, CreateAndAssignFieldCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

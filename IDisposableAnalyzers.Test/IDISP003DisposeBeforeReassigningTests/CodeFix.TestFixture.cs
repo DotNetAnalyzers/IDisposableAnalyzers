@@ -7,6 +7,9 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         internal class TestFixture
         {
+            // ReSharper disable once UnusedMember.Local
+            private static readonly DisposeInTearDownCodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
+
             [Test]
             public void AssigningFieldInSetUpCreatesTearDownAndDisposes()
             {
@@ -59,8 +62,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -115,8 +118,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -176,8 +179,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -237,8 +240,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { ExplicitDisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -293,8 +296,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -354,8 +357,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll<AssignmentAnalyzer, DisposeInTearDownCodeFixProvider>(ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
         }
     }
