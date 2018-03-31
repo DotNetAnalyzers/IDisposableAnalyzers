@@ -1,7 +1,6 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -12,7 +11,7 @@ namespace IDisposableAnalyzers
     {
         public const string DiagnosticId = "IDISP001";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Dispose created.",
             messageFormat: "Dispose created.",
@@ -66,154 +65,17 @@ namespace IDisposableAnalyzers
                             return;
                         }
 
-                        if (context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local)
+                        if (context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local &&
+                            !Disposable.IsReturned(local, block, context.SemanticModel, context.CancellationToken) &&
+                            !Disposable.IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken) &&
+                            !Disposable.IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken) &&
+                            !Disposable.IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
                         {
-                            if (IsReturned(local, block, context.SemanticModel, context.CancellationToken))
-                            {
-                                return;
-                            }
-
-                            if (IsAssignedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
-                            {
-                                return;
-                            }
-
-                            if (IsAddedToFieldOrProperty(local, block, context.SemanticModel, context.CancellationToken))
-                            {
-                                return;
-                            }
-
-                            if (IsDisposedAfter(local, value, context.SemanticModel, context.CancellationToken))
-                            {
-                                return;
-                            }
-                        }
-
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
-                    }
-                }
-            }
-        }
-
-        private static bool IsReturned(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var walker = ReturnValueWalker.Borrow(block, Search.TopLevel, semanticModel, cancellationToken))
-            {
-                foreach (var value in walker)
-                {
-                    var returnedSymbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-                    if (SymbolComparer.Equals(symbol, returnedSymbol))
-                    {
-                        return true;
-                    }
-
-                    if (value is ObjectCreationExpressionSyntax objectCreation)
-                    {
-                        if (objectCreation.ArgumentList != null)
-                        {
-                            foreach (var argument in objectCreation.ArgumentList.Arguments)
-                            {
-                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
-                                if (SymbolComparer.Equals(symbol, arg))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        if (objectCreation.Initializer != null)
-                        {
-                            foreach (var argument in objectCreation.Initializer.Expressions)
-                            {
-                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
-                                if (SymbolComparer.Equals(symbol, arg))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (value is InvocationExpressionSyntax invocation)
-                    {
-                        if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
-                            invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TrySingle(out ArgumentSyntax argument) &&
-                            argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
-                        {
-                            var body = lambda.Body;
-                            using (var pooledInvocations = InvocationWalker.Borrow(body))
-                            {
-                                foreach (var candidate in pooledInvocations.Invocations)
-                                {
-                                    if (Disposable.IsDisposing(candidate, symbol, semanticModel, cancellationToken))
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
                         }
                     }
                 }
             }
-
-            return false;
-        }
-
-        private static bool IsAssignedToFieldOrProperty(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            AssignmentExpressionSyntax assignment = null;
-            if (block?.TryGetAssignment(symbol, semanticModel, cancellationToken, out assignment) == true)
-            {
-                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
-                           semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
-                return left is IFieldSymbol || left is IPropertySymbol || left is ILocalSymbol || left is IParameterSymbol;
-            }
-
-            return false;
-        }
-
-        private static bool IsAddedToFieldOrProperty(ILocalSymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var pooledInvocations = InvocationWalker.Borrow(block))
-            {
-                foreach (var invocation in pooledInvocations.Invocations)
-                {
-                    var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
-                    if (method?.Name == "Add")
-                    {
-                        using (var nameWalker = IdentifierNameWalker.Borrow(invocation.ArgumentList))
-                        {
-                            foreach (var identifierName in nameWalker.IdentifierNames)
-                            {
-                                var argSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
-                                if (symbol.Equals(argSymbol))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private static bool IsDisposedAfter(ILocalSymbol local, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var pooled = InvocationWalker.Borrow(assignment.FirstAncestorOrSelf<BlockSyntax>()))
-            {
-                foreach (var invocation in pooled.Invocations)
-                {
-                    if (Disposable.IsDisposing(invocation, local, semanticModel, cancellationToken))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }
