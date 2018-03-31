@@ -13,8 +13,8 @@ namespace IDisposableAnalyzers
         internal readonly string Type;
         private readonly string @alias;
 
-        internal QualifiedType(string qualifiedName, string alias = null)
-            : this(qualifiedName, NamespaceParts.Create(qualifiedName), qualifiedName.Substring(qualifiedName.LastIndexOf('.') + 1), alias)
+        internal QualifiedType(string fullName, string alias = null)
+            : this(fullName, NamespaceParts.Create(fullName), fullName.Substring(fullName.LastIndexOf('.') + 1), alias)
         {
         }
 

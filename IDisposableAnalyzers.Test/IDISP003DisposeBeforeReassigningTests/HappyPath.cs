@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(IDISP003DisposeBeforeReassigning))]
+    [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
     internal class HappyPath<T>
         where T : DiagnosticAnalyzer, new()

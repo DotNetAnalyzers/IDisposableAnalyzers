@@ -125,7 +125,7 @@ namespace RoslynSandbox
     {
         public static long Bar()
         {
-            ↓var meh = new Disposable();
+            ↓var disposable = new Disposable();
             return 1;
         }
     }

@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         internal class TestFixture
         {
             // ReSharper disable once UnusedMember.Local
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DisposeInTearDownCodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
 
             [Test]
