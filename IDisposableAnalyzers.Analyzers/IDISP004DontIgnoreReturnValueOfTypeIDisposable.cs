@@ -1,7 +1,6 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
-    using System.Threading;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -42,16 +41,15 @@ namespace IDisposableAnalyzers
             }
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                MustBeHandled(objectCreation, context.SemanticModel, context.CancellationToken))
+                Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                Disposable.IsIgnored(objectCreation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
 
             if (context.Node is InvocationExpressionSyntax invocation &&
-                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                !method.ReturnsVoid &&
-                Disposable.IsPotentiallyAssignableTo(method.ReturnType) &&
-                MustBeHandled(invocation, context.SemanticModel, context.CancellationToken))
+                Disposable.IsCreation(invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                Disposable.IsIgnored(invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
@@ -59,47 +57,11 @@ namespace IDisposableAnalyzers
             if (context.Node is MemberAccessExpressionSyntax memberAccess &&
                 context.SemanticModel.GetSymbolSafe(memberAccess.Expression, context.CancellationToken) is IPropertySymbol property &&
                 Disposable.IsPotentiallyAssignableTo(property.Type) &&
-                MustBeHandled(memberAccess.Expression, context.SemanticModel, context.CancellationToken))
+                Disposable.IsCreation(memberAccess.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                Disposable.IsIgnored(memberAccess.Expression, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
-        }
-
-        private static bool MustBeHandled(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (node.Parent is AnonymousFunctionExpressionSyntax ||
-                node.Parent is UsingStatementSyntax ||
-                node.Parent is EqualsValueClauseSyntax ||
-                node.Parent is ReturnStatementSyntax ||
-                node.Parent is ArrowExpressionClauseSyntax)
-            {
-                return false;
-            }
-
-            if (Disposable.IsCreation(node, semanticModel, cancellationToken)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-            {
-                return false;
-            }
-
-            if (node.Parent is StatementSyntax)
-            {
-                return true;
-            }
-
-            if (node.Parent is ArgumentSyntax argument)
-            {
-                return Disposable.IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken)
-                                 .IsEither(Result.No, Result.AssumeNo);
-            }
-
-            if (node.Parent is MemberAccessExpressionSyntax memberAccess)
-            {
-                return Disposable.IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken)
-                                 .IsEither(Result.No, Result.AssumeNo);
-            }
-
-            return false;
         }
     }
 }

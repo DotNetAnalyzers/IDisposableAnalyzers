@@ -289,5 +289,36 @@ namespace IDisposableAnalyzers
 
             return false;
         }
+
+        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (node.Parent is AnonymousFunctionExpressionSyntax ||
+                node.Parent is UsingStatementSyntax ||
+                node.Parent is EqualsValueClauseSyntax ||
+                node.Parent is ReturnStatementSyntax ||
+                node.Parent is ArrowExpressionClauseSyntax)
+            {
+                return false;
+            }
+
+            if (node.Parent is StatementSyntax)
+            {
+                return true;
+            }
+
+            if (node.Parent is ArgumentSyntax argument)
+            {
+                return Disposable.IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken)
+                                 .IsEither(Result.No, Result.AssumeNo);
+            }
+
+            if (node.Parent is MemberAccessExpressionSyntax memberAccess)
+            {
+                return Disposable.IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken)
+                                 .IsEither(Result.No, Result.AssumeNo);
+            }
+
+            return false;
+        }
     }
 }
