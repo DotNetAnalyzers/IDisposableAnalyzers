@@ -29,7 +29,7 @@ namespace IDisposableAnalyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.LocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression);
+            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.LocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.Argument);
         }
 
         private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
@@ -70,6 +70,26 @@ namespace IDisposableAnalyzers
                     Disposable.ShouldDispose(parameter, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
+                }
+            }
+
+            if (context.Node is ArgumentSyntax argument &&
+                argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
+                argument.Expression is IdentifierNameSyntax argIdentifier &&
+                Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+            {
+                var assignedSymbol = context.SemanticModel.GetSymbolSafe(argIdentifier, context.CancellationToken);
+                if (assignedSymbol is ILocalSymbol local &&
+                    Disposable.ShouldDispose(local, argIdentifier, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
+                }
+
+                if (assignedSymbol is IParameterSymbol parameter &&
+                    parameter.RefKind == RefKind.None &&
+                    Disposable.ShouldDispose(parameter, argIdentifier, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                 }
             }
         }

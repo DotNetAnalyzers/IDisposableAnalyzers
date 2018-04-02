@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System.Diagnostics;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -150,13 +149,30 @@ namespace IDisposableAnalyzers
 
         internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooled = InvocationWalker.Borrow(location.FirstAncestorOrSelf<BlockSyntax>()))
+            if (location.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
             {
-                foreach (var invocation in pooled.Invocations)
+                using (var walker = InvocationWalker.Borrow(block))
                 {
-                    if (IsDisposing(invocation, local, semanticModel, cancellationToken))
+                    foreach (var invocation in walker.Invocations)
                     {
-                        return true;
+                        if (location.IsExecutedBefore(invocation) == Result.Yes &&
+                            IsDisposing(invocation, local, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                using (var walker = UsingStatementWalker.Borrow(block))
+                {
+                    foreach (var usingStatement in walker.UsingStatements)
+                    {
+                        if (location.IsExecutedBefore(usingStatement) == Result.Yes &&
+                            usingStatement.Expression is IdentifierNameSyntax identifierName &&
+                            identifierName.Identifier.ValueText == local.Name)
+                        {
+                            return true;
+                        }
                     }
                 }
             }

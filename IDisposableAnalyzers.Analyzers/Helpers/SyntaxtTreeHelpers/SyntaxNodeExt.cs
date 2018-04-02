@@ -6,6 +6,12 @@ namespace IDisposableAnalyzers
 
     internal static class SyntaxNodeExt
     {
+        internal static bool IsEitherKind(this SyntaxToken node, SyntaxKind first, SyntaxKind other)
+        {
+            var kind = node.Kind();
+            return kind == first || kind == other;
+        }
+
         internal static bool IsEitherKind(this SyntaxNode node, SyntaxKind first, SyntaxKind other)
         {
             var kind = node?.Kind();
