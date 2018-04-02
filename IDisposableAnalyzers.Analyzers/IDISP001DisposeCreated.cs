@@ -66,6 +66,7 @@ namespace IDisposableAnalyzers
                 }
 
                 if (assignedSymbol is IParameterSymbol parameter &&
+                    parameter.RefKind == RefKind.None &&
                     Disposable.ShouldDispose(parameter, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));

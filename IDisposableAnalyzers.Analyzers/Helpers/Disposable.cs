@@ -271,12 +271,56 @@ namespace IDisposableAnalyzers
 
         internal static bool ShouldDispose(ILocalSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return ShouldDisposeLocalOrParameter(local, location, semanticModel, cancellationToken);
+            if (location is AssignmentExpressionSyntax assignment &&
+                assignment.Left is IdentifierNameSyntax identifierName &&
+                identifierName.Identifier.ValueText == local.Name &&
+                assignment.Parent is UsingStatementSyntax)
+            {
+                return false;
+            }
+
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
+            {
+                if (declaration.Parent is UsingStatementSyntax ||
+                    declaration.Parent is AnonymousFunctionExpressionSyntax)
+                {
+                    return false;
+                }
+
+                if (declaration.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
+                {
+                    return !IsReturned(local, block, semanticModel, cancellationToken) &&
+                           !IsAssignedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
+                           !IsAddedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
+                           !IsDisposedAfter(local, location, semanticModel, cancellationToken);
+                }
+            }
+
+            return false;
         }
 
-        internal static bool ShouldDispose(IParameterSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool ShouldDispose(IParameterSymbol parameter, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return ShouldDisposeLocalOrParameter(local, location, semanticModel, cancellationToken);
+            if (location is AssignmentExpressionSyntax assignment &&
+                assignment.Left is IdentifierNameSyntax identifierName &&
+                identifierName.Identifier.ValueText == parameter.Name &&
+                assignment.Parent is UsingStatementSyntax)
+            {
+                return false;
+            }
+
+            if (parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                declaration.Parent is ParameterListSyntax parameterList &&
+                parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
+                methodDeclaration.Body is BlockSyntax block)
+            {
+                return !IsReturned(parameter, block, semanticModel, cancellationToken) &&
+                       !IsAssignedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
+                       !IsAddedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
+                       !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
+            }
+
+            return false;
         }
 
         internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -303,37 +347,6 @@ namespace IDisposableAnalyzers
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
             {
                 return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
-            }
-
-            return false;
-        }
-
-        private static bool ShouldDisposeLocalOrParameter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            Debug.Assert(local.IsEither<ILocalSymbol, IParameterSymbol>(), "local.IsEither<ILocalSymbol, IParameterSymbol>()");
-            if (location is AssignmentExpressionSyntax assignment &&
-                assignment.Left is IdentifierNameSyntax identifierName &&
-                identifierName.Identifier.ValueText == local.Name &&
-                assignment.Parent is UsingStatementSyntax)
-            {
-                return false;
-            }
-
-            if (local.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration))
-            {
-                if (declaration.Parent is UsingStatementSyntax ||
-                    declaration.Parent is AnonymousFunctionExpressionSyntax)
-                {
-                    return false;
-                }
-
-                if (declaration.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
-                {
-                    return !IsReturned(local, block, semanticModel, cancellationToken) &&
-                           !IsAssignedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
-                           !IsAddedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
-                           !IsDisposedAfter(local, location, semanticModel, cancellationToken);
-                }
             }
 
             return false;
