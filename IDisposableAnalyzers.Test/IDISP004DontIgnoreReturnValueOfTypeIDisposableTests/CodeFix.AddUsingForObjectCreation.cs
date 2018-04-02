@@ -1,30 +1,42 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
-        internal class AddUsing
+        internal class AddUsingForObjectCreation
         {
-            private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+            private static readonly DiagnosticAnalyzer Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
-            private static readonly AddUsingCodeFixProvider Fix = new AddUsingCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
+
+            private static readonly string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
 
             [Test]
-            public void AddUsingForIgnoredReturn()
+            public void AddUsingForIgnoredFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
-    using System.IO;
-
     public sealed class Foo
     {
         public void Meh()
         {
-            ↓File.OpenRead(string.Empty);
+            ↓new Disposable();
             var i = 1;
         }
     }
@@ -33,22 +45,19 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
-    using System.IO;
-
     public sealed class Foo
     {
         public void Meh()
         {
-            using (File.OpenRead(string.Empty))
+            using (new Disposable())
             {
                 var i = 1;
             }
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -58,13 +67,12 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
 
     public sealed class Foo
     {
         public void Meh()
         {
-            ↓File.OpenRead(string.Empty);
+            ↓new Disposable();
         }
     }
 }";
@@ -73,20 +81,19 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
 
     public sealed class Foo
     {
         public void Meh()
         {
-            using (File.OpenRead(string.Empty))
+            using (new Disposable())
             {
             }
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -96,13 +103,12 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
 
     public sealed class Foo
     {
         public void Meh()
         {
-            ↓File.OpenRead(string.Empty);
+            ↓new Disposable();
             var a = 1;
             var b = 2;
             if (a == b)
@@ -119,13 +125,12 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
 
     public sealed class Foo
     {
         public void Meh()
         {
-            using (File.OpenRead(string.Empty))
+            using (new Disposable())
             {
                 var a = 1;
                 var b = 2;
@@ -139,8 +144,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -149,20 +154,20 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    using System.IO;
+    using System;
 
     public class Foo
     {
         internal static string Bar()
         {
-            return Meh(↓File.OpenRead(string.Empty));
+            return Meh(↓new Disposable());
         }
 
-        private static string Meh(Stream stream) => stream.ToString();
+        private static string Meh(IDisposable stream) => stream.ToString();
     }
 }";
 
-                AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+                AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode });
             }
         }
     }
