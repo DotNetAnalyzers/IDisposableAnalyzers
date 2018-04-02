@@ -40,20 +40,28 @@ namespace IDisposableAnalyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                    if (statement?.Parent is BlockSyntax block)
+                    if (node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>() is LocalDeclarationStatementSyntax statement &&
+                        statement.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
                             (editor, _) => AddUsing(editor, block, statement),
                             diagnostic);
                     }
+                    else if (node.FirstAncestorOrSelf<ExpressionStatementSyntax>() is ExpressionStatementSyntax expressionStatement &&
+                             expressionStatement.Parent is BlockSyntax expressionStatementBlock)
+                    {
+                        context.RegisterDocumentEditorFix(
+                            "Add using to end of block.",
+                            (editor, _) => AddUsing(editor, expressionStatementBlock, expressionStatement),
+                            diagnostic);
+                    }
                 }
 
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
                 {
-                    var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement?.Parent is BlockSyntax block)
+                    if (node.FirstAncestorOrSelf<ExpressionStatementSyntax>() is ExpressionStatementSyntax statement &&
+                        statement.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
