@@ -11,6 +11,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP004DontIgnoreReturnValueOfTypeIDisposable.Descriptor,
             IDISP014UseSingleInstanceOfHttpClient.Descriptor);
 
         /// <inheritdoc/>
@@ -35,6 +36,14 @@ namespace IDisposableAnalyzers
                     !IsStaticPropertyInitializer(objectCreation))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
+                }
+
+                if (Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                {
+                    if (Disposable.IsIgnored(objectCreation, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP004DontIgnoreReturnValueOfTypeIDisposable.Descriptor, context.Node.GetLocation()));
+                    }
                 }
             }
         }

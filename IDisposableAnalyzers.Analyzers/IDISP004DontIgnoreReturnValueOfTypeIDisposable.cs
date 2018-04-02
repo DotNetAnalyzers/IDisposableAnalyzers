@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
     {
         public const string DiagnosticId = "IDISP004";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Don't ignore return value of type IDisposable.",
             messageFormat: "Don't ignore return value of type IDisposable.",
@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -38,13 +38,6 @@ namespace IDisposableAnalyzers
             if (context.IsExcludedFromAnalysis())
             {
                 return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
-                Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                Disposable.IsIgnored(objectCreation, context.SemanticModel, context.CancellationToken))
-            {
-                context.ReportDiagnostic(Diagnostic.Create(Descriptor, context.Node.GetLocation()));
             }
 
             if (context.Node is InvocationExpressionSyntax invocation &&

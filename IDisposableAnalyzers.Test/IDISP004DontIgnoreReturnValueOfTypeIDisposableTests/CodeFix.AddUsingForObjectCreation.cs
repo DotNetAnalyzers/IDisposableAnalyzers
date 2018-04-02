@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     {
         internal class AddUsingForObjectCreation
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+            private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
             private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
 

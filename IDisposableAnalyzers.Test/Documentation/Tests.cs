@@ -69,9 +69,12 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            if (descriptorInfo.Analyzer is AssignmentAnalyzer)
+            switch (descriptorInfo.Descriptor.Id)
             {
-                return;
+                case IDISP003DisposeBeforeReassigning.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
+                case IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId when descriptorInfo.Analyzer is IDISP004DontIgnoreReturnValueOfTypeIDisposable:
+                case IDISP008DontMixInjectedAndCreatedForMember.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
+                    return;
             }
 
             var expected = GetTable(CreateStub(descriptorInfo));

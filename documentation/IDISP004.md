@@ -21,7 +21,7 @@
 </tr>
 <tr>
   <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/IDISP004DontIgnoreReturnValueOfTypeIDisposable.cs">IDISP004DontIgnoreReturnValueOfTypeIDisposable</a></td>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/NodeAnalyzers/ObjectCreationAnalyzer.cs">ObjectCreationAnalyzer</a></td>
 </tr>
 </table>
 <!-- end generated table -->
