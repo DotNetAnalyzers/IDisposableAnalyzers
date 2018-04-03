@@ -253,7 +253,7 @@ namespace RoslynSandbox
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public void DisposingCaclulatedPropertyNestedStatementBody(string disposeCall)
+        public void DisposingCalculatedPropertyNestedStatementBody(string disposeCall)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -308,7 +308,7 @@ namespace RoslynSandbox
         [TestCase("this.Disposable?.Dispose();")]
         [TestCase("Disposable.Dispose();")]
         [TestCase("Disposable?.Dispose();")]
-        public void DisposingCaclulatedPropertyNestedExpressionBody(string disposeCall)
+        public void DisposingCalculatedPropertyNestedExpressionBody(string disposeCall)
         {
             var fooCode = @"
 namespace RoslynSandbox

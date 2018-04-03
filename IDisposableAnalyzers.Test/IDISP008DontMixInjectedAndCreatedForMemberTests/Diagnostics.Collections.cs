@@ -1,13 +1,13 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class Diagnostics
     {
-        [Explicit("Fix later")]
         internal class Collections
         {
+            [Explicit("Fix later")]
             [Test]
             public void ListInitializer()
             {

@@ -6,8 +6,8 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     internal partial class HappyPath<T>
     {
         [TestCase("this.stream == null")]
-        ////[TestCase("this.stream == null && file != null")]
-        ////[TestCase("this.disposable is null")]
+        //[TestCase("this.stream == null && file != null")]
+        //[TestCase("this.disposable is null")]
         [TestCase("ReferenceEquals(this.stream, null)")]
         [TestCase("Equals(this.stream, null)")]
         [TestCase("object.ReferenceEquals(this.stream, null)")]

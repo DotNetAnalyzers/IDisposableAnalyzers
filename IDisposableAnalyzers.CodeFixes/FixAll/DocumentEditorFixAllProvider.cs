@@ -1,8 +1,9 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.CodeAnalysis;
@@ -30,7 +31,7 @@
             var diagnostics = await fixAllContext.GetDocumentDiagnosticsAsync(fixAllContext.Document)
                                                  .ConfigureAwait(false);
             var documentEditorActions = new List<DocumentEditorAction>();
-            foreach (var diagnostic in diagnostics)
+            foreach (var diagnostic in diagnostics.OrderBy(x => x.Location.SourceSpan.Start))
             {
                 var codeFixContext = new CodeFixContext(
                     fixAllContext.Document,

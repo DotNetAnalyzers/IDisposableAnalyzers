@@ -1,31 +1,10 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(ArgumentAnalyzer))]
-    [TestFixture(typeof(AssignmentAnalyzer))]
-    internal class HappyPathRecursion<T>
-        where T : DiagnosticAnalyzer, new()
+    internal partial class HappyPath<T>
     {
-        private static readonly T Analyzer = new T();
-
-#pragma warning disable SA1203 // Constants must appear before fields
-        //// ReSharper disable once UnusedMember.Local
-        private const string DisposableCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-}";
-
         [Test]
         public void IgnoresWhenDisposingRecursiveProperty()
         {
