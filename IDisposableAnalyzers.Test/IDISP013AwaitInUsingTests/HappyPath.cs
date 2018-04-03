@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         private static readonly ReturnValueAnalyzer Analyzer = new ReturnValueAnalyzer();
 
         [Test]
-        public void AwaitingInUsing()
+        public void AwaitWebClientDownloadStringTaskAsyncInUsing()
         {
             var testCode = @"
 namespace RoslynSandbox
