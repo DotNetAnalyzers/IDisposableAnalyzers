@@ -282,7 +282,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        [Explicit("Temporary")]
         [Test]
         public void OutParameter()
         {
@@ -296,7 +295,7 @@ namespace RoslynSandbox
         public Foo()
         {
             Stream stream;
-            if (TryGetStream(out ↓stream))
+            if (TryGetStream(↓out stream))
             {
             }
         }
