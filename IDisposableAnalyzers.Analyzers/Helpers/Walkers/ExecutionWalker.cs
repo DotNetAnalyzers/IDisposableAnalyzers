@@ -47,29 +47,27 @@ namespace IDisposableAnalyzers
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             base.VisitIdentifierName(node);
-            if (this.Search == Search.Recursive)
+            if (this.Search == Search.Recursive &&
+                TryGetPropertyGet(node, out var getter) &&
+                this.visited.Add(getter))
             {
-                if (TryGetPropertyGet(node, out var getter) &&
-                    this.visited.Add(getter))
-                {
-                    this.Visit(getter);
-                }
+                this.Visit(getter);
             }
 
-            bool TryGetPropertyGet(SyntaxNode candidate, out AccessorDeclarationSyntax getter)
+            bool TryGetPropertyGet(SyntaxNode candidate, out AccessorDeclarationSyntax result)
             {
-                getter = null;
+                result = null;
                 if (candidate.Parent is MemberAccessExpressionSyntax)
                 {
-                    return TryGetPropertyGet(candidate.Parent, out getter);
+                    return TryGetPropertyGet(candidate.Parent, out result);
                 }
 
                 if (candidate.Parent is ArgumentSyntax ||
                     candidate.Parent is EqualsValueClauseSyntax)
                 {
                     return this.SemanticModel.GetSymbolSafe(candidate, this.CancellationToken) is IPropertySymbol property &&
-                           property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
-                           propertyDeclaration.TryGetGetAccessorDeclaration(out getter);
+                           property.GetMethod is IMethodSymbol getMethod &&
+                           getMethod.TrySingleDeclaration(this.CancellationToken, out result);
                 }
 
                 return false;
@@ -79,27 +77,13 @@ namespace IDisposableAnalyzers
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             base.VisitAssignmentExpression(node);
-            if (this.Search == Search.Recursive)
+            if (this.Search == Search.Recursive &&
+                this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) is IPropertySymbol property &&
+                property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
+                propertyDeclaration.TryGetSetAccessorDeclaration(out var setter) &&
+                this.visited.Add(node))
             {
-                if (TryGetPropertySet(node.Left, out var setter) &&
-                    this.visited.Add(node))
-                {
-                    this.Visit(setter);
-                }
-            }
-
-            bool TryGetPropertySet(SyntaxNode candidate, out AccessorDeclarationSyntax setter)
-            {
-                setter = null;
-                if (candidate.Parent is ArgumentSyntax ||
-                    candidate.Parent is EqualsValueClauseSyntax)
-                {
-                    return false;
-                }
-
-                return this.SemanticModel.GetSymbolSafe(candidate, this.CancellationToken) is IPropertySymbol property &&
-                       property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
-                       propertyDeclaration.TryGetSetAccessorDeclaration(out setter);
+                this.Visit(setter);
             }
         }
 
