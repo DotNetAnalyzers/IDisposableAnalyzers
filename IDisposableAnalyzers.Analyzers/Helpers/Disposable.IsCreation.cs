@@ -30,10 +30,9 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {
-                            var symbol = semanticModel.GetSymbolSafe(assigned.Left, cancellationToken);
                             if (IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
-                                (symbol is IFieldSymbol ||
-                                 symbol is IPropertySymbol))
+                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol symbol &&
+                                symbol.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
                                 pooledSet.Add(symbol).IgnoreReturnValue();
                             }

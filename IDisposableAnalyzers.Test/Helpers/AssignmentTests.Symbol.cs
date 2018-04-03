@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public partial class AssignmentTests
+    public partial class AssignmentWalkerTests
     {
         internal class Symbol
         {
