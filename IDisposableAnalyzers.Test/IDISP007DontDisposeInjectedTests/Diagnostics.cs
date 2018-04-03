@@ -695,29 +695,6 @@ namespace Gu.Reactive
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        [Explicit("Don't think this is very useful.")]
-        [TestCase("action(disposable)")]
-        [TestCase("action.Invoke(disposable)")]
-        public void LambdaUsageOnInjected(string disposeCode)
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Foo
-    {
-        public Foo(IDisposable disposable)
-        {
-            Action<IDisposable> action = x => x.Dispose();
-            ↓action(disposable);
-        }
-    }
-}";
-            testCode = testCode.AssertReplace("action(disposable)", disposeCode);
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
-        }
-
         [Test]
         public void DisposingArrayItemAssignedWithInjected()
         {
