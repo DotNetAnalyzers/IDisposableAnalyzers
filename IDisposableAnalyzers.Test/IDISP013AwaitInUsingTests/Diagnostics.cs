@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP013");
 
         [Test]
-        public void NotAwaitingReturnInvocationInUsing()
+        public void WebClientDownloadStringTaskAsync()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotAwaitingInUsing()
+        public void LocalTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,6 +48,29 @@ namespace RoslynSandbox
             {
                 var task = client.DownloadStringTaskAsync(string.Empty);
                 return ↓task;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void TaskCompletionSourceTask()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        static Task Bar()
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            using (var disposable = new Disposable())
+            {
+                return tcs.Task;
             }
         }
     }
