@@ -1,3 +1,4 @@
+#pragma warning disable AvoidAsyncSuffix // Avoid Async suffix
 namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
 {
     using Gu.Roslyn.Asserts;

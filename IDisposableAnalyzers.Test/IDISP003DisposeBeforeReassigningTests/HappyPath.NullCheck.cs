@@ -35,6 +35,5 @@ namespace RoslynSandbox
             testCode = testCode.AssertReplace("this.stream == null", nullCheck);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
-
     }
 }

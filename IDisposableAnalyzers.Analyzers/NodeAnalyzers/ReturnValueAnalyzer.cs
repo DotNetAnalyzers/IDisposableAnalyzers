@@ -143,7 +143,8 @@ namespace IDisposableAnalyzers
 
             if (ReturnType(context).Is(KnownSymbol.Task) &&
                 returnValue.FirstAncestor<UsingStatementSyntax>() != null &&
-                returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null)
+                returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
+                context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task))
             {
                 context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
             }
