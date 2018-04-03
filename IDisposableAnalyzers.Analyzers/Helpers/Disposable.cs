@@ -54,19 +54,6 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (type is ITypeParameterSymbol typeParameter)
-            {
-                foreach (var constraintType in typeParameter.ConstraintTypes)
-                {
-                    if (IsAssignableTo(constraintType))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
             // https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
             if (type == KnownSymbol.Task)
             {

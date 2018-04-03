@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -409,6 +409,77 @@ namespace RoslynSandbox
         public void Dispose()
         {
         }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenImplementingInterface()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class Foo : IFoo
+    {
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+
+    public interface IFoo : IDisposable
+    {
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenSubclassingAndImplementingTwoInterfaces()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Windows;
+
+    public sealed class Foo : DependencyObject, IFoo, IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public interface IFoo
+    {
     }
 }";
 

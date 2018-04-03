@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using Microsoft.CodeAnalysis;
@@ -34,7 +34,7 @@
             {
                 if (method.Parameters.Length == 0 &&
                     method.GetAttributes().Length == 0 &&
-                    !Disposable.IsAssignableTo(method.ContainingType))
+                    !method.ContainingType.Is(KnownSymbol.IDisposable))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
                 }

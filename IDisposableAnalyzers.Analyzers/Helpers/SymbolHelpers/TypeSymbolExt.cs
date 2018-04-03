@@ -116,6 +116,19 @@ namespace IDisposableAnalyzers
 
         internal static bool Is(this ITypeSymbol type, QualifiedType qualifiedType)
         {
+            if (type is ITypeParameterSymbol typeParameter)
+            {
+                foreach (var constraintType in typeParameter.ConstraintTypes)
+                {
+                    if (constraintType.Is(qualifiedType))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
             while (type != null)
             {
                 if (type == qualifiedType)
