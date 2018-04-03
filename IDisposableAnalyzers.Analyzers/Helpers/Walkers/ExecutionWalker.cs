@@ -48,13 +48,13 @@ namespace IDisposableAnalyzers
         {
             base.VisitIdentifierName(node);
             if (this.Search == Search.Recursive &&
-                TryGetPropertyGet(node, out var getter) &&
-                this.visited.Add(getter))
+                this.visited.Add(node) &&
+                TryGetPropertyGet(node, out var getter))
             {
                 this.Visit(getter);
             }
 
-            bool TryGetPropertyGet(SyntaxNode candidate, out AccessorDeclarationSyntax result)
+            bool TryGetPropertyGet(SyntaxNode candidate, out SyntaxNode result)
             {
                 result = null;
                 if (candidate.Parent is MemberAccessExpressionSyntax)
@@ -78,10 +78,10 @@ namespace IDisposableAnalyzers
         {
             base.VisitAssignmentExpression(node);
             if (this.Search == Search.Recursive &&
-                this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) is IPropertySymbol property &&
+                this.visited.Add(node) &&
+                this.SemanticModel.GetSymbolSafe(node.Left, this.CancellationToken) is IPropertySymbol property &&
                 property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
-                propertyDeclaration.TryGetSetAccessorDeclaration(out var setter) &&
-                this.visited.Add(node))
+                propertyDeclaration.TryGetSetAccessorDeclaration(out var setter))
             {
                 this.Visit(setter);
             }
