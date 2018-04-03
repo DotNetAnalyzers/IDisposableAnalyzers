@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
     internal class ReturnValueAnalyzer : DiagnosticAnalyzer
     {
 #pragma warning disable GU0001 // Name the arguments.
-                              /// <inheritdoc/>
+        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
             IDISP011DontReturnDisposed.Descriptor,
@@ -139,19 +139,13 @@ namespace IDisposableAnalyzers
                         }
                     }
                 }
+            }
 
-                if (invocation.FirstAncestor<UsingStatementSyntax>() != null &&
-                    invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-                {
-                    var symbol = context.SemanticModel.GetSymbolSafe(memberAccess.Expression, context.CancellationToken);
-                    if (IsInUsing(symbol, context.CancellationToken))
-                    {
-                        if (context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
-                        }
-                    }
-                }
+            if (ReturnType(context).Is(KnownSymbol.Task) &&
+                returnValue.FirstAncestor<UsingStatementSyntax>() != null &&
+                returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null)
+            {
+                context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
             }
         }
 

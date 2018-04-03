@@ -31,7 +31,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        [Explicit("Fix #48")]
         [Test]
         public void NotAwaitingInUsing()
         {
