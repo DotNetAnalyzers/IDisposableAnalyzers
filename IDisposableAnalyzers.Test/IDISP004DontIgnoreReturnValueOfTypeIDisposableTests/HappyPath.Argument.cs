@@ -440,6 +440,41 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void SubclassedNinjectKernel()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using Ninject;
+    using Ninject.Modules;
+
+    public static class Foo
+    {
+        public static IKernel Kernel { get; } = new FooKernel(
+            new NinjectSettings(),
+            new FooModule());
+    }
+
+    public class FooKernel : StandardKernel
+    {
+        public FooKernel(INinjectSettings settings, params INinjectModule[] modules)
+            : base(settings, modules)
+        {
+        }
+    }
+
+    public class FooModule : NinjectModule
+    {
+        public override void Load()
+        {
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
