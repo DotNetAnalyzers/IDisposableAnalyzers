@@ -49,13 +49,30 @@ namespace IDisposableAnalyzers
             base.VisitIdentifierName(node);
             if (this.Search == Search.Recursive)
             {
-                if (this.TryGetPropertyGet(node, out IMethodSymbol getter))
+                if (TryGetPropertyGet(node, out var getter) &&
+                    this.visited.Add(getter))
                 {
-                    foreach (var reference in getter.DeclaringSyntaxReferences)
-                    {
-                        this.Visit(reference.GetSyntax(this.CancellationToken));
-                    }
+                    this.Visit(getter);
                 }
+            }
+
+            bool TryGetPropertyGet(SyntaxNode candidate, out AccessorDeclarationSyntax getter)
+            {
+                getter = null;
+                if (candidate.Parent is MemberAccessExpressionSyntax)
+                {
+                    return TryGetPropertyGet(candidate.Parent, out getter);
+                }
+
+                if (candidate.Parent is ArgumentSyntax ||
+                    candidate.Parent is EqualsValueClauseSyntax)
+                {
+                    return this.SemanticModel.GetSymbolSafe(candidate, this.CancellationToken) is IPropertySymbol property &&
+                           property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
+                           propertyDeclaration.TryGetGetAccessorDeclaration(out getter);
+                }
+
+                return false;
             }
         }
 
@@ -64,14 +81,25 @@ namespace IDisposableAnalyzers
             base.VisitAssignmentExpression(node);
             if (this.Search == Search.Recursive)
             {
-                if (this.TryGetPropertySet(node.Left, out IMethodSymbol setter) &&
+                if (TryGetPropertySet(node.Left, out var setter) &&
                     this.visited.Add(node))
                 {
-                    foreach (var reference in setter.DeclaringSyntaxReferences)
-                    {
-                        this.Visit(reference.GetSyntax(this.CancellationToken));
-                    }
+                    this.Visit(setter);
                 }
+            }
+
+            bool TryGetPropertySet(SyntaxNode candidate, out AccessorDeclarationSyntax setter)
+            {
+                setter = null;
+                if (candidate.Parent is ArgumentSyntax ||
+                    candidate.Parent is EqualsValueClauseSyntax)
+                {
+                    return false;
+                }
+
+                return this.SemanticModel.GetSymbolSafe(candidate, this.CancellationToken) is IPropertySymbol property &&
+                       property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
+                       propertyDeclaration.TryGetSetAccessorDeclaration(out setter);
             }
         }
 
@@ -115,36 +143,6 @@ namespace IDisposableAnalyzers
                     this.Visit(reference.GetSyntax(this.CancellationToken));
                 }
             }
-        }
-
-        private bool TryGetPropertySet(SyntaxNode node, out IMethodSymbol setter)
-        {
-            var property = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) as IPropertySymbol;
-            setter = property?.SetMethod;
-            return setter != null;
-        }
-
-        private bool TryGetPropertyGet(SyntaxNode node, out IMethodSymbol getter)
-        {
-            getter = null;
-            var property = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) as IPropertySymbol;
-            if (property?.GetMethod == null)
-            {
-                return false;
-            }
-
-            if (node.Parent is MemberAccessExpressionSyntax)
-            {
-                return this.TryGetPropertyGet(node.Parent, out getter);
-            }
-
-            if (node.Parent is ArgumentSyntax ||
-                node.Parent is EqualsValueClauseSyntax)
-            {
-                getter = property.GetMethod;
-            }
-
-            return getter != null;
         }
     }
 }
