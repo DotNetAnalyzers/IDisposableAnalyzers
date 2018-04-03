@@ -341,7 +341,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MatehodReturningStreamReader()
+            public void MethodReturningStreamReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -369,7 +369,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MatehodReturningStreamReaderExpressionBody()
+            public void MethodReturningStreamReaderExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -394,7 +394,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MatehodWithFuncTaskAsParameter()
+            public void MethodWithFuncTaskAsParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
