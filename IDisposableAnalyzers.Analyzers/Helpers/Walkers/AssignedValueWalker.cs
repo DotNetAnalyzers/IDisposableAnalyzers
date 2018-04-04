@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
-        private readonly MemberWalker memberWalker;
+        private readonly PublicMemberWalker publicMemberWalker;
 
         private SyntaxNode context;
         private SemanticModel semanticModel;
@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers
 
         private AssignedValueWalker()
         {
-            this.memberWalker = new MemberWalker(this);
+            this.publicMemberWalker = new PublicMemberWalker(this);
         }
 
         public int Count => this.values.Count;
@@ -435,7 +435,7 @@ namespace IDisposableAnalyzers
                             foreach (var reference in type.DeclaringSyntaxReferences)
                             {
                                 var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                                this.memberWalker.Visit(typeDeclaration);
+                                this.publicMemberWalker.Visit(typeDeclaration);
                             }
 
                             type = type.BaseType;
@@ -445,21 +445,21 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private void HandleAssignedValue(SyntaxNode assignee, ExpressionSyntax value)
+        private void HandleAssignedValue(SyntaxNode assigned, ExpressionSyntax value)
         {
             if (value == null)
             {
                 return;
             }
 
-            if (assignee is VariableDeclaratorSyntax declarator &&
+            if (assigned is VariableDeclaratorSyntax declarator &&
                 declarator.Identifier.ValueText != this.CurrentSymbol.Name)
             {
                 return;
             }
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
-                assignee is MemberAccessExpressionSyntax)
+                assigned is MemberAccessExpressionSyntax)
             {
                 return;
             }
@@ -528,8 +528,8 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            var assignedSymbol = this.semanticModel.GetSymbolSafe(assignee, this.cancellationToken) ??
-                                 this.semanticModel.GetDeclaredSymbolSafe(assignee, this.cancellationToken);
+            var assignedSymbol = this.semanticModel.GetSymbolSafe(assigned, this.cancellationToken) ??
+                                 this.semanticModel.GetDeclaredSymbolSafe(assigned, this.cancellationToken);
             if (assignedSymbol == null)
             {
                 return;
@@ -606,11 +606,11 @@ namespace IDisposableAnalyzers
             return Result.Yes;
         }
 
-        private class MemberWalker : CSharpSyntaxWalker
+        private class PublicMemberWalker : CSharpSyntaxWalker
         {
             private readonly AssignedValueWalker inner;
 
-            public MemberWalker(AssignedValueWalker inner)
+            public PublicMemberWalker(AssignedValueWalker inner)
             {
                 this.inner = inner;
             }
