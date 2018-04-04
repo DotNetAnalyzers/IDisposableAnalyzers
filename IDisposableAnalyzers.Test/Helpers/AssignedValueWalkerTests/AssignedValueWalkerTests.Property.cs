@@ -503,7 +503,7 @@ namespace RoslynSandbox
             using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", assignedValues);
-                Assert.AreEqual("", actual);
+                Assert.AreEqual("null, value", actual);
             }
         }
     }
