@@ -18,7 +18,7 @@
 
             if (TryGetSetter(property, cancellationToken, out var setter))
             {
-                if (AssignmentWalker.FirstForSymbol(symbol, setter, Search.Recursive, semanticModel, cancellationToken))
+                if (AssignmentExecutionWalker.FirstForSymbol(symbol, setter, Search.Recursive, semanticModel, cancellationToken))
                 {
                     return true;
                 }
