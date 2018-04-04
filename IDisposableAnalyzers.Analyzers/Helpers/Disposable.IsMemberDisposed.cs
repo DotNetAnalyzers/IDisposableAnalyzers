@@ -198,7 +198,7 @@ namespace IDisposableAnalyzers
 
             if (TryGetScope(assignment, out var block))
             {
-                using (var walker = InvocationWalker.Borrow(block))
+                using (var walker = InvocationExecutionWalker.Borrow(block))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
@@ -219,7 +219,7 @@ namespace IDisposableAnalyzers
                 semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
-                using (var pooled = InvocationWalker.Borrow(setter))
+                using (var pooled = InvocationExecutionWalker.Borrow(setter))
                 {
                     foreach (var invocation in pooled.Invocations)
                     {

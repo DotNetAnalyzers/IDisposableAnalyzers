@@ -14,7 +14,7 @@
                 return false;
             }
 
-            if (AssignmentWalker.SingleForSymbol(fieldOrProperty, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 if (Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
@@ -43,7 +43,7 @@
 
         internal static bool IsAssignedInSetUp(ISymbol fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
         {
-            if (AssignmentWalker.SingleForSymbol(fieldOrProperty, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 return Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||

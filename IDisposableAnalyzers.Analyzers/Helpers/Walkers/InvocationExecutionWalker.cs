@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class InvocationWalker : ExecutionWalker<InvocationWalker>, IReadOnlyList<InvocationExpressionSyntax>
+    internal sealed class InvocationExecutionWalker : ExecutionWalker<InvocationExecutionWalker>, IReadOnlyList<InvocationExpressionSyntax>
     {
         private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
 
-        private InvocationWalker()
+        private InvocationExecutionWalker()
         {
             this.Search = Search.TopLevel;
         }
@@ -30,7 +30,7 @@
             base.VisitInvocationExpression(node);
         }
 
-        internal static InvocationWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new InvocationWalker());
+        internal static InvocationExecutionWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new InvocationExecutionWalker());
 
         protected override void Clear()
         {

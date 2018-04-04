@@ -7,12 +7,12 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignmentWalker : ExecutionWalker<AssignmentWalker>
+    internal sealed class AssignmentExecutionWalker : ExecutionWalker<AssignmentExecutionWalker>
     {
         private readonly List<AssignmentExpressionSyntax> assignments = new List<AssignmentExpressionSyntax>();
         private readonly List<ArgumentSyntax> arguments = new List<ArgumentSyntax>();
 
-        private AssignmentWalker()
+        private AssignmentExecutionWalker()
         {
         }
 
@@ -33,9 +33,9 @@ namespace IDisposableAnalyzers
             base.VisitArgument(node);
         }
 
-        internal static AssignmentWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignmentExecutionWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = Borrow(() => new AssignmentWalker());
+            var walker = Borrow(() => new AssignmentExecutionWalker());
             walker.SemanticModel = semanticModel;
             walker.CancellationToken = cancellationToken;
             walker.Search = search;

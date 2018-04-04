@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -85,18 +85,12 @@
                     {
                         if (IsMutableFromOutside(fieldOrProperty))
                         {
-                            context.ReportDiagnostic(
-                                Diagnostic.Create(
-                                    IDISP008DontMixInjectedAndCreatedForMember.Descriptor,
-                                    context.Node.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                         }
                         else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken)
                                            .IsEither(Result.Yes, Result.AssumeYes))
                         {
-                            context.ReportDiagnostic(
-                                Diagnostic.Create(
-                                    IDISP008DontMixInjectedAndCreatedForMember.Descriptor,
-                                    context.Node.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                         }
                         else if (Disposable.IsMemberDisposed(fieldOrProperty, context.Node.FirstAncestorOrSelf<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken)
                                            .IsEither(Result.No, Result.AssumeNo, Result.Unknown) &&
@@ -109,10 +103,7 @@
                             if (Disposable.IsAssignableTo(fieldOrProperty.ContainingType) &&
                                 Disposable.TryGetDisposeMethod(fieldOrProperty.ContainingType, Search.TopLevel, out IMethodSymbol _))
                             {
-                                context.ReportDiagnostic(
-                                    Diagnostic.Create(
-                                        IDISP002DisposeMember.Descriptor,
-                                        context.Node.GetLocation()));
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
                             }
                             else
                             {
@@ -123,16 +114,10 @@
                                     context.CancellationToken,
                                     out _))
                                 {
-                                    context.ReportDiagnostic(
-                                        Diagnostic.Create(
-                                            IDISP002DisposeMember.Descriptor,
-                                            context.Node.GetLocation()));
+                                    context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
                                 }
 
-                                context.ReportDiagnostic(
-                                    Diagnostic.Create(
-                                        IDISP006ImplementIDisposable.Descriptor,
-                                        context.Node.GetLocation()));
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
                             }
                         }
                     }
@@ -151,17 +136,17 @@
 
                 switch (field.DeclaredAccessibility)
                 {
-                case Accessibility.Private:
-                    return false;
-                case Accessibility.Protected:
-                    return !field.ContainingType.IsSealed;
-                case Accessibility.Internal:
-                case Accessibility.ProtectedOrInternal:
-                case Accessibility.ProtectedAndInternal:
-                case Accessibility.Public:
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    case Accessibility.Private:
+                        return false;
+                    case Accessibility.Protected:
+                        return !field.ContainingType.IsSealed;
+                    case Accessibility.Internal:
+                    case Accessibility.ProtectedOrInternal:
+                    case Accessibility.ProtectedAndInternal:
+                    case Accessibility.Public:
+                        return true;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
@@ -174,17 +159,17 @@
 
                 switch (property.SetMethod.DeclaredAccessibility)
                 {
-                case Accessibility.Private:
-                    return false;
-                case Accessibility.Protected:
-                    return !property.ContainingType.IsSealed;
-                case Accessibility.Internal:
-                case Accessibility.ProtectedOrInternal:
-                case Accessibility.ProtectedAndInternal:
-                case Accessibility.Public:
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                    case Accessibility.Private:
+                        return false;
+                    case Accessibility.Protected:
+                        return !property.ContainingType.IsSealed;
+                    case Accessibility.Internal:
+                    case Accessibility.ProtectedOrInternal:
+                    case Accessibility.ProtectedAndInternal:
+                    case Accessibility.Public:
+                        return true;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
