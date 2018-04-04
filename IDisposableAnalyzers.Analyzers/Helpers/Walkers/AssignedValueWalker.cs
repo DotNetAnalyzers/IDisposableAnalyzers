@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly HashSet<SyntaxNode> visitedLocations = new HashSet<SyntaxNode>();
+        private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly MemberWalker memberWalker;
 
@@ -55,7 +55,7 @@ namespace IDisposableAnalyzers
         {
             if (node.Initializer != null)
             {
-                if (this.visitedLocations.Add(node.Initializer))
+                if (this.visited.Add(node.Initializer))
                 {
                     var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
                     this.HandleInvoke(ctor, node.Initializer.ArgumentList);
@@ -113,7 +113,7 @@ namespace IDisposableAnalyzers
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (this.visitedLocations.Add(node))
+            if (this.visited.Add(node))
             {
                 base.VisitInvocationExpression(node);
                 var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
@@ -147,7 +147,7 @@ namespace IDisposableAnalyzers
         public override void VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
-                this.visitedLocations.Add(node) &&
+                this.visited.Add(node) &&
                 this.context is ElementAccessExpressionSyntax &&
                 SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
             {
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
 
         public override void VisitArgument(ArgumentSyntax node)
         {
-            if (this.visitedLocations.Add(node) &&
+            if (this.visited.Add(node) &&
                 (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) ||
                  node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword)))
             {
@@ -309,7 +309,7 @@ namespace IDisposableAnalyzers
         protected override void Clear()
         {
             this.values.Clear();
-            this.visitedLocations.Clear();
+            this.visited.Clear();
             this.refParameters.Clear();
             this.CurrentSymbol = null;
             this.context = null;
@@ -377,7 +377,7 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
-                            if (this.visitedLocations.Add(creation))
+                            if (this.visited.Add(creation))
                             {
                                 if (contextCtor == null ||
                                     creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
@@ -559,13 +559,10 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
-            else
+            else if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
+                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
             {
-                if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
-                    this.refParameters.Contains(assignedSymbol as IParameterSymbol))
-                {
-                    this.values.Add(value);
-                }
+                this.values.Add(value);
             }
         }
 
