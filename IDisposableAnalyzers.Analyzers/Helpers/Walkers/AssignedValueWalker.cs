@@ -587,7 +587,7 @@ namespace IDisposableAnalyzers
                         walker.semanticModel = this.semanticModel;
                         walker.cancellationToken = this.cancellationToken;
                         walker.context = setter;
-                        walker.setterWalkers.ParentWalkers = this.setterWalkers;
+                        walker.setterWalkers.Parent = this.setterWalkers;
                         walker.Visit(setter);
                     }
                 }
@@ -701,12 +701,12 @@ namespace IDisposableAnalyzers
 
         private class SetterWalkers
         {
-            private readonly Dictionary<IPropertySymbol, AssignedValueWalker> propertyWalkerMap = new Dictionary<IPropertySymbol, AssignedValueWalker>();
+            private readonly Dictionary<IPropertySymbol, AssignedValueWalker> map = new Dictionary<IPropertySymbol, AssignedValueWalker>();
 
-            public SetterWalkers ParentWalkers { get; set; }
+            public SetterWalkers Parent { get; set; }
 
-            private Dictionary<IPropertySymbol, AssignedValueWalker> Current => this.ParentWalkers?.Current ??
-                                                                                this.propertyWalkerMap;
+            private Dictionary<IPropertySymbol, AssignedValueWalker> Current => this.Parent?.Current ??
+                                                                                this.map;
 
             public void Add(IPropertySymbol property, AssignedValueWalker walker)
             {
@@ -720,17 +720,17 @@ namespace IDisposableAnalyzers
 
             public void Clear()
             {
-                if (this.propertyWalkerMap != null)
+                if (this.map != null)
                 {
-                    foreach (var propertyWalker in this.propertyWalkerMap)
+                    foreach (var propertyWalker in this.map)
                     {
                         propertyWalker.Value?.Dispose();
                     }
 
-                    this.propertyWalkerMap.Clear();
+                    this.map.Clear();
                 }
 
-                this.ParentWalkers = null;
+                this.Parent = null;
             }
         }
     }
