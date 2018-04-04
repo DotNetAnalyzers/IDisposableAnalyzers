@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly SetterWalkers setterWalkers = new SetterWalkers();
+        private readonly MemberWalkers<IPropertySymbol> setterWalkers = new MemberWalkers<IPropertySymbol>();
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
@@ -699,21 +699,22 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private class SetterWalkers
+        private class MemberWalkers<T>
+            where T : ISymbol
         {
-            private readonly Dictionary<IPropertySymbol, AssignedValueWalker> map = new Dictionary<IPropertySymbol, AssignedValueWalker>();
+            private readonly Dictionary<T, AssignedValueWalker> map = new Dictionary<T, AssignedValueWalker>();
 
-            public SetterWalkers Parent { get; set; }
+            public MemberWalkers<T> Parent { get; set; }
 
-            private Dictionary<IPropertySymbol, AssignedValueWalker> Current => this.Parent?.Current ??
-                                                                                this.map;
+            private Dictionary<T, AssignedValueWalker> Current => this.Parent?.Current ??
+                                                                  this.map;
 
-            public void Add(IPropertySymbol property, AssignedValueWalker walker)
+            public void Add(T property, AssignedValueWalker walker)
             {
                 this.Current.Add(property, walker);
             }
 
-            public bool TryGetValue(IPropertySymbol property, out AssignedValueWalker walker)
+            public bool TryGetValue(T property, out AssignedValueWalker walker)
             {
                 return this.Current.TryGetValue(property, out walker);
             }
