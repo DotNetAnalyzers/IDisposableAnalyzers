@@ -22,6 +22,7 @@ namespace IDisposableAnalyzers
             }
 
             if (semanticModel.GetSymbolSafe(disposable, cancellationToken) is IPropertySymbol property &&
+                IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
                 using (var pooledSet = PooledHashSet<ISymbol>.Borrow())
@@ -30,7 +31,9 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {
-                            if (IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
+                            if (assigned.Right is IdentifierNameSyntax identifierName &&
+                                identifierName.Identifier.ValueText == "value" &&
+                                IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
                                 semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol symbol &&
                                 symbol.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
