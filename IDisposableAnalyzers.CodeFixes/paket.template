@@ -1,5 +1,5 @@
 ﻿type file
-version 0.1.4.5-dev
+version 1.0.0.0
 title IDisposableAnalyzers
 id IDisposableAnalyzers
 authors Johan Larsson, milleniumbug
