@@ -38,9 +38,9 @@ internal class Foo
             }
 
             [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "value")]
+            [TestCase("var temp2 = value;", "1")]
             [TestCase("var temp3 = value;", "")]
-            [TestCase("var temp4 = value;", "value")]
+            [TestCase("var temp4 = value;", "2")]
             public void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -104,6 +104,7 @@ internal class Foo<T>
                 }
             }
 
+            [Explicit("Temp")]
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "value")]
             public void LocalAssignedWithChainedOutParameter(string code, string expected)
