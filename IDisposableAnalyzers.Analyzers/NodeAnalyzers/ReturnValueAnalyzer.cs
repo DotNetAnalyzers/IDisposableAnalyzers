@@ -156,7 +156,7 @@ namespace IDisposableAnalyzers
                    declaration.Parent?.Parent is UsingStatementSyntax;
         }
 
-        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> set = null)
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
                 method.ReturnType.Is(KnownSymbol.IEnumerable) &&
@@ -169,14 +169,18 @@ namespace IDisposableAnalyzers
 
                 using (var walker = ReturnValueWalker.Borrow(methodDeclaration, Search.TopLevel, semanticModel, cancellationToken))
                 {
-                    set = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(set);
-                    foreach (var returnValue in walker)
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                    using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+#pragma warning restore IDISP003 // Dispose previous before re-assigning.
                     {
-                        if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                            set.Add(returnValue) &&
-                            IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken))
+                        foreach (var returnValue in walker)
                         {
-                            return true;
+                            if (returnValue is InvocationExpressionSyntax nestedInvocation &&
+                                visited.Add(returnValue) &&
+                                IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
