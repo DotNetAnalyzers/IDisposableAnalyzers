@@ -153,40 +153,23 @@ namespace IDisposableAnalyzers
         public override void VisitArgument(ArgumentSyntax node)
         {
             if (this.visited.Add(node) &&
-                (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) ||
-                 node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword)))
+                node.Parent is ArgumentListSyntax argumentList)
             {
-                var invocation = node.FirstAncestorOrSelf<InvocationExpressionSyntax>();
-                var argSymbol = this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken);
-                if (invocation != null &&
-                    (SymbolComparer.Equals(this.CurrentSymbol, argSymbol) ||
-                     this.refParameters.Contains(argSymbol as IParameterSymbol)))
+                if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
+                    this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol refSymbol &&
+                    (SymbolComparer.Equals(this.CurrentSymbol, refSymbol) ||
+                    this.refParameters.Contains(refSymbol as IParameterSymbol)) &&
+                    this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol method &&
+                    method.TryGetMatchingParameter(node, out var parameter))
                 {
-                    var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                    if (method != null &&
-                        method.DeclaringSyntaxReferences.Length > 0)
-                    {
-                        foreach (var reference in method.DeclaringSyntaxReferences)
-                        {
-                            var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                            if (methodDeclaration.TryGetMatchingParameter(node, out var parameterSyntax))
-                            {
-                                var parameterSymbol = this.semanticModel.GetDeclaredSymbolSafe(parameterSyntax, this.cancellationToken);
-                                if (parameterSymbol != null)
-                                {
-                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword))
-                                    {
-                                        this.refParameters.Add(parameterSymbol).IgnoreReturnValue();
-                                    }
-
-                                    if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
-                                    {
-                                        this.values.Add(node.Expression);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    this.refParameters.Add(parameter);
+                }
+                else if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
+                         this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol outSymbol &&
+                         (SymbolComparer.Equals(this.CurrentSymbol, outSymbol) ||
+                          this.refParameters.Contains(outSymbol as IParameterSymbol)))
+                {
+                    this.values.Add(node.Expression);
                 }
             }
 
