@@ -72,45 +72,8 @@ namespace IDisposableAnalyzers
 
         private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, IFieldSymbol field)
         {
-            bool TryGetPreviousStatement(StatementSyntax s, out StatementSyntax result)
-            {
-                result = null;
-                if (s.Parent is BlockSyntax block)
-                {
-                    var index = block.Statements.IndexOf(statement);
-                    if (index > 0)
-                    {
-                        result = block.Statements[index - 1];
-                        return true;
-                    }
-                }
-
-                return false;
-            }
-
-            bool TryGetCreateCompositeDisposable(StatementSyntax s, IFieldSymbol f, out ObjectCreationExpressionSyntax result)
-            {
-                if (s is ExpressionStatementSyntax expressionStatement &&
-                    expressionStatement.Expression is AssignmentExpressionSyntax assignment &&
-                    assignment.Right is ObjectCreationExpressionSyntax objectCreation)
-                {
-                    if ((assignment.Left is IdentifierNameSyntax identifierName &&
-                         identifierName.Identifier.ValueText == f.Name) ||
-                        (assignment.Left is MemberAccessExpressionSyntax memberAccess &&
-                         memberAccess.Expression is ThisExpressionSyntax &&
-                         memberAccess.Name.Identifier.ValueText == f.Name))
-                    {
-                        result = objectCreation;
-                        return true;
-                    }
-                }
-
-                result = null;
-                return false;
-            }
-
-            if (TryGetPreviousStatement(statement, out var previous) &&
-                TryGetCreateCompositeDisposable(previous, field, out var compositeDisposableCreation))
+            if (TryGetPreviousStatement(out var previous) &&
+                TryGetCreateCompositeDisposable(out var compositeDisposableCreation))
             {
                 editor.RemoveNode(statement);
                 editor.AddItemToCollectionInitializer(
@@ -120,17 +83,45 @@ namespace IDisposableAnalyzers
             }
             else
             {
-                var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
-                var memberAccessExpressionSyntax = usesUnderscoreNames
-                    ? (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(SyntaxFactory.IdentifierName(field.Name), "Add")
-                    : (MemberAccessExpressionSyntax)editor.Generator.MemberAccessExpression(editor.Generator.MemberAccessExpression(SyntaxFactory.ThisExpression(), SyntaxFactory.IdentifierName(field.Name)), "Add");
+                var code = CodeStyle.UnderscoreFields(editor.SemanticModel)
+                    ? $"{field.Name}.Add({statement.Expression});"
+                    : $"this.{field.Name}.Add({statement.Expression});";
 
                 editor.ReplaceNode(
                     statement,
-                    SyntaxFactory.ExpressionStatement(
-                        (InvocationExpressionSyntax)editor.Generator.InvocationExpression(
-                            memberAccessExpressionSyntax,
-                            statement.Expression)));
+                    SyntaxFactory.ParseStatement(code).WithTriviaFrom(statement));
+            }
+
+            bool TryGetPreviousStatement(out StatementSyntax result)
+            {
+                result = null;
+                if (statement.Parent is BlockSyntax block)
+                {
+                    return block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
+                }
+
+                return false;
+            }
+
+            bool TryGetCreateCompositeDisposable(out ObjectCreationExpressionSyntax result)
+            {
+                if (previous is ExpressionStatementSyntax expressionStatement &&
+                    expressionStatement.Expression is AssignmentExpressionSyntax assignment &&
+                    assignment.Right is ObjectCreationExpressionSyntax objectCreation)
+                {
+                    if ((assignment.Left is IdentifierNameSyntax identifierName &&
+                         identifierName.Identifier.ValueText == field.Name) ||
+                        (assignment.Left is MemberAccessExpressionSyntax memberAccess &&
+                         memberAccess.Expression is ThisExpressionSyntax &&
+                         memberAccess.Name.Identifier.ValueText == field.Name))
+                    {
+                        result = objectCreation;
+                        return true;
+                    }
+                }
+
+                result = null;
+                return false;
             }
         }
 
