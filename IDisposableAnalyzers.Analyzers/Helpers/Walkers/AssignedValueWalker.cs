@@ -12,9 +12,11 @@ namespace IDisposableAnalyzers
     internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
+        private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
         private readonly MemberWalkers<IPropertySymbol> setterWalkers = new MemberWalkers<IPropertySymbol>();
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
+        private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
 
         private SyntaxNode context;
@@ -152,24 +154,25 @@ namespace IDisposableAnalyzers
 
         public override void VisitArgument(ArgumentSyntax node)
         {
-            if (this.visited.Add(node) &&
-                node.Parent is ArgumentListSyntax argumentList)
+            if (node.Parent is ArgumentListSyntax argumentList)
             {
                 if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
                     this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol refSymbol &&
                     (SymbolComparer.Equals(this.CurrentSymbol, refSymbol) ||
                     this.refParameters.Contains(refSymbol as IParameterSymbol)) &&
-                    this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol method &&
-                    method.TryGetMatchingParameter(node, out var parameter))
+                    this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol refMethod &&
+                    refMethod.TryGetMatchingParameter(node, out var refParameter))
                 {
-                    this.refParameters.Add(parameter);
+                    this.refParameters.Add(refParameter);
                 }
                 else if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
                          this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol outSymbol &&
                          (SymbolComparer.Equals(this.CurrentSymbol, outSymbol) ||
-                          this.refParameters.Contains(outSymbol as IParameterSymbol)))
+                          this.refParameters.Contains(outSymbol as IParameterSymbol)) &&
+                         this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol outMethod &&
+                         outMethod.TryGetMatchingParameter(node, out var outParameter))
                 {
-                    this.values.Add(node.Expression);
+                    this.outParameters.Add(outParameter);
                 }
             }
 
@@ -271,23 +274,37 @@ namespace IDisposableAnalyzers
                     for (var i = before; i < this.values.Count; i++)
                     {
                         if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
-                            parameter.RefKind != RefKind.Out)
+                            argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
                         {
-                            if (argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
-                            {
-                                this.values[i] = arg;
-                            }
+                            this.values[i] = arg;
                         }
                     }
                 }
+
+                foreach (var outValue in this.outValues)
+                {
+                    if (this.semanticModel.GetSymbolSafe(outValue, this.cancellationToken) is IParameterSymbol parameter &&
+                        argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
+                    {
+                        this.values.Add(arg);
+                    }
+                    else
+                    {
+                        this.values.Add(outValue);
+                    }
+                }
+
+                this.outValues.Clear();
             }
         }
 
         protected override void Clear()
         {
             this.values.Clear();
+            this.outValues.Clear();
             this.visited.Clear();
             this.refParameters.Clear();
+            this.outParameters.Clear();
             this.CurrentSymbol = null;
             this.context = null;
             this.semanticModel = null;
@@ -532,9 +549,14 @@ namespace IDisposableAnalyzers
             }
 
             if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
-                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
+                this.refParameters.Contains(assignedSymbol as IParameterSymbol))
             {
                 this.values.Add(value);
+            }
+
+            if (this.outParameters.Contains(assignedSymbol))
+            {
+                this.outValues.Add(value);
             }
 
             bool TryGetSetterWalker(out AssignedValueWalker walker)

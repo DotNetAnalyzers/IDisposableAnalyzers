@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
@@ -32,10 +33,7 @@ internal class Foo
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-#pragma warning disable GU0006 // Use nameof.
-                    Assert.AreEqual("value", actual);
-#pragma warning restore GU0006 // Use nameof.
+                    Assert.AreEqual("1", assignedValues.Single().ToString());
                 }
             }
 
@@ -102,10 +100,7 @@ internal class Foo<T>
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-#pragma warning disable GU0006 // Use nameof.
-                    Assert.AreEqual("value", actual);
-#pragma warning restore GU0006 // Use nameof.
+                    Assert.AreEqual("default(T)", assignedValues.Single().ToString());
                 }
             }
 
@@ -213,9 +208,9 @@ internal class Foo
             }
 
             [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, this.value")]
-            [TestCase("var temp3 = this.value;", "1, this.value, this.value")]
-            [TestCase("var temp4 = this.value;", "1, this.value, this.value")]
+            [TestCase("var temp2 = this.value;", "1, 2")]
+            [TestCase("var temp3 = this.value;", "1, 2, 3")]
+            [TestCase("var temp4 = this.value;", "1, 2, 3")]
             public void FieldAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -338,6 +333,35 @@ namespace RoslynSandbox
                 {
                     var actual = string.Join(", ", assignedValues);
                     Assert.AreEqual(expected, actual);
+                }
+            }
+
+            [Test]
+            public void RefBeforeOut()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+internal class Foo
+{
+    internal Foo()
+    {
+        int value = 0;
+        Assign(ref value, out value);
+        var temp = value;
+    }
+
+    internal void Assign(ref int refValue, out int outValue)
+    {
+        outValue = 2;
+        refValue = 1;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual("0, 1, 2", actual);
                 }
             }
         }
