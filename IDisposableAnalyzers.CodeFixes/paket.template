@@ -13,9 +13,7 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releasenotes
-  FEATÙRE: IDISP014 check that HttpClient is assigned to static field or property.
-  BUGFIX: IDISP001 handle dispose in lambda closure.
-  BUGFIX: IDISP004 handle properties.
+  Bugfixes
 
 files
   bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs

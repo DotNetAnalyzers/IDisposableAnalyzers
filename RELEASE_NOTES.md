@@ -1,3 +1,6 @@
+#### 1.0.0
+* Bugfixes
+
 #### 0.1.4.4
 * FEATÙRE: IDISP014 check that HttpClient is assigned to static field or property.
 * BUGFIX: IDISP001 handle dispose in lambda closure.
