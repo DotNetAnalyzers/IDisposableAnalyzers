@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -81,6 +81,14 @@ namespace RoslynSandbox
 
         private readonly int value5;
         private int value6;
+
+        public Foo()
+        {
+            value5 = Value2;
+            value6 = Value2;
+        }
+
+        public int Bar => this.value5 + this.value6;
     }
 }";
 
@@ -100,6 +108,14 @@ namespace RoslynSandbox
         private readonly int value5;
         private int value6;
         private bool disposed;
+
+        public Foo()
+        {
+            value5 = Value2;
+            value6 = Value2;
+        }
+
+        public int Bar => this.value5 + this.value6;
 
         public void Dispose()
         {
