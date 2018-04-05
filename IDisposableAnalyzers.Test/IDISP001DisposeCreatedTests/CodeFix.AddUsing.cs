@@ -178,7 +178,33 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Stream stream;
+            if (TryGetStream(out stream))
+            {
+                using (stream)
+                {
+                }
+            }
+        }
+
+        private static bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Explicit("C#7")]

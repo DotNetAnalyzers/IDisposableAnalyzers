@@ -56,6 +56,17 @@ namespace IDisposableAnalyzers
                             (editor, _) => AddUsing(editor, expressionStatementBlock, expressionStatement),
                             diagnostic);
                     }
+                    else if (node is ArgumentSyntax argument &&
+                            argument.Parent is ArgumentListSyntax argumentList &&
+                            argumentList.Parent is InvocationExpressionSyntax invocation &&
+                            invocation.Parent is IfStatementSyntax ifStatement &&
+                             ifStatement.Statement is BlockSyntax ifBlock)
+                    {
+                        context.RegisterDocumentEditorFix(
+                            "Add using to end of block.",
+                            (editor, _) => AddUsing(editor, ifBlock, argument.Expression),
+                            diagnostic);
+                    }
                 }
 
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
@@ -108,6 +119,22 @@ namespace IDisposableAnalyzers
                     expression: statement.Expression,
                     statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
+        }
+
+        private static void AddUsing(DocumentEditor editor, BlockSyntax block, ExpressionSyntax expression)
+        {
+            foreach (var statementSyntax in block.Statements)
+            {
+                editor.RemoveNode(statementSyntax);
+            }
+
+            editor.ReplaceNode(
+                block,
+                SyntaxFactory.Block(
+                    SyntaxFactory.UsingStatement(
+                        declaration: null,
+                        expression: expression,
+                        statement: block.WithAdditionalAnnotations(Formatter.Annotation))));
         }
     }
 }
