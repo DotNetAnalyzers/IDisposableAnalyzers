@@ -145,7 +145,9 @@ namespace IDisposableAnalyzers
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
             {
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
                 using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+#pragma warning restore IDISP003 // Dispose previous before re-assigning.
                 {
                     if (!visited.Add(memberAccess))
                     {
