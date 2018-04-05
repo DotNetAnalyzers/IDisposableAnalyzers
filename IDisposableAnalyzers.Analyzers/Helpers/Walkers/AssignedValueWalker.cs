@@ -114,30 +114,23 @@ namespace IDisposableAnalyzers
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (this.visited.Add(node))
+            if (this.visited.Add(node) &&
+                this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol method)
             {
                 base.VisitInvocationExpression(node);
-                var method = this.semanticModel.GetSymbolSafe(node, this.cancellationToken);
-                if (method == null)
-                {
-                    return;
-                }
-
                 if (this.context is ElementAccessExpressionSyntax &&
                     node.Expression is MemberAccessExpressionSyntax memberAccess &&
+                    method.Name == "Add" &&
                     SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(memberAccess.Expression, this.cancellationToken)))
                 {
-                    if (method.Name == "Add")
+                    if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
+                        node.ArgumentList?.Arguments.Count == 2)
                     {
-                        if (method.ContainingType.Is(KnownSymbol.IDictionary) &&
-                            node.ArgumentList?.Arguments.Count == 2)
-                        {
-                            this.values.Add(node.ArgumentList.Arguments[1].Expression);
-                        }
-                        else if (node.ArgumentList?.Arguments.Count == 1)
-                        {
-                            this.values.Add(node.ArgumentList.Arguments[0].Expression);
-                        }
+                        this.values.Add(node.ArgumentList.Arguments[1].Expression);
+                    }
+                    else if (node.ArgumentList?.Arguments.Count == 1)
+                    {
+                        this.values.Add(node.ArgumentList.Arguments[0].Expression);
                     }
                 }
 
