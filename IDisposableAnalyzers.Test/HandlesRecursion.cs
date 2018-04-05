@@ -30,6 +30,7 @@ namespace IDisposableAnalyzers.Test
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.Collections.Generic;
 
     public abstract class Foo
@@ -43,13 +44,13 @@ namespace RoslynSandbox
             value = this.RecursiveExpressionBodyMethod(1);
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
-            value = RecursiveStatementBodyMethodWithOptionalParameter(1);
+            value = RecursiveStatementBodyMethodWithOptionalParameter(value);
             // value = value;
         }
 
-        public int RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
+        public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
-        public int RecursiveStatementBodyProperty
+        public IDisposable RecursiveStatementBodyProperty
         {
             get
             {
@@ -57,18 +58,50 @@ namespace RoslynSandbox
             }
         }
 
-        public int RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
+        public IDisposable RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
 
-        public int RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
+        public IDisposable RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
 
-        public int RecursiveStatementBodyMethod()
+        public IDisposable RecursiveStatementBodyMethod()
         {
             return this.RecursiveStatementBodyMethod();
         }
 
-        public int RecursiveStatementBodyMethod(int value)
+        public IDisposable RecursiveStatementBodyMethod(int value)
         {
             return this.RecursiveStatementBodyMethod(value);
+        }
+
+        public static bool RecursiveOut(out IDisposable value)
+        {
+            return RecursiveOut(out value);
+        }
+
+        public static bool RecursiveOut(int foo, out IDisposable value)
+        {
+            return RecursiveOut(2, out value);
+        }
+
+        public static bool RecursiveOut(double foo, out IDisposable value)
+        {
+            value = null;
+            return RecursiveOut(3.0, out value);
+        }
+
+        public static bool RecursiveOut(string foo, out IDisposable value)
+        {
+            if (foo == null)
+            {
+                return RecursiveOut(3.0, out value);
+            }
+
+            value = null;
+            return true;
+        }
+
+        public static bool RecursiveRef(ref IDisposable value)
+        {
+            return RecursiveRef(ref value);
         }
 
         public void Meh()
@@ -79,11 +112,16 @@ namespace RoslynSandbox
             value = this.RecursiveExpressionBodyMethod(1);
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
-            value = RecursiveStatementBodyMethodWithOptionalParameter(1);
+            value = RecursiveStatementBodyMethodWithOptionalParameter(value);
+            RecursiveOut(out value);
+            RecursiveOut(1, out value);
+            RecursiveOut(1.0, out value);
+            RecursiveOut(string.Empty, out value);
+            RecursiveRef(ref value);
             // value = value;
         }
 
-        private static int RecursiveStatementBodyMethodWithOptionalParameter(int value, IEnumerable<int> values = null)
+        private static IDisposable RecursiveStatementBodyMethodWithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
         {
             if (values == null)
             {

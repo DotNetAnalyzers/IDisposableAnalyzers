@@ -14,6 +14,7 @@ namespace IDisposableAnalyzers
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
         private readonly MemberWalkers<IPropertySymbol> setterWalkers = new MemberWalkers<IPropertySymbol>();
+        private readonly MemberWalkers<IMethodSymbol> methodWalkers = new MemberWalkers<IMethodSymbol>();
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
@@ -152,33 +153,6 @@ namespace IDisposableAnalyzers
             }
         }
 
-        public override void VisitArgument(ArgumentSyntax node)
-        {
-            if (node.Parent is ArgumentListSyntax argumentList)
-            {
-                if (node.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
-                    this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol refSymbol &&
-                    (SymbolComparer.Equals(this.CurrentSymbol, refSymbol) ||
-                    this.refParameters.Contains(refSymbol as IParameterSymbol)) &&
-                    this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol refMethod &&
-                    refMethod.TryGetMatchingParameter(node, out var refParameter))
-                {
-                    this.refParameters.Add(refParameter);
-                }
-                else if (node.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
-                         this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken) is ISymbol outSymbol &&
-                         (SymbolComparer.Equals(this.CurrentSymbol, outSymbol) ||
-                          this.refParameters.Contains(outSymbol as IParameterSymbol)) &&
-                         this.semanticModel.GetSymbolSafe(argumentList.Parent, this.cancellationToken) is IMethodSymbol outMethod &&
-                         outMethod.TryGetMatchingParameter(node, out var outParameter))
-                {
-                    this.outParameters.Add(outParameter);
-                }
-            }
-
-            base.VisitArgument(node);
-        }
-
         internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return Borrow(property, null, semanticModel, cancellationToken);
@@ -254,47 +228,120 @@ namespace IDisposableAnalyzers
             return pooled;
         }
 
-        internal void HandleInvoke(ISymbol method, ArgumentListSyntax argumentList)
+        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
         {
-            if (method != null)
+            if (method != null &&
+                (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
+                 this.CurrentSymbol.ContainingType.Is(method.ContainingType)))
             {
-                var before = this.values.Count;
-                if (method.ContainingType.Is(this.CurrentSymbol.ContainingType) ||
-                    this.CurrentSymbol.ContainingType.Is(method.ContainingType))
+                if (TryGetWalker(out var walker))
                 {
-                    foreach (var reference in method.DeclaringSyntaxReferences)
+                    foreach (var value in walker.values)
                     {
-                        base.Visit(reference.GetSyntax(this.cancellationToken));
-                    }
-                }
-
-                if (before != this.values.Count &&
-                    argumentList != null)
-                {
-                    for (var i = before; i < this.values.Count; i++)
-                    {
-                        if (this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken) is IParameterSymbol parameter &&
-                            argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
+                        if (value is IdentifierNameSyntax identifierName &&
+                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                         {
-                            this.values[i] = arg;
+                            if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                            {
+                                this.values.Add(argument.Expression);
+                            }
+                            else if (parameter.HasExplicitDefaultValue &&
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                            {
+                                this.values.Add(parameterDeclaration.Default?.Value);
+                            }
+                            else
+                            {
+                                this.values.Add(value);
+                            }
+                        }
+                        else
+                        {
+                            this.values.Add(value);
+                        }
+                    }
+
+                    foreach (var outValue in walker.outValues)
+                    {
+                        if (outValue is IdentifierNameSyntax identifierName &&
+                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                        {
+                            if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                            {
+                                this.values.Add(argument.Expression);
+                            }
+                            else if (parameter.HasExplicitDefaultValue &&
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                            {
+                                this.values.Add(parameterDeclaration.Default?.Value);
+                            }
+                            else
+                            {
+                                this.values.Add(outValue);
+                            }
+                        }
+                        else
+                        {
+                            this.values.Add(outValue);
                         }
                     }
                 }
+            }
 
-                foreach (var outValue in this.outValues)
+            bool TryGetWalker(out AssignedValueWalker result)
+            {
+                if (this.methodWalkers.TryGetValue(method, out result))
                 {
-                    if (this.semanticModel.GetSymbolSafe(outValue, this.cancellationToken) is IParameterSymbol parameter &&
-                        argumentList.TryGetArgumentValue(parameter, this.cancellationToken, out var arg))
-                    {
-                        this.values.Add(arg);
-                    }
-                    else
-                    {
-                        this.values.Add(outValue);
-                    }
+                    return result != null &&
+                           !ReferenceEquals(this, result);
                 }
 
-                this.outValues.Clear();
+                if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                {
+                    result = Borrow(() => new AssignedValueWalker());
+                    this.methodWalkers.Add(method, result);
+                    result.CurrentSymbol = this.CurrentSymbol;
+                    result.semanticModel = this.semanticModel;
+                    result.cancellationToken = this.cancellationToken;
+                    result.context = this.context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null ? this.context : declaration;
+                    result.methodWalkers.Parent = this.methodWalkers;
+                    if (argumentList != null)
+                    {
+                        foreach (var argument in argumentList.Arguments)
+                        {
+                            if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
+                                TryGetMatchingParameter(argument, out var parameter))
+                            {
+                                result.refParameters.Add(parameter);
+                            }
+                            else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
+                                     TryGetMatchingParameter(argument, out parameter))
+                            {
+                                result.outParameters.Add(parameter);
+                            }
+                        }
+                    }
+
+                    result.Visit(declaration);
+                }
+
+                return result != null;
+
+                bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol parameter)
+                {
+                    parameter = null;
+                    if (this.semanticModel.GetSymbolSafe(argument.Expression, this.cancellationToken) is ISymbol symbol)
+                    {
+                        if (SymbolComparer.Equals(this.CurrentSymbol, symbol) ||
+                            this.refParameters.Contains(symbol) ||
+                            this.outParameters.Contains(symbol))
+                        {
+                            return method.TryGetMatchingParameter(argument, out parameter);
+                        }
+                    }
+
+                    return false;
+                }
             }
         }
 
@@ -310,6 +357,7 @@ namespace IDisposableAnalyzers
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
             this.setterWalkers.Clear();
+            this.methodWalkers.Clear();
         }
 
         private void Run()
@@ -379,7 +427,7 @@ namespace IDisposableAnalyzers
                                 {
                                     this.VisitObjectCreationExpression(creation);
                                     var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                    this.HandleInvoke(method, creation.ArgumentList);
+                                    this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
                                 }
                             }
                         }
@@ -573,7 +621,8 @@ namespace IDisposableAnalyzers
                 {
                     if (this.setterWalkers.TryGetValue(property, out walker))
                     {
-                        return walker != null;
+                        return walker != null &&
+                              !ReferenceEquals(this, walker);
                     }
 
                     if (property.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
@@ -697,24 +746,24 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private class MemberWalkers<T>
-            where T : ISymbol
+        private class MemberWalkers<TMember>
+            where TMember : ISymbol
         {
-            private readonly Dictionary<T, AssignedValueWalker> map = new Dictionary<T, AssignedValueWalker>();
+            private readonly Dictionary<TMember, AssignedValueWalker> map = new Dictionary<TMember, AssignedValueWalker>();
 
-            public MemberWalkers<T> Parent { get; set; }
+            public MemberWalkers<TMember> Parent { get; set; }
 
-            private Dictionary<T, AssignedValueWalker> Current => this.Parent?.Current ??
-                                                                  this.map;
+            private Dictionary<TMember, AssignedValueWalker> Current => this.Parent?.Current ??
+                                                                        this.map;
 
-            public void Add(T property, AssignedValueWalker walker)
+            public void Add(TMember member, AssignedValueWalker walker)
             {
-                this.Current.Add(property, walker);
+                this.Current.Add(member, walker);
             }
 
-            public bool TryGetValue(T property, out AssignedValueWalker walker)
+            public bool TryGetValue(TMember member, out AssignedValueWalker walker)
             {
-                return this.Current.TryGetValue(property, out walker);
+                return this.Current.TryGetValue(member, out walker);
             }
 
             public void Clear()

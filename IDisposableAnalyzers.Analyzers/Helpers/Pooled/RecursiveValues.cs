@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Concurrent;
@@ -120,7 +120,7 @@
                     {
                         using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                         {
-                            assignedValues.HandleInvoke(invokedMethod, invocation.ArgumentList);
+                            assignedValues.HandleInvoke(invokedMethod as IMethodSymbol, invocation.ArgumentList);
                             return this.AddManyRecursively(assignedValues);
                         }
                     }

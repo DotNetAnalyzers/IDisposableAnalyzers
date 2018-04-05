@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers
             if (context.Node is ArgumentSyntax argument &&
                 argument.Parent is ArgumentListSyntax argumentList &&
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
-                !argument.RefOrOutKeyword.IsKind(SyntaxKind.None) &&
+                argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
                 method.TrySingleDeclaration(context.CancellationToken, out _))
             {

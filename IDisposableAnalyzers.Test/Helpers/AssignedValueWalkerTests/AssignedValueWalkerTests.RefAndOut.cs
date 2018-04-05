@@ -104,9 +104,8 @@ internal class Foo<T>
                 }
             }
 
-            [Explicit("Temp")]
-            [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "value")]
+            [TestCase("var temp1 = value;", "0")]
+            [TestCase("var temp2 = value;", "0, 1")]
             public void LocalAssignedWithChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -116,18 +115,18 @@ namespace RoslynSandbox
     {
         internal Foo()
         {
-            int value;
+            int value = 0;
             var temp1 = value;
             Assign1(out value, 1);
             var temp2 = value;
         }
 
-        internal void Assign1(out int value1, int arg1)
+        internal static void Assign1(out int value1, int arg1)
         {
             Assign2(out value1, arg1);
         }
 
-        internal void Assign2(out int value2, int arg2)
+        internal static void Assign2(out int value2, int arg2)
         {
             value2 = arg2;
         }
@@ -341,19 +340,22 @@ namespace RoslynSandbox
             public void RefBeforeOut()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+namespace RoslynSandbox
 {
-    internal Foo()
+    internal class Foo
     {
-        int value = 0;
-        Assign(ref value, out value);
-        var temp = value;
-    }
+        internal Foo()
+        {
+            int value = 0;
+            Assign(ref value, out value);
+            var temp = value;
+        }
 
-    internal void Assign(ref int refValue, out int outValue)
-    {
-        outValue = 2;
-        refValue = 1;
+        internal void Assign(ref int refValue, out int outValue)
+        {
+            outValue = 2;
+            refValue = 1;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -363,6 +365,76 @@ internal class Foo
                 {
                     var actual = string.Join(", ", assignedValues);
                     Assert.AreEqual("0, 1, 2", actual);
+                }
+            }
+
+            [Test]
+            public void RecursiveOutAssigned()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        internal Foo()
+        {
+            int value;
+            RecursiveOut(out value);
+            var temp = value;
+        }
+
+        public static bool RecursiveOut(out int value)
+        {
+            value = 0;
+            if (value < 0)
+            {
+                return RecursiveOut(out value);
+            }
+
+            value = 1;
+            return true;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual("0, 1", actual);
+                }
+            }
+
+            [Test]
+            public void RecursiveOut()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        internal void Bar()
+        {
+            int value;
+            RecursiveOut(1.0, out value);
+            var temp = value;
+        }
+
+        public static bool RecursiveOut(double foo, out int value)
+        {
+            value = 0;
+            return RecursiveOut(3.0, out value);
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual("0", actual);
                 }
             }
         }

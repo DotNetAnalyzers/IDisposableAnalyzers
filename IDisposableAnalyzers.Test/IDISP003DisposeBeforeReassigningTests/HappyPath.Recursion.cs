@@ -121,5 +121,31 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void RecursiveOut()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class Foo
+    {
+        public static bool RecursiveOut(double foo, out IDisposable value)
+        {
+            value = 2;
+            return RecursiveOut(3.0, out value);
+        }
+
+        public void Meh()
+        {
+            IDisposable value;
+            RecursiveOut(1.0, out value);
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
