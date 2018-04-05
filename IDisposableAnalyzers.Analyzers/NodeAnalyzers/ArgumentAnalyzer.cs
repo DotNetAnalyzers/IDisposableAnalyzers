@@ -10,8 +10,8 @@ namespace IDisposableAnalyzers
     internal class ArgumentAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } =
-            ImmutableArray.Create(IDISP003DisposeBeforeReassigning.Descriptor);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP003DisposeBeforeReassigning.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -33,27 +33,17 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                method.TrySingleDeclaration(context.CancellationToken, out _))
+                method.TrySingleDeclaration(context.CancellationToken, out _) &&
+                method.TryGetMatchingParameter(argument, out var parameter) &&
+                Disposable.IsPotentiallyAssignableTo(parameter.Type))
             {
-                if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+                if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol symbol &&
+                    Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    !Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
                 {
-                    return;
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
                 }
-
-                var symbol = context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken);
-                if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken)
-                              .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
-                {
-                    return;
-                }
-
-                if (Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
-                {
-                    return;
-                }
-
-                context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
             }
         }
     }
