@@ -226,41 +226,34 @@ namespace IDisposableAnalyzers
 
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation)
         {
-            if (invocation == null)
+            if (this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is IMethodSymbol method)
             {
-                return false;
-            }
+                if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                {
+                    base.Visit(declaration);
+                    for (var i = this.values.Count - 1; i >= 0; i--)
+                    {
+                        var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                        if (this.search == Search.Recursive &&
+                            SymbolComparer.Equals(symbol, method))
+                        {
+                            this.values.RemoveAt(i);
+                            continue;
+                        }
 
-            var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-            if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0)
-            {
+                        if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
+                        {
+                            this.values[i] = arg;
+                        }
+                    }
+
+                    this.values.PurgeDuplicates();
+                }
+
                 return true;
             }
 
-            foreach (var reference in method.DeclaringSyntaxReferences)
-            {
-                base.Visit(reference.GetSyntax(this.cancellationToken));
-            }
-
-            for (var i = this.values.Count - 1; i >= 0; i--)
-            {
-                var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.search == Search.Recursive &&
-                    SymbolComparer.Equals(symbol, method))
-                {
-                    this.values.RemoveAt(i);
-                    continue;
-                }
-
-                if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
-                {
-                    this.values[i] = arg;
-                }
-            }
-
-            this.values.PurgeDuplicates();
-            return true;
+            return false;
         }
 
         private bool TryHandleInvocation(MemberAccessExpressionSyntax invocation)
