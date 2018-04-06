@@ -298,41 +298,28 @@ namespace IDisposableAnalyzers
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet)
         {
-            if (propertyGet == null)
+            if (this.semanticModel.GetSymbolSafe(propertyGet, this.cancellationToken) is IPropertySymbol property)
             {
-                return false;
-            }
+                if (property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode getter))
+                {
+                    base.Visit(getter);
+                    for (var i = this.values.Count - 1; i >= 0; i--)
+                    {
+                        var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                        if (this.search == Search.Recursive &&
+                            SymbolComparer.Equals(symbol, property))
+                        {
+                            this.values.RemoveAt(i);
+                        }
+                    }
 
-            var property = this.semanticModel.GetSymbolSafe(propertyGet, this.cancellationToken) as IPropertySymbol;
-            var getter = property?.GetMethod;
-            if (getter == null)
-            {
-                return false;
-            }
+                    this.values.PurgeDuplicates();
+                }
 
-            if (getter.DeclaringSyntaxReferences.Length == 0)
-            {
                 return true;
             }
 
-            foreach (var reference in getter.DeclaringSyntaxReferences)
-            {
-                base.Visit(reference.GetSyntax(this.cancellationToken));
-            }
-
-            for (var i = this.values.Count - 1; i >= 0; i--)
-            {
-                var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.search == Search.Recursive &&
-                    SymbolComparer.Equals(symbol, property))
-                {
-                    this.values.RemoveAt(i);
-                }
-            }
-
-            this.values.PurgeDuplicates();
-
-            return true;
+            return false;
         }
 
         private bool TryHandleAwait(AwaitExpressionSyntax @await)
