@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
@@ -477,6 +478,54 @@ namespace RoslynSandbox
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual(expected, string.Join(", ", returnValues));
+            }
+        }
+
+        [Test]
+        public void ChainedExtensionMethod()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public void Bar(int i)
+        {
+            var value = i.AsDisposable().AsDisposable();
+        }
+    }
+
+    public static class Ext
+    {
+        public static IDisposable AsDisposable(this int i) => new Disposable();
+
+        public static IDisposable AsDisposable(this IDisposable d) => new WrappingDisposable(d);
+    }
+
+    public sealed class WrappingDisposable : IDisposable
+    {
+        private readonly IDisposable inner;
+
+        public WrappingDisposable(IDisposable inner)
+        {
+            this.inner = inner;
+        }
+
+        public void Dispose()
+        {
+            this.inner.Dispose();
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            {
+                Assert.AreEqual("new WrappingDisposable(d)", returnValues.Single().ToString());
             }
         }
 
