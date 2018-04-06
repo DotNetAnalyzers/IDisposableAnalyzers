@@ -412,9 +412,9 @@ namespace RoslynSandbox
             var value = // Meh();
         }
 
-        internal static async Task<int> RecursiveAsync() => RecursiveAsync();
+        internal static Task<int> RecursiveAsync() => RecursiveAsync();
 
-        internal static async Task<int> RecursiveAsync(int arg) => RecursiveAsync(arg);
+        internal static Task<int> RecursiveAsync(int arg) => RecursiveAsync(arg);
 
         internal static async Task<string> CreateStringAsync()
         {
@@ -447,23 +447,23 @@ namespace RoslynSandbox
             }
         }
 
-        internal static async int CreateInt() => 1;
+        internal static async Task<int> CreateInt() => 1;
 
         private static async Task<int> RecursiveAsync1(int value)
         {
             return await RecursiveAsync2(value);
         }
-        
+
         private static async Task<int> RecursiveAsync2(int value)
         {
             return await RecursiveAsync1(value);
         }
 
-        private static async Task<int> RecursiveAsync3(int value)
+        private static Task<int> RecursiveAsync3(int value)
         {
             return RecursiveAsync4(value);
         }
-        
+
         private static async Task<int> RecursiveAsync4(int value)
         {
             return await RecursiveAsync3(value);

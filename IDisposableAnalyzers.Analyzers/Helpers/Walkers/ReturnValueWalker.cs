@@ -168,7 +168,7 @@ namespace IDisposableAnalyzers
                     {
                         this.values.Add(value);
                     }
-                    else if(this.TryGetRecursive(invocation, out var walker))
+                    else if (this.TryGetRecursive(invocation, out var walker))
                     {
                         foreach (var returnValue in walker.values)
                         {
