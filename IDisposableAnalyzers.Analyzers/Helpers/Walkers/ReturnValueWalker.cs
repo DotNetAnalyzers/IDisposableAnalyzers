@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -10,6 +10,7 @@
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
+        private readonly MemberWalkers<IMethodSymbol> methodWalkers = new MemberWalkers<IMethodSymbol>();
         private readonly RecursionLoop recursionLoop = new RecursionLoop();
 
         private Search search;
@@ -388,6 +389,42 @@
 
             this.values.PurgeDuplicates();
             return true;
+        }
+
+        private class MemberWalkers<TMember>
+            where TMember : ISymbol
+        {
+            private readonly Dictionary<TMember, AssignedValueWalker> map = new Dictionary<TMember, AssignedValueWalker>();
+
+            public MemberWalkers<TMember> Parent { get; set; }
+
+            private Dictionary<TMember, AssignedValueWalker> Current => this.Parent?.Current ??
+                                                                        this.map;
+
+            public void Add(TMember member, AssignedValueWalker walker)
+            {
+                this.Current.Add(member, walker);
+            }
+
+            public bool TryGetValue(TMember member, out AssignedValueWalker walker)
+            {
+                return this.Current.TryGetValue(member, out walker);
+            }
+
+            public void Clear()
+            {
+                if (this.map != null)
+                {
+                    foreach (var propertyWalker in this.map)
+                    {
+                        propertyWalker.Value?.Dispose();
+                    }
+
+                    this.map.Clear();
+                }
+
+                this.Parent = null;
+            }
         }
     }
 }
