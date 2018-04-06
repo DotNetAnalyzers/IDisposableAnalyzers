@@ -29,7 +29,7 @@ namespace IDisposableAnalyzers
                     method.ReducedFrom is IMethodSymbol reducedFrom)
                 {
                     var parameter = reducedFrom.Parameters[0];
-                    return CheckReturnValues(parameter, memberAccess, semanticModel, cancellationToken, visited);
+                    return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
                 }
             }
 
@@ -112,36 +112,6 @@ namespace IDisposableAnalyzers
 
         private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)
         {
-            Result CheckReturnValue(ExpressionSyntax returnValue)
-            {
-                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
-                {
-                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
-                    {
-                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                    }
-
-                    return Result.No;
-                }
-
-                if (returnValue is InvocationExpressionSyntax nestedInvocation)
-                {
-                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
-                    {
-                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
-                    }
-
-                    return Result.No;
-                }
-
-                if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
-                {
-                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
-                }
-
-                return Result.Unknown;
-            }
-
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
             {
@@ -182,6 +152,36 @@ namespace IDisposableAnalyzers
             }
 
             return result;
+
+            Result CheckReturnValue(ExpressionSyntax returnValue)
+            {
+                if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
+                {
+                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    {
+                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    }
+
+                    return Result.No;
+                }
+
+                if (returnValue is InvocationExpressionSyntax nestedInvocation)
+                {
+                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    {
+                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                    }
+
+                    return Result.No;
+                }
+
+                if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
+                {
+                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                }
+
+                return Result.Unknown;
+            }
         }
 
         private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member, out IMethodSymbol ctor)

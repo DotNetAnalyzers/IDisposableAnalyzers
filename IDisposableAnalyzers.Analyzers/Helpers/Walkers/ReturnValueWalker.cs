@@ -213,7 +213,6 @@ namespace IDisposableAnalyzers
             }
 
             if (this.TryHandleInvocation(node as InvocationExpressionSyntax) ||
-                this.TryHandleInvocation(node as MemberAccessExpressionSyntax) ||
                 this.TryHandleAwait(node as AwaitExpressionSyntax) ||
                 this.TryHandlePropertyGet(node as ExpressionSyntax) ||
                 this.TryHandleLambda(node as LambdaExpressionSyntax))
@@ -254,46 +253,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-        }
-
-        private bool TryHandleInvocation(MemberAccessExpressionSyntax invocation)
-        {
-            if (invocation == null)
-            {
-                return false;
-            }
-
-            var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-            if (method == null ||
-                method.DeclaringSyntaxReferences.Length == 0)
-            {
-                return true;
-            }
-
-            foreach (var reference in method.DeclaringSyntaxReferences)
-            {
-                base.Visit(reference.GetSyntax(this.cancellationToken));
-            }
-
-            for (var i = this.values.Count - 1; i >= 0; i--)
-            {
-                var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
-                if (this.search == Search.Recursive &&
-                    SymbolComparer.Equals(symbol, method))
-                {
-                    this.values.RemoveAt(i);
-                    continue;
-                }
-
-                if (symbol is IParameterSymbol parameter &&
-                    parameter.IsThis)
-                {
-                    this.values[i] = invocation.Expression;
-                }
-            }
-
-            this.values.PurgeDuplicates();
-            return true;
         }
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet)
