@@ -238,26 +238,12 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var value in walker.values)
                     {
-                        if (TryGetArgumentValue(value, out var arg))
-                        {
-                            this.values.Add(arg);
-                        }
-                        else
-                        {
-                            this.values.Add(value);
-                        }
+                        this.values.Add(GetArgumentValue(value));
                     }
 
                     foreach (var outValue in walker.outValues)
                     {
-                        if (TryGetArgumentValue(outValue, out var arg))
-                        {
-                            this.values.Add(arg);
-                        }
-                        else
-                        {
-                            this.values.Add(outValue);
-                        }
+                        this.values.Add(GetArgumentValue(outValue));
                     }
                 }
             }
@@ -318,27 +304,24 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            bool TryGetArgumentValue(ExpressionSyntax value, out ExpressionSyntax result)
+            ExpressionSyntax GetArgumentValue(ExpressionSyntax value)
             {
                 if (value is IdentifierNameSyntax identifierName &&
                     method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                 {
                     if (argumentList.TryGetMatchingArgument(parameter, out var argument))
                     {
-                        result = argument.Expression;
-                        return true;
+                        return argument.Expression;
                     }
 
                     if (parameter.HasExplicitDefaultValue &&
                         parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
                     {
-                        result = parameterDeclaration.Default?.Value;
-                        return true;
+                        return parameterDeclaration.Default?.Value;
                     }
                 }
 
-                result = null;
-                return false;
+                return value;
             }
         }
 
