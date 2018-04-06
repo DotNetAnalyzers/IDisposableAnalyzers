@@ -238,22 +238,9 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var value in walker.values)
                     {
-                        if (value is IdentifierNameSyntax identifierName &&
-                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                        if (TryGetArgumentValue(value, out var arg))
                         {
-                            if (argumentList.TryGetMatchingArgument(parameter, out var argument))
-                            {
-                                this.values.Add(argument.Expression);
-                            }
-                            else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
-                            {
-                                this.values.Add(parameterDeclaration.Default?.Value);
-                            }
-                            else
-                            {
-                                this.values.Add(value);
-                            }
+                            this.values.Add(arg);
                         }
                         else
                         {
@@ -263,22 +250,9 @@ namespace IDisposableAnalyzers
 
                     foreach (var outValue in walker.outValues)
                     {
-                        if (outValue is IdentifierNameSyntax identifierName &&
-                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                        if (TryGetArgumentValue(outValue, out var arg))
                         {
-                            if (argumentList.TryGetMatchingArgument(parameter, out var argument))
-                            {
-                                this.values.Add(argument.Expression);
-                            }
-                            else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
-                            {
-                                this.values.Add(parameterDeclaration.Default?.Value);
-                            }
-                            else
-                            {
-                                this.values.Add(outValue);
-                            }
+                            this.values.Add(arg);
                         }
                         else
                         {
@@ -342,6 +316,29 @@ namespace IDisposableAnalyzers
 
                     return false;
                 }
+            }
+
+            bool TryGetArgumentValue(ExpressionSyntax value, out ExpressionSyntax result)
+            {
+                if (value is IdentifierNameSyntax identifierName &&
+                    method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                {
+                    if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                    {
+                        result = argument.Expression;
+                        return true;
+                    }
+
+                    if (parameter.HasExplicitDefaultValue &&
+                        parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                    {
+                        result = parameterDeclaration.Default?.Value;
+                        return true;
+                    }
+                }
+
+                result = null;
+                return false;
             }
         }
 
