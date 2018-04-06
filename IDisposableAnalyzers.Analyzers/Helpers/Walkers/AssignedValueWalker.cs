@@ -767,9 +767,9 @@ namespace IDisposableAnalyzers
             {
                 if (this.map != null)
                 {
-                    foreach (var propertyWalker in this.map)
+                    foreach (var walker in this.map.Values)
                     {
-                        propertyWalker.Value?.Dispose();
+                        walker?.Dispose();
                     }
 
                     this.map.Clear();
