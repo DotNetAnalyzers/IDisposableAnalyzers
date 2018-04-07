@@ -164,8 +164,10 @@ namespace RoslynSandbox
         [TestCase("RecursiveWithOptional(1, null)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.Recursive, "1")]
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("Task.Run(() => 1)", Search.Recursive, "")]
-        [TestCase("Task.Run(() => 1)", Search.TopLevel, "")]
+        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.Recursive, "")]
+        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.TopLevel, "")]
+        [TestCase("Missing()", Search.Recursive, "")]
+        [TestCase("Missing()", Search.TopLevel, "")]
         [TestCase("this.ThisExpressionBody()", Search.Recursive, "this")]
         [TestCase("this.ThisExpressionBody()", Search.TopLevel, "this")]
         public void Call(string code, Search search, string expected)
