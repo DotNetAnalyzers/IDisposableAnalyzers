@@ -6,6 +6,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Semantics;
 
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
@@ -160,42 +161,52 @@ namespace IDisposableAnalyzers
 
             if (this.search == Search.Recursive)
             {
-                if (value is InvocationExpressionSyntax invocation)
+                switch (value)
                 {
-                    var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                    if (method == null ||
-                        method.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        this.values.Add(value);
-                    }
-                    else if (this.TryGetRecursive(invocation, out var walker))
-                    {
-                        foreach (var returnValue in walker.values)
-                        {
-                            this.AddReturnValue(returnValue);
-                        }
-                    }
-                }
-                else if (this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(value, this.cancellationToken))
-                {
-                    using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
-                    {
-                        if (assignedValues.Count == 0)
+                    case InvocationExpressionSyntax invocation:
+                        var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
+                        if (method == null ||
+                            method.DeclaringSyntaxReferences.Length == 0)
                         {
                             this.values.Add(value);
                         }
-                        else
+                        else if (this.TryGetRecursive(invocation, out var walker))
                         {
-                            foreach (var assignment in assignedValues)
+                            foreach (var returnValue in walker.values)
                             {
-                                this.AddReturnValue(assignment);
+                                this.AddReturnValue(returnValue);
                             }
                         }
-                    }
-                }
-                else
-                {
-                    this.values.Add(value);
+
+                        break;
+                    case ConditionalExpressionSyntax ternary:
+                        this.AddReturnValue(ternary.WhenTrue);
+                        this.AddReturnValue(ternary.WhenFalse);
+                        break;
+                    case BinaryExpressionSyntax coalesce when coalesce.IsKind(SyntaxKind.CoalesceExpression):
+                        this.AddReturnValue(coalesce.Left);
+                        this.AddReturnValue(coalesce.Right);
+                        break;
+                    case IdentifierNameSyntax identifierName when this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(identifierName, this.cancellationToken):
+                        using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
+                        {
+                            if (assignedValues.Count == 0)
+                            {
+                                this.values.Add(value);
+                            }
+                            else
+                            {
+                                foreach (var assignment in assignedValues)
+                                {
+                                    this.AddReturnValue(assignment);
+                                }
+                            }
+                        }
+
+                        break;
+                    default:
+                        this.values.Add(value);
+                        break;
                 }
             }
             else

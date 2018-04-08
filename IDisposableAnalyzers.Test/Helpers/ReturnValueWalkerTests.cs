@@ -532,6 +532,64 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void ReturnTernary()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            var temp = ReturnTernary(true);
+        }
+
+        private static int ReturnTernary(bool b)
+        {
+            return b ? 1 : 2;
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnTernary(true)").Value;
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            {
+                Assert.AreEqual("1, 2", string.Join(", ", returnValues));
+            }
+        }
+
+        [Test]
+        public void ReturnNullCoalesce()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            var temp = ReturnNullCoalesce(null);
+        }
+
+        private static string ReturnNullCoalesce(string text)
+        {
+            return text ?? string.Empty;
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnNullCoalesce(null)").Value;
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            {
+                Assert.AreEqual("null, string.Empty", string.Join(", ", returnValues));
+            }
+        }
+
+        [Test]
         public void ValidationErrorToStringConverter()
         {
             var testCode = @"
