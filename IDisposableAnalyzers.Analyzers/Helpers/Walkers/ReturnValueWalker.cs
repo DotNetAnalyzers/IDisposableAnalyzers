@@ -125,7 +125,7 @@ namespace IDisposableAnalyzers
 
         private void Run(SyntaxNode node)
         {
-            if (this.TryHandleInvocation(node as InvocationExpressionSyntax) ||
+            if (this.TryHandleInvocation(node as InvocationExpressionSyntax, out _) ||
                 this.TryHandleAwait(node as AwaitExpressionSyntax) ||
                 this.TryHandlePropertyGet(node as ExpressionSyntax) ||
                 this.TryHandleLambda(node as LambdaExpressionSyntax))
@@ -136,31 +136,29 @@ namespace IDisposableAnalyzers
             this.Visit(node);
         }
 
-        private bool TryHandleInvocation(InvocationExpressionSyntax invocation)
+        private bool TryHandleInvocation(InvocationExpressionSyntax invocation, out IMethodSymbol method)
         {
-            if (this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is IMethodSymbol method)
+            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method) &&
+                method.TrySingleDeclaration(this.cancellationToken, out var declaration))
             {
-                if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                base.Visit(declaration);
+                for (var i = this.returnValues.Count - 1; i >= 0; i--)
                 {
-                    base.Visit(declaration);
-                    for (var i = this.returnValues.Count - 1; i >= 0; i--)
+                    var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
+                    if (this.search == Search.Recursive &&
+                        SymbolComparer.Equals(symbol, method))
                     {
-                        var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
-                        if (this.search == Search.Recursive &&
-                            SymbolComparer.Equals(symbol, method))
-                        {
-                            this.returnValues.RemoveAt(i);
-                            continue;
-                        }
-
-                        if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
-                        {
-                            this.returnValues[i] = arg;
-                        }
+                        this.returnValues.RemoveAt(i);
+                        continue;
                     }
 
-                    this.returnValues.PurgeDuplicates();
+                    if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
+                    {
+                        this.returnValues[i] = arg;
+                    }
                 }
+
+                this.returnValues.PurgeDuplicates();
 
                 return true;
             }
@@ -213,7 +211,7 @@ namespace IDisposableAnalyzers
                     }
                     else
                     {
-                        return this.TryHandleInvocation(invocation);
+                        return this.TryHandleInvocation(invocation, out _);
                     }
                 }
 
