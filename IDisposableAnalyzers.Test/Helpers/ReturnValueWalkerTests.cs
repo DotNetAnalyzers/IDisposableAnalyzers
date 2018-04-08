@@ -39,14 +39,6 @@ internal class Foo
             }
         }
 
-        [TestCase("StaticRecursiveExpressionBody", Search.Recursive, "")]
-        [TestCase("StaticRecursiveExpressionBody", Search.TopLevel, "StaticRecursiveExpressionBody")]
-        [TestCase("StaticRecursiveStatementBody", Search.Recursive, "")]
-        [TestCase("StaticRecursiveStatementBody", Search.TopLevel, "StaticRecursiveStatementBody")]
-        [TestCase("this.RecursiveExpressionBody", Search.Recursive, "")]
-        [TestCase("this.RecursiveExpressionBody", Search.TopLevel, "this.RecursiveExpressionBody")]
-        [TestCase("this.RecursiveStatementBody", Search.Recursive, "")]
-        [TestCase("this.RecursiveStatementBody", Search.TopLevel, "this.RecursiveStatementBody")]
         [TestCase("this.CalculatedExpressionBody", Search.Recursive, "1")]
         [TestCase("this.CalculatedExpressionBody", Search.TopLevel, "1")]
         [TestCase("this.CalculatedStatementBody", Search.Recursive, "1")]
@@ -68,30 +60,8 @@ namespace RoslynSandbox
 
         internal Foo()
         {
-            var temp = // Meh();
+            var temp = CalculatedExpressionBody;
         }
-
-
-        public static int StaticRecursiveExpressionBody => StaticRecursiveExpressionBody;
-
-        public static int StaticRecursiveStatementBody
-        {
-            get
-            {
-                return StaticRecursiveStatementBody;
-            }
-        }
-
-        public int RecursiveExpressionBody => this.RecursiveExpressionBody;
-
-        public int RecursiveStatementBody
-        {
-            get
-            {
-                return this.RecursiveStatementBody;
-            }
-        }
-
 
         public int CalculatedExpressionBody => 1;
 
@@ -116,7 +86,64 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("// Meh()", code);
+            testCode = testCode.AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {code}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", returnValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("StaticRecursiveExpressionBody", Search.Recursive, "")]
+        [TestCase("StaticRecursiveExpressionBody", Search.TopLevel, "StaticRecursiveExpressionBody")]
+        [TestCase("StaticRecursiveStatementBody", Search.Recursive, "")]
+        [TestCase("StaticRecursiveStatementBody", Search.TopLevel, "StaticRecursiveStatementBody")]
+        [TestCase("RecursiveExpressionBody", Search.Recursive, "")]
+        [TestCase("RecursiveExpressionBody", Search.TopLevel, "this.RecursiveExpressionBody")]
+        [TestCase("this.RecursiveExpressionBody", Search.Recursive, "")]
+        [TestCase("this.RecursiveExpressionBody", Search.TopLevel, "this.RecursiveExpressionBody")]
+        [TestCase("this.RecursiveStatementBody", Search.Recursive, "")]
+        [TestCase("this.RecursiveStatementBody", Search.TopLevel, "this.RecursiveStatementBody")]
+        [TestCase("RecursiveStatementBody", Search.Recursive, "")]
+        [TestCase("RecursiveStatementBody", Search.TopLevel, "this.RecursiveStatementBody")]
+        public void PropertyRecursive(string code, Search search, string expected)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        internal Foo()
+        {
+            var temp = StaticRecursiveExpressionBody;
+        }
+
+        public static int StaticRecursiveExpressionBody => StaticRecursiveExpressionBody;
+
+        public static int StaticRecursiveStatementBody
+        {
+            get
+            {
+                return StaticRecursiveStatementBody;
+            }
+        }
+
+        public int RecursiveExpressionBody => this.RecursiveExpressionBody;
+
+        public int RecursiveStatementBody
+        {
+            get
+            {
+                return this.RecursiveStatementBody;
+            }
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);

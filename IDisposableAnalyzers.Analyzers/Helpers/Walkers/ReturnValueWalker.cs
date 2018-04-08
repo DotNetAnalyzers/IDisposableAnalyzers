@@ -127,7 +127,7 @@ namespace IDisposableAnalyzers
         {
             if (this.TryHandleInvocation(node as InvocationExpressionSyntax, out _) ||
                 this.TryHandleAwait(node as AwaitExpressionSyntax) ||
-                this.TryHandlePropertyGet(node as ExpressionSyntax) ||
+                this.TryHandlePropertyGet(node as ExpressionSyntax, out _) ||
                 this.TryHandleLambda(node as LambdaExpressionSyntax))
             {
                 return;
@@ -175,26 +175,14 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private bool TryHandlePropertyGet(ExpressionSyntax propertyGet)
+        private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, out IPropertySymbol property)
         {
-            if (this.semanticModel.GetSymbolSafe(propertyGet, this.cancellationToken) is IPropertySymbol property)
+            if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out property) &&
+                property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode getter) &&
+                this.TryGetRecursive(propertyGet, getter, out var walker))
             {
-                if (property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode getter))
-                {
-                    base.Visit(getter);
-                    for (var i = this.returnValues.Count - 1; i >= 0; i--)
-                    {
-                        var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
-                        if (this.search == Search.Recursive &&
-                            SymbolComparer.Equals(symbol, property))
-                        {
-                            this.returnValues.RemoveAt(i);
-                        }
-                    }
-
-                    this.returnValues.PurgeDuplicates();
-                }
-
+                this.returnValues.AddRange(walker.returnValues);
+                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
@@ -306,7 +294,7 @@ namespace IDisposableAnalyzers
                         this.AddReturnValue(coalesce.Left);
                         this.AddReturnValue(coalesce.Right);
                         break;
-                    case IdentifierNameSyntax identifierName when this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(identifierName, this.cancellationToken):
+                    case IdentifierNameSyntax identifierName when this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken).IsEither<ILocalSymbol, IParameterSymbol>():
                         using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
                         {
                             if (assignedValues.Count == 0)
@@ -320,6 +308,15 @@ namespace IDisposableAnalyzers
                                     this.AddReturnValue(assignment);
                                 }
                             }
+                        }
+
+                        break;
+                    case ExpressionSyntax expression when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
+                        if (!this.TryHandlePropertyGet(value, out var property) &&
+                            property != null &&
+                            property.DeclaringSyntaxReferences.Length == 0)
+                        {
+                            this.returnValues.Add(value);
                         }
 
                         break;
