@@ -105,21 +105,21 @@ namespace IDisposableAnalyzers
             this.cancellationToken = CancellationToken.None;
         }
 
-        private bool TryGetRecursive(SyntaxNode node, out ReturnValueWalker walker)
+        private bool TryGetRecursive(SyntaxNode location, SyntaxNode scope, out ReturnValueWalker walker)
         {
-            if (this.recursiveWalkers.TryGetValue(node, out walker))
+            if (this.recursiveWalkers.TryGetValue(location, out walker))
             {
                 return walker != this;
             }
 
             walker = Borrow(() => new ReturnValueWalker());
-            this.recursiveWalkers.Add(node, walker);
+            this.recursiveWalkers.Add(location, walker);
             walker.search = this.search;
             walker.awaits = this.awaits;
             walker.semanticModel = this.semanticModel;
             walker.cancellationToken = this.cancellationToken;
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
-            walker.Run(node);
+            walker.Run(scope);
             return true;
         }
 
@@ -248,7 +248,7 @@ namespace IDisposableAnalyzers
             if (this.awaits)
             {
                 if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out var awaited) &&
-                    this.TryGetRecursive(awaited, out var walker))
+                    this.TryGetRecursive(value, awaited, out var walker))
                 {
                     if (walker.returnValues.Count == 0)
                     {
@@ -289,7 +289,7 @@ namespace IDisposableAnalyzers
                         {
                             this.returnValues.Add(value);
                         }
-                        else if (this.TryGetRecursive(invocation, out var walker))
+                        else if (this.TryGetRecursive(invocation, invocation, out var walker))
                         {
                             foreach (var returnValue in walker.returnValues)
                             {
