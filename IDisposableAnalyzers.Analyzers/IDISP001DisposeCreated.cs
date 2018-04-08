@@ -29,10 +29,10 @@ namespace IDisposableAnalyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleDeclaration, SyntaxKind.LocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.Argument);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.LocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.Argument);
         }
 
-        private static void HandleDeclaration(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {
@@ -53,10 +53,9 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
-
-            if (context.Node is AssignmentExpressionSyntax assignment &&
-                assignment.Left is IdentifierNameSyntax assigned &&
-                Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+            else if (context.Node is AssignmentExpressionSyntax assignment &&
+                     assignment.Left is IdentifierNameSyntax assigned &&
+                     Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
             {
                 var assignedSymbol = context.SemanticModel.GetSymbolSafe(assigned, context.CancellationToken);
                 if (assignedSymbol is ILocalSymbol local &&
@@ -72,11 +71,10 @@ namespace IDisposableAnalyzers
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
                 }
             }
-
-            if (context.Node is ArgumentSyntax argument &&
-                argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
-                argument.Expression is IdentifierNameSyntax argIdentifier &&
-                Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+            else if (context.Node is ArgumentSyntax argument &&
+                     argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
+                     argument.Expression is IdentifierNameSyntax argIdentifier &&
+                     Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
             {
                 var assignedSymbol = context.SemanticModel.GetSymbolSafe(argIdentifier, context.CancellationToken);
                 if (assignedSymbol is ILocalSymbol local &&
