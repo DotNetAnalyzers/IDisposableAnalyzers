@@ -126,6 +126,37 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void WithOptionalParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public abstract class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var value = disposable;
+            value = WithOptionalParameter(value);
+        }
+
+        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+        {
+            if (values == null)
+            {
+                return WithOptionalParameter(value, new[] { value });
+            }
+
+            return value;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }

@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
-        [TestCase(Search.Recursive, "Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        [TestCase(Search.Recursive, "")]
         [TestCase(Search.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public void AwaitSyntaxError(Search search, string expected)
         {
@@ -148,28 +148,16 @@ namespace RoslynSandbox
         [TestCase("ReturnLocal()", Search.TopLevel, "local")]
         [TestCase("ReturnLocalAssignedTwice(true)", Search.Recursive, "1, 2, 3")]
         [TestCase("ReturnLocalAssignedTwice(true)", Search.TopLevel, "local, 3")]
-        [TestCase("Recursive()", Search.Recursive, "")]
-        [TestCase("Recursive()", Search.TopLevel, "Recursive()")]
-        [TestCase("Recursive(1)", Search.Recursive, "")]
-        [TestCase("Recursive(1)", Search.TopLevel, "Recursive(arg)")]
-        [TestCase("Recursive1(1)", Search.Recursive, "")]
-        [TestCase("Recursive1(1)", Search.TopLevel, "Recursive2(value)")]
-        [TestCase("Recursive2(1)", Search.Recursive, "")]
-        [TestCase("Recursive2(1)", Search.TopLevel, "Recursive1(value)")]
-        [TestCase("Recursive(true)", Search.Recursive, "!flag, true")]
-        [TestCase("Recursive(true)", Search.TopLevel, "Recursive(!flag), true")]
-        [TestCase("RecursiveWithOptional(1)", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("RecursiveWithOptional(1, null)", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1, null)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.Recursive, "")]
         [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.TopLevel, "")]
         [TestCase("Missing()", Search.Recursive, "")]
         [TestCase("Missing()", Search.TopLevel, "")]
         [TestCase("this.ThisExpressionBody()", Search.Recursive, "this")]
         [TestCase("this.ThisExpressionBody()", Search.TopLevel, "this")]
+        [TestCase("this.ReturningFileOpenRead()", Search.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningFileOpenRead()", Search.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningLocalFileOpenRead()", Search.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningLocalFileOpenRead()", Search.TopLevel, "stream")]
         public void Call(string code, Search search, string expected)
         {
             var testCode = @"
@@ -177,12 +165,13 @@ namespace RoslynSandbox
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
 
     internal class Foo
     {
         internal Foo()
         {
-            var temp = // Meh();
+            var temp = StaticCreateIntStatementBody();
         }
 
         internal static int StaticCreateIntStatementBody()
@@ -255,6 +244,64 @@ namespace RoslynSandbox
             return 3;
         }
 
+        public Foo ThisExpressionBody() => this;
+
+        public static Stream ReturningFileOpenRead()
+        {
+            return System.IO.File.OpenRead(string.Empty);
+        }
+
+        public static Stream ReturningLocalFileOpenRead()
+        {
+            var stream = System.IO.File.OpenRead(string.Empty);
+            return stream;
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {code}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", returnValues);
+                Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [TestCase("Recursive()", Search.Recursive, "")]
+        [TestCase("Recursive()", Search.TopLevel, "Recursive()")]
+        [TestCase("Recursive(1)", Search.Recursive, "")]
+        [TestCase("Recursive(1)", Search.TopLevel, "Recursive(arg)")]
+        [TestCase("Recursive1(1)", Search.Recursive, "")]
+        [TestCase("Recursive1(1)", Search.TopLevel, "Recursive2(value)")]
+        [TestCase("Recursive2(1)", Search.Recursive, "")]
+        [TestCase("Recursive2(1)", Search.TopLevel, "Recursive1(value)")]
+        [TestCase("Recursive(true)", Search.Recursive, "!flag, true")]
+        [TestCase("Recursive(true)", Search.TopLevel, "Recursive(!flag), true")]
+        [TestCase("RecursiveWithOptional(1)", Search.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, null)", Search.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1, null)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        public void CallRecursive(string code, Search search, string expected)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    internal class Foo
+    {
+        internal Foo()
+        {
+            var temp = Recursive();
+        }
+
         public static int Recursive() => Recursive();
 
         public static int Recursive(int arg) => Recursive(arg);
@@ -268,8 +315,6 @@ namespace RoslynSandbox
 
             return flag;
         }
-
-        public Foo ThisExpressionBody() => this;
 
         private static int RecursiveWithOptional(int arg, IEnumerable<int> args = null)
         {
@@ -292,7 +337,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("// Meh()", code);
+            testCode = testCode.AssertReplace("var temp = Recursive()", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -301,6 +346,45 @@ namespace RoslynSandbox
             {
                 var actual = string.Join(", ", returnValues);
                 Assert.AreEqual(expected, actual);
+            }
+        }
+
+        [Test]
+        public void RecursiveWithOptionalParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public abstract class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var local = disposable;
+            local = WithOptionalParameter(local);
+        }
+
+        private static IDisposable WithOptionalParameter(IDisposable parameter, IEnumerable<IDisposable> values = null)
+        {
+            if (values == null)
+            {
+                return WithOptionalParameter(parameter, new[] { parameter });
+            }
+
+            return parameter;
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("WithOptionalParameter(local)");
+            using (var returnValues = ReturnValueWalker.Borrow(value, Search.Recursive, semanticModel, CancellationToken.None))
+            {
+                var actual = string.Join(", ", returnValues);
+                Assert.AreEqual(string.Empty, actual);
             }
         }
 
@@ -639,7 +723,7 @@ namespace RoslynSandbox
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
             using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual("text, text, error.ErrorContent, result.ErrorContent, text, error.ErrorContent, value", string.Join(", ", returnValues));
+                Assert.AreEqual("text, error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
             }
         }
     }

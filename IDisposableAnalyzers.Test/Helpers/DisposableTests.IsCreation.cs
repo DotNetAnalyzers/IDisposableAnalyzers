@@ -179,7 +179,7 @@ namespace RoslynSandbox
             [TestCase("CreateDisposableInIf(true)", Result.Yes)]
             [TestCase("CreateDisposableInElse(true)", Result.Yes)]
             [TestCase("ReturningLocal()", Result.Yes)]
-            public void CallMethodInSyntaxTreeReturningDisposable(string code, Result expected)
+            public void Call(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -314,6 +314,41 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(code);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void RecursiveWithOptionalParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public abstract class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var value = disposable;
+            value = WithOptionalParameter(value);
+        }
+
+        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+        {
+            if (values == null)
+            {
+                return WithOptionalParameter(value, new[] { value });
+            }
+
+            return value;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("WithOptionalParameter(value)");
+                Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
             [TestCase("Task.Run(() => 1)", Result.No)]
