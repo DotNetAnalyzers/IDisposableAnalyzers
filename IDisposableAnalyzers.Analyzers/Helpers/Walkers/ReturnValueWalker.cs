@@ -109,7 +109,7 @@ namespace IDisposableAnalyzers
         {
             if (this.recursiveWalkers.TryGetValue(location, out walker))
             {
-                return walker != this;
+                return false;
             }
 
             walker = Borrow(() => new ReturnValueWalker());
@@ -139,31 +139,40 @@ namespace IDisposableAnalyzers
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation, out IMethodSymbol method)
         {
             if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method) &&
-                method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                method.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                this.TryGetRecursive(invocation, declaration, out var walker))
             {
-                base.Visit(declaration);
-                for (var i = this.returnValues.Count - 1; i >= 0; i--)
+                foreach (var value in walker.returnValues)
                 {
-                    var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
-                    if (this.search == Search.Recursive &&
-                        SymbolComparer.Equals(symbol, method))
+                    if (value is IdentifierNameSyntax identifierName &&
+                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
-                        this.returnValues.RemoveAt(i);
-                        continue;
+                        if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                        {
+                            this.AddReturnValue(argument.Expression);
+                        }
+                        else if (parameter.HasExplicitDefaultValue &&
+                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                        {
+                            this.returnValues.Add(parameterDeclaration.Default?.Value);
+                        }
                     }
 
-                    if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
-                    {
-                        this.returnValues[i] = arg;
-                    }
+                    this.AddReturnValue(value);
                 }
 
+                this.returnValues.RemoveAll(IsParameter);
                 this.returnValues.PurgeDuplicates();
-
                 return true;
             }
 
             return false;
+
+            bool IsParameter(ExpressionSyntax value)
+            {
+                return value is IdentifierNameSyntax id &&
+                       declaration.ParameterList.Parameters.TryFirst(x => x.Identifier.ValueText == id.Identifier.ValueText, out _);
+            }
         }
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet)
@@ -281,18 +290,11 @@ namespace IDisposableAnalyzers
                 switch (value)
                 {
                     case InvocationExpressionSyntax invocation:
-                        var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                        if (method == null ||
+                        if (!this.TryHandleInvocation(invocation, out var method) &&
+                            method != null &&
                             method.DeclaringSyntaxReferences.Length == 0)
                         {
-                            this.returnValues.Add(value);
-                        }
-                        else if (this.TryGetRecursive(invocation, invocation, out var walker))
-                        {
-                            foreach (var returnValue in walker.returnValues)
-                            {
-                                this.AddReturnValue(returnValue);
-                            }
+                            this.returnValues.Add(invocation);
                         }
 
                         break;

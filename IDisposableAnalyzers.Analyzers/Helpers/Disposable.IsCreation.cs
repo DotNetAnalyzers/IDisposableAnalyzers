@@ -248,9 +248,7 @@ namespace IDisposableAnalyzers
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (IsAssignableTo(
-                    semanticModel.GetTypeInfoSafe(candidate, cancellationToken)
-                                 .Type))
+                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
                 {
                     return Result.Yes;
                 }

@@ -457,6 +457,52 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
+
+            [Test]
+            public void CompositeDisposableExtAddAndReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public static class CompositeDisposableExt
+    {
+        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+            where T : IDisposable
+        {
+            if (item != null)
+            {
+                disposable.Add(item);
+            }
+
+            return item;
+        }
+    }
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
+
+        public Foo()
+        {
+            disposable.AddAndReturn(File.OpenRead(string.Empty));
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("disposable.AddAndReturn(File.OpenRead(string.Empty))");
+                Assert.AreEqual(Result.Yes, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }
