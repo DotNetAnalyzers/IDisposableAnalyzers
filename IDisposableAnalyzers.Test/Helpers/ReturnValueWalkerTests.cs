@@ -495,14 +495,6 @@ namespace RoslynSandbox
         [TestCase("await CreateStringAsync()", Search.TopLevel, "new string(' ', 1)")]
         [TestCase("await ReturnAwaitTaskRunAsync()", Search.Recursive, "new string(' ', 1)")]
         [TestCase("await ReturnAwaitTaskRunAsync()", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await RecursiveAsync()", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync()", Search.TopLevel, "RecursiveAsync()")]
-        [TestCase("await RecursiveAsync(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync(1)", Search.TopLevel, "RecursiveAsync(arg)")]
-        [TestCase("await RecursiveAsync1(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync1(1)", Search.TopLevel, "await RecursiveAsync2(value)")]
-        [TestCase("await RecursiveAsync3(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync3(1)", Search.TopLevel, "RecursiveAsync4(value)")]
         public void AsyncAwait(string code, Search search, string expected)
         {
             var testCode = @"
@@ -522,12 +514,8 @@ namespace RoslynSandbox
     {
         internal async Task Bar()
         {
-            var value = // Meh();
+            var value = await CreateStringAsync();
         }
-
-        internal static Task<int> RecursiveAsync() => RecursiveAsync();
-
-        internal static Task<int> RecursiveAsync(int arg) => RecursiveAsync(arg);
 
         internal static async Task<string> CreateStringAsync()
         {
@@ -561,6 +549,52 @@ namespace RoslynSandbox
         }
 
         internal static async Task<int> CreateInt() => 1;
+    }
+}";
+            testCode = testCode.AssertReplace("var value = await CreateStringAsync()", $"var value = {code}");
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
+            {
+                Assert.AreEqual(expected, string.Join(", ", returnValues));
+            }
+        }
+
+        [TestCase("await RecursiveAsync()", Search.Recursive, "")]
+        [TestCase("await RecursiveAsync()", Search.TopLevel, "RecursiveAsync()")]
+        [TestCase("await RecursiveAsync(1)", Search.Recursive, "")]
+        [TestCase("await RecursiveAsync(1)", Search.TopLevel, "RecursiveAsync(arg)")]
+        [TestCase("await RecursiveAsync1(1)", Search.Recursive, "")]
+        [TestCase("await RecursiveAsync1(1)", Search.TopLevel, "await RecursiveAsync2(value)")]
+        [TestCase("await RecursiveAsync3(1)", Search.Recursive, "")]
+        [TestCase("await RecursiveAsync3(1)", Search.TopLevel, "RecursiveAsync4(value)")]
+        public void AsyncAwaitRecursive(string code, Search search, string expected)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    internal class Foo
+    {
+        internal async Task Bar()
+        {
+            var value = await RecursiveAsync();
+        }
+
+        internal static Task<int> RecursiveAsync() => RecursiveAsync();
+
+        internal static Task<int> RecursiveAsync(int arg) => RecursiveAsync(arg);
 
         private static async Task<int> RecursiveAsync1(int value)
         {
@@ -583,7 +617,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("// Meh()", code);
+            testCode = testCode.AssertReplace("var value = await RecursiveAsync()", $"var value = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
