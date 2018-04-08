@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
 
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
-        private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
+        private readonly List<ExpressionSyntax> returnValues = new List<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private Search search;
         private bool awaits;
@@ -20,11 +20,11 @@ namespace IDisposableAnalyzers
         {
         }
 
-        public int Count => this.values.Count;
+        public int Count => this.returnValues.Count;
 
-        public ExpressionSyntax this[int index] => this.values[index];
+        public ExpressionSyntax this[int index] => this.returnValues[index];
 
-        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.GetEnumerator();
+        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.returnValues.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
@@ -70,13 +70,13 @@ namespace IDisposableAnalyzers
 
             using (var walker = Borrow(body, Search.TopLevel, semanticModel, cancellationToken))
             {
-                if (walker.values.Count != 1)
+                if (walker.returnValues.Count != 1)
                 {
                     returnValue = null;
                     return false;
                 }
 
-                returnValue = walker.values[0];
+                returnValue = walker.returnValues[0];
                 return returnValue != null;
             }
         }
@@ -98,7 +98,7 @@ namespace IDisposableAnalyzers
 
         protected override void Clear()
         {
-            this.values.Clear();
+            this.returnValues.Clear();
             this.recursiveWalkers.Clear();
             this.awaits = false;
             this.semanticModel = null;
@@ -123,97 +123,6 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        private void AddReturnValue(ExpressionSyntax value)
-        {
-            if (this.awaits)
-            {
-                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out var awaited) &&
-                    this.TryGetRecursive(awaited, out var walker))
-                {
-                    if (walker.values.Count == 0)
-                    {
-                        this.values.Add(awaited);
-                    }
-                    else
-                    {
-                        foreach (var returnValue in walker.values)
-                        {
-                            this.AddReturnValue(returnValue);
-                        }
-                    }
-
-                    return;
-                }
-
-                if (AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
-                {
-                    this.AddReturnValue(awaited);
-                    return;
-                }
-
-                if (this.search == Search.Recursive &&
-                    value is AwaitExpressionSyntax @await)
-                {
-                    value = @await.Expression;
-                }
-            }
-
-            if (this.search == Search.Recursive)
-            {
-                switch (value)
-                {
-                    case InvocationExpressionSyntax invocation:
-                        var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                        if (method == null ||
-                            method.DeclaringSyntaxReferences.Length == 0)
-                        {
-                            this.values.Add(value);
-                        }
-                        else if (this.TryGetRecursive(invocation, out var walker))
-                        {
-                            foreach (var returnValue in walker.values)
-                            {
-                                this.AddReturnValue(returnValue);
-                            }
-                        }
-
-                        break;
-                    case ConditionalExpressionSyntax ternary:
-                        this.AddReturnValue(ternary.WhenTrue);
-                        this.AddReturnValue(ternary.WhenFalse);
-                        break;
-                    case BinaryExpressionSyntax coalesce when coalesce.IsKind(SyntaxKind.CoalesceExpression):
-                        this.AddReturnValue(coalesce.Left);
-                        this.AddReturnValue(coalesce.Right);
-                        break;
-                    case IdentifierNameSyntax identifierName when this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(identifierName, this.cancellationToken):
-                        using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
-                        {
-                            if (assignedValues.Count == 0)
-                            {
-                                this.values.Add(value);
-                            }
-                            else
-                            {
-                                foreach (var assignment in assignedValues)
-                                {
-                                    this.AddReturnValue(assignment);
-                                }
-                            }
-                        }
-
-                        break;
-                    default:
-                        this.values.Add(value);
-                        break;
-                }
-            }
-            else
-            {
-                this.values.Add(value);
-            }
-        }
-
         private void Run(SyntaxNode node)
         {
             if (this.TryHandleInvocation(node as InvocationExpressionSyntax) ||
@@ -234,23 +143,23 @@ namespace IDisposableAnalyzers
                 if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
                 {
                     base.Visit(declaration);
-                    for (var i = this.values.Count - 1; i >= 0; i--)
+                    for (var i = this.returnValues.Count - 1; i >= 0; i--)
                     {
-                        var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                        var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
                         if (this.search == Search.Recursive &&
                             SymbolComparer.Equals(symbol, method))
                         {
-                            this.values.RemoveAt(i);
+                            this.returnValues.RemoveAt(i);
                             continue;
                         }
 
                         if (invocation.TryGetArgumentValue(symbol as IParameterSymbol, this.cancellationToken, out var arg))
                         {
-                            this.values[i] = arg;
+                            this.returnValues[i] = arg;
                         }
                     }
 
-                    this.values.PurgeDuplicates();
+                    this.returnValues.PurgeDuplicates();
                 }
 
                 return true;
@@ -266,17 +175,17 @@ namespace IDisposableAnalyzers
                 if (property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode getter))
                 {
                     base.Visit(getter);
-                    for (var i = this.values.Count - 1; i >= 0; i--)
+                    for (var i = this.returnValues.Count - 1; i >= 0; i--)
                     {
-                        var symbol = this.semanticModel.GetSymbolSafe(this.values[i], this.cancellationToken);
+                        var symbol = this.semanticModel.GetSymbolSafe(this.returnValues[i], this.cancellationToken);
                         if (this.search == Search.Recursive &&
                             SymbolComparer.Equals(symbol, property))
                         {
-                            this.values.RemoveAt(i);
+                            this.returnValues.RemoveAt(i);
                         }
                     }
 
-                    this.values.PurgeDuplicates();
+                    this.returnValues.PurgeDuplicates();
                 }
 
                 return true;
@@ -285,14 +194,14 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private bool TryHandleAwait(AwaitExpressionSyntax @await)
+        private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (@await == null)
+            if (awaitExpression == null)
             {
                 return false;
             }
 
-            if (AsyncAwait.TryGetAwaitedInvocation(@await, this.semanticModel, this.cancellationToken, out var invocation))
+            if (AsyncAwait.TryGetAwaitedInvocation(awaitExpression, this.semanticModel, this.cancellationToken, out var invocation))
             {
                 this.awaits = true;
                 var symbol = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
@@ -330,8 +239,99 @@ namespace IDisposableAnalyzers
                 base.Visit(lambda);
             }
 
-            this.values.PurgeDuplicates();
+            this.returnValues.PurgeDuplicates();
             return true;
+        }
+
+        private void AddReturnValue(ExpressionSyntax value)
+        {
+            if (this.awaits)
+            {
+                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out var awaited) &&
+                    this.TryGetRecursive(awaited, out var walker))
+                {
+                    if (walker.returnValues.Count == 0)
+                    {
+                        this.returnValues.Add(awaited);
+                    }
+                    else
+                    {
+                        foreach (var returnValue in walker.returnValues)
+                        {
+                            this.AddReturnValue(returnValue);
+                        }
+                    }
+
+                    return;
+                }
+
+                if (AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
+                {
+                    this.AddReturnValue(awaited);
+                    return;
+                }
+
+                if (this.search == Search.Recursive &&
+                    value is AwaitExpressionSyntax awaitExpression)
+                {
+                    value = awaitExpression.Expression;
+                }
+            }
+
+            if (this.search == Search.Recursive)
+            {
+                switch (value)
+                {
+                    case InvocationExpressionSyntax invocation:
+                        var method = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
+                        if (method == null ||
+                            method.DeclaringSyntaxReferences.Length == 0)
+                        {
+                            this.returnValues.Add(value);
+                        }
+                        else if (this.TryGetRecursive(invocation, out var walker))
+                        {
+                            foreach (var returnValue in walker.returnValues)
+                            {
+                                this.AddReturnValue(returnValue);
+                            }
+                        }
+
+                        break;
+                    case ConditionalExpressionSyntax ternary:
+                        this.AddReturnValue(ternary.WhenTrue);
+                        this.AddReturnValue(ternary.WhenFalse);
+                        break;
+                    case BinaryExpressionSyntax coalesce when coalesce.IsKind(SyntaxKind.CoalesceExpression):
+                        this.AddReturnValue(coalesce.Left);
+                        this.AddReturnValue(coalesce.Right);
+                        break;
+                    case IdentifierNameSyntax identifierName when this.semanticModel.IsEither<IParameterSymbol, ILocalSymbol>(identifierName, this.cancellationToken):
+                        using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
+                        {
+                            if (assignedValues.Count == 0)
+                            {
+                                this.returnValues.Add(value);
+                            }
+                            else
+                            {
+                                foreach (var assignment in assignedValues)
+                                {
+                                    this.AddReturnValue(assignment);
+                                }
+                            }
+                        }
+
+                        break;
+                    default:
+                        this.returnValues.Add(value);
+                        break;
+                }
+            }
+            else
+            {
+                this.returnValues.Add(value);
+            }
         }
 
         private class RecursiveWalkers
