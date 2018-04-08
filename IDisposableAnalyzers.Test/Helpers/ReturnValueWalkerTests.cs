@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
-        [TestCase(Search.Recursive, "")]
+        [TestCase(Search.Recursive, "Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         [TestCase(Search.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public void AwaitSyntaxError(Search search, string expected)
         {
@@ -384,7 +384,7 @@ namespace RoslynSandbox
             using (var returnValues = ReturnValueWalker.Borrow(value, Search.Recursive, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(string.Empty, actual);
+                Assert.AreEqual("local", actual);
             }
         }
 
@@ -723,7 +723,7 @@ namespace RoslynSandbox
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
             using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual("text, error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
+                Assert.AreEqual("text, text, error.ErrorContent, result.ErrorContent, text, error.ErrorContent, value", string.Join(", ", returnValues));
             }
         }
     }
