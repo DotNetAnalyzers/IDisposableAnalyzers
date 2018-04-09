@@ -50,11 +50,6 @@ namespace IDisposableAnalyzers
                 {
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
-                        if (method == KnownSymbol.CompositeDisposable.Add)
-                        {
-                            return Result.Yes;
-                        }
-
                         return method.ReturnsVoid ||
                                !IsAssignableTo(method.ReturnType)
                             ? Result.No
@@ -113,6 +108,30 @@ namespace IDisposableAnalyzers
             }
 
             return Result.Unknown;
+        }
+
+        internal static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        {
+            if (argument?.Parent is ArgumentListSyntax argumentList)
+            {
+                if (argumentList.Parent is InvocationExpressionSyntax invocation &&
+                    semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+                {
+                    if (method == KnownSymbol.CompositeDisposable.Add)
+                    {
+                        return Result.Yes;
+                    }
+
+                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out _))
+                    {
+                        return Result.Yes;
+                    }
+
+                    return Result.No;
+                }
+            }
+
+            return Result.No;
         }
 
         private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)

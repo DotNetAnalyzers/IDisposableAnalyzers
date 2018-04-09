@@ -344,7 +344,8 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is ArgumentSyntax argument)
             {
-                return IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                return IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                       IsArgumentAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
