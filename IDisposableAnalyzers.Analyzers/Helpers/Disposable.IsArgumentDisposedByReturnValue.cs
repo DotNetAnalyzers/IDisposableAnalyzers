@@ -284,7 +284,7 @@ namespace IDisposableAnalyzers
                 methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
             {
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
-                if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out var assignment))
+                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||

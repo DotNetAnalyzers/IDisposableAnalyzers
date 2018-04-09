@@ -168,9 +168,9 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsReturned(ISymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsReturned(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = ReturnValueWalker.Borrow(block, Search.TopLevel, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(scope, Search.TopLevel, semanticModel, cancellationToken))
             {
                 foreach (var value in walker)
                 {
@@ -245,37 +245,42 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<ISymbol> visited = null)
         {
-            AssignmentExpressionSyntax assignment = null;
-            if (block?.TryGetAssignment(symbol, semanticModel, cancellationToken, out assignment) == true)
+            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
             {
                 var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
                            semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
-                return left is IFieldSymbol || left is IPropertySymbol || left is ILocalSymbol || left is IParameterSymbol;
+                if (left.IsEither<IParameterSymbol, ILocalSymbol>())
+                {
+                    using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
+                    {
+                        return visited.Add(symbol) &&
+                               visited.Add(left) &&
+                               IsAssignedToFieldOrProperty(left, scope, semanticModel, cancellationToken, visited);
+                    }
+                }
+
+                return left.IsEither<IFieldSymbol, IPropertySymbol>();
             }
 
             return false;
         }
 
-        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledInvocations = InvocationWalker.Borrow(block))
+            using (var pooledInvocations = InvocationWalker.Borrow(scope))
             {
                 foreach (var invocation in pooledInvocations.Invocations)
                 {
-                    var method = semanticModel.GetSymbolSafe(invocation, cancellationToken) as IMethodSymbol;
-                    if (method?.Name == "Add")
+                    if (invocation.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == symbol.Name, out var argument))
                     {
-                        using (var nameWalker = IdentifierNameWalker.Borrow(invocation.ArgumentList))
+                        if (invocation.TryGetInvokedMethodName(out var name))
                         {
-                            foreach (var identifierName in nameWalker.IdentifierNames)
+                            if (name == "Add" &&
+                                symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
                             {
-                                var argSymbol = semanticModel.GetSymbolSafe(identifierName, cancellationToken);
-                                if (symbol.Equals(argSymbol))
-                                {
-                                    return true;
-                                }
+                                return true;
                             }
                         }
                     }
@@ -303,7 +308,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (declaration.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
+                if (declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax block)
                 {
                     return !IsReturned(local, block, semanticModel, cancellationToken) &&
                            !IsAssignedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&

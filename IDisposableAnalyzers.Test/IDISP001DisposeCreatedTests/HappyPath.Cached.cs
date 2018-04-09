@@ -164,6 +164,62 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void CustomCacheWrappingDictionary()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal sealed class Foo : IDisposable
+    {
+        private readonly Cache cache = new Cache();
+
+        private Foo()
+        {
+        }
+
+        public void Dispose()
+        {
+            this.cache.Clear();
+        }
+
+        public string Bar(int location)
+        {
+            if (this.cache.TryGetValue(location, out var foo))
+            {
+                return foo.ToString();
+            }
+
+            return null;
+        }
+
+        private class Cache
+        {
+            private readonly Dictionary<int, Foo> map = new Dictionary<int, Foo>();
+
+            public bool TryGetValue(int location, out Foo walker)
+            {
+                return this.map.TryGetValue(location, out walker);
+            }
+
+            public void Clear()
+            {
+                foreach (var value in this.map.Values)
+                {
+                    value.Dispose();
+                }
+
+                this.map.Clear();
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
             public void PooledConcurrentQueueTryDequeue()
             {
                 var testCode = @"
@@ -278,6 +334,63 @@ namespace RoslynSandbox
             if (this.refCount <= 0)
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void TryGetRecursive()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal sealed class Foo : IDisposable
+    {
+        private readonly RecursiveFoos recursiveFoos = new RecursiveFoos();
+
+        private Foo()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+
+        public bool Try(int location)
+        {
+            return this.TryGetRecursive(location, out var walker);
+        }
+
+        private bool TryGetRecursive(int location, out Foo walker)
+        {
+            if (this.recursiveFoos.TryGetValue(location, out walker))
+            {
+                return false;
+            }
+
+            walker = new Foo();
+            this.recursiveFoos.Add(location, walker);
+            return true;
+        }
+
+        private class RecursiveFoos
+        {
+            private readonly Dictionary<int, Foo> map = new Dictionary<int, Foo>();
+
+            public void Add(int location, Foo walker)
+            {
+                this.map.Add(location, walker);
+            }
+
+            public bool TryGetValue(int location, out Foo walker)
+            {
+                return this.map.TryGetValue(location, out walker);
             }
         }
     }

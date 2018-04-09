@@ -35,17 +35,53 @@ namespace IDisposableAnalyzers.Test
         public void Repro(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
-{
     using System;
+    using System.Collections.Generic;
 
-    public class Foo
+    internal sealed class Foo : IDisposable
     {
-        public Foo()
+        private readonly RecursiveFoos recursiveFoos = new RecursiveFoos();
+
+        private Foo()
         {
         }
-    }
-}";
+
+        public void Dispose()
+        {
+        }
+
+        public bool Try(int location)
+        {
+            return this.TryGetRecursive(location, out var walker);
+        }
+
+        private bool TryGetRecursive(int location, out Foo walker)
+        {
+            if (this.recursiveFoos.TryGetValue(location, out walker))
+            {
+                return false;
+            }
+
+            walker = new Foo();
+            this.recursiveFoos.Add(location, walker);
+            return true;
+        }
+
+        private class RecursiveFoos
+        {
+            private readonly Dictionary<int, Foo> map = new Dictionary<int, Foo>();
+
+            public void Add(int location, Foo walker)
+            {
+                this.map.Add(location, walker);
+            }
+
+            public bool TryGetValue(int location, out Foo walker)
+            {
+                return this.map.TryGetValue(location, out walker);
+            }
+        }
+    }";
             AnalyzerAssert.Valid(analyzer, testCode);
         }
     }
