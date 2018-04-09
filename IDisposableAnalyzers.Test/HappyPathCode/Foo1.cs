@@ -19,6 +19,7 @@
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
 #pragma warning disable GU0021 // Calculated property allocates reference type.
+#pragma warning disable 169
 namespace IDisposableAnalyzers.Test.HappyPathCode
 {
     using System;
