@@ -483,8 +483,12 @@ namespace RoslynSandbox
         [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", Search.TopLevel, "1")]
         [TestCase("await ReturnAwaitTaskRunAsync()", Search.Recursive, "new string(' ', 1)")]
         [TestCase("await ReturnAwaitTaskRunAsync()", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => 1)", Search.Recursive, "1")]
-        [TestCase("await Task.Run(() => 1)", Search.TopLevel, "1")]
+        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", Search.TopLevel, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", Search.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", Search.TopLevel, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", Search.TopLevel, "new string(' ', 1)")]
         [TestCase("await Task.Run(() => 1)", Search.Recursive, "1")]
         [TestCase("await Task.Run(() => 1)", Search.TopLevel, "1")]
         [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", Search.Recursive, "1")]
@@ -549,11 +553,9 @@ namespace RoslynSandbox
 
         internal static Task<int> ReturnTaskFromResultAsync(int arg) => Task.FromResult(arg);
 
-        internal static async Task<string> ReturnAwaitTaskRunAsync()
-        {
-            await Task.Delay(0);
-            return await Task.Run(() => new string(' ', 1)).ConfigureAwait(false);
-        }
+        internal static async Task<string> ReturnAwaitTaskRunAsync() => await Task.Run(() => new string(' ', 1));
+
+        internal static async Task<string> ReturnAwaitTaskRunConfigureAwaitAsync() => await Task.Run(() => new string(' ', 1)).ConfigureAwait(false);
 
         internal static Task<int> CreateAsync(int arg)
         {
