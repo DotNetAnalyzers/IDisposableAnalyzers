@@ -242,7 +242,13 @@ namespace IDisposableAnalyzers
                 }
                 else if (AsyncAwait.TryAwaitTaskRun(expression, this.semanticModel, this.cancellationToken, out awaited))
                 {
-                    this.TryHandleLambda(awaited as LambdaExpressionSyntax);
+                    if (this.TryGetRecursive(awaited, awaited, out var walker))
+                    {
+                        foreach (var value in walker.returnValues)
+                        {
+                            AwaitValue(value);
+                        }
+                    }
                 }
                 else
                 {
