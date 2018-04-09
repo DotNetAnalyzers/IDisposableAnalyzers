@@ -204,6 +204,21 @@ namespace IDisposableAnalyzers
                     {
                         if (AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out var awaited))
                         {
+                            if (awaited is IdentifierNameSyntax identifierName &&
+                                symbol is IMethodSymbol method &&
+                                method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                            {
+                                if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                                {
+                                    this.AddReturnValue(argument.Expression);
+                                }
+                                else if (parameter.HasExplicitDefaultValue &&
+                                         parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                                {
+                                    this.returnValues.Add(parameterDeclaration.Default?.Value);
+                                }
+                            }
+
                             this.AddReturnValue(awaited);
                         }
                         else if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out awaited))
@@ -213,10 +228,19 @@ namespace IDisposableAnalyzers
                     }
                 }
 
+                this.returnValues.RemoveAll(IsParameter);
+                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
             return false;
+
+            bool IsParameter(ExpressionSyntax value)
+            {
+                return value is IdentifierNameSyntax id &&
+                       declaration is MethodDeclarationSyntax methodDeclaration &&
+                       methodDeclaration.ParameterList.Parameters.TryFirst(x => x.Identifier.ValueText == id.Identifier.ValueText, out _);
+            }
         }
 
         private bool TryHandleLambda(LambdaExpressionSyntax lambda)

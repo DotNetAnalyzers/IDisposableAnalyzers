@@ -463,6 +463,28 @@ namespace RoslynSandbox
             }
         }
 
+        [TestCase("await CreateAsync(0)", Search.Recursive, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0)", Search.TopLevel, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.Recursive, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.TopLevel, "1, 0, 2, 3")]
+        [TestCase("await CreateStringAsync()", Search.Recursive, "new string(' ', 1)")]
+        [TestCase("await CreateStringAsync()", Search.TopLevel, "new string(' ', 1)")]
+        [TestCase("await CreateIntAsync()", Search.Recursive, "1")]
+        [TestCase("await CreateIntAsync()", Search.TopLevel, "1")]
+        [TestCase("await CreateIntAsync().ConfigureAwait(false)", Search.Recursive, "1")]
+        [TestCase("await CreateIntAsync().ConfigureAwait(false)", Search.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync()", Search.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync()", Search.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", Search.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", Search.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1)", Search.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1)", Search.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", Search.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", Search.TopLevel, "1")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", Search.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", Search.TopLevel, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => 1)", Search.Recursive, "1")]
+        [TestCase("await Task.Run(() => 1)", Search.TopLevel, "1")]
         [TestCase("await Task.Run(() => 1)", Search.Recursive, "1")]
         [TestCase("await Task.Run(() => 1)", Search.TopLevel, "1")]
         [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", Search.Recursive, "1")]
@@ -487,14 +509,6 @@ namespace RoslynSandbox
         [TestCase("await Task.FromResult(CreateInt())", Search.TopLevel, "CreateInt()")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", Search.Recursive, "1")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", Search.TopLevel, "CreateInt()")]
-        [TestCase("await CreateAsync(0)", Search.Recursive, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0)", Search.TopLevel, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.Recursive, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.TopLevel, "1, 0, 2, 3")]
-        [TestCase("await CreateStringAsync()", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await CreateStringAsync()", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunAsync()", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunAsync()", Search.TopLevel, "new string(' ', 1)")]
         public void AsyncAwait(string code, Search search, string expected)
         {
             var testCode = @"
@@ -517,11 +531,23 @@ namespace RoslynSandbox
             var value = await CreateStringAsync();
         }
 
+        internal static int CreateInt() => 1;
+
         internal static async Task<string> CreateStringAsync()
         {
             await Task.Delay(0);
             return new string(' ', 1);
         }
+
+        internal static async Task<int> CreateIntAsync()
+        {
+            await Task.Delay(0);
+            return 1;
+        }
+
+        internal static Task<int> ReturnTaskFromResultAsync() => Task.FromResult(1);
+
+        internal static Task<int> ReturnTaskFromResultAsync(int arg) => Task.FromResult(arg);
 
         internal static async Task<string> ReturnAwaitTaskRunAsync()
         {
@@ -547,8 +573,6 @@ namespace RoslynSandbox
                     return Task.Run(() => { return arg; });
             }
         }
-
-        internal static async Task<int> CreateInt() => 1;
     }
 }";
             testCode = testCode.AssertReplace("var value = await CreateStringAsync()", $"var value = {code}");
