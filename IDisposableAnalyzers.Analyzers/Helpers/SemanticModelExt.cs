@@ -10,15 +10,6 @@ namespace IDisposableAnalyzers
     /// </summary>
     internal static class SemanticModelExt
     {
-        internal static bool IsEither<T1, T2>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
-            where T1 : ISymbol
-            where T2 : ISymbol
-        {
-            return semanticModel.GetSymbolSafe(node, cancellationToken).IsEither<T1, T2>() ||
-                   semanticModel.GetDeclaredSymbolSafe(node, cancellationToken).IsEither<T1, T2>() ||
-                   semanticModel.GetTypeInfoSafe(node, cancellationToken).Type.IsEither<T1, T2>();
-        }
-
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
         {
             return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
@@ -32,7 +23,8 @@ namespace IDisposableAnalyzers
         internal static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
             where TSymbol : class, ISymbol
         {
-            symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol;
+            symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol ??
+                     GetDeclaredSymbolSafe(semanticModel, node, cancellationToken) as TSymbol;
             return symbol != null;
         }
 

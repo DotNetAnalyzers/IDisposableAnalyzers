@@ -73,23 +73,39 @@ namespace IDisposableAnalyzers
             }
             else if (context.Node is ArgumentSyntax argument &&
                      argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
-                     argument.Expression is IdentifierNameSyntax argIdentifier &&
+                     TryGetSymbol(argument, context, out var assignedSymbol) &&
                      Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
             {
-                var assignedSymbol = context.SemanticModel.GetSymbolSafe(argIdentifier, context.CancellationToken);
                 if (assignedSymbol is ILocalSymbol local &&
-                    Disposable.ShouldDispose(local, argIdentifier, context.SemanticModel, context.CancellationToken))
+                    Disposable.ShouldDispose(local, argument, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                 }
 
                 if (assignedSymbol is IParameterSymbol parameter &&
                     parameter.RefKind == RefKind.None &&
-                    Disposable.ShouldDispose(parameter, argIdentifier, context.SemanticModel, context.CancellationToken))
+                    Disposable.ShouldDispose(parameter, argument, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, argument.GetLocation()));
                 }
             }
+        }
+
+        private static bool TryGetSymbol(ArgumentSyntax argument, SyntaxNodeAnalysisContext context, out ISymbol symbol)
+        {
+            if (argument.Expression is IdentifierNameSyntax candidate)
+            {
+                return context.SemanticModel.TryGetSymbol(candidate, context.CancellationToken, out symbol);
+            }
+
+            if (argument.Expression is DeclarationExpressionSyntax declarationExpression &&
+                    declarationExpression.Designation is SingleVariableDesignationSyntax singleVariable)
+            {
+                return context.SemanticModel.TryGetSymbol(singleVariable, context.CancellationToken, out symbol);
+            }
+
+            symbol = null;
+            return false;
         }
     }
 }

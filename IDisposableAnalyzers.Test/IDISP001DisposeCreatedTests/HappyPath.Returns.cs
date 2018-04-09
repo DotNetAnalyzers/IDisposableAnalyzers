@@ -63,6 +63,69 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void LocalFileOpenReadDisposable()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static IDisposable Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return stream;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void LocalFileOpenReadAsDisposable()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static IDisposable Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return stream as IDisposable;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void LocalFileOpenReadCastDisposable()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static IDisposable Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return (IDisposable)stream;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
             public void LocalFileOpenReadAfterAccessingLength()
             {
                 var testCode = @"
@@ -138,6 +201,8 @@ namespace RoslynSandbox
             public void LocalInStreamReaderMethodBody()
             {
                 var testCode = @"
+namespace RoslynSandbox
+{
     using System.IO;
 
     public static class Foo
@@ -147,7 +212,28 @@ namespace RoslynSandbox
             var stream = File.OpenRead(string.Empty);
             return new StreamReader(stream);
         }
-    }";
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void LocalInStreamReaderMethodBodyAsDisposable()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class Foo
+    {
+        public static StreamReader Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            return new StreamReader(stream);
+        }
+    }
+}";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 

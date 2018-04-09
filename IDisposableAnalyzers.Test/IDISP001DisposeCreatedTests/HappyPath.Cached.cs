@@ -8,90 +8,278 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public class Cached
         {
             [Test]
-            public void DontUseUsingWhenGettingFromStaticFieldConcurrentDictionaryGetOrAdd()
+            public void StaticConcurrentDictionaryGetOrAdd()
             {
                 var testCode = @"
-using System.Collections.Concurrent;
-using System.IO;
-
-public static class Foo
+namespace RoslynSandbox
 {
-    private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+    using System.Collections.Concurrent;
+    using System.IO;
 
-    public static long Bar()
+    public static class Foo
     {
-        var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
-        return stream.Length;
-    }
-}";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-            [Test]
-            public void DontUseUsingWhenGettingFromFieldConcurrentDictionaryGetOrAdd()
-            {
-                var testCode = @"
-using System.Collections.Concurrent;
-using System.IO;
-
-public class Foo
-{
-    private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
-
-    public long Bar()
-    {
-        var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
-        return stream.Length;
-    }
-}";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
-
-            [Test]
-            public void DontUseUsingWhenGettingFromConcurrentDictionaryTryGetValue()
-            {
-                var testCode = @"
-using System.Collections.Concurrent;
-using System.IO;
-
-public static class Foo
-{
-    private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
-
-    public static long Bar()
-    {
-        Stream stream;
-        if (Cache.TryGetValue(1, out stream))
+        public static long Bar()
         {
+            var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
             return stream.Length;
         }
-
-        return 0;
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
-            public void DontUseUsingWhenGettingFromConditionalWeakTableTryGetValue()
+            public void ConcurrentDictionaryGetOrAdd()
             {
                 var testCode = @"
-using System.IO;
-using System.Runtime.CompilerServices;
-
-public static class Foo
+namespace RoslynSandbox
 {
-    private static readonly ConditionalWeakTable<string, Stream> Cache = new ConditionalWeakTable<string, Stream>();
+    using System.Collections.Concurrent;
+    using System.IO;
 
-    public static long Bar()
+    public class Foo
     {
-        Stream stream;
-        if (Cache.TryGetValue(""1"", out stream))
+        private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+        public long Bar()
         {
+            var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
             return stream.Length;
         }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
 
-        return 0;
+            [Test]
+            public void ConcurrentDictionaryTryGetValue()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Concurrent;
+    using System.IO;
+
+    public static class Foo
+    {
+        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+        public static long Bar()
+        {
+            Stream stream;
+            if (Cache.TryGetValue(1, out stream))
+            {
+                return stream.Length;
+            }
+
+            return 0;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void ConcurrentDictionaryTryGetValueVarOut()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Concurrent;
+    using System.IO;
+
+    public static class Foo
+    {
+        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+
+        public static long Bar()
+        {
+            if (Cache.TryGetValue(1, var out stream))
+            {
+                return stream.Length;
+            }
+
+            return 0;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void ConditionalWeakTableTryGetValue()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Runtime.CompilerServices;
+
+    public static class Foo
+    {
+        private static readonly ConditionalWeakTable<string, Stream> Cache = new ConditionalWeakTable<string, Stream>();
+
+        public static long Bar()
+        {
+            Stream stream;
+            if (Cache.TryGetValue(""1"", out stream))
+            {
+                return stream.Length;
+            }
+
+            return 0;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void ConditionalWeakTableTryGetValueVarOut()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Runtime.CompilerServices;
+
+    public static class Foo
+    {
+        private static readonly ConditionalWeakTable<string, Stream> Cache = new ConditionalWeakTable<string, Stream>();
+
+        public static long Bar()
+        {
+            if (Cache.TryGetValue(""1"", out var stream))
+            {
+                return stream.Length;
+            }
+
+            return 0;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void PooledConcurrentQueueTryDequeue()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    using System.Collections.Concurrent;
+    using System.Diagnostics;
+
+    internal class Foo : IDisposable
+    {
+        private static readonly ConcurrentQueue<Foo> Cache = new ConcurrentQueue<Foo>();
+        private int refCount;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected static Foo Borrow(Func<Foo> create)
+        {
+            if (!Cache.TryDequeue(out var walker))
+            {
+                walker = create();
+            }
+
+            walker.refCount = 1;
+            return walker;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.refCount--;
+                Debug.Assert(this.refCount >= 0, ""refCount>= 0"");
+                if (this.refCount == 0)
+                {
+                    Cache.Enqueue(this);
+                }
+            }
+        }
+
+        [Conditional(""DEBUG"")]
+        protected void ThrowIfDisposed()
+        {
+            if (this.refCount <= 0)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void PooledConcurrentQueueTryDequeue2()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    using System.Collections.Concurrent;
+    using System.Diagnostics;
+
+    internal class Foo : IDisposable
+    {
+        private static readonly ConcurrentQueue<Foo> Cache = new ConcurrentQueue<Foo>();
+        private int refCount;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected static Foo BorrowAndVisit(Func<Foo> create)
+        {
+            var walker = Borrow(create);
+            return walker;
+        }
+
+        protected static Foo Borrow(Func<Foo> create)
+        {
+            if (!Cache.TryDequeue(out var walker))
+            {
+                walker = create();
+            }
+
+            walker.refCount = 1;
+            return walker;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.refCount--;
+                Debug.Assert(this.refCount >= 0, ""refCount>= 0"");
+                if (this.refCount == 0)
+                {
+                    Cache.Enqueue(this);
+                }
+            }
+        }
+
+        [Conditional(""DEBUG"")]
+        protected void ThrowIfDisposed()
+        {
+            if (this.refCount <= 0)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);

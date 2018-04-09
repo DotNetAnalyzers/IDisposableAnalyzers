@@ -133,8 +133,19 @@ namespace IDisposableAnalyzers
                 SyntaxFactory.Block(
                     SyntaxFactory.UsingStatement(
                         declaration: null,
-                        expression: expression,
+                        expression: GetExpression(),
                         statement: block.WithAdditionalAnnotations(Formatter.Annotation))));
+
+            ExpressionSyntax GetExpression()
+            {
+                if (expression is DeclarationExpressionSyntax declaration &&
+                    declaration.Designation is SingleVariableDesignationSyntax singleVariable)
+                {
+                    return SyntaxFactory.IdentifierName(singleVariable.Identifier);
+                }
+
+                return expression;
+            }
         }
     }
 }

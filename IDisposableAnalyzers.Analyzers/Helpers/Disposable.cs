@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -173,13 +174,25 @@ namespace IDisposableAnalyzers
             {
                 foreach (var value in walker)
                 {
-                    var returnedSymbol = semanticModel.GetSymbolSafe(value, cancellationToken);
+                    var candidate = value;
+                    if (candidate is CastExpressionSyntax castExpression)
+                    {
+                        candidate = castExpression.Expression;
+                    }
+
+                    if (candidate is BinaryExpressionSyntax binary &&
+                        binary.IsKind(SyntaxKind.AsExpression))
+                    {
+                        candidate = binary.Left;
+                    }
+
+                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
                     if (SymbolComparer.Equals(symbol, returnedSymbol))
                     {
                         return true;
                     }
 
-                    if (value is ObjectCreationExpressionSyntax objectCreation)
+                    if (candidate is ObjectCreationExpressionSyntax objectCreation)
                     {
                         if (objectCreation.ArgumentList != null)
                         {
@@ -206,7 +219,7 @@ namespace IDisposableAnalyzers
                         }
                     }
 
-                    if (value is InvocationExpressionSyntax invocation)
+                    if (candidate is InvocationExpressionSyntax invocation)
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
@@ -216,9 +229,9 @@ namespace IDisposableAnalyzers
                             var body = lambda.Body;
                             using (var pooledInvocations = InvocationWalker.Borrow(body))
                             {
-                                foreach (var candidate in pooledInvocations.Invocations)
+                                foreach (var disposeCandidate in pooledInvocations.Invocations)
                                 {
-                                    if (IsDisposing(candidate, symbol, semanticModel, cancellationToken))
+                                    if (IsDisposing(disposeCandidate, symbol, semanticModel, cancellationToken))
                                     {
                                         return true;
                                     }
@@ -282,7 +295,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
+            if (local.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration))
             {
                 if (declaration.Parent is UsingStatementSyntax ||
                     declaration.Parent is AnonymousFunctionExpressionSyntax)

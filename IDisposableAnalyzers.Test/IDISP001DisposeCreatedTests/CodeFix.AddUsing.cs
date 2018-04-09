@@ -207,7 +207,6 @@ namespace RoslynSandbox
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
-            [Explicit("C#7")]
             [Test]
             public void VarOutParameter()
             {
@@ -220,7 +219,7 @@ namespace RoslynSandbox
     {
         public Foo()
         {
-            if (TryGetStream(out var ↓stream))
+            if (TryGetStream(↓out var stream))
             {
             }
         }

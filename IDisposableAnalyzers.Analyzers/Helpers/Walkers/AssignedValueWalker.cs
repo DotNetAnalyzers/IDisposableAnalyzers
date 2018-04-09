@@ -13,8 +13,7 @@ namespace IDisposableAnalyzers
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
-        private readonly MemberWalkers<IPropertySymbol> setterWalkers = new MemberWalkers<IPropertySymbol>();
-        private readonly MemberWalkers<IMethodSymbol> methodWalkers = new MemberWalkers<IMethodSymbol>();
+        private readonly MemberWalkers memberWalkers = new MemberWalkers();
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
@@ -267,39 +266,42 @@ namespace IDisposableAnalyzers
 
             bool TryGetWalker(out AssignedValueWalker result)
             {
-                if (this.methodWalkers.TryGetValue(method, out result))
+                result = null;
+                if (TryGetKey(out var key))
                 {
-                    return result != null &&
-                           !ReferenceEquals(this, result);
-                }
-
-                if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
-                {
-                    result = Borrow(() => new AssignedValueWalker());
-                    this.methodWalkers.Add(method, result);
-                    result.CurrentSymbol = this.CurrentSymbol;
-                    result.semanticModel = this.semanticModel;
-                    result.cancellationToken = this.cancellationToken;
-                    result.context = this.context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null ? this.context : declaration;
-                    result.methodWalkers.Parent = this.methodWalkers;
-                    if (argumentList != null)
+                    if (this.memberWalkers.TryGetValue(key, out result))
                     {
-                        foreach (var argument in argumentList.Arguments)
-                        {
-                            if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
-                                TryGetMatchingParameter(argument, out var parameter))
-                            {
-                                result.refParameters.Add(parameter);
-                            }
-                            else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
-                                     TryGetMatchingParameter(argument, out parameter))
-                            {
-                                result.outParameters.Add(parameter);
-                            }
-                        }
+                        return false;
                     }
 
-                    result.Visit(declaration);
+                    if (method.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                    {
+                        result = Borrow(() => new AssignedValueWalker());
+                        this.memberWalkers.Add(key, result);
+                        result.CurrentSymbol = this.CurrentSymbol;
+                        result.semanticModel = this.semanticModel;
+                        result.cancellationToken = this.cancellationToken;
+                        result.context = this.context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null ? this.context : declaration;
+                        result.memberWalkers.Parent = this.memberWalkers;
+                        if (argumentList != null)
+                        {
+                            foreach (var argument in argumentList.Arguments)
+                            {
+                                if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
+                                    TryGetMatchingParameter(argument, out var parameter))
+                                {
+                                    result.refParameters.Add(parameter);
+                                }
+                                else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
+                                         TryGetMatchingParameter(argument, out parameter))
+                                {
+                                    result.outParameters.Add(parameter);
+                                }
+                            }
+                        }
+
+                        result.Visit(declaration);
+                    }
                 }
 
                 return result != null;
@@ -318,6 +320,17 @@ namespace IDisposableAnalyzers
                     }
 
                     return false;
+                }
+
+                bool TryGetKey(out SyntaxNode node)
+                {
+                    if (argumentList != null)
+                    {
+                        node = argumentList;
+                        return true;
+                    }
+
+                    return method.TrySingleDeclaration(this.cancellationToken, out node);
                 }
             }
 
@@ -353,8 +366,7 @@ namespace IDisposableAnalyzers
             this.context = null;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
-            this.setterWalkers.Clear();
-            this.methodWalkers.Clear();
+            this.memberWalkers.Clear();
         }
 
         private void Run()
@@ -625,22 +637,21 @@ namespace IDisposableAnalyzers
                     !SymbolComparer.Equals(this.CurrentSymbol, property) &&
                     property.ContainingType.Is(this.CurrentSymbol.ContainingType))
                 {
-                    if (this.setterWalkers.TryGetValue(property, out walker))
+                    if (this.memberWalkers.TryGetValue(value, out walker))
                     {
-                        return walker != null &&
-                              !ReferenceEquals(this, walker);
+                        return false;
                     }
 
                     if (property.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                         declaration.TryGetSetAccessorDeclaration(out var setter))
                     {
                         walker = Borrow(() => new AssignedValueWalker());
-                        this.setterWalkers.Add(property, walker);
+                        this.memberWalkers.Add(value, walker);
                         walker.CurrentSymbol = this.CurrentSymbol;
                         walker.semanticModel = this.semanticModel;
                         walker.cancellationToken = this.cancellationToken;
                         walker.context = setter;
-                        walker.setterWalkers.Parent = this.setterWalkers;
+                        walker.memberWalkers.Parent = this.memberWalkers;
                         walker.Visit(setter);
                     }
                 }
@@ -752,24 +763,23 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private class MemberWalkers<TMember>
-            where TMember : ISymbol
+        private class MemberWalkers
         {
-            private readonly Dictionary<TMember, AssignedValueWalker> map = new Dictionary<TMember, AssignedValueWalker>();
+            private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new Dictionary<SyntaxNode, AssignedValueWalker>();
 
-            public MemberWalkers<TMember> Parent { get; set; }
+            public MemberWalkers Parent { get; set; }
 
-            private Dictionary<TMember, AssignedValueWalker> Current => this.Parent?.Current ??
+            private Dictionary<SyntaxNode, AssignedValueWalker> Current => this.Parent?.Current ??
                                                                         this.map;
 
-            public void Add(TMember member, AssignedValueWalker walker)
+            public void Add(SyntaxNode location, AssignedValueWalker walker)
             {
-                this.Current.Add(member, walker);
+                this.Current.Add(location, walker);
             }
 
-            public bool TryGetValue(TMember member, out AssignedValueWalker walker)
+            public bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
             {
-                return this.Current.TryGetValue(member, out walker);
+                return this.Current.TryGetValue(location, out walker);
             }
 
             public void Clear()
