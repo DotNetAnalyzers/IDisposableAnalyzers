@@ -178,7 +178,11 @@ namespace IDisposableAnalyzers
                 property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode getter) &&
                 this.TryGetRecursive(propertyGet, getter, out var walker))
             {
-                this.returnValues.AddRange(walker.returnValues);
+                foreach (var returnValue in walker.returnValues)
+                {
+                    this.AddReturnValue(returnValue);
+                }
+
                 this.returnValues.PurgeDuplicates();
                 return true;
             }
