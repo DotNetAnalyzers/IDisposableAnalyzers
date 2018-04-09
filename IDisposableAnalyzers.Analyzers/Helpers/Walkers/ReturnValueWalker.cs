@@ -12,7 +12,6 @@ namespace IDisposableAnalyzers
         private readonly List<ExpressionSyntax> returnValues = new List<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private Search search;
-        private bool awaits;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -100,7 +99,6 @@ namespace IDisposableAnalyzers
         {
             this.returnValues.Clear();
             this.recursiveWalkers.Clear();
-            this.awaits = false;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
         }
@@ -115,7 +113,6 @@ namespace IDisposableAnalyzers
             walker = Borrow(() => new ReturnValueWalker());
             this.recursiveWalkers.Add(location, walker);
             walker.search = this.search;
-            walker.awaits = this.awaits;
             walker.semanticModel = this.semanticModel;
             walker.cancellationToken = this.cancellationToken;
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
@@ -191,31 +188,80 @@ namespace IDisposableAnalyzers
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (awaitExpression == null)
+            if (AsyncAwait.TryGetAwaitedInvocation(awaitExpression, this.semanticModel, this.cancellationToken, out var invocation) &&
+                this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is ISymbol symbol)
             {
-                return false;
-            }
-
-            if (AsyncAwait.TryGetAwaitedInvocation(awaitExpression, this.semanticModel, this.cancellationToken, out var invocation))
-            {
-                this.awaits = true;
-                var symbol = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                if (symbol != null)
+                if (symbol.TrySingleDeclaration(this.cancellationToken, out MemberDeclarationSyntax declaration) &&
+                    declaration is MethodDeclarationSyntax methodDeclaration)
                 {
-                    if (symbol.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        this.AddReturnValue(invocation);
-                    }
-                    else
+                    if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
                     {
                         return this.TryHandleInvocation(invocation, out _);
                     }
+
+                    if (this.TryGetRecursive(awaitExpression, declaration, out var walker))
+                    {
+                        foreach (var value in walker.returnValues)
+                        {
+                            AwaitValue(value);
+                        }
+                    }
+                }
+                else
+                {
+                    AwaitValue(invocation);
                 }
 
+                this.returnValues.RemoveAll(IsParameter);
+                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
             return false;
+
+            void AwaitValue(ExpressionSyntax expression)
+            {
+                if (AsyncAwait.TryAwaitTaskFromResult(expression, this.semanticModel, this.cancellationToken, out var awaited))
+                {
+                    if (awaited is IdentifierNameSyntax identifierName &&
+                        symbol is IMethodSymbol method &&
+                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                    {
+                        if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                        {
+                            this.AddReturnValue(argument.Expression);
+                        }
+                        else if (parameter.HasExplicitDefaultValue &&
+                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                        {
+                            this.returnValues.Add(parameterDeclaration.Default?.Value);
+                        }
+                    }
+
+                    this.AddReturnValue(awaited);
+                }
+                else if (AsyncAwait.TryAwaitTaskRun(expression, this.semanticModel, this.cancellationToken, out awaited))
+                {
+                    if (this.TryGetRecursive(awaited, awaited, out var walker))
+                    {
+                        foreach (var value in walker.returnValues)
+                        {
+                            AwaitValue(value);
+                        }
+                    }
+                }
+                else
+                {
+                    this.AddReturnValue(expression);
+                }
+            }
+
+            bool IsParameter(ExpressionSyntax value)
+            {
+                return value is IdentifierNameSyntax id &&
+                       symbol is IMethodSymbol method &&
+                       method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
+            }
         }
 
         private bool TryHandleLambda(LambdaExpressionSyntax lambda)
@@ -240,39 +286,6 @@ namespace IDisposableAnalyzers
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            if (this.awaits)
-            {
-                if (AsyncAwait.TryAwaitTaskRun(value, this.semanticModel, this.cancellationToken, out var awaited) &&
-                    this.TryGetRecursive(value, awaited, out var walker))
-                {
-                    if (walker.returnValues.Count == 0)
-                    {
-                        this.returnValues.Add(awaited);
-                    }
-                    else
-                    {
-                        foreach (var returnValue in walker.returnValues)
-                        {
-                            this.AddReturnValue(returnValue);
-                        }
-                    }
-
-                    return;
-                }
-
-                if (AsyncAwait.TryAwaitTaskFromResult(value, this.semanticModel, this.cancellationToken, out awaited))
-                {
-                    this.AddReturnValue(awaited);
-                    return;
-                }
-
-                if (this.search == Search.Recursive &&
-                    value is AwaitExpressionSyntax awaitExpression)
-                {
-                    value = awaitExpression.Expression;
-                }
-            }
-
             if (this.search == Search.Recursive)
             {
                 switch (value)
@@ -285,6 +298,9 @@ namespace IDisposableAnalyzers
                             this.returnValues.Add(invocation);
                         }
 
+                        break;
+                    case AwaitExpressionSyntax awaitExpression:
+                        this.TryHandleAwait(awaitExpression);
                         break;
                     case ConditionalExpressionSyntax ternary:
                         this.AddReturnValue(ternary.WhenTrue);
