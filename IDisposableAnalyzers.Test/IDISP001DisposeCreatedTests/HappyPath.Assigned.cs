@@ -93,8 +93,6 @@ namespace RoslynSandbox
 {
     public class Foo
     {
-        private readonly Disposable disposable;
-
         public Foo()
         {
             var temp = new Disposable();

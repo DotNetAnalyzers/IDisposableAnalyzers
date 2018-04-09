@@ -421,7 +421,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo3
+    public class FooOut
     {
         public static bool TryGetStream(out Stream stream)
         {

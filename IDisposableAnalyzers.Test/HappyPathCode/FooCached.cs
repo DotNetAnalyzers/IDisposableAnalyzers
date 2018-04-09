@@ -11,8 +11,6 @@
 // ReSharper disable PossibleUnintendedReferenceComparison
 // ReSharper disable RedundantCheckBeforeAssignment
 // ReSharper disable UnusedMethodReturnValue.Global
-// ReSharper disable NotAccessedVariable
-// ReSharper disable InlineOutVariableDeclaration
 #pragma warning disable 1717
 #pragma warning disable SA1101 // Prefix local calls with this
 #pragma warning disable GU0011 // Don't ignore the return value.
@@ -20,21 +18,24 @@
 #pragma warning disable IDE0009 // Member access should be qualified.
 namespace IDisposableAnalyzers.Test.HappyPathCode
 {
-    using System;
+    using System.Collections.Concurrent;
+    using System.IO;
 
-    public class Disposable : IDisposable
+    class FooCached
     {
-        public Disposable(string meh)
-            : this()
+        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+        private readonly ConcurrentDictionary<int, Stream> cache = new ConcurrentDictionary<int, Stream>();
+
+        public static long Bar()
         {
+            var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+            return stream.Length;
         }
 
-        public Disposable()
+        public long Bar1()
         {
-        }
-
-        public void Dispose()
-        {
+            var stream = cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+            return stream.Length;
         }
     }
 }
