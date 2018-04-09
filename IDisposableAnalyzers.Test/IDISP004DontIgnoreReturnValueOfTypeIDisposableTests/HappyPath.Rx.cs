@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Rx
+        [Test]
+        public void SerialDisposable()
         {
-            [Test]
-            public void SerialDisposable()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -33,13 +31,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SingleAssignmentDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void SingleAssignmentDisposable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -62,13 +60,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableInitializer()
-            {
-                var testCode = @"
+        [Test]
+        public void CompositeDisposableInitializer()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -95,13 +93,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableCtor()
-            {
-                var testCode = @"
+        [Test]
+        public void CompositeDisposableCtor()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -126,13 +124,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableAdd()
-            {
-                var testCode = @"
+        [Test]
+        public void CompositeDisposableAdd()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -153,13 +151,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableAddThrottleSubscribe()
-            {
-                var testCode = @"
+        [Test]
+        public void CompositeDisposableAddThrottleSubscribe()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -182,13 +180,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableExtAddAndReturn()
-            {
-                var compositeDisposableExtCode = @"
+        [Test]
+        public void CompositeDisposableExtAddAndReturn()
+        {
+            var compositeDisposableExtCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -208,7 +206,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -229,8 +227,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, testCode);
         }
     }
 }

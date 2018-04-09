@@ -113,7 +113,7 @@ namespace IDisposableAnalyzers
         private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)
         {
             var result = Result.No;
-            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
+            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.RecursiveInside, semanticModel, cancellationToken))
             {
 #pragma warning disable IDISP003 // Dispose previous before re-assigning.
                 using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))

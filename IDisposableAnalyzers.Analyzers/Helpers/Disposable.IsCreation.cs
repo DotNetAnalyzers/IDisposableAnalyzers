@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
                 return Result.Yes;
             }
 
-            using (var walker = ReturnValueWalker.Borrow(candidate, Search.Recursive, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(candidate, Search.RecursiveInside, semanticModel, cancellationToken))
             {
                 if (walker.Count == 0)
                 {

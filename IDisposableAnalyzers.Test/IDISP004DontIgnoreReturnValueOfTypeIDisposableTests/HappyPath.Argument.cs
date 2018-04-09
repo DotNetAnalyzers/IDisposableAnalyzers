@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Argument
+        [Test]
+        public void ChainedCtor()
         {
-            [Test]
-            public void ChainedCtor()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -35,13 +33,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void ChainedCtorCoalesce()
-            {
-                var testCode = @"
+        [Test]
+        public void ChainedCtorCoalesce()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -66,13 +64,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void ChainedCtors()
-            {
-                var testCode = @"
+        [Test]
+        public void ChainedCtors()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -105,13 +103,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void ChainedCtorCallsBaseCtorDisposedInThis()
-            {
-                var baseCode = @"
+        [Test]
+        public void ChainedCtorCallsBaseCtorDisposedInThis()
+        {
+            var baseCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -145,7 +143,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -181,13 +179,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, baseCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, baseCode, testCode);
+        }
 
-            [Test]
-            public void ChainedBaseCtorDisposedInThis()
-            {
-                var baseCode = @"
+        [Test]
+        public void ChainedBaseCtorDisposedInThis()
+        {
+            var baseCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -227,7 +225,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -258,13 +256,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, baseCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, baseCode, testCode);
+        }
 
-            [Test]
-            public void StreamInStreamReader()
-            {
-                var testCode = @"
+        [Test]
+        public void UsingStreamInStreamReader()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -280,13 +278,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposableCreate()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposableCreate()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -301,13 +299,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void NewStandardKernelNewModuleArgument()
-            {
-                var modulCode = @"
+        [Test]
+        public void NewStandardKernelNewModuleArgument()
+        {
+            var modulCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -322,7 +320,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using Ninject;
@@ -337,13 +335,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, modulCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, modulCode, testCode);
+        }
 
-            [Test]
-            public void MethodReturningStreamReader()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodReturningStreamReader()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -365,13 +363,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodReturningStreamReaderExpressionBody()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodReturningStreamReaderExpressionBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -390,13 +388,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodWithFuncTaskAsParameter()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodWithFuncTaskAsParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -413,13 +411,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodWithFuncStreamAsParameter()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodWithFuncStreamAsParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -438,13 +436,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SubclassedNinjectKernel()
-            {
-                var testCode = @"
+        [Test]
+        public void SubclassedNinjectKernel()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using Ninject;
@@ -473,8 +471,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

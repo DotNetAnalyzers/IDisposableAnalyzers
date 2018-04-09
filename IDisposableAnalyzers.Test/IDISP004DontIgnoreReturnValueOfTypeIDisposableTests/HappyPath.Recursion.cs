@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        public class Recursion
+        [Test]
+        public void IgnoresWhenDisposingRecursiveProperty()
         {
-            [Test]
-            public void IgnoresWhenDisposingRecursiveProperty()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,13 +23,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void IgnoresWhenNotDisposingRecursiveProperty()
-            {
-                var testCode = @"
+        [Test]
+        public void IgnoresWhenNotDisposingRecursiveProperty()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -45,13 +43,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
-            {
-                var testCode = @"
+        [Test]
+        public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -73,13 +71,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
-            {
-                var testCode = @"
+        [Test]
+        public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -100,13 +98,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void IgnoresWhenDisposingRecursiveMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void IgnoresWhenDisposingRecursiveMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -121,13 +119,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ValidationErrorToStringConverter()
-            {
-                var testCode = @"
+        [Test]
+        public void ValidationErrorToStringConverter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
      using System;
@@ -168,8 +166,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Returned
+        [Test]
+        public void Generic()
         {
-            [Test]
-            public void Generic()
-            {
-                var factoryCode = @"
+            var factoryCode = @"
 namespace RoslynSandbox
 {
     public class Factory
@@ -19,7 +17,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -30,13 +28,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, factoryCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, factoryCode, testCode);
+        }
 
-            [Test]
-            public void Operator()
-            {
-                var mehCode = @"
+        [Test]
+        public void Operator()
+        {
+            var mehCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -45,7 +43,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -58,13 +56,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
+        }
 
-            [Test]
-            public void OperatorNestedCall()
-            {
-                var mehCode = @"
+        [Test]
+        public void OperatorNestedCall()
+        {
+            var mehCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -73,7 +71,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -91,13 +89,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
+        }
 
-            [Test]
-            public void OperatorEquals()
-            {
-                var mehCode = @"
+        [Test]
+        public void OperatorEquals()
+        {
+            var mehCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -105,7 +103,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -118,13 +116,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, mehCode, testCode);
+        }
 
-            [Test]
-            public void MethodReturningObject()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodReturningObject()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -137,13 +135,13 @@ namespace RoslynSandbox
         private static object Meh() => new object();
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodWithArgReturningObject()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodWithArgReturningObject()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -156,13 +154,13 @@ namespace RoslynSandbox
         private static object Meh(string arg) => new object();
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodWithObjArgReturningObject()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodWithObjArgReturningObject()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -175,13 +173,13 @@ namespace RoslynSandbox
         private static object Id(object arg) => arg;
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturningStatementBody()
-            {
-                var testCode = @"
+        [Test]
+        public void ReturningStatementBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -194,13 +192,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturningLocalStatementBody()
-            {
-                var testCode = @"
+        [Test]
+        public void ReturningLocalStatementBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -214,13 +212,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturningExpressionBody()
-            {
-                var testCode = @"
+        [Test]
+        public void ReturningExpressionBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -230,13 +228,13 @@ namespace RoslynSandbox
         public Stream Bar() => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturningNewAssigningAndDisposing()
-            {
-                var fooCode = @"
+        [Test]
+        public void ReturningNewAssigningAndDisposing()
+        {
+            var fooCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -256,7 +254,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -267,13 +265,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+        }
 
-            [Test]
-            public void ReturningNewAssigningAndDisposingParams()
-            {
-                var fooCode = @"
+        [Test]
+        public void ReturningNewAssigningAndDisposingParams()
+        {
+            var fooCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -296,7 +294,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -307,13 +305,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+        }
 
-            [Test]
-            public void ReturningCreateNewAssigningAndDisposing()
-            {
-                var fooCode = @"
+        [Test]
+        public void ReturningCreateNewAssigningAndDisposing()
+        {
+            var fooCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -333,7 +331,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -348,13 +346,13 @@ namespace RoslynSandbox
         private static Foo Create(IDisposable disposable) => new Foo(disposable);
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+        }
 
-            [Test]
-            public void ReturningCreateNewStreamReader()
-            {
-                var testCode = @"
+        [Test]
+        public void ReturningCreateNewStreamReader()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -369,13 +367,13 @@ namespace RoslynSandbox
         private static StreamReader Create(Stream stream) => new StreamReader(stream);
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturningAssigningPrivateChained()
-            {
-                var fooCode = @"
+        [Test]
+        public void ReturningAssigningPrivateChained()
+        {
+            var fooCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -400,7 +398,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Meh
@@ -411,13 +409,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+        }
 
-            [Test]
-            public void StreamInStreamReader()
-            {
-                var testCode = @"
+        [Test]
+        public void StreamInStreamReader()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -430,13 +428,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void StreamInStreamReaderLocal()
-            {
-                var testCode = @"
+        [Test]
+        public void StreamInStreamReaderLocal()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -450,8 +448,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

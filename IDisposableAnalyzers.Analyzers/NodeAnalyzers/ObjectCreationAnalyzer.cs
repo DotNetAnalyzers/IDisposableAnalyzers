@@ -38,12 +38,10 @@ namespace IDisposableAnalyzers
                     context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
                 }
 
-                if (Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                if (Disposable.IsCreation(objectCreation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    Disposable.IsIgnored(objectCreation, context.SemanticModel, context.CancellationToken))
                 {
-                    if (Disposable.IsIgnored(objectCreation, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP004DontIgnoreReturnValueOfTypeIDisposable.Descriptor, context.Node.GetLocation()));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP004DontIgnoreReturnValueOfTypeIDisposable.Descriptor, context.Node.GetLocation()));
                 }
             }
         }

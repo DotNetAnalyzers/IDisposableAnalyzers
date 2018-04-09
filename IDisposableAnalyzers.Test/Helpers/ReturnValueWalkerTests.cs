@@ -170,6 +170,7 @@ namespace RoslynSandbox
         [TestCase("AssigningToParameter(1)", Search.Recursive, "1, 2, 3, 4")]
         [TestCase("AssigningToParameter(1)", Search.TopLevel, "1, 4")]
         [TestCase("CallingIdExpressionBody(1)", Search.Recursive, "1")]
+        [TestCase("CallingIdExpressionBody(1)", Search.RecursiveInside, "")]
         [TestCase("CallingIdExpressionBody(1)", Search.TopLevel, "IdExpressionBody(arg1)")]
         [TestCase("ReturnLocal()", Search.Recursive, "1")]
         [TestCase("ReturnLocal()", Search.TopLevel, "local")]

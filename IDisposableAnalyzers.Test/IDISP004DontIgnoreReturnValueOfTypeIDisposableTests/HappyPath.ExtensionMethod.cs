@@ -1,16 +1,14 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class ExtensionMethod
+        [Test]
+        public void Simple()
         {
-            [Test]
-            public void Simple()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,7 +23,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var extCode = @"
+            var extCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -36,7 +34,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var wrappingDisposableCode = @"
+            var wrappingDisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -58,13 +56,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+        }
 
-            [Test]
-            public void SimpleWithArg()
-            {
-                var testCode = @"
+        [Test]
+        public void SimpleWithArg()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -79,7 +77,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var extCode = @"
+            var extCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -90,7 +88,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var wrappingDisposableCode = @"
+            var wrappingDisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -112,13 +110,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+        }
 
-            [Test]
-            public void SimpleWhenArg()
-            {
-                var testCode = @"
+        [Test]
+        public void SimpleWhenArg()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -133,7 +131,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var extCode = @"
+            var extCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -144,7 +142,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var wrappingDisposableCode = @"
+            var wrappingDisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -166,13 +164,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+        }
 
-            [Test]
-            public void Chained()
-            {
-                var testCode = @"
+        [Test]
+        public void Chained()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -187,7 +185,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                var extCode = @"
+            var extCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -200,7 +198,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var wrappingDisposableCode = @"
+            var wrappingDisposableCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -222,8 +220,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
         }
     }
 }

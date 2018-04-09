@@ -2,11 +2,15 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    [TestFixture(typeof(IDISP004DontIgnoreReturnValueOfTypeIDisposable))]
+    [TestFixture(typeof(ObjectCreationAnalyzer))]
+    internal partial class HappyPath<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+        private static readonly DiagnosticAnalyzer Analyzer = new T();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

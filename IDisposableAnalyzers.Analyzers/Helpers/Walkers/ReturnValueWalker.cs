@@ -112,7 +112,7 @@ namespace IDisposableAnalyzers
 
             walker = Borrow(() => new ReturnValueWalker());
             this.recursiveWalkers.Add(location, walker);
-            walker.search = this.search;
+            walker.search = this.search == Search.RecursiveInside ? Search.Recursive : this.search;
             walker.semanticModel = this.semanticModel;
             walker.cancellationToken = this.cancellationToken;
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
@@ -144,7 +144,8 @@ namespace IDisposableAnalyzers
                     if (value is IdentifierNameSyntax identifierName &&
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
-                        if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                        if (this.search != Search.RecursiveInside &&
+                            invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
                         }
@@ -231,7 +232,8 @@ namespace IDisposableAnalyzers
                         symbol is IMethodSymbol method &&
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
-                        if (invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                        if (this.search != Search.RecursiveInside &&
+                            invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
                         }

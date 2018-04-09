@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Using
+        [Test]
+        public void FileOpenRead()
         {
-            [Test]
-            public void FileOpenRead()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -25,13 +23,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void NewStreamReader()
-            {
-                var testCode = @"
+        [Test]
+        public void NewStreamReader()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -46,13 +44,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SampleWithAwait()
-            {
-                var testCode = @"
+        [Test]
+        public void SampleWithAwait()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -76,8 +74,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

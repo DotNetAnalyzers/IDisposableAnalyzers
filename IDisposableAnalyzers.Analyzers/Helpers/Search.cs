@@ -1,8 +1,9 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     internal enum Search
     {
         TopLevel,
-        Recursive
+        Recursive,
+        RecursiveInside,
     }
 }

@@ -170,8 +170,8 @@ namespace RoslynSandbox
             [TestCase("Id<IDisposable>(null)", Result.No)]
             [TestCase("this.Id<IDisposable>(null)", Result.No)]
             [TestCase("this.Id<IDisposable>(this.disposable)", Result.No)]
-            [TestCase("this.Id<IDisposable>(new Disposable())", Result.Yes)]
-            [TestCase("this.Id<object>(new Disposable())", Result.Yes)]
+            [TestCase("this.Id<IDisposable>(new Disposable())", Result.No)]
+            [TestCase("this.Id<object>(new Disposable())", Result.No)]
             [TestCase("CreateDisposableStatementBody()", Result.Yes)]
             [TestCase("this.CreateDisposableStatementBody()", Result.Yes)]
             [TestCase("CreateDisposableExpressionBody()", Result.Yes)]
@@ -501,7 +501,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.AddAndReturn(File.OpenRead(string.Empty))");
-                Assert.AreEqual(Result.Yes, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
         }
     }
