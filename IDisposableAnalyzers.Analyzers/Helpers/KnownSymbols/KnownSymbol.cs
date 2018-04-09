@@ -59,6 +59,7 @@ namespace IDisposableAnalyzers
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
         internal static readonly XmlSerializerType XmlSerializer = new XmlSerializerType();
+        internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly RxDisposableType RxDisposable = new RxDisposableType();
@@ -77,9 +78,9 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType NUnitTearDownAttribute = new QualifiedType("NUnit.Framework.TearDownAttribute");
         internal static readonly QualifiedType NUnitOneTimeSetUpAttribute = new QualifiedType("NUnit.Framework.OneTimeSetUpAttribute");
         internal static readonly QualifiedType NUnitOneTimeTearDownAttribute = new QualifiedType("NUnit.Framework.OneTimeTearDownAttribute");
+        internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
 
         internal static readonly XunitAssertType XunitAssert = new XunitAssertType();
-        internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
 
         private static QualifiedType Create(string qualifiedName, string alias = null)
         {
