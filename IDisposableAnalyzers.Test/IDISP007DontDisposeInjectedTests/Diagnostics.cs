@@ -796,5 +796,74 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [TestCase("((IDisposable)o).Dispose()")]
+        [TestCase("((IDisposable)o)?.Dispose()")]
+        [TestCase("(o as IDisposable).Dispose().Dispose()")]
+        [TestCase("(o as IDisposable).Dispose()?.Dispose()")]
+        public void Cast(string cast)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public static void Bar(object o)
+        {
+            ↓((IDisposable)o).Dispose();
+        }
+    }
+}";
+            testCode = testCode.AssertReplace("((IDisposable)o).Dispose()", cast);
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void IfPatternMatchedInjected()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public static void Bar(object o)
+        {
+            if (o is IDisposable disposable)
+            {
+                ↓disposable.Dispose();
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
+        public void SwitchPatternMatchedInjected()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public static void Bar(object o)
+        {
+            switch (o)
+            {
+                case IDisposable disposable:
+                ↓disposable.Dispose();
+                break;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

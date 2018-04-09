@@ -153,6 +153,23 @@ namespace IDisposableAnalyzers
             }
         }
 
+        public override void VisitIsPatternExpression(IsPatternExpressionSyntax node)
+        {
+            this.HandleAssignedValue(node.Pattern, node.Expression);
+            base.VisitIsPatternExpression(node);
+        }
+
+        public override void VisitCasePatternSwitchLabel(CasePatternSwitchLabelSyntax node)
+        {
+            if (node.Parent is SwitchSectionSyntax switchSection &&
+                switchSection.Parent is SwitchStatementSyntax switchStatement)
+            {
+                this.HandleAssignedValue(node.Pattern, switchStatement.Expression);
+            }
+
+            base.VisitCasePatternSwitchLabel(node);
+        }
+
         internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return Borrow(property, null, semanticModel, cancellationToken);
@@ -478,6 +495,15 @@ namespace IDisposableAnalyzers
             if (assigned is VariableDeclaratorSyntax declarator &&
                 declarator.Identifier.ValueText != this.CurrentSymbol.Name)
             {
+                return;
+            }
+
+            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
+                assigned is DeclarationPatternSyntax declarationPattern &&
+                declarationPattern.Designation is SingleVariableDesignationSyntax singleVariableDesignation &&
+                singleVariableDesignation.Identifier.ValueText == this.CurrentSymbol.Name)
+            {
+                this.values.Add(value);
                 return;
             }
 
