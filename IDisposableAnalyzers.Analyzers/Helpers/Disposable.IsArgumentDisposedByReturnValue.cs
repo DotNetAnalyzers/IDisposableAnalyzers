@@ -127,6 +127,41 @@ namespace IDisposableAnalyzers
                         return Result.Yes;
                     }
 
+                    if (method.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                        method.TryGetMatchingParameter(argument, out var parameter))
+                    {
+                        using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+                        {
+                            using (var walker = InvocationWalker.Borrow(declaration))
+                            {
+                                foreach (var nested in walker)
+                                {
+                                    if (nested.ArgumentList != null &&
+                                        nested.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == parameter.Name, out var nestedArg))
+                                    {
+                                        switch (IsArgumentAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
+                                        {
+                                            case Result.Unknown:
+                                                break;
+                                            case Result.Yes:
+                                                return Result.Yes;
+                                            case Result.AssumeYes:
+                                                return Result.AssumeYes;
+                                            case Result.No:
+                                                break;
+                                            case Result.AssumeNo:
+                                                break;
+                                            default:
+                                                throw new ArgumentOutOfRangeException();
+                                        }
+
+
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     return Result.No;
                 }
             }

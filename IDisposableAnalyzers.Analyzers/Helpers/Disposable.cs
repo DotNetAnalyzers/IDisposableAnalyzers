@@ -138,7 +138,7 @@ namespace IDisposableAnalyzers
         {
             if (location.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
             {
-                using (var walker = InvocationExecutionWalker.Borrow(block))
+                using (var walker = InvocationWalker.Borrow(block))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
@@ -214,7 +214,7 @@ namespace IDisposableAnalyzers
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;
-                            using (var pooledInvocations = InvocationExecutionWalker.Borrow(body))
+                            using (var pooledInvocations = InvocationWalker.Borrow(body))
                             {
                                 foreach (var candidate in pooledInvocations.Invocations)
                                 {
@@ -247,7 +247,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAddedToFieldOrProperty(ISymbol symbol, BlockSyntax block, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var pooledInvocations = InvocationExecutionWalker.Borrow(block))
+            using (var pooledInvocations = InvocationWalker.Borrow(block))
             {
                 foreach (var invocation in pooledInvocations.Invocations)
                 {

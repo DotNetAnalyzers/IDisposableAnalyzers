@@ -44,7 +44,7 @@ namespace IDisposableAnalyzers
                     method.IsOverride &&
                     method.OverriddenMethod is IMethodSymbol overridden)
                 {
-                    using (var invocations = InvocationExecutionWalker.Borrow(context.Node))
+                    using (var invocations = InvocationWalker.Borrow(context.Node))
                     {
                         foreach (var invocation in invocations)
                         {
