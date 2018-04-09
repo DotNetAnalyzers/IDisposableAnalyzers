@@ -255,8 +255,7 @@ namespace IDisposableAnalyzers
                 {
                     using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
                     {
-                        return visited.Add(symbol) &&
-                               visited.Add(left) &&
+                        return visited.Add(left) &&
                                IsAssignedToFieldOrProperty(left, scope, semanticModel, cancellationToken, visited);
                     }
                 }
