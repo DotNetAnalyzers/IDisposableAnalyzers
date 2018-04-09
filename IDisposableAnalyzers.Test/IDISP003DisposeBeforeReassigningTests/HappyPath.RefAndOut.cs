@@ -239,5 +239,32 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void TryGetOutVar()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            if (TryGetStream(out var stream))
+            {
+            }
+        }
+
+        private static bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }
