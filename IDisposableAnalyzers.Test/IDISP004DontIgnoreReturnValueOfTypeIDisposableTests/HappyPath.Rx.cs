@@ -128,7 +128,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableAdd()
+        public void CompositeDisposableAddIObservableSubscribe()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -143,6 +143,33 @@ namespace RoslynSandbox
         public Foo(IObservable<object> observable)
         {
             this.disposable.Add(observable.Subscribe(_ => { }));
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void CompositeDisposableAddNewSingleAssignmentDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Reactive.Disposables;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
+
+        public Foo()
+        {
+            this.disposable.Add(new SingleAssignmentDisposable());
         }
 
         public void Dispose()

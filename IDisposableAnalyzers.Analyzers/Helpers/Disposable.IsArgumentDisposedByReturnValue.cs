@@ -118,7 +118,7 @@ namespace IDisposableAnalyzers
         private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)
         {
             var result = Result.No;
-            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.RecursiveInside, semanticModel, cancellationToken))
+            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
             {
 #pragma warning disable IDISP003 // Dispose previous before re-assigning.
                 using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
@@ -229,9 +229,9 @@ namespace IDisposableAnalyzers
             }
 
             if (method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
-                methodDeclaration.TryGetMatchingParameter(argument, out var paremeter))
+                methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
             {
-                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(paremeter, cancellationToken);
+                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
                 if (methodDeclaration.Body.TryGetAssignment(parameterSymbol, semanticModel, cancellationToken, out var assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
@@ -245,7 +245,7 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == paremeter.Identifier.ValueText, out var chainedArgument))
+                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
                 {
                     var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
