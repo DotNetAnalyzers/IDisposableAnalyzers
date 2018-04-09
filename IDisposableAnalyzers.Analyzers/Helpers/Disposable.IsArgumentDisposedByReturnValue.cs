@@ -154,8 +154,6 @@ namespace IDisposableAnalyzers
                                             default:
                                                 throw new ArgumentOutOfRangeException();
                                         }
-
-
                                     }
                                 }
                             }

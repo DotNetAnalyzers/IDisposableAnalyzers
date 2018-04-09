@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
     using System.Collections.Concurrent;
     using System.IO;
 
-    class FooCached
+    internal class FooCached
     {
         private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
         private readonly ConcurrentDictionary<int, Stream> cache = new ConcurrentDictionary<int, Stream>();
