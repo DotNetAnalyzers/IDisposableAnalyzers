@@ -25,7 +25,7 @@ namespace IDisposableAnalyzers
                 IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
-                using (var pooledSet = PooledSet<ISymbol>.Borrow())
+                using (var symbols = PooledSet<ISymbol>.Borrow())
                 {
                     using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
@@ -37,14 +37,14 @@ namespace IDisposableAnalyzers
                                 semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol symbol &&
                                 symbol.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
-                                pooledSet.Add(symbol).IgnoreReturnValue();
+                                symbols.Add(symbol).IgnoreReturnValue();
                             }
                         }
                     }
 
                     assignedSymbol = null;
                     var result = Result.No;
-                    foreach (var symbol in pooledSet)
+                    foreach (var symbol in symbols)
                     {
                         switch (IsAssignedWithCreated(symbol, disposable, semanticModel, cancellationToken))
                         {
