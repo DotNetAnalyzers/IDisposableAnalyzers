@@ -18,6 +18,7 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
             using (var set = PooledSet<int>.Borrow())
             {
                 set.Add(1);
+                // ReSharper disable once UnusedVariable
                 foreach (var i in set)
                 {
                 }
