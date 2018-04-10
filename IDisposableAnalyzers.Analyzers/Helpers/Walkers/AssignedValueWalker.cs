@@ -14,7 +14,6 @@ namespace IDisposableAnalyzers
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
         private readonly MemberWalkers memberWalkers = new MemberWalkers();
-        private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
@@ -58,11 +57,8 @@ namespace IDisposableAnalyzers
         {
             if (node.Initializer != null)
             {
-                if (this.visited.Add(node.Initializer))
-                {
-                    var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
-                    this.HandleInvoke(ctor, node.Initializer.ArgumentList);
-                }
+                var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
+                this.HandleInvoke(ctor, node.Initializer.ArgumentList);
             }
             else
             {
@@ -116,8 +112,7 @@ namespace IDisposableAnalyzers
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (this.visited.Add(node) &&
-                this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol method)
+            if (this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol method)
             {
                 base.VisitInvocationExpression(node);
                 if (this.context is ElementAccessExpressionSyntax &&
@@ -143,7 +138,6 @@ namespace IDisposableAnalyzers
         public override void VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
-                this.visited.Add(node) &&
                 this.context is ElementAccessExpressionSyntax &&
                 SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
             {
@@ -359,7 +353,6 @@ namespace IDisposableAnalyzers
         {
             this.values.Clear();
             this.outValues.Clear();
-            this.visited.Clear();
             this.refParameters.Clear();
             this.outParameters.Clear();
             this.CurrentSymbol = null;
@@ -429,15 +422,12 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
-                            if (this.visited.Add(creation))
+                            if (contextCtor == null ||
+                                creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
                             {
-                                if (contextCtor == null ||
-                                    creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
-                                {
-                                    this.VisitObjectCreationExpression(creation);
-                                    var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                    this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
-                                }
+                                this.VisitObjectCreationExpression(creation);
+                                var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
+                                this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
                             }
                         }
 
