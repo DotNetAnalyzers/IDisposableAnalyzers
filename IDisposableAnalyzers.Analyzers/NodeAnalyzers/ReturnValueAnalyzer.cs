@@ -175,7 +175,7 @@ namespace IDisposableAnalyzers
                         {
                             if (returnValue is InvocationExpressionSyntax nestedInvocation &&
                                 visited.Add(returnValue) &&
-                                IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken))
+                                IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken, visited))
                             {
                                 return true;
                             }
