@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers.Test
                                .ToArray();
 
         private static readonly Solution Solution = CodeFactory.CreateSolution(
-            new FileInfo("C:\\Git\\Gu.Reactive\\Gu.Reactive\\Gu.Reactive.csproj"),
+            new FileInfo("C:\\Git\\Gu.Reactive\\Gu.Reactive.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
