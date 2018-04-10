@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
                                 semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol symbol &&
                                 symbol.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
-                                symbols.Add(symbol).IgnoreReturnValue();
+                                symbols.Add(symbol);
                             }
                         }
                     }

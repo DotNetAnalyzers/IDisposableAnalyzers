@@ -169,9 +169,7 @@ namespace IDisposableAnalyzers
 
                 using (var walker = ReturnValueWalker.Borrow(methodDeclaration, Search.TopLevel, semanticModel, cancellationToken))
                 {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
                     using (visited = PooledSet.BorrowOrIncrementUsage(visited))
-#pragma warning restore IDISP003 // Dispose previous before re-assigning.
                     {
                         foreach (var returnValue in walker)
                         {
