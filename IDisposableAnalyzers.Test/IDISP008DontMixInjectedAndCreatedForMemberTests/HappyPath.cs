@@ -487,5 +487,43 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
         }
+
+        [Test]
+        public void PublicMethodRefIntParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public bool TryGetStream(ref int number)
+        {
+            number = 1;
+            return true;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void PublicMethodRefStringParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public bool TryGetStream(ref string text)
+        {
+            text = new string('a', 1);
+            return true;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
