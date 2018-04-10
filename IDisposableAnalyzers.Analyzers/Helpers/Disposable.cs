@@ -266,18 +266,29 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<ISymbol> visited = null)
         {
             using (var pooledInvocations = InvocationWalker.Borrow(scope))
             {
                 foreach (var invocation in pooledInvocations.Invocations)
                 {
                     if (TryGetArgument(invocation, out var argument) &&
-                        TryGetMethod(invocation, out _))
+                        semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate)
                     {
-                        if (symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
+                        if (IsAddMethod(candidate) &&
+                            symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
                         {
                             return true;
+                        }
+
+                        if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                            candidate.TryGetMatchingParameter(argument, out var parameter))
+                        {
+                            using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
+                            {
+                                return visited.Add(parameter) &&
+                                       IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited);
+                            }
                         }
                     }
                 }
@@ -300,6 +311,14 @@ namespace IDisposableAnalyzers
                                 argument = candidate;
                                 return true;
                             }
+
+                            if (candidate.Expression is DeclarationExpressionSyntax declaration &&
+                                declaration.Designation is SingleVariableDesignationSyntax singleVariable &&
+                                singleVariable.Identifier.ValueText == symbol.Name)
+                            {
+                                argument = candidate;
+                                return true;
+                            }
                         }
                         else if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(candidate.Expression, cancellationToken)))
                         {
@@ -312,29 +331,20 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            bool TryGetMethod(InvocationExpressionSyntax invocation, out IMethodSymbol method)
+            bool IsAddMethod(IMethodSymbol candidate)
             {
-                if (invocation.TryGetInvokedMethodName(out var name))
+                switch (candidate.Name)
                 {
-                    switch (name)
-                    {
-                        case "Add":
-                        case "Insert":
-                        case "Push":
-                        case "Enqueue":
-                            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate &&
-                                candidate.DeclaringSyntaxReferences.Length == 0 &&
-                                candidate.ContainingType.Is(KnownSymbol.IEnumerable))
-                            {
-                                method = candidate;
-                                return true;
-                            }
-
-                            break;
-                    }
+                    case "Add":
+                    case "Insert":
+                    case "Push":
+                    case "Enqueue":
+                    case "TryAdd":
+                    case "TryUpdate":
+                        return candidate.DeclaringSyntaxReferences.Length == 0 &&
+                               candidate.ContainingType.Is(KnownSymbol.IEnumerable);
                 }
 
-                method = null;
                 return false;
             }
         }

@@ -153,6 +153,70 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
+
+            [TestCase("TryAdd(1, disposable)")]
+            [TestCase("TryUpdate(1, disposable, disposable)")]
+            public void WhenConcurrentDictionary(string code)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Concurrent;
+
+    internal class Foo
+    {
+        private ConcurrentDictionary<int, IDisposable> disposables = new ConcurrentDictionary<int, IDisposable>();
+
+        internal Foo(IDisposable disposable)
+        {
+            this.disposables.TryAdd(1, disposable);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("TryAdd(1, disposable)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void WhenAddListOfTInitialize()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class Foo
+    {
+        private List<IDisposable> disposables = new List<IDisposable>();
+
+        internal Foo(IDisposable disposable)
+        {
+            this.Initialize(disposable);
+        }
+
+        private void Initialize(IDisposable disposable)
+        {
+            this.disposables.Add(disposable);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+            }
+
         }
     }
 }
