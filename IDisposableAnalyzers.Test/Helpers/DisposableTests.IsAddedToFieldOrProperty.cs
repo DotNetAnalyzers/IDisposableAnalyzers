@@ -216,7 +216,6 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
-
         }
     }
 }

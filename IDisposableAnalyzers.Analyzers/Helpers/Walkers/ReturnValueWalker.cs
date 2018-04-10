@@ -52,34 +52,6 @@ namespace IDisposableAnalyzers
             this.AddReturnValue(node.Expression);
         }
 
-        internal static bool TrySingle(BlockSyntax body, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax returnValue)
-        {
-            if (body == null ||
-                body.Statements.Count == 0)
-            {
-                returnValue = null;
-                return false;
-            }
-
-            if (body.Statements.Count == 1)
-            {
-                returnValue = (body.Statements[0] as ReturnStatementSyntax)?.Expression;
-                return returnValue != null;
-            }
-
-            using (var walker = Borrow(body, Search.TopLevel, semanticModel, cancellationToken))
-            {
-                if (walker.returnValues.Count != 1)
-                {
-                    returnValue = null;
-                    return false;
-                }
-
-                returnValue = walker.returnValues[0];
-                return returnValue != null;
-            }
-        }
-
         internal static ReturnValueWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = Borrow(() => new ReturnValueWalker());
