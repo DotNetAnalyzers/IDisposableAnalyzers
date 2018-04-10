@@ -247,7 +247,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<ISymbol> visited = null)
         {
-            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
+            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.Recursive, semanticModel, cancellationToken, out var assignment))
             {
                 var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
                            semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
@@ -272,21 +272,71 @@ namespace IDisposableAnalyzers
             {
                 foreach (var invocation in pooledInvocations.Invocations)
                 {
-                    if (invocation.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == symbol.Name, out var argument))
+                    if (TryGetArgument(invocation, out var argument) &&
+                        TryGetMethod(invocation, out _))
                     {
-                        if (invocation.TryGetInvokedMethodName(out var name))
+                        if (symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
                         {
-                            if (name == "Add" &&
-                                symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }
             }
 
             return false;
+
+            bool TryGetArgument(InvocationExpressionSyntax invocation, out ArgumentSyntax argument)
+            {
+                argument = null;
+                if (invocation.ArgumentList is ArgumentListSyntax argumentList)
+                {
+                    foreach (var candidate in argumentList.Arguments)
+                    {
+                        if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                        {
+                            if (candidate.Expression is IdentifierNameSyntax identifierName &&
+                                identifierName.Identifier.ValueText == symbol.Name)
+                            {
+                                argument = candidate;
+                                return true;
+                            }
+                        }
+                        else if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(candidate.Expression, cancellationToken)))
+                        {
+                            argument = candidate;
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            bool TryGetMethod(InvocationExpressionSyntax invocation, out IMethodSymbol method)
+            {
+                if (invocation.TryGetInvokedMethodName(out var name))
+                {
+                    switch (name)
+                    {
+                        case "Add":
+                        case "Insert":
+                        case "Push":
+                        case "Enqueue":
+                            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate &&
+                                candidate.DeclaringSyntaxReferences.Length == 0 &&
+                                candidate.ContainingType.Is(KnownSymbol.IEnumerable))
+                            {
+                                method = candidate;
+                                return true;
+                            }
+
+                            break;
+                    }
+                }
+
+                method = null;
+                return false;
+            }
         }
 
         internal static bool ShouldDispose(ILocalSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)

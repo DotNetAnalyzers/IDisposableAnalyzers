@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     internal partial class DisposableTests
     {
-        internal class IsAssignedToFieldOrProperty
+        internal class IsAddedToFieldOrProperty
         {
             [Test]
             public void WhenNotUsed()
@@ -30,22 +30,55 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(false, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void AssigningLocal()
+            [TestCase("Add(disposable)")]
+            [TestCase("Insert(1, disposable)")]
+            public void WhenListOfT(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections.Generic;
 
     internal class Foo
     {
+        private List<IDisposable> disposables = new List<IDisposable>();
+
         internal Foo(IDisposable disposable)
         {
-            var temp = disposable;
+            this.disposables.Add(disposable);
+        }
+    }
+}";
+                testCode = testCode.AssertReplace("Add(disposable)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void WhenStackOfT()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class Foo
+    {
+        private Stack<IDisposable> disposables = new Stack<IDisposable>();
+
+        internal Foo(IDisposable disposable)
+        {
+            this.disposables.Push(disposable);
         }
     }
 }";
@@ -55,148 +88,70 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(false, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void FieldAssignedInCtor()
+            [TestCase("private Queue<IDisposable> disposables = new Queue<IDisposable>()")]
+            [TestCase("private ConcurrentQueue<IDisposable> disposables = new ConcurrentQueue<IDisposable>()")]
+            public void WhenQueueOfT(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections.Generic;
+    using System.Collections.Concurrent;
 
     internal class Foo
     {
-        private IDisposable disposable;
+        private Queue<IDisposable> disposables = new Queue<IDisposable>();
 
         internal Foo(IDisposable disposable)
         {
-            this.disposable = disposable;
+            this.disposables.Enqueue(disposable);
         }
     }
 }";
+                testCode = testCode.AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void ArrayFieldAssignedInCtor()
+            [TestCase("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
+            [TestCase("private IDictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
+            [TestCase("private IDictionary disposables = new Dictionary<int, IDisposable>()")]
+            public void WhenDictionaryAdd(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
 
     internal class Foo
     {
-        private IDisposable[] disposables = new IDisposable[1];
+        private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>();
 
         internal Foo(IDisposable disposable)
         {
-            this.disposables[0] = disposable;
+            this.disposables.Add(1, disposable);
         }
     }
 }";
+                testCode = testCode.AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
-            }
-
-            [Test]
-            public void FieldAssignedInCtorCallingInitialize()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    internal class Foo
-    {
-        private IDisposable disposable;
-
-        internal Foo(IDisposable disposable)
-        {
-            this.Initialize(disposable);
-        }
-
-        private void Initialize(IDisposable arg)
-        {
-            this.disposable = arg;
-        }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
-            }
-
-            [Test]
-            public void FieldAssignedInCtorViaLocal()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    internal class Foo
-    {
-        private IDisposable disposable;
-
-        internal Foo(IDisposable disposable)
-        {
-            var temp = disposable;
-            this.disposable = temp;
-        }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
-            }
-
-            [Test]
-            public void PropertyAssignedInCtor()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    internal class Foo
-    {
-        internal Foo(IDisposable disposable)
-        {
-            this.Disposable = disposable;
-        }
-
-        public IDisposable Disposable { get; }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsAddedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
             }
         }
     }

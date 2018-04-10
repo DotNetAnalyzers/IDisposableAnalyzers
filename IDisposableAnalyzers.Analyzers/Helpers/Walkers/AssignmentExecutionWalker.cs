@@ -148,7 +148,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                if (search == Search.Recursive)
+                if (search != Search.TopLevel)
                 {
                     foreach (var argument in walker.arguments)
                     {
