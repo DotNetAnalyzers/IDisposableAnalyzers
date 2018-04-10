@@ -32,7 +32,6 @@ namespace IDisposableAnalyzers.Test
         public void NotEmpty()
         {
             CollectionAssert.IsNotEmpty(AllAnalyzers);
-            Assert.Pass($"Count: {AllAnalyzers.Length}");
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]

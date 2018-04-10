@@ -7,6 +7,8 @@ namespace IDisposableAnalyzers
     using System.Diagnostics;
     using System.Threading;
 
+    [DebuggerTypeProxy(typeof(PooledSetDebugView<>))]
+    [DebuggerDisplay("Count = {this.Count}, refCount = {this.refCount}")]
     internal sealed class PooledSet<T> : IDisposable, IReadOnlyCollection<T>
     {
         private static readonly ConcurrentQueue<PooledSet<T>> Cache = new ConcurrentQueue<PooledSet<T>>();
@@ -32,11 +34,15 @@ namespace IDisposableAnalyzers
 
         void IDisposable.Dispose()
         {
-            Debug.Assert(this.refCount >= 0, $"{nameof(IDisposable.Dispose)} set.refCount == {this.refCount}");
-            if (Interlocked.Decrement(ref this.refCount) == 0)
+            var current = Interlocked.Decrement(ref this.refCount);
+            if (current == 0)
             {
                 this.inner.Clear();
                 Cache.Enqueue(this);
+            }
+            else if (current < 0)
+            {
+                Debug.Assert(current >= 0, $"{nameof(IDisposable.Dispose)} set.refCount == {current}");
             }
         }
 
@@ -59,8 +65,8 @@ namespace IDisposableAnalyzers
                 return Borrow();
             }
 
-            Interlocked.Increment(ref set.refCount).IgnoreReturnValue();
-            Debug.Assert(set.refCount >= 1, $"{nameof(BorrowOrIncrementUsage)} set.refCount == {set.refCount}");
+            var current = Interlocked.Increment(ref set.refCount);
+            Debug.Assert(current >= 1, $"{nameof(BorrowOrIncrementUsage)} set.refCount == {current}");
             return set;
         }
 
