@@ -5,15 +5,16 @@ namespace IDisposableAnalyzers
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Threading;
 
-    internal sealed class PooledHashSet<T> : IDisposable, IReadOnlyCollection<T>
+    internal sealed class PooledSet<T> : IDisposable, IReadOnlyCollection<T>
     {
-        private static readonly ConcurrentQueue<PooledHashSet<T>> Cache = new ConcurrentQueue<PooledHashSet<T>>();
+        private static readonly ConcurrentQueue<PooledSet<T>> Cache = new ConcurrentQueue<PooledSet<T>>();
         private readonly HashSet<T> inner = new HashSet<T>();
 
         private int refCount;
 
-        private PooledHashSet()
+        private PooledSet()
         {
         }
 
@@ -31,34 +32,35 @@ namespace IDisposableAnalyzers
 
         public void Dispose()
         {
-            this.refCount--;
-            Debug.Assert(this.refCount >= 0, "refCount>= 0");
-            if (this.refCount == 0)
+            Debug.Assert(this.refCount >= 0, $"{nameof(this.Dispose)} set.refCount == {this.refCount}");
+            if (Interlocked.Decrement(ref this.refCount) == 0)
             {
                 this.inner.Clear();
                 Cache.Enqueue(this);
             }
         }
 
-        internal static PooledHashSet<T> Borrow()
+        internal static PooledSet<T> Borrow()
         {
-            if (!Cache.TryDequeue(out var set))
+            if (Cache.TryDequeue(out var set))
             {
-                set = new PooledHashSet<T>();
+                Debug.Assert(set.refCount == 0, $"{nameof(Borrow)} set.refCount == {set.refCount}");
+                set.refCount = 1;
+                return set;
             }
 
-            set.refCount = 1;
-            return set;
+            return new PooledSet<T> { refCount = 1 };
         }
 
-        internal static PooledHashSet<T> BorrowOrIncrementUsage(PooledHashSet<T> set)
+        internal static PooledSet<T> BorrowOrIncrementUsage(PooledSet<T> set)
         {
             if (set == null)
             {
                 return Borrow();
             }
 
-            set.refCount++;
+            Interlocked.Increment(ref set.refCount).IgnoreReturnValue();
+            Debug.Assert(set.refCount >= 1, $"{nameof(BorrowOrIncrementUsage)} set.refCount == {set.refCount}");
             return set;
         }
 
@@ -67,6 +69,7 @@ namespace IDisposableAnalyzers
         {
             if (this.refCount <= 0)
             {
+                Debug.Assert(this.refCount == 0, $"{nameof(this.ThrowIfDisposed)} set.refCount == {this.refCount}");
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
         }

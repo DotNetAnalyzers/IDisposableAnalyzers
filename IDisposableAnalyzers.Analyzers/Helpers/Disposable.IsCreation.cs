@@ -25,7 +25,7 @@ namespace IDisposableAnalyzers
                 IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
-                using (var pooledSet = PooledHashSet<ISymbol>.Borrow())
+                using (var pooledSet = PooledSet<ISymbol>.Borrow())
                 {
                     using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
@@ -165,8 +165,9 @@ namespace IDisposableAnalyzers
             }
 
             Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
-            var invocation = candidate.FirstAncestor<InvocationExpressionSyntax>();
-            if (invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out var parameter) &&
+            if (candidate.Parent is ArgumentListSyntax argumentList &&
+                argumentList.Parent is InvocationExpressionSyntax invocation &&
+                invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out var parameter) &&
                 IsPotentiallyAssignableTo(parameter.Type))
             {
                 return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);

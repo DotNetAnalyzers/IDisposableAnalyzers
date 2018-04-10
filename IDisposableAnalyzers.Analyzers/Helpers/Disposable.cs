@@ -245,7 +245,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<ISymbol> visited = null)
+        internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
         {
             if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.Recursive, semanticModel, cancellationToken, out var assignment))
             {
@@ -253,7 +253,7 @@ namespace IDisposableAnalyzers
                            semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
                 if (left.IsEither<IParameterSymbol, ILocalSymbol>())
                 {
-                    using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
+                    using (visited = PooledSet.BorrowOrIncrementUsage(visited))
                     {
                         return visited.Add(left) &&
                                IsAssignedToFieldOrProperty(left, scope, semanticModel, cancellationToken, visited);
@@ -266,7 +266,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<ISymbol> visited = null)
+        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
         {
             using (var pooledInvocations = InvocationWalker.Borrow(scope))
             {
@@ -284,7 +284,7 @@ namespace IDisposableAnalyzers
                         if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
                             candidate.TryGetMatchingParameter(argument, out var parameter))
                         {
-                            using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
+                            using (visited = PooledSet.BorrowOrIncrementUsage(visited))
                             {
                                 if (visited.Add(parameter) &&
                                     IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited))

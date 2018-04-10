@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
             if (symbol is IMethodSymbol method)
@@ -41,7 +41,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        internal static Result IsArgumentDisposedByReturnValue(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        internal static Result IsArgumentDisposedByReturnValue(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
@@ -110,7 +110,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        internal static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited = null)
+        internal static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
                     if (method.TrySingleDeclaration(cancellationToken, out var declaration) &&
                         method.TryGetMatchingParameter(argument, out var parameter))
                     {
-                        using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+                        using (visited = PooledSet.BorrowOrIncrementUsage(visited))
                         {
                             using (var walker = InvocationWalker.Borrow(declaration))
                             {
@@ -167,13 +167,13 @@ namespace IDisposableAnalyzers
             return Result.No;
         }
 
-        private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledHashSet<SyntaxNode> visited)
+        private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
             {
 #pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                using (visited = PooledHashSet<SyntaxNode>.BorrowOrIncrementUsage(visited))
+                using (visited = PooledSet.BorrowOrIncrementUsage(visited))
 #pragma warning restore IDISP003 // Dispose previous before re-assigning.
                 {
                     if (!visited.Add(memberAccess))
