@@ -28,11 +28,11 @@ namespace IDisposableAnalyzers
 
         public IEnumerator<T> GetEnumerator() => this.inner.GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.inner).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
-        public void Dispose()
+        void IDisposable.Dispose()
         {
-            Debug.Assert(this.refCount >= 0, $"{nameof(this.Dispose)} set.refCount == {this.refCount}");
+            Debug.Assert(this.refCount >= 0, $"{nameof(IDisposable.Dispose)} set.refCount == {this.refCount}");
             if (Interlocked.Decrement(ref this.refCount) == 0)
             {
                 this.inner.Clear();

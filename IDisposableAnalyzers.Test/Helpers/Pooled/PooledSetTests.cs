@@ -13,6 +13,30 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         }
 
         [Test]
+        public void UsingBorrowBorrowOrIncrementUsage()
+        {
+            using (var set = PooledSet<int>.Borrow())
+            {
+                // ReSharper disable once UnusedVariable
+                using (var meh = PooledSet.BorrowOrIncrementUsage(set))
+                {
+                }
+            }
+        }
+
+        [Test]
+        public void UsingBorrowOrIncrementUsageNull()
+        {
+            using (var set = PooledSet<int>.BorrowOrIncrementUsage(null))
+            {
+                // ReSharper disable once UnusedVariable
+                using (var meh = PooledSet.BorrowOrIncrementUsage(set))
+                {
+                }
+            }
+        }
+
+        [Test]
         public void UsingBorrowAddForeach()
         {
             using (var set = PooledSet<int>.Borrow())
@@ -33,6 +57,7 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
                 set.Add(1);
                 foreach (var i in set)
                 {
+                    // ReSharper disable once UnusedVariable
                     var j = Id(i);
                 }
             }
