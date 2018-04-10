@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -46,7 +46,6 @@ namespace RoslynSandbox
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
 
-        [Explicit("C#7")]
         [Test]
         public void ReturnFileOpenReadGetExpressionBody()
         {
