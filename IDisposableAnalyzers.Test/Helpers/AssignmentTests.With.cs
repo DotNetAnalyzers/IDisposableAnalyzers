@@ -40,6 +40,33 @@ namespace RoslynSandbox
 
             [TestCase(Search.Recursive)]
             [TestCase(Search.TopLevel)]
+            public void FieldCtorArgViaLocal(Search search)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    internal class Foo
+    {
+        private readonly int value;
+
+        internal Foo(int arg)
+        {
+            var temp = arg;
+            this.value = temp;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
+                var arg = semanticModel.GetDeclaredSymbol(syntaxTree.FindParameter("int arg"), CancellationToken.None);
+                Assert.AreEqual(true, AssignmentExecutionWalker.FirstWith(arg, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
+                Assert.AreEqual("this.value = temp", result?.ToString());
+            }
+
+            [TestCase(Search.Recursive)]
+            [TestCase(Search.TopLevel)]
             public void FieldCtorArgInNested(Search search)
             {
                 var testCode = @"
