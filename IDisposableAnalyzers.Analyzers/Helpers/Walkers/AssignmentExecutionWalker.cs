@@ -137,7 +137,7 @@ namespace IDisposableAnalyzers
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
                         semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
                     {
-                        using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                        using (visited = visited.IncrementUsage())
                         {
                             if (visited.Add(local) &&
                                 FirstWith(local, scope, search, semanticModel, cancellationToken, out assignment, visited))
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
                             method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
                             method.TryGetMatchingParameter(argument, out var parameter))
                         {
-                            using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                            using (visited = visited.IncrementUsage())
                             {
                                 if (visited.Add(parameter) &&
                                     FirstWith(parameter, methodDeclaration, search, semanticModel, cancellationToken, out assignment, visited))

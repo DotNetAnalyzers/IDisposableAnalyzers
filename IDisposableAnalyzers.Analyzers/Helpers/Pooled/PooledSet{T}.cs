@@ -46,6 +46,9 @@ namespace IDisposableAnalyzers
             }
         }
 
+        /// <summary>
+        /// The result from this call is meant to be used in a using.
+        /// </summary>
         internal static PooledSet<T> Borrow()
         {
             if (Cache.TryDequeue(out var set))
@@ -58,6 +61,9 @@ namespace IDisposableAnalyzers
             return new PooledSet<T> { refCount = 1 };
         }
 
+        /// <summary>
+        /// The result from this call is meant to be used in a using.
+        /// </summary>
         internal static PooledSet<T> BorrowOrIncrementUsage(PooledSet<T> set)
         {
             if (set == null)

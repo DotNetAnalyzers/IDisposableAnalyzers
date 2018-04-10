@@ -169,7 +169,7 @@ namespace IDisposableAnalyzers
 
                 using (var walker = ReturnValueWalker.Borrow(methodDeclaration, Search.TopLevel, semanticModel, cancellationToken))
                 {
-                    using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                    using (visited = visited.IncrementUsage())
                     {
                         foreach (var returnValue in walker)
                         {

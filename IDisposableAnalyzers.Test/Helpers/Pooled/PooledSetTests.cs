@@ -18,9 +18,9 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         {
             using (var set = PooledSet<int>.Borrow())
             {
-                using (var meh = PooledSet.BorrowOrIncrementUsage(set))
+                using (var meh = PooledSet.IncrementUsage(set))
                 {
-                    using (var meh1 = PooledSet.BorrowOrIncrementUsage(meh))
+                    using (var meh1 = PooledSet.IncrementUsage(meh))
                     {
                     }
                 }
@@ -32,9 +32,9 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         {
             using (var set = PooledSet<int>.BorrowOrIncrementUsage(null))
             {
-                using (var meh = PooledSet.BorrowOrIncrementUsage(set))
+                using (var meh = PooledSet.IncrementUsage(set))
                 {
-                    using (var meh1 = PooledSet.BorrowOrIncrementUsage(meh))
+                    using (var meh1 = PooledSet.IncrementUsage(meh))
                     {
                     }
                 }

@@ -253,7 +253,7 @@ namespace IDisposableAnalyzers
                            semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
                 if (left.IsEither<IParameterSymbol, ILocalSymbol>())
                 {
-                    using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                    using (visited = visited.IncrementUsage())
                     {
                         return visited.Add(left) &&
                                IsAssignedToFieldOrProperty(left, scope, semanticModel, cancellationToken, visited);
@@ -284,7 +284,7 @@ namespace IDisposableAnalyzers
                         if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
                             candidate.TryGetMatchingParameter(argument, out var parameter))
                         {
-                            using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                            using (visited = visited.IncrementUsage())
                             {
                                 if (visited.Add(parameter) &&
                                     IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited))

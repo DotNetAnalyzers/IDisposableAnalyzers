@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
                     if (method.TrySingleDeclaration(cancellationToken, out var declaration) &&
                         method.TryGetMatchingParameter(argument, out var parameter))
                     {
-                        using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                        using (visited = visited.IncrementUsage())
                         {
                             using (var walker = InvocationWalker.Borrow(declaration))
                             {
@@ -172,7 +172,7 @@ namespace IDisposableAnalyzers
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
             {
-                using (visited = PooledSet.BorrowOrIncrementUsage(visited))
+                using (visited = visited.IncrementUsage())
                 {
                     if (!visited.Add(memberAccess))
                     {
