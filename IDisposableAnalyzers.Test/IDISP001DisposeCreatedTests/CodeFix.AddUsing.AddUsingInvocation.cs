@@ -1,15 +1,17 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
-        internal class AddUsing
+        internal class AddUsingInvocation
         {
-            private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+            private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
-            private static readonly AddUsingCodeFixProvider Fix = new AddUsingCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
 
             private static readonly string DisposableCode = @"
 namespace RoslynSandbox
@@ -145,114 +147,6 @@ namespace RoslynSandbox
                     var c = 2;
                 }
             }
-        }
-    }
-}";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            }
-
-            [Test]
-            public void OutParameter()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            Stream stream;
-            if (TryGetStream(↓out stream))
-            {
-            }
-        }
-
-        private static bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-                var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            Stream stream;
-            if (TryGetStream(out stream))
-            {
-                using (stream)
-                {
-                }
-            }
-        }
-
-        private static bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            }
-
-            [Test]
-            public void VarOutParameter()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            if (TryGetStream(↓out var stream))
-            {
-            }
-        }
-
-        private static bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-                var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            if (TryGetStream(out var stream))
-            {
-                using (stream)
-                {
-                }
-            }
-        }
-
-        private static bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
         }
     }
 }";

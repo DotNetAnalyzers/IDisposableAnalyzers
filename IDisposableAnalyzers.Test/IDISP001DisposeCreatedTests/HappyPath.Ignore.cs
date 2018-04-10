@@ -1,20 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Ignore
+        [TestCase("disposables.First();")]
+        [TestCase("disposables.First(x => x != null);")]
+        [TestCase("disposables.Where(x => x != null);")]
+        [TestCase("disposables.Single();")]
+        [TestCase("Enumerable.Empty<IDisposable>();")]
+        public void Linq(string linq)
         {
-            [TestCase("disposables.First();")]
-            [TestCase("disposables.First(x => x != null);")]
-            [TestCase("disposables.Where(x => x != null);")]
-            [TestCase("disposables.Single();")]
-            [TestCase("Enumerable.Empty<IDisposable>();")]
-            public void Linq(string linq)
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -28,14 +26,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                testCode = testCode.AssertReplace("disposables.First();", linq);
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            testCode = testCode.AssertReplace("disposables.First();", linq);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MockOf()
-            {
-                var testCode = @"
+        [Test]
+        public void MockOf()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -51,13 +49,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void Ninject()
-            {
-                var testCode = @"
+        [Test]
+        public void Ninject()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -71,8 +69,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

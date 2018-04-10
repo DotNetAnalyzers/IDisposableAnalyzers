@@ -281,33 +281,5 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
-
-        [Test]
-        public void OutParameter()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class Foo
-    {
-        public Foo()
-        {
-            Stream stream;
-            if (TryGetStream(↓out stream))
-            {
-            }
-        }
-
-        private static bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
-        }
     }
 }

@@ -12,7 +12,6 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
     public class Foo
@@ -20,7 +19,13 @@ namespace RoslynSandbox
         public bool Update()
         {
             Stream stream;
-            return TryGetStream(out stream);
+            if (this.TryGetStream(out stream))
+            {
+                stream.Dispose();
+                return true;
+            }
+
+            return false;
         }
 
         public bool TryGetStream(out Stream result)
@@ -49,6 +54,7 @@ namespace RoslynSandbox
             TryGetStream(out stream);
             stream?.Dispose();
             TryGetStream(out stream);
+            stream.Dispose();
         }
 
         public bool TryGetStream(out Stream result)
@@ -145,7 +151,6 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
     public class Foo
@@ -153,7 +158,8 @@ namespace RoslynSandbox
         public void Bar()
         {
             Stream stream = null;
-            Assign(ref stream);
+            this.Assign(ref stream);
+            stream.Dispose();
         }
 
         private void Assign(ref Stream result)
@@ -182,6 +188,7 @@ namespace RoslynSandbox
             Assign(ref stream);
             stream?.Dispose();
             Assign(ref stream);
+            stream.Dispose();
         }
 
         private void Assign(ref Stream result)
@@ -254,6 +261,7 @@ namespace RoslynSandbox
         {
             if (TryGetStream(out var stream))
             {
+                stream.Dispose();
             }
         }
 

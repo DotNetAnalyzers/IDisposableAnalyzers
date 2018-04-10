@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        public class Recursion
+        [Test]
+        public void IgnoresRecursiveCalculatedProperty()
         {
-            [Test]
-            public void IgnoresRecursiveCalculatedProperty()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -33,13 +31,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void IgnoresRecursiveGetSetProperty()
-            {
-                var testCode = @"
+        [Test]
+        public void IgnoresRecursiveGetSetProperty()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -65,13 +63,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void MethodStatementBody()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodStatementBody()
+        {
+            var testCode = @"
     using System;
 
     public static class Foo
@@ -94,13 +92,13 @@ namespace RoslynSandbox
             return Forever();
         }
     }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void MethodExpressionBody()
-            {
-                var testCode = @"
+        [Test]
+        public void MethodExpressionBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -124,13 +122,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void WithOptionalParameter()
-            {
-                var testCode = @"
+        [Test]
+        public void WithOptionalParameter()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -155,8 +153,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

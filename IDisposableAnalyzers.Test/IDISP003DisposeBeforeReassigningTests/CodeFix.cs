@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
@@ -31,7 +32,7 @@ namespace RoslynSandbox
     }
 }";
 
-        private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
         private static readonly DisposeBeforeAssignCodeFixProvider Fix = new DisposeBeforeAssignCodeFixProvider();
 
@@ -914,6 +915,63 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+        }
+
+        [Test]
+        public void AssigningVariableViaOutParameterBefore()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                ↓stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
         }
     }
 }

@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Rx
+        [Test]
+        public void CompositeDisposableInitializer()
         {
-            [Test]
-            public void CompositeDisposableInitializer()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -33,13 +31,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CompositeDisposableAdd()
-            {
-                var testCode = @"
+        [Test]
+        public void CompositeDisposableAdd()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -62,13 +60,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SerialDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void SerialDisposable()
+        {
+            var testCode = @"
 using System;
 using System.IO;
 using System.Reactive.Disposables;
@@ -88,13 +86,13 @@ public sealed class Foo : IDisposable
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SerialDisposableObjectInitializer()
-            {
-                var testCode = @"
+        [Test]
+        public void SerialDisposableObjectInitializer()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -117,13 +115,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SingleAssignmentDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void SingleAssignmentDisposable()
+        {
+            var testCode = @"
 using System;
 using System.IO;
 using System.Reactive.Disposables;
@@ -143,13 +141,13 @@ public sealed class Foo : IDisposable
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposableCreateClosure()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposableCreateClosure()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -171,13 +169,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DisposableCreateClosureStatementBody()
-            {
-                var testCode = @"
+        [Test]
+        public void DisposableCreateClosureStatementBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -202,13 +200,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ReturnsCompositeDisposableInitializer()
-            {
-                var testCode = @"
+        [Test]
+        public void ReturnsCompositeDisposableInitializer()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -224,8 +222,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

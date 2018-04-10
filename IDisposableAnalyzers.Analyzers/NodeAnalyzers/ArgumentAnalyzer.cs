@@ -11,6 +11,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP001DisposeCreated.Descriptor,
             IDISP003DisposeBeforeReassigning.Descriptor);
 
         /// <inheritdoc/>
@@ -33,18 +34,54 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                method.TrySingleDeclaration(context.CancellationToken, out _) &&
+                method.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                 method.TryGetMatchingParameter(argument, out var parameter) &&
                 Disposable.IsPotentiallyAssignableTo(parameter.Type))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol symbol &&
-                    Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    !Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                    !Disposable.IsAddedToFieldOrProperty(parameter, declaration, context.SemanticModel, context.CancellationToken) &&
+                    context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol symbol)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
+                    if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                        !Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
+                    }
+
+                    if (TryGetSymbol(argument, context, out var assignedSymbol))
+                    {
+                        if (assignedSymbol is ILocalSymbol assignedLocal &&
+                            Disposable.ShouldDispose(assignedLocal, argument, context.SemanticModel, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
+                        }
+
+                        if (assignedSymbol is IParameterSymbol assignedParameter &&
+                            assignedParameter.RefKind == RefKind.None &&
+                            Disposable.ShouldDispose(assignedParameter, argument, context.SemanticModel, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
+                        }
+                    }
                 }
             }
+        }
+
+        private static bool TryGetSymbol(ArgumentSyntax argument, SyntaxNodeAnalysisContext context, out ISymbol symbol)
+        {
+            if (argument.Expression is IdentifierNameSyntax candidate)
+            {
+                return context.SemanticModel.TryGetSymbol(candidate, context.CancellationToken, out symbol);
+            }
+
+            if (argument.Expression is DeclarationExpressionSyntax declarationExpression &&
+                declarationExpression.Designation is SingleVariableDesignationSyntax singleVariable)
+            {
+                return context.SemanticModel.TryGetSymbol(singleVariable, context.CancellationToken, out symbol);
+            }
+
+            symbol = null;
+            return false;
         }
     }
 }

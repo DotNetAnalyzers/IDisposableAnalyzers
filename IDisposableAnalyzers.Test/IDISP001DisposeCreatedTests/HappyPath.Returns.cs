@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        public class Returns
+        [Test]
+        public void SimpleStatementBody()
         {
-            [Test]
-            public void SimpleStatementBody()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -23,13 +21,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void SimpleExpressionBody()
-            {
-                var testCode = @"
+        [Test]
+        public void SimpleExpressionBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -39,13 +37,13 @@ namespace RoslynSandbox
         public static Stream Bar() => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalFileOpenRead()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalFileOpenRead()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -59,13 +57,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalFileOpenReadDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalFileOpenReadDisposable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -80,13 +78,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalFileOpenReadAsDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalFileOpenReadAsDisposable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -101,13 +99,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalFileOpenReadCastDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalFileOpenReadCastDisposable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -122,13 +120,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalFileOpenReadAfterAccessingLength()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalFileOpenReadAfterAccessingLength()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -143,13 +141,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalInIfAndEnd()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalInIfAndEnd()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -168,13 +166,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalInIf()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalInIf()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -194,13 +192,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalInStreamReaderMethodBody()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalInStreamReaderMethodBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -214,13 +212,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void LocalInStreamReaderMethodBodyAsDisposable()
-            {
-                var testCode = @"
+        [Test]
+        public void LocalInStreamReaderMethodBodyAsDisposable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -234,13 +232,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
-            {
-                var testCode = @"
+        [Test]
+        public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -255,13 +253,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void WhenDisposableIsReturnedPropertySimple()
-            {
-                var testCode = @"
+        [Test]
+        public void WhenDisposableIsReturnedPropertySimple()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -277,13 +275,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void WhenDisposableIsReturnedPropertyBody()
-            {
-                var testCode = @"
+        [Test]
+        public void WhenDisposableIsReturnedPropertyBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -300,13 +298,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void WhenDisposableIsReturnedPropertyExpressionBody()
-            {
-                var testCode = @"
+        [Test]
+        public void WhenDisposableIsReturnedPropertyExpressionBody()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -316,8 +314,7 @@ namespace RoslynSandbox
         public static Stream Bar => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

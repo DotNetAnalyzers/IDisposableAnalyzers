@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        public class Assigned
+        [Test]
+        public void AssignLocalWithInt()
         {
-            [Test]
-            public void AssignLocalWithInt()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -22,13 +20,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignField()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignField()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -41,13 +39,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignFieldLocal()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignFieldLocal()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -62,13 +60,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignProperty()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignProperty()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -82,13 +80,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignPropertyLocal()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignPropertyLocal()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -103,13 +101,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignFieldIndexer()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignFieldIndexer()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -127,13 +125,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void AssignFieldListAdd()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignFieldListAdd()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -153,40 +151,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
-
-            [Test]
-            public void BuildCollectionThenAssignField()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo
-    {
-        private Disposable[] disposables;
-
-        public Foo()
-        {
-            var items = new Disposable[2];
-            for (var i = 0; i < 2; i++)
-            {
-                var item = new Disposable();
-                items[i] = item;
-            }
-
-            this.disposables = items;
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
-    }
-}";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
-
-            [Test]
-            public void AssignAssemblyLoadToLocal()
-            {
-                var testCode = @"
+        [Test]
+        public void AssignAssemblyLoadToLocal()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Reflection;
@@ -199,13 +170,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void Ternary()
-            {
-                var testCode = @"
+        [Test]
+        public void Ternary()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -223,8 +194,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }

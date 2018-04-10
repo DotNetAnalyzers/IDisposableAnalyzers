@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        internal class Assigns
+        [Test]
+        public void DontUseUsingWhenAssigningAField()
         {
-            [Test]
-            public void DontUseUsingWhenAssigningAField()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -26,13 +24,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningAFieldTernary()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningAFieldTernary()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -50,13 +48,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningAFieldInAMethod()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningAFieldInAMethod()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -71,13 +69,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -93,13 +91,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAddingLocalVariableToFieldList()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAddingLocalVariableToFieldList()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Generic;
@@ -116,13 +114,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -143,13 +141,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningACallThatReturnsAField()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningACallThatReturnsAField()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -170,13 +168,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
-            {
-                var testCode = @"
+        [Test]
+        public void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -208,13 +206,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void BuildCollectionThenAssignFieldIndexer()
-            {
-                var testCode = @"
+        [Test]
+        public void BuildCollectionThenAssignFieldIndexer()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -232,13 +230,13 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
 
-            [Test]
-            public void BuildCollectionThenAssignField()
-            {
-                var testCode = @"
+        [Test]
+        public void BuildCollectionThenAssignField()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     public class Foo
@@ -258,8 +256,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }

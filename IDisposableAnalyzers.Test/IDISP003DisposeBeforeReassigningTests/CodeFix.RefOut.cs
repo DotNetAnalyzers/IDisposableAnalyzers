@@ -1,12 +1,15 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
         internal class RefAndOut
         {
+            private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
+
             [Test]
             public void AssigningFieldViaOutParameterInPublicMethod()
             {
@@ -52,63 +55,6 @@ namespace RoslynSandbox
         public bool TryGetStream(out Stream outValue)
         {
             outValue = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-            }
-
-            [Test]
-            public void AssigningVariableViaOutParameterBefore()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class Foo
-    {
-        public void Bar()
-        {
-            Stream stream;
-            if (this.TryGetStream(out stream))
-            {
-                ↓stream = File.OpenRead(string.Empty);
-            }
-        }
-
-        public bool TryGetStream(out Stream result)
-        {
-            result = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-                var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class Foo
-    {
-        public void Bar()
-        {
-            Stream stream;
-            if (this.TryGetStream(out stream))
-            {
-                stream?.Dispose();
-                stream = File.OpenRead(string.Empty);
-            }
-        }
-
-        public bool TryGetStream(out Stream result)
-        {
-            result = File.OpenRead(string.Empty);
             return true;
         }
     }
@@ -164,8 +110,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -217,8 +163,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -278,8 +224,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -341,8 +287,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -414,8 +360,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -475,8 +421,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
-                AnalyzerAssert.FixAll<ArgumentAnalyzer, DisposeBeforeAssignCodeFixProvider>(testCode, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
         }
     }

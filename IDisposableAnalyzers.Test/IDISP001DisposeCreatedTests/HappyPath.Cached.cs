@@ -3,14 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class HappyPath
+    internal partial class HappyPath<T>
     {
-        public class Cached
+        [Test]
+        public void StaticConcurrentDictionaryGetOrAdd()
         {
-            [Test]
-            public void StaticConcurrentDictionaryGetOrAdd()
-            {
-                var testCode = @"
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -27,13 +25,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConcurrentDictionaryGetOrAdd()
-            {
-                var testCode = @"
+        [Test]
+        public void ConcurrentDictionaryGetOrAdd()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -50,13 +48,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConcurrentDictionaryTryGetValue()
-            {
-                var testCode = @"
+        [Test]
+        public void ConcurrentDictionaryTryGetValue()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -78,13 +76,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConcurrentDictionaryTryGetValueVarOut()
-            {
-                var testCode = @"
+        [Test]
+        public void ConcurrentDictionaryTryGetValueVarOut()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.Collections.Concurrent;
@@ -105,13 +103,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConditionalWeakTableTryGetValue()
-            {
-                var testCode = @"
+        [Test]
+        public void ConditionalWeakTableTryGetValue()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -133,13 +131,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void ConditionalWeakTableTryGetValueVarOut()
-            {
-                var testCode = @"
+        [Test]
+        public void ConditionalWeakTableTryGetValueVarOut()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -160,13 +158,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void CustomCacheWrappingDictionary()
-            {
-                var testCode = @"
+        [Test]
+        public void CustomCacheWrappingDictionary()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -216,13 +214,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void PooledConcurrentQueueTryDequeue()
-            {
-                var testCode = @"
+        [Test]
+        public void PooledConcurrentQueueTryDequeue()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -274,13 +272,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void PooledConcurrentQueueTryDequeue2()
-            {
-                var testCode = @"
+        [Test]
+        public void PooledConcurrentQueueTryDequeue2()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -338,13 +336,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
 
-            [Test]
-            public void TryGetRecursive()
-            {
-                var testCode = @"
+        [Test]
+        public void TryGetRecursive()
+        {
+            var testCode = @"
 namespace RoslynSandbox
 {
     using System;
@@ -395,8 +393,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
-            }
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
 }
