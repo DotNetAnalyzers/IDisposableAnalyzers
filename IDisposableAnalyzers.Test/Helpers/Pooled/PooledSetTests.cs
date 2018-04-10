@@ -1,3 +1,4 @@
+// ReSharper disable UnusedVariable
 namespace IDisposableAnalyzers.Test.Helpers.Pooled
 {
     using NUnit.Framework;
@@ -17,9 +18,11 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         {
             using (var set = PooledSet<int>.Borrow())
             {
-                // ReSharper disable once UnusedVariable
                 using (var meh = PooledSet.BorrowOrIncrementUsage(set))
                 {
+                    using (var meh1 = PooledSet.BorrowOrIncrementUsage(meh))
+                    {
+                    }
                 }
             }
         }
@@ -29,9 +32,11 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         {
             using (var set = PooledSet<int>.BorrowOrIncrementUsage(null))
             {
-                // ReSharper disable once UnusedVariable
                 using (var meh = PooledSet.BorrowOrIncrementUsage(set))
                 {
+                    using (var meh1 = PooledSet.BorrowOrIncrementUsage(meh))
+                    {
+                    }
                 }
             }
         }
@@ -42,7 +47,6 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
             using (var set = PooledSet<int>.Borrow())
             {
                 set.Add(1);
-                //// ReSharper disable once UnusedVariable
                 foreach (var i in set)
                 {
                 }
@@ -57,7 +61,6 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
                 set.Add(1);
                 foreach (var i in set)
                 {
-                    // ReSharper disable once UnusedVariable
                     var j = Id(i);
                 }
             }
