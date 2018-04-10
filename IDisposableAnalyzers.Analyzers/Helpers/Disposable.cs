@@ -286,8 +286,11 @@ namespace IDisposableAnalyzers
                         {
                             using (visited = PooledHashSet<ISymbol>.BorrowOrIncrementUsage(visited))
                             {
-                                return visited.Add(parameter) &&
-                                       IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited);
+                                if (visited.Add(parameter) &&
+                                    IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited))
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
