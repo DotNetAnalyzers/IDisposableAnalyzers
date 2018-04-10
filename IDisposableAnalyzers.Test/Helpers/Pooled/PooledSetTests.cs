@@ -42,6 +42,16 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         }
 
         [Test]
+        public void UseSet()
+        {
+            using (var set = PooledSet<int>.BorrowOrIncrementUsage(null))
+            {
+                UseSet(set);
+                UseSet(set);
+            }
+        }
+
+        [Test]
         public void UsingBorrowAddForeach()
         {
             using (var set = PooledSet<int>.Borrow())
@@ -67,5 +77,17 @@ namespace IDisposableAnalyzers.Test.Helpers.Pooled
         }
 
         private static int Id(int n) => n;
+
+        private static void UseSet(PooledSet<int> set)
+        {
+            using (set = PooledSet<int>.BorrowOrIncrementUsage(set))
+            {
+                set.Add(set.Count);
+                foreach (var i in set)
+                {
+                    var j = Id(i);
+                }
+            }
+        }
     }
 }
