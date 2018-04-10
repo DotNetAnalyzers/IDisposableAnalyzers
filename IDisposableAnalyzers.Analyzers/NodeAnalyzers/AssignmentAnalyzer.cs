@@ -107,6 +107,70 @@ namespace IDisposableAnalyzers
 
         private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            var ifStatement = context.FirstAncestor<IfStatementSyntax>();
+            if (ifStatement == null ||
+                !ifStatement.Statement.Contains(context))
+            {
+                return false;
+            }
+
+            switch (ifStatement.Condition)
+            {
+                case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.EqualsExpression):
+                    if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
+                        IsSymbol(binary.Right))
+                    {
+                        return !IsAssignedBefore(ifStatement);
+                    }
+
+                    if (IsSymbol(binary.Left) &&
+                        binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
+                    {
+                        return !IsAssignedBefore(ifStatement);
+                    }
+
+                    break;
+                case IsPatternExpressionSyntax isPattern:
+                    if (IsSymbol(isPattern.Expression) &&
+                        isPattern.Pattern is ConstantPatternSyntax constantPattern &&
+                        constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                    {
+                        return !IsAssignedBefore(ifStatement);
+                    }
+
+                    break;
+                case InvocationExpressionSyntax invocation:
+                    if (invocation.Expression is IdentifierNameSyntax identifierName &&
+                        invocation.ArgumentList != null &&
+                        invocation.ArgumentList.Arguments.Count == 2 &&
+                        (identifierName.Identifier.ValueText == "ReferenceEquals" ||
+                         identifierName.Identifier.ValueText == "Equals"))
+                    {
+                        if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                            invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
+                        {
+                            return !IsAssignedBefore(ifStatement);
+                        }
+                    }
+                    else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                             memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
+                             invocation.ArgumentList != null &&
+                             invocation.ArgumentList.Arguments.Count == 2 &&
+                             (memberIdentifier.Identifier.ValueText == "ReferenceEquals" ||
+                              memberIdentifier.Identifier.ValueText == "Equals"))
+                    {
+                        if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                            invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
+                        {
+                            return !IsAssignedBefore(ifStatement);
+                        }
+                    }
+
+                    break;
+            }
+
+            return IsNullChecked(symbol, ifStatement, semanticModel, cancellationToken);
+
             bool IsSymbol(ExpressionSyntax expression)
             {
                 if (expression is IdentifierNameSyntax identifierName)
@@ -141,63 +205,6 @@ namespace IDisposableAnalyzers
 
                 return false;
             }
-
-            var ifStatement = context.FirstAncestor<IfStatementSyntax>();
-            if (ifStatement == null)
-            {
-                return false;
-            }
-
-            if (!ifStatement.Statement.Contains(context))
-            {
-                return false;
-            }
-
-            if (ifStatement.Condition is BinaryExpressionSyntax binary &&
-                binary.IsKind(SyntaxKind.EqualsExpression))
-            {
-                if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
-                    IsSymbol(binary.Right))
-                {
-                    return !IsAssignedBefore(ifStatement);
-                }
-
-                if (IsSymbol(binary.Left) &&
-                    binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
-                {
-                    return !IsAssignedBefore(ifStatement);
-                }
-            }
-            else if (ifStatement.Condition is InvocationExpressionSyntax invocation)
-            {
-                if (invocation.Expression is IdentifierNameSyntax identifierName &&
-                    invocation.ArgumentList != null &&
-                    invocation.ArgumentList.Arguments.Count == 2 &&
-                    (identifierName.Identifier.ValueText == "ReferenceEquals" ||
-                     identifierName.Identifier.ValueText == "Equals"))
-                {
-                    if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                        invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
-                    {
-                        return !IsAssignedBefore(ifStatement);
-                    }
-                }
-                else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                         memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
-                        invocation.ArgumentList != null &&
-                        invocation.ArgumentList.Arguments.Count == 2 &&
-                        (memberIdentifier.Identifier.ValueText == "ReferenceEquals" ||
-                         memberIdentifier.Identifier.ValueText == "Equals"))
-                {
-                    if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                        invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
-                    {
-                        return !IsAssignedBefore(ifStatement);
-                    }
-                }
-            }
-
-            return IsNullChecked(symbol, ifStatement, semanticModel, cancellationToken);
         }
     }
 }

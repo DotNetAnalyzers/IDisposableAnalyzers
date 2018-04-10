@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         [TestCase("this.stream == null")]
         //[TestCase("this.stream == null && file != null")]
-        //[TestCase("this.disposable is null")]
+        [TestCase("this.stream is null")]
         [TestCase("ReferenceEquals(this.stream, null)")]
         [TestCase("Equals(this.stream, null)")]
         [TestCase("object.ReferenceEquals(this.stream, null)")]

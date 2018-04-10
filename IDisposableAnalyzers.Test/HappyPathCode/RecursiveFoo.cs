@@ -35,7 +35,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
-            // value = value;
+            value = value;
         }
 
         public IDisposable RecursiveProperty => this.RecursiveProperty;
