@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         internal class RefAndOut
         {
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
 
             [Test]

@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
+    // ReSharper disable once UnusedTypeParameter
     internal partial class HappyPath<T>
     {
         [Test]
@@ -65,6 +66,7 @@ namespace RoslynSandbox
 
         public void Bar()
         {
+            this.stream.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
     }
@@ -87,6 +89,7 @@ namespace RoslynSandbox
         public void Bar()
         {
             var newStream = File.OpenRead(string.Empty);
+            this.stream?.Dispose();
             this.stream = newStream;
         }
     }

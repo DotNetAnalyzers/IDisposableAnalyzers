@@ -12,6 +12,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
+            IDISP001DisposeCreated.Descriptor,
             IDISP003DisposeBeforeReassigning.Descriptor,
             IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
 
@@ -30,19 +31,36 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (context.Node is AssignmentExpressionSyntax assignment)
+            if (context.Node is AssignmentExpressionSyntax assignment &&
+                context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken) is ISymbol assignedSymbol)
             {
-                if (context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken) is IParameterSymbol parameter &&
-                    parameter.ContainingSymbol.DeclaredAccessibility != Accessibility.Private &&
-                    parameter.RefKind == RefKind.Ref &&
-                    Disposable.IsAssignableTo(context.SemanticModel.GetTypeInfoSafe(assignment.Right, context.CancellationToken).Type))
+                if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                    if (assignedSymbol is ILocalSymbol local &&
+                        Disposable.ShouldDispose(local, assignment, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
+                    }
+
+                    if (assignedSymbol is IParameterSymbol parameter &&
+                        parameter.RefKind == RefKind.None &&
+                        Disposable.ShouldDispose(parameter, assignment, context.SemanticModel, context.CancellationToken))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
+                    }
                 }
 
                 if (IsReassignedWithCreated(assignment, context))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, assignment.GetLocation()));
+                }
+
+                if (assignedSymbol is IParameterSymbol assignedParameter &&
+                    assignedParameter.ContainingSymbol.DeclaredAccessibility != Accessibility.Private &&
+                    assignedParameter.RefKind == RefKind.Ref &&
+                    Disposable.IsAssignableTo(context.SemanticModel.GetTypeInfoSafe(assignment.Right, context.CancellationToken).Type))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                 }
             }
         }

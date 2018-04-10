@@ -137,9 +137,9 @@ namespace IDisposableAnalyzers
 
         internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (location.FirstAncestorOrSelf<BlockSyntax>() is BlockSyntax block)
+            if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)
             {
-                using (var walker = InvocationWalker.Borrow(block))
+                using (var walker = InvocationWalker.Borrow(scope))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
@@ -151,7 +151,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                using (var walker = UsingStatementWalker.Borrow(block))
+                using (var walker = UsingStatementWalker.Borrow(scope))
                 {
                     foreach (var usingStatement in walker.UsingStatements)
                     {

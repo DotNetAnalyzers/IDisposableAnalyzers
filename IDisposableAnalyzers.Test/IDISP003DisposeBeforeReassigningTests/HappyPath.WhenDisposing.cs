@@ -22,6 +22,7 @@ namespace RoslynSandbox
             var stream = File.OpenRead(string.Empty);
             stream.Dispose();
             stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
         }
     }
 }";
@@ -40,10 +41,10 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        public void Meh()
+        public void Meh(bool b)
         {
             Stream stream = File.OpenRead(string.Empty);
-            if (true)
+            if (b)
             {
                 stream.Dispose();
                 stream = File.OpenRead(string.Empty);
@@ -53,6 +54,8 @@ namespace RoslynSandbox
                 stream.Dispose();
                 stream = File.OpenRead(string.Empty);
             }
+
+            stream.Dispose();
         }
     }
 }";
@@ -71,11 +74,11 @@ namespace RoslynSandbox
 
     public class Foo
     {
-        public void Meh()
+        public void Meh(bool b)
         {
             Stream stream = File.OpenRead(string.Empty);
             stream.Dispose();
-            if (true)
+            if (b)
             {
                 stream = null;
             }
@@ -83,6 +86,8 @@ namespace RoslynSandbox
             {
                 stream = File.OpenRead(string.Empty);
             }
+
+            stream?.Dispose();
         }
     }
 }";
@@ -137,6 +142,7 @@ namespace RoslynSandbox
             stream = File.OpenRead(string.Empty);
             stream?.Dispose();
             stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
         }
     }
 }";

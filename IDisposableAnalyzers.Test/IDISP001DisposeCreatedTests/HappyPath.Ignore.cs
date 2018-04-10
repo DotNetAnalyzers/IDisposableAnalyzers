@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
+    // ReSharper disable once UnusedTypeParameter
     internal partial class HappyPath<T>
     {
         [TestCase("disposables.First();")]

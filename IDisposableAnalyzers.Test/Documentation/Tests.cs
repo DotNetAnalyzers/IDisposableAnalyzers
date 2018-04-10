@@ -72,6 +72,7 @@ namespace IDisposableAnalyzers.Test.Documentation
             switch (descriptorInfo.Descriptor.Id)
             {
                 case IDISP001DisposeCreated.DiagnosticId when descriptorInfo.Analyzer is IDISP001DisposeCreated:
+                case IDISP001DisposeCreated.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
                 case IDISP003DisposeBeforeReassigning.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
                 case IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId when descriptorInfo.Analyzer is IDISP004DontIgnoreReturnValueOfTypeIDisposable:
                 case IDISP008DontMixInjectedAndCreatedForMember.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:

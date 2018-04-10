@@ -29,7 +29,7 @@ namespace IDisposableAnalyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.LocalDeclarationStatement, SyntaxKind.SimpleAssignmentExpression, SyntaxKind.Argument);
+            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.LocalDeclarationStatement);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -51,24 +51,6 @@ namespace IDisposableAnalyzers
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
                     }
-                }
-            }
-            else if (context.Node is AssignmentExpressionSyntax assignment &&
-                     assignment.Left is IdentifierNameSyntax assigned &&
-                     Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-            {
-                var assignedSymbol = context.SemanticModel.GetSymbolSafe(assigned, context.CancellationToken);
-                if (assignedSymbol is ILocalSymbol local &&
-                    Disposable.ShouldDispose(local, assignment, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
-                }
-
-                if (assignedSymbol is IParameterSymbol parameter &&
-                    parameter.RefKind == RefKind.None &&
-                    Disposable.ShouldDispose(parameter, assignment, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, assignment.GetLocation()));
                 }
             }
         }
