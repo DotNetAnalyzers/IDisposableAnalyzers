@@ -141,10 +141,25 @@ namespace IDisposableAnalyzers
             if (ReturnType(context).Is(KnownSymbol.Task) &&
                 returnValue.FirstAncestor<UsingStatementSyntax>() != null &&
                 returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
-                context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task))
+                context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&
+                ShouldAwait(context, returnValue))
             {
                 context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
             }
+        }
+
+        private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
+        {
+            switch (returnValue)
+            {
+                case InvocationExpressionSyntax invocation when invocation.TryGetInvokedMethodName(out var name) &&
+                                                                name == KnownSymbol.Task.FromResult.Name:
+                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
+                case MemberAccessExpressionSyntax memberAccess when memberAccess.Name.Identifier.ValueText == "CompletedTask":
+                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
+            }
+
+            return true;
         }
 
         private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)

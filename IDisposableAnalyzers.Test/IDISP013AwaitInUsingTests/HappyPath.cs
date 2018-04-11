@@ -69,5 +69,51 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void TaskFromResult()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public Task<int> Bar()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                return Task.FromResult(1);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void TaskCompletedTask()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public Task Bar()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                return Task.CompletedTask;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

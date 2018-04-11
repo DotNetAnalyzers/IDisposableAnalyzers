@@ -6,6 +6,7 @@ namespace IDisposableAnalyzers
         internal readonly QualifiedMethod Run;
         internal readonly QualifiedMethod RunOfT;
         internal readonly QualifiedMethod ConfigureAwait;
+        internal readonly QualifiedProperty CompletedTask;
 
         internal TaskType()
             : base("System.Threading.Tasks.Task")
@@ -14,6 +15,7 @@ namespace IDisposableAnalyzers
             this.Run = new QualifiedMethod(this, nameof(this.Run));
             this.RunOfT = new QualifiedMethod(this, $"{nameof(this.Run)}`1");
             this.ConfigureAwait = new QualifiedMethod(this, nameof(this.ConfigureAwait));
+            this.CompletedTask = new QualifiedProperty(this, nameof(this.CompletedTask));
         }
     }
 }
