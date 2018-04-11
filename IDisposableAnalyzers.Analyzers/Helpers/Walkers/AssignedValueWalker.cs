@@ -369,9 +369,9 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.CurrentSymbol is ILocalSymbol local)
+            if (this.CurrentSymbol is ILocalSymbol local &&
+                local.TrySingleDeclaration(this.cancellationToken, out var declaration))
             {
-                var declaration = local.DeclaringSyntaxReferences.Single().GetSyntax(this.cancellationToken);
                 var scope = (SyntaxNode)declaration.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
                                         declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                 if (scope != null)
