@@ -1,8 +1,9 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Concurrent;
     using System.Diagnostics;
+    using System.Linq;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
 
@@ -10,7 +11,6 @@
         where T : PooledWalker<T>
     {
         private static readonly ConcurrentQueue<PooledWalker<T>> Cache = new ConcurrentQueue<PooledWalker<T>>();
-        private int refCount;
 
         public void Dispose()
         {
@@ -31,7 +31,6 @@
                 walker = create();
             }
 
-            walker.refCount = 1;
             return (T)walker;
         }
 
@@ -39,13 +38,9 @@
         {
             if (disposing)
             {
-                this.refCount--;
-                Debug.Assert(this.refCount >= 0, "refCount>= 0");
-                if (this.refCount == 0)
-                {
-                    this.Clear();
-                    Cache.Enqueue(this);
-                }
+                Debug.Assert(!Cache.Contains(this), "!Cache.Contains(this)");
+                this.Clear();
+                Cache.Enqueue(this);
             }
         }
 
@@ -54,7 +49,7 @@
         [Conditional("DEBUG")]
         protected void ThrowIfDisposed()
         {
-            if (this.refCount <= 0)
+            if (Cache.Contains(this))
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
