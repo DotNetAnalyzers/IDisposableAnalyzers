@@ -5,6 +5,7 @@ namespace IDisposableAnalyzers
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
 
     [DebuggerTypeProxy(typeof(PooledSetDebugView<>))]
@@ -34,15 +35,11 @@ namespace IDisposableAnalyzers
 
         void IDisposable.Dispose()
         {
-            var current = Interlocked.Decrement(ref this.refCount);
-            if (current == 0)
+            if (Interlocked.Decrement(ref this.refCount) == 0)
             {
+                Debug.Assert(!Cache.Contains(this), "!Cache.Contains(this)");
                 this.inner.Clear();
                 Cache.Enqueue(this);
-            }
-            else if (current < 0)
-            {
-                Debug.Assert(current >= 0, $"{nameof(IDisposable.Dispose)} set.refCount == {current}");
             }
         }
 
