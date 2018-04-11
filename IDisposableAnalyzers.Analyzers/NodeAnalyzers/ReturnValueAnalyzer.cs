@@ -121,7 +121,7 @@ namespace IDisposableAnalyzers
             else if (returnValue is InvocationExpressionSyntax invocation &&
                      invocation.ArgumentList is ArgumentListSyntax argumentList)
             {
-                foreach (var argument in invocation.ArgumentList.Arguments)
+                foreach (var argument in argumentList.Arguments)
                 {
                     if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
