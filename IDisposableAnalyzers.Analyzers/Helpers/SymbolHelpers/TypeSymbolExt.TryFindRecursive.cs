@@ -5,57 +5,57 @@ namespace IDisposableAnalyzers
 
     internal static partial class TypeSymbolExt
     {
-        internal static bool TryGetFieldRecursive(this ITypeSymbol type, string name, out IFieldSymbol field)
+        internal static bool TryFindFieldRecursive(this ITypeSymbol type, string name, out IFieldSymbol field)
         {
-            return type.TrySingleMemberRecursive(name, out field);
+            return type.TryFindSingleMemberRecursive(name, out field);
         }
 
-        internal static bool TryGetEventRecursive(this ITypeSymbol type, string name, out IEventSymbol @event)
+        internal static bool TryFindEventRecursive(this ITypeSymbol type, string name, out IEventSymbol @event)
         {
-            return type.TrySingleMemberRecursive(name, out @event);
+            return type.TryFindSingleMemberRecursive(name, out @event);
         }
 
-        internal static bool TryGetPropertyRecursive(this ITypeSymbol type, string name, out IPropertySymbol property)
+        internal static bool TryFindPropertyRecursive(this ITypeSymbol type, string name, out IPropertySymbol property)
         {
             if (name == "Item[]")
             {
-                return type.TrySingleMemberRecursive(x => x.IsIndexer, out property);
+                return type.TryFindSingleMemberRecursive(x => x.IsIndexer, out property);
             }
 
-            return type.TrySingleMemberRecursive(name, out property);
+            return type.TryFindSingleMemberRecursive(name, out property);
         }
 
-        internal static bool TryFirstMethodRecursive(this ITypeSymbol type, string name, out IMethodSymbol result)
+        internal static bool TryFindFirstMethodRecursive(this ITypeSymbol type, string name, out IMethodSymbol result)
         {
             return type.TryFirstMemberRecursive(name, out result);
         }
 
-        internal static bool TryFirstMethodRecursive(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
+        internal static bool TryFindFirstMethodRecursive(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
             return type.TryFirstMemberRecursive(predicate, out result);
         }
 
-        internal static bool TrySingleMethodRecursive(this ITypeSymbol type, string name, out IMethodSymbol result)
+        internal static bool TryFindSingleMethodRecursive(this ITypeSymbol type, string name, out IMethodSymbol result)
         {
-            return type.TrySingleMemberRecursive(name, out result);
+            return type.TryFindSingleMemberRecursive(name, out result);
         }
 
-        internal static bool TrySingleMethodRecursive(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
+        internal static bool TryFindSingleMethodRecursive(this ITypeSymbol type, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
-            return type.TrySingleMemberRecursive(predicate, out result);
+            return type.TryFindSingleMemberRecursive(predicate, out result);
         }
 
-        internal static bool TrySingleMethodRecursive(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
+        internal static bool TryFindSingleMethodRecursive(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol result)
         {
-            return type.TrySingleMemberRecursive(name, predicate, out result);
+            return type.TryFindSingleMemberRecursive(name, predicate, out result);
         }
 
-        internal static bool TryFirstMethodRecursive(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
+        internal static bool TryFindFirstMethodRecursive(this ITypeSymbol type, string name, Func<IMethodSymbol, bool> predicate, out IMethodSymbol property)
         {
-            return type.TrySingleMemberRecursive(name, predicate, out property);
+            return type.TryFindSingleMemberRecursive(name, predicate, out property);
         }
 
-        internal static bool TrySingleMemberRecursive<TMember>(this ITypeSymbol type, string name, out TMember member)
+        internal static bool TryFindSingleMemberRecursive<TMember>(this ITypeSymbol type, string name, out TMember member)
             where TMember : class, ISymbol
         {
             member = null;
@@ -85,7 +85,7 @@ namespace IDisposableAnalyzers
             return member != null;
         }
 
-        internal static bool TrySingleMemberRecursive<TMember>(this ITypeSymbol type, Func<TMember, bool> predicate, out TMember member)
+        internal static bool TryFindSingleMemberRecursive<TMember>(this ITypeSymbol type, Func<TMember, bool> predicate, out TMember member)
             where TMember : class, ISymbol
         {
             member = null;
@@ -119,7 +119,7 @@ namespace IDisposableAnalyzers
             return member != null;
         }
 
-        internal static bool TrySingleMemberRecursive<TMember>(this ITypeSymbol type, string name, Func<TMember, bool> predicate, out TMember member)
+        internal static bool TryFindSingleMemberRecursive<TMember>(this ITypeSymbol type, string name, Func<TMember, bool> predicate, out TMember member)
             where TMember : class, ISymbol
         {
             member = null;

@@ -651,14 +651,14 @@ namespace IDisposableAnalyzers
                 bool TryGetProperty(out IPropertySymbol result)
                 {
                     if (assigned is IdentifierNameSyntax identifierName &&
-                        this.CurrentSymbol.ContainingType.TryGetPropertyRecursive(identifierName.Identifier.ValueText, out result))
+                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(identifierName.Identifier.ValueText, out result))
                     {
                         return true;
                     }
 
                     if (assigned is MemberAccessExpressionSyntax memberAccess &&
                         memberAccess.Expression is InstanceExpressionSyntax &&
-                        this.CurrentSymbol.ContainingType.TryGetPropertyRecursive(memberAccess.Name.Identifier.ValueText, out result))
+                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(memberAccess.Name.Identifier.ValueText, out result))
                     {
                         return true;
                     }

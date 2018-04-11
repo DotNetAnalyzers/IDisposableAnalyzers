@@ -101,7 +101,7 @@ namespace IDisposableAnalyzers
                     continue;
                 }
 
-                if (type.TrySingleMethodRecursive("Dispose", out var disposeMethod) &&
+                if (type.TryFindSingleMethodRecursive("Dispose", out var disposeMethod) &&
                     !disposeMethod.IsStatic &&
                     disposeMethod.ReturnsVoid &&
                     disposeMethod.Parameters.Length == 0)
@@ -109,8 +109,8 @@ namespace IDisposableAnalyzers
                     continue;
                 }
 
-                if (type.TryGetFieldRecursive("disposed", out _) ||
-                    type.TryGetFieldRecursive("_disposed", out _))
+                if (type.TryFindFieldRecursive("disposed", out _) ||
+                    type.TryFindFieldRecursive("_disposed", out _))
                 {
                     return;
                 }
@@ -237,7 +237,7 @@ namespace IDisposableAnalyzers
 
             if (!type.GetMembers().TryFirst(x => x.Name == "ThrowIfDisposed", out _))
             {
-                if (type.BaseType.TrySingleMethodRecursive("ThrowIfDisposed", out var baseThrow) &&
+                if (type.BaseType.TryFindSingleMethodRecursive("ThrowIfDisposed", out var baseThrow) &&
                     baseThrow.Parameters.Length == 0)
                 {
                     if (baseThrow.IsVirtual)
@@ -322,7 +322,7 @@ namespace IDisposableAnalyzers
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TrySingleMethodRecursive("ThrowIfDisposed", out _))
+            if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
             {
                 editor.AddMethod(
                     classDeclaration,
@@ -378,7 +378,7 @@ namespace IDisposableAnalyzers
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TrySingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
+            if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
             {
                 editor.AddMethod(
                     classDeclaration,
