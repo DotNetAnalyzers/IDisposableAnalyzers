@@ -633,7 +633,7 @@ namespace IDisposableAnalyzers
                     }
 
                     if (property.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
-                        declaration.TryGetSetAccessorDeclaration(out var setter))
+                        declaration.TryGetSetter(out var setter))
                     {
                         walker = Borrow(() => new AssignedValueWalker());
                         this.memberWalkers.Add(value, walker);

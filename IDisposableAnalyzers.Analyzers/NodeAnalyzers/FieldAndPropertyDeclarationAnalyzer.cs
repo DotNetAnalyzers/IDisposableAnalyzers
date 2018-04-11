@@ -61,7 +61,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (propertyDeclaration.TryGetSetAccessorDeclaration(out var setter) &&
+            if (propertyDeclaration.TryGetSetter(out var setter) &&
                 setter.Body != null)
             {
                 // Handle the backing field

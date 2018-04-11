@@ -7,8 +7,8 @@ namespace IDisposableAnalyzers
         internal static bool IsAutoProperty(this PropertyDeclarationSyntax property)
         {
             AccessorDeclarationSyntax setter = null;
-            if (property.TryGetGetAccessorDeclaration(out AccessorDeclarationSyntax getter) ||
-                property.TryGetSetAccessorDeclaration(out setter))
+            if (property.TryGetGetter(out AccessorDeclarationSyntax getter) ||
+                property.TryGetSetter(out setter))
             {
                 return getter?.Body == null && setter?.Body == null;
             }

@@ -81,7 +81,7 @@ namespace IDisposableAnalyzers
                 this.visited.Add(node) &&
                 this.SemanticModel.GetSymbolSafe(node.Left, this.CancellationToken) is IPropertySymbol property &&
                 property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
-                propertyDeclaration.TryGetSetAccessorDeclaration(out var setter))
+                propertyDeclaration.TryGetSetter(out var setter))
             {
                 this.Visit(setter);
             }
