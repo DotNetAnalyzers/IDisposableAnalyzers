@@ -266,7 +266,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
+        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> recursion = null)
         {
             using (var pooledInvocations = InvocationWalker.Borrow(scope))
             {
@@ -284,7 +284,7 @@ namespace IDisposableAnalyzers
                         if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
                             candidate.TryGetMatchingParameter(argument, out var parameter))
                         {
-                            using (visited = visited.IncrementUsage())
+                            using (var visited = recursion.IncrementUsage())
                             {
                                 if (visited.Add(parameter) &&
                                     IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited))

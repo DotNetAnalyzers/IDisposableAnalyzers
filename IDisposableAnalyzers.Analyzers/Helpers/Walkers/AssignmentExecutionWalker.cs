@@ -110,7 +110,7 @@ namespace IDisposableAnalyzers
             return assignment != null;
         }
 
-        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, PooledSet<ISymbol> visited = null)
+        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, PooledSet<ISymbol> recursion = null)
         {
             assignment = null;
             if (symbol == null ||
@@ -137,7 +137,7 @@ namespace IDisposableAnalyzers
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
                         semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
                     {
-                        using (visited = visited.IncrementUsage())
+                        using (var visited = recursion.IncrementUsage())
                         {
                             if (visited.Add(local) &&
                                 FirstWith(local, scope, search, semanticModel, cancellationToken, out assignment, visited))
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
                             method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
                             method.TryGetMatchingParameter(argument, out var parameter))
                         {
-                            using (visited = visited.IncrementUsage())
+                            using (var visited = recursion.IncrementUsage())
                             {
                                 if (visited.Add(parameter) &&
                                     FirstWith(parameter, methodDeclaration, search, semanticModel, cancellationToken, out assignment, visited))
