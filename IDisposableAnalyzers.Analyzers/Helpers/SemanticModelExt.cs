@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -9,8 +8,16 @@ namespace IDisposableAnalyzers
     /// <summary>
     /// The safe versions handle situations like partial classes when the node is not in the same syntax tree.
     /// </summary>
-    internal static class SemanticModelExt
+    internal static partial class SemanticModelExt
     {
+        internal static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
+            where TSymbol : class, ISymbol
+        {
+            symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol ??
+                     GetDeclaredSymbolSafe(semanticModel, node, cancellationToken) as TSymbol;
+            return symbol != null;
+        }
+
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
         {
             return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
@@ -19,14 +26,6 @@ namespace IDisposableAnalyzers
         internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, ConstructorInitializerSyntax node, CancellationToken cancellationToken)
         {
             return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
-        }
-
-        internal static bool TryGetSymbol<TSymbol>(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken, out TSymbol symbol)
-            where TSymbol : class, ISymbol
-        {
-            symbol = GetSymbolSafe(semanticModel, node, cancellationToken) as TSymbol ??
-                     GetDeclaredSymbolSafe(semanticModel, node, cancellationToken) as TSymbol;
-            return symbol != null;
         }
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
@@ -39,74 +38,6 @@ namespace IDisposableAnalyzers
             return semanticModel.SemanticModelFor(node)
                                 ?.GetSymbolInfo(node, cancellationToken)
                                 .Symbol;
-        }
-
-        internal static IFieldSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, FieldDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            if (node?.Declaration == null)
-            {
-                return null;
-            }
-
-            if (node.Declaration.Variables.TrySingle(out var variable))
-            {
-                return (IFieldSymbol)semanticModel.SemanticModelFor(node)
-                                                  ?.GetDeclaredSymbol(variable, cancellationToken);
-            }
-
-            return null;
-        }
-
-        internal static IMethodSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, ConstructorDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return (IMethodSymbol)semanticModel.SemanticModelFor(node)
-                                               ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static ISymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, BasePropertyDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return semanticModel.SemanticModelFor(node)
-                                ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static IPropertySymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, PropertyDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return (IPropertySymbol)semanticModel.SemanticModelFor(node)
-                                                 ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static IPropertySymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, IndexerDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return (IPropertySymbol)semanticModel.SemanticModelFor(node)
-                                                 ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static IMethodSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, MethodDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return (IMethodSymbol)semanticModel.SemanticModelFor(node)
-                                               ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static ITypeSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, TypeDeclarationSyntax node, CancellationToken cancellationToken)
-        {
-            return (ITypeSymbol)semanticModel.SemanticModelFor(node)
-                                             ?.GetDeclaredSymbol(node, cancellationToken);
-        }
-
-        internal static IParameterSymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, ParameterSyntax node, CancellationToken cancellationToken)
-        {
-            return (IParameterSymbol)GetDeclaredSymbolSafe(semanticModel, (SyntaxNode)node, cancellationToken);
-        }
-
-        internal static ISymbol GetDeclaredSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
-        {
-            if (node is FieldDeclarationSyntax fieldDeclaration)
-            {
-                return GetDeclaredSymbolSafe(semanticModel, fieldDeclaration, cancellationToken);
-            }
-
-            return semanticModel.SemanticModelFor(node)
-                                ?.GetDeclaredSymbol(node, cancellationToken);
         }
 
         internal static Optional<object> GetConstantValueSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)

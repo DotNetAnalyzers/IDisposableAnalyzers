@@ -51,10 +51,13 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else
             {
+                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.Begin();
                 foreach (var summary in RunAll())
                 {
                     CopyResult(summary);
                 }
+
+                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.End();
             }
         }
 
