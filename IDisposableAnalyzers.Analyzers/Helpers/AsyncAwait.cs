@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
 
@@ -7,20 +7,20 @@
 
     internal static class AsyncAwait
     {
-        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax @await, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax result)
+        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax result)
         {
             result = null;
-            if (@await?.Expression == null)
+            if (awaitExpression?.Expression == null)
             {
                 return false;
             }
 
-            if (TryPeelConfigureAwait(@await.Expression as InvocationExpressionSyntax, semanticModel, cancellationToken, out result))
+            if (TryPeelConfigureAwait(awaitExpression.Expression as InvocationExpressionSyntax, semanticModel, cancellationToken, out result))
             {
                 return result != null;
             }
 
-            result = @await.Expression as InvocationExpressionSyntax;
+            result = awaitExpression.Expression as InvocationExpressionSyntax;
             return result != null;
         }
 
@@ -31,9 +31,9 @@
                 return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
             }
 
-            if (expression is AwaitExpressionSyntax @await)
+            if (expression is AwaitExpressionSyntax awaitExpression)
             {
-                return TryAwaitTaskFromResult(@await.Expression, semanticModel, cancellationToken, out result);
+                return TryAwaitTaskFromResult(awaitExpression.Expression, semanticModel, cancellationToken, out result);
             }
 
             result = null;
