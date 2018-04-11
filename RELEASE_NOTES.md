@@ -1,3 +1,6 @@
+#### 2.0.0
+* FEATURE: Support C#7.
+
 #### 1.0.0
 * Bugfixes
 

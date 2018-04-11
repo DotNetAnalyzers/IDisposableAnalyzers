@@ -6,6 +6,9 @@ Roslyn analyzers for IDisposable
 [![Build status](https://ci.appveyor.com/api/projects/status/nt35pbd1r08vj2m8/branch/master?svg=true)](https://ci.appveyor.com/project/JohanLarsson/idisposableanalyzers/branch/master)
 [![NuGet](https://img.shields.io/nuget/v/IDisposableAnalyzers.svg)](https://www.nuget.org/packages/IDisposableAnalyzers/)
 
+* 1.x versions are for Visual Studio 2015.
+* 2.x versions are for Visual Studio 2017.
+
 <!-- start generated table -->
 <table>
 <tr>
