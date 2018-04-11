@@ -60,14 +60,8 @@ namespace IDisposableAnalyzers
                     continue;
                 }
 
-                var classDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ClassDeclarationSyntax>();
-                if (classDeclaration == null)
-                {
-                    continue;
-                }
-
-                var type = semanticModel.GetDeclaredSymbolSafe(classDeclaration, context.CancellationToken);
-
+                var typeDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
+                                                .FirstAncestorOrSelf<TypeDeclarationSyntax>();
                 if (diagnostic.Id == IDISP009IsIDisposable.DiagnosticId)
                 {
                     context.RegisterCodeFix(
@@ -77,99 +71,111 @@ namespace IDisposableAnalyzers
                                 AddInterfaceAsync(
                                     context,
                                     cancellationToken,
-                                    classDeclaration),
+                                    typeDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "add interface"),
                         diagnostic);
                     continue;
                 }
 
-                if (Disposable.IsAssignableTo(type) &&
-                    Disposable.TryGetBaseVirtualDisposeMethod(type, out var baseDispose))
-                {
-                    context.RegisterCodeFix(
-                        CodeAction.Create(
-                            "override Dispose(bool)",
-                            cancellationToken =>
-                                OverrideDisposeAsync(
-                                    context,
-                                    semanticModel,
-                                    classDeclaration,
-                                    baseDispose,
-                                    cancellationToken),
-                            nameof(ImplementIDisposableCodeFixProvider) + "override"),
-                        diagnostic);
-                    continue;
-                }
-
-                if (type.TryFindSingleMethodRecursive("Dispose", out var disposeMethod) &&
-                    !disposeMethod.IsStatic &&
-                    disposeMethod.ReturnsVoid &&
-                    disposeMethod.Parameters.Length == 0)
-                {
-                    continue;
-                }
-
-                if (type.TryFindFieldRecursive("disposed", out _) ||
-                    type.TryFindFieldRecursive("_disposed", out _))
-                {
-                    return;
-                }
-
-                if (type.IsSealed)
+                if (typeDeclaration is StructDeclarationSyntax structDeclaration)
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             "Implement IDisposable.",
                             cancellationToken =>
+                                ImplementIDisposableStructAsync(
+                                    context,
+                                    cancellationToken,
+                                    structDeclaration),
+                            nameof(ImplementIDisposableCodeFixProvider) + "Struct"),
+                        diagnostic);
+                }
+                else if (typeDeclaration is ClassDeclarationSyntax classDeclaration)
+                {
+                    var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
+                    if (Disposable.IsAssignableTo(type) &&
+                        Disposable.TryGetBaseVirtualDisposeMethod(type, out var baseDispose))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "override Dispose(bool)",
+                                cancellationToken =>
+                                    OverrideDisposeAsync(
+                                        context,
+                                        classDeclaration,
+                                        baseDispose,
+                                        cancellationToken),
+                                nameof(ImplementIDisposableCodeFixProvider) + "override"),
+                            diagnostic);
+                        continue;
+                    }
+
+                    if (type.TryFindSingleMethodRecursive("Dispose", out var disposeMethod) &&
+                        !disposeMethod.IsStatic &&
+                        disposeMethod.ReturnsVoid &&
+                        disposeMethod.Parameters.Length == 0)
+                    {
+                        continue;
+                    }
+
+                    if (type.TryFindFieldRecursive("disposed", out _) ||
+                        type.TryFindFieldRecursive("_disposed", out _))
+                    {
+                        return;
+                    }
+
+                    if (type.IsSealed)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Implement IDisposable.",
+                                cancellationToken =>
+                                    ImplementIDisposableSealedAsync(
+                                        context,
+                                        cancellationToken,
+                                        classDeclaration),
+                                nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
+                            diagnostic);
+                        continue;
+                    }
+
+                    if (type.IsAbstract)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Implement IDisposable with virtual dispose method.",
+                                cancellationToken =>
+                                    ImplementIDisposableVirtualAsync(
+                                        context,
+                                        cancellationToken,
+                                        classDeclaration),
+                                nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
+                            diagnostic);
+                        continue;
+                    }
+
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
+                            "Implement IDisposable and make class sealed.",
+                            cancellationToken =>
                                 ImplementIDisposableSealedAsync(
                                     context,
-                                    semanticModel,
                                     cancellationToken,
                                     classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
                         diagnostic);
-                    continue;
-                }
 
-                if (type.IsAbstract)
-                {
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             "Implement IDisposable with virtual dispose method.",
                             cancellationToken =>
                                 ImplementIDisposableVirtualAsync(
                                     context,
-                                    semanticModel,
                                     cancellationToken,
                                     classDeclaration),
                             nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
                         diagnostic);
-                    continue;
                 }
-
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Implement IDisposable and make class sealed.",
-                        cancellationToken =>
-                            ImplementIDisposableSealedAsync(
-                                context,
-                                semanticModel,
-                                cancellationToken,
-                                classDeclaration),
-                        nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
-                    diagnostic);
-
-                context.RegisterCodeFix(
-                    CodeAction.Create(
-                        "Implement IDisposable with virtual dispose method.",
-                        cancellationToken =>
-                            ImplementIDisposableVirtualAsync(
-                                context,
-                                semanticModel,
-                                cancellationToken,
-                                classDeclaration),
-                        nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
-                    diagnostic);
             }
         }
 
@@ -190,21 +196,20 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static async Task<Document> AddInterfaceAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> AddInterfaceAsync(CodeFixContext context, CancellationToken cancellationToken, TypeDeclarationSyntax typeDeclaration)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-            editor.AddInterfaceType(classDeclaration, IDisposableInterface);
+            editor.AddInterfaceType(typeDeclaration, IDisposableInterface);
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> OverrideDisposeAsync(CodeFixContext context, SemanticModel semanticModel, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
+        private static async Task<Document> OverrideDisposeAsync(CodeFixContext context, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
         {
-            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
-
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
+            var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var field = editor.AddField(
                 classDeclaration,
                 usesUnderscoreNames
@@ -278,13 +283,12 @@ namespace IDisposableAnalyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ImplementIDisposableVirtualAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> ImplementIDisposableVirtualAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
         {
-            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-
+            var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var field = editor.AddField(
                 classDeclaration,
                 usesUnderscoreNames
@@ -346,13 +350,12 @@ namespace IDisposableAnalyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ImplementIDisposableSealedAsync(CodeFixContext context, SemanticModel semanticModel, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> ImplementIDisposableSealedAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
         {
-            var type = (ITypeSymbol)semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(semanticModel);
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-
+            var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var field = editor.AddField(
                 classDeclaration,
                 usesUnderscoreNames
@@ -410,6 +413,26 @@ namespace IDisposableAnalyzers
                                            .ConfigureAwait(false);
             var updatedClassDeclaration = updatedRoot.GetCurrentNode(classDeclaration);
             return updated.WithSyntaxRoot(MakeSealedRewriter.Default.Visit(updatedRoot, updatedClassDeclaration));
+        }
+
+        private static async Task<Document> ImplementIDisposableStructAsync(CodeFixContext context, CancellationToken cancellationToken, StructDeclarationSyntax structDeclaration)
+        {
+            var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
+                                             .ConfigureAwait(false);
+
+            editor.AddMethod(
+                structDeclaration,
+                (MethodDeclarationSyntax)SyntaxFactory.ParseCompilationUnit(@"public void Dispose()
+                          {
+                          }")
+                                                      .Members
+                                                      .Single()
+                                                      .WithSimplifiedNames()
+                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                                      .WithAdditionalAnnotations(Formatter.Annotation));
+
+            return editor.GetChangedDocument();
         }
 
         private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, FieldDeclarationSyntax field = null)
