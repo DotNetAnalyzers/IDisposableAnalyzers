@@ -1,3 +1,4 @@
+// ReSharper disable InconsistentNaming
 namespace IDisposableAnalyzers.Test
 {
     using System;
@@ -35,13 +36,13 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void PropertyChangedAnalyzersSln(DiagnosticAnalyzer analyzer)
+        public void IDisposableAnalyzersSln(DiagnosticAnalyzer analyzer)
         {
             AnalyzerAssert.Valid(analyzer, Solution);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void PropertyChangedAnalyzersProject(DiagnosticAnalyzer analyzer)
+        public void IDisposableAnalyzersProject(DiagnosticAnalyzer analyzer)
         {
             AnalyzerAssert.Valid(analyzer, IDisposableAnalyzersAnalyzersProjectSln);
         }
