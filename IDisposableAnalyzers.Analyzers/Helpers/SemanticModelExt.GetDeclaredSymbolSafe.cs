@@ -73,6 +73,5 @@ namespace IDisposableAnalyzers
             return semanticModel.SemanticModelFor(node)
                                 ?.GetDeclaredSymbol(node, cancellationToken);
         }
-
     }
 }
