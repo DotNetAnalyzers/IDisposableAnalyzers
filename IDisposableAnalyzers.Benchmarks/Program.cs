@@ -24,9 +24,11 @@ namespace IDisposableAnalyzers.Benchmarks
                 benchmark.Run();
                 Console.WriteLine("Attach profiler and press any key to continue...");
                 Console.ReadKey();
+                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.Begin();
                 benchmark.Run();
+                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.End();
             }
-            else if (true)
+            else if (false)
             {
                 var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreReturnValueOfTypeIDisposable());
                 //// Warmup

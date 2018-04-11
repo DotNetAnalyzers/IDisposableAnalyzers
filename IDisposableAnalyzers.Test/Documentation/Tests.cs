@@ -16,6 +16,7 @@ namespace IDisposableAnalyzers.Test.Documentation
         private static readonly IReadOnlyList<DescriptorInfo> Descriptors = typeof(AnalyzerCategory)
             .Assembly.GetTypes()
             .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+            .Except(new[] { typeof(CacheAnalyzer) })
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
             .SelectMany(DescriptorInfo.Create)
             .OrderBy(x => x.Descriptor.Id)
