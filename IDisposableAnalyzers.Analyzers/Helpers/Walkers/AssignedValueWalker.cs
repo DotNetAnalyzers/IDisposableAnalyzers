@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -306,8 +305,8 @@ namespace IDisposableAnalyzers
                     if (this.semanticModel.GetSymbolSafe(argument.Expression, this.cancellationToken) is ISymbol symbol)
                     {
                         if (SymbolComparer.Equals(this.CurrentSymbol, symbol) ||
-                            this.refParameters.Contains(symbol) ||
-                            this.outParameters.Contains(symbol))
+                            this.refParameters.Contains(symbol as IParameterSymbol) ||
+                            this.outParameters.Contains(symbol as IParameterSymbol))
                         {
                             return method.TryGetMatchingParameter(argument, out parameter);
                         }
@@ -610,7 +609,7 @@ namespace IDisposableAnalyzers
                 this.values.Add(value);
             }
 
-            if (this.outParameters.Contains(assignedSymbol))
+            if (this.outParameters.Contains(assignedSymbol as IParameterSymbol))
             {
                 this.outValues.Add(value);
             }
