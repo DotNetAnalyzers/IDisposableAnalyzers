@@ -28,7 +28,9 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void SolutionRepro(DiagnosticAnalyzer analyzer)
         {
+            Cache<SyntaxTree, SemanticModel>.Begin();
             AnalyzerAssert.Valid(analyzer, Solution);
+            Cache<SyntaxTree, SemanticModel>.End();
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]

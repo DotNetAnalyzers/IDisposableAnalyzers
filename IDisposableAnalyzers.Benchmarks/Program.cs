@@ -5,6 +5,7 @@ namespace IDisposableAnalyzers.Benchmarks
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using BenchmarkDotNet.Reports;
@@ -17,15 +18,27 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(
-                    Code.AnalyzersProject,
-                    new AssignmentAnalyzer());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreReturnValueOfTypeIDisposable());
 
                 // Warmup
                 benchmark.Run();
                 Console.WriteLine("Attach profiler and press any key to continue...");
                 Console.ReadKey();
                 benchmark.Run();
+            }
+            else if (true)
+            {
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreReturnValueOfTypeIDisposable());
+                //// Warmup
+                benchmark.Run();
+                var sw = Stopwatch.StartNew();
+                ////Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.Begin();
+                benchmark.Run();
+                sw.Stop();
+                ////Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.End();
+                Console.WriteLine($"Took: {sw.Elapsed.TotalMilliseconds:F3} ms");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
             }
             else if (false)
             {
@@ -59,7 +72,7 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
                                           .Single();
-            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath,  "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
+            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath, "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
             Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
         }

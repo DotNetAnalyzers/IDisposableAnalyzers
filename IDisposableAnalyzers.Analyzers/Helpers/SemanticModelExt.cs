@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
 
     using Microsoft.CodeAnalysis;
@@ -154,23 +155,28 @@ namespace IDisposableAnalyzers
                 return semanticModel;
             }
 
-            if (semanticModel.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
-            {
-                return semanticModel.Compilation.GetSemanticModel(expression.SyntaxTree);
-            }
+            return Cache.GetOrAdd(expression.SyntaxTree, GetSemanticModel);
 
-            foreach (var metadataReference in semanticModel.Compilation.References)
+            SemanticModel GetSemanticModel(SyntaxTree syntaxTree)
             {
-                if (metadataReference is CompilationReference compilationReference)
+                if (semanticModel.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
                 {
-                    if (compilationReference.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
+                    return semanticModel.Compilation.GetSemanticModel(expression.SyntaxTree);
+                }
+
+                foreach (var metadataReference in semanticModel.Compilation.References)
+                {
+                    if (metadataReference is CompilationReference compilationReference)
                     {
-                        return compilationReference.Compilation.GetSemanticModel(expression.SyntaxTree);
+                        if (compilationReference.Compilation.ContainsSyntaxTree(expression.SyntaxTree))
+                        {
+                            return compilationReference.Compilation.GetSemanticModel(expression.SyntaxTree);
+                        }
                     }
                 }
-            }
 
-            return null;
+                return null;
+            }
         }
     }
 }
