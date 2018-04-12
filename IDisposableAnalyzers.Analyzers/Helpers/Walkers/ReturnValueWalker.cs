@@ -342,9 +342,9 @@ namespace IDisposableAnalyzers
 
             public void Clear()
             {
-                foreach (var walker in this.map)
+                foreach (var walker in this.map.Values)
                 {
-                    walker.Value?.Dispose();
+                    walker?.Dispose();
                 }
 
                 this.map.Clear();
