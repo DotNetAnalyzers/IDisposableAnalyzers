@@ -317,5 +317,38 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void LocalInLazy()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly Lazy<IDisposable> disposable;
+
+        public Foo()
+        {
+            this.disposable = new Lazy<IDisposable>(() =>
+            {
+                var temp = new Disposable();
+                return temp;
+            });
+        }
+
+        public void Dispose()
+        {
+            if (this.disposable.IsValueCreated)
+            {
+                this.disposable.Value.Dispose();
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

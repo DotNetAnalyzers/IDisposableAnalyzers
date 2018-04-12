@@ -362,7 +362,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (local.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration))
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
             {
                 if (declaration.Parent is UsingStatementSyntax ||
                     declaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -370,11 +370,11 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax block)
+                if (local.TryGetScope(cancellationToken, out var scope))
                 {
-                    return !IsReturned(local, block, semanticModel, cancellationToken) &&
-                           !IsAssignedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
-                           !IsAddedToFieldOrProperty(local, block, semanticModel, cancellationToken) &&
+                    return !IsReturned(local, scope, semanticModel, cancellationToken) &&
+                           !IsAssignedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
+                           !IsAddedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
                            !IsDisposedAfter(local, location, semanticModel, cancellationToken);
                 }
             }

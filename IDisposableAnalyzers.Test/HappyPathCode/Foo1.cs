@@ -33,6 +33,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+        private readonly Lazy<IDisposable> lazyDisposable;
 
         private IDisposable meh1;
         private IDisposable meh2;
@@ -50,6 +51,12 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
             using (var temp = CreateDisposable())
             {
             }
+
+            this.lazyDisposable = new Lazy<IDisposable>(() =>
+            {
+                var temp = new Disposable();
+                return temp;
+            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged
@@ -91,6 +98,10 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
         {
             this.subscription.Dispose();
             this.compositeDisposable.Dispose();
+            if (this.lazyDisposable.IsValueCreated)
+            {
+                this.lazyDisposable.Value.Dispose();
+            }
         }
 
         public IDisposable CreateDisposable() => new Disposable();
