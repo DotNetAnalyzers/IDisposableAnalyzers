@@ -870,5 +870,32 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void SingleSimpleAssignment()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public Foo()
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
     }
 }
