@@ -150,8 +150,6 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
             }
         }
 
-        public IDisposable CallingProperty() => CallingMethod;
-
         public static bool RecursiveOut(out IDisposable value)
         {
             return RecursiveOut(out value);
@@ -185,6 +183,8 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
         }
 
         public Disposable RecursiveMethod() => this.RecursiveMethod();
+
+        public IDisposable CallingProperty() => CallingMethod;
 
         public void NotUsingRecursive()
         {

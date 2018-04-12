@@ -281,6 +281,18 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
 
             return value;
         }
+
+        private static IReadOnlyList<IDisposable> Flatten(IReadOnlyList<IDisposable> source, List<IDisposable> result = null)
+        {
+            result = result ?? new List<IDisposable>();
+            result.AddRange(source);
+            foreach (var condition in source)
+            {
+                Flatten(new[] { condition }, result);
+            }
+
+            return result;
+        }
     }
 }";
             var converterCode = @"

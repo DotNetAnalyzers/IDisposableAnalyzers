@@ -11,6 +11,7 @@ namespace IDisposableAnalyzers
     {
         private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
+        private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private Search search;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
@@ -71,6 +72,7 @@ namespace IDisposableAnalyzers
         {
             this.returnValues.Clear();
             this.recursiveWalkers.Clear();
+            this.assignedValueWalkers.Clear();
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
         }
@@ -285,18 +287,23 @@ namespace IDisposableAnalyzers
                         this.AddReturnValue(coalesce.Right);
                         break;
                     case IdentifierNameSyntax identifierName when this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken).IsEither<ILocalSymbol, IParameterSymbol>():
-                        using (var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken))
+                        if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
                         {
-                            if (assignedValues.Count == 0)
+                            this.returnValues.Add(value);
+                            return;
+                        }
+
+                        var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken);
+                        this.assignedValueWalkers.Add(identifierName, assignedValues);
+                        if (assignedValues.Count == 0)
+                        {
+                            this.returnValues.Add(value);
+                        }
+                        else
+                        {
+                            foreach (var assignment in assignedValues)
                             {
-                                this.returnValues.Add(value);
-                            }
-                            else
-                            {
-                                foreach (var assignment in assignedValues)
-                                {
-                                    this.AddReturnValue(assignment);
-                                }
+                                this.AddReturnValue(assignment);
                             }
                         }
 
@@ -349,6 +356,31 @@ namespace IDisposableAnalyzers
 
                 this.map.Clear();
                 this.Parent = null;
+            }
+        }
+
+        private class AssignedValueWalkers
+        {
+            private readonly Dictionary<IdentifierNameSyntax, AssignedValueWalker> map = new Dictionary<IdentifierNameSyntax, AssignedValueWalker>();
+
+            public void Add(IdentifierNameSyntax location, AssignedValueWalker walker)
+            {
+                this.map.Add(location, walker);
+            }
+
+            public bool TryGetValue(IdentifierNameSyntax location, out AssignedValueWalker walker)
+            {
+                return this.map.TryGetValue(location, out walker);
+            }
+
+            public void Clear()
+            {
+                foreach (var walker in this.map.Values)
+                {
+                    walker?.Dispose();
+                }
+
+                this.map.Clear();
             }
         }
     }

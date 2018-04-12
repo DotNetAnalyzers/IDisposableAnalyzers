@@ -314,6 +314,8 @@ namespace RoslynSandbox
         [TestCase("RecursiveWithOptional(1, null)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.Recursive, "1")]
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("Flatten(null, null)", Search.TopLevel, "null")]
+        [TestCase("Flatten(null, null)", Search.Recursive, "null, new List<IDisposable>()")]
         public void CallRecursive(string code, Search search, string expected)
         {
             var testCode = @"
@@ -362,6 +364,18 @@ namespace RoslynSandbox
         private static int Recursive2(int value)
         {
             return Recursive1(value);
+        }
+
+        private static IReadOnlyList<IDisposable> Flatten(IReadOnlyList<IDisposable> source, List<IDisposable> result = null)
+        {
+            result = result ?? new List<IDisposable>();
+            result.AddRange(source);
+            foreach (var condition in source)
+            {
+                Flatten(new[] { condition }, result);
+            }
+
+            return result;
         }
     }
 }";
