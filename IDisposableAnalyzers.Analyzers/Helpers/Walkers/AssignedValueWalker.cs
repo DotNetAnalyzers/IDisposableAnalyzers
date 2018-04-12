@@ -757,31 +757,27 @@ namespace IDisposableAnalyzers
 
             public MemberWalkers Parent { get; set; }
 
-            private Dictionary<SyntaxNode, AssignedValueWalker> Current => this.Parent?.Current ??
-                                                                        this.map;
+            private Dictionary<SyntaxNode, AssignedValueWalker> Map => this.Parent?.Map ??
+                                                                       this.map;
 
             public void Add(SyntaxNode location, AssignedValueWalker walker)
             {
-                this.Current.Add(location, walker);
+                this.Map.Add(location, walker);
             }
 
             public bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
             {
-                return this.Current.TryGetValue(location, out walker);
+                return this.Map.TryGetValue(location, out walker);
             }
 
             public void Clear()
             {
-                if (this.map != null)
+                foreach (var walker in this.map.Values)
                 {
-                    foreach (var walker in this.map.Values)
-                    {
-                        walker?.Dispose();
-                    }
-
-                    this.map.Clear();
+                    walker?.Dispose();
                 }
 
+                this.map.Clear();
                 this.Parent = null;
             }
         }
