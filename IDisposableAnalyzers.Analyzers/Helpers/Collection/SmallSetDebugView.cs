@@ -4,11 +4,11 @@ namespace IDisposableAnalyzers
     using System.Diagnostics;
     using System.Linq;
 
-    internal class PooledSetDebugView<T>
+    internal class SmallSetDebugView<T>
     {
-        private readonly PooledSet<T> set;
+        private readonly SmallSet<T> set;
 
-        public PooledSetDebugView(PooledSet<T> set)
+        public SmallSetDebugView(SmallSet<T> set)
         {
             this.set = set ?? throw new ArgumentNullException(nameof(set));
         }

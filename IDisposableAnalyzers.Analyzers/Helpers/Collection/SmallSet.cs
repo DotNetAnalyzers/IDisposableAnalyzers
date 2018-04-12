@@ -3,7 +3,10 @@ namespace IDisposableAnalyzers
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
 
+    [DebuggerTypeProxy(typeof(SmallSetDebugView<>))]
+    [DebuggerDisplay("Count = {this.Count}, refCount = {this.refCount}")]
     internal class SmallSet<T> : IReadOnlyList<T>
     {
         private readonly List<T> inner = new List<T>();
