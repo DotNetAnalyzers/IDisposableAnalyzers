@@ -134,7 +134,8 @@ namespace IDisposableAnalyzers
                             return false;
                         }
 
-                        return MemberPath.TryFindRootMember(pooled[0], out disposedMember);
+                        return pooled.TrySingle(out var expression) &&
+                               MemberPath.TryFindRootMember(expression, out disposedMember);
                     }
                 }
             }
