@@ -14,6 +14,14 @@ namespace IDisposableAnalyzers
             return symbol is T1 || symbol is T2;
         }
 
+        internal static bool IsEither<T1, T2, T3>(this ISymbol symbol)
+            where T1 : ISymbol
+            where T2 : ISymbol
+            where T3 : ISymbol
+        {
+            return symbol is T1 || symbol is T2 || symbol is T3;
+        }
+
         internal static bool TryGetScope(this ILocalSymbol local, CancellationToken cancellationToken, out SyntaxNode scope)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration))
