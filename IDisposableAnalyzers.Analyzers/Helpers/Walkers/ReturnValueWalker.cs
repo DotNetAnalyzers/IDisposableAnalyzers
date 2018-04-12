@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
 
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
     {
-        private readonly List<ExpressionSyntax> returnValues = new List<ExpressionSyntax>();
+        private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private Search search;
         private SemanticModel semanticModel;
@@ -132,7 +132,6 @@ namespace IDisposableAnalyzers
                 }
 
                 this.returnValues.RemoveAll(IsParameter);
-                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
@@ -156,7 +155,6 @@ namespace IDisposableAnalyzers
                     this.AddReturnValue(returnValue);
                 }
 
-                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
@@ -190,7 +188,6 @@ namespace IDisposableAnalyzers
                 }
 
                 this.returnValues.RemoveAll(IsParameter);
-                this.returnValues.PurgeDuplicates();
                 return true;
             }
 
@@ -258,7 +255,6 @@ namespace IDisposableAnalyzers
                 base.Visit(lambda);
             }
 
-            this.returnValues.PurgeDuplicates();
             return true;
         }
 
@@ -331,31 +327,27 @@ namespace IDisposableAnalyzers
 
             public RecursiveWalkers Parent { get; set; }
 
-            private Dictionary<SyntaxNode, ReturnValueWalker> Current => this.Parent?.Current ??
-                                                                        this.map;
+            private Dictionary<SyntaxNode, ReturnValueWalker> Map => this.Parent?.Map ??
+                                                                     this.map;
 
             public void Add(SyntaxNode member, ReturnValueWalker walker)
             {
-                this.Current.Add(member, walker);
+                this.Map.Add(member, walker);
             }
 
             public bool TryGetValue(SyntaxNode member, out ReturnValueWalker walker)
             {
-                return this.Current.TryGetValue(member, out walker);
+                return this.Map.TryGetValue(member, out walker);
             }
 
             public void Clear()
             {
-                if (this.map != null)
+                foreach (var walker in this.map)
                 {
-                    foreach (var walker in this.map)
-                    {
-                        walker.Value?.Dispose();
-                    }
-
-                    this.map.Clear();
+                    walker.Value?.Dispose();
                 }
 
+                this.map.Clear();
                 this.Parent = null;
             }
         }
