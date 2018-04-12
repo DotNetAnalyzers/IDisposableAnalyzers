@@ -7,14 +7,14 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 
     internal partial class CodeFix
     {
-        internal class AddUsingInvocation
+        internal class AddUsingDeclaration
         {
             private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
             private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
 
             [Test]
-            public void AddUsingForLocal()
+            public void Local()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddUsingForLocalOneStatementAfter()
+            public void LocalOneStatementAfter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddUsingForLocalManyStatements()
+            public void LocalManyStatements()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -140,6 +140,49 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
+
+            [Test]
+            public void LocalInLambda()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                ↓var disposable = new Disposable();
+            };
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                using (var disposable = new Disposable())
+                {
+                }
+            };
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
         }
     }
 }
