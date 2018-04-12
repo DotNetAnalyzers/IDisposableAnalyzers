@@ -148,6 +148,7 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
+    using System.IO;
 
     public class Foo
     {
@@ -155,7 +156,7 @@ namespace RoslynSandbox
         {
             Console.CancelKeyPress += (_, __) =>
             {
-                ↓var disposable = new Disposable();
+                ↓var stream = File.OpenRead(string.Empty);
             };
         }
     }
@@ -165,6 +166,7 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
+    using System.IO;
 
     public class Foo
     {
@@ -172,7 +174,7 @@ namespace RoslynSandbox
         {
             Console.CancelKeyPress += (_, __) =>
             {
-                using (var disposable = new Disposable())
+                using (var stream = File.OpenRead(string.Empty))
                 {
                 }
             };
@@ -182,7 +184,6 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
-
         }
     }
 }

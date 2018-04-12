@@ -80,12 +80,15 @@ namespace IDisposableAnalyzers
             {
                 assignedSymbol = assignedValues.CurrentSymbol;
                 if (assignedValues.Count == 1 &&
-                    disposable.Parent is AssignmentExpressionSyntax assignment &&
-                    assignment.Parent is ParenthesizedExpressionSyntax parenthesizedExpression &&
-                    parenthesizedExpression.Parent is BinaryExpressionSyntax binary &&
-                    binary.IsKind(SyntaxKind.CoalesceExpression))
+                    disposable.Parent is AssignmentExpressionSyntax assignment)
                 {
-                    return Result.No;
+                    if (assignment.Parent is ParenthesizedExpressionSyntax parenthesizedExpression &&
+                        parenthesizedExpression.Parent is BinaryExpressionSyntax binary &&
+                        binary.IsKind(SyntaxKind.CoalesceExpression))
+                    {
+                        // lazy
+                        return Result.No;
+                    }
                 }
 
                 using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
