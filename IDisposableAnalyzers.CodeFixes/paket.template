@@ -1,5 +1,5 @@
 ﻿type file
-version 2.0.0.2
+version 2.0.1.0
 title IDisposableAnalyzers
 id IDisposableAnalyzers
 authors Johan Larsson, milleniumbug
@@ -13,7 +13,7 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releasenotes
-  FEATURE: Support C#7.
+  BUGFIX: Handle recursion.
 
 files
   bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs

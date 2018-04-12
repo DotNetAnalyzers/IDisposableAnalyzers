@@ -1,3 +1,6 @@
+#### 2.0.1
+* BUGFIX: Handle recursion.
+
 #### 2.0.0
 * FEATURE: Support C#7.
 
