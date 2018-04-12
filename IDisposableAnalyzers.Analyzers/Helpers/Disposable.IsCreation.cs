@@ -21,11 +21,12 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            if (semanticModel.GetSymbolSafe(disposable, cancellationToken) is IPropertySymbol property &&
+            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
+            if (symbol is IPropertySymbol property &&
                 IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
-                using (var symbols = PooledSet<ISymbol>.Borrow())
+                using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
                 {
                     using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
@@ -34,33 +35,33 @@ namespace IDisposableAnalyzers
                             if (assigned.Right is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == "value" &&
                                 IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
-                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol symbol &&
-                                symbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
+                                candidate.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
-                                symbols.Add(symbol);
+                                assignedSymbols.Add(candidate);
                             }
                         }
                     }
 
                     assignedSymbol = null;
                     var result = Result.No;
-                    foreach (var symbol in symbols)
+                    foreach (var candidate in assignedSymbols)
                     {
-                        switch (IsAssignedWithCreated(symbol, disposable, semanticModel, cancellationToken))
+                        switch (IsAssignedWithCreated(candidate, disposable, semanticModel, cancellationToken))
                         {
                             case Result.Unknown:
                                 if (result == Result.No)
                                 {
-                                    assignedSymbol = symbol;
+                                    assignedSymbol = candidate;
                                     result = Result.Unknown;
                                 }
 
                                 break;
                             case Result.Yes:
-                                assignedSymbol = symbol;
+                                assignedSymbol = candidate;
                                 return Result.Yes;
                             case Result.AssumeYes:
-                                assignedSymbol = symbol;
+                                assignedSymbol = candidate;
                                 result = Result.AssumeYes;
                                 break;
                             case Result.No:
