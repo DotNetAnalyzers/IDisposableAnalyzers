@@ -89,8 +89,7 @@ namespace IDisposableAnalyzers
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken)
-                          .IsEither(Result.Yes, Result.AssumeYes) &&
+            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) == Result.Yes &&
                 context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol returnedSymbol)
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||

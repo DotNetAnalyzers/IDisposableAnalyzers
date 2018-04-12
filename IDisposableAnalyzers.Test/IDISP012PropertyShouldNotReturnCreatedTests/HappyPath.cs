@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -84,7 +84,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningNewTimespan()
+        public void PropertyReturningNewTimeSpan()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningNewTimespanExpressionBody()
+        public void PropertyReturningNewTimeSpanExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -168,6 +168,30 @@ namespace RoslynSandbox
         {
             this.disposable.Dispose();
         }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void PropertyReturningBackingFieldFunc()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo
+    {
+        private readonly Func<IDisposable> func;
+
+        public Foo(Func<IDisposable> func)
+        {
+            this.func = func;
+        }
+
+        public IDisposable Disposable => this.func();
     }
 }";
 
