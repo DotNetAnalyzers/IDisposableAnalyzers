@@ -56,6 +56,8 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
             }
         }
 
+        public IDisposable CallingMethod => CallingMethod;
+
         public IDisposable Value4
         {
             get
@@ -147,6 +149,8 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
                 this.bar2 = value;
             }
         }
+
+        public IDisposable CallingProperty() => CallingMethod;
 
         public static bool RecursiveOut(out IDisposable value)
         {
