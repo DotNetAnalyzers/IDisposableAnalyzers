@@ -672,8 +672,7 @@ namespace IDisposableAnalyzers
         {
             if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
-                if (node is ExpressionStatementSyntax &&
-                    this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
+                if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
                     node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                 {
                     return node.IsExecutedBefore(this.context);
