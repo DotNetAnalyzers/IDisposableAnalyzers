@@ -187,5 +187,42 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void UsingNewBarLocalFuncTask()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public struct Bar : IDisposable
+    {
+        public Bar(Func<Task> task)
+        {
+            this.Task = task();
+        }
+
+        public Task Task { get; }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public sealed class Foo
+    {
+        public Foo()
+        {
+            var fromResult = Task.FromResult(1);
+            using (var bar = new Bar(() => fromResult))
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

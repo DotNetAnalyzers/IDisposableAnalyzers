@@ -139,7 +139,8 @@ namespace IDisposableAnalyzers
             }
 
             if (ReturnType(context).Is(KnownSymbol.Task) &&
-                returnValue.FirstAncestor<UsingStatementSyntax>() != null &&
+                returnValue.FirstAncestor<UsingStatementSyntax>() is UsingStatementSyntax usingStatement &&
+                usingStatement.Statement.Contains(returnValue) &&
                 returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
                 context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&
                 ShouldAwait(context, returnValue))
