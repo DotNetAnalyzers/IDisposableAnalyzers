@@ -6,11 +6,6 @@ namespace IDisposableAnalyzers
 
     internal static class BasePropertyDeclarationSyntaxExt
     {
-        internal static bool IsPropertyOrIndexer(this BasePropertyDeclarationSyntax declaration)
-        {
-            return declaration is PropertyDeclarationSyntax || declaration is IndexerDeclarationSyntax;
-        }
-
         internal static bool TryGetGetter(this BasePropertyDeclarationSyntax property, out AccessorDeclarationSyntax result)
         {
             result = null;
