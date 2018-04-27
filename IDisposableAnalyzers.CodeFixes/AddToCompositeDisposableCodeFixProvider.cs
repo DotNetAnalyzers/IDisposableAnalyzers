@@ -5,6 +5,7 @@ namespace IDisposableAnalyzers
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -83,13 +84,13 @@ namespace IDisposableAnalyzers
             }
             else
             {
-                var code = CodeStyle.UnderscoreFields(editor.SemanticModel)
+                var code = editor.SemanticModel.UnderscoreFields()
                     ? $"{field.Name}.Add({statement.Expression});"
                     : $"this.{field.Name}.Add({statement.Expression});";
 
                 editor.ReplaceNode(
                     statement,
-                    SyntaxFactory.ParseStatement(code).WithTriviaFrom(statement));
+                    SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseStatement(code), statement));
             }
 
             bool TryGetPreviousStatement(out StatementSyntax result)

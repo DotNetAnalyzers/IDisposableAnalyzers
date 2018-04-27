@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using System.Composition;
     using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -74,7 +75,7 @@ namespace IDisposableAnalyzers
         private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var variableDeclarator = statement.Declaration.Variables[0];
             var identifier = variableDeclarator.Identifier;
             var field = editor.AddField(

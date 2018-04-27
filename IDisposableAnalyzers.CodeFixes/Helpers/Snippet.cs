@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Threading;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,17 +11,16 @@ namespace IDisposableAnalyzers
         internal static StatementSyntax DisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var prefix = member.IsEither<IFieldSymbol, IPropertySymbol>() &&
-                         !CodeStyle.UnderscoreFields(semanticModel)
+                         !semanticModel.UnderscoreFields()
                     ? "this."
                     : string.Empty;
             var type = MemberType(member);
             if (!Disposable.IsAssignableTo(type) ||
                 IsExplicit(type))
             {
-                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
-                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                    .WithSimplifiedNames();
+                return Simplify.WithSimplifiedNames(SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
+                                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
             }
 
             if (IsNeverNull(member, semanticModel, cancellationToken))

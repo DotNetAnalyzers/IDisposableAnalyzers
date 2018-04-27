@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
-
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
