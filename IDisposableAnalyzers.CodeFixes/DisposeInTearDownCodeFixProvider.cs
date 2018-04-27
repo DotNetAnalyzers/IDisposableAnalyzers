@@ -5,6 +5,7 @@ namespace IDisposableAnalyzers
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -48,7 +49,7 @@ namespace IDisposableAnalyzers
                              (SyntaxNode)(node as AssignmentExpressionSyntax)?.Left;
                 if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
-                    if (TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
+                    if (TestFixture.IsAssignedInSetUp(memberSymbol, SyntaxNodeExt.FirstAncestor<ClassDeclarationSyntax>(member), semanticModel, context.CancellationToken, out var setupAttribute))
                     {
                         if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDownMethodDeclaration))
                         {
@@ -57,9 +58,9 @@ namespace IDisposableAnalyzers
                                 (editor, cancellationToken) => DisposeInTearDownMethod(editor, memberSymbol, tearDownMethodDeclaration, cancellationToken),
                                 diagnostic);
                         }
-                        else if (setupAttribute.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax setupMethod)
+                        else if (SyntaxNodeExt.FirstAncestor<MethodDeclarationSyntax>(setupAttribute) is MethodDeclarationSyntax setupMethod)
                         {
-                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
+                            var tearDownType = SemanticModelExt.GetTypeInfoSafe(semanticModel, setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
                                 ? KnownSymbol.NUnitTearDownAttribute
                                 : KnownSymbol.NUnitOneTimeTearDownAttribute;
 
@@ -122,9 +123,9 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetMemberSymbol(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
-            symbol = semanticModel.GetSymbolSafe(node, cancellationToken) ??
-                     semanticModel.GetDeclaredSymbolSafe(node, cancellationToken);
-            return symbol != null && symbol.IsEither<IFieldSymbol, IPropertySymbol>();
+            symbol = SemanticModelExt.GetSymbolSafe(semanticModel, node, cancellationToken) ??
+                     SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, node, cancellationToken);
+            return symbol != null && SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(symbol);
         }
     }
 }

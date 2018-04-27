@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class DependencyPropertyType : QualifiedType
     {
         internal readonly QualifiedMethod Register;

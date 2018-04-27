@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class XunitAssertType : QualifiedType
     {
         internal readonly QualifiedMethod Equal;

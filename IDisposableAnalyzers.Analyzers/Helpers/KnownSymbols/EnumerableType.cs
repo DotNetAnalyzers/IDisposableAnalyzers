@@ -1,5 +1,7 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class EnumerableType : QualifiedType
     {
         internal static readonly EnumerableType Default = new EnumerableType();

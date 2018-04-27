@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class NUnitAssertType : QualifiedType
     {
         internal readonly QualifiedMethod AreEqual;

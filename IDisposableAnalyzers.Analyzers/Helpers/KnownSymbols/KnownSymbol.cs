@@ -2,6 +2,8 @@
 // ReSharper disable UnusedMember.Global
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal static class KnownSymbol
     {
         internal static readonly QualifiedType Void = Create("System.Void", "void");

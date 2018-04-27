@@ -1,6 +1,7 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -60,7 +61,7 @@
                 }
             }
 
-            var attributeType = semanticModel.GetTypeInfoSafe(attribute, cancellationToken).Type;
+            var attributeType = SemanticModelExt.GetTypeInfoSafe(semanticModel, attribute, cancellationToken).Type;
             return attributeType == qualifiedType;
         }
     }

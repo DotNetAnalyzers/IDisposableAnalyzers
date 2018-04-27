@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class ResourceManagerType : QualifiedType
     {
         internal readonly QualifiedMethod GetStream;

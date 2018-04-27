@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class CompositeDisposableType : QualifiedType
     {
         internal readonly QualifiedMethod Add;

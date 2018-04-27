@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     // ReSharper disable once InconsistentNaming
     internal class IListType : QualifiedType
     {

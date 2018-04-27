@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -52,7 +53,7 @@ namespace IDisposableAnalyzers
             SemanticModel semanticModel,
             CancellationToken cancellationToken)
         {
-            var conversion = semanticModel.SemanticModelFor(valueExpression)
+            var conversion = SemanticModelExt.SemanticModelFor(semanticModel, valueExpression)
                                           .ClassifyConversion(valueExpression, toType);
             if (!conversion.Exists)
             {
@@ -82,7 +83,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            if (toType.IsNullable(valueExpression, semanticModel, cancellationToken))
+            if (IsNullable(toType, valueExpression, semanticModel, cancellationToken))
             {
                 return true;
             }
@@ -110,8 +111,8 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            var typeInfo = semanticModel.GetTypeInfoSafe(value, cancellationToken);
-            return namedTypeSymbol.TypeArguments[0].IsSameType(typeInfo.Type);
+            var typeInfo = SemanticModelExt.GetTypeInfoSafe(semanticModel, value, cancellationToken);
+            return IsSameType(namedTypeSymbol.TypeArguments[0], typeInfo.Type);
         }
 
         internal static bool Is(this ITypeSymbol type, QualifiedType qualifiedType)
@@ -120,7 +121,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var constraintType in typeParameter.ConstraintTypes)
                 {
-                    if (constraintType.Is(qualifiedType))
+                    if (Is(constraintType, qualifiedType))
                     {
                         return true;
                     }

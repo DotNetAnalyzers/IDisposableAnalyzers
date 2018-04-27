@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class StringBuilderType : QualifiedType
     {
         internal readonly QualifiedMethod AppendLine;

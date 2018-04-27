@@ -1,5 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using Gu.Roslyn.AnalyzerExtensions;
+
     internal class PasswordBoxType : QualifiedType
     {
         internal readonly QualifiedProperty SecurePassword;
