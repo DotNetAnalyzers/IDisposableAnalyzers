@@ -47,7 +47,7 @@ namespace RoslynSandbox
 }";
                 testCode = testCode.AssertReplace("foo.Inner", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.FindEqualsValueClause("var temp = ").Value;
+                var value = syntaxTree.FindExpression(code);
                 Assert.AreEqual(true, MemberPath.TryFindRootMember(value, out ExpressionSyntax member));
                 Assert.AreEqual(expected, member.ToString());
 

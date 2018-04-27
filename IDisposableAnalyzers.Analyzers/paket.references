@@ -1,4 +1,5 @@
 Microsoft.CodeAnalysis.CSharp
+Gu.Roslyn.AnalyzerExtensions
 
 group Analyzers
   AsyncUsageAnalyzers

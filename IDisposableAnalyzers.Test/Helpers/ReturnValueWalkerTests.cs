@@ -31,7 +31,7 @@ internal class Foo
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause("var text = await CreateAsync()").Value;
+            var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
             using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled);
