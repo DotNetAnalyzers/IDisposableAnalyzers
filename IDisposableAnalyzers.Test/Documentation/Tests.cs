@@ -24,7 +24,7 @@ namespace IDisposableAnalyzers.Test.Documentation
 
         private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln").DirectoryName;
+        private static string SolutionDirectory => SolutionFile.Find("IDisposableAnalyzers.sln").DirectoryName;
 
         private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
 

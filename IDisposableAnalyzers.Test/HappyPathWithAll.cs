@@ -19,13 +19,13 @@ namespace IDisposableAnalyzers.Test
             .ToImmutableArray();
 
         private static readonly Solution Solution = CodeFactory.CreateSolution(
-            CodeFactory.FindSolutionFile("IDisposableAnalyzers.sln"),
+            SolutionFile.Find("IDisposableAnalyzers.sln"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
         // ReSharper disable once InconsistentNaming
-        private static readonly Solution IDisposableAnalyzersAnalyzersProjectSln = CodeFactory.CreateSolution(
-            CodeFactory.FindProjectFile("IDisposableAnalyzers.Analyzers.csproj"),
+        private static readonly Solution Project = CodeFactory.CreateSolution(
+            ProjectFile.Find("IDisposableAnalyzers.Analyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
@@ -44,7 +44,7 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void IDisposableAnalyzersProject(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, IDisposableAnalyzersAnalyzersProjectSln);
+            AnalyzerAssert.Valid(analyzer, Project);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]

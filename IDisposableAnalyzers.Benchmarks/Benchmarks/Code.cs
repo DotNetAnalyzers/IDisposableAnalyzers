@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Benchmarks.Benchmarks
+namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -30,7 +30,7 @@
                                                                                                     .ToArray();
 
         public static Solution AnalyzersProject { get; } = CodeFactory.CreateSolution(
-            CodeFactory.FindProjectFile("IDisposableAnalyzers.Analyzers.csproj"),
+            ProjectFile.Find("IDisposableAnalyzers.Analyzers.csproj"),
             AllAnalyzers,
             MetadataReferences);
     }
