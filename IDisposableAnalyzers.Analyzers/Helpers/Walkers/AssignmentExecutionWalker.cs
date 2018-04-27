@@ -2,7 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -68,7 +68,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in pooledAssignments.Assignments)
                 {
-                    var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
+                    var assignedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
                     {
                         assignment = candidate;
@@ -93,7 +93,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in pooledAssignments.Assignments)
                 {
-                    var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
+                    var assignedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
                     {
                         if (assignment != null)
@@ -133,9 +133,9 @@ namespace IDisposableAnalyzers
                 foreach (var declaration in walker.localDeclarations)
                 {
                     if (declaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
-                        variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
+                        EnumerableExt.TryFirst(variableDeclaration.Variables, x => x.Initializer != null, out var variable) &&
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
-                        semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
+                        SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, variable, cancellationToken) is ILocalSymbol local)
                     {
                         using (var visited = recursion.IncrementUsage())
                         {
@@ -154,9 +154,9 @@ namespace IDisposableAnalyzers
                     {
                         if (argument.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == symbol.Name &&
-                            semanticModel.GetSymbolSafe(argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
+                            SemanticModelExt.GetSymbolSafe(semanticModel, argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
                             method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
-                            method.TryGetMatchingParameter(argument, out var parameter))
+                            MethodSymbolExt.TryGetMatchingParameter(method, argument, out var parameter))
                         {
                             using (var visited = recursion.IncrementUsage())
                             {
@@ -197,17 +197,17 @@ namespace IDisposableAnalyzers
                     return IsMatch(symbol, binary.Left, semanticModel, cancellationToken);
                 case CastExpressionSyntax cast:
                     return IsMatch(symbol, cast.Expression, semanticModel, cancellationToken);
-                case ObjectCreationExpressionSyntax objectCreation when objectCreation.ArgumentList != null && objectCreation.ArgumentList.Arguments.TryFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _):
+                case ObjectCreationExpressionSyntax objectCreation when objectCreation.ArgumentList != null && EnumerableExt.TryFirst(objectCreation.ArgumentList.Arguments, x => SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, x.Expression, cancellationToken)), out ArgumentSyntax _):
                     return true;
                 default:
-                    if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                    if (SymbolExt.IsEither<ILocalSymbol, IParameterSymbol>(symbol))
                     {
                         return expression is IdentifierNameSyntax identifierName &&
                                identifierName.Identifier.ValueText == symbol.Name &&
-                               SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(expression, cancellationToken));
+                               SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, expression, cancellationToken));
                     }
 
-                    return SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(expression, cancellationToken));
+                    return SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, expression, cancellationToken));
             }
         }
     }

@@ -1,7 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -19,10 +19,10 @@ namespace IDisposableAnalyzers
 
             if (candidate is ObjectCreationExpressionSyntax objectCreation)
             {
-                return IsAssignableTo(semanticModel.GetTypeInfoSafe(objectCreation, cancellationToken).Type);
+                return IsAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, objectCreation, cancellationToken).Type);
             }
 
-            return IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type);
+            return IsPotentiallyAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken).Type);
         }
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
@@ -97,7 +97,7 @@ namespace IDisposableAnalyzers
                            (disposeMethod.Parameters.Length == 1 &&
                             disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
                 case 2:
-                    if (disposers.TrySingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
+                    if (EnumerableExt.TrySingle(disposers, x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
                     {
                         disposeMethod = temp as IMethodSymbol;
                         return disposeMethod != null &&
@@ -123,7 +123,7 @@ namespace IDisposableAnalyzers
             var baseType = type.BaseType;
             while (baseType != null)
             {
-                if (baseType.TryFindSingleMethodRecursive("Dispose", IsVirtualDispose, out result))
+                if (TypeSymbolExt.TryFindSingleMethodRecursive(baseType, "Dispose", IsVirtualDispose, out result))
                 {
                     return true;
                 }
@@ -143,7 +143,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (location.IsExecutedBefore(invocation) == Result.Yes &&
+                        if (SyntaxNodeExt.IsExecutedBefore(location, invocation) == Result.Yes &&
                             IsDisposing(invocation, local, semanticModel, cancellationToken))
                         {
                             return true;
@@ -155,7 +155,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var usingStatement in walker.UsingStatements)
                     {
-                        if (location.IsExecutedBefore(usingStatement) == Result.Yes &&
+                        if (SyntaxNodeExt.IsExecutedBefore(location, usingStatement) == Result.Yes &&
                             usingStatement.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == local.Name)
                         {
@@ -186,7 +186,7 @@ namespace IDisposableAnalyzers
                         candidate = binary.Left;
                     }
 
-                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
+                    var returnedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
                     if (SymbolComparer.Equals(symbol, returnedSymbol))
                     {
                         return true;
@@ -198,7 +198,7 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var argument in objectCreation.ArgumentList.Arguments)
                             {
-                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
+                                var arg = SemanticModelExt.GetSymbolSafe(semanticModel, argument.Expression, cancellationToken);
                                 if (SymbolComparer.Equals(symbol, arg))
                                 {
                                     return true;
@@ -210,7 +210,7 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var argument in objectCreation.Initializer.Expressions)
                             {
-                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
+                                var arg = SemanticModelExt.GetSymbolSafe(semanticModel, argument, cancellationToken);
                                 if (SymbolComparer.Equals(symbol, arg))
                                 {
                                     return true;
@@ -223,7 +223,7 @@ namespace IDisposableAnalyzers
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TrySingle(out ArgumentSyntax argument) &&
+                            EnumerableExt.TrySingle(invocation.ArgumentList.Arguments, out ArgumentSyntax argument) &&
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;
@@ -249,9 +249,9 @@ namespace IDisposableAnalyzers
         {
             if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.Recursive, semanticModel, cancellationToken, out var assignment))
             {
-                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
-                           semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
-                if (left.IsEither<IParameterSymbol, ILocalSymbol>())
+                var left = SemanticModelExt.GetSymbolSafe(semanticModel, assignment.Left, cancellationToken) ??
+                           SemanticModelExt.GetSymbolSafe(semanticModel, (assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
+                if (SymbolExt.IsEither<IParameterSymbol, ILocalSymbol>(left))
                 {
                     using (visited = visited.IncrementUsage())
                     {
@@ -260,7 +260,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                return left.IsEither<IFieldSymbol, IPropertySymbol>();
+                return SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(left);
             }
 
             return false;
@@ -273,16 +273,16 @@ namespace IDisposableAnalyzers
                 foreach (var invocation in pooledInvocations.Invocations)
                 {
                     if (TryGetArgument(invocation, out var argument) &&
-                        semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate)
+                        SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol candidate)
                     {
                         if (IsAddMethod(candidate) &&
-                            symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
+                            symbol.Equals(SemanticModelExt.GetSymbolSafe(semanticModel, argument.Expression, cancellationToken)))
                         {
                             return true;
                         }
 
                         if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
-                            candidate.TryGetMatchingParameter(argument, out var parameter))
+                            MethodSymbolExt.TryGetMatchingParameter(candidate, argument, out var parameter))
                         {
                             using (var visited = recursion.IncrementUsage())
                             {
@@ -306,7 +306,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var candidate in argumentList.Arguments)
                     {
-                        if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                        if (SymbolExt.IsEither<ILocalSymbol, IParameterSymbol>(symbol))
                         {
                             if (candidate.Expression is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == symbol.Name)
@@ -323,7 +323,7 @@ namespace IDisposableAnalyzers
                                 return true;
                             }
                         }
-                        else if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(candidate.Expression, cancellationToken)))
+                        else if (SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Expression, cancellationToken)))
                         {
                             argument = candidate;
                             return true;
@@ -362,7 +362,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
+            if (SymbolExt.TrySingleDeclaration(local, cancellationToken, out var declaration))
             {
                 if (declaration.Parent is UsingStatementSyntax ||
                     declaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -370,7 +370,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (local.TryGetScope(cancellationToken, out var scope))
+                if (SymbolExt.TryGetScope(local, cancellationToken, out var scope))
                 {
                     return !IsReturned(local, scope, semanticModel, cancellationToken) &&
                            !IsAssignedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
@@ -392,7 +392,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
+            if (SymbolExt.TrySingleDeclaration(parameter, cancellationToken, out var declaration) &&
                 declaration.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                 methodDeclaration.Body is BlockSyntax block)

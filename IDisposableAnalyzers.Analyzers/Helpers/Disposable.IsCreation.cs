@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers
     using System;
     using System.Diagnostics;
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
+            var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, disposable, cancellationToken);
             if (symbol is IPropertySymbol property &&
                 IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
@@ -35,8 +35,8 @@ namespace IDisposableAnalyzers
                             if (assigned.Right is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == "value" &&
                                 IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
-                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
-                                candidate.IsEither<IFieldSymbol, IPropertySymbol>())
+                                SemanticModelExt.GetSymbolSafe(semanticModel, assigned.Left, cancellationToken) is ISymbol candidate &&
+                                SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(candidate))
                             {
                                 assignedSymbols.Add(candidate);
                             }
@@ -123,7 +123,7 @@ namespace IDisposableAnalyzers
 
             if (candidate is IdentifierNameSyntax identifierName &&
                 identifierName.Identifier.ValueText == "value" &&
-                candidate.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+                SyntaxNodeExt.FirstAncestor<AccessorDeclarationSyntax>(candidate) is AccessorDeclarationSyntax accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
                 return Result.No;
@@ -138,7 +138,7 @@ namespace IDisposableAnalyzers
             {
                 if (walker.Count == 0)
                 {
-                    var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
+                    var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
                     if (symbol != null &&
                         symbol.DeclaringSyntaxReferences.Length == 0)
                     {
@@ -234,7 +234,7 @@ namespace IDisposableAnalyzers
             }
 
             if (!IsPotentiallyAssignableTo(
-                semanticModel.GetTypeInfoSafe(candidate, cancellationToken)
+                SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken)
                              .Type))
             {
                 return Result.No;
@@ -253,7 +253,7 @@ namespace IDisposableAnalyzers
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
+                if (IsAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken).Type))
                 {
                     return Result.Yes;
                 }
@@ -261,7 +261,7 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
+            var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
             return IsCreationCore(symbol);
         }
 

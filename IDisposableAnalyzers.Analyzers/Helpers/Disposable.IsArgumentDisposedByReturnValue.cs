@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -9,7 +10,7 @@ namespace IDisposableAnalyzers
     {
         internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
-            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, memberAccess, cancellationToken);
             if (symbol is IMethodSymbol method)
             {
                 if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
@@ -33,7 +34,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (symbol.IsEither<IFieldSymbol, IPropertySymbol>())
+            if (SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(symbol))
             {
                 return Result.No;
             }
@@ -46,7 +47,7 @@ namespace IDisposableAnalyzers
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
                 if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+                    SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol method)
                 {
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
@@ -73,7 +74,7 @@ namespace IDisposableAnalyzers
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                         if (initializer != null)
                         {
-                            if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
+                            if (SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
                                 if (TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out var disposeMethod))
@@ -115,7 +116,7 @@ namespace IDisposableAnalyzers
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
                 if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+                    SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol method)
                 {
                     if (method == KnownSymbol.CompositeDisposable.Add)
                     {
@@ -128,7 +129,7 @@ namespace IDisposableAnalyzers
                     }
 
                     if (method.TrySingleDeclaration(cancellationToken, out var declaration) &&
-                        method.TryGetMatchingParameter(argument, out var parameter))
+                        MethodSymbolExt.TryGetMatchingParameter(method, argument, out var parameter))
                     {
                         using (visited = visited.IncrementUsage())
                         {
@@ -137,7 +138,7 @@ namespace IDisposableAnalyzers
                                 foreach (var nested in walker)
                                 {
                                     if (nested.ArgumentList != null &&
-                                        nested.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == parameter.Name, out var nestedArg))
+                                        EnumerableExt.TryFirst(nested.ArgumentList.Arguments, x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == parameter.Name, out var nestedArg))
                                     {
                                         switch (IsArgumentAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
                                         {
@@ -212,7 +213,7 @@ namespace IDisposableAnalyzers
             {
                 if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
                 {
-                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    if (ObjectCreationExt.TryGetMatchingArgument(nestedObjectCreation, parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
@@ -222,7 +223,7 @@ namespace IDisposableAnalyzers
 
                 if (returnValue is InvocationExpressionSyntax nestedInvocation)
                 {
-                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    if (InvocationExpressionSyntaxExt.TryGetMatchingArgument(nestedInvocation, parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
@@ -252,17 +253,17 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
         {
-            var objectCreation = argument.FirstAncestor<ObjectCreationExpressionSyntax>();
+            var objectCreation = SyntaxNodeExt.FirstAncestor<ObjectCreationExpressionSyntax>(argument);
             if (objectCreation != null)
             {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
+                ctor = SemanticModelExt.GetSymbolSafe(semanticModel, objectCreation, cancellationToken) as IMethodSymbol;
                 return ctor != null;
             }
 
-            var initializer = argument.FirstAncestor<ConstructorInitializerSyntax>();
+            var initializer = SyntaxNodeExt.FirstAncestor<ConstructorInitializerSyntax>(argument);
             if (initializer != null)
             {
-                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken);
+                ctor = SemanticModelExt.GetSymbolSafe(semanticModel, initializer, cancellationToken);
                 return ctor != null;
             }
 
@@ -279,12 +280,12 @@ namespace IDisposableAnalyzers
             }
 
             if (method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
-                methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
+                BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(methodDeclaration, argument, out var parameter))
             {
-                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
+                var parameterSymbol = SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, parameter, cancellationToken);
                 if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
                 {
-                    member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
+                    member = SemanticModelExt.GetSymbolSafe(semanticModel, assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||
                         member is IPropertySymbol)
                     {
@@ -295,9 +296,9 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
+                    EnumerableExt.TrySingle(initializer.ArgumentList.Arguments, x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
                 {
-                    var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
+                    var chained = SemanticModelExt.GetSymbolSafe(semanticModel, ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
                 }
             }

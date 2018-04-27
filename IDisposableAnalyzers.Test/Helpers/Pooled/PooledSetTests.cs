@@ -1,6 +1,7 @@
 // ReSharper disable UnusedVariable
 namespace IDisposableAnalyzers.Test.Helpers.Pooled
 {
+    using Gu.Roslyn.AnalyzerExtensions;
     using NUnit.Framework;
 
    internal class PooledSetTests
