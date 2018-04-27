@@ -165,7 +165,7 @@ namespace IDisposableAnalyzers
 
         private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
         {
-            return SymbolExt.TrySingleDeclaration<SyntaxNode>(symbol, cancellationToken, out var declaration) &&
+            return symbol.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
                    declaration.Parent?.Parent is UsingStatementSyntax;
         }
 
@@ -173,7 +173,7 @@ namespace IDisposableAnalyzers
         {
             if (SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol method &&
                 method.ReturnType.Is(KnownSymbol.IEnumerable) &&
-                SymbolExt.TrySingleDeclaration(method, cancellationToken, out MethodDeclarationSyntax methodDeclaration))
+                method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
             {
                 if (YieldStatementWalker.Any(methodDeclaration))
                 {

@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -110,7 +111,7 @@ namespace IDisposableAnalyzers
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation, out IMethodSymbol method)
         {
             if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method) &&
-                method.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                 this.TryGetRecursive(invocation, declaration, out var walker))
             {
                 foreach (var value in walker.returnValues)

@@ -128,7 +128,7 @@ namespace IDisposableAnalyzers
                         return Result.Yes;
                     }
 
-                    if (method.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                    if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                         MethodSymbolExt.TryGetMatchingParameter(method, argument, out var parameter))
                     {
                         using (visited = visited.IncrementUsage())
@@ -279,7 +279,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
+            if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
                 BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(methodDeclaration, argument, out var parameter))
             {
                 var parameterSymbol = SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, parameter, cancellationToken);

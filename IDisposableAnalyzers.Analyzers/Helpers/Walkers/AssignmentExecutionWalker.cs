@@ -155,7 +155,7 @@ namespace IDisposableAnalyzers
                         if (argument.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == symbol.Name &&
                             SemanticModelExt.GetSymbolSafe(semanticModel, argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
-                            method.TrySingleDeclaration(cancellationToken, out var methodDeclaration) &&
+                            method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
                             MethodSymbolExt.TryGetMatchingParameter(method, argument, out var parameter))
                         {
                             using (var visited = recursion.IncrementUsage())

@@ -35,7 +35,7 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
-                method.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
+                method.TrySingleDeclaration(context.CancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                 method.TryGetMatchingParameter(argument, out var parameter) &&
                 Disposable.IsPotentiallyAssignableTo(parameter.Type))
             {

@@ -281,8 +281,8 @@ namespace IDisposableAnalyzers
                             return true;
                         }
 
-                        if (candidate.TrySingleDeclaration(cancellationToken, out var declaration) &&
-                            MethodSymbolExt.TryGetMatchingParameter(candidate, argument, out var parameter))
+                        if (candidate.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
+                            candidate.TryGetMatchingParameter(argument, out var parameter))
                         {
                             using (var visited = recursion.IncrementUsage())
                             {
@@ -362,7 +362,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (SymbolExt.TrySingleDeclaration(local, cancellationToken, out var declaration))
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
             {
                 if (declaration.Parent is UsingStatementSyntax ||
                     declaration.Parent is AnonymousFunctionExpressionSyntax)
@@ -392,7 +392,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (SymbolExt.TrySingleDeclaration(parameter, cancellationToken, out var declaration) &&
+            if (parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                 methodDeclaration.Body is BlockSyntax block)
