@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System.Collections.Generic;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -99,86 +98,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-        }
-
-        internal static void AddRunBefore(SyntaxNode context, HashSet<IMethodSymbol> ctorsRunBefore, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (context == null)
-            {
-                return;
-            }
-
-            var contextCtor = context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (contextCtor == null)
-            {
-                var type = (INamedTypeSymbol)semanticModel.GetDeclaredSymbolSafe(context.FirstAncestorOrSelf<TypeDeclarationSyntax>(), cancellationToken);
-                if (type == null)
-                {
-                    return;
-                }
-
-                if (type.Constructors.Length != 0)
-                {
-                    foreach (var ctor in type.Constructors)
-                    {
-                        foreach (var reference in ctor.DeclaringSyntaxReferences)
-                        {
-                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                            ctorsRunBefore.Add(ctor).IgnoreReturnValue();
-                            AddCtorsRecursively(ctorDeclaration, ctorsRunBefore, semanticModel, cancellationToken);
-                        }
-                    }
-                }
-                else
-                {
-                    if (TryGetDefault(type, out IMethodSymbol ctor))
-                    {
-                        foreach (var reference in ctor.DeclaringSyntaxReferences)
-                        {
-                            var ctorDeclaration = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                            ctorsRunBefore.Add(ctor).IgnoreReturnValue();
-                            AddCtorsRecursively(ctorDeclaration, ctorsRunBefore, semanticModel, cancellationToken);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                AddCtorsRecursively(contextCtor, ctorsRunBefore, semanticModel, cancellationToken);
-            }
-        }
-
-        private static void AddCtorsRecursively(ConstructorDeclarationSyntax ctor, HashSet<IMethodSymbol> ctorsRunBefore, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (ctor.Initializer != null)
-            {
-                var nestedCtor = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
-                if (nestedCtor == null)
-                {
-                    return;
-                }
-
-                foreach (var reference in nestedCtor.DeclaringSyntaxReferences)
-                {
-                    var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                    ctorsRunBefore.Add(nestedCtor).IgnoreReturnValue();
-                    AddCtorsRecursively(runBefore, ctorsRunBefore, semanticModel, cancellationToken);
-                }
-            }
-            else
-            {
-                var baseType = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken)
-                                            .ContainingType.BaseType;
-                if (TryGetDefault(baseType, out IMethodSymbol defaultCtor))
-                {
-                    foreach (var reference in defaultCtor.DeclaringSyntaxReferences)
-                    {
-                        ctorsRunBefore.Add(defaultCtor).IgnoreReturnValue();
-                        var runBefore = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                        AddCtorsRecursively(runBefore, ctorsRunBefore, semanticModel, cancellationToken);
-                    }
-                }
-            }
         }
 
         private static bool TryGetInitializer(IMethodSymbol ctor, CancellationToken cancellationToken, out ConstructorInitializerSyntax initializer)
