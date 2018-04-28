@@ -423,15 +423,13 @@ namespace IDisposableAnalyzers
 
             editor.AddMethod(
                 structDeclaration,
-                (MethodDeclarationSyntax)SyntaxFactory.ParseCompilationUnit(@"public void Dispose()
+                Parse.MethodDeclaration(@"public void Dispose()
                           {
                           }")
-                                                      .Members
-                                                      .Single()
-                                                      .WithSimplifiedNames()
-                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                                      .WithAdditionalAnnotations(Formatter.Annotation));
+                     .WithSimplifiedNames()
+                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                     .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                     .WithAdditionalAnnotations(Formatter.Annotation));
 
             return editor.GetChangedDocument();
         }

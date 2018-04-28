@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System.Linq;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;

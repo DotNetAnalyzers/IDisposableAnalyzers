@@ -101,13 +101,11 @@ namespace IDisposableAnalyzers
                                         .AppendLine($"    {Snippet.DisposeStatement(fieldOrProperty, editor.SemanticModel, cancellationToken)}")
                                         .AppendLine("}")
                                         .Return();
-            var tearDownMethod = (MethodDeclarationSyntax)SyntaxFactory.ParseCompilationUnit(code)
-                                                                       .Members
-                                                                       .Single()
-                                                                       .WithSimplifiedNames()
-                                                                       .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                                       .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                                                       .WithAdditionalAnnotations(Formatter.Annotation);
+            var tearDownMethod = Parse.MethodDeclaration(code)
+                                      .WithSimplifiedNames()
+                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
+                                      .WithAdditionalAnnotations(Formatter.Annotation);
             editor.InsertAfter(setupMethod, tearDownMethod);
         }
 

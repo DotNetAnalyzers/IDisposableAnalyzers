@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
