@@ -223,7 +223,7 @@ namespace IDisposableAnalyzers
 
                 if (returnValue is InvocationExpressionSyntax nestedInvocation)
                 {
-                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    if (nestedInvocation.TryFindArgument(parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }

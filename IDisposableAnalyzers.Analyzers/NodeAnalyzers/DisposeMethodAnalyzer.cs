@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var invocation in invocations)
                         {
-                            if (invocation.TryGetInvokedMethodName(out var name) &&
+                            if (invocation.TryGetMethodName(out var name) &&
                                 name != overridden.Name)
                             {
                                 continue;

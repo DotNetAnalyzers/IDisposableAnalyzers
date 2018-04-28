@@ -147,7 +147,7 @@ namespace IDisposableAnalyzers
         {
             bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol current)
             {
-                if (invocation.TryGetInvokedMethodName(out var name) &&
+                if (invocation.TryGetMethodName(out var name) &&
                     name != "Dispose")
                 {
                     return false;
@@ -306,7 +306,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var invocation in this.invocations)
                 {
-                    if (invocation.TryGetInvokedMethodName(out var name) &&
+                    if (invocation.TryGetMethodName(out var name) &&
                         name != "Dispose")
                     {
                         continue;

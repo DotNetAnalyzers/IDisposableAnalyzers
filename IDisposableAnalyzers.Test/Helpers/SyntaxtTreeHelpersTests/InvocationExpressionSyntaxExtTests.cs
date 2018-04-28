@@ -1,5 +1,6 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers.SyntaxtTreeHelpersTests
+namespace IDisposableAnalyzers.Test.Helpers.SyntaxtTreeHelpersTests
 {
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
@@ -33,7 +34,7 @@ namespace RoslynSandbox
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var invocation = syntaxTree.FindInvocation(code);
-            Assert.AreEqual(true, invocation.TryGetInvokedMethodName(out var name));
+            Assert.AreEqual(true, invocation.TryGetMethodName(out var name));
             Assert.AreEqual(expected, name);
         }
     }

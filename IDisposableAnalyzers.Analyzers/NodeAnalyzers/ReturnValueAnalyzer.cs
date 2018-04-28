@@ -153,7 +153,7 @@ namespace IDisposableAnalyzers
         {
             switch (returnValue)
             {
-                case InvocationExpressionSyntax invocation when invocation.TryGetInvokedMethodName(out var name) &&
+                case InvocationExpressionSyntax invocation when invocation.TryGetMethodName(out var name) &&
                                                                 name == KnownSymbol.Task.FromResult.Name:
                     return SemanticModelExt.GetSymbolSafe(context.SemanticModel, returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
                 case MemberAccessExpressionSyntax memberAccess when memberAccess.Name.Identifier.ValueText == "CompletedTask":

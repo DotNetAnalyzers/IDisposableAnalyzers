@@ -1,7 +1,7 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -79,31 +79,14 @@
             }
 
             if (context.Node is InvocationExpressionSyntax invocation &&
-                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() == null)
+                invocation.ArgumentList != null &&
+                invocation.ArgumentList.Arguments.Count == 0 &&
+                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() == null &&
+                context.SemanticModel.TryGetSymbol(invocation, KnownSymbol.IDisposable.Dispose, context.CancellationToken, out var dispose) &&
+                dispose.Parameters.Length == 0 &&
+                Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
             {
-                if (invocation.TryGetInvokedMethodName(out var name) &&
-                    name != "Dispose")
-                {
-                    return;
-                }
-
-                if (invocation.ArgumentList != null &&
-                    invocation.ArgumentList.Arguments.Count > 0)
-                {
-                    return;
-                }
-
-                var call = context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) as IMethodSymbol;
-                if (call != KnownSymbol.IDisposable.Dispose ||
-                    call?.Parameters.Length != 0)
-                {
-                    return;
-                }
-
-                if (Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
-                }
+                context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
             }
         }
     }
