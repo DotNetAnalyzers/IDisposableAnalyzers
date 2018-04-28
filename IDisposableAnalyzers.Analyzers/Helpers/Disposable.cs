@@ -65,7 +65,7 @@ namespace IDisposableAnalyzers
                    type.Is(KnownSymbol.IDisposable);
         }
 
-        internal static bool TryGetDisposeMethod(ITypeSymbol type, Search search, out IMethodSymbol disposeMethod)
+        internal static bool TryGetDisposeMethod(ITypeSymbol type, ReturnValueSearch search, out IMethodSymbol disposeMethod)
         {
             disposeMethod = null;
             if (type == null)
@@ -78,10 +78,10 @@ namespace IDisposableAnalyzers
             {
                 case 0:
                     var baseType = type.BaseType;
-                    if (search == Search.Recursive &&
+                    if (search == ReturnValueSearch.Recursive &&
                         IsAssignableTo(baseType))
                     {
-                        return TryGetDisposeMethod(baseType, Search.Recursive, out disposeMethod);
+                        return TryGetDisposeMethod(baseType, ReturnValueSearch.Recursive, out disposeMethod);
                     }
 
                     return false;
@@ -170,7 +170,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsReturned(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = ReturnValueWalker.Borrow(scope, Search.TopLevel, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(scope, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
             {
                 foreach (var value in walker)
                 {
@@ -247,7 +247,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
         {
-            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.Recursive, semanticModel, cancellationToken, out var assignment))
+            if (AssignmentExecutionWalker.FirstWith(symbol, scope, ReturnValueSearch.Recursive, semanticModel, cancellationToken, out var assignment))
             {
                 var left = SemanticModelExt.GetSymbolSafe(semanticModel, assignment.Left, cancellationToken) ??
                            SemanticModelExt.GetSymbolSafe(semanticModel, (assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);

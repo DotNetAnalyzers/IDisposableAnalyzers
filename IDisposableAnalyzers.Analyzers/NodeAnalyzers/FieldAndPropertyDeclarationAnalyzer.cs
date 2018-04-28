@@ -102,7 +102,7 @@ namespace IDisposableAnalyzers
                                      context.CancellationToken))
                         {
                             if (Disposable.IsAssignableTo(fieldOrProperty.ContainingType) &&
-                                Disposable.TryGetDisposeMethod(fieldOrProperty.ContainingType, Search.TopLevel, out IMethodSymbol _))
+                                Disposable.TryGetDisposeMethod(fieldOrProperty.ContainingType, ReturnValueSearch.TopLevel, out IMethodSymbol _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
                             }

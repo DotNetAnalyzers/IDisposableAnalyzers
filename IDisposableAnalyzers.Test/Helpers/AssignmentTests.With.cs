@@ -11,9 +11,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     {
         internal class With
         {
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldCtorArg(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldCtorArg(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -38,9 +38,9 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldCtorArgViaLocal(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldCtorArgViaLocal(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -65,9 +65,9 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.value = temp", result?.ToString());
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldCtorArgInNested(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldCtorArgInNested(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -94,9 +94,9 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.reader = new StreamReader(stream)", result?.ToString());
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void ChainedCtorArg(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void ChainedCtorArg(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -121,20 +121,20 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 var symbol = semanticModel.GetDeclaredSymbolSafe(syntaxTree.FindParameter("arg"), CancellationToken.None);
-                if (search == Search.Recursive)
+                if (search == ReturnValueSearch.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out var result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstWith(symbol, ctor, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None, out var result));
                     Assert.AreEqual("this.value = chainedArg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstWith(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out _));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstWith(symbol, ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None, out _));
                 }
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldWithCtorArgViaProperty(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldWithCtorArgViaProperty(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -162,14 +162,14 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var symbol = semanticModel.GetDeclaredSymbolSafe(value, CancellationToken.None);
-                if (search == Search.Recursive)
+                if (search == ReturnValueSearch.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstWith(symbol, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstWith(symbol, ctor, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.Number = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(symbol, ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

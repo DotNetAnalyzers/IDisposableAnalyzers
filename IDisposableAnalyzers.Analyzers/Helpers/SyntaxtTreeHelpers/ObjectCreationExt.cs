@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers
 
     internal static class ObjectCreationExt
     {
-        internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var created = semanticModel.GetSymbolSafe(creation, cancellationToken) as IMethodSymbol;
             var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            return search == Search.Recursive &&
+            return search == ReturnValueSearch.Recursive &&
                    Constructor.IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
         }
 

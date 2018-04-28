@@ -26,7 +26,7 @@ namespace RoslynSandbox
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var objectCreation = syntaxTree.FindObjectCreationExpression("new Foo()");
             var ctor = syntaxTree.FindConstructorDeclaration("public Foo()");
-            Assert.AreEqual(true, objectCreation.Creates(ctor, Search.TopLevel, semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, objectCreation.Creates(ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None));
         }
     }
 }

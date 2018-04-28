@@ -42,7 +42,7 @@ namespace IDisposableAnalyzers
                 var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
                 {
-                    if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, Search.TopLevel, out var disposeMethodSymbol) &&
+                    if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, ReturnValueSearch.TopLevel, out var disposeMethodSymbol) &&
                         disposeMethodSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                     {
                         if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&

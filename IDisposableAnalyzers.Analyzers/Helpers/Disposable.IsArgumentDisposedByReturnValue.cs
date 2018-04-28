@@ -77,7 +77,7 @@ namespace IDisposableAnalyzers
                             if (SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
-                                if (TryGetDisposeMethod(chainedCtor.ContainingType, Search.TopLevel, out var disposeMethod))
+                                if (TryGetDisposeMethod(chainedCtor.ContainingType, ReturnValueSearch.TopLevel, out var disposeMethod))
                                 {
                                     return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken)
                                         ? Result.Yes
@@ -171,7 +171,7 @@ namespace IDisposableAnalyzers
         private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             var result = Result.No;
-            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, Search.Recursive, semanticModel, cancellationToken))
+            using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
             {
                 using (visited = visited.IncrementUsage())
                 {
@@ -283,7 +283,7 @@ namespace IDisposableAnalyzers
                 methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
             {
                 var parameterSymbol = SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, parameter, cancellationToken);
-                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
+                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, ReturnValueSearch.TopLevel, semanticModel, cancellationToken, out var assignment))
                 {
                     member = SemanticModelExt.GetSymbolSafe(semanticModel, assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||

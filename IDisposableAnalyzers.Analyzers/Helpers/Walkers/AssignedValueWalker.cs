@@ -422,7 +422,7 @@ namespace IDisposableAnalyzers
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
                             if (contextCtor == null ||
-                                creation.Creates(contextCtor, Search.Recursive, this.semanticModel, this.cancellationToken))
+                                creation.Creates(contextCtor, ReturnValueSearch.Recursive, this.semanticModel, this.cancellationToken))
                             {
                                 this.VisitObjectCreationExpression(creation);
                                 var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);

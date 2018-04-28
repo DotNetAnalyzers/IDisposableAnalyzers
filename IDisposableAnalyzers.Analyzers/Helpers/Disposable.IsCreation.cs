@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
             {
                 using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
                 {
-                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, cancellationToken))
+                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {
@@ -134,7 +134,7 @@ namespace IDisposableAnalyzers
                 return Result.Yes;
             }
 
-            using (var walker = ReturnValueWalker.Borrow(candidate, Search.RecursiveInside, semanticModel, cancellationToken))
+            using (var walker = ReturnValueWalker.Borrow(candidate, ReturnValueSearch.RecursiveInside, semanticModel, cancellationToken))
             {
                 if (walker.Count == 0)
                 {

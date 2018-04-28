@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers
     {
         private readonly HashSet<SyntaxNode> visited = new HashSet<SyntaxNode>();
 
-        protected Search Search { get; set; }
+        protected ReturnValueSearch Search { get; set; }
 
         protected SemanticModel SemanticModel { get; set; }
 
@@ -47,7 +47,7 @@ namespace IDisposableAnalyzers
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             base.VisitIdentifierName(node);
-            if (this.Search != Search.TopLevel &&
+            if (this.Search != ReturnValueSearch.TopLevel &&
                 this.visited.Add(node) &&
                 TryGetPropertyGet(node, out var getter))
             {
@@ -77,7 +77,7 @@ namespace IDisposableAnalyzers
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
         {
             base.VisitAssignmentExpression(node);
-            if (this.Search != Search.TopLevel &&
+            if (this.Search != ReturnValueSearch.TopLevel &&
                 this.visited.Add(node) &&
                 this.SemanticModel.GetSymbolSafe(node.Left, this.CancellationToken) is IPropertySymbol property &&
                 property.TrySingleDeclaration(this.CancellationToken, out var propertyDeclaration) &&
@@ -113,7 +113,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.Search != Search.TopLevel &&
+            if (this.Search != ReturnValueSearch.TopLevel &&
                 this.visited.Add(node))
             {
                 var method = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken);

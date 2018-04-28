@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers
         private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
-        private Search search;
+        private ReturnValueSearch search;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -54,7 +54,7 @@ namespace IDisposableAnalyzers
             this.AddReturnValue(node.Expression);
         }
 
-        internal static ReturnValueWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ReturnValueWalker Borrow(SyntaxNode node, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = Borrow(() => new ReturnValueWalker());
             if (node == null)
@@ -87,7 +87,7 @@ namespace IDisposableAnalyzers
 
             walker = Borrow(() => new ReturnValueWalker());
             this.recursiveWalkers.Add(location, walker);
-            walker.search = this.search == Search.RecursiveInside ? Search.Recursive : this.search;
+            walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
             walker.semanticModel = this.semanticModel;
             walker.cancellationToken = this.cancellationToken;
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
@@ -119,7 +119,7 @@ namespace IDisposableAnalyzers
                     if (value is IdentifierNameSyntax identifierName &&
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
-                        if (this.search != Search.RecursiveInside &&
+                        if (this.search != ReturnValueSearch.RecursiveInside &&
                             invocation.TryFindArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
@@ -204,7 +204,7 @@ namespace IDisposableAnalyzers
                         symbol is IMethodSymbol method &&
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
-                        if (this.search != Search.RecursiveInside &&
+                        if (this.search != ReturnValueSearch.RecursiveInside &&
                             invocation.TryFindArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
@@ -263,7 +263,7 @@ namespace IDisposableAnalyzers
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            if (this.search == Search.Recursive)
+            if (this.search == ReturnValueSearch.Recursive)
             {
                 switch (value)
                 {

@@ -127,7 +127,7 @@ namespace IDisposableAnalyzers
                 foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(cancellationToken);
-                    using (var pooled = ReturnValueWalker.Borrow(node, Search.TopLevel, semanticModel, cancellationToken))
+                    using (var pooled = ReturnValueWalker.Borrow(node, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                     {
                         if (pooled.Count == 0)
                         {
@@ -243,7 +243,7 @@ namespace IDisposableAnalyzers
 
             private DisposeWalker()
             {
-                this.Search = Search.Recursive;
+                this.Search = ReturnValueSearch.Recursive;
             }
 
             public int Count => this.invocations.Count;
@@ -278,7 +278,7 @@ namespace IDisposableAnalyzers
                     return Borrow(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, Search.Recursive, out var disposeMethod))
+                if (TryGetDisposeMethod(type, ReturnValueSearch.Recursive, out var disposeMethod))
                 {
                     return Borrow(disposeMethod, semanticModel, cancellationToken);
                 }

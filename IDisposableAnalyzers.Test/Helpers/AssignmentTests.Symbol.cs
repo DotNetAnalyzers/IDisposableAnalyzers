@@ -11,9 +11,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     {
         internal class Symbol
         {
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldWithCtorArg(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldWithCtorArg(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -38,9 +38,9 @@ namespace RoslynSandbox
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldWithChainedCtorArg(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldWithChainedCtorArg(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -67,20 +67,20 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == Search.Recursive)
+                if (search == ReturnValueSearch.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldWithCtorArgViaProperty(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldWithCtorArgViaProperty(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -108,20 +108,20 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == Search.Recursive)
+                if (search == ReturnValueSearch.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = value", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
 
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldInPropertyExpressionBody(Search search)
+            [TestCase(ReturnValueSearch.Recursive)]
+            [TestCase(ReturnValueSearch.TopLevel)]
+            public void FieldInPropertyExpressionBody(ReturnValueSearch search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -145,14 +145,14 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == Search.Recursive)
+                if (search == ReturnValueSearch.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = 3", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, ReturnValueSearch.TopLevel, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

@@ -8,9 +8,9 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     internal class ReturnValueWalkerTests
     {
-        [TestCase(Search.Recursive, "")]
-        [TestCase(Search.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
-        public void AwaitSyntaxError(Search search, string expected)
+        [TestCase(ReturnValueSearch.Recursive, "")]
+        [TestCase(ReturnValueSearch.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        public void AwaitSyntaxError(ReturnValueSearch search, string expected)
         {
             var testCode = @"
 using System.Threading.Tasks;
@@ -39,17 +39,17 @@ internal class Foo
             }
         }
 
-        [TestCase("this.CalculatedExpressionBody", Search.Recursive, "1")]
-        [TestCase("this.CalculatedExpressionBody", Search.TopLevel, "1")]
-        [TestCase("this.CalculatedStatementBody", Search.Recursive, "1")]
-        [TestCase("this.CalculatedStatementBody", Search.TopLevel, "1")]
-        [TestCase("this.ThisExpressionBody", Search.Recursive, "this")]
-        [TestCase("this.ThisExpressionBody", Search.TopLevel, "this")]
-        [TestCase("this.CalculatedReturningFieldExpressionBody", Search.Recursive, "this.value")]
-        [TestCase("this.CalculatedReturningFieldExpressionBody", Search.TopLevel, "this.value")]
-        [TestCase("this.CalculatedReturningFieldStatementBody", Search.Recursive, "this.value")]
-        [TestCase("this.CalculatedReturningFieldStatementBody", Search.TopLevel, "this.value")]
-        public void Property(string code, Search search, string expected)
+        [TestCase("this.CalculatedExpressionBody", ReturnValueSearch.Recursive, "1")]
+        [TestCase("this.CalculatedExpressionBody", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("this.CalculatedStatementBody", ReturnValueSearch.Recursive, "1")]
+        [TestCase("this.CalculatedStatementBody", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("this.ThisExpressionBody", ReturnValueSearch.Recursive, "this")]
+        [TestCase("this.ThisExpressionBody", ReturnValueSearch.TopLevel, "this")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody", ReturnValueSearch.Recursive, "this.value")]
+        [TestCase("this.CalculatedReturningFieldExpressionBody", ReturnValueSearch.TopLevel, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.Recursive, "this.value")]
+        [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.TopLevel, "this.value")]
+        public void Property(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -98,19 +98,19 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("StaticRecursiveExpressionBody", Search.Recursive, "")]
-        [TestCase("StaticRecursiveExpressionBody", Search.TopLevel, "StaticRecursiveExpressionBody")]
-        [TestCase("StaticRecursiveStatementBody", Search.Recursive, "")]
-        [TestCase("StaticRecursiveStatementBody", Search.TopLevel, "StaticRecursiveStatementBody")]
-        [TestCase("RecursiveExpressionBody", Search.Recursive, "")]
-        [TestCase("RecursiveExpressionBody", Search.TopLevel, "this.RecursiveExpressionBody")]
-        [TestCase("this.RecursiveExpressionBody", Search.Recursive, "")]
-        [TestCase("this.RecursiveExpressionBody", Search.TopLevel, "this.RecursiveExpressionBody")]
-        [TestCase("this.RecursiveStatementBody", Search.Recursive, "")]
-        [TestCase("this.RecursiveStatementBody", Search.TopLevel, "this.RecursiveStatementBody")]
-        [TestCase("RecursiveStatementBody", Search.Recursive, "")]
-        [TestCase("RecursiveStatementBody", Search.TopLevel, "this.RecursiveStatementBody")]
-        public void PropertyRecursive(string code, Search search, string expected)
+        [TestCase("StaticRecursiveExpressionBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("StaticRecursiveExpressionBody", ReturnValueSearch.TopLevel, "StaticRecursiveExpressionBody")]
+        [TestCase("StaticRecursiveStatementBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("StaticRecursiveStatementBody", ReturnValueSearch.TopLevel, "StaticRecursiveStatementBody")]
+        [TestCase("RecursiveExpressionBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("RecursiveExpressionBody", ReturnValueSearch.TopLevel, "this.RecursiveExpressionBody")]
+        [TestCase("this.RecursiveExpressionBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("this.RecursiveExpressionBody", ReturnValueSearch.TopLevel, "this.RecursiveExpressionBody")]
+        [TestCase("this.RecursiveStatementBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("this.RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
+        [TestCase("RecursiveStatementBody", ReturnValueSearch.Recursive, "")]
+        [TestCase("RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
+        public void PropertyRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -155,38 +155,38 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("StaticCreateIntStatementBody()", Search.Recursive, "1")]
-        [TestCase("StaticCreateIntStatementBody()", Search.TopLevel, "1")]
-        [TestCase("StaticCreateIntExpressionBody()", Search.Recursive, "2")]
-        [TestCase("StaticCreateIntExpressionBody()", Search.TopLevel, "2")]
-        [TestCase("IdStatementBody(1)", Search.Recursive, "1")]
-        [TestCase("IdStatementBody(1)", Search.TopLevel, "1")]
-        [TestCase("IdExpressionBody(1)", Search.Recursive, "1")]
-        [TestCase("IdExpressionBody(1)", Search.TopLevel, "1")]
-        [TestCase("OptionalIdExpressionBody()", Search.Recursive, "1")]
-        [TestCase("OptionalIdExpressionBody()", Search.TopLevel, "1")]
-        [TestCase("OptionalIdExpressionBody(1)", Search.Recursive, "1")]
-        [TestCase("OptionalIdExpressionBody(1)", Search.TopLevel, "1")]
-        [TestCase("AssigningToParameter(1)", Search.Recursive, "1, 2, 3, 4")]
-        [TestCase("AssigningToParameter(1)", Search.TopLevel, "1, 4")]
-        [TestCase("CallingIdExpressionBody(1)", Search.Recursive, "1")]
-        [TestCase("CallingIdExpressionBody(1)", Search.RecursiveInside, "")]
-        [TestCase("CallingIdExpressionBody(1)", Search.TopLevel, "IdExpressionBody(arg1)")]
-        [TestCase("ReturnLocal()", Search.Recursive, "1")]
-        [TestCase("ReturnLocal()", Search.TopLevel, "local")]
-        [TestCase("ReturnLocalAssignedTwice(true)", Search.Recursive, "1, 2, 3")]
-        [TestCase("ReturnLocalAssignedTwice(true)", Search.TopLevel, "local, 3")]
-        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.Recursive, "")]
-        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", Search.TopLevel, "")]
-        [TestCase("Missing()", Search.Recursive, "")]
-        [TestCase("Missing()", Search.TopLevel, "")]
-        [TestCase("this.ThisExpressionBody()", Search.Recursive, "this")]
-        [TestCase("this.ThisExpressionBody()", Search.TopLevel, "this")]
-        [TestCase("this.ReturningFileOpenRead()", Search.Recursive, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningFileOpenRead()", Search.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningLocalFileOpenRead()", Search.Recursive, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningLocalFileOpenRead()", Search.TopLevel, "stream")]
-        public void Call(string code, Search search, string expected)
+        [TestCase("StaticCreateIntStatementBody()", ReturnValueSearch.Recursive, "1")]
+        [TestCase("StaticCreateIntStatementBody()", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("StaticCreateIntExpressionBody()", ReturnValueSearch.Recursive, "2")]
+        [TestCase("StaticCreateIntExpressionBody()", ReturnValueSearch.TopLevel, "2")]
+        [TestCase("IdStatementBody(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("IdStatementBody(1)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("IdExpressionBody(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("IdExpressionBody(1)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("OptionalIdExpressionBody()", ReturnValueSearch.Recursive, "1")]
+        [TestCase("OptionalIdExpressionBody()", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("OptionalIdExpressionBody(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("OptionalIdExpressionBody(1)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("AssigningToParameter(1)", ReturnValueSearch.Recursive, "1, 2, 3, 4")]
+        [TestCase("AssigningToParameter(1)", ReturnValueSearch.TopLevel, "1, 4")]
+        [TestCase("CallingIdExpressionBody(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("CallingIdExpressionBody(1)", ReturnValueSearch.RecursiveInside, "")]
+        [TestCase("CallingIdExpressionBody(1)", ReturnValueSearch.TopLevel, "IdExpressionBody(arg1)")]
+        [TestCase("ReturnLocal()", ReturnValueSearch.Recursive, "1")]
+        [TestCase("ReturnLocal()", ReturnValueSearch.TopLevel, "local")]
+        [TestCase("ReturnLocalAssignedTwice(true)", ReturnValueSearch.Recursive, "1, 2, 3")]
+        [TestCase("ReturnLocalAssignedTwice(true)", ReturnValueSearch.TopLevel, "local, 3")]
+        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("System.Threading.Tasks.Task.Run(() => 1)", ReturnValueSearch.TopLevel, "")]
+        [TestCase("Missing()", ReturnValueSearch.Recursive, "")]
+        [TestCase("Missing()", ReturnValueSearch.TopLevel, "")]
+        [TestCase("this.ThisExpressionBody()", ReturnValueSearch.Recursive, "this")]
+        [TestCase("this.ThisExpressionBody()", ReturnValueSearch.TopLevel, "this")]
+        [TestCase("this.ReturningFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningFileOpenRead()", ReturnValueSearch.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
+        public void Call(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -298,25 +298,25 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("Recursive()", Search.Recursive, "")]
-        [TestCase("Recursive()", Search.TopLevel, "Recursive()")]
-        [TestCase("Recursive(1)", Search.Recursive, "")]
-        [TestCase("Recursive(1)", Search.TopLevel, "Recursive(arg)")]
-        [TestCase("Recursive1(1)", Search.Recursive, "")]
-        [TestCase("Recursive1(1)", Search.TopLevel, "Recursive2(value)")]
-        [TestCase("Recursive2(1)", Search.Recursive, "")]
-        [TestCase("Recursive2(1)", Search.TopLevel, "Recursive1(value)")]
-        [TestCase("Recursive(true)", Search.Recursive, "!flag, true")]
-        [TestCase("Recursive(true)", Search.TopLevel, "Recursive(!flag), true")]
-        [TestCase("RecursiveWithOptional(1)", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("RecursiveWithOptional(1, null)", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1, null)", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.Recursive, "1")]
-        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", Search.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
-        [TestCase("Flatten(null, null)", Search.TopLevel, "null")]
-        [TestCase("Flatten(null, null)", Search.Recursive, "null, new List<IDisposable>()")]
-        public void CallRecursive(string code, Search search, string expected)
+        [TestCase("Recursive()", ReturnValueSearch.Recursive, "")]
+        [TestCase("Recursive()", ReturnValueSearch.TopLevel, "Recursive()")]
+        [TestCase("Recursive(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("Recursive(1)", ReturnValueSearch.TopLevel, "Recursive(arg)")]
+        [TestCase("Recursive1(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("Recursive1(1)", ReturnValueSearch.TopLevel, "Recursive2(value)")]
+        [TestCase("Recursive2(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("Recursive2(1)", ReturnValueSearch.TopLevel, "Recursive1(value)")]
+        [TestCase("Recursive(true)", ReturnValueSearch.Recursive, "!flag, true")]
+        [TestCase("Recursive(true)", ReturnValueSearch.TopLevel, "Recursive(!flag), true")]
+        [TestCase("RecursiveWithOptional(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1)", ReturnValueSearch.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, null)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1, null)", ReturnValueSearch.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", ReturnValueSearch.Recursive, "1")]
+        [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", ReturnValueSearch.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
+        [TestCase("Flatten(null, null)", ReturnValueSearch.TopLevel, "null")]
+        [TestCase("Flatten(null, null)", ReturnValueSearch.Recursive, "null, new List<IDisposable>()")]
+        public void CallRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -423,30 +423,30 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindInvocation("WithOptionalParameter(local)");
-            using (var returnValues = ReturnValueWalker.Borrow(value, Search.Recursive, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
                 Assert.AreEqual("disposable", actual);
             }
         }
 
-        [TestCase("Func<int> temp = () => 1", Search.Recursive, "1")]
-        [TestCase("Func<int> temp = () => 1", Search.TopLevel, "1")]
-        [TestCase("Func<int, int> temp = x => 1", Search.Recursive, "1")]
-        [TestCase("Func<int, int> temp = x => 1", Search.TopLevel, "1")]
-        [TestCase("Func<int, int> temp = x => x", Search.Recursive, "x")]
-        [TestCase("Func<int, int> temp = x => x", Search.TopLevel, "x")]
-        [TestCase("Func<int> temp = () => { return 1; }", Search.Recursive, "1")]
-        [TestCase("Func<int> temp = () => { return 1; }", Search.TopLevel, "1")]
-        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", Search.Recursive, "1, 2")]
-        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", Search.TopLevel, "1, 2")]
-        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", Search.Recursive, "x, 1")]
-        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", Search.TopLevel, "x, 1")]
-        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", Search.Recursive, "1, x")]
-        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", Search.TopLevel, "1, x")]
-        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", Search.Recursive, "1, 2")]
-        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", Search.TopLevel, "1, 2")]
-        public void Lambda(string code, Search search, string expected)
+        [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Recursive, "1")]
+        [TestCase("Func<int> temp = () => 1", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("Func<int, int> temp = x => 1", ReturnValueSearch.Recursive, "1")]
+        [TestCase("Func<int, int> temp = x => 1", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("Func<int, int> temp = x => x", ReturnValueSearch.Recursive, "x")]
+        [TestCase("Func<int, int> temp = x => x", ReturnValueSearch.TopLevel, "x")]
+        [TestCase("Func<int> temp = () => { return 1; }", ReturnValueSearch.Recursive, "1")]
+        [TestCase("Func<int> temp = () => { return 1; }", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", ReturnValueSearch.Recursive, "1, 2")]
+        [TestCase("Func<int> temp = () => { if (true) return 1; return 2; }", ReturnValueSearch.TopLevel, "1, 2")]
+        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", ReturnValueSearch.Recursive, "x, 1")]
+        [TestCase("Func<int,int> temp = x => { if (true) return x; return 1; }", ReturnValueSearch.TopLevel, "x, 1")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", ReturnValueSearch.Recursive, "1, x")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", ReturnValueSearch.TopLevel, "1, x")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.Recursive, "1, 2")]
+        [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.TopLevel, "1, 2")]
+        public void Lambda(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -478,57 +478,57 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("await CreateAsync(0)", Search.Recursive, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0)", Search.TopLevel, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.Recursive, "1, 0, 2, 3")]
-        [TestCase("await CreateAsync(0).ConfigureAwait(false)", Search.TopLevel, "1, 0, 2, 3")]
-        [TestCase("await CreateStringAsync()", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await CreateStringAsync()", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await CreateIntAsync()", Search.Recursive, "1")]
-        [TestCase("await CreateIntAsync()", Search.TopLevel, "1")]
-        [TestCase("await CreateIntAsync().ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await CreateIntAsync().ConfigureAwait(false)", Search.TopLevel, "1")]
-        [TestCase("await ReturnTaskFromResultAsync()", Search.Recursive, "1")]
-        [TestCase("await ReturnTaskFromResultAsync()", Search.TopLevel, "1")]
-        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", Search.TopLevel, "1")]
-        [TestCase("await ReturnTaskFromResultAsync(1)", Search.Recursive, "1")]
-        [TestCase("await ReturnTaskFromResultAsync(1)", Search.TopLevel, "1")]
-        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", Search.TopLevel, "1")]
-        [TestCase("await ReturnAwaitTaskRunAsync()", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunAsync()", Search.TopLevel, "await Task.Run(() => new string(\' \', 1))")]
-        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", Search.TopLevel, "await Task.Run(() => new string(' ', 1))")]
-        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", Search.TopLevel, "await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)")]
-        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", Search.TopLevel, "await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)")]
-        [TestCase("await Task.Run(() => 1)", Search.Recursive, "1")]
-        [TestCase("await Task.Run(() => 1)", Search.TopLevel, "1")]
-        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", Search.TopLevel, "1")]
-        [TestCase("await Task.Run(() => new Disposable())", Search.Recursive, "new Disposable()")]
-        [TestCase("await Task.Run(() => new Disposable())", Search.TopLevel, "new Disposable()")]
-        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", Search.Recursive, "new Disposable()")]
-        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", Search.TopLevel, "new Disposable()")]
-        [TestCase("await Task.Run(() => new string(' ', 1))", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => new string(' ', 1))", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await Task.Run(() => CreateInt())", Search.Recursive, "1")]
-        [TestCase("await Task.Run(() => CreateInt())", Search.TopLevel, "CreateInt()")]
-        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", Search.TopLevel, "CreateInt()")]
-        [TestCase("await Task.FromResult(new string(' ', 1))", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await Task.FromResult(new string(' ', 1))", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", Search.Recursive, "new string(' ', 1)")]
-        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", Search.TopLevel, "new string(' ', 1)")]
-        [TestCase("await Task.FromResult(CreateInt())", Search.Recursive, "1")]
-        [TestCase("await Task.FromResult(CreateInt())", Search.TopLevel, "CreateInt()")]
-        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", Search.Recursive, "1")]
-        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", Search.TopLevel, "CreateInt()")]
-        public void AsyncAwait(string code, Search search, string expected)
+        [TestCase("await CreateAsync(0)", ReturnValueSearch.Recursive, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0)", ReturnValueSearch.TopLevel, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1, 0, 2, 3")]
+        [TestCase("await CreateAsync(0).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "1, 0, 2, 3")]
+        [TestCase("await CreateStringAsync()", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await CreateStringAsync()", ReturnValueSearch.TopLevel, "new string(' ', 1)")]
+        [TestCase("await CreateIntAsync()", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await CreateIntAsync()", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await CreateIntAsync().ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await CreateIntAsync().ConfigureAwait(false)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync()", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync()", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync().ConfigureAwait(false)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await ReturnTaskFromResultAsync(1).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync()", ReturnValueSearch.TopLevel, "await Task.Run(() => new string(\' \', 1))")]
+        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunAsync().ConfigureAwait(false)", ReturnValueSearch.TopLevel, "await Task.Run(() => new string(' ', 1))")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync()", ReturnValueSearch.TopLevel, "await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await ReturnAwaitTaskRunConfigureAwaitAsync().ConfigureAwait(false)", ReturnValueSearch.TopLevel, "await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => 1)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.Run(() => 1)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.Run(() => 1).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "1")]
+        [TestCase("await Task.Run(() => new Disposable())", ReturnValueSearch.Recursive, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable())", ReturnValueSearch.TopLevel, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", ReturnValueSearch.Recursive, "new Disposable()")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "new Disposable()")]
+        [TestCase("await Task.Run(() => new string(' ', 1))", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1))", ReturnValueSearch.TopLevel, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "new string(' ', 1)")]
+        [TestCase("await Task.Run(() => CreateInt())", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.Run(() => CreateInt())", ReturnValueSearch.TopLevel, "CreateInt()")]
+        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.Run(() => CreateInt()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "CreateInt()")]
+        [TestCase("await Task.FromResult(new string(' ', 1))", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1))", ReturnValueSearch.TopLevel, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", ReturnValueSearch.Recursive, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "new string(' ', 1)")]
+        [TestCase("await Task.FromResult(CreateInt())", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.FromResult(CreateInt())", ReturnValueSearch.TopLevel, "CreateInt()")]
+        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
+        [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "CreateInt()")]
+        public void AsyncAwait(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -603,15 +603,15 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("await RecursiveAsync()", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync()", Search.TopLevel, "RecursiveAsync()")]
-        [TestCase("await RecursiveAsync(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync(1)", Search.TopLevel, "RecursiveAsync(arg)")]
-        [TestCase("await RecursiveAsync1(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync1(1)", Search.TopLevel, "await RecursiveAsync2(value)")]
-        [TestCase("await RecursiveAsync3(1)", Search.Recursive, "")]
-        [TestCase("await RecursiveAsync3(1)", Search.TopLevel, "RecursiveAsync4(value)")]
-        public void AsyncAwaitRecursive(string code, Search search, string expected)
+        [TestCase("await RecursiveAsync()", ReturnValueSearch.Recursive, "")]
+        [TestCase("await RecursiveAsync()", ReturnValueSearch.TopLevel, "RecursiveAsync()")]
+        [TestCase("await RecursiveAsync(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("await RecursiveAsync(1)", ReturnValueSearch.TopLevel, "RecursiveAsync(arg)")]
+        [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.TopLevel, "await RecursiveAsync2(value)")]
+        [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Recursive, "")]
+        [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.TopLevel, "RecursiveAsync4(value)")]
+        public void AsyncAwaitRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -711,7 +711,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual("new WrappingDisposable(d)", returnValues.Single().ToString());
             }
@@ -740,7 +740,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnTernary(true)").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual("1, 2", string.Join(", ", returnValues));
             }
@@ -769,7 +769,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnNullCoalesce(null)").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual("null, string.Empty", string.Join(", ", returnValues));
             }
@@ -823,7 +823,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, Search.Recursive, semanticModel, CancellationToken.None))
+            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual("error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
             }

@@ -180,7 +180,7 @@ namespace IDisposableAnalyzers
                     return true;
                 }
 
-                using (var walker = ReturnValueWalker.Borrow(methodDeclaration, Search.TopLevel, semanticModel, cancellationToken))
+                using (var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                 {
                     using (visited = visited.IncrementUsage())
                     {

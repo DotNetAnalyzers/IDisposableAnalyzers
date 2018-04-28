@@ -196,7 +196,7 @@ namespace IDisposableAnalyzers
             if (symbol is IPropertySymbol property &&
                 !property.IsAutoProperty(cancellationToken))
             {
-                using (var returnValues = ReturnValueWalker.Borrow(value, Search.TopLevel, semanticModel, cancellationToken))
+                using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                 {
                     using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
                     {
