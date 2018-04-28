@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers.Test
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;

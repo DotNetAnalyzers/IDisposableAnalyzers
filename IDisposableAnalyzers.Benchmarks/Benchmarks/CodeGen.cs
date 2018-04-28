@@ -18,7 +18,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
                                                                                                     .GetTypes()
                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                    .Except(new[] { typeof(CacheAnalyzer) })
                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                     .ToArray();
 

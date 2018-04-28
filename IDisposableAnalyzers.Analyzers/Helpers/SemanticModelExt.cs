@@ -1,7 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -20,12 +20,12 @@ namespace IDisposableAnalyzers
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, AwaitExpressionSyntax node, CancellationToken cancellationToken)
         {
-            return semanticModel.GetSymbolSafe(node.Expression, cancellationToken);
+            return GetSymbolSafe(semanticModel, node.Expression, cancellationToken);
         }
 
         internal static IMethodSymbol GetSymbolSafe(this SemanticModel semanticModel, ConstructorInitializerSyntax node, CancellationToken cancellationToken)
         {
-            return (IMethodSymbol)semanticModel.GetSymbolSafe((SyntaxNode)node, cancellationToken);
+            return (IMethodSymbol)GetSymbolSafe(semanticModel, (SyntaxNode)node, cancellationToken);
         }
 
         internal static ISymbol GetSymbolSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
@@ -35,14 +35,14 @@ namespace IDisposableAnalyzers
                 return GetSymbolSafe(semanticModel, awaitExpression, cancellationToken);
             }
 
-            return semanticModel.SemanticModelFor(node)
+            return SemanticModelFor(semanticModel, node)
                                 ?.GetSymbolInfo(node, cancellationToken)
                                 .Symbol;
         }
 
         internal static Optional<object> GetConstantValueSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
-            return semanticModel.SemanticModelFor(node)
+            return SemanticModelFor(semanticModel, node)
                                 ?.GetConstantValue(node, cancellationToken) ?? default(Optional<object>);
         }
 
@@ -61,7 +61,7 @@ namespace IDisposableAnalyzers
 
         internal static TypeInfo GetTypeInfoSafe(this SemanticModel semanticModel, SyntaxNode node, CancellationToken cancellationToken)
         {
-            return semanticModel.SemanticModelFor(node)
+            return SemanticModelFor(semanticModel, node)
                                 ?.GetTypeInfo(node, cancellationToken) ?? default(TypeInfo);
         }
 

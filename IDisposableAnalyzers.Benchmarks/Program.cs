@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using System.Linq;
     using BenchmarkDotNet.Reports;
     using BenchmarkDotNet.Running;
+    using Gu.Roslyn.AnalyzerExtensions;
     using IDisposableAnalyzers.Benchmarks.Benchmarks;
 
     public class Program
