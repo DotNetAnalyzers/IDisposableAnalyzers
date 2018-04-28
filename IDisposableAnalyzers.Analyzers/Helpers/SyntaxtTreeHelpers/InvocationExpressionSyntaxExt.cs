@@ -1,7 +1,7 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Threading;
-
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -45,12 +45,6 @@
                 default:
                     return false;
             }
-        }
-
-        internal static bool IsNameOf(this InvocationExpressionSyntax invocation)
-        {
-            return invocation.TryGetInvokedMethodName(out var name) &&
-                   name == "nameof";
         }
 
         internal static bool TryGetMatchingArgument(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, out ArgumentSyntax argument)
