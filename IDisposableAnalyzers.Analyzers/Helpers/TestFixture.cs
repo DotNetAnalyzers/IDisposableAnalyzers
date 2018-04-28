@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers
             if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, ReturnValueSearch.TopLevel, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
-                if (Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
+                if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
                 {
                     if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute),
@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                if (Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _))
+                if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _))
                 {
                     if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitOneTimeTearDownAttribute),
@@ -47,8 +47,8 @@ namespace IDisposableAnalyzers
             if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, ReturnValueSearch.TopLevel, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
-                return Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
-                       Attribute.TryGetAttribute(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute);
+                return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute);
             }
 
             attribute = null;
@@ -73,7 +73,7 @@ namespace IDisposableAnalyzers
             {
                 if (member is MethodDeclarationSyntax methodDeclaration)
                 {
-                    if (Attribute.TryGetAttribute(methodDeclaration, teardOwnAttributeType, semanticModel, cancellationToken, out _))
+                    if (Attribute.TryFind(methodDeclaration, teardOwnAttributeType, semanticModel, cancellationToken, out _))
                     {
                         result = methodDeclaration;
                         return true;
