@@ -123,7 +123,7 @@ namespace IDisposableAnalyzers
 
             if (candidate is IdentifierNameSyntax identifierName &&
                 identifierName.Identifier.ValueText == "value" &&
-                SyntaxNodeExt.FirstAncestor<AccessorDeclarationSyntax>(candidate) is AccessorDeclarationSyntax accessor &&
+                candidate.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
                 return Result.No;

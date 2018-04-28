@@ -100,13 +100,13 @@ namespace IDisposableAnalyzers
                 }
                 else
                 {
-                    if (SyntaxNodeExt.FirstAncestor<AccessorDeclarationSyntax>(returnValue) is AccessorDeclarationSyntax accessor &&
+                    if (returnValue.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
                         accessor.IsKind(SyntaxKind.GetAccessorDeclaration))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
                     }
 
-                    if (SyntaxNodeExt.FirstAncestor<ArrowExpressionClauseSyntax>(returnValue) is ArrowExpressionClauseSyntax arrow &&
+                    if (returnValue.FirstAncestor<ArrowExpressionClauseSyntax>() is ArrowExpressionClauseSyntax arrow &&
                         arrow.Parent is PropertyDeclarationSyntax)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
@@ -139,7 +139,7 @@ namespace IDisposableAnalyzers
             }
 
             if (ReturnType(context).Is(KnownSymbol.Task) &&
-                SyntaxNodeExt.FirstAncestor<UsingStatementSyntax>(returnValue) is UsingStatementSyntax usingStatement &&
+                returnValue.FirstAncestor<UsingStatementSyntax>() is UsingStatementSyntax usingStatement &&
                 usingStatement.Statement.Contains(returnValue) &&
                 returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
                 SemanticModelExt.GetTypeInfoSafe(context.SemanticModel, returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&

@@ -213,7 +213,7 @@ namespace IDisposableAnalyzers
             {
                 if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
                 {
-                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
+                    if (nestedObjectCreation.TryFindArgument(parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
@@ -253,14 +253,14 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
         {
-            var objectCreation = SyntaxNodeExt.FirstAncestor<ObjectCreationExpressionSyntax>(argument);
+            var objectCreation = argument.FirstAncestor<ObjectCreationExpressionSyntax>();
             if (objectCreation != null)
             {
                 ctor = SemanticModelExt.GetSymbolSafe(semanticModel, objectCreation, cancellationToken) as IMethodSymbol;
                 return ctor != null;
             }
 
-            var initializer = SyntaxNodeExt.FirstAncestor<ConstructorInitializerSyntax>(argument);
+            var initializer = argument.FirstAncestor<ConstructorInitializerSyntax>();
             if (initializer != null)
             {
                 ctor = SemanticModelExt.GetSymbolSafe(semanticModel, initializer, cancellationToken);

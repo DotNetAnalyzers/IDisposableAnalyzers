@@ -19,17 +19,5 @@ namespace IDisposableAnalyzers
             return search == ReturnValueSearch.Recursive &&
                    Constructor.IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
         }
-
-        internal static bool TryGetMatchingArgument(this ObjectCreationExpressionSyntax objectCreation, IParameterSymbol parameter, out ArgumentSyntax argument)
-        {
-            if (objectCreation?.ArgumentList == null ||
-                parameter == null)
-            {
-                argument = null;
-                return false;
-            }
-
-            return objectCreation.TryFindArgument(parameter, out argument);
-        }
     }
 }
