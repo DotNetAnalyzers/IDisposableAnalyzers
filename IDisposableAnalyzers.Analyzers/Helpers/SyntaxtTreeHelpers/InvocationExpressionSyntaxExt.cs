@@ -59,18 +59,6 @@ namespace IDisposableAnalyzers
             return invocation.TryFindArgument(parameter, out argument);
         }
 
-        internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)
-        {
-            if (invocation?.ArgumentList == null ||
-                parameter == null)
-            {
-                value = null;
-                return false;
-            }
-
-            return invocation.ArgumentList.TryGetArgumentValue(parameter, cancellationToken, out value);
-        }
-
         internal static bool TryGetMatchingParameter(this InvocationExpressionSyntax invocation, ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IParameterSymbol parameter)
         {
             parameter = null;
