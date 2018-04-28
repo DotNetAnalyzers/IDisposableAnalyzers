@@ -38,7 +38,7 @@ namespace IDisposableAnalyzers
 
         private static bool IsExplicit(ITypeSymbol type)
         {
-            if (type.IsInterface())
+            if (type.TypeKind == TypeKind.Interface)
             {
                 return !type.Is(KnownSymbol.IDisposable);
             }
