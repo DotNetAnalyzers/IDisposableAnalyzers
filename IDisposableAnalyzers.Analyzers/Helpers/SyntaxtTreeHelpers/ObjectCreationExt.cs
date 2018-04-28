@@ -20,30 +20,6 @@ namespace IDisposableAnalyzers
                    Constructor.IsRunBefore(created, ctorSymbol, semanticModel, cancellationToken);
         }
 
-        internal static bool TryGetMatchingParameter(this ObjectCreationExpressionSyntax objectCreation, ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IParameterSymbol parameter)
-        {
-            parameter = null;
-            if (objectCreation?.ArgumentList == null)
-            {
-                return false;
-            }
-
-            if (semanticModel.GetSymbolSafe(objectCreation, cancellationToken) is IMethodSymbol method)
-            {
-                if (argument.NameColon is NameColonSyntax nameColon &&
-                    nameColon.Name is IdentifierNameSyntax name)
-                {
-                    return method.Parameters.TrySingle(x => x.Name == name.Identifier.ValueText, out parameter);
-                }
-
-                return method.Parameters.TryElementAt(
-                    objectCreation.ArgumentList.Arguments.IndexOf(argument),
-                    out parameter);
-            }
-
-            return false;
-        }
-
         internal static bool TryGetMatchingArgument(this ObjectCreationExpressionSyntax objectCreation, IParameterSymbol parameter, out ArgumentSyntax argument)
         {
             if (objectCreation?.ArgumentList == null ||

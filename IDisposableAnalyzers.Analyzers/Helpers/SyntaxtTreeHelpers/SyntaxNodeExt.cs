@@ -12,12 +12,6 @@ namespace IDisposableAnalyzers
             return kind == first || kind == other;
         }
 
-        internal static bool IsEitherKind(this SyntaxNode node, SyntaxKind first, SyntaxKind other)
-        {
-            var kind = node?.Kind();
-            return kind == first || kind == other;
-        }
-
         internal static T FirstAncestor<T>(this SyntaxNode node)
             where T : SyntaxNode
         {
