@@ -68,7 +68,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in pooledAssignments.Assignments)
                 {
-                    var assignedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Left, cancellationToken);
+                    var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
                     {
                         assignment = candidate;
@@ -93,7 +93,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in pooledAssignments.Assignments)
                 {
-                    var assignedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Left, cancellationToken);
+                    var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
                     {
                         if (assignment != null)
@@ -154,7 +154,7 @@ namespace IDisposableAnalyzers
                     {
                         if (argument.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == symbol.Name &&
-                            SemanticModelExt.GetSymbolSafe(semanticModel, argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
+                            semanticModel.GetSymbolSafe(argument.Parent?.Parent, cancellationToken) is IMethodSymbol method &&
                             method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
                             method.TryFindParameter(argument, out var parameter))
                         {
@@ -197,17 +197,17 @@ namespace IDisposableAnalyzers
                     return IsMatch(symbol, binary.Left, semanticModel, cancellationToken);
                 case CastExpressionSyntax cast:
                     return IsMatch(symbol, cast.Expression, semanticModel, cancellationToken);
-                case ObjectCreationExpressionSyntax objectCreation when objectCreation.ArgumentList != null && objectCreation.ArgumentList.Arguments.TryFirst(x => SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, x.Expression, cancellationToken)), out ArgumentSyntax _):
+                case ObjectCreationExpressionSyntax objectCreation when objectCreation.ArgumentList != null && objectCreation.ArgumentList.Arguments.TryFirst(x => SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(x.Expression, cancellationToken)), out ArgumentSyntax _):
                     return true;
                 default:
-                    if (SymbolExt.IsEither<ILocalSymbol, IParameterSymbol>(symbol))
+                    if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
                     {
                         return expression is IdentifierNameSyntax identifierName &&
                                identifierName.Identifier.ValueText == symbol.Name &&
-                               SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, expression, cancellationToken));
+                               SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(expression, cancellationToken));
                     }
 
-                    return SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, expression, cancellationToken));
+                    return SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(expression, cancellationToken));
             }
         }
     }

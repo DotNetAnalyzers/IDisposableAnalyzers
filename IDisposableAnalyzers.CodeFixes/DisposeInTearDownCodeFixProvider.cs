@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -60,7 +59,7 @@ namespace IDisposableAnalyzers
                         }
                         else if (setupAttribute.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax setupMethod)
                         {
-                            var tearDownType = SemanticModelExt.GetTypeInfoSafe(semanticModel, setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
+                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
                                 ? KnownSymbol.NUnitTearDownAttribute
                                 : KnownSymbol.NUnitOneTimeTearDownAttribute;
 
@@ -121,9 +120,9 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetMemberSymbol(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
         {
-            symbol = SemanticModelExt.GetSymbolSafe(semanticModel, node, cancellationToken) ??
+            symbol = semanticModel.GetSymbolSafe(node, cancellationToken) ??
                      SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, node, cancellationToken);
-            return symbol != null && SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(symbol);
+            return symbol != null && symbol.IsEither<IFieldSymbol, IPropertySymbol>();
         }
     }
 }

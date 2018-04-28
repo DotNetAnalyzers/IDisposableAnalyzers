@@ -91,7 +91,7 @@ namespace IDisposableAnalyzers
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) == Result.Yes &&
-                SemanticModelExt.GetSymbolSafe(context.SemanticModel, returnValue, context.CancellationToken) is ISymbol returnedSymbol)
+                context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol returnedSymbol)
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||
                     Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
@@ -124,7 +124,7 @@ namespace IDisposableAnalyzers
                 foreach (var argument in argumentList.Arguments)
                 {
                     if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        SemanticModelExt.GetSymbolSafe(context.SemanticModel, argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
+                        context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
                     {
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
@@ -142,7 +142,7 @@ namespace IDisposableAnalyzers
                 returnValue.FirstAncestor<UsingStatementSyntax>() is UsingStatementSyntax usingStatement &&
                 usingStatement.Statement.Contains(returnValue) &&
                 returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
-                SemanticModelExt.GetTypeInfoSafe(context.SemanticModel, returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&
+                context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&
                 ShouldAwait(context, returnValue))
             {
                 context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
@@ -155,9 +155,9 @@ namespace IDisposableAnalyzers
             {
                 case InvocationExpressionSyntax invocation when invocation.TryGetMethodName(out var name) &&
                                                                 name == KnownSymbol.Task.FromResult.Name:
-                    return SemanticModelExt.GetSymbolSafe(context.SemanticModel, returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
+                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
                 case MemberAccessExpressionSyntax memberAccess when memberAccess.Name.Identifier.ValueText == "CompletedTask":
-                    return SemanticModelExt.GetSymbolSafe(context.SemanticModel, returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
+                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
             }
 
             return true;
@@ -171,7 +171,7 @@ namespace IDisposableAnalyzers
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
-            if (SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol method &&
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
                 method.ReturnType.Is(KnownSymbol.IEnumerable) &&
                 method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
             {
@@ -248,7 +248,7 @@ namespace IDisposableAnalyzers
             var anonymousFunction = context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
             if (anonymousFunction != null)
             {
-                var method = SemanticModelExt.GetSymbolSafe(context.SemanticModel, anonymousFunction, context.CancellationToken) as IMethodSymbol;
+                var method = context.SemanticModel.GetSymbolSafe(anonymousFunction, context.CancellationToken) as IMethodSymbol;
                 return method?.ReturnType;
             }
 

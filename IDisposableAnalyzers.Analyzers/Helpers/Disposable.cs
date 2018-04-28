@@ -19,10 +19,10 @@ namespace IDisposableAnalyzers
 
             if (candidate is ObjectCreationExpressionSyntax objectCreation)
             {
-                return IsAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, objectCreation, cancellationToken).Type);
+                return IsAssignableTo(semanticModel.GetTypeInfoSafe(objectCreation, cancellationToken).Type);
             }
 
-            return IsPotentiallyAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken).Type);
+            return IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type);
         }
 
         internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
@@ -186,7 +186,7 @@ namespace IDisposableAnalyzers
                         candidate = binary.Left;
                     }
 
-                    var returnedSymbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
+                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
                     if (SymbolComparer.Equals(symbol, returnedSymbol))
                     {
                         return true;
@@ -198,7 +198,7 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var argument in objectCreation.ArgumentList.Arguments)
                             {
-                                var arg = SemanticModelExt.GetSymbolSafe(semanticModel, argument.Expression, cancellationToken);
+                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
                                 if (SymbolComparer.Equals(symbol, arg))
                                 {
                                     return true;
@@ -210,7 +210,7 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var argument in objectCreation.Initializer.Expressions)
                             {
-                                var arg = SemanticModelExt.GetSymbolSafe(semanticModel, argument, cancellationToken);
+                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
                                 if (SymbolComparer.Equals(symbol, arg))
                                 {
                                     return true;
@@ -249,9 +249,9 @@ namespace IDisposableAnalyzers
         {
             if (AssignmentExecutionWalker.FirstWith(symbol, scope, ReturnValueSearch.Recursive, semanticModel, cancellationToken, out var assignment))
             {
-                var left = SemanticModelExt.GetSymbolSafe(semanticModel, assignment.Left, cancellationToken) ??
-                           SemanticModelExt.GetSymbolSafe(semanticModel, (assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
-                if (SymbolExt.IsEither<IParameterSymbol, ILocalSymbol>(left))
+                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
+                           semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
+                if (left.IsEither<IParameterSymbol, ILocalSymbol>())
                 {
                     using (visited = visited.IncrementUsage())
                     {
@@ -260,7 +260,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                return SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(left);
+                return left.IsEither<IFieldSymbol, IPropertySymbol>();
             }
 
             return false;
@@ -273,10 +273,10 @@ namespace IDisposableAnalyzers
                 foreach (var invocation in pooledInvocations.Invocations)
                 {
                     if (TryGetArgument(invocation, out var argument) &&
-                        SemanticModelExt.GetSymbolSafe(semanticModel, invocation, cancellationToken) is IMethodSymbol candidate)
+                        semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate)
                     {
                         if (IsAddMethod(candidate) &&
-                            symbol.Equals(SemanticModelExt.GetSymbolSafe(semanticModel, argument.Expression, cancellationToken)))
+                            symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
                         {
                             return true;
                         }
@@ -306,7 +306,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var candidate in argumentList.Arguments)
                     {
-                        if (SymbolExt.IsEither<ILocalSymbol, IParameterSymbol>(symbol))
+                        if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
                         {
                             if (candidate.Expression is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == symbol.Name)
@@ -323,7 +323,7 @@ namespace IDisposableAnalyzers
                                 return true;
                             }
                         }
-                        else if (SymbolComparer.Equals(symbol, SemanticModelExt.GetSymbolSafe(semanticModel, candidate.Expression, cancellationToken)))
+                        else if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(candidate.Expression, cancellationToken)))
                         {
                             argument = candidate;
                             return true;
@@ -370,7 +370,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (SymbolExt.TryGetScope(local, cancellationToken, out var scope))
+                if (local.TryGetScope(cancellationToken, out var scope))
                 {
                     return !IsReturned(local, scope, semanticModel, cancellationToken) &&
                            !IsAssignedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&

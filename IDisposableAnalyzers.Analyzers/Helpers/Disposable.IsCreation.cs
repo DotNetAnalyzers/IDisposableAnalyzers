@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, disposable, cancellationToken);
+            var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol is IPropertySymbol property &&
                 IsAssignableTo(property.Type) &&
                 property.TryGetSetter(cancellationToken, out var setter))
@@ -35,8 +35,8 @@ namespace IDisposableAnalyzers
                             if (assigned.Right is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == "value" &&
                                 IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
-                                SemanticModelExt.GetSymbolSafe(semanticModel, assigned.Left, cancellationToken) is ISymbol candidate &&
-                                SymbolExt.IsEither<IFieldSymbol, IPropertySymbol>(candidate))
+                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
+                                candidate.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
                                 assignedSymbols.Add(candidate);
                             }
@@ -138,7 +138,7 @@ namespace IDisposableAnalyzers
             {
                 if (walker.Count == 0)
                 {
-                    var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
+                    var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
                     if (symbol != null &&
                         symbol.DeclaringSyntaxReferences.Length == 0)
                     {
@@ -234,8 +234,7 @@ namespace IDisposableAnalyzers
             }
 
             if (!IsPotentiallyAssignableTo(
-                SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken)
-                             .Type))
+                semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
             {
                 return Result.No;
             }
@@ -253,7 +252,7 @@ namespace IDisposableAnalyzers
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (IsAssignableTo(SemanticModelExt.GetTypeInfoSafe(semanticModel, candidate, cancellationToken).Type))
+                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
                 {
                     return Result.Yes;
                 }
@@ -261,7 +260,7 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            var symbol = SemanticModelExt.GetSymbolSafe(semanticModel, candidate, cancellationToken);
+            var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
             return IsCreationCore(symbol);
         }
 
