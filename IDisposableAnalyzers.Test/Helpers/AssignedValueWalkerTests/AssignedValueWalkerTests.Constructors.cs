@@ -37,7 +37,7 @@ namespace RoslynSandbox
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = SyntaxNodeExt.FindEqualsValueClause(syntaxTree, code).Value;
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);

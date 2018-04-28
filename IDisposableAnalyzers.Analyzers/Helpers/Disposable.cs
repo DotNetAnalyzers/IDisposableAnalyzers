@@ -97,7 +97,7 @@ namespace IDisposableAnalyzers
                            (disposeMethod.Parameters.Length == 1 &&
                             disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
                 case 2:
-                    if (EnumerableExt.TrySingle(disposers, x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
+                    if (disposers.TrySingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
                     {
                         disposeMethod = temp as IMethodSymbol;
                         return disposeMethod != null &&
@@ -223,7 +223,7 @@ namespace IDisposableAnalyzers
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
-                            EnumerableExt.TrySingle(invocation.ArgumentList.Arguments, out ArgumentSyntax argument) &&
+                            invocation.ArgumentList.Arguments.TrySingle(out ArgumentSyntax argument) &&
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;
@@ -282,7 +282,7 @@ namespace IDisposableAnalyzers
                         }
 
                         if (candidate.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                            candidate.TryGetMatchingParameter(argument, out var parameter))
+                            candidate.TryFindParameter(argument, out var parameter))
                         {
                             using (var visited = recursion.IncrementUsage())
                             {

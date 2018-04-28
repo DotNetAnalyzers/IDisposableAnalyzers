@@ -19,9 +19,9 @@ namespace IDisposableAnalyzers
             if (!Disposable.IsAssignableTo(type) ||
                 IsExplicit(type))
             {
-                return Simplify.WithSimplifiedNames(SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
-                                                                      .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                                      .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+                return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
+                                    .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                    .WithTrailingTrivia(SyntaxFactory.ElasticMarker).WithSimplifiedNames();
             }
 
             if (IsNeverNull(member, semanticModel, cancellationToken))

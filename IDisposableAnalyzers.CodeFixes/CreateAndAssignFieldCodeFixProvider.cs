@@ -103,7 +103,7 @@ namespace IDisposableAnalyzers
 
         private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement)
         {
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
 
             var field = editor.AddField(

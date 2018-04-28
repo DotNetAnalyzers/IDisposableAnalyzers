@@ -44,7 +44,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.FindConstructorDeclaration(code1);
                 var other = syntaxTree.FindConstructorDeclaration(code2);
-                Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
+                Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
             [TestCase("FooBase()", "Foo()", true)]
@@ -105,7 +105,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.FindConstructorDeclaration(code1);
                 var other = syntaxTree.FindConstructorDeclaration(code2);
-                Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
+                Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
             [TestCase("FooBase()", "Foo()", true)]
@@ -167,7 +167,7 @@ namespace RoslynSandbox
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var first = syntaxTree.FindConstructorDeclaration(code1);
                 var other = syntaxTree.FindConstructorDeclaration(code2);
-                Assert.AreEqual(expected, Constructor.IsRunBefore(first, other, semanticModel, CancellationToken.None));
+                Assert.AreEqual(expected, first.IsRunBefore(other, semanticModel, CancellationToken.None));
             }
 
             [TestCase("Foo()", "Foo()", false)]

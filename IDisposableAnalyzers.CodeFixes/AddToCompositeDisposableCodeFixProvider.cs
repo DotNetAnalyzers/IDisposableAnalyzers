@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
         private static void CreateAndInitialize(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = CodeStyle.UnderscoreFields(editor.SemanticModel);
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var field = editor.AddField(
                 containingType,
                 usesUnderscoreNames

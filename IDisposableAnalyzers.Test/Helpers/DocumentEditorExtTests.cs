@@ -57,7 +57,7 @@ namespace RoslynSandbox
 }";
             var sln = CodeFactory.CreateSolution(testCode);
             var editor = await DocumentEditor.CreateAsync(sln.Projects.First().Documents.First()).ConfigureAwait(false);
-            var containingType = SyntaxNodeExt.FindClassDeclaration(editor.OriginalRoot.SyntaxTree, "Foo");
+            var containingType = editor.OriginalRoot.SyntaxTree.FindClassDeclaration("Foo");
 
             var expected = @"
 namespace RoslynSandbox
@@ -148,7 +148,7 @@ namespace RoslynSandbox
 }";
             var sln = CodeFactory.CreateSolution(testCode);
             var editor = await DocumentEditor.CreateAsync(sln.Projects.First().Documents.First()).ConfigureAwait(false);
-            var containingType = SyntaxNodeExt.FindClassDeclaration(editor.OriginalRoot.SyntaxTree, "Foo");
+            var containingType = editor.OriginalRoot.SyntaxTree.FindClassDeclaration("Foo");
             var method = SyntaxFactory.ParseCompilationUnit("private int NewMethod() => 1;")
                                       .Members
                                       .Single()
@@ -245,7 +245,7 @@ namespace RoslynSandbox
 }";
             var sln = CodeFactory.CreateSolution(testCode);
             var editor = await DocumentEditor.CreateAsync(sln.Projects.First().Documents.First()).ConfigureAwait(false);
-            var containingType = SyntaxNodeExt.FindClassDeclaration(editor.OriginalRoot.SyntaxTree, "Foo");
+            var containingType = editor.OriginalRoot.SyntaxTree.FindClassDeclaration("Foo");
             var method = SyntaxFactory.ParseCompilationUnit("public int NewMethod() => 1;")
                                       .Members
                                       .Single()

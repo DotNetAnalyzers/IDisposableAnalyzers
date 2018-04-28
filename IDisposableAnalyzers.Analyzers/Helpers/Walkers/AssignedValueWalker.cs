@@ -308,7 +308,7 @@ namespace IDisposableAnalyzers
                             this.refParameters.Contains(symbol as IParameterSymbol) ||
                             this.outParameters.Contains(symbol as IParameterSymbol))
                         {
-                            return method.TryGetMatchingParameter(argument, out parameter);
+                            return method.TryFindParameter(argument, out parameter);
                         }
                     }
 
@@ -330,9 +330,9 @@ namespace IDisposableAnalyzers
             ExpressionSyntax GetArgumentValue(ExpressionSyntax value)
             {
                 if (value is IdentifierNameSyntax identifierName &&
-                    method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                    method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
                 {
-                    if (argumentList.TryGetMatchingArgument(parameter, out var argument))
+                    if (argumentList.TryFind(parameter, out var argument))
                     {
                         return argument.Expression;
                     }
@@ -435,7 +435,7 @@ namespace IDisposableAnalyzers
                             foreach (var initializer in ctorWalker.Initializers)
                             {
                                 var other = (ConstructorDeclarationSyntax)initializer.Parent;
-                                if (Constructor.IsRunBefore(contextCtor, other, this.semanticModel, this.cancellationToken))
+                                if (contextCtor.IsRunBefore(other, this.semanticModel, this.cancellationToken))
                                 {
                                     this.Visit(other);
                                 }

@@ -56,7 +56,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            return invocation.ArgumentList.TryGetMatchingArgument(parameter, out argument);
+            return invocation.TryFindArgument(parameter, out argument);
         }
 
         internal static bool TryGetArgumentValue(this InvocationExpressionSyntax invocation, IParameterSymbol parameter, CancellationToken cancellationToken, out ExpressionSyntax value)

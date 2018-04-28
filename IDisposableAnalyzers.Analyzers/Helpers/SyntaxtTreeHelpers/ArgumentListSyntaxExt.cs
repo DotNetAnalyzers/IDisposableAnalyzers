@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (arguments.TryGetMatchingArgument(parameter, out var argument))
+            if (arguments.TryFind(parameter, out var argument))
             {
                 value = argument.Expression;
                 return value != null;

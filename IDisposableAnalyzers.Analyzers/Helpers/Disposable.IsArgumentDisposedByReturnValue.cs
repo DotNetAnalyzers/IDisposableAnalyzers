@@ -129,7 +129,7 @@ namespace IDisposableAnalyzers
                     }
 
                     if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                        MethodSymbolExt.TryGetMatchingParameter(method, argument, out var parameter))
+                        method.TryFindParameter(argument, out var parameter))
                     {
                         using (visited = visited.IncrementUsage())
                         {
@@ -213,7 +213,7 @@ namespace IDisposableAnalyzers
             {
                 if (returnValue is ObjectCreationExpressionSyntax nestedObjectCreation)
                 {
-                    if (ObjectCreationExt.TryGetMatchingArgument(nestedObjectCreation, parameter, out var nestedArgument))
+                    if (nestedObjectCreation.TryGetMatchingArgument(parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
@@ -223,7 +223,7 @@ namespace IDisposableAnalyzers
 
                 if (returnValue is InvocationExpressionSyntax nestedInvocation)
                 {
-                    if (InvocationExpressionSyntaxExt.TryGetMatchingArgument(nestedInvocation, parameter, out var nestedArgument))
+                    if (nestedInvocation.TryGetMatchingArgument(parameter, out var nestedArgument))
                     {
                         return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
@@ -280,7 +280,7 @@ namespace IDisposableAnalyzers
             }
 
             if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
-                BaseMethodDeclarationSyntaxExt.TryGetMatchingParameter(methodDeclaration, argument, out var parameter))
+                methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
             {
                 var parameterSymbol = SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, parameter, cancellationToken);
                 if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
@@ -296,7 +296,7 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    EnumerableExt.TrySingle(initializer.ArgumentList.Arguments, x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
+                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
                 {
                     var chained = SemanticModelExt.GetSymbolSafe(semanticModel, ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);

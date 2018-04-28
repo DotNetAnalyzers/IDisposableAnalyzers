@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers
                 argument.RefOrOutKeyword.IsEitherKind(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
                 method.TrySingleDeclaration(context.CancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                method.TryGetMatchingParameter(argument, out var parameter) &&
+                method.TryFindParameter(argument, out var parameter) &&
                 Disposable.IsPotentiallyAssignableTo(parameter.Type))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&

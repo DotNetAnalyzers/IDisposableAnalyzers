@@ -53,7 +53,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            return objectCreation.ArgumentList.TryGetMatchingArgument(parameter, out argument);
+            return objectCreation.TryFindArgument(parameter, out argument);
         }
     }
 }

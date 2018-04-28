@@ -120,7 +120,7 @@ namespace IDisposableAnalyzers
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
                         if (this.search != Search.RecursiveInside &&
-                            invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                            invocation.TryFindArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
                         }
@@ -205,7 +205,7 @@ namespace IDisposableAnalyzers
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
                         if (this.search != Search.RecursiveInside &&
-                            invocation.ArgumentList.TryGetMatchingArgument(parameter, out var argument))
+                            invocation.TryFindArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
                         }
