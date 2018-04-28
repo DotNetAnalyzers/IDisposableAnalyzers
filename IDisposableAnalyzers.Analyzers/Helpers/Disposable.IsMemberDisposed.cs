@@ -257,9 +257,8 @@ namespace IDisposableAnalyzers
             public override void VisitInvocationExpression(InvocationExpressionSyntax node)
             {
                 base.VisitInvocationExpression(node);
-                var symbol = this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) as IMethodSymbol;
-                if (symbol == KnownSymbol.IDisposable.Dispose &&
-                    symbol?.Parameters.Length == 0)
+                if (this.SemanticModel.TryGetSymbol(node, KnownSymbol.IDisposable.Dispose, this.CancellationToken, out var dispose) &&
+                    dispose.Parameters.Length == 0)
                 {
                     this.invocations.Add(node);
                 }
