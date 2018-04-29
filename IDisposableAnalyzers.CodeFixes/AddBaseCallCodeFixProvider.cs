@@ -5,10 +5,10 @@ namespace IDisposableAnalyzers
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddBaseCallCodeFixProvider))]
     [Shared]
@@ -18,47 +18,34 @@ namespace IDisposableAnalyzers
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
+        public override FixAllProvider GetFixAllProvider() => null;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                                   .ConfigureAwait(false);
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax disposeMethod &&
+                    disposeMethod.Body is BlockSyntax body &&
+                    disposeMethod.ParameterList is ParameterListSyntax parameterList &&
+                    parameterList.Parameters.TrySingle(out var parameter))
                 {
-                    continue;
-                }
-
-                var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (member is MethodDeclarationSyntax disposeMethod)
-                {
-                    if (disposeMethod.ParameterList != null &&
-                        disposeMethod.ParameterList.Parameters.TrySingle(out var parameter))
-                    {
-                        context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
+                        CodeAction.Create(
                             $"Call base.Dispose({parameter.Identifier.ValueText})",
-                            (editor, _) => AddBaseCall(editor, disposeMethod),
-                            "Call base.Dispose()",
-                            diagnostic);
-                    }
+                            _ => Task.FromResult(
+                                context.Document.WithSyntaxRoot(
+                                    syntaxRoot.ReplaceNode(
+                                        body,
+                                        body.AddStatements(SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
+                                                                        .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
+                                                                        .WithTrailingTrivia(SyntaxFactory.ElasticMarker))))),
+                            "Call base.Dispose()"),
+                        diagnostic);
                 }
-            }
-        }
-
-        private static void AddBaseCall(DocumentEditor editor, MethodDeclarationSyntax disposeMethod)
-        {
-            if (disposeMethod.ParameterList.Parameters.TrySingle(out var parameter))
-            {
-                var baseCall = SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
-                                            .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                            .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
-                editor.SetStatements(disposeMethod, disposeMethod.Body.Statements.Add(baseCall));
             }
         }
     }

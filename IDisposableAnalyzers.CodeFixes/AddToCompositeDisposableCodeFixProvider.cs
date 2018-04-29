@@ -23,7 +23,8 @@ namespace IDisposableAnalyzers
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
 
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
 
         public override FixAllProvider GetFixAllProvider() => null;
 
@@ -36,36 +37,25 @@ namespace IDisposableAnalyzers
                                              .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
+                              .TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement))
                 {
-                    continue;
-                }
-
-                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
-                {
-                    var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement != null)
+                    if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
                     {
-                        if (TryGetField(statement, semanticModel, context.CancellationToken, out IFieldSymbol field))
+                        context.RegisterDocumentEditorFix(
+                            "Add to CompositeDisposable.",
+                            (editor, cancellationToken) => AddToExisting(editor, statement, field),
+                            diagnostic);
+                    }
+                    else
+                    {
+                        if (semanticModel.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Contains("System.Reactive")))
                         {
                             context.RegisterDocumentEditorFix(
-                                "Add to CompositeDisposable.",
-                                (editor, cancellationToken) => AddToExisting(editor, statement, field),
+                                "Add to new CompositeDisposable.",
+                                (editor, cancellationToken) =>
+                                    CreateAndInitialize(editor, statement, cancellationToken),
                                 diagnostic);
-                        }
-                        else
-                        {
-                            if (semanticModel.Compilation.ReferencedAssemblyNames.Any(
-                                x => x.Name.Contains("System.Reactive")))
-                            {
-                                context.RegisterDocumentEditorFix(
-                                    "Add to new CompositeDisposable.",
-                                    (editor, cancellationToken) => CreateAndInitialize(editor, statement, cancellationToken),
-                                    diagnostic);
-                            }
                         }
                     }
                 }
