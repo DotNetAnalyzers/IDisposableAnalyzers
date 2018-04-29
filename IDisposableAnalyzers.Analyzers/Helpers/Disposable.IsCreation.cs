@@ -171,7 +171,8 @@ namespace IDisposableAnalyzers
             Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
             if (candidate.Parent is ArgumentListSyntax argumentList &&
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
-                invocation.TryGetMatchingParameter(candidate, semanticModel, cancellationToken, out var parameter) &&
+                semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                method.TryFindParameter(candidate, out var parameter) &&
                 IsPotentiallyAssignableTo(parameter.Type))
             {
                 return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);

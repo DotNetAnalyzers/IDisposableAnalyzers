@@ -57,7 +57,7 @@ namespace IDisposableAnalyzers
                             : Result.AssumeYes;
                     }
 
-                    if (invocation.TryGetMatchingParameter(argument, semanticModel, cancellationToken, out var parameter))
+                    if (method.TryFindParameter(argument, out var parameter))
                     {
                         return CheckReturnValues(parameter, invocation, semanticModel, cancellationToken, visited);
                     }
