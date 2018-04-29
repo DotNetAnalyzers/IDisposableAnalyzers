@@ -99,7 +99,7 @@ namespace IDisposableAnalyzers
                         return IsAssignableTo(ctor.ContainingType) ? Result.AssumeYes : Result.No;
                     }
 
-                    if (ctor.ContainingType.Is(KnownSymbol.NinjectStandardKernel))
+                    if (ctor.ContainingType.IsAssignableTo(KnownSymbol.NinjectStandardKernel, semanticModel.Compilation))
                     {
                         return Result.Yes;
                     }

@@ -44,7 +44,7 @@ namespace IDisposableAnalyzers
                     {
                         context.RegisterDocumentEditorFix(
                             "Dispose member.",
-                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration,cancellationToken),
+                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
                             diagnostic);
                     }
 

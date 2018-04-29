@@ -138,11 +138,11 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (ReturnType(context).Is(KnownSymbol.Task) &&
+            if (ReturnType(context).IsAssignableTo(KnownSymbol.Task, context.SemanticModel.Compilation) &&
                 returnValue.FirstAncestor<UsingStatementSyntax>() is UsingStatementSyntax usingStatement &&
                 usingStatement.Statement.Contains(returnValue) &&
                 returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
-                context.SemanticModel.GetTypeInfoSafe(returnValue, context.CancellationToken).Type.Is(KnownSymbol.Task) &&
+                returnValue.IsAssignableTo(KnownSymbol.Task, context.SemanticModel) &&
                 ShouldAwait(context, returnValue))
             {
                 context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
@@ -172,7 +172,7 @@ namespace IDisposableAnalyzers
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
-                method.ReturnType.Is(KnownSymbol.IEnumerable) &&
+                method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
                 method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
             {
                 if (YieldStatementWalker.Any(methodDeclaration))

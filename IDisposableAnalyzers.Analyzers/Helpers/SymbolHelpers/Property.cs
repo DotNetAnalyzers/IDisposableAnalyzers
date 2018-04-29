@@ -10,7 +10,8 @@ namespace IDisposableAnalyzers
         internal static bool TryGetSetter(this IPropertySymbol property, CancellationToken cancellationToken, out AccessorDeclarationSyntax setter)
         {
             setter = null;
-            return property.TrySingleDeclaration(cancellationToken, out var declaration) &&
+            return property.SetMethod != null &&
+                   property.TrySingleDeclaration(cancellationToken, out var declaration) &&
                    declaration.TryGetSetter(out setter);
         }
 

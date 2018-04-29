@@ -345,7 +345,7 @@ namespace IDisposableAnalyzers
                     case "TryAdd":
                     case "TryUpdate":
                         return candidate.DeclaringSyntaxReferences.Length == 0 &&
-                               candidate.ContainingType.Is(KnownSymbol.IEnumerable);
+                               candidate.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation);
                 }
 
                 return false;

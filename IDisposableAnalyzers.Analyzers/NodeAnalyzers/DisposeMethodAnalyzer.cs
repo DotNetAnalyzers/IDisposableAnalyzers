@@ -35,7 +35,7 @@ namespace IDisposableAnalyzers
             {
                 if (method.Parameters.Length == 0 &&
                     method.GetAttributes().Length == 0 &&
-                    !method.ContainingType.Is(KnownSymbol.IDisposable))
+                    !method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
                 }
