@@ -29,46 +29,31 @@ namespace IDisposableAnalyzers
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                             .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
-                {
-                    continue;
-                }
-
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
+                if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId &&
+                    node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
+                    localDeclaration.TryFirstAncestor<ConstructorDeclarationSyntax>(out _) &&
+                    localDeclaration.Declaration.Variables.TrySingle(out var variable) &&
+                    variable.Initializer != null &&
+                    semanticModel.TryGetType(localDeclaration.Declaration.Type, context.CancellationToken, out var type))
                 {
-                    var statement = node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>();
-                    if (statement?.FirstAncestor<ConstructorDeclarationSyntax>() != null &&
-                        statement.Declaration.Variables.Count == 1 &&
-                        statement.Declaration.Variables[0].Initializer != null)
-                    {
-                        var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                                                  .ConfigureAwait(false);
-                        if (semanticModel.GetSymbolInfo(statement.Declaration.Type).Symbol is ITypeSymbol type)
-                        {
-                            context.RegisterDocumentEditorFix(
-                                "Create and assign field.",
-                                (editor, cancellationToken) => CreateAndAssignField(editor, statement, type),
-                                diagnostic);
-                        }
-                    }
+                    context.RegisterDocumentEditorFix(
+                        "Create and assign field.",
+                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, type),
+                        diagnostic);
                 }
-
-                if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
+                else if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId &&
+                         node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
+                         statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
                 {
-                    var statement = node.FirstAncestorOrSelf<ExpressionStatementSyntax>();
-                    if (statement?.FirstAncestor<ConstructorDeclarationSyntax>() != null)
-                    {
-                        context.RegisterDocumentEditorFix(
-                            "Create and assign field.",
-                            (editor, cancellationToken) => CreateAndAssignField(editor, statement),
-                            diagnostic);
-                    }
+                    context.RegisterDocumentEditorFix(
+                        "Create and assign field.",
+                        (editor, cancellationToken) => CreateAndAssignField(editor, statement),
+                        diagnostic);
                 }
             }
         }

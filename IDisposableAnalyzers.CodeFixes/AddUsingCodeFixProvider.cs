@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using System.Composition;
     using System.Linq;
     using System.Threading.Tasks;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -30,17 +31,10 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
-                {
-                    continue;
-                }
-
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    if (node.FirstAncestorOrSelf<LocalDeclarationStatementSyntax>() is LocalDeclarationStatementSyntax statement &&
+                    if (node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var statement) &&
                         statement.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
@@ -48,7 +42,7 @@ namespace IDisposableAnalyzers
                             (editor, _) => AddUsing(editor, block, statement),
                             diagnostic);
                     }
-                    else if (node.FirstAncestorOrSelf<ExpressionStatementSyntax>() is ExpressionStatementSyntax expressionStatement &&
+                    else if (node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var expressionStatement) &&
                              expressionStatement.Parent is BlockSyntax expressionStatementBlock)
                     {
                         context.RegisterDocumentEditorFix(
@@ -60,7 +54,7 @@ namespace IDisposableAnalyzers
                             argument.Parent is ArgumentListSyntax argumentList &&
                             argumentList.Parent is InvocationExpressionSyntax invocation &&
                             invocation.Parent is IfStatementSyntax ifStatement &&
-                             ifStatement.Statement is BlockSyntax ifBlock)
+                            ifStatement.Statement is BlockSyntax ifBlock)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
@@ -71,7 +65,7 @@ namespace IDisposableAnalyzers
 
                 if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
                 {
-                    if (node.FirstAncestorOrSelf<ExpressionStatementSyntax>() is ExpressionStatementSyntax statement &&
+                    if (node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
                         statement.Parent is BlockSyntax block)
                     {
                         context.RegisterDocumentEditorFix(
