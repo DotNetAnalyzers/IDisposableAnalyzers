@@ -33,38 +33,29 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MemberDeclarationSyntax member &&
+                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol) &&
+                    Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, ReturnValueSearch.TopLevel, out var disposeMethod) &&
+                    disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                 {
-                    continue;
-                }
-
-                var member = (MemberDeclarationSyntax)syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
-                {
-                    if (Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, ReturnValueSearch.TopLevel, out var disposeMethodSymbol) &&
-                        disposeMethodSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                    if (disposeMethod.DeclaredAccessibility == Accessibility.Public &&
+                        disposeMethod.ContainingType == memberSymbol.ContainingType &&
+                        disposeMethod.Parameters.Length == 0)
                     {
-                        if (disposeMethodSymbol.DeclaredAccessibility == Accessibility.Public &&
-                            disposeMethodSymbol.ContainingType == memberSymbol.ContainingType &&
-                            disposeMethodSymbol.Parameters.Length == 0)
-                        {
-                            context.RegisterDocumentEditorFix(
-                                "Dispose member.",
-                                (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
-                                diagnostic);
-                        }
+                        context.RegisterDocumentEditorFix(
+                            "Dispose member.",
+                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration,cancellationToken),
+                            diagnostic);
+                    }
 
-                        if (disposeMethodSymbol.Parameters.Length == 1 &&
-                            disposeMethodSymbol.Parameters[0].Type == KnownSymbol.Boolean &&
-                            TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
-                        {
-                            context.RegisterDocumentEditorFix(
-                                "Dispose member.",
-                                (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
-                                diagnostic);
-                        }
+                    if (disposeMethod.Parameters.TrySingle(out var parameter) &&
+                        parameter.Type == KnownSymbol.Boolean &&
+                        TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
+                    {
+                        context.RegisterDocumentEditorFix(
+                            "Dispose member.",
+                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
+                            diagnostic);
                     }
                 }
             }
@@ -123,41 +114,23 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
         {
-            foreach (var statement in disposeMethod.Body.Statements)
+            if (disposeMethod.ParameterList is ParameterListSyntax parameterList &&
+                parameterList.Parameters.TrySingle(out var parameter) &&
+                parameter.Type == KnownSymbol.Boolean)
             {
-                var ifStatement = statement as IfStatementSyntax;
-                if (ifStatement == null)
+                foreach (var statement in disposeMethod.Body.Statements)
                 {
-                    continue;
-                }
-
-                if ((ifStatement.Condition as IdentifierNameSyntax)?.Identifier.ValueText == "disposing")
-                {
-                    result = ifStatement;
-                    return true;
+                    if (statement is IfStatementSyntax ifStatement &&
+                        ifStatement.Condition is IdentifierNameSyntax identifierName &&
+                        identifierName.Identifier.ValueText == parameter.Identifier.ValueText)
+                    {
+                        result = ifStatement;
+                        return true;
+                    }
                 }
             }
 
             result = null;
-            return false;
-        }
-
-        private static bool TryGetMemberSymbol(MemberDeclarationSyntax member, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
-        {
-            if (member is FieldDeclarationSyntax field &&
-                field.Declaration.Variables.TrySingle(out var declarator))
-            {
-                symbol = semanticModel.GetDeclaredSymbolSafe(declarator, cancellationToken);
-                return symbol != null;
-            }
-
-            if (member is PropertyDeclarationSyntax property)
-            {
-                symbol = semanticModel.GetDeclaredSymbolSafe(property, cancellationToken);
-                return symbol != null;
-            }
-
-            symbol = null;
             return false;
         }
     }
