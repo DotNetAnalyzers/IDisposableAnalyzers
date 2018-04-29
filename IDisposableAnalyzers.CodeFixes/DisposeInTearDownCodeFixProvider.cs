@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers
             IDISP003DisposeBeforeReassigning.DiagnosticId);
 
         /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Default;
+        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Document;
 
         /// <inheritdoc/>
         public override async Task RegisterCodeFixesAsync(CodeFixContext context)
