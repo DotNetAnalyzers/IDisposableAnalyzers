@@ -38,37 +38,22 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
-                {
-                    continue;
-                }
-
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (node is AssignmentExpressionSyntax assignment)
+                if (node is AssignmentExpressionSyntax assignment &&
+                    TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out var disposeStatement))
                 {
-                    if (TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out var disposeStatement))
-                    {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose before re-assigning.",
-                            (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, assignment, disposeStatement),
-                            diagnostic);
-                    }
-
-                    continue;
+                    context.RegisterDocumentEditorFix(
+                        "Dispose before re-assigning.",
+                        (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, assignment, disposeStatement),
+                        diagnostic);
                 }
-
-                var argument = node.FirstAncestorOrSelf<ArgumentSyntax>();
-                if (argument != null)
+                else if (node.TryFirstAncestorOrSelf<ArgumentSyntax>(out var argument) &&
+                         TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out disposeStatement))
                 {
-                    if (TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out var disposeStatement))
-                    {
-                        context.RegisterDocumentEditorFix(
-                                "Dispose before re-assigning.",
-                                (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, argument, disposeStatement),
-                            diagnostic);
-                    }
+                    context.RegisterDocumentEditorFix(
+                        "Dispose before re-assigning.",
+                        (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, argument, disposeStatement),
+                        diagnostic);
                 }
             }
         }

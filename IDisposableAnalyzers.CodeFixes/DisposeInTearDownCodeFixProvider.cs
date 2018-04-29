@@ -36,38 +36,30 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var token = syntaxRoot.FindToken(diagnostic.Location.SourceSpan.Start);
-                if (string.IsNullOrEmpty(token.ValueText) ||
-                    token.IsMissing)
-                {
-                    continue;
-                }
-
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 var member = node as MemberDeclarationSyntax ??
                              (SyntaxNode)(node as AssignmentExpressionSyntax)?.Left;
-                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol))
+                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol) &&
+                    TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
                 {
-                    if (TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
+                    if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDownMethodDeclaration))
                     {
-                        if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDownMethodDeclaration))
-                        {
-                            context.RegisterDocumentEditorFix(
-                                $"Dispose member in {tearDownMethodDeclaration.Identifier.ValueText}.",
-                                (editor, cancellationToken) => DisposeInTearDownMethod(editor, memberSymbol, tearDownMethodDeclaration, cancellationToken),
-                                diagnostic);
-                        }
-                        else if (setupAttribute.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax setupMethod)
-                        {
-                            var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
-                                ? KnownSymbol.NUnitTearDownAttribute
-                                : KnownSymbol.NUnitOneTimeTearDownAttribute;
+                        context.RegisterDocumentEditorFix(
+                            $"Dispose member in {tearDownMethodDeclaration.Identifier.ValueText}.",
+                            (editor, cancellationToken) => DisposeInTearDownMethod(editor, memberSymbol, tearDownMethodDeclaration, cancellationToken),
+                            diagnostic);
+                    }
+                    else if (setupAttribute.TryFirstAncestor<MethodDeclarationSyntax>(out var setupMethod))
+                    {
+                        var tearDownType = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken)
+                                                        .Type == KnownSymbol.NUnitSetUpAttribute
+                            ? KnownSymbol.NUnitTearDownAttribute
+                            : KnownSymbol.NUnitOneTimeTearDownAttribute;
 
-                            context.RegisterDocumentEditorFix(
-                                $"Create {tearDownType.Type} method and dispose member.",
-                                (editor, cancellationToken) => CreateTearDownMethod(editor, memberSymbol, setupMethod, tearDownType, cancellationToken),
-                                diagnostic);
-                        }
+                        context.RegisterDocumentEditorFix(
+                            $"Create {tearDownType.Type} method and dispose member.",
+                            (editor, cancellationToken) => CreateTearDownMethod(editor, memberSymbol, setupMethod, tearDownType, cancellationToken),
+                            diagnostic);
                     }
                 }
             }
