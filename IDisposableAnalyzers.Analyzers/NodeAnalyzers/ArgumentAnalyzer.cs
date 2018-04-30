@@ -34,14 +34,14 @@ namespace IDisposableAnalyzers
                 argument.Parent is ArgumentListSyntax argumentList &&
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
-                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken) is IMethodSymbol method &&
+                context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method) &&
                 method.TrySingleDeclaration(context.CancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                 method.TryFindParameter(argument, out var parameter) &&
                 Disposable.IsPotentiallyAssignableTo(parameter.Type))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     !Disposable.IsAddedToFieldOrProperty(parameter, declaration, context.SemanticModel, context.CancellationToken) &&
-                    context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol symbol)
+                    context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
                 {
                     if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         !Disposable.IsDisposedBefore(symbol, argument.Expression, context.SemanticModel, context.CancellationToken))
@@ -70,15 +70,12 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetSymbol(ArgumentSyntax argument, SyntaxNodeAnalysisContext context, out ISymbol symbol)
         {
-            if (argument.Expression is IdentifierNameSyntax candidate)
+            switch (argument.Expression)
             {
-                return context.SemanticModel.TryGetSymbol(candidate, context.CancellationToken, out symbol);
-            }
-
-            if (argument.Expression is DeclarationExpressionSyntax declarationExpression &&
-                declarationExpression.Designation is SingleVariableDesignationSyntax singleVariable)
-            {
-                return context.SemanticModel.TryGetSymbol(singleVariable, context.CancellationToken, out symbol);
+                case IdentifierNameSyntax candidate:
+                    return context.SemanticModel.TryGetSymbol(candidate, context.CancellationToken, out symbol);
+                case DeclarationExpressionSyntax declarationExpression when declarationExpression.Designation is SingleVariableDesignationSyntax singleVariable:
+                    return context.SemanticModel.TryGetSymbol(singleVariable, context.CancellationToken, out symbol);
             }
 
             symbol = null;

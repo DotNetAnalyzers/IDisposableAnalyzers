@@ -91,7 +91,7 @@ namespace IDisposableAnalyzers
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) == Result.Yes &&
-                context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) is ISymbol returnedSymbol)
+                context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out ISymbol returnedSymbol))
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||
                     Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
@@ -124,7 +124,7 @@ namespace IDisposableAnalyzers
                 foreach (var argument in argumentList.Arguments)
                 {
                     if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        context.SemanticModel.GetSymbolSafe(argument.Expression, context.CancellationToken) is ISymbol argumentSymbol)
+                        context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol argumentSymbol))
                     {
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))

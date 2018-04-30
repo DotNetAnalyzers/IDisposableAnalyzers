@@ -55,9 +55,8 @@ namespace IDisposableAnalyzers
                                 continue;
                             }
 
-                            if (SymbolComparer.Equals(
-                                context.SemanticModel.GetSymbolSafe(invocation, context.CancellationToken),
-                                overridden))
+                            if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var target) &&
+                                SymbolComparer.Equals(target, overridden))
                             {
                                 return;
                             }
@@ -74,21 +73,12 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var disposeCall in disposeWalker)
                         {
-                            if (Disposable.TryGetDisposedRootMember(
-                                disposeCall,
-                                context.SemanticModel,
-                                context.CancellationToken,
-                                out var disposed))
+                            if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                                context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out ISymbol member) &&
+                                !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
                             {
-                                var member = context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken);
-                                if (!Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
-                                {
-                                    context.ReportDiagnostic(
-                                        Diagnostic.Create(
-                                            IDISP010CallBaseDispose.Descriptor,
-                                            context.Node.GetLocation()));
-                                    return;
-                                }
+                                context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
+                                return;
                             }
                         }
                     }

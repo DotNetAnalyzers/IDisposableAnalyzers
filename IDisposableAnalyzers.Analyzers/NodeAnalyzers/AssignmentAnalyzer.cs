@@ -33,7 +33,7 @@ namespace IDisposableAnalyzers
             }
 
             if (context.Node is AssignmentExpressionSyntax assignment &&
-                context.SemanticModel.GetSymbolSafe(assignment.Left, context.CancellationToken) is ISymbol assignedSymbol)
+                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol assignedSymbol))
             {
                 if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                 {
@@ -144,8 +144,8 @@ namespace IDisposableAnalyzers
                     if (invocation.Expression is IdentifierNameSyntax identifierName &&
                         invocation.ArgumentList != null &&
                         invocation.ArgumentList.Arguments.Count == 2 &&
-                        (identifierName.Identifier.ValueText == "ReferenceEquals" ||
-                         identifierName.Identifier.ValueText == "Equals"))
+                        (identifierName.Identifier.ValueText == nameof(ReferenceEquals) ||
+                         identifierName.Identifier.ValueText == nameof(Equals)))
                     {
                         if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                             invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
@@ -157,8 +157,8 @@ namespace IDisposableAnalyzers
                              memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
                              invocation.ArgumentList != null &&
                              invocation.ArgumentList.Arguments.Count == 2 &&
-                             (memberIdentifier.Identifier.ValueText == "ReferenceEquals" ||
-                              memberIdentifier.Identifier.ValueText == "Equals"))
+                             (memberIdentifier.Identifier.ValueText == nameof(ReferenceEquals) ||
+                              memberIdentifier.Identifier.ValueText == nameof(Equals)))
                     {
                         if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                             invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
