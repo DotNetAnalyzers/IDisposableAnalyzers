@@ -112,27 +112,15 @@ namespace IDisposableAnalyzers
 
         internal static bool TryGetBaseVirtualDisposeMethod(ITypeSymbol type, out IMethodSymbol result)
         {
-            bool IsVirtualDispose(IMethodSymbol m)
+            return type.TryFindFirstMethodRecursive("Dispose", IsVirtualDispose, out result);
+
+            bool IsVirtualDispose(IMethodSymbol candidate)
             {
-                return m.IsVirtual &&
-                       m.ReturnsVoid &&
-                       m.Parameters.Length == 1 &&
-                       m.Parameters[0].Type == KnownSymbol.Boolean;
+                return candidate.IsVirtual &&
+                       candidate.ReturnsVoid &&
+                       candidate.Parameters.TrySingle(out var parameter) &&
+                       parameter.Type == KnownSymbol.Boolean;
             }
-
-            var baseType = type.BaseType;
-            while (baseType != null)
-            {
-                if (baseType.TryFindSingleMethodRecursive("Dispose", IsVirtualDispose, out result))
-                {
-                    return true;
-                }
-
-                baseType = baseType.BaseType;
-            }
-
-            result = null;
-            return false;
         }
 
         internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
