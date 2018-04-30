@@ -193,7 +193,7 @@ namespace IDisposableAnalyzers
 
             bool IsAssignedBefore(IfStatementSyntax nullCheck)
             {
-                using (var walker = AssignmentExecutionWalker.Borrow(nullCheck, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
+                using (var walker = AssignmentExecutionWalker.Borrow(nullCheck, Search.TopLevel, semanticModel, cancellationToken))
                 {
                     foreach (var assignment in walker.Assignments)
                     {

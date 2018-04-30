@@ -238,7 +238,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
         {
-            if (AssignmentExecutionWalker.FirstWith(symbol, scope, ReturnValueSearch.Recursive, semanticModel, cancellationToken, out var assignment))
+            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Search.Recursive, semanticModel, cancellationToken, out var assignment))
             {
                 var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
                            semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);

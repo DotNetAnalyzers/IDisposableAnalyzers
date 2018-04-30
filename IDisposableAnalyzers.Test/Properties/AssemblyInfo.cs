@@ -1,4 +1,4 @@
-﻿using Gu.Roslyn.Asserts;
+using Gu.Roslyn.Asserts;
 
 [assembly: MetadataReference(typeof(object), new[] { "global", "mscorlib" })]
 [assembly: MetadataReference(typeof(System.Diagnostics.Debug), new[] { "global", "System" })]
@@ -17,4 +17,6 @@
     typeof(System.Xaml.XamlLanguage),
     typeof(Moq.Mock<>),
     typeof(Ninject.StandardKernel),
+    typeof(Gu.Roslyn.AnalyzerExtensions.SyntaxTokenExt),
+    typeof(Gu.Roslyn.CodeFixExtensions.Parse),
     typeof(NUnit.Framework.Assert))]

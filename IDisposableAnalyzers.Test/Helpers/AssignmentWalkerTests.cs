@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -92,7 +93,7 @@ namespace RoslynSandbox
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var setter = syntaxTree.FindPropertyDeclaration("Bar2").Find<AccessorDeclarationSyntax>("set");
-            using (var assignedValues = AssignmentExecutionWalker.Borrow(setter, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
+            using (var assignedValues = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", assignedValues.Assignments);
                 var expected = "this.Bar2 = null, this.Bar1 = null, this.Bar2 = null, this.bar1.Selected = false, this.bar1 = value, this.bar1.Selected = true, this.bar2.Selected = false, this.bar2 = value, this.bar2.Selected = true, this.bar1.Selected = false, this.bar1 = value, this.bar1.Selected = true";

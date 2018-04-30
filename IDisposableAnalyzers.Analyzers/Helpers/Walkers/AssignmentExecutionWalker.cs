@@ -40,7 +40,7 @@ namespace IDisposableAnalyzers
             base.VisitLocalDeclarationStatement(node);
         }
 
-        internal static AssignmentExecutionWalker Borrow(SyntaxNode node, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignmentExecutionWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = Borrow(() => new AssignmentExecutionWalker());
             walker.SemanticModel = semanticModel;
@@ -50,12 +50,12 @@ namespace IDisposableAnalyzers
             return walker;
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return FirstForSymbol(symbol, scope, search, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -80,7 +80,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool SingleForSymbol(ISymbol symbol, SyntaxNode scope, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool SingleForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
@@ -110,7 +110,7 @@ namespace IDisposableAnalyzers
             return assignment != null;
         }
 
-        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, PooledSet<ISymbol> recursion = null)
+        internal static bool FirstWith(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, PooledSet<ISymbol> recursion = null)
         {
             assignment = null;
             if (symbol == null ||
@@ -119,7 +119,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var walker = Borrow(scope, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
+            using (var walker = Borrow(scope, Search.TopLevel, semanticModel, cancellationToken))
             {
                 foreach (var candidate in walker.assignments)
                 {
@@ -135,7 +135,7 @@ namespace IDisposableAnalyzers
                     if (declaration.Declaration is VariableDeclarationSyntax variableDeclaration &&
                         variableDeclaration.Variables.TryFirst(x => x.Initializer != null, out var variable) &&
                         IsMatch(symbol, variable.Initializer.Value, semanticModel, cancellationToken) &&
-                        SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, variable, cancellationToken) is ILocalSymbol local)
+                        semanticModel.GetDeclaredSymbolSafe(variable, cancellationToken) is ILocalSymbol local)
                     {
                         using (var visited = recursion.IncrementUsage())
                         {
@@ -148,7 +148,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                if (search != ReturnValueSearch.TopLevel)
+                if (search != Search.TopLevel)
                 {
                     foreach (var argument in walker.arguments)
                     {

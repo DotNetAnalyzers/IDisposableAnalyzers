@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
             {
                 using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
                 {
-                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
+                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Search.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {

@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
     {
         internal static bool Creates(this ObjectCreationExpressionSyntax creation, ConstructorDeclarationSyntax ctor, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var created = semanticModel.GetSymbolSafe(creation, cancellationToken) as IMethodSymbol;
+            var created = semanticModel.GetSymbolSafe(creation, cancellationToken);
             var ctorSymbol = semanticModel.GetDeclaredSymbolSafe(ctor, cancellationToken);
             if (SymbolComparer.Equals(ctorSymbol, created))
             {
