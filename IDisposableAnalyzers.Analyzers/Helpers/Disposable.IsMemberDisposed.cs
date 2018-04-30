@@ -272,12 +272,12 @@ namespace IDisposableAnalyzers
 
             internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                if (!IsAssignableTo(type))
+                if (!IsAssignableFrom(type, semanticModel.Compilation))
                 {
                     return Borrow(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, ReturnValueSearch.Recursive, out var disposeMethod))
+                if (TryGetDisposeMethod(type, semanticModel.Compilation, Gu.Roslyn.AnalyzerExtensions.Search.Recursive, out var disposeMethod))
                 {
                     return Borrow(disposeMethod, semanticModel, cancellationToken);
                 }

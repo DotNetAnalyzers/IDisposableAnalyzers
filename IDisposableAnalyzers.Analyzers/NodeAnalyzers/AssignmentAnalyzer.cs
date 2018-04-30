@@ -59,7 +59,8 @@ namespace IDisposableAnalyzers
                 if (assignedSymbol is IParameterSymbol assignedParameter &&
                     assignedParameter.ContainingSymbol.DeclaredAccessibility != Accessibility.Private &&
                     assignedParameter.RefKind == RefKind.Ref &&
-                    Disposable.IsAssignableTo(context.SemanticModel.GetTypeInfoSafe(assignment.Right, context.CancellationToken).Type))
+                    context.SemanticModel.TryGetType(assignment.Right, context.CancellationToken, out var type) &&
+                    Disposable.IsAssignableFrom(type, context.Compilation))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                 }

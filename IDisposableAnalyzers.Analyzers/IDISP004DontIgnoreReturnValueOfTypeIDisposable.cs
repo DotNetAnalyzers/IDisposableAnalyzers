@@ -50,7 +50,7 @@ namespace IDisposableAnalyzers
 
             if (context.Node is MemberAccessExpressionSyntax memberAccess &&
                 context.SemanticModel.TryGetSymbol(memberAccess.Expression, context.CancellationToken, out IPropertySymbol property) &&
-                Disposable.IsPotentiallyAssignableTo(property.Type) &&
+                Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation) &&
                 Disposable.IsCreation(memberAccess.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                 Disposable.IsIgnored(memberAccess.Expression, context.SemanticModel, context.CancellationToken))
             {

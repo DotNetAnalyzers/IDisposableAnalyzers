@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static bool IsPotentiallyAssignableTo(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsPotentiallyAssignableFrom(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (candidate == null ||
                 candidate.IsMissing ||
@@ -19,13 +19,17 @@ namespace IDisposableAnalyzers
 
             if (candidate is ObjectCreationExpressionSyntax objectCreation)
             {
-                return IsAssignableTo(semanticModel.GetTypeInfoSafe(objectCreation, cancellationToken).Type);
+                return semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+                       IsAssignableFrom(type, semanticModel.Compilation);
             }
-
-            return IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type);
+            else
+            {
+                return semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
+                       IsPotentiallyAssignableFrom(type, semanticModel.Compilation);
+            }
         }
 
-        internal static bool IsPotentiallyAssignableTo(ITypeSymbol type)
+        internal static bool IsPotentiallyAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
             if (type == null ||
                 type is IErrorTypeSymbol)
@@ -34,13 +38,13 @@ namespace IDisposableAnalyzers
             }
 
             if (type.IsValueType &&
-                !IsAssignableTo(type))
+                !IsAssignableFrom(type, compilation))
             {
                 return false;
             }
 
             if (type.IsSealed &&
-                !IsAssignableTo(type))
+                !IsAssignableFrom(type, compilation))
             {
                 return false;
             }
@@ -48,7 +52,7 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        internal static bool IsAssignableTo(ITypeSymbol type)
+        internal static bool IsAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
             if (type == null)
             {
@@ -62,10 +66,10 @@ namespace IDisposableAnalyzers
             }
 
             return type == KnownSymbol.IDisposable ||
-                   type.Is(KnownSymbol.IDisposable);
+                   type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
         }
 
-        internal static bool TryGetDisposeMethod(ITypeSymbol type, ReturnValueSearch search, out IMethodSymbol disposeMethod)
+        internal static bool TryGetDisposeMethod(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
         {
             disposeMethod = null;
             if (type == null)
@@ -78,10 +82,10 @@ namespace IDisposableAnalyzers
             {
                 case 0:
                     var baseType = type.BaseType;
-                    if (search == ReturnValueSearch.Recursive &&
-                        IsAssignableTo(baseType))
+                    if (search == Search.Recursive &&
+                        IsAssignableFrom(baseType, compilation))
                     {
-                        return TryGetDisposeMethod(baseType, ReturnValueSearch.Recursive, out disposeMethod);
+                        return TryGetDisposeMethod(baseType, compilation, Search.Recursive, out disposeMethod);
                     }
 
                     return false;
@@ -163,21 +167,14 @@ namespace IDisposableAnalyzers
                 foreach (var value in walker)
                 {
                     var candidate = value;
-                    if (candidate is CastExpressionSyntax castExpression)
+                    switch (candidate)
                     {
-                        candidate = castExpression.Expression;
-                    }
-
-                    if (candidate is BinaryExpressionSyntax binary &&
-                        binary.IsKind(SyntaxKind.AsExpression))
-                    {
-                        candidate = binary.Left;
-                    }
-
-                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-                    if (SymbolComparer.Equals(symbol, returnedSymbol))
-                    {
-                        return true;
+                        case CastExpressionSyntax castExpression:
+                            candidate = castExpression.Expression;
+                            break;
+                        case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AsExpression):
+                            candidate = binary.Left;
+                            break;
                     }
 
                     if (candidate is ObjectCreationExpressionSyntax objectCreation)
@@ -186,8 +183,8 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var argument in objectCreation.ArgumentList.Arguments)
                             {
-                                var arg = semanticModel.GetSymbolSafe(argument.Expression, cancellationToken);
-                                if (SymbolComparer.Equals(symbol, arg))
+                                if (semanticModel.TryGetSymbol(argument.Expression, cancellationToken, out ISymbol argumentSymbol) &&
+                                    SymbolComparer.Equals(symbol, argumentSymbol))
                                 {
                                     return true;
                                 }
@@ -196,15 +193,21 @@ namespace IDisposableAnalyzers
 
                         if (objectCreation.Initializer != null)
                         {
-                            foreach (var argument in objectCreation.Initializer.Expressions)
+                            foreach (var expression in objectCreation.Initializer.Expressions)
                             {
-                                var arg = semanticModel.GetSymbolSafe(argument, cancellationToken);
-                                if (SymbolComparer.Equals(symbol, arg))
+                                if (semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol argumentSymbol) &&
+                                    SymbolComparer.Equals(symbol, argumentSymbol))
                                 {
                                     return true;
                                 }
                             }
                         }
+                    }
+
+                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
+                    if (SymbolComparer.Equals(symbol, returnedSymbol))
+                    {
+                        return true;
                     }
 
                     if (candidate is InvocationExpressionSyntax invocation)

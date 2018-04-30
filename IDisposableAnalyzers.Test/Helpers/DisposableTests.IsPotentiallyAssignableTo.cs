@@ -30,7 +30,7 @@ namespace RoslynSandbox
                 testCode = testCode.AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, new Mock<SemanticModel>(MockBehavior.Strict).Object, CancellationToken.None));
+                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, new Mock<SemanticModel>(MockBehavior.Strict).Object, CancellationToken.None));
             }
 
             [TestCase("new string(' ', 1)", false)]
@@ -53,7 +53,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableTo(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, semanticModel, CancellationToken.None));
             }
         }
     }

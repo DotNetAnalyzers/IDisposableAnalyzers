@@ -93,7 +93,7 @@ namespace IDisposableAnalyzers
                 else if (typeDeclaration is ClassDeclarationSyntax classDeclaration)
                 {
                     var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
-                    if (Disposable.IsAssignableTo(type) &&
+                    if (Disposable.IsAssignableFrom(type, semanticModel.Compilation) &&
                         Disposable.TryGetBaseVirtualDisposeMethod(type, out var baseDispose))
                     {
                         context.RegisterCodeFix(

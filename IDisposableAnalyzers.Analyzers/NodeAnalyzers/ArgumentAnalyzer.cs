@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
                 context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method) &&
                 method.TrySingleDeclaration(context.CancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                 method.TryFindParameter(argument, out var parameter) &&
-                Disposable.IsPotentiallyAssignableTo(parameter.Type))
+                Disposable.IsPotentiallyAssignableFrom(parameter.Type, context.Compilation))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     !Disposable.IsAddedToFieldOrProperty(parameter, declaration, context.SemanticModel, context.CancellationToken) &&

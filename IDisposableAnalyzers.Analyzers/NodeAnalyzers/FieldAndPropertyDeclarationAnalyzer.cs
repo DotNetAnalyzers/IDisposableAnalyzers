@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers
             if (context.ContainingSymbol is IFieldSymbol field &&
                 !field.IsStatic &&
                 !field.IsConst &&
-                Disposable.IsPotentiallyAssignableTo(field.Type))
+                Disposable.IsPotentiallyAssignableFrom(field.Type, context.Compilation))
             {
                 HandleFieldOrProperty(context, field);
             }
@@ -69,7 +69,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (Disposable.IsPotentiallyAssignableTo(property.Type))
+            if (Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {
                 HandleFieldOrProperty(context, property);
             }
@@ -101,8 +101,8 @@ namespace IDisposableAnalyzers
                                      context.SemanticModel,
                                      context.CancellationToken))
                         {
-                            if (Disposable.IsAssignableTo(fieldOrProperty.ContainingType) &&
-                                Disposable.TryGetDisposeMethod(fieldOrProperty.ContainingType, ReturnValueSearch.TopLevel, out IMethodSymbol _))
+                            if (Disposable.IsAssignableFrom(fieldOrProperty.ContainingType, context.Compilation) &&
+                                Disposable.TryGetDisposeMethod(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
                             }

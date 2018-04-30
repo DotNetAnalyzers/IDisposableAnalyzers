@@ -112,7 +112,7 @@ namespace IDisposableAnalyzers
                         context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
                     }
 
-                    if (!IsDisposableReturnTypeOrIgnored(ReturnType(context)))
+                    if (!IsDisposableReturnTypeOrIgnored(ReturnType(context), context.Compilation))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
                     }
@@ -200,7 +200,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type)
+        private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type, Compilation compilation)
         {
             if (type == null ||
                 type == KnownSymbol.Void)
@@ -208,7 +208,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            if (Disposable.IsAssignableTo(type))
+            if (Disposable.IsAssignableFrom(type, compilation))
             {
                 return true;
             }
@@ -221,13 +221,15 @@ namespace IDisposableAnalyzers
             if (type == KnownSymbol.Task)
             {
                 var namedType = type as INamedTypeSymbol;
-                return namedType?.IsGenericType == true && Disposable.IsAssignableTo(namedType.TypeArguments[0]);
+                return namedType?.IsGenericType == true &&
+                       Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
             }
 
             if (type == KnownSymbol.Func)
             {
                 var namedType = type as INamedTypeSymbol;
-                return namedType?.IsGenericType == true && Disposable.IsAssignableTo(namedType.TypeArguments[namedType.TypeArguments.Length - 1]);
+                return namedType?.IsGenericType == true &&
+                       Disposable.IsAssignableFrom(namedType.TypeArguments[namedType.TypeArguments.Length - 1], compilation);
             }
 
             return false;

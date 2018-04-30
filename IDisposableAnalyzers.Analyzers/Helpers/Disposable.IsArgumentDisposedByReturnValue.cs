@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers
                 if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                 {
                     return method.ReturnsVoid ||
-                           !IsAssignableTo(method.ReturnType)
+                           !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
                         ? Result.No
                         : Result.AssumeYes;
                 }
@@ -52,7 +52,7 @@ namespace IDisposableAnalyzers
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
                         return method.ReturnsVoid ||
-                               !IsAssignableTo(method.ReturnType)
+                               !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
                             ? Result.No
                             : Result.AssumeYes;
                     }
@@ -77,7 +77,7 @@ namespace IDisposableAnalyzers
                             if (SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
-                                if (TryGetDisposeMethod(chainedCtor.ContainingType, ReturnValueSearch.TopLevel, out var disposeMethod))
+                                if (TryGetDisposeMethod(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
                                 {
                                     return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken)
                                         ? Result.Yes
@@ -96,7 +96,7 @@ namespace IDisposableAnalyzers
 
                     if (ctor.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
-                        return IsAssignableTo(ctor.ContainingType) ? Result.AssumeYes : Result.No;
+                        return IsAssignableFrom(ctor.ContainingType, semanticModel.Compilation) ? Result.AssumeYes : Result.No;
                     }
 
                     if (ctor.ContainingType.IsAssignableTo(KnownSymbol.NinjectStandardKernel, semanticModel.Compilation))

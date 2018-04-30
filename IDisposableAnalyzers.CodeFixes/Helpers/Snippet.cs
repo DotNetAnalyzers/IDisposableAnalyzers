@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers
                     ? "this."
                     : string.Empty;
             var type = MemberType(member);
-            if (!Disposable.IsAssignableTo(type) ||
+            if (!Disposable.IsAssignableFrom(type, semanticModel.Compilation) ||
                 IsExplicit(type))
             {
                 return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")

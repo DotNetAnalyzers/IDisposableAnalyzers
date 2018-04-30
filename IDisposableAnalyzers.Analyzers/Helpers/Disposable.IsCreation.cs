@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
         {
-            if (!IsPotentiallyAssignableTo(disposable, semanticModel, cancellationToken))
+            if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
             {
                 assignedSymbol = null;
                 return Result.No;
@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers
 
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol is IPropertySymbol property &&
-                IsAssignableTo(property.Type) &&
+                IsAssignableFrom(property.Type, semanticModel.Compilation) &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
                 using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
@@ -34,7 +34,7 @@ namespace IDisposableAnalyzers
                         {
                             if (assigned.Right is IdentifierNameSyntax identifierName &&
                                 identifierName.Identifier.ValueText == "value" &&
-                                IsPotentiallyAssignableTo(assigned.Left, semanticModel, cancellationToken) &&
+                                IsPotentiallyAssignableFrom(assigned.Left, semanticModel, cancellationToken) &&
                                 semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
                                 candidate.IsEither<IFieldSymbol, IPropertySymbol>())
                             {
@@ -114,7 +114,7 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!IsPotentiallyAssignableTo(candidate, semanticModel, cancellationToken) ||
+            if (!IsPotentiallyAssignableFrom(candidate, semanticModel, cancellationToken) ||
                 candidate is ThisExpressionSyntax ||
                 candidate is BaseExpressionSyntax)
             {
@@ -138,11 +138,10 @@ namespace IDisposableAnalyzers
             {
                 if (walker.Count == 0)
                 {
-                    var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-                    if (symbol != null &&
+                    if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol) &&
                         symbol.DeclaringSyntaxReferences.Length == 0)
                     {
-                        return IsCreationCore(symbol);
+                        return IsCreationCore(symbol, semanticModel.Compilation);
                     }
 
                     using (var recursive = RecursiveValues.Create(new[] { candidate }, semanticModel, cancellationToken))
@@ -173,7 +172,7 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                 method.TryFindParameter(candidate, out var parameter) &&
-                IsPotentiallyAssignableTo(parameter.Type))
+                IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
             {
                 return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
             }
@@ -234,8 +233,7 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            if (!IsPotentiallyAssignableTo(
-                semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
+            if (!IsPotentiallyAssignableFrom(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type, semanticModel.Compilation))
             {
                 return Result.No;
             }
@@ -253,7 +251,8 @@ namespace IDisposableAnalyzers
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (IsAssignableTo(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type))
+                if (semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
+                    IsAssignableFrom(type, semanticModel.Compilation))
                 {
                     return Result.Yes;
                 }
@@ -261,11 +260,20 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-            return IsCreationCore(symbol);
+            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol))
+            {
+                switch (symbol)
+                {
+                     case IPropertySymbol _:
+                     case IMethodSymbol _:
+                         return IsCreationCore(symbol, semanticModel.Compilation);
+                }
+            }
+
+            return Result.No;
         }
 
-        private static Result IsCreationCore(ISymbol candidate)
+        private static Result IsCreationCore(ISymbol candidate, Compilation compilation)
         {
             if (candidate == null ||
                 candidate is ILocalSymbol)
@@ -300,7 +308,7 @@ namespace IDisposableAnalyzers
                         return Result.Yes;
                     }
 
-                    if (method.ContainingType.Is(KnownSymbol.IDictionary) ||
+                    if (method.ContainingType.IsAssignableTo(KnownSymbol.IDictionary, compilation) ||
                         method.ContainingType == KnownSymbol.Enumerable ||
                         method.ContainingType == KnownSymbol.ListOfT ||
                         method.ContainingType == KnownSymbol.StackOfT ||
@@ -339,13 +347,14 @@ namespace IDisposableAnalyzers
 
                     if (method.ReturnType == KnownSymbol.TaskOfT)
                     {
-                        return IsAssignableTo(((INamedTypeSymbol)method.ReturnType).TypeArguments[0])
+                        return method.TypeArguments.TrySingle(out var typeArg) &&
+                               IsAssignableFrom(typeArg, compilation)
                             ? Result.AssumeYes
                             : Result.No;
                     }
 
                     if (method.ContainingType == KnownSymbol.File &&
-                        IsAssignableTo(method.ReturnType))
+                        IsAssignableFrom(method.ReturnType, compilation))
                     {
                         return Result.Yes;
                     }
@@ -356,7 +365,7 @@ namespace IDisposableAnalyzers
                         return Result.AssumeNo;
                     }
 
-                    return IsAssignableTo(method.ReturnType)
+                    return IsAssignableFrom(method.ReturnType, compilation)
                                ? Result.AssumeYes
                                : Result.No;
                 }

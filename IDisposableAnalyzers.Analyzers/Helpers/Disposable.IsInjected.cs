@@ -7,78 +7,6 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static bool IsAssignedWithCreatedAndNotCachedOrInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
-            {
-                return false;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           !IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndNotCachedOrInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (property == null ||
-                !IsPotentiallyAssignableTo(property.Type))
-            {
-                return false;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           !IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndInjected(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (field == null ||
-                !IsPotentiallyAssignableTo(field.Type))
-            {
-                return false;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(field, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
-        internal static bool IsAssignedWithCreatedAndInjected(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (property == null ||
-                !IsPotentiallyAssignableTo(property.Type))
-            {
-                return false;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(property, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                           IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
@@ -111,7 +39,7 @@ namespace IDisposableAnalyzers
         {
             if (disposable == null ||
                 disposable.IsMissing ||
-                !IsPotentiallyAssignableTo(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type))
+                !IsPotentiallyAssignableFrom(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type, semanticModel.Compilation))
             {
                 return false;
             }
