@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Threading;
@@ -774,7 +775,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var walker in this.map.Values)
                 {
-                    walker?.Dispose();
+                    ((IDisposable)walker)?.Dispose();
                 }
 
                 this.map.Clear();
