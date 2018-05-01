@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -283,6 +284,19 @@ namespace IDisposableAnalyzers
 
                 return false;
             }
+        }
+
+        internal static bool ShouldDispose(LocalOrParameter localOrParameter, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            switch (localOrParameter.Symbol)
+            {
+                case ILocalSymbol local:
+                    return ShouldDispose(local, location, semanticModel, cancellationToken);
+                case IParameterSymbol parameter:
+                    return ShouldDispose(parameter, location, semanticModel, cancellationToken);
+            }
+
+            throw new InvalidOperationException("Should never get here.");
         }
 
         internal static bool ShouldDispose(ILocalSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)

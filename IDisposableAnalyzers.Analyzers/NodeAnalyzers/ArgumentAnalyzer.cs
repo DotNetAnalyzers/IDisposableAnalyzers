@@ -43,20 +43,10 @@ namespace IDisposableAnalyzers
                     !Disposable.IsAddedToFieldOrProperty(parameter, declaration, context.SemanticModel, context.CancellationToken) &&
                     context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
                 {
-                    if (TryGetSymbol(argument, context, out var assignedSymbol))
+                    if (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
+                        Disposable.ShouldDispose(localOrParameter, argument, context.SemanticModel, context.CancellationToken))
                     {
-                        if (assignedSymbol is ILocalSymbol assignedLocal &&
-                            Disposable.ShouldDispose(assignedLocal, argument, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
-                        }
-
-                        if (assignedSymbol is IParameterSymbol assignedParameter &&
-                            assignedParameter.RefKind == RefKind.None &&
-                            Disposable.ShouldDispose(assignedParameter, argument, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
-                        }
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
                     }
 
                     if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
@@ -66,20 +56,6 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
-        }
-
-        private static bool TryGetSymbol(ArgumentSyntax argument, SyntaxNodeAnalysisContext context, out ISymbol symbol)
-        {
-            switch (argument.Expression)
-            {
-                case IdentifierNameSyntax candidate:
-                    return context.SemanticModel.TryGetSymbol(candidate, context.CancellationToken, out symbol);
-                case DeclarationExpressionSyntax declarationExpression when declarationExpression.Designation is SingleVariableDesignationSyntax singleVariable:
-                    return context.SemanticModel.TryGetSymbol(singleVariable, context.CancellationToken, out symbol);
-            }
-
-            symbol = null;
-            return false;
         }
     }
 }

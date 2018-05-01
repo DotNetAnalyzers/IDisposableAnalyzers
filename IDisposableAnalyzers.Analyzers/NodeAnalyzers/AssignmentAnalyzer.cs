@@ -35,19 +35,11 @@ namespace IDisposableAnalyzers
             if (context.Node is AssignmentExpressionSyntax assignment &&
                 context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol assignedSymbol))
             {
-                if (Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&
+                    Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    Disposable.ShouldDispose(localOrParameter, assignment, context.SemanticModel, context.CancellationToken))
                 {
-                    if (assignedSymbol is ILocalSymbol local &&
-                        Disposable.ShouldDispose(local, assignment, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
-                    }
-
-                    if (assignedSymbol is IParameterSymbol parameter &&
-                        Disposable.ShouldDispose(parameter, assignment, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
                 }
 
                 if (IsReassignedWithCreated(assignment, context))
