@@ -12,12 +12,11 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out ExpressionSyntax member))
+            if (!DisposeCall.TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var symbol))
             {
                 return false;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(member, cancellationToken);
             if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
             {
                 return true;

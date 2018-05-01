@@ -6,32 +6,6 @@ namespace IDisposableAnalyzers
 
     internal static class MemberPath
     {
-        internal static bool TryFindRootMember(ExpressionSyntax node, out ExpressionSyntax member)
-        {
-            if (TryPeel(node, out member) &&
-                IsRootMember(member))
-            {
-                return true;
-            }
-
-            if (!TryFindMember(node, out member))
-            {
-                return false;
-            }
-
-            do
-            {
-                if (IsRootMember(member))
-                {
-                    return true;
-                }
-            }
-            while (TryFindMemberCore(member, out member));
-
-            member = null;
-            return false;
-        }
-
         internal static bool IsRootMember(ExpressionSyntax expression)
         {
             if (!TryPeel(expression, out ExpressionSyntax member))
