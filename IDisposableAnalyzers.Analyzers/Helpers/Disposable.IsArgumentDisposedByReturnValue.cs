@@ -74,10 +74,10 @@ namespace IDisposableAnalyzers
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                         if (initializer != null)
                         {
-                            if (SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
+                            if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
                                 chainedCtor.ContainingType != member.ContainingType)
                             {
-                                if (TryGetDisposeMethod(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
+                                if (DisposeMethod.TryFindFirst(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
                                 {
                                     return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken)
                                         ? Result.Yes

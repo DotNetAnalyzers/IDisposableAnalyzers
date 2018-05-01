@@ -33,28 +33,26 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MemberDeclarationSyntax member &&
-                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol) &&
-                    Disposable.TryGetDisposeMethod(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
-                    disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                if (syntaxRoot.TryFindNode<MemberDeclarationSyntax>(diagnostic, out var member) &&
+                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol))
                 {
-                    if (disposeMethod.DeclaredAccessibility == Accessibility.Public &&
-                        disposeMethod.ContainingType == memberSymbol.ContainingType &&
-                        disposeMethod.Parameters.Length == 0)
+                    if (DisposeMethod.TryFindVirtualDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
+                        disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                    {
+                        if (TryFindIfDisposing(disposeMethodDeclaration, out var ifDisposing))
+                        {
+                            context.RegisterDocumentEditorFix(
+                                "Dispose member.",
+                                (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
+                                diagnostic);
+                        }
+                    }
+                    else if (DisposeMethod.TryFindIDisposableDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeMethod) &&
+                        disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
                     {
                         context.RegisterDocumentEditorFix(
                             "Dispose member.",
                             (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
-                            diagnostic);
-                    }
-
-                    if (disposeMethod.Parameters.TrySingle(out var parameter) &&
-                        parameter.Type == KnownSymbol.Boolean &&
-                        TryGetIfDisposing(disposeMethodDeclaration, out var ifDisposing))
-                    {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose member.",
-                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
                             diagnostic);
                     }
                 }
@@ -112,7 +110,7 @@ namespace IDisposableAnalyzers
             return method.Body.Statements.Add(newStatement);
         }
 
-        private static bool TryGetIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
+        private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
         {
             if (disposeMethod.ParameterList is ParameterListSyntax parameterList &&
                 parameterList.Parameters.TrySingle(out var parameter) &&

@@ -94,7 +94,7 @@ namespace IDisposableAnalyzers
                 {
                     var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
                     if (Disposable.IsAssignableFrom(type, semanticModel.Compilation) &&
-                        Disposable.TryGetBaseVirtualDisposeMethod(type, out var baseDispose))
+                        DisposeMethod.TryFindBaseVirtual(type, out var baseDispose))
                     {
                         context.RegisterCodeFix(
                             CodeAction.Create(

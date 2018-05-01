@@ -277,7 +277,7 @@ namespace IDisposableAnalyzers
                     return Borrow(semanticModel, cancellationToken);
                 }
 
-                if (TryGetDisposeMethod(type, semanticModel.Compilation, Gu.Roslyn.AnalyzerExtensions.Search.Recursive, out var disposeMethod))
+                if (DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod))
                 {
                     return Borrow(disposeMethod, semanticModel, cancellationToken);
                 }

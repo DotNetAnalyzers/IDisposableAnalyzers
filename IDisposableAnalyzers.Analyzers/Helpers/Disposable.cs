@@ -69,64 +69,6 @@ namespace IDisposableAnalyzers
                    type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
         }
 
-        internal static bool TryGetDisposeMethod(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
-        {
-            disposeMethod = null;
-            if (type == null)
-            {
-                return false;
-            }
-
-            var disposers = type.GetMembers("Dispose");
-            switch (disposers.Length)
-            {
-                case 0:
-                    var baseType = type.BaseType;
-                    if (search == Search.Recursive &&
-                        IsAssignableFrom(baseType, compilation))
-                    {
-                        return TryGetDisposeMethod(baseType, compilation, Search.Recursive, out disposeMethod);
-                    }
-
-                    return false;
-                case 1:
-                    disposeMethod = disposers[0] as IMethodSymbol;
-                    if (disposeMethod == null)
-                    {
-                        return false;
-                    }
-
-                    return (disposeMethod.Parameters.Length == 0 &&
-                            disposeMethod.DeclaredAccessibility == Accessibility.Public) ||
-                           (disposeMethod.Parameters.Length == 1 &&
-                            disposeMethod.Parameters[0].Type == KnownSymbol.Boolean);
-                case 2:
-                    if (disposers.TrySingle(x => (x as IMethodSymbol)?.Parameters.Length == 1, out ISymbol temp))
-                    {
-                        disposeMethod = temp as IMethodSymbol;
-                        return disposeMethod != null &&
-                               disposeMethod.Parameters[0].Type == KnownSymbol.Boolean;
-                    }
-
-                    break;
-            }
-
-            return false;
-        }
-
-        internal static bool TryGetBaseVirtualDisposeMethod(ITypeSymbol type, out IMethodSymbol result)
-        {
-            return type.TryFindFirstMethodRecursive("Dispose", IsVirtualDispose, out result);
-
-            bool IsVirtualDispose(IMethodSymbol candidate)
-            {
-                return candidate.IsVirtual &&
-                       candidate.ReturnsVoid &&
-                       candidate.Parameters.TrySingle(out var parameter) &&
-                       parameter.Type == KnownSymbol.Boolean;
-            }
-        }
-
         internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)
