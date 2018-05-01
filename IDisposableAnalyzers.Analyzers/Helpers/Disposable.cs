@@ -325,7 +325,8 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
+            if (parameter.RefKind == RefKind.None &&
+                parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
                 methodDeclaration.Body is BlockSyntax block)

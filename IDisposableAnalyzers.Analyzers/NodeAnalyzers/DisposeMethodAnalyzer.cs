@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
@@ -30,10 +31,12 @@ namespace IDisposableAnalyzers
             }
 
             if (context.ContainingSymbol is IMethodSymbol method &&
+                context.Node is MethodDeclarationSyntax methodDeclaration &&
                 method.Name == "Dispose" &&
                 method.ReturnsVoid)
             {
                 if (method.Parameters.Length == 0 &&
+                    method.DeclaredAccessibility == Accessibility.Public &&
                     method.GetAttributes().Length == 0 &&
                     !method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation))
                 {
@@ -45,45 +48,52 @@ namespace IDisposableAnalyzers
                     method.IsOverride &&
                     method.OverriddenMethod is IMethodSymbol overridden)
                 {
-                    using (var invocations = InvocationWalker.Borrow(context.Node))
-                    {
-                        foreach (var invocation in invocations)
-                        {
-                            if (invocation.TryGetMethodName(out var name) &&
-                                name != overridden.Name)
-                            {
-                                continue;
-                            }
-
-                            if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var target) &&
-                                SymbolComparer.Equals(target, overridden))
-                            {
-                                return;
-                            }
-                        }
-                    }
-
-                    if (overridden.DeclaringSyntaxReferences.Length == 0)
+                    if (overridden.DeclaringSyntaxReferences.Length == 0 &&
+                        !CallsBase(methodDeclaration, overridden, context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
-                        return;
                     }
-
-                    using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                    else
                     {
-                        foreach (var disposeCall in disposeWalker)
+                        using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
                         {
-                            if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                                context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out ISymbol member) &&
-                                !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                            foreach (var disposeCall in disposeWalker)
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
-                                return;
+                                if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                                    context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out ISymbol member) &&
+                                    !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                                {
+                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
+                                    break;
+                                }
                             }
                         }
                     }
                 }
             }
+        }
+
+        private static bool CallsBase(MemberDeclarationSyntax method, IMethodSymbol overridden, SyntaxNodeAnalysisContext context)
+        {
+            using (var invocations = InvocationWalker.Borrow(method))
+            {
+                foreach (var invocation in invocations)
+                {
+                    if (invocation.TryGetMethodName(out var name) &&
+                        name != overridden.Name)
+                    {
+                        continue;
+                    }
+
+                    if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var target) &&
+                        SymbolComparer.Equals(target, overridden))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
