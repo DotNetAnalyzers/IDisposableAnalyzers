@@ -94,5 +94,15 @@ namespace IDisposableAnalyzers
                    candidate.Parameters.TrySingle(out var parameter) &&
                    parameter.Type == KnownSymbol.Boolean;
         }
+
+        internal static bool IsIDisposableDispose(IMethodSymbol candidate, Compilation compilation)
+        {
+            return candidate != null &&
+                   candidate.Name == "Dispose" &&
+                   candidate.ReturnsVoid &&
+                   candidate.Parameters.Length == 0 &&
+                   candidate.DeclaredAccessibility == Accessibility.Public &&
+                   candidate.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+        }
     }
 }
