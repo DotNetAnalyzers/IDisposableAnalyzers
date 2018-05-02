@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers
 
         private DisposeWalker()
         {
-            this.Search = Search.Recursive;
+            this.Scope = Scope.Recursive;
         }
 
         public int Count => this.invocations.Count;
