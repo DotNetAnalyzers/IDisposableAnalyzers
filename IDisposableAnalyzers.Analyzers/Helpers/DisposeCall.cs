@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -11,20 +10,9 @@ namespace IDisposableAnalyzers
         internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol disposed)
         {
             disposed = null;
-            if (IsIDisposableDispose(disposeCall))
-            {
-                throw new NotImplementedException("Use MemberPat.TrySingle here.");
-                using (var walker = Gu.Roslyn.AnalyzerExtensions.MemberPath.PathWalker.Borrow(disposeCall))
-                {
-                    if (walker.IdentifierNames.TrySingle(out var expression) &&
-                        semanticModel.TryGetSymbol(expression, cancellationToken, out disposed))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            return IsIDisposableDispose(disposeCall) &&
+                   MemberPath.TrySingle(disposeCall, out var expression) &&
+                   semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
         }
 
         internal static bool IsDisposing(InvocationExpressionSyntax disposeCall, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -41,8 +29,8 @@ namespace IDisposableAnalyzers
                 {
                     using (var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                     {
-                        throw new NotImplementedException("Use MemberPat.TrySingle here.");
-                        return walker.TrySingle(out var expression) &&
+                        return walker.TrySingle(out var returnValue) &&
+                               MemberPath.TrySingle(returnValue, out var expression) &&
                                semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol nested) &&
                                SymbolComparer.Equals(nested, symbol);
                     }
