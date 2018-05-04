@@ -8,13 +8,13 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public partial class AssignmentWalkerTests
+    public partial class AssignmentExecutionWalkerTests
     {
         internal class Symbol
         {
-            [TestCase(Search.Recursive)]
-            [TestCase(Search.TopLevel)]
-            public void FieldWithCtorArg(Search search)
+            [TestCase(Scope.Recursive)]
+            [TestCase(Scope.Member)]
+            public void FieldWithCtorArg(Scope scope)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -35,13 +35,13 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindMemberAccessExpression("this.value");
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, search, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
+                Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, scope, semanticModel, CancellationToken.None, out AssignmentExpressionSyntax result));
                 Assert.AreEqual("this.value = arg", result?.ToString());
             }
 
-            [TestCase(ReturnValueSearch.Recursive)]
-            [TestCase(ReturnValueSearch.TopLevel)]
-            public void FieldWithChainedCtorArg(ReturnValueSearch search)
+            [TestCase(Scope.Recursive)]
+            [TestCase(Scope.Member)]
+            public void FieldWithChainedCtorArg(Scope scope)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -68,20 +68,20 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == ReturnValueSearch.Recursive)
+                if (scope == Scope.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.value = arg", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Member, semanticModel, CancellationToken.None, out result));
                 }
             }
 
-            [TestCase(ReturnValueSearch.Recursive)]
-            [TestCase(ReturnValueSearch.TopLevel)]
-            public void FieldWithCtorArgViaProperty(ReturnValueSearch search)
+            [TestCase(Scope.Recursive)]
+            [TestCase(Scope.Member)]
+            public void FieldWithCtorArgViaProperty(Scope search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -109,20 +109,20 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo(int arg)");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == ReturnValueSearch.Recursive)
+                if (search == Scope.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = value", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Member, semanticModel, CancellationToken.None, out result));
                 }
             }
 
-            [TestCase(ReturnValueSearch.Recursive)]
-            [TestCase(ReturnValueSearch.TopLevel)]
-            public void FieldInPropertyExpressionBody(ReturnValueSearch search)
+            [TestCase(Scope.Recursive)]
+            [TestCase(Scope.Member)]
+            public void FieldInPropertyExpressionBody(Scope search)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -146,14 +146,14 @@ namespace RoslynSandbox
                 var ctor = syntaxTree.FindConstructorDeclaration("Foo()");
                 AssignmentExpressionSyntax result;
                 var field = semanticModel.GetSymbolSafe(value, CancellationToken.None);
-                if (search == ReturnValueSearch.Recursive)
+                if (search == Scope.Recursive)
                 {
-                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.Recursive, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(true, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Recursive, semanticModel, CancellationToken.None, out result));
                     Assert.AreEqual("this.number = 3", result?.ToString());
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(field, ctor, Scope.Member, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

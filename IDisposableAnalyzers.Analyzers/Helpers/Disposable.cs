@@ -79,7 +79,7 @@ namespace IDisposableAnalyzers
                     foreach (var invocation in walker.Invocations)
                     {
                         if (SyntaxNodeExt.IsExecutedBefore(location, invocation) == Result.Yes &&
-                            IsDisposing(invocation, local, semanticModel, cancellationToken))
+                            DisposeCall.IsDisposing(invocation, local, semanticModel, cancellationToken))
                         {
                             return true;
                         }
@@ -165,7 +165,7 @@ namespace IDisposableAnalyzers
                             {
                                 foreach (var disposeCandidate in pooledInvocations.Invocations)
                                 {
-                                    if (IsDisposing(disposeCandidate, symbol, semanticModel, cancellationToken))
+                                    if (DisposeCall.IsDisposing(disposeCandidate, symbol, semanticModel, cancellationToken))
                                     {
                                         return true;
                                     }

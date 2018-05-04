@@ -55,13 +55,13 @@ namespace IDisposableAnalyzers
                     }
                     else
                     {
-                        using (var disposeWalker = Disposable.DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                        using (var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
                         {
                             foreach (var disposeCall in disposeWalker)
                             {
-                                if (Disposable.TryGetDisposedRootMember(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                                    context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out ISymbol member) &&
-                                    !Disposable.IsMemberDisposed(member, method, context.SemanticModel, context.CancellationToken))
+                                if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                                    FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                                    !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
                                     break;

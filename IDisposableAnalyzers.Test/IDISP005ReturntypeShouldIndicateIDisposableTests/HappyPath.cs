@@ -1,13 +1,14 @@
-﻿// ReSharper disable InconsistentNaming
+// ReSharper disable InconsistentNaming
 #pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new ReturnValueAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

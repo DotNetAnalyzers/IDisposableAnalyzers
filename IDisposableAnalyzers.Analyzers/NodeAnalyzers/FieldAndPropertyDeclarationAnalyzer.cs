@@ -36,9 +36,10 @@ namespace IDisposableAnalyzers
             if (context.ContainingSymbol is IFieldSymbol field &&
                 !field.IsStatic &&
                 !field.IsConst &&
+                FieldOrProperty.TryCreate(field, out var fieldOrProperty) &&
                 Disposable.IsPotentiallyAssignableFrom(field.Type, context.Compilation))
             {
-                HandleFieldOrProperty(context, field);
+                HandleFieldOrProperty(context, fieldOrProperty);
             }
         }
 
@@ -69,22 +70,23 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
+            if (FieldOrProperty.TryCreate(property, out var fieldOrProperty) &&
+                Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {
-                HandleFieldOrProperty(context, property);
+                HandleFieldOrProperty(context, fieldOrProperty);
             }
         }
 
-        private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, ISymbol fieldOrProperty)
+        private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, FieldOrProperty fieldOrProperty)
         {
-            using (var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty, context.SemanticModel, context.CancellationToken))
+            using (var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken))
             {
                 using (var recursive = RecursiveValues.Create(assignedValues, context.SemanticModel, context.CancellationToken))
                 {
                     if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
                         if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                            Disposable.IsMemberDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken)
+                            DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken)
                                       .IsEither(Result.No, Result.AssumeNo) &&
                             !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
                         {
@@ -106,9 +108,9 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool IsMutableFromOutside(ISymbol symbol)
+        private static bool IsMutableFromOutside(FieldOrProperty fieldOrProperty)
         {
-            if (symbol is IFieldSymbol field)
+            if (fieldOrProperty.Symbol is IFieldSymbol field)
             {
                 if (field.IsReadOnly)
                 {
@@ -131,9 +133,10 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (symbol is IPropertySymbol property)
+            if (fieldOrProperty.Symbol is IPropertySymbol property)
             {
-                if (property.SetMethod == null)
+                if (property.SetMethod == null ||
+                    property.DeclaredAccessibility == Accessibility.Private)
                 {
                     return false;
                 }

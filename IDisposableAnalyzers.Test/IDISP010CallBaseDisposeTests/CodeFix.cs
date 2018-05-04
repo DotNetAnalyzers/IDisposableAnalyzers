@@ -1,12 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFix
     {
-        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly AddBaseCallCodeFixProvider Fix = new AddBaseCallCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
+        private static readonly CodeFixProvider Fix = new AddBaseCallCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP010");
 
         private const string DisposableCode = @"

@@ -69,7 +69,7 @@ namespace IDisposableAnalyzers
                     argumentList.Parent is ConstructorInitializerSyntax)
                 {
                     if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out var member, out var ctor) &&
-                        member != null)
+                        FieldOrProperty.TryCreate(member, out var fieldOrProperty))
                     {
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                         if (initializer != null)
@@ -79,14 +79,14 @@ namespace IDisposableAnalyzers
                             {
                                 if (DisposeMethod.TryFindFirst(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
                                 {
-                                    return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken)
+                                    return DisposableMember.IsDisposed(fieldOrProperty, disposeMethod, semanticModel, cancellationToken)
                                         ? Result.Yes
                                         : Result.No;
                                 }
                             }
                         }
 
-                        return IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken);
+                        return DisposableMember.IsDisposed(fieldOrProperty, ctor.ContainingType, semanticModel, cancellationToken);
                     }
 
                     if (ctor == null)

@@ -40,33 +40,28 @@ namespace IDisposableAnalyzers
             base.VisitLocalDeclarationStatement(node);
         }
 
-        internal static AssignmentExecutionWalker Borrow(SyntaxNode node, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignmentExecutionWalker Borrow(SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = Borrow(() => new AssignmentExecutionWalker());
-            walker.SemanticModel = semanticModel;
-            walker.CancellationToken = cancellationToken;
-            walker.Search = search;
-            walker.Visit(node);
-            return walker;
+            return BorrowAndVisit(node, scope, semanticModel, cancellationToken, () => new AssignmentExecutionWalker());
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return FirstForSymbol(symbol, scope, search, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
+            return FirstForSymbol(symbol, node, scope, semanticModel, cancellationToken, out _);
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
-                scope == null)
+                node == null)
             {
                 return false;
             }
 
-            using (var pooledAssignments = Borrow(scope, search, semanticModel, cancellationToken))
+            using (var walker = Borrow(node, scope, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Assignments)
+                foreach (var candidate in walker.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -80,18 +75,18 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool SingleForSymbol(ISymbol symbol, SyntaxNode scope, Search search, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
+        internal static bool SingleForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;
             if (symbol == null ||
-                scope == null)
+                node == null)
             {
                 return false;
             }
 
-            using (var pooledAssignments = Borrow(scope, search, semanticModel, cancellationToken))
+            using (var walker = Borrow(node, scope, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Assignments)
+                foreach (var candidate in walker.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -119,7 +114,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var walker = Borrow(scope, Search.TopLevel, semanticModel, cancellationToken))
+            using (var walker = Borrow(scope, Scope.Member, semanticModel, cancellationToken))
             {
                 foreach (var candidate in walker.assignments)
                 {

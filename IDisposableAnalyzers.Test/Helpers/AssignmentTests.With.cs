@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public partial class AssignmentWalkerTests
+    public partial class AssignmentExecutionWalkerTests
     {
         internal class With
         {
@@ -170,7 +170,7 @@ namespace RoslynSandbox
                 }
                 else
                 {
-                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(symbol, ctor, Search.TopLevel, semanticModel, CancellationToken.None, out result));
+                    Assert.AreEqual(false, AssignmentExecutionWalker.FirstForSymbol(symbol, ctor, Scope.Member, semanticModel, CancellationToken.None, out result));
                 }
             }
         }

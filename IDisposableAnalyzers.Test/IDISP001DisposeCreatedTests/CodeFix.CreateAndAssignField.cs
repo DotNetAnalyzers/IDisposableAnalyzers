@@ -1,15 +1,17 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
         internal class CreateAndAssignField
         {
-            private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+            private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
+            private static readonly CodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
-            private static readonly CreateAndAssignFieldCodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
 
             [Test]
             public void LocalExplicitTypeToFieldInCtor()

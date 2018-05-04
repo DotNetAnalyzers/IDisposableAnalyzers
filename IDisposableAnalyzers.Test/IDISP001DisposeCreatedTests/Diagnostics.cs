@@ -1,11 +1,12 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class Diagnostics
     {
-        private static readonly IDISP001DisposeCreated Analyzer = new IDISP001DisposeCreated();
+        private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
 
         private static readonly string DisposableCode = @"

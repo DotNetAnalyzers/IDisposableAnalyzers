@@ -2,11 +2,12 @@
 namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox
