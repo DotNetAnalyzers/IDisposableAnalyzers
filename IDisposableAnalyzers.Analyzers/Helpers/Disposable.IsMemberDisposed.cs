@@ -7,50 +7,46 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static Result IsMemberDisposed(ISymbol member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return IsMemberDisposed(member, semanticModel.GetDeclaredSymbolSafe(context, cancellationToken), semanticModel, cancellationToken);
-        }
-
-        internal static Result IsMemberDisposed(ISymbol member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (!(member is IFieldSymbol ||
-                  member is IPropertySymbol) ||
-                  context == null)
+            if (TryGetScope(assignment, out var block))
             {
-                return Result.Unknown;
-            }
-
-            using (var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
-            {
-                return walker.IsMemberDisposed(member);
-            }
-        }
-
-        internal static bool IsMemberDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (member == null ||
-                disposeMethod == null)
-            {
-                return false;
-            }
-
-            using (var walker = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken))
-            {
-                foreach (var invocation in walker)
+                using (var walker = InvocationWalker.Borrow(block))
                 {
-                    if (DisposeCall.IsDisposing(invocation, member, semanticModel, cancellationToken))
+                    foreach (var invocation in walker.Invocations)
                     {
-                        return true;
+                        if (invocation.IsExecutedBefore(assignment) != Result.Yes)
+                        {
+                            continue;
+                        }
+
+                        if (IsDisposing(invocation, symbol))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (assignment is AssignmentExpressionSyntax assignmentExpression &&
+                semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
+                property.TryGetSetter(cancellationToken, out var setter))
+            {
+                using (var pooled = InvocationWalker.Borrow(setter))
+                {
+                    foreach (var invocation in pooled.Invocations)
+                    {
+                        if (IsDisposing(invocation, symbol) ||
+                            IsDisposing(invocation, property))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
 
             return false;
-        }
 
-        internal static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
             bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol current)
             {
                 if (invocation.TryGetMethodName(out var name) &&
@@ -102,44 +98,6 @@ namespace IDisposableAnalyzers
 
                 return result != null;
             }
-
-            if (TryGetScope(assignment, out var block))
-            {
-                using (var walker = InvocationWalker.Borrow(block))
-                {
-                    foreach (var invocation in walker.Invocations)
-                    {
-                        if (invocation.IsExecutedBefore(assignment) != Result.Yes)
-                        {
-                            continue;
-                        }
-
-                        if (IsDisposing(invocation, symbol))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            if (assignment is AssignmentExpressionSyntax assignmentExpression &&
-                semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
-                property.TryGetSetter(cancellationToken, out var setter))
-            {
-                using (var pooled = InvocationWalker.Borrow(setter))
-                {
-                    foreach (var invocation in pooled.Invocations)
-                    {
-                        if (IsDisposing(invocation, symbol) ||
-                            IsDisposing(invocation, property))
-                        {
-                            return true;
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

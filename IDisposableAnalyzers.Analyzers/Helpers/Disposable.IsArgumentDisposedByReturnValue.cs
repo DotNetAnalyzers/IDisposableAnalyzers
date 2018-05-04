@@ -79,14 +79,14 @@ namespace IDisposableAnalyzers
                             {
                                 if (DisposeMethod.TryFindFirst(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
                                 {
-                                    return IsMemberDisposed(member, disposeMethod, semanticModel, cancellationToken)
+                                    return DisposableMember.IsDisposed(member, disposeMethod, semanticModel, cancellationToken)
                                         ? Result.Yes
                                         : Result.No;
                                 }
                             }
                         }
 
-                        return IsMemberDisposed(member, ctor.ContainingType, semanticModel, cancellationToken);
+                        return DisposableMember.IsDisposed(member, ctor.ContainingType, semanticModel, cancellationToken);
                     }
 
                     if (ctor == null)

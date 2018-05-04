@@ -81,7 +81,7 @@ namespace IDisposableAnalyzers
             if (context.Node is InvocationExpressionSyntax invocation &&
                 invocation.ArgumentList != null &&
                 invocation.ArgumentList.Arguments.Count == 0 &&
-                invocation.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() == null &&
+                !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 context.SemanticModel.TryGetSymbol(invocation, KnownSymbol.IDisposable.Dispose, context.CancellationToken, out var dispose) &&
                 dispose.Parameters.Length == 0 &&
                 Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))

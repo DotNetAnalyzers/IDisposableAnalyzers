@@ -24,7 +24,7 @@ namespace IDisposableAnalyzers
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute),
                         out var tearDown))
                     {
-                        return Disposable.IsMemberDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
+                        return DisposableMember.IsDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
                     }
                 }
 
@@ -34,7 +34,7 @@ namespace IDisposableAnalyzers
                         x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitOneTimeTearDownAttribute),
                         out var tearDown))
                     {
-                        return Disposable.IsMemberDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
+                        return DisposableMember.IsDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
                     }
                 }
             }

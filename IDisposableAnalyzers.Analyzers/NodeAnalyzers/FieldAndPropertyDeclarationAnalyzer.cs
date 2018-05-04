@@ -84,7 +84,7 @@ namespace IDisposableAnalyzers
                     if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
                         if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                            Disposable.IsMemberDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken)
+                            DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken)
                                       .IsEither(Result.No, Result.AssumeNo) &&
                             !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
                         {
