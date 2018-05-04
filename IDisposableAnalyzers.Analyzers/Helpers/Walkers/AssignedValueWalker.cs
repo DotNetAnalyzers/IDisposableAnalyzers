@@ -424,7 +424,7 @@ namespace IDisposableAnalyzers
                             {
                                 this.VisitObjectCreationExpression(creation);
                                 var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                                this.HandleInvoke(method as IMethodSymbol, creation.ArgumentList);
+                                this.HandleInvoke(method, creation.ArgumentList);
                             }
                         }
 

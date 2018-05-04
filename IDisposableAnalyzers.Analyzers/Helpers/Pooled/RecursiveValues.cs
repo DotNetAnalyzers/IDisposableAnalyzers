@@ -121,7 +121,7 @@ namespace IDisposableAnalyzers
                     {
                         using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                         {
-                            assignedValues.HandleInvoke(invokedMethod as IMethodSymbol, invocation.ArgumentList);
+                            assignedValues.HandleInvoke(invokedMethod, invocation.ArgumentList);
                             return this.AddManyRecursively(assignedValues);
                         }
                     }

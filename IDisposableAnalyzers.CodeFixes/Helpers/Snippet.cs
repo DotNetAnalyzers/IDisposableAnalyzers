@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers
                     : string.Empty;
             var type = MemberType(member);
             if (!Disposable.IsAssignableFrom(type, semanticModel.Compilation) ||
-                IsExplicit(type))
+                IsExplicit(type, semanticModel.Compilation))
             {
                 return SyntaxFactory.ParseStatement($"({prefix}{member.Name} as System.IDisposable)?.Dispose();")
                                     .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
@@ -36,11 +36,11 @@ namespace IDisposableAnalyzers
                                 .WithTrailingTrivia(SyntaxFactory.ElasticMarker);
         }
 
-        private static bool IsExplicit(ITypeSymbol type)
+        private static bool IsExplicit(ITypeSymbol type, Compilation compilation)
         {
             if (type.TypeKind == TypeKind.Interface)
             {
-                return !type.Is(KnownSymbol.IDisposable);
+                return !type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
             }
 
             return !type.TryFindFirstMethodRecursive("Dispose", m => m.Parameters.Length == 0, out _);

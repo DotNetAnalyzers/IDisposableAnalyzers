@@ -8,40 +8,6 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
-        {
-            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
-            if (symbol is IMethodSymbol method)
-            {
-                if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
-                {
-                    return Result.Yes;
-                }
-
-                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                {
-                    return method.ReturnsVoid ||
-                           !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
-                        ? Result.No
-                        : Result.AssumeYes;
-                }
-
-                if (method.IsExtensionMethod &&
-                    method.ReducedFrom is IMethodSymbol reducedFrom)
-                {
-                    var parameter = reducedFrom.Parameters[0];
-                    return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
-                }
-            }
-
-            if (symbol.IsEither<IFieldSymbol, IPropertySymbol>())
-            {
-                return Result.No;
-            }
-
-            return Result.Unknown;
-        }
-
         internal static Result IsArgumentDisposedByReturnValue(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
@@ -111,7 +77,41 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        internal static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        private static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        {
+            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
+            if (symbol is IMethodSymbol method)
+            {
+                if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
+                {
+                    return Result.Yes;
+                }
+
+                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                {
+                    return method.ReturnsVoid ||
+                           !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                        ? Result.No
+                        : Result.AssumeYes;
+                }
+
+                if (method.IsExtensionMethod &&
+                    method.ReducedFrom is IMethodSymbol reducedFrom)
+                {
+                    var parameter = reducedFrom.Parameters[0];
+                    return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
+                }
+            }
+
+            if (symbol.IsEither<IFieldSymbol, IPropertySymbol>())
+            {
+                return Result.No;
+            }
+
+            return Result.Unknown;
+        }
+
+        private static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
@@ -279,7 +279,7 @@ namespace IDisposableAnalyzers
             if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
                 methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
             {
-                var parameterSymbol = SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, parameter, cancellationToken);
+                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
                 if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
