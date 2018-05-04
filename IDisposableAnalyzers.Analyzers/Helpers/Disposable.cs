@@ -78,7 +78,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (SyntaxNodeExt.IsExecutedBeforeOld(location, invocation) == Result.Yes &&
+                        if (location.IsExecutedBefore(invocation) == true &&
                             DisposeCall.IsDisposing(invocation, local, semanticModel, cancellationToken))
                         {
                             return true;
@@ -90,7 +90,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var usingStatement in walker.UsingStatements)
                     {
-                        if (SyntaxNodeExt.IsExecutedBeforeOld(location, usingStatement) == Result.Yes &&
+                        if (location.IsExecutedBefore(usingStatement) == true &&
                             usingStatement.Expression is IdentifierNameSyntax identifierName &&
                             identifierName.Identifier.ValueText == local.Name)
                         {
