@@ -55,22 +55,19 @@ namespace IDisposableAnalyzers
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            if (node.Initializer != null)
+            if (node.Initializer == null &&
+                this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                Constructor.TryGetDefault(ctor.ContainingType?.BaseType, out var baseCtor))
             {
-                var ctor = this.semanticModel.GetSymbolSafe(node.Initializer, this.cancellationToken);
-                this.HandleInvoke(ctor, node.Initializer.ArgumentList);
+                this.HandleInvoke(baseCtor, null);
             }
-            else
+            else if (node.Initializer is ConstructorInitializerSyntax initializer &&
+                     this.semanticModel.TryGetSymbol(initializer, this.cancellationToken, out var chained))
             {
-                var ctor = this.semanticModel.GetDeclaredSymbolSafe(node, this.cancellationToken);
-                if (Constructor.TryGetDefault(ctor?.ContainingType?.BaseType, out var baseCtor))
-                {
-                    this.HandleInvoke(baseCtor, null);
-                }
+                this.HandleInvoke(chained, node.Initializer.ArgumentList);
             }
 
-            var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
-            if (contextCtor != null)
+            if (this.context.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
             {
                 if (contextCtor == node ||
                     node.IsRunBefore(contextCtor, this.semanticModel, this.cancellationToken))
