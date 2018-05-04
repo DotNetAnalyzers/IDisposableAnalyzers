@@ -52,7 +52,7 @@ namespace IDisposableAnalyzers
 
         internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return FirstForSymbol(symbol, node, scope, semanticModel, cancellationToken, out AssignmentExpressionSyntax _);
+            return FirstForSymbol(symbol, node, scope, semanticModel, cancellationToken, out _);
         }
 
         internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
@@ -64,9 +64,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var pooledAssignments = Borrow(node, scope, semanticModel, cancellationToken))
+            using (var walker = Borrow(node, scope, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Assignments)
+                foreach (var candidate in walker.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
@@ -89,9 +89,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var pooledAssignments = Borrow(node, scope, semanticModel, cancellationToken))
+            using (var walker = Borrow(node, scope, semanticModel, cancellationToken))
             {
-                foreach (var candidate in pooledAssignments.Assignments)
+                foreach (var candidate in walker.Assignments)
                 {
                     var assignedSymbol = semanticModel.GetSymbolSafe(candidate.Left, cancellationToken);
                     if (SymbolComparer.Equals(symbol, assignedSymbol))
