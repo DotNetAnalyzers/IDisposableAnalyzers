@@ -19,7 +19,6 @@ group Test
   nuget System.Reactive.PlatformServices
 
 group Build
-  storage: none
   source http://www.nuget.org/api/v2/
   nuget Microsoft.VSSDK.BuildTools
 
