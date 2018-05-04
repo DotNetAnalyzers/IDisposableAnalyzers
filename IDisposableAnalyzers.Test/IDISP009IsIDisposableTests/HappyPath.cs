@@ -1,11 +1,12 @@
 namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly DisposeMethodAnalyzer Analyzer = new DisposeMethodAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         [Test]
         public void DisposingCreatedFieldInVirtualDispose()

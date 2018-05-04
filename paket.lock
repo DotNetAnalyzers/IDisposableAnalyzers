@@ -1,10 +1,10 @@
 STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
-    Gu.Roslyn.AnalyzerExtensions (0.2.1.16-dev)
+    Gu.Roslyn.AnalyzerExtensions (0.2.1.17-dev)
       Microsoft.CodeAnalysis.CSharp (>= 2.0)
-    Gu.Roslyn.CodeFixExtensions (0.2.1.16-dev)
-      Gu.Roslyn.AnalyzerExtensions (>= 0.2.1.16-dev)
+    Gu.Roslyn.CodeFixExtensions (0.2.1.17-dev)
+      Gu.Roslyn.AnalyzerExtensions (>= 0.2.1.17-dev)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     ManagedEsent (1.9.4) - restriction: >= net46
     Microsoft.CodeAnalysis.Analyzers (2.6) - restriction: >= netstandard1.3
@@ -1402,10 +1402,8 @@ NUGET
 GROUP Build
 NUGET
   remote: http://www.nuget.org/api/v2
-    AsyncUsageAnalyzers (1.0.0-alpha003) - restriction: >= net46
-    Microsoft.VisualStudio.SDK.Analyzers (15.7.3) - restriction: >= net46
-      AsyncUsageAnalyzers (>= 1.0.0-alpha003) - restriction: >= net46
-      Microsoft.VisualStudio.Threading.Analyzers (>= 15.7.17) - restriction: >= net46
+    Microsoft.VisualStudio.SDK.Analyzers (15.7.4) - restriction: >= net46
+      Microsoft.VisualStudio.Threading.Analyzers (>= 15.7.17) - restriction: >= netstandard1.1
     Microsoft.VisualStudio.Threading.Analyzers (15.7.17) - restriction: >= net46
     Microsoft.VSSDK.BuildTools (15.7.109)
       Microsoft.VisualStudio.SDK.Analyzers (>= 15.7.3) - restriction: >= net46

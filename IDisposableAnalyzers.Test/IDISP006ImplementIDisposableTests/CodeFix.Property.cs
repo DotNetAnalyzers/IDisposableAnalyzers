@@ -1,14 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
         internal class Property
         {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly ImplementIDisposableCodeFixProvider CodeFix = new ImplementIDisposableCodeFixProvider();
+            private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+            private static readonly CodeFixProvider CodeFix = new ImplementIDisposableCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 
             [Test]

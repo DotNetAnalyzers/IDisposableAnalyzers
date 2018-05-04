@@ -1,14 +1,16 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
         internal class TestFixture
         {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly DisposeInTearDownCodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
+            private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+            private static readonly CodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
             [Test]

@@ -1,12 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class CodeFixAll
     {
-        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-        private static readonly DisposeMemberCodeFixProvider Fix = new DisposeMemberCodeFixProvider();
+        private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+        private static readonly CodeFixProvider Fix = new DisposeMemberCodeFixProvider();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
         [Test]

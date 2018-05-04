@@ -1,11 +1,12 @@
 namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class Diagnostics
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP014");
 
         [Test]

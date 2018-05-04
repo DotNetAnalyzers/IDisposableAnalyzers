@@ -37,11 +37,6 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="Exists('$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets')" />
   <Import Project="..\.paket\paket.targets" />
   <ItemGroup>
-    <Analyzer Include="..\packages\build\AsyncUsageAnalyzers\analyzers\dotnet\AsyncUsageAnalyzers.dll">
-      <Paket>True</Paket>
-    </Analyzer>
-  </ItemGroup>
-  <ItemGroup>
     <Analyzer Include="..\packages\build\Microsoft.VisualStudio.SDK.Analyzers\analyzers\cs\Microsoft.VisualStudio.SDK.Analyzers.dll">
       <Paket>True</Paket>
     </Analyzer>

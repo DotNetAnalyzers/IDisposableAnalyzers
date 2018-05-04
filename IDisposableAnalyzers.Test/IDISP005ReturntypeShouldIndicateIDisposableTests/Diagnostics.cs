@@ -1,11 +1,12 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class Diagnostics
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new ReturnValueAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP005");
 
         [Test]

@@ -21,9 +21,9 @@ namespace IDisposableAnalyzers
                 return Result.Unknown;
             }
 
-            using (var pooled = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
+            using (var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
             {
-                return pooled.IsMemberDisposed(member);
+                return walker.IsMemberDisposed(member);
             }
         }
 
@@ -35,9 +35,9 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var pooled = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken))
+            using (var walker = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken))
             {
-                foreach (var invocation in pooled)
+                foreach (var invocation in walker)
                 {
                     if (DisposeCall.IsDisposing(invocation, member, semanticModel, cancellationToken))
                     {
