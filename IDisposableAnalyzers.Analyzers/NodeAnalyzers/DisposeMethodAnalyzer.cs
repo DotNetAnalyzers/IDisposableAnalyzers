@@ -60,7 +60,8 @@ namespace IDisposableAnalyzers
                             foreach (var disposeCall in disposeWalker)
                             {
                                 if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                                    !DisposableMember.IsDisposed(disposed, method, context.SemanticModel, context.CancellationToken))
+                                    FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                                    !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
                                 {
                                     context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
                                     break;

@@ -85,7 +85,8 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (TestFixture.IsAssignedAndDisposedInSetupAndTearDown(assignedSymbol, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+            if ( FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty) &&
+                TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
             {
                 return false;
             }

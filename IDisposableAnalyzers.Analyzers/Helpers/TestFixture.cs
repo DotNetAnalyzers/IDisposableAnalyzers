@@ -8,21 +8,14 @@ namespace IDisposableAnalyzers
 
     internal static class TestFixture
     {
-        internal static bool IsAssignedAndDisposedInSetupAndTearDown(ISymbol fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedAndDisposedInSetupAndTearDown(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (fieldOrProperty == null)
-            {
-                return false;
-            }
-
-            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
                 {
-                    if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(
-                        x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute),
-                        out var tearDown))
+                    if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute), out var tearDown))
                     {
                         return DisposableMember.IsDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
                     }
@@ -42,9 +35,9 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAssignedInSetUp(ISymbol fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
         {
-            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||

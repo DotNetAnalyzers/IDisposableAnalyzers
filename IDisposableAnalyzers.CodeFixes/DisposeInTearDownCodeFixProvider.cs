@@ -39,8 +39,9 @@ namespace IDisposableAnalyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 var member = node as MemberDeclarationSyntax ??
                              (SyntaxNode)(node as AssignmentExpressionSyntax)?.Left;
-                if (TryGetMemberSymbol(member, semanticModel, context.CancellationToken, out var memberSymbol) &&
-                    TestFixture.IsAssignedInSetUp(memberSymbol, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
+                if (semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol) &&
+                    FieldOrProperty.TryCreate(memberSymbol, out var fieldOrProperty) &&
+                    TestFixture.IsAssignedInSetUp(fieldOrProperty, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var setupAttribute))
                 {
                     if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDownMethodDeclaration))
                     {
@@ -108,13 +109,6 @@ namespace IDisposableAnalyzers
             }
 
             return method.Body.Statements.Add(newStatement);
-        }
-
-        private static bool TryGetMemberSymbol(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol symbol)
-        {
-            symbol = semanticModel.GetSymbolSafe(node, cancellationToken) ??
-                     SemanticModelExt.GetDeclaredSymbolSafe(semanticModel, node, cancellationToken);
-            return symbol != null && symbol.IsEither<IFieldSymbol, IPropertySymbol>();
         }
     }
 }

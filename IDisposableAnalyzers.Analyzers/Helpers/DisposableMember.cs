@@ -7,30 +7,27 @@ namespace IDisposableAnalyzers
 
     internal static class DisposableMember
     {
-        internal static Result IsDisposed(ISymbol member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsDisposed(FieldOrProperty member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return IsDisposed(member, semanticModel.GetDeclaredSymbolSafe(context, cancellationToken), semanticModel, cancellationToken);
         }
 
-        internal static Result IsDisposed(ISymbol member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsDisposed(FieldOrProperty member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!(member is IFieldSymbol ||
-                  member is IPropertySymbol) ||
-                context == null)
+            if (context == null)
             {
                 return Result.Unknown;
             }
 
             using (var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
             {
-                return walker.IsMemberDisposed(member);
+                return walker.IsMemberDisposed(member.Symbol);
             }
         }
 
-        internal static bool IsDisposed(ISymbol member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (member == null ||
-                disposeMethod == null)
+            if (disposeMethod == null)
             {
                 return false;
             }
@@ -39,7 +36,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var invocation in walker)
                 {
-                    if (DisposeCall.IsDisposing(invocation, member, semanticModel, cancellationToken))
+                    if (DisposeCall.IsDisposing(invocation, member.Symbol, semanticModel, cancellationToken))
                     {
                         return true;
                     }
