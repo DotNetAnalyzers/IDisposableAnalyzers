@@ -39,7 +39,7 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.ShouldVisit(node).IsEither(Result.AssumeNo, Result.No))
+            if (this.ShouldVisit(node) == false)
             {
                 return;
             }
@@ -666,17 +666,17 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private Result ShouldVisit(SyntaxNode node)
+        private bool? ShouldVisit(SyntaxNode node)
         {
             if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
                 if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
                     node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                 {
-                    return node.IsExecutedBeforeOld(this.context);
+                    return node.IsExecutedBefore(this.context);
                 }
 
-                return Result.Yes;
+                return true;
             }
 
             if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
@@ -687,22 +687,22 @@ namespace IDisposableAnalyzers
                         local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                         lambda.Contains(declaration))
                     {
-                        return node.IsExecutedBeforeOld(this.context);
+                        return node.IsExecutedBefore(this.context);
                     }
 
-                    return Result.Yes;
+                    return true;
                 }
 
-                return node.IsExecutedBeforeOld(this.context);
+                return node.IsExecutedBefore(this.context);
             }
 
             if (this.context is InvocationExpressionSyntax &&
                 ReferenceEquals(node, this.context))
             {
-                return Result.No;
+                return false;
             }
 
-            return Result.Yes;
+            return true;
         }
 
         private class PublicMemberWalker : CSharpSyntaxWalker
