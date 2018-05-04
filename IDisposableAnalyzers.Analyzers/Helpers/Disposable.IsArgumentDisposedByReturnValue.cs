@@ -253,21 +253,18 @@ namespace IDisposableAnalyzers
 
         private static bool TryGetConstructor(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out IMethodSymbol ctor)
         {
-            var objectCreation = argument.FirstAncestor<ObjectCreationExpressionSyntax>();
-            if (objectCreation != null)
-            {
-                ctor = semanticModel.GetSymbolSafe(objectCreation, cancellationToken) as IMethodSymbol;
-                return ctor != null;
-            }
-
-            var initializer = argument.FirstAncestor<ConstructorInitializerSyntax>();
-            if (initializer != null)
-            {
-                ctor = semanticModel.GetSymbolSafe(initializer, cancellationToken);
-                return ctor != null;
-            }
-
             ctor = null;
+            if (argument.Parent is ArgumentListSyntax argumentList)
+            {
+                switch (argumentList.Parent)
+                {
+                    case ObjectCreationExpressionSyntax objectCreation:
+                        return semanticModel.TryGetSymbol(objectCreation, cancellationToken, out ctor);
+                    case ConstructorInitializerSyntax initializer:
+                        return semanticModel.TryGetSymbol(initializer, cancellationToken, out ctor);
+                }
+            }
+
             return false;
         }
 

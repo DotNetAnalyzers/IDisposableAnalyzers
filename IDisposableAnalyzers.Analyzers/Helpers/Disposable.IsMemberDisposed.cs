@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (invocation.IsExecutedBefore(assignment) != Result.Yes)
+                        if (invocation.IsExecutedBefore(assignment) != true)
                         {
                             continue;
                         }

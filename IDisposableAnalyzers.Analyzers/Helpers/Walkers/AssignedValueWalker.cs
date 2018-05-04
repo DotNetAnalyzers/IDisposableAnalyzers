@@ -673,7 +673,7 @@ namespace IDisposableAnalyzers
                 if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
                     node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                 {
-                    return node.IsExecutedBefore(this.context);
+                    return node.IsExecutedBeforeOld(this.context);
                 }
 
                 return Result.Yes;
@@ -687,13 +687,13 @@ namespace IDisposableAnalyzers
                         local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                         lambda.Contains(declaration))
                     {
-                        return node.IsExecutedBefore(this.context);
+                        return node.IsExecutedBeforeOld(this.context);
                     }
 
                     return Result.Yes;
                 }
 
-                return node.IsExecutedBefore(this.context);
+                return node.IsExecutedBeforeOld(this.context);
             }
 
             if (this.context is InvocationExpressionSyntax &&

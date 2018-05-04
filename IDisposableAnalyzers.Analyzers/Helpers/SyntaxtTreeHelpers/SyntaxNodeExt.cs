@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers
 
     internal static class SyntaxNodeExt
     {
-        internal static Result IsExecutedBefore(this SyntaxNode node, SyntaxNode other)
+        internal static Result IsExecutedBeforeOld(this SyntaxNode node, SyntaxNode other)
         {
             if (node is null ||
                 other is null)
