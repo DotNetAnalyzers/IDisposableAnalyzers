@@ -42,12 +42,7 @@ namespace IDisposableAnalyzers
 
         internal static AssignmentExecutionWalker Borrow(SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = Borrow(() => new AssignmentExecutionWalker());
-            walker.SemanticModel = semanticModel;
-            walker.CancellationToken = cancellationToken;
-            walker.Scope = scope;
-            walker.Visit(node);
-            return walker;
+            return BorrowAndVisit(node, scope, semanticModel, cancellationToken, () => new AssignmentExecutionWalker());
         }
 
         internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)

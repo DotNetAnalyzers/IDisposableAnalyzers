@@ -13,8 +13,7 @@ namespace IDisposableAnalyzers
                        TryFindVirtualDispose(type, compilation, search, out disposeMethod);
             }
 
-            while (type != null &&
-                   type != KnownSymbol.Object)
+            while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
             {
                 if (TryFindFirst(type, compilation, Search.TopLevel, out disposeMethod))
                 {

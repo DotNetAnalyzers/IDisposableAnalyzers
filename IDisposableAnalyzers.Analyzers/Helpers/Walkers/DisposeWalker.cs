@@ -43,28 +43,23 @@ namespace IDisposableAnalyzers
 
         internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation))
-            {
-                return Borrow(semanticModel, cancellationToken);
-            }
-
-            if (DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod))
+            if (type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
+                DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod))
             {
                 return Borrow(disposeMethod, semanticModel, cancellationToken);
             }
 
-            return Borrow(semanticModel, cancellationToken);
+            return Borrow(() => new DisposeWalker());
         }
 
         internal static DisposeWalker Borrow(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var pooled = Borrow(semanticModel, cancellationToken);
-            foreach (var reference in disposeMethod.DeclaringSyntaxReferences)
+            if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
             {
-                pooled.Visit(reference.GetSyntax(cancellationToken));
+                return BorrowAndVisit(declaration, Scope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
             }
 
-            return pooled;
+            return Borrow(() => new DisposeWalker());
         }
 
         internal Result IsMemberDisposed(ISymbol member)
@@ -93,14 +88,6 @@ namespace IDisposableAnalyzers
             this.invocations.Clear();
             this.identifiers.Clear();
             base.Clear();
-        }
-
-        private static DisposeWalker Borrow(SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var pooled = Borrow(() => new DisposeWalker());
-            pooled.SemanticModel = semanticModel;
-            pooled.CancellationToken = cancellationToken;
-            return pooled;
         }
     }
 }
