@@ -74,7 +74,9 @@ namespace IDisposableAnalyzers
 
             foreach (var name in this.identifiers)
             {
-                if (SymbolComparer.Equals(member, this.SemanticModel.GetSymbolSafe(name, this.CancellationToken)))
+                if (member.Name == name.Identifier.ValueText &&
+                    this.SemanticModel.TryGetSymbol(name, this.CancellationToken, out ISymbol candidate) &&
+                    SymbolComparer.Equals(member, candidate))
                 {
                     return Result.AssumeYes;
                 }
