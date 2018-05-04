@@ -12,23 +12,24 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!DisposeCall.TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var symbol))
+            if (DisposeCall.TryGetDisposedRootMember(disposeCall, semanticModel, cancellationToken, out var root) &&
+                semanticModel.TryGetSymbol(root, cancellationToken, out ISymbol symbol))
             {
-                return false;
-            }
-
-            if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
-            {
-                return true;
-            }
-
-            using (var assignedValues = AssignedValueWalker.Borrow(symbol, disposeCall, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
                 {
-                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    return true;
+                }
+
+                using (var assignedValues = AssignedValueWalker.Borrow(symbol, disposeCall, semanticModel, cancellationToken))
+                {
+                    using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                    {
+                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    }
                 }
             }
+
+            return false;
         }
 
         /// <summary>

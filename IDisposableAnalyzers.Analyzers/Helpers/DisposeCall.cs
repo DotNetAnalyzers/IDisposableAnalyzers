@@ -15,6 +15,41 @@ namespace IDisposableAnalyzers
                    semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
         }
 
+        internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out IdentifierNameSyntax disposedMember)
+        {
+            if (MemberPath.TryFindRoot(disposeCall, out disposedMember))
+            {
+                var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
+                if (property == null ||
+                    property.IsAutoProperty(cancellationToken))
+                {
+                    return true;
+                }
+
+                if (property.GetMethod == null)
+                {
+                    return false;
+                }
+
+                foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
+                {
+                    var node = reference.GetSyntax(cancellationToken);
+                    using (var pooled = ReturnValueWalker.Borrow(node, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
+                    {
+                        if (pooled.Count == 0)
+                        {
+                            return false;
+                        }
+
+                        return pooled.TrySingle(out var expression) &&
+                               MemberPath.TryFindRoot(expression, out disposedMember);
+                    }
+                }
+            }
+
+            return false;
+        }
+
         internal static bool IsDisposing(InvocationExpressionSyntax disposeCall, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed))
