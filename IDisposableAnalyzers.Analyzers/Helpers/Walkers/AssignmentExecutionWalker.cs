@@ -45,11 +45,6 @@ namespace IDisposableAnalyzers
             return BorrowAndVisit(node, scope, semanticModel, cancellationToken, () => new AssignmentExecutionWalker());
         }
 
-        internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return FirstForSymbol(symbol, node, scope, semanticModel, cancellationToken, out _);
-        }
-
         internal static bool FirstForSymbol(ISymbol symbol, SyntaxNode node, Scope scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment)
         {
             assignment = null;

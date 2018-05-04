@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (TryGetInitializer(other, cancellationToken, out ConstructorInitializerSyntax initializer))
+            if (TryGetInitializer(other, cancellationToken, out var initializer))
             {
                 if (SymbolComparer.Equals(first.ContainingType, other.ContainingType) &&
                     !initializer.ThisOrBaseKeyword.IsKind(SyntaxKind.ThisKeyword))
