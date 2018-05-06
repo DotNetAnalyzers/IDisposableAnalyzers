@@ -107,18 +107,6 @@ namespace IDisposableAnalyzers
             return result;
         }
 
-        private static bool IsAssignedWithInjected(ISymbol symbol, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)
-                        .IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
-        }
-
         private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
@@ -201,6 +189,17 @@ namespace IDisposableAnalyzers
             }
 
             return Result.No;
+        }
+
+        private static bool IsAssignedWithInjected(ISymbol symbol, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                {
+                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                }
+            }
         }
     }
 }

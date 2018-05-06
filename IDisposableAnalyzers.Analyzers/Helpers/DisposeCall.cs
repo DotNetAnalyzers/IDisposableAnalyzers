@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers
         internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol disposed)
         {
             disposed = null;
-            return IsIDisposableDispose(disposeCall) &&
+            return IsIDisposableDispose(disposeCall, semanticModel, cancellationToken) &&
                    MemberPath.TrySingle(disposeCall, out var expression) &&
                    semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
         }
@@ -75,13 +75,15 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsIDisposableDispose(InvocationExpressionSyntax candidate)
+        internal static bool IsIDisposableDispose(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return candidate.TryGetMethodName(out var name) &&
                    name == "Dispose" &&
                    candidate.ArgumentList is ArgumentListSyntax argumentList &&
                    argumentList.Arguments.Count == 0 &&
-                   candidate.Expression != null;
+                   !MemberPath.IsEmpty(candidate) &&
+                   semanticModel.TryGetSymbol(candidate, cancellationToken, out var method) &&
+                   method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation);
         }
     }
 }
