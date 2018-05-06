@@ -20,13 +20,7 @@ namespace IDisposableAnalyzers
                     return true;
                 }
 
-                using (var assignedValues = AssignedValueWalker.Borrow(symbol, disposeCall, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                    {
-                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                    }
-                }
+                return IsAssignedWithInjected(symbol, disposeCall, semanticModel, cancellationToken);
             }
 
             return false;
@@ -113,6 +107,18 @@ namespace IDisposableAnalyzers
             return result;
         }
 
+        private static bool IsAssignedWithInjected(ISymbol symbol, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
+            {
+                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                {
+                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)
+                        .IsEither(Result.Yes, Result.AssumeYes);
+                }
+            }
+        }
+
         private static bool IsPotentiallyCachedOrInjectedCore(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
@@ -134,13 +140,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
+            return IsAssignedWithInjected(symbol, value, semanticModel, cancellationToken);
         }
 
         private static Result IsInjectedCore(ISymbol symbol)
