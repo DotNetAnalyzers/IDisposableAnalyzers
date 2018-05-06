@@ -31,19 +31,9 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static bool IsPotentiallyCachedOrInjected(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposable == null ||
-                disposable.IsMissing ||
-                !IsPotentiallyAssignableFrom(semanticModel.GetTypeInfoSafe(disposable, cancellationToken).Type, semanticModel.Compilation))
-            {
-                return false;
-            }
-
-            if (IsInjectedCore(semanticModel.GetSymbolSafe(disposable, cancellationToken)) == Result.Yes)
-            {
-                return true;
-            }
-
-            return IsPotentiallyCachedOrInjectedCore(disposable, semanticModel, cancellationToken);
+            return semanticModel.TryGetType(disposable, cancellationToken, out var type) &&
+                   IsPotentiallyAssignableFrom(type, semanticModel.Compilation) &&
+                   IsPotentiallyCachedOrInjectedCore(disposable, semanticModel, cancellationToken);
         }
 
         internal static Result IsAnyCachedOrInjected(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)

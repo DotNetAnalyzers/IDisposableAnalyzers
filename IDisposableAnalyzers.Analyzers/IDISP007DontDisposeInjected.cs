@@ -48,13 +48,12 @@ namespace IDisposableAnalyzers
                 if (Disposable.IsPotentiallyCachedOrInjected(usingStatement.Expression, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
-                    return;
                 }
             }
 
-            if (usingStatement.Declaration != null)
+            if (usingStatement.Declaration is VariableDeclarationSyntax variableDeclaration)
             {
-                foreach (var variableDeclarator in usingStatement.Declaration.Variables)
+                foreach (var variableDeclarator in variableDeclaration.Variables)
                 {
                     if (variableDeclarator.Initializer == null)
                     {
@@ -65,7 +64,6 @@ namespace IDisposableAnalyzers
                     if (Disposable.IsPotentiallyCachedOrInjected(value, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, value.GetLocation()));
-                        return;
                     }
                 }
             }
