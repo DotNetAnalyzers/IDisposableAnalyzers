@@ -117,7 +117,7 @@ namespace IDisposableAnalyzers
                 foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
                 {
                     var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                    if (methodDeclaration.TryGetMatchingParameter(argument, out ParameterSyntax parameter))
+                    if (methodDeclaration.TryFindParameter(argument, out ParameterSyntax parameter))
                     {
                         using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                         {

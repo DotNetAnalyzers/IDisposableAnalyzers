@@ -59,7 +59,9 @@ namespace IDisposableAnalyzers
         {
             if (node.Initializer == null &&
                 this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                Constructor.TryGetDefault(ctor.ContainingType?.BaseType, out var baseCtor))
+                ctor.ContainingType is INamedTypeSymbol containingType &&
+                containingType.BaseType is INamedTypeSymbol baseType &&
+                Constructor.TryFindDefault(baseType, Search.Recursive, out var baseCtor))
             {
                 this.HandleInvoke(baseCtor, null);
             }

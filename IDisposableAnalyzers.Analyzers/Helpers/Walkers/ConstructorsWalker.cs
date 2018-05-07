@@ -121,7 +121,7 @@ namespace IDisposableAnalyzers
             if (walker.nonPrivateCtors.Count == 0 &&
                 walker.Default == null)
             {
-                if (Constructor.TryGetDefault(walker.Type, out var defaultCtor) &&
+                if (Constructor.TryFindDefault(walker.Type, Search.Recursive, out var defaultCtor) &&
                     defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax defaultCtorDeclaration))
                 {
                     walker.Default = defaultCtorDeclaration;

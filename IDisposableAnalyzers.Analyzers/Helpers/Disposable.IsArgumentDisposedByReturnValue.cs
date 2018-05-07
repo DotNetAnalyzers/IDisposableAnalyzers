@@ -277,7 +277,7 @@ namespace IDisposableAnalyzers
             }
 
             if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
-                methodDeclaration.TryGetMatchingParameter(argument, out var parameter))
+                methodDeclaration.TryFindParameter(argument, out var parameter))
             {
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
                 if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
