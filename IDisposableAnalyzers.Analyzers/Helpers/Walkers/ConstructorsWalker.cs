@@ -121,13 +121,16 @@ namespace IDisposableAnalyzers
             if (walker.nonPrivateCtors.Count == 0 &&
                 walker.Default == null)
             {
-                if (Constructor.TryGetDefault(walker.Type, out var @default))
+                if (Constructor.TryGetDefault(walker.Type, out var defaultCtor) &&
+                    defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax defaultCtorDeclaration))
                 {
-                    foreach (var reference in @default.DeclaringSyntaxReferences)
+                    walker.Default = defaultCtorDeclaration;
+                    if (!defaultCtorDeclaration.Modifiers.Any(SyntaxKind.PrivateKeyword))
                     {
-                        walker.Default = (ConstructorDeclarationSyntax)reference.GetSyntax(cancellationToken);
-                        walker.Visit(walker.Default);
+                        walker.nonPrivateCtors.Add(defaultCtorDeclaration);
                     }
+
+                    walker.Visit(walker.Default);
                 }
             }
 

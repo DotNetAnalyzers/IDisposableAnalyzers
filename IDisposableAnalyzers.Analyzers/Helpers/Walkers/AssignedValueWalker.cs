@@ -17,6 +17,7 @@ namespace IDisposableAnalyzers
         private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
+        private readonly CtorArgWalker ctorArgWalker;
 
         private SyntaxNode context;
         private SemanticModel semanticModel;
@@ -25,6 +26,7 @@ namespace IDisposableAnalyzers
         private AssignedValueWalker()
         {
             this.publicMemberWalker = new PublicMemberWalker(this);
+            this.ctorArgWalker = new CtorArgWalker(this);
         }
 
         public int Count => this.values.Count;
@@ -67,18 +69,7 @@ namespace IDisposableAnalyzers
                 this.HandleInvoke(chained, node.Initializer.ArgumentList);
             }
 
-            if (this.context.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
-            {
-                if (contextCtor == node ||
-                    node.IsRunBefore(contextCtor, this.semanticModel, this.cancellationToken))
-                {
-                    base.VisitConstructorDeclaration(node);
-                }
-            }
-            else
-            {
-                base.VisitConstructorDeclaration(node);
-            }
+            base.VisitConstructorDeclaration(node);
         }
 
         public override void VisitAssignmentExpression(AssignmentExpressionSyntax node)
@@ -412,49 +403,49 @@ namespace IDisposableAnalyzers
                     this.values.Add(propertyDeclaration.Initializer.Value);
                 }
 
-                var contextCtor = this.context?.FirstAncestorOrSelf<ConstructorDeclarationSyntax>();
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
                     using (var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
-                        foreach (var creation in ctorWalker.ObjectCreations)
+                        if (this.context.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                         {
-                            if (contextCtor == null ||
-                                creation.Creates(contextCtor, ReturnValueSearch.Recursive, this.semanticModel, this.cancellationToken))
+                            this.Visit(contextCtor);
+                            if (contextCtor.ParameterList is ParameterListSyntax parameterList &&
+                                parameterList.Parameters.Any())
+                            {
+                                foreach (var creation in ctorWalker.ObjectCreations)
+                                {
+                                    this.ctorArgWalker.Visit(creation);
+                                }
+
+                                foreach (var ctor in ctorWalker.NonPrivateCtors)
+                                {
+                                    this.ctorArgWalker.Visit(ctor);
+                                }
+
+                                if (contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                                {
+                                    this.values.RemoveAll(
+                                        x => x is IdentifierNameSyntax identifierName &&
+                                             x.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var ctor) &&
+                                             ctor == contextCtor &&
+                                             parameterList.TryFind(identifierName.Identifier.ValueText, out _));
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (var creation in ctorWalker.ObjectCreations)
                             {
                                 this.VisitObjectCreationExpression(creation);
                                 var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
                                 this.HandleInvoke(method, creation.ArgumentList);
                             }
-                        }
 
-                        if (contextCtor != null)
-                        {
-                            foreach (var initializer in ctorWalker.Initializers)
+                            foreach (var ctor in ctorWalker.NonPrivateCtors)
                             {
-                                var other = (ConstructorDeclarationSyntax)initializer.Parent;
-                                if (contextCtor.IsRunBefore(other, this.semanticModel, this.cancellationToken))
-                                {
-                                    this.Visit(other);
-                                }
+                                this.Visit(ctor);
                             }
-
-                            if (!contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                            {
-                                this.Visit(contextCtor);
-                            }
-
-                            return;
-                        }
-
-                        if (ctorWalker.Default != null)
-                        {
-                            this.Visit(ctorWalker.Default);
-                        }
-
-                        foreach (var ctor in ctorWalker.NonPrivateCtors)
-                        {
-                            this.Visit(ctor);
                         }
                     }
                 }
@@ -746,6 +737,35 @@ namespace IDisposableAnalyzers
             public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
             {
                 this.inner.VisitArrowExpressionClause(node);
+            }
+        }
+
+        private class CtorArgWalker : CSharpSyntaxWalker
+        {
+            private readonly AssignedValueWalker inner;
+
+            public CtorArgWalker(AssignedValueWalker inner)
+            {
+                this.inner = inner;
+            }
+
+            public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+            {
+                if (node.Initializer is ConstructorInitializerSyntax initializer &&
+                    this.inner.semanticModel.TryGetSymbol(initializer, this.inner.cancellationToken, out var chained) &&
+                    chained.ContainingType == this.inner.CurrentSymbol.ContainingType)
+                {
+                    this.inner.HandleInvoke(chained, node.Initializer.ArgumentList);
+                }
+            }
+
+            public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+            {
+                if (this.inner.semanticModel.TryGetSymbol(node, this.inner.cancellationToken, out var ctor) &&
+                    ctor.ContainingType == this.inner.CurrentSymbol.ContainingType)
+                {
+                    this.inner.HandleInvoke(ctor, node.ArgumentList);
+                }
             }
         }
 

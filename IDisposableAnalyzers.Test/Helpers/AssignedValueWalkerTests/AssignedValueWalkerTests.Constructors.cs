@@ -194,7 +194,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2, 3")]
             [TestCase("var temp3 = this.value;", "1, 2, 3, 4")]
             [TestCase("var temp4 = this.value;", "1")]
-            [TestCase("var temp5 = this.value;", "1, 2, ctorArg")]
+            [TestCase("var temp5 = this.value;", "1, ctorArg, 2")]
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
@@ -279,7 +279,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, 2, ctorArg")]
+            [TestCase("var temp2 = this.value;", "1, ctorArg, 2")]
             public void FieldPublicCtorFactory(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
