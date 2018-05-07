@@ -280,7 +280,7 @@ namespace IDisposableAnalyzers
                 methodDeclaration.TryFindParameter(argument, out var parameter))
             {
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
-                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Search.TopLevel, semanticModel, cancellationToken, out var assignment))
+                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
                 {
                     member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
                     if (member is IFieldSymbol ||

@@ -350,5 +350,78 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void LocalFunctionStatementBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    class Foo
+    {
+        public static IDisposable Create()
+        {
+            return CreateCore();
+
+            IDisposable CreateCore()
+            {
+                return File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void LocalFunctionExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    class Foo
+    {
+        public static IDisposable Create()
+        {
+            return CreateCore();
+
+            IDisposable CreateCore() => File.OpenRead(string.Empty);
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void LocalInLocalFunction()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    class Foo
+    {
+        public static IDisposable Create()
+        {
+            return CreateCore();
+
+            IDisposable CreateCore()
+            {
+                var disposable = File.OpenRead(string.Empty);
+                return disposable;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

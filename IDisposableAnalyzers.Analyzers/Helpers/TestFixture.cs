@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers
     {
         internal static bool IsAssignedAndDisposedInSetupAndTearDown(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
         {
-            if (AssignmentExecutionWalker.SingleForSymbol(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
             {
                 return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||

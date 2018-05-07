@@ -106,7 +106,21 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            this.Visit(node);
+            if (node is LocalFunctionStatementSyntax local)
+            {
+                if (local.ExpressionBody is ArrowExpressionClauseSyntax arrowExpressionClause)
+                {
+                    this.AddReturnValue(arrowExpressionClause.Expression);
+                }
+                else
+                {
+                    this.Visit(local.Body);
+                }
+            }
+            else
+            {
+                this.Visit(node);
+            }
         }
 
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation, out IMethodSymbol method)
