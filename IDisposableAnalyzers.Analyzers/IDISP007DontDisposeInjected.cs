@@ -45,7 +45,7 @@ namespace IDisposableAnalyzers
             if (usingStatement.Expression is InvocationExpressionSyntax ||
                 usingStatement.Expression is IdentifierNameSyntax)
             {
-                if (Disposable.IsPotentiallyCachedOrInjected(usingStatement.Expression, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsCachedOrInjected(usingStatement.Expression, usingStatement, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
                 }
@@ -61,7 +61,7 @@ namespace IDisposableAnalyzers
                     }
 
                     var value = variableDeclarator.Initializer.Value;
-                    if (Disposable.IsPotentiallyCachedOrInjected(value, context.SemanticModel, context.CancellationToken))
+                    if (Disposable.IsCachedOrInjected(value, usingStatement, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, value.GetLocation()));
                     }
@@ -79,7 +79,8 @@ namespace IDisposableAnalyzers
             if (context.Node is InvocationExpressionSyntax invocation &&
                 DisposeCall.IsIDisposableDispose(invocation, context.SemanticModel, context.CancellationToken) &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
-                Disposable.IsPotentiallyCachedOrInjected(invocation, context.SemanticModel, context.CancellationToken))
+                DisposeCall.TryGetDisposedRootMember(invocation, context.SemanticModel, context.CancellationToken, out var root) &&
+                Disposable.IsCachedOrInjected(root, invocation, context.SemanticModel, context.CancellationToken))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
             }
