@@ -26,14 +26,12 @@ namespace IDisposableAnalyzers
 
         internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
-            if (expression is InvocationExpressionSyntax invocation)
+            switch (expression)
             {
-                return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
-            }
-
-            if (expression is AwaitExpressionSyntax awaitExpression)
-            {
-                return TryAwaitTaskFromResult(awaitExpression.Expression, semanticModel, cancellationToken, out result);
+                case InvocationExpressionSyntax invocation:
+                    return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
+                case AwaitExpressionSyntax awaitExpression:
+                    return TryAwaitTaskFromResult(awaitExpression.Expression, semanticModel, cancellationToken, out result);
             }
 
             result = null;
@@ -65,14 +63,12 @@ namespace IDisposableAnalyzers
 
         internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
         {
-            if (expression is InvocationExpressionSyntax invocation)
+            switch (expression)
             {
-                return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
-            }
-
-            if (expression is AwaitExpressionSyntax @await)
-            {
-                return TryAwaitTaskRun(@await.Expression, semanticModel, cancellationToken, out result);
+                case InvocationExpressionSyntax invocation:
+                    return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
+                case AwaitExpressionSyntax awaitExpression:
+                    return TryAwaitTaskRun(awaitExpression.Expression, semanticModel, cancellationToken, out result);
             }
 
             result = null;
@@ -114,16 +110,16 @@ namespace IDisposableAnalyzers
                     return true;
                 }
 
-                var memberaccess = invocation?.Expression as MemberAccessExpressionSyntax;
-                while (memberaccess != null)
+                var memberAccess = invocation?.Expression as MemberAccessExpressionSyntax;
+                while (memberAccess != null)
                 {
-                    result = memberaccess.Expression as InvocationExpressionSyntax;
+                    result = memberAccess.Expression as InvocationExpressionSyntax;
                     if (result != null)
                     {
                         return true;
                     }
 
-                    memberaccess = memberaccess.Expression as MemberAccessExpressionSyntax;
+                    memberAccess = memberAccess.Expression as MemberAccessExpressionSyntax;
                 }
             }
 
