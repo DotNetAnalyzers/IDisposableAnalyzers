@@ -55,8 +55,8 @@ namespace IDisposableAnalyzers
             if (node.Type is SimpleNameSyntax typeName &&
                 typeName.Identifier.ValueText == this.context.Identifier.ValueText)
             {
-                if (this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
-                    SymbolComparer.Equals(this.Type, ctor.ContainingType))
+                if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                    this.Type.Equals(ctor.ContainingType))
                 {
                     this.objectCreations.Add(node);
                 }
@@ -64,14 +64,14 @@ namespace IDisposableAnalyzers
             else if (node.Type is QualifiedNameSyntax qualifiedName &&
                      qualifiedName.Right.Identifier.ValueText == this.context.Identifier.ValueText)
             {
-                if (this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
-                    SymbolComparer.Equals(this.Type, ctor.ContainingType))
+                if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                    this.Type.Equals(ctor.ContainingType))
                 {
                     this.objectCreations.Add(node);
                 }
             }
-            else if (this.semanticModel.GetSymbolSafe(node, this.cancellationToken) is IMethodSymbol ctor &&
-                     SymbolComparer.Equals(this.Type, ctor.ContainingType))
+            else if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                     this.Type.Equals(ctor.ContainingType))
             {
                 this.objectCreations.Add(node);
             }
