@@ -130,7 +130,8 @@ namespace IDisposableAnalyzers
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
                 this.context is ElementAccessExpressionSyntax &&
-                SymbolComparer.Equals(this.CurrentSymbol, this.semanticModel.GetSymbolSafe(node.Expression, this.cancellationToken)))
+                this.semanticModel.TryGetSymbol(node.Expression, this.cancellationToken, out ISymbol symbol) &&
+                symbol.Equals(this.CurrentSymbol))
             {
                 this.values.Add(assignment.Right);
                 base.VisitElementAccessExpression(node);
@@ -294,11 +295,11 @@ namespace IDisposableAnalyzers
                 bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol parameter)
                 {
                     parameter = null;
-                    if (this.semanticModel.GetSymbolSafe(argument.Expression, this.cancellationToken) is ISymbol symbol)
+                    if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out ISymbol candidate))
                     {
-                        if (SymbolComparer.Equals(this.CurrentSymbol, symbol) ||
-                            this.refParameters.Contains(symbol as IParameterSymbol) ||
-                            this.outParameters.Contains(symbol as IParameterSymbol))
+                        if (candidate.Equals(this.CurrentSymbol) ||
+                            this.refParameters.Contains(candidate as IParameterSymbol) ||
+                            this.outParameters.Contains(candidate as IParameterSymbol))
                         {
                             return method.TryFindParameter(argument, out parameter);
                         }
