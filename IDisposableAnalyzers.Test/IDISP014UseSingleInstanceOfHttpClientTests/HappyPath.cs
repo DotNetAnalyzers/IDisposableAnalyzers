@@ -2,11 +2,12 @@
 namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal class HappyPath
     {
-        private static readonly ObjectCreationAnalyzer Analyzer = new ObjectCreationAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
 
         [Test]
         public void StaticField()
@@ -40,6 +41,36 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void CustomHttpClient()
+        {
+            var httpClientCode = @"namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class HttpClient : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo
+    {
+        public Foo()
+        {
+            using (var client = new HttpClient())
+            {
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, httpClientCode, testCode);
         }
     }
 }

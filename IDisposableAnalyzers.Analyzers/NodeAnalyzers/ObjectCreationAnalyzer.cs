@@ -32,7 +32,8 @@ namespace IDisposableAnalyzers
 
             if (context.Node is ObjectCreationExpressionSyntax objectCreation)
             {
-                if (objectCreation.Type == KnownSymbol.HttpClient &&
+                if (context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
+                    type.IsAssignableTo(KnownSymbol.HttpClient, context.Compilation) &&
                     !IsStaticFieldInitializer(objectCreation) &&
                     !IsStaticPropertyInitializer(objectCreation))
                 {
