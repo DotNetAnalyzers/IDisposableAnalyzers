@@ -127,7 +127,7 @@ namespace IDisposableAnalyzers
                             foreach (var argument in objectCreation.ArgumentList.Arguments)
                             {
                                 if (semanticModel.TryGetSymbol(argument.Expression, cancellationToken, out ISymbol argumentSymbol) &&
-                                    SymbolComparer.Equals(symbol, argumentSymbol))
+                                    symbol.Equals(argumentSymbol))
                                 {
                                     return true;
                                 }
@@ -138,8 +138,8 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var expression in objectCreation.Initializer.Expressions)
                             {
-                                if (semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol argumentSymbol) &&
-                                    SymbolComparer.Equals(symbol, argumentSymbol))
+                                if (semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol expressionSymbol) &&
+                                    symbol.Equals(expressionSymbol))
                                 {
                                     return true;
                                 }
@@ -147,8 +147,8 @@ namespace IDisposableAnalyzers
                         }
                     }
 
-                    var returnedSymbol = semanticModel.GetSymbolSafe(candidate, cancellationToken);
-                    if (SymbolComparer.Equals(symbol, returnedSymbol))
+                    if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol returnedSymbol) &&
+                        symbol.Equals(returnedSymbol))
                     {
                         return true;
                     }
@@ -157,7 +157,7 @@ namespace IDisposableAnalyzers
                     {
                         if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
                             invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TrySingle(out ArgumentSyntax argument) &&
+                            invocation.ArgumentList.Arguments.TrySingle(out var argument) &&
                             argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
                         {
                             var body = lambda.Body;
@@ -257,7 +257,8 @@ namespace IDisposableAnalyzers
                                 return true;
                             }
                         }
-                        else if (SymbolComparer.Equals(symbol, semanticModel.GetSymbolSafe(candidate.Expression, cancellationToken)))
+                        else if (semanticModel.TryGetSymbol(candidate.Expression, cancellationToken, out ISymbol candidateSymbol) &&
+                                 symbol.Equals(candidateSymbol))
                         {
                             argument = candidate;
                             return true;
