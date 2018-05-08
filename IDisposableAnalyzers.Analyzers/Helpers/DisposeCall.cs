@@ -21,7 +21,7 @@ namespace IDisposableAnalyzers
             {
                 var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
                 if (property == null ||
-                    property.IsAutoProperty(cancellationToken))
+                    property.IsAutoProperty())
                 {
                     return true;
                 }
@@ -38,7 +38,7 @@ namespace IDisposableAnalyzers
                     {
                         if (pooled.Count == 0)
                         {
-                            return false;
+                            return true;
                         }
 
                         return pooled.TrySingle(out var expression) &&

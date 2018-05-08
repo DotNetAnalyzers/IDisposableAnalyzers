@@ -132,8 +132,8 @@ namespace IDisposableAnalyzers
                 cancellationToken);
 
             var fieldAccess = usesUnderscoreNames
-                                  ? SyntaxFactory.IdentifierName(field.Name())
-                                  : SyntaxFactory.ParseExpression($"this.{field.Name()}");
+                                  ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
+                                  : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
 
             var trailingTrivia = statement.GetTrailingTrivia();
             if (trailingTrivia.Any(SyntaxKind.SingleLineCommentTrivia))

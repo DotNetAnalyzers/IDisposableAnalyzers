@@ -435,10 +435,10 @@ namespace IDisposableAnalyzers
 
         private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, FieldDeclarationSyntax field = null)
         {
-            if (field != null &&
-                field.Name() != "disposed")
+            if (field.TryGetName(out var name) &&
+                name != "disposed")
             {
-                code = code.Replace("disposed", field.Name());
+                code = code.Replace("disposed", name);
             }
 
             if (usesUnderscoreNames)

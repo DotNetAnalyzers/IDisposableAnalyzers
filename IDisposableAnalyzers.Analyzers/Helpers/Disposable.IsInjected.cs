@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers
             }
 
             if (symbol is IPropertySymbol property &&
-                !property.IsAutoProperty(cancellationToken))
+                !property.IsAutoProperty())
             {
                 using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                 {
