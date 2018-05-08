@@ -615,9 +615,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (TryGetProperty(out var property) &&
-                    !SymbolComparer.Equals(this.CurrentSymbol, property) &&
-                    property.ContainingType.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
+                if (TryGetProperty(out var property))
                 {
                     if (this.memberWalkers.TryGetValue(value, out walker))
                     {
@@ -642,21 +640,11 @@ namespace IDisposableAnalyzers
 
                 bool TryGetProperty(out IPropertySymbol result)
                 {
-                    if (assigned is IdentifierNameSyntax identifierName &&
-                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(identifierName.Identifier.ValueText, out result))
-                    {
-                        return true;
-                    }
-
-                    if (assigned is MemberAccessExpressionSyntax memberAccess &&
-                        memberAccess.Expression is InstanceExpressionSyntax &&
-                        this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(memberAccess.Name.Identifier.ValueText, out result))
-                    {
-                        return true;
-                    }
-
                     result = null;
-                    return false;
+                    return assigned is ExpressionSyntax assignedExpression &&
+                           MemberPath.TrySingle(assignedExpression, out var assignedMember) &&
+                           assignedMember.Identifier.ValueText != this.CurrentSymbol.Name &&
+                           this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.Identifier.ValueText, out result);
                 }
             }
         }
