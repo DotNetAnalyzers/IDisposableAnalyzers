@@ -72,11 +72,17 @@ namespace IDisposableAnalyzers
                 }
             }
 
+            if (member is IPropertySymbol property &&
+                property.OverriddenProperty is IPropertySymbol overridden)
+            {
+                return this.IsMemberDisposed(overridden);
+            }
+
             foreach (var name in this.identifiers)
             {
                 if (member.Name == name.Identifier.ValueText &&
                     this.SemanticModel.TryGetSymbol(name, this.CancellationToken, out ISymbol candidate) &&
-                    SymbolComparer.Equals(member, candidate))
+                     member.Equals(candidate))
                 {
                     return Result.AssumeYes;
                 }

@@ -54,7 +54,7 @@ namespace IDisposableAnalyzers
         {
             if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed))
             {
-                if (SymbolComparer.Equals(disposed, symbol))
+                if (disposed.Equals(symbol))
                 {
                     return true;
                 }
@@ -67,7 +67,7 @@ namespace IDisposableAnalyzers
                         return walker.TrySingle(out var returnValue) &&
                                MemberPath.TrySingle(returnValue, out var expression) &&
                                semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol nested) &&
-                               SymbolComparer.Equals(nested, symbol);
+                               nested.Equals(symbol);
                     }
                 }
             }
