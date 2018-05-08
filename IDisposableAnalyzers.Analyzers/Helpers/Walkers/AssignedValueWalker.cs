@@ -589,22 +589,18 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            var assignedSymbol = this.semanticModel.GetSymbolSafe(assigned, this.cancellationToken) ??
-                                 this.semanticModel.GetDeclaredSymbolSafe(assigned, this.cancellationToken);
-            if (assignedSymbol == null)
+            if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol assignedSymbol))
             {
-                return;
-            }
+                if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
+                    this.refParameters.Contains(assignedSymbol as IParameterSymbol))
+                {
+                    this.values.Add(value);
+                }
 
-            if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
-                this.refParameters.Contains(assignedSymbol as IParameterSymbol))
-            {
-                this.values.Add(value);
-            }
-
-            if (this.outParameters.Contains(assignedSymbol as IParameterSymbol))
-            {
-                this.outValues.Add(value);
+                if (this.outParameters.Contains(assignedSymbol as IParameterSymbol))
+                {
+                    this.outValues.Add(value);
+                }
             }
 
             bool TryGetSetterWalker(out AssignedValueWalker walker)
