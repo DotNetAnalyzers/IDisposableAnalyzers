@@ -20,7 +20,7 @@ namespace IDisposableAnalyzers
                             continue;
                         }
 
-                        if (IsDisposing(invocation, symbol))
+                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken))
                         {
                             return true;
                         }
@@ -36,8 +36,8 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in pooled.Invocations)
                     {
-                        if (IsDisposing(invocation, symbol) ||
-                            IsDisposing(invocation, property))
+                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
+                            DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken))
                         {
                             return true;
                         }
@@ -46,39 +46,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-
-            bool IsDisposing(InvocationExpressionSyntax invocation, ISymbol current)
-            {
-                if (invocation.TryGetMethodName(out var name) &&
-                    name != "Dispose")
-                {
-                    return false;
-                }
-
-                var invokedSymbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-                if (invokedSymbol?.Name != "Dispose")
-                {
-                    return false;
-                }
-
-                var statement = invocation.FirstAncestorOrSelf<StatementSyntax>();
-                if (statement != null)
-                {
-                    using (var names = IdentifierNameWalker.Borrow(statement))
-                    {
-                        foreach (var identifierName in names.IdentifierNames)
-                        {
-                            if (identifierName.Identifier.ValueText == current.Name &&
-                                SymbolComparer.Equals(current, semanticModel.GetSymbolSafe(identifierName, cancellationToken)))
-                            {
-                                return true;
-                            }
-                        }
-                    }
-                }
-
-                return false;
-            }
 
             bool TryGetScope(SyntaxNode node, out BlockSyntax result)
             {

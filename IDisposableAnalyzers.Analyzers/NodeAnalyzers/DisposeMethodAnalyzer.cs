@@ -86,7 +86,7 @@ namespace IDisposableAnalyzers
                     }
 
                     if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var target) &&
-                        SymbolComparer.Equals(target, overridden))
+                        target.Equals(overridden))
                     {
                         return true;
                     }
