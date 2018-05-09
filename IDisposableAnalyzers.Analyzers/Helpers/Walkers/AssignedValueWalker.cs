@@ -591,7 +591,8 @@ namespace IDisposableAnalyzers
 
             if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol assignedSymbol))
             {
-                if (SymbolComparer.Equals(this.CurrentSymbol, assignedSymbol) ||
+                if (assignedSymbol.Equals(this.CurrentSymbol) ||
+                    assignedSymbol.Equals(this.CurrentSymbol.OriginalDefinition) ||
                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
                 {
                     this.values.Add(value);
