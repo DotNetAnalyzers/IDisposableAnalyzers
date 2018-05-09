@@ -184,6 +184,79 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
+
+            [Test]
+            public void LocalInSwitchCase()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    class Foo
+    {
+        public Foo(StringComparison comparison)
+        {
+            switch (comparison)
+            {
+                case StringComparison.CurrentCulture:
+                    break;
+                case StringComparison.CurrentCultureIgnoreCase:
+                    break;
+                case StringComparison.InvariantCulture:
+                    break;
+                case StringComparison.InvariantCultureIgnoreCase:
+                    break;
+                case StringComparison.Ordinal:
+                    break;
+                case StringComparison.OrdinalIgnoreCase:
+                    ↓var stream = File.OpenRead(string.Empty);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+            }
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    class Foo
+    {
+        public Foo(StringComparison comparison)
+        {
+            switch (comparison)
+            {
+                case StringComparison.CurrentCulture:
+                    break;
+                case StringComparison.CurrentCultureIgnoreCase:
+                    break;
+                case StringComparison.InvariantCulture:
+                    break;
+                case StringComparison.InvariantCultureIgnoreCase:
+                    break;
+                case StringComparison.Ordinal:
+                    break;
+                case StringComparison.OrdinalIgnoreCase:
+                    using (var stream = File.OpenRead(string.Empty))
+                    {
+                    }
+
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(comparison), comparison, null);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
         }
     }
 }

@@ -149,6 +149,12 @@ namespace IDisposableAnalyzers
             }
         }
 
+        private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
+        {
+            return symbol.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
+                   declaration.Parent?.Parent is UsingStatementSyntax;
+        }
+
         private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             switch (returnValue)
@@ -161,12 +167,6 @@ namespace IDisposableAnalyzers
             }
 
             return true;
-        }
-
-        private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
-        {
-            return symbol.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
-                   declaration.Parent?.Parent is UsingStatementSyntax;
         }
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)

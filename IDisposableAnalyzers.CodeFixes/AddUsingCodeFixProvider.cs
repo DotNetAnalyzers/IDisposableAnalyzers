@@ -34,13 +34,23 @@ namespace IDisposableAnalyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    if (node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var statement) &&
-                        statement.Parent is BlockSyntax block)
+                    if (node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var statement))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Add using to end of block.",
-                            (editor, _) => AddUsing(editor, block, statement),
-                            diagnostic);
+                        switch (statement.Parent)
+                        {
+                            case BlockSyntax block:
+                                context.RegisterDocumentEditorFix(
+                                    "Add using to end of block.",
+                                    (editor, _) => AddUsing(editor, block, statement),
+                                    diagnostic);
+                                break;
+                            case SwitchSectionSyntax switchSection:
+                                context.RegisterDocumentEditorFix(
+                                    "Add using to end of block.",
+                                    (editor, _) => AddUsing(editor, switchSection, statement),
+                                    diagnostic);
+                                break;
+                        }
                     }
                     else if (node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var expressionStatement) &&
                              expressionStatement.Parent is BlockSyntax expressionStatementBlock)
@@ -81,6 +91,27 @@ namespace IDisposableAnalyzers
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
+                                  .ToArray();
+            foreach (var statementSyntax in statements)
+            {
+                editor.RemoveNode(statementSyntax);
+            }
+
+            editor.ReplaceNode(
+                statement,
+                SyntaxFactory.UsingStatement(
+                    declaration: statement.Declaration,
+                    expression: null,
+                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
+                                            .WithAdditionalAnnotations(Formatter.Annotation)));
+        }
+
+        private static void AddUsing(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax statement)
+        {
+            var statements = switchSection.Statements
+                                  .Where(s => s.SpanStart > statement.SpanStart)
+                                          .Where(s => !(s == switchSection.Statements.Last() &&
+                                                        s is BreakStatementSyntax))
                                   .ToArray();
             foreach (var statementSyntax in statements)
             {
