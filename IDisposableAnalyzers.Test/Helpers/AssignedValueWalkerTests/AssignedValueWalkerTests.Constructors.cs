@@ -851,6 +851,42 @@ namespace RoslynSandbox
                 }
             }
 
+            [Test]
+            public void AbstractGenericInitializedInBaseCtorSimple()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    public abstract class FooBase<T>
+    {
+        protected FooBase()
+        {
+            this.Value = default(T);
+        }
+
+        public abstract T Value { get; set; }
+    }
+
+    public class Foo : FooBase<int>
+    {
+        public Foo()
+        {
+            var temp = this.Value;
+        }
+
+        public override int Value { get; set; }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = this.Value;").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    var actual = string.Join(", ", assignedValues);
+                    Assert.AreEqual("default(T)", actual);
+                }
+            }
+
             [TestCase("var temp1 = this.value;", "default(T)")]
             [TestCase("var temp2 = this.value;", "default(T)")]
             public void InitializedInBaseCtorWithDefaultGeneric(string code, string expected)
