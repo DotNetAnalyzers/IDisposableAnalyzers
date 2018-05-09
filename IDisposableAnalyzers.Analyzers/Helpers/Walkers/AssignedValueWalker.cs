@@ -591,7 +591,7 @@ namespace IDisposableAnalyzers
 
             if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol assignedSymbol))
             {
-                if (IsEquivalent(assignedSymbol, this.CurrentSymbol) ||
+                if (assignedSymbol.IsEquivalentTo(this.CurrentSymbol) ||
                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
                 {
                     this.values.Add(value);
@@ -642,28 +642,6 @@ namespace IDisposableAnalyzers
                            assignedMember.Identifier.ValueText != this.CurrentSymbol.Name &&
                            this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.Identifier.ValueText, out result);
                 }
-            }
-
-            bool IsEquivalent(ISymbol x, ISymbol y)
-            {
-                if (x.Equals(y))
-                {
-                    return true;
-                }
-
-                if (x.IsDefinition &&
-                    !y.Equals(y.OriginalDefinition))
-                {
-                    return IsEquivalent(x, y.OriginalDefinition);
-                }
-
-                if (y is IPropertySymbol property &&
-                    property.OverriddenProperty is IPropertySymbol overridden)
-                {
-                    return IsEquivalent(x, overridden);
-                }
-
-                return false;
             }
         }
 

@@ -1,10 +1,10 @@
 STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
-    Gu.Roslyn.AnalyzerExtensions (0.2.1.25-dev)
+    Gu.Roslyn.AnalyzerExtensions (0.2.1.27-dev)
       Microsoft.CodeAnalysis.CSharp (>= 2.0)
-    Gu.Roslyn.CodeFixExtensions (0.2.1.25-dev)
-      Gu.Roslyn.AnalyzerExtensions (>= 0.2.1.25-dev)
+    Gu.Roslyn.CodeFixExtensions (0.2.1.27-dev)
+      Gu.Roslyn.AnalyzerExtensions (>= 0.2.1.27-dev)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     ManagedEsent (1.9.4) - restriction: >= net46
     Microsoft.CodeAnalysis.Analyzers (2.6) - restriction: >= netstandard1.3
