@@ -6,7 +6,7 @@
     <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Version>2.0.1.0</Version>
+    <Version>2.0.2.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <NeutralLanguage>en-US</NeutralLanguage>
