@@ -1,22 +1,14 @@
-﻿type file
-version 2.0.1.0
-title IDisposableAnalyzers
+﻿type project
 id IDisposableAnalyzers
-authors Johan Larsson, milleniumbug
-owners Johan Larsson
-copyright Copyright Johan Larsson 2017
+include-referenced-projects true
 developmentDependency true
-description Roslyn analyzers for IDisposable.
-tags Roslyn Diagnostic Analyzer DotnetAnalyzers IDisposable
 
-projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
-licenseUrl http://opensource.org/licenses/MIT
-
-releasenotes
-  BUGFIX: Handle recursion.
+excludedgroups
+  Main
+  Analyzers
 
 files
-  bin/Release/netstandard1.3/IDisposableAnalyzers.Analyzers.dll ==> analyzers/dotnet/cs
-  bin/Release/netstandard1.3/IDisposableAnalyzers.CodeFixes.dll ==> analyzers/dotnet/cs
-  ../.paket/tools/*.ps1 ==> tools
+  bin/Release/Gu.Roslyn.AnalyzerExtensions.dll ==> analyzers/dotnet/cs
+  bin/Release/Gu.Roslyn.CodeFixExtensions.dll ==> analyzers/dotnet/cs
+
 

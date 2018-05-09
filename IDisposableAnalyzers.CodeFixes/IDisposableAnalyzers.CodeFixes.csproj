@@ -1,19 +1,41 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3</TargetFrameworks>
+    <TargetFramework>netstandard1.3</TargetFramework>
     <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <Version>2.0.1.0</Version>
+    <Authors>Johan Larsson, milleniumbug</Authors>
+    <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.CodeFixes.ruleset</CodeAnalysisRuleSet>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <RootNamespace>IDisposableAnalyzers</RootNamespace>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>IDisposableAnalyzers</PackageId>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <Description>Roslyn analyzers for IDisposable.</Description>
+    <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
+    <PackageReleaseNotes>BUGFIX: Nullchecks in routed event analyzer.</PackageReleaseNotes>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</RepositoryUrl>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>   
+
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Exec Command=".paket\paket.exe pack publish --template $(ProjectDir)paket.template" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+  
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
