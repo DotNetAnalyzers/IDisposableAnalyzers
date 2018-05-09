@@ -139,9 +139,9 @@ namespace IDisposableAnalyzers
             }
 
             if (ReturnType(context).IsAssignableTo(KnownSymbol.Task, context.SemanticModel.Compilation) &&
-                returnValue.FirstAncestor<UsingStatementSyntax>() is UsingStatementSyntax usingStatement &&
+                returnValue.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
                 usingStatement.Statement.Contains(returnValue) &&
-                returnValue.FirstAncestorOrSelf<AwaitExpressionSyntax>() == null &&
+                !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
                 returnValue.IsAssignableTo(KnownSymbol.Task, context.SemanticModel) &&
                 ShouldAwait(context, returnValue))
             {
