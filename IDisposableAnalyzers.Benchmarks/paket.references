@@ -6,5 +6,5 @@ group Benchmarks
 
 group Analyzers
   AsyncUsageAnalyzers
-  IDisposableAnalyzers
+  Gu.Analyzers
   StyleCop.Analyzers
