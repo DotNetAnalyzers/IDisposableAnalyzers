@@ -10,20 +10,7 @@
     <Rule Id="UseAsyncSuffix" Action="Error" />
     <Rule Id="UseConfigureAwait" Action="Error" />
   </Rules>
-  <Rules AnalyzerId="IDisposableAnalyzers.Analyzers" RuleNamespace="IDisposableAnalyzers.Analyzers">
-    <Rule Id="GU0001" Action="Warning" />
-    <Rule Id="GU0002" Action="Warning" />
-    <Rule Id="GU0003" Action="Warning" />
-    <Rule Id="GU0004" Action="Warning" />
-    <Rule Id="GU0006" Action="Warning" />
-    <Rule Id="GU0007" Action="None" />
-    <Rule Id="GU0008" Action="Warning" />
-    <Rule Id="GU0010" Action="Warning" />
-    <Rule Id="GU0011" Action="Warning" />
-    <Rule Id="GU0020" Action="Warning" />
-    <Rule Id="GU0021" Action="Warning" />
-    <Rule Id="IDISP004" Action="Warning" />
-  </Rules>
+
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
     <Rule Id="CA1009" Action="Warning" />

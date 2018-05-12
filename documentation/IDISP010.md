@@ -21,7 +21,7 @@
 </tr>
 <tr>
   <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/NodeAnalyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
 </tr>
 </table>
 <!-- end generated table -->

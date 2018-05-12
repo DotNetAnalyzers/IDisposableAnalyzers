@@ -30,7 +30,7 @@
   </PropertyGroup>   
 
   <ItemGroup>
-    <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
+    <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">

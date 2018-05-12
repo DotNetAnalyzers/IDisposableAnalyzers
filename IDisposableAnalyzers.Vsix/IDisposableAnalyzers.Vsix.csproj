@@ -24,7 +24,7 @@
     <None Include="source.extension.vsixmanifest" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj" />
+    <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
     <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
   </ItemGroup>
   <ItemGroup>

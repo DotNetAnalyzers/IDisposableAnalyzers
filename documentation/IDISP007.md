@@ -21,7 +21,7 @@
 </tr>
 <tr>
   <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers.Analyzers/IDISP007DontDisposeInjected.cs">IDISP007DontDisposeInjected</a></td>
+  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP007DontDisposeInjected.cs">IDISP007DontDisposeInjected</a></td>
 </tr>
 </table>
 <!-- end generated table -->

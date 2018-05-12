@@ -25,7 +25,7 @@ namespace IDisposableAnalyzers.Test
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution Project = CodeFactory.CreateSolution(
-            ProjectFile.Find("IDisposableAnalyzers.Analyzers.csproj"),
+            ProjectFile.Find("IDisposableAnalyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 

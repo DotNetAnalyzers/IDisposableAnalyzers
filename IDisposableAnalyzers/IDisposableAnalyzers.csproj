@@ -7,7 +7,8 @@
     <Authors>Johan Larsson, milleniumbug</Authors>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <CodeAnalysisRuleSet>IDisposableAnalyzers.Analyzers.ruleset</CodeAnalysisRuleSet>
+    <PackageId>IDisposableAnalyzers.NewIdRequiredDueToNuGetBug</PackageId>
+    <CodeAnalysisRuleSet>IDisposableAnalyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   
   <PropertyGroup>

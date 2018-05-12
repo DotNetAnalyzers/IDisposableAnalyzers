@@ -52,7 +52,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Test",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Vsix", "IDisposableAnalyzers.Vsix\IDisposableAnalyzers.Vsix.csproj", "{BE3E8AFA-390E-4FD9-A4E9-A7FF246E8A0E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Analyzers", "IDisposableAnalyzers.Analyzers\IDisposableAnalyzers.Analyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers", "IDisposableAnalyzers\IDisposableAnalyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
