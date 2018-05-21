@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+    using System.Linq;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -38,7 +39,10 @@ namespace IDisposableAnalyzers
                 if (method.Parameters.Length == 0 &&
                     method.DeclaredAccessibility == Accessibility.Public &&
                     method.GetAttributes().Length == 0 &&
-                    !method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation))
+                    method.ReturnsVoid &&
+                    method.OverriddenMethod == null &&
+                    !method.ExplicitInterfaceImplementations.Any() &&
+                    !IsInterfaceImplementation(method))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
                 }
@@ -71,6 +75,31 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
+        }
+
+        private static bool IsInterfaceImplementation(IMethodSymbol method)
+        {
+            if (method.ContainingType.TypeKind == TypeKind.Interface)
+            {
+                return true;
+            }
+
+            foreach (var @interface in method.ContainingType.AllInterfaces)
+            {
+                foreach (var member in @interface.GetMembers())
+                {
+                    if (member is IMethodSymbol candidate &&
+                        candidate.Name == "Dispose" &&
+                        candidate.ReturnsVoid &&
+                        candidate.DeclaredAccessibility == Accessibility.Public &&
+                        candidate.Parameters.Length == 0)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         private static bool CallsBase(MemberDeclarationSyntax method, IMethodSymbol overridden, SyntaxNodeAnalysisContext context)

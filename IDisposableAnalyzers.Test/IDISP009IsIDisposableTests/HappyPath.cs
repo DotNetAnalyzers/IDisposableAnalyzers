@@ -464,6 +464,22 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void WhenImplementingIHttpModule()
+        {
+            var testCode = @"
+namespace System.Web
+{
+  public interface IHttpModule
+  {
+    void Init(HttpApplication context);
+    void Dispose();
+  }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void WhenSubclassingAndImplementingTwoInterfaces()
         {
             var testCode = @"
