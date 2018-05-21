@@ -47,7 +47,28 @@ It is created in the initializer but can later be assigned with streams created 
 ## How to fix violations
 
 Make members holding created disposables readonly or at least private set.
+
+#### Example public field
+```cs
+public IDisposable Disposable; // could be assigned from the outside so we don't know if disposing it is safe.
+```
+Change to 
+```cs
+public readonly IDisposable Disposable; // We can now check all places it is assigned and hopefully figure out if we should dispose
+```
+
+#### Example public field
+```cs
+public IDisposable Disposable { get; set; } // could be assigned from the outside so we don't know if disposing it is safe.
+```
+Change to 
+```cs
+public readonly IDisposable Disposable { get; } // We can now check all places it is assigned and hopefully figure out if we should dispose
+```
+
 For members accepting injected disposables never assign a disposable that we create inside tha class.
+
+
 
 <!-- start generated config severity -->
 ## Configure severity
