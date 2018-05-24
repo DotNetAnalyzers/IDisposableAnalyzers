@@ -132,7 +132,7 @@ namespace IDisposableAnalyzers
                 foreach (var value in walker.returnValues)
                 {
                     if (value is IdentifierNameSyntax identifierName &&
-                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
+                        method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
                     {
                         if (this.search != ReturnValueSearch.RecursiveInside &&
                             invocation.TryFindArgument(parameter, out var argument))
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
             bool IsParameter(ExpressionSyntax value)
             {
                 return value is IdentifierNameSyntax id &&
-                       declaration.ParameterList.Parameters.TryFirst(x => x.Identifier.ValueText == id.Identifier.ValueText, out _);
+                       declaration.TryFindParameter(id.Identifier.ValueText, out _);
             }
         }
 
