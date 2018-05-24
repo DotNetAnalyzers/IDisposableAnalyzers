@@ -18,6 +18,8 @@
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
+#pragma warning disable IDE0018 // Variable declaration can be inlined.
+#pragma warning disable IDE0019 // Use pattern matching.
 namespace IDisposableAnalyzers.Test.HappyPathCode
 {
     using System;
