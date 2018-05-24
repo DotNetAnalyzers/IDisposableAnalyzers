@@ -91,6 +91,7 @@ namespace IDisposableAnalyzers
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
+                                  .TakeWhile(s => !(s is LocalFunctionStatementSyntax))
                                   .ToArray();
             foreach (var statementSyntax in statements)
             {

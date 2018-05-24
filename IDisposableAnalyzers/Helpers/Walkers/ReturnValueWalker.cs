@@ -125,41 +125,76 @@ namespace IDisposableAnalyzers
 
         private bool TryHandleInvocation(InvocationExpressionSyntax invocation, out IMethodSymbol method)
         {
-            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method) &&
-                method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                this.TryGetRecursive(invocation, declaration, out var walker))
+            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method))
             {
-                foreach (var value in walker.returnValues)
+                if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax baseMethod) &&
+                    this.TryGetRecursive(invocation, baseMethod, out var methodWalker))
                 {
-                    if (value is IdentifierNameSyntax identifierName &&
-                        method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
+                    foreach (var value in methodWalker.returnValues)
                     {
-                        if (this.search != ReturnValueSearch.RecursiveInside &&
-                            invocation.TryFindArgument(parameter, out var argument))
+                        if (value is IdentifierNameSyntax identifierName &&
+                            method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
                         {
-                            this.AddReturnValue(argument.Expression);
+                            if (this.search != ReturnValueSearch.RecursiveInside &&
+                                invocation.TryFindArgument(parameter, out var argument))
+                            {
+                                this.AddReturnValue(argument.Expression);
+                            }
+                            else if (parameter.HasExplicitDefaultValue &&
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                            {
+                                this.returnValues.Add(parameterDeclaration.Default?.Value);
+                            }
                         }
-                        else if (parameter.HasExplicitDefaultValue &&
-                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
-                        {
-                            this.returnValues.Add(parameterDeclaration.Default?.Value);
-                        }
+
+                        this.AddReturnValue(value);
                     }
 
-                    this.AddReturnValue(value);
+                    this.returnValues.RemoveAll(IsParameter);
+                    return true;
+
+                    bool IsParameter(ExpressionSyntax value)
+                    {
+                        return value is IdentifierNameSyntax id &&
+                               baseMethod.TryFindParameter(id.Identifier.ValueText, out _);
+                    }
                 }
 
-                this.returnValues.RemoveAll(IsParameter);
-                return true;
+                if (method.TrySingleDeclaration(this.cancellationToken, out LocalFunctionStatementSyntax localFunction) &&
+                    this.TryGetRecursive(invocation, localFunction, out var localFunctionWalker))
+                {
+                    foreach (var value in localFunctionWalker.returnValues)
+                    {
+                        if (value is IdentifierNameSyntax identifierName &&
+                            method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
+                        {
+                            if (this.search != ReturnValueSearch.RecursiveInside &&
+                                invocation.TryFindArgument(parameter, out var argument))
+                            {
+                                this.AddReturnValue(argument.Expression);
+                            }
+                            else if (parameter.HasExplicitDefaultValue &&
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                            {
+                                this.returnValues.Add(parameterDeclaration.Default?.Value);
+                            }
+                        }
+
+                        this.AddReturnValue(value);
+                    }
+
+                    this.returnValues.RemoveAll(IsParameter);
+                    return true;
+
+                    bool IsParameter(ExpressionSyntax value)
+                    {
+                        return value is IdentifierNameSyntax id &&
+                               localFunction.ParameterList.TryFind(id.Identifier.ValueText, out _);
+                    }
+                }
             }
 
             return false;
-
-            bool IsParameter(ExpressionSyntax value)
-            {
-                return value is IdentifierNameSyntax id &&
-                       declaration.TryFindParameter(id.Identifier.ValueText, out _);
-            }
         }
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, out IPropertySymbol property)

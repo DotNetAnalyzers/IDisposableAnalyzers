@@ -257,6 +257,54 @@ namespace RoslynSandbox
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
             }
+
+            [Test]
+            public void LocalFactoryMethod()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            ↓var stream = Create();
+
+            IDisposable Create()
+            {
+                return File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo()
+        {
+            using (var stream = Create())
+            {
+            }
+
+            IDisposable Create()
+            {
+                return File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
         }
     }
 }
