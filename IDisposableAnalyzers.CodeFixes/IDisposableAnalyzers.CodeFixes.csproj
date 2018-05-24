@@ -6,7 +6,7 @@
     <BuildOutputTargetFolder>analyzers\dotnet\cs</BuildOutputTargetFolder>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <Version>2.0.2.1</Version>
+    <Version>2.0.2.2</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <NeutralLanguage>en-US</NeutralLanguage>
@@ -18,7 +18,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
-    <PackageReleaseNotes>BUGFIX: Nullchecks in routed event analyzer.</PackageReleaseNotes>
+    <PackageReleaseNotes>BUGFIX: Handle local functions.</PackageReleaseNotes>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</RepositoryUrl>
