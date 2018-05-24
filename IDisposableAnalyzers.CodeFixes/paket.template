@@ -2,6 +2,8 @@
 id IDisposableAnalyzers
 include-referenced-projects true
 developmentDependency true
+projectUrl https://github.com/DotNetAnalyzers/PropertyChangedAnalyzers
+licenseUrl http://opensource.org/licenses/MIT
 
 excludedgroups
   Main
