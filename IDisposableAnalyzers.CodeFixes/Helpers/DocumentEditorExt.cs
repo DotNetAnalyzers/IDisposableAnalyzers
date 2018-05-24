@@ -50,7 +50,7 @@ namespace IDisposableAnalyzers
                 accessibility: accessibility,
                 modifiers: modifiers,
                 type: type);
-            editor.AddField(containingType, newField);
+            _ = editor.AddField(containingType, newField);
             return newField;
         }
     }

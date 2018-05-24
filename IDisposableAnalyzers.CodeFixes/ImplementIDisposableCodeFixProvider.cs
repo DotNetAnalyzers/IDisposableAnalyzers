@@ -236,7 +236,7 @@ namespace IDisposableAnalyzers
                                         .AppendLine("     base.Dispose(disposing);")
                                         .AppendLine("}")
                                         .Return();
-            editor.AddMethod(
+            _ = editor.AddMethod(
                 classDeclaration,
                 ParseMethod(code, usesUnderscoreNames, field));
 
@@ -258,14 +258,14 @@ namespace IDisposableAnalyzers
                                                 .AppendLine("     base.ThrowIfDisposed();")
                                                 .AppendLine("}")
                                                 .Return();
-                        editor.AddMethod(
+                        _ = editor.AddMethod(
                             classDeclaration,
                             ParseMethod(code, usesUnderscoreNames, field));
                     }
                 }
                 else
                 {
-                    editor.AddMethod(
+                    _ = editor.AddMethod(
                         classDeclaration,
                         ParseMethod(
                             @"protected virtual void ThrowIfDisposed()
@@ -299,7 +299,7 @@ namespace IDisposableAnalyzers
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            editor.AddMethod(
+            _ = editor.AddMethod(
                 classDeclaration,
                 ParseMethod(
                     @"public void Dispose()
@@ -308,7 +308,7 @@ namespace IDisposableAnalyzers
                           }",
                     usesUnderscoreNames));
 
-            editor.AddMethod(
+            _ = editor.AddMethod(
                 classDeclaration,
                 ParseMethod(
                     @"protected virtual void Dispose(bool disposing)
@@ -328,7 +328,7 @@ namespace IDisposableAnalyzers
 
             if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
             {
-                editor.AddMethod(
+                _ = editor.AddMethod(
                     classDeclaration,
                     ParseMethod(
                         @"protected virtual void ThrowIfDisposed()
@@ -366,7 +366,7 @@ namespace IDisposableAnalyzers
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            editor.AddMethod(
+            _ = editor.AddMethod(
                 classDeclaration,
                 ParseMethod(
                     @"public void Dispose()
@@ -383,7 +383,7 @@ namespace IDisposableAnalyzers
 
             if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
             {
-                editor.AddMethod(
+                _ = editor.AddMethod(
                     classDeclaration,
                     ParseMethod(
                         @"private void ThrowIfDisposed()
@@ -420,7 +420,7 @@ namespace IDisposableAnalyzers
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
 
-            editor.AddMethod(
+            _ = editor.AddMethod(
                 structDeclaration,
                 Parse.MethodDeclaration(@"public void Dispose()
                           {
