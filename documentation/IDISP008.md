@@ -32,22 +32,62 @@ Don't assign member with injected and created disposables. It creates a confusin
 
 ## Motivation
 
+### Example 1
+```cs
+using System;
+using System.Threading;
+
+public class Foo : IDisposable
+{
+    private readonly Mutex dependency;
+
+    public Foo(Mutex dependency = null)
+    {
+        this.dependency = dependency ?? new Mutex();
+    }
+}
+```
+In the above example the field `dependency` is either assigned with the constructor parameter or `new Mutex()` if null. This means that we don't know if we created the mutex and are responsible for disposing it.
+
+### Example 2
+
 ```c#
 using System.IO;
 
 public class Foo
 {
-    public Stream Stream { get; protected set; } = File.OpenRead(string.Empty);
+    public Stream Stream { get; set; } = File.OpenRead(string.Empty);
 }
 ```
 
 Above is a confusing situation about who is responsible for disposing the stream. 
-It is created in the initializer but can later be assigned with streams created outside.
+It is created in the initializer but can later be assigned with streams created outside as there is no way to know what the property is assigned with.
+In this case removing the `set;` makes analysis trivial, then we only need to check initializer and constructor to figure out what the property is assigned with.
+Making it `private set` means we check all assignments within the class.
 
 ## How to fix violations
 
 Make members holding created disposables readonly or at least private set.
-For members accepting injected disposables never assign a disposable that we create inside tha class.
+
+#### Example public field
+```cs
+public IDisposable Disposable; // could be assigned from the outside so we don't know if disposing it is safe.
+```
+Change to 
+```cs
+public readonly IDisposable Disposable; // We can now check all places it is assigned and hopefully figure out if we should dispose
+```
+
+#### Example public field
+```cs
+public IDisposable Disposable { get; set; } // could be assigned from the outside so we don't know if disposing it is safe.
+```
+Change to 
+```cs
+public readonly IDisposable Disposable { get; } // We can now check all places it is assigned and hopefully figure out if we should dispose
+```
+
+For members accepting injected disposables never assign a disposable that we create inside the class.
 
 <!-- start generated config severity -->
 ## Configure severity
