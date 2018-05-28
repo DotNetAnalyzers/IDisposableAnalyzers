@@ -274,5 +274,126 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void WhenGettingPropertyOfDisposable()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool disposed;
+        private int value;
+
+        public int Value
+        {
+            get
+            {
+                this.ThrowIfDisposed();
+                return this.value;
+            }
+
+            set
+            {
+                this.ThrowIfDisposed();
+                this.value = value;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+
+    class Bar
+    {
+        public Bar(Foo foo)
+        {
+            var fooValue = foo.Value;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void WhenGettingPropertyOfProperty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class Foo : IDisposable
+    {
+        private bool disposed;
+        private int value;
+
+        public int Value
+        {
+            get
+            {
+                this.ThrowIfDisposed();
+                return this.value;
+            }
+
+            set
+            {
+                this.ThrowIfDisposed();
+                this.value = value;
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+
+    class Bar
+    {
+        public Bar(Foo foo)
+        {
+            this.Foo = foo;
+            var fooValue = this.Foo.Value;
+        }
+
+        public Foo Foo { get; }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
