@@ -17,6 +17,7 @@
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable GU0015 // Don't assign same more than once.
 #pragma warning disable IDE0009 // Member access should be qualified.
+#pragma warning disable IDE0025 // Use expression body for properties.
 namespace IDisposableAnalyzers.Test.HappyPathCode
 {
     using System;
