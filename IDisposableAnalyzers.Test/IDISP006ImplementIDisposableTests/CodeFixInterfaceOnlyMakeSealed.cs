@@ -78,7 +78,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class Foo : ↓IDisposable
     {
     }
 }";
@@ -225,7 +225,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : FooBase, IDisposable
+    public class Foo : FooBase, ↓IDisposable
     {
         public override int Value1 { get; protected set; }
 

@@ -946,9 +946,11 @@ namespace RoslynSandbox
             [Test]
             public void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
             {
-                var subclassCode = @"
+                var barCode = @"
 namespace RoslynSandbox
 {
+    using System;
+
     public sealed class Bar : Disposable
     {
     }
@@ -983,8 +985,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, subclassCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, subclassCode, testCode }, fixedCode);
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, barCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, barCode, testCode }, fixedCode);
             }
 
             [Test]
