@@ -6,6 +6,7 @@ namespace IDisposableAnalyzers.Test.Documentation
     using System.IO;
     using System.Linq;
     using System.Text;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -13,21 +14,25 @@ namespace IDisposableAnalyzers.Test.Documentation
 
     public class Tests
     {
-        private static readonly IReadOnlyList<DescriptorInfo> Descriptors = typeof(AnalyzerCategory)
-            .Assembly.GetTypes()
-            .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
+                                                                              .Assembly
+                                                                              .GetTypes()
+                                                                              .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                                                                              .OrderBy(x => x.Name)
+                                                                              .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                                                                              .ToArray();
+
+        private static readonly IReadOnlyList<DescriptorInfo> DescriptorInfos = Analyzers
             .SelectMany(DescriptorInfo.Create)
-            .OrderBy(x => x.Descriptor.Id)
             .ToArray();
 
-        private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => Descriptors.Where(d => d.DocExists).ToArray();
+        private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => DescriptorInfos.Where(d => d.DocExists).ToArray();
 
-        private static string SolutionDirectory => SolutionFile.Find("IDisposableAnalyzers.sln").DirectoryName;
+        private static DirectoryInfo SolutionDirectory => SolutionFile.Find("IDisposableAnalyzers.sln").Directory;
 
-        private static string DocumentsDirectory => Path.Combine(SolutionDirectory, "documentation");
+        private static DirectoryInfo DocumentsDirectory => SolutionDirectory.EnumerateDirectories("documentation", SearchOption.TopDirectoryOnly).Single();
 
-        [TestCaseSource(nameof(Descriptors))]
+        [TestCaseSource(nameof(DescriptorInfos))]
         public void MissingDocs(DescriptorInfo descriptorInfo)
         {
             if (!descriptorInfo.DocExists)
@@ -59,7 +64,7 @@ namespace IDisposableAnalyzers.Test.Documentation
                                .SkipWhile(l => !l.StartsWith("## Description"))
                                .Skip(1)
                                .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l));
-            var actual = descriptorInfo.Descriptor.Description.ToString();
+            var actual = descriptorInfo.Descriptor.Description.ToString().Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).First();
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -69,16 +74,6 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            switch (descriptorInfo.Descriptor.Id)
-            {
-                case IDISP001DisposeCreated.DiagnosticId when descriptorInfo.Analyzer is IDISP001DisposeCreated:
-                case IDISP001DisposeCreated.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
-                case IDISP003DisposeBeforeReassigning.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
-                case IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId when descriptorInfo.Analyzer is IDISP004DontIgnoreReturnValueOfTypeIDisposable:
-                case IDISP008DontMixInjectedAndCreatedForMember.DiagnosticId when descriptorInfo.Analyzer is AssignmentAnalyzer:
-                    return;
-            }
-
             var expected = GetTable(CreateStub(descriptorInfo));
             DumpIfDebug(expected);
             var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
@@ -94,10 +89,10 @@ namespace IDisposableAnalyzers.Test.Documentation
             CodeAssert.AreEqual(expected, actual);
         }
 
-        [TestCaseSource(nameof(Descriptors))]
+        [TestCaseSource(nameof(DescriptorInfos))]
         public void UniqueIds(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual(1, Descriptors.Select(x => x.Descriptor).Distinct().Count(d => d.Id == descriptorInfo.Descriptor.Id));
+            Assert.AreEqual(1, DescriptorInfos.Select(x => x.Descriptor).Distinct().Count(d => d.Id == descriptorInfo.Descriptor.Id));
         }
 
         [Test]
@@ -108,54 +103,52 @@ namespace IDisposableAnalyzers.Test.Documentation
                    .AppendLine("<table>");
             foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor).Distinct().OrderBy(x => x.Id))
             {
-                builder.AppendLine("<tr>");
-                builder.AppendLine($@"  <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>");
-                builder.AppendLine($"  <td>{descriptor.Title}</td>");
-                builder.AppendLine("</tr>");
+                builder.AppendLine("  <tr>");
+                builder.AppendLine($@"    <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>");
+                builder.AppendLine($"    <td>{descriptor.Title}</td>");
+                builder.AppendLine("  </tr>");
             }
 
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
             var expected = builder.ToString();
             DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory, "Readme.md")));
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")));
             CodeAssert.AreEqual(expected, actual);
         }
 
         private static string CreateStub(DescriptorInfo descriptorInfo)
         {
             var descriptor = descriptorInfo.Descriptor;
-            return CreateStub(
-                id: descriptor.Id,
-                title: descriptor.Title.ToString(),
-                severity: descriptor.DefaultSeverity,
-                enabled: descriptor.IsEnabledByDefault,
-                codeFileUrl: descriptorInfo.CodeFileUri,
-                category: descriptor.Category,
-                typeName: descriptorInfo.Analyzer.GetType().Name,
-                description: descriptor.Description.ToString());
-        }
+            var stub = Properties.Resources.DiagnosticDocTemplate
+                             .AssertReplace("{ID}", descriptor.Id)
+                             .AssertReplace("## ADD TITLE HERE", $"## {descriptor.Title.ToString()}")
+                             .AssertReplace("{SEVERITY}", descriptor.DefaultSeverity.ToString())
+                             .AssertReplace("{ENABLED}", descriptor.IsEnabledByDefault ? "true" : "false")
+                             .AssertReplace("{CATEGORY}", descriptor.Category)
+                             .AssertReplace("ADD DESCRIPTION HERE", descriptor.Description.ToString())
+                             .AssertReplace("{TITLE}", descriptor.Title.ToString());
+            if (Analyzers.Count(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)) == 1)
+            {
+                return stub.AssertReplace("{TYPENAME}", descriptorInfo.Analyzer.GetType().Name)
+                           .AssertReplace("{URL}", descriptorInfo.CodeFileUri);
+            }
 
-        private static string CreateStub(
-            string id,
-            string title,
-            DiagnosticSeverity severity,
-            bool enabled,
-            string codeFileUrl,
-            string category,
-            string typeName,
-            string description)
-        {
-            return Properties.Resources.DiagnosticDocTemplate.Replace("{ID}", id)
-                             .Replace("## ADD TITLE HERE", $"## {title}")
-                             .Replace("{SEVERITY}", severity.ToString())
-                             .Replace("{ENABLED}", enabled ? "true" : "false")
-                             .Replace("{CATEGORY}", category)
-                             .Replace("{URL}", codeFileUrl ?? "https://github.com/DotNetAnalyzers/PropertyChangedAnalyzers")
-                             .Replace("{TYPENAME}", typeName)
-                             .Replace("ADD DESCRIPTION HERE", description ?? "ADD DESCRIPTION HERE")
-                             .Replace("{TITLE}", title)
-                             .Replace("{TRIMMEDTYPENAME}", typeName.Substring(id.Length));
+            var builder = StringBuilderPool.Borrow();
+            var first = true;
+            foreach (var analyzer in Analyzers.Where(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)))
+            {
+                _ = builder.AppendLine("  <tr>")
+                           .AppendLine($"    <td>{(first ? "Code" : string.Empty)}</td>")
+                           .AppendLine($"     <td><a href=\"{DescriptorInfo.GetCodeFileUri(analyzer)}\">{analyzer.GetType().Name}</a></td>")
+                           .AppendLine("  </tr>");
+
+                first = false;
+            }
+
+            var text = builder.Return();
+            return stub.Replace("  <tr>\r\n    <td>Code</td>\r\n    <td><a href=\"{URL}\">{TYPENAME}</a></td>\r\n  </tr>\r\n", text)
+                       .Replace("  <tr>\n    <td>Code</td>\n    <td><a href=\"{URL}\">{TYPENAME}</a></td>\n  </tr>\n", text);
         }
 
         private static string GetTable(string doc)
@@ -185,23 +178,24 @@ namespace IDisposableAnalyzers.Test.Documentation
 
         public class DescriptorInfo
         {
-            public DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
+            private DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
             {
                 this.Analyzer = analyzer;
                 this.Descriptor = descriptor;
-                this.DocFileName = Path.Combine(DocumentsDirectory, descriptor.Id + ".md");
+                this.DocFileName = Path.Combine(DocumentsDirectory.FullName, descriptor.Id + ".md");
                 this.CodeFileName = Directory.EnumerateFiles(
-                                                 SolutionDirectory,
+                                                 SolutionDirectory.FullName,
                                                  analyzer.GetType().Name + ".cs",
                                                  SearchOption.AllDirectories)
                                              .FirstOrDefault();
-                this.CodeFileUri = this.CodeFileName != null
-                    ? @"https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/" +
-                      this.CodeFileName.Substring(SolutionDirectory.Length + 1).Replace("\\", "/")
-                    : "missing";
+                this.CodeFileUri = GetCodeFileUri(analyzer);
             }
 
             public DiagnosticAnalyzer Analyzer { get; }
+
+            public bool DocExists => File.Exists(this.DocFileName);
+
+            public DiagnosticDescriptor Descriptor { get; }
 
             public string DocFileName { get; }
 
@@ -209,11 +203,23 @@ namespace IDisposableAnalyzers.Test.Documentation
 
             public string CodeFileUri { get; }
 
-            public DiagnosticDescriptor Descriptor { get; }
+            public static string GetCodeFileUri(DiagnosticAnalyzer analyzer)
+            {
+                string fileName = Directory.EnumerateFiles(SolutionDirectory.FullName, analyzer.GetType().Name + ".cs", SearchOption.AllDirectories)
+                                           .FirstOrDefault();
+                return fileName != null
+                    ? "https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master" +
+                      fileName.Substring(SolutionDirectory.FullName.Length).Replace("\\", "/")
+                    : "missing";
+            }
 
-            public bool DocExists => File.Exists(this.DocFileName);
-
-            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer) => analyzer.SupportedDiagnostics.Select(d => new DescriptorInfo(analyzer, d));
+            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer)
+            {
+                foreach (var descriptor in analyzer.SupportedDiagnostics)
+                {
+                    yield return new DescriptorInfo(analyzer, descriptor);
+                }
+            }
 
             public override string ToString() => this.Descriptor.Id;
         }

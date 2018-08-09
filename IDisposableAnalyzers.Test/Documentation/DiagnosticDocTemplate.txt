@@ -3,26 +3,26 @@
 
 <!-- start generated table -->
 <table>
-<tr>
-  <td>CheckId</td>
-  <td>{ID}</td>
-</tr>
-<tr>
-  <td>Severity</td>
-  <td>{SEVERITY}</td>
-</tr>
-<tr>
-  <td>Enabled</td>
-  <td>{ENABLED}</td>
-</tr>
-<tr>
-  <td>Category</td>
-  <td>{CATEGORY}</td>
-</tr>
-<tr>
-  <td>TypeName</td>
-  <td><a href="{URL}">{TYPENAME}</a></td>
-</tr>
+  <tr>
+    <td>CheckId</td>
+    <td>{ID}</td>
+  </tr>
+  <tr>
+    <td>Severity</td>
+    <td>{SEVERITY}</td>
+  </tr>
+  <tr>
+    <td>Enabled</td>
+    <td>{ENABLED}</td>
+  </tr>
+  <tr>
+    <td>Category</td>
+    <td>{CATEGORY}</td>
+  </tr>
+  <tr>
+    <td>Code</td>
+    <td><a href="{URL}">{TYPENAME}</a></td>
+  </tr>
 </table>
 <!-- end generated table -->
 

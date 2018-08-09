@@ -3,26 +3,26 @@
 
 <!-- start generated table -->
 <table>
-<tr>
-  <td>CheckId</td>
-  <td>IDISP002</td>
-</tr>
-<tr>
-  <td>Severity</td>
-  <td>Warning</td>
-</tr>
-<tr>
-  <td>Enabled</td>
-  <td>true</td>
-</tr>
-<tr>
-  <td>Category</td>
-  <td>IDisposableAnalyzers.Correctness</td>
-</tr>
-<tr>
-  <td>TypeName</td>
-  <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/FieldAndPropertyDeclarationAnalyzer.cs">FieldAndPropertyDeclarationAnalyzer</a></td>
-</tr>
+  <tr>
+    <td>CheckId</td>
+    <td>IDISP002</td>
+  </tr>
+  <tr>
+    <td>Severity</td>
+    <td>Warning</td>
+  </tr>
+  <tr>
+    <td>Enabled</td>
+    <td>true</td>
+  </tr>
+  <tr>
+    <td>Category</td>
+    <td>IDisposableAnalyzers.Correctness</td>
+  </tr>
+  <tr>
+    <td>Code</td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/FieldAndPropertyDeclarationAnalyzer.cs">FieldAndPropertyDeclarationAnalyzer</a></td>
+  </tr>
 </table>
 <!-- end generated table -->
 
