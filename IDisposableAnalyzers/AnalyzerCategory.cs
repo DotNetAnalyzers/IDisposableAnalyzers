@@ -1,4 +1,6 @@
-﻿namespace IDisposableAnalyzers
+using ;
+
+namespace IDisposableAnalyzers
 {
     /// <summary>
     /// Class defining the analyzer category constants.
