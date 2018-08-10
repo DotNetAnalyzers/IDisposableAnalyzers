@@ -1,5 +1,3 @@
-using ;
-
 namespace IDisposableAnalyzers
 {
     /// <summary>
