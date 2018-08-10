@@ -32,6 +32,11 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
+            if (node == null)
+            {
+                return;
+            }
+
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleLambdaExpression:
