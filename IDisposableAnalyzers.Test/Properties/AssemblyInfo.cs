@@ -8,6 +8,7 @@ using Gu.Roslyn.Asserts;
     typeof(System.Net.WebClient),
     typeof(System.Data.Common.DbConnection),
     typeof(System.Reactive.Disposables.SerialDisposable),
+    typeof(System.Threading.Tasks.ValueTask),
     typeof(System.Reactive.Disposables.ICancelable),
     typeof(System.Reactive.Linq.Observable),
     typeof(System.Xml.Serialization.XmlSerializer),

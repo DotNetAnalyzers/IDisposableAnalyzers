@@ -138,11 +138,12 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (ReturnType(context).IsAssignableTo(KnownSymbol.Task, context.SemanticModel.Compilation) &&
+            if (ReturnType(context).IsAwaitable() &&
                 returnValue.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
                 usingStatement.Statement.Contains(returnValue) &&
                 !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
-                returnValue.IsAssignableTo(KnownSymbol.Task, context.SemanticModel) &&
+                context.SemanticModel.TryGetType(returnValue, context.CancellationToken, out var returnValueType) &&
+                returnValueType.IsAwaitable() &&
                 ShouldAwait(context, returnValue))
             {
                 context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));

@@ -34,6 +34,34 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void ValueTask()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Threading.Tasks;
+
+    public static class Foo
+    {
+        public static ValueTask<int> BarAsync()
+        {
+            using (System.IO.File.OpenRead(string.Empty))
+            {
+                return ↓InnerAsync();
+            }
+        }
+
+        private static async ValueTask<int> InnerAsync()
+        {
+            await Task.Delay(10).ConfigureAwait(false);
+            return 1;
+        }
+    }
+}";
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
+
+        [Test]
         public void LocalTask()
         {
             var testCode = @"
