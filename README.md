@@ -67,6 +67,10 @@ Roslyn analyzers for IDisposable
     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP014.md">IDISP014</a></td>
     <td>Use a single instance of HttpClient.</td>
   </tr>
+  <tr>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP015.md">IDISP015</a></td>
+    <td>Member should not return created and cached instance.</td>
+  </tr>
 <table>
 <!-- end generated table -->
 

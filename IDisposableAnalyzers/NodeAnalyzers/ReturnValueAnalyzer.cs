@@ -11,14 +11,12 @@ namespace IDisposableAnalyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ReturnValueAnalyzer : DiagnosticAnalyzer
     {
-#pragma warning disable GU0001 // Name the arguments.
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
             IDISP011DontReturnDisposed.Descriptor,
             IDISP012PropertyShouldNotReturnCreated.Descriptor,
             IDISP013AwaitInUsing.Descriptor);
-#pragma warning restore GU0001 // Name the arguments.
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)

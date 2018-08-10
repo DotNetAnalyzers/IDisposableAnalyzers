@@ -1,19 +1,19 @@
+using Microsoft.CodeAnalysis;
+
 namespace IDisposableAnalyzers
 {
-    using Microsoft.CodeAnalysis;
-
-    internal static class IDISP014UseSingleInstanceOfHttpClient
+    internal static class IDISP015DontReturnCachedAndCreated
     {
-        public const string DiagnosticId = "IDISP014";
+        public const string DiagnosticId = "IDISP015";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Use a single instance of HttpClient.",
-            messageFormat: "Use a single instance of HttpClient.",
+            title: "Member should not return created and cached instance.",
+            messageFormat: "Member should not return created and cached instance.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Use a single instance of HttpClient.",
+            description: "Member should not return created and cached instance.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }
