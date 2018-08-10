@@ -11,7 +11,6 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
 
-
             [Test]
             public void UsingField1()
             {
@@ -59,7 +58,6 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
-
         }
     }
 }

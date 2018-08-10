@@ -5,6 +5,10 @@ developmentDependency true
 projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
+releaseNotes
+  BUGFIX: INPC013 return early & return null.
+  FEATURE: New analyzers & fixes.
+
 excludedgroups
   Main
   Analyzers

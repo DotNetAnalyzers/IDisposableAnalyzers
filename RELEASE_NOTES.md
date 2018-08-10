@@ -1,4 +1,8 @@
 #### 2.0.1
+* BUGFIX: INPC013 return early & return null.
+* FEATURE: New analyzers & fixes.
+
+#### 2.0.1
 * BUGFIX: Handle recursion.
 
 #### 2.0.0
