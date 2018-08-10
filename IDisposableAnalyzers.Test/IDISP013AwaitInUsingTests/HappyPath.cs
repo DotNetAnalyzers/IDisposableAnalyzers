@@ -225,5 +225,82 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void ReturnNullAfterAwaitIssue89()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public async Task<string> Bar()
+        {
+            using (var client = new WebClient())
+            {
+                await Task.Delay(0);
+                return null;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ReturnNullIssue89()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        public Task<string> Bar()
+        {
+            using (var client = new WebClient())
+            {
+                return null;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void EarlyReturnNullIssue89()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Net;
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    public class Foo
+    {
+        private async Task<string> Retrieve(HttpClient client, Uri location)
+        {
+            using (HttpResponseMessage response = await client.GetAsync(location))
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    return null;
+                }
+
+                return await response.Content.ReadAsStringAsync();
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
