@@ -42,6 +42,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\IDISP012.md = documentation\IDISP012.md
 		documentation\IDISP013.md = documentation\IDISP013.md
 		documentation\IDISP014.md = documentation\IDISP014.md
+		documentation\SemanticModelCacheAnalyzer.md = documentation\SemanticModelCacheAnalyzer.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"

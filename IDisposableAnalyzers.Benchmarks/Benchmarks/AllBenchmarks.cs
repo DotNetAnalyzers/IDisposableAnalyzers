@@ -21,6 +21,8 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ReturnValueAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ReturnValueAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark SemanticModelCacheAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.SemanticModelCacheAnalyzer());
+
         [BenchmarkDotNet.Attributes.Benchmark]
         public void IDISP001DisposeCreated()
         {
@@ -73,6 +75,12 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void ReturnValueAnalyzer()
         {
             ReturnValueAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void SemanticModelCacheAnalyzer()
+        {
+            SemanticModelCacheAnalyzerBenchmark.Run();
         }
     }
 }
