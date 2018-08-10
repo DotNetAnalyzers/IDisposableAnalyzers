@@ -6,5 +6,6 @@ namespace IDisposableAnalyzers
     internal static class AnalyzerCategory
     {
         internal const string Correctness = "IDisposableAnalyzers.Correctness";
+        internal const string Documentation = "IDisposableAnalyzers.Documentation";
     }
 }

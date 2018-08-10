@@ -71,6 +71,10 @@ Roslyn analyzers for IDisposable
     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP015.md">IDISP015</a></td>
     <td>Member should not return created and cached instance.</td>
   </tr>
+  <tr>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP016.md">IDISP016</a></td>
+    <td>Don't use disposed instance.</td>
+  </tr>
 <table>
 <!-- end generated table -->
 
