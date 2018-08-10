@@ -1,10 +1,13 @@
 namespace IDisposableAnalyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -19,7 +22,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP001DisposeCreated.DiagnosticId,
-            IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
+            IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId,
+            IDISP017PreferUsing.DiagnosticId);
 
         public override FixAllProvider GetFixAllProvider() => null;
 
@@ -31,36 +35,35 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    if (node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var statement))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out LocalDeclarationStatementSyntax statement))
                     {
                         switch (statement.Parent)
                         {
                             case BlockSyntax block:
                                 context.RegisterDocumentEditorFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsing(editor, block, statement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
                                     diagnostic);
                                 break;
                             case SwitchSectionSyntax switchSection:
                                 context.RegisterDocumentEditorFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsing(editor, switchSection, statement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, switchSection, statement),
                                     diagnostic);
                                 break;
                         }
                     }
-                    else if (node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var expressionStatement) &&
+                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax expressionStatement) &&
                              expressionStatement.Parent is BlockSyntax expressionStatementBlock)
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
-                            (editor, _) => AddUsing(editor, expressionStatementBlock, expressionStatement),
+                            (editor, _) => AddUsingToEndOfBlock(editor, expressionStatementBlock, expressionStatement),
                             diagnostic);
                     }
-                    else if (node is ArgumentSyntax argument &&
+                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
                             argument.Parent is ArgumentListSyntax argumentList &&
                             argumentList.Parent is InvocationExpressionSyntax invocation &&
                             invocation.Parent is IfStatementSyntax ifStatement &&
@@ -68,26 +71,31 @@ namespace IDisposableAnalyzers
                     {
                         context.RegisterDocumentEditorFix(
                             "Add using to end of block.",
-                            (editor, _) => AddUsing(editor, ifBlock, argument.Expression),
+                            (editor, _) => AddUsingToEndOfBlock(editor, ifBlock, argument.Expression),
                             diagnostic);
                     }
                 }
-
-                if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId)
+                else if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId &&
+                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
+                         statement.Parent is BlockSyntax block)
                 {
-                    if (node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
-                        statement.Parent is BlockSyntax block)
-                    {
-                        context.RegisterDocumentEditorFix(
-                            "Add using to end of block.",
-                            (editor, _) => AddUsing(editor, block, statement),
-                            diagnostic);
-                    }
+                    context.RegisterDocumentEditorFix(
+                        "Add using to end of block.",
+                        (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
+                        diagnostic);
+                }
+                else if (diagnostic.Id == IDISP017PreferUsing.DiagnosticId &&
+                         syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax invocation))
+                {
+                    context.RegisterDocumentEditorFix(
+                        "Replace with using.",
+                        (editor, cancellationToken) => ReplaceWithUsing(editor, invocation, cancellationToken),
+                        diagnostic);
                 }
             }
         }
 
-        private static void AddUsing(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax statement)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax statement)
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
@@ -107,7 +115,7 @@ namespace IDisposableAnalyzers
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
         }
 
-        private static void AddUsing(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax statement)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax statement)
         {
             var statements = switchSection.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
@@ -128,7 +136,7 @@ namespace IDisposableAnalyzers
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
         }
 
-        private static void AddUsing(DocumentEditor editor, BlockSyntax block, ExpressionStatementSyntax statement)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, ExpressionStatementSyntax statement)
         {
             var statements = block.Statements
                                   .Where(s => s.SpanStart > statement.SpanStart)
@@ -147,7 +155,7 @@ namespace IDisposableAnalyzers
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
         }
 
-        private static void AddUsing(DocumentEditor editor, BlockSyntax block, ExpressionSyntax expression)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, ExpressionSyntax expression)
         {
             foreach (var statementSyntax in block.Statements)
             {
@@ -171,6 +179,38 @@ namespace IDisposableAnalyzers
                 }
 
                 return expression;
+            }
+        }
+
+        private static void ReplaceWithUsing(DocumentEditor editor, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
+        {
+            if (DisposeCall.TryGetDisposedRootMember(invocation, editor.SemanticModel, cancellationToken, out var root) &&
+                editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol local) &&
+                local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax declaration) &&
+                declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement &&
+                invocation.Parent is ExpressionStatementSyntax expressionStatement &&
+                localDeclarationStatement.Parent is BlockSyntax block)
+            {
+                var statements = new List<StatementSyntax>();
+                foreach (var statement in block.Statements.SkipWhile(x => x != localDeclarationStatement).Skip(1))
+                {
+                    editor.RemoveNode(statement);
+                    if (statement != expressionStatement)
+                    {
+                        statements.Add(statement);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                editor.ReplaceNode(
+                    localDeclarationStatement,
+                    SyntaxFactory.UsingStatement(
+                        declaration.WithoutTrailingTrivia(),
+                        null,
+                        SyntaxFactory.Block(statements).WithAdditionalAnnotations(Formatter.Annotation)));
             }
         }
     }

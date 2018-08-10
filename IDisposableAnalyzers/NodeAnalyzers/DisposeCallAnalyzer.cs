@@ -14,7 +14,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP007DontDisposeInjected.Descriptor,
-            IDISP016DontUseDisposedInstance.Descriptor);
+            IDISP016DontUseDisposedInstance.Descriptor,
+            IDISP017PreferUsing.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -40,18 +41,29 @@ namespace IDisposableAnalyzers
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
-
-                if (IsUsedAfter(root, invocation, context, out var locations))
+                else if (context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol local))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation(), additionalLocations: locations));
+                    if (IsUsedAfter(local, invocation, context, out var locations))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation(), additionalLocations: locations));
+                    }
+
+                    if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
+                        declaration is VariableDeclaratorSyntax declarator &&
+                        declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax localDeclarationStatement) &&
+                        invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
+                        localDeclarationStatement.Parent == expressionStatement.Parent &&
+                        Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP017PreferUsing.Descriptor, invocation.GetLocation()));
+                    }
                 }
             }
         }
 
-        private static bool IsUsedAfter(IdentifierNameSyntax root, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context, out IReadOnlyList<Location> locations)
+        private static bool IsUsedAfter(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context, out IReadOnlyList<Location> locations)
         {
-            if (context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol local) &&
-                local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
+            if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                 declaration.TryFirstAncestor(out BlockSyntax block))
             {
                 List<Location> temp = null;
@@ -59,7 +71,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var identifierName in walker.IdentifierNames)
                     {
-                        if (identifierName.Identifier.ValueText == root.Identifier.ValueText &&
+                        if (identifierName.Identifier.ValueText == local.Name &&
                             invocation.IsExecutedBefore(identifierName) == true &&
                             context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol candidate) &&
                             local.Equals(candidate))

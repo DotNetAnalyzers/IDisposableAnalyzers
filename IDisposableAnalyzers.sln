@@ -44,6 +44,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\IDISP014.md = documentation\IDISP014.md
 		documentation\IDISP015.md = documentation\IDISP015.md
 		documentation\IDISP016.md = documentation\IDISP016.md
+		documentation\IDISP017.md = documentation\IDISP017.md
 		documentation\SemanticModelCacheAnalyzer.md = documentation\SemanticModelCacheAnalyzer.md
 	EndProjectSection
 EndProject
