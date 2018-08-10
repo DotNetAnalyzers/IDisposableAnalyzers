@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 
     internal partial class HappyPath
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new IDISP007DontDisposeInjected();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

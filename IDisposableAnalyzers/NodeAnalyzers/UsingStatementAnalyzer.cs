@@ -7,6 +7,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Diagnostics;
 
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class UsingStatementAnalyzer : DiagnosticAnalyzer
     {
         /// <inheritdoc/>

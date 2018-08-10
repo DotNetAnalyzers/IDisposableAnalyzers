@@ -1,7 +1,7 @@
-using Microsoft.CodeAnalysis;
-
 namespace IDisposableAnalyzers
 {
+    using Microsoft.CodeAnalysis;
+
     internal static class IDISP015DontReturnCachedAndCreated
     {
         public const string DiagnosticId = "IDISP015";

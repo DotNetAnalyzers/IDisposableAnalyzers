@@ -21,7 +21,7 @@
   </tr>
   <tr>
     <td>Code</td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP007DontDisposeInjected.cs">IDISP007DontDisposeInjected</a></td>
+     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/DisposeCallAnalyzer.cs">DisposeCallAnalyzer</a></td>
   </tr>
   <tr>
     <td></td>

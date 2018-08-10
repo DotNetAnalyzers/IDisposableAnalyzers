@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     {
         public class Using
         {
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
 
             [Test]

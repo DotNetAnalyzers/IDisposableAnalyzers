@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     {
         internal class Disposing
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new IDISP007DontDisposeInjected();
+            private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
 
             [TestCase("stream ?? File.OpenRead(string.Empty)")]
