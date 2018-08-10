@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     {
         public const string DiagnosticId = "IDISP007";
 
-        private static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
             title: "Don't dispose injected.",
             messageFormat: "Don't dispose injected.",
@@ -30,43 +30,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleUsing, SyntaxKind.UsingStatement);
             context.RegisterSyntaxNodeAction(HandleInvocation, SyntaxKind.InvocationExpression);
-        }
-
-        private static void HandleUsing(SyntaxNodeAnalysisContext context)
-        {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var usingStatement = (UsingStatementSyntax)context.Node;
-            if (usingStatement.Expression is InvocationExpressionSyntax ||
-                usingStatement.Expression is IdentifierNameSyntax)
-            {
-                if (Disposable.IsCachedOrInjected(usingStatement.Expression, usingStatement, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptor, usingStatement.Expression.GetLocation()));
-                }
-            }
-
-            if (usingStatement.Declaration is VariableDeclarationSyntax variableDeclaration)
-            {
-                foreach (var variableDeclarator in variableDeclaration.Variables)
-                {
-                    if (variableDeclarator.Initializer == null)
-                    {
-                        continue;
-                    }
-
-                    var value = variableDeclarator.Initializer.Value;
-                    if (Disposable.IsCachedOrInjected(value, usingStatement, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptor, value.GetLocation()));
-                    }
-                }
-            }
         }
 
         private static void HandleInvocation(SyntaxNodeAnalysisContext context)

@@ -1,12 +1,15 @@
 namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class HappyPath
     {
         public class Using
         {
+            private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
+
             [Test]
             public void FileOpenRead()
             {
