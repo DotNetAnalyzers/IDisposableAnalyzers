@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -8,12 +8,12 @@
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,
-            title: "Call base.Dispose(true)",
-            messageFormat: "Call base.Dispose(true)",
+            title: "Call base.Dispose(disposing)",
+            messageFormat: "Call base.Dispose({0})",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
-            description: "Call base.Dispose(true)",
+            description: "Call base.Dispose(disposing)",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }

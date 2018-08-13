@@ -47,15 +47,15 @@ namespace IDisposableAnalyzers
                     context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
                 }
 
-                if (method.Parameters.Length == 1 &&
-                    method.Parameters[0].Type == KnownSymbol.Boolean &&
+                if (method.Parameters.TrySingle(out var parameter) &&
+                    parameter.Type == KnownSymbol.Boolean &&
                     method.IsOverride &&
                     method.OverriddenMethod is IMethodSymbol overridden)
                 {
                     if (overridden.DeclaringSyntaxReferences.Length == 0 &&
                         !CallsBase(methodDeclaration, overridden, context))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
                     }
                     else
                     {
@@ -67,7 +67,7 @@ namespace IDisposableAnalyzers
                                     FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
                                     !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
                                 {
-                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation()));
+                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
                                     break;
                                 }
                             }
