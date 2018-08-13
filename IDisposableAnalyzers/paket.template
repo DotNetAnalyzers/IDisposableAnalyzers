@@ -1,0 +1,19 @@
+﻿type project
+include-referenced-projects true
+developmentDependency true
+projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
+licenseUrl http://opensource.org/licenses/MIT
+
+releaseNotes
+  CLEANUP: One dll.
+
+excludedgroups
+  Main
+  Analyzers
+
+files
+  bin/Release/Gu.Roslyn.AnalyzerExtensions.dll ==> analyzers/dotnet/cs
+  bin/Release/Gu.Roslyn.CodeFixExtensions.dll ==> analyzers/dotnet/cs
+  ../.paket/tools/*.ps1 ==> tools
+
+
