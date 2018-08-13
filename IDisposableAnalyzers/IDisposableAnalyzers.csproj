@@ -37,6 +37,10 @@
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-  
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <Exec Command=".paket\paket.exe pack publish" WorkingDirectory="$(SolutionDir)" />
+  </Target>
+
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

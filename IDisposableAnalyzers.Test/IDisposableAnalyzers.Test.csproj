@@ -23,7 +23,6 @@
   </ItemGroup>   
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
-    <ProjectReference Include="..\IDisposableAnalyzers.CodeFixes\IDisposableAnalyzers.CodeFixes.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />

@@ -49,7 +49,7 @@ Roslyn analyzers for IDisposable
   </tr>
   <tr>
     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP010.md">IDISP010</a></td>
-    <td>Call base.Dispose(true)</td>
+    <td>Call base.Dispose(disposing)</td>
   </tr>
   <tr>
     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP011.md">IDISP011</a></td>
