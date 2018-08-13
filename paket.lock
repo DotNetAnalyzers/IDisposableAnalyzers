@@ -1,10 +1,10 @@
 STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
-    Gu.Roslyn.AnalyzerExtensions (0.3.1.1-dev)
+    Gu.Roslyn.AnalyzerExtensions (0.3.1.3-dev)
       Microsoft.CodeAnalysis.CSharp (>= 2.0)
-    Gu.Roslyn.CodeFixExtensions (0.3.1.1-dev)
-      Gu.Roslyn.AnalyzerExtensions (>= 0.3.1.1-dev)
+    Gu.Roslyn.CodeFixExtensions (0.3.1.3-dev)
+      Gu.Roslyn.AnalyzerExtensions (>= 0.3.1.3-dev)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     ManagedEsent (1.9.4) - restriction: >= net46
     Microsoft.CodeAnalysis.Analyzers (2.6.1) - restriction: >= netstandard1.3
@@ -717,7 +717,7 @@ STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
     AsyncUsageAnalyzers (1.0.0-alpha003)
-    Gu.Analyzers (1.2.15-dev)
+    Gu.Analyzers (1.2.16-dev)
     StyleCop.Analyzers (1.0.2)
 
 GROUP Benchmarks
