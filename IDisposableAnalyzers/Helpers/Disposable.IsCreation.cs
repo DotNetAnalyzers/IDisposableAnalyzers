@@ -146,13 +146,13 @@ namespace IDisposableAnalyzers
 
                     using (var recursive = RecursiveValues.Create(new[] { candidate }, semanticModel, cancellationToken))
                     {
-                        return IsCreationCore(recursive, semanticModel, cancellationToken);
+                        return IsAnyCreation(recursive, semanticModel, cancellationToken);
                     }
                 }
 
                 using (var recursive = RecursiveValues.Create(walker, semanticModel, cancellationToken))
                 {
-                    return IsCreationCore(recursive, semanticModel, cancellationToken);
+                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
             }
         }
@@ -180,18 +180,13 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        internal static Result IsAnyCreation(RecursiveValues walker, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (walker.Count == 0)
+            if (values.Count == 0)
             {
                 return Result.No;
             }
 
-            return IsCreationCore(walker, semanticModel, cancellationToken);
-        }
-
-        private static Result IsCreationCore(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
             values.Reset();
             var result = Result.No;
             while (values.MoveNext())
