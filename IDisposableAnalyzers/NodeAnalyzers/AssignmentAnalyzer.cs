@@ -68,7 +68,7 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (Disposable.IsAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
+            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
                           .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
             {
                 return false;

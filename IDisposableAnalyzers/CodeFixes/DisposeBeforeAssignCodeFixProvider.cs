@@ -138,7 +138,7 @@ namespace IDisposableAnalyzers
         private static bool TryCreateDisposeStatement(AssignmentExpressionSyntax assignment, SemanticModel semanticModel, CancellationToken cancellationToken, out StatementSyntax result)
         {
             result = null;
-            if (Disposable.IsAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
+            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, semanticModel, cancellationToken, out var assignedSymbol)
                           .IsEither(Result.No, Result.Unknown))
             {
                 return false;

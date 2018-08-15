@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     internal partial class DisposableTests
     {
-        internal class IsAssignedWithCreated
+        internal class IsAlreadyAssignedWithCreated
         {
             [Test]
             public void FieldAssignedInCtor()
@@ -38,7 +38,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -73,7 +73,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.Yes, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -104,7 +104,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -138,7 +138,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -172,7 +172,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.Yes, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -260,7 +260,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.Bar1 = null;").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
         }
     }

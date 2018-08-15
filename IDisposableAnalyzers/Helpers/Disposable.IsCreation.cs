@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers
         /// <summary>
         /// Check if any path returns a created IDisposable
         /// </summary>
-        internal static Result IsAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
+        internal static Result IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
         {
             if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
             {
