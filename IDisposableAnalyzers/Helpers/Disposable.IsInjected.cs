@@ -25,8 +25,7 @@ namespace IDisposableAnalyzers
                 {
                     using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
                     {
-                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)
-                            .IsEither(Result.Yes, Result.AssumeYes);
+                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                     }
                 }
             }

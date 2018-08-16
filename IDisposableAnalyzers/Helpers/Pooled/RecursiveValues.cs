@@ -117,7 +117,7 @@ namespace IDisposableAnalyzers
                 foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
                 {
                     var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                    if (methodDeclaration.TryFindParameter(argument, out ParameterSyntax parameter))
+                    if (methodDeclaration.TryFindParameter(argument, out var parameter))
                     {
                         using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
                         {
@@ -171,60 +171,38 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            var symbol = this.semanticModel.GetSymbolSafe(assignedValue, this.cancellationToken);
-            if (symbol == null)
+            if (this.semanticModel.TryGetSymbol(assignedValue, this.cancellationToken, out ISymbol symbol))
             {
-                return false;
-            }
-
-            if (symbol is IFieldSymbol)
-            {
-                this.values.Add(assignedValue);
-                return true;
-            }
-
-            if (symbol is IParameterSymbol)
-            {
-                this.values.Add(assignedValue);
-                using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
+                switch (symbol)
                 {
-                    return this.AddManyRecursively(assignedValues);
-                }
-            }
+                    case ILocalSymbol _:
+                        using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
+                        {
+                            return this.AddManyRecursively(assignedValues);
+                        }
 
-            if (symbol is ILocalSymbol)
-            {
-                using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
-                {
-                    return this.AddManyRecursively(assignedValues);
-                }
-            }
+                    case IParameterSymbol _:
+                        this.values.Add(assignedValue);
+                        using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
+                        {
+                            return this.AddManyRecursively(assignedValues);
+                        }
 
-            if (symbol is IPropertySymbol property)
-            {
-                if (property.DeclaringSyntaxReferences.Length == 0)
-                {
-                    this.values.Add(assignedValue);
-                    return true;
-                }
+                    case IFieldSymbol _:
+                            this.values.Add(assignedValue);
+                            return true;
+                    case IPropertySymbol _:
+                    case IMethodSymbol _:
+                        if (symbol.DeclaringSyntaxReferences.Length == 0)
+                        {
+                            this.values.Add(assignedValue);
+                            return true;
+                        }
 
-                using (var returnValues = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
-                {
-                    return this.AddManyRecursively(returnValues);
-                }
-            }
-
-            if (symbol is IMethodSymbol method)
-            {
-                if (method.DeclaringSyntaxReferences.Length == 0)
-                {
-                    this.values.Add(assignedValue);
-                    return true;
-                }
-
-                using (var walker = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
-                {
-                    return this.AddManyRecursively(walker);
+                        using (var returnValues = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
+                        {
+                            return this.AddManyRecursively(returnValues);
+                        }
                 }
             }
 
