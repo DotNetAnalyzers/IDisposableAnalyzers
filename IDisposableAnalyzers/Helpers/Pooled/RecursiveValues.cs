@@ -25,9 +25,9 @@ namespace IDisposableAnalyzers
         {
         }
 
-        object IEnumerator.Current => this.Current;
+        public bool IsEmpty => this.rawValues.Count == 0;
 
-        public int Count => this.rawValues.Count;
+        object IEnumerator.Current => this.Current;
 
         public ExpressionSyntax Current => this.values[this.recursiveIndex];
 

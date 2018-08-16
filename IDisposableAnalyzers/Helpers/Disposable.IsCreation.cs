@@ -182,7 +182,7 @@ namespace IDisposableAnalyzers
 
         internal static Result IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (values.Count == 0)
+            if (values.IsEmpty)
             {
                 return Result.No;
             }
