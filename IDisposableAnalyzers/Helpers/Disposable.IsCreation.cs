@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Diagnostics;
-    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -95,10 +94,7 @@ namespace IDisposableAnalyzers
 
                 if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
                 {
-                    using (var recursive = RecursiveValues.Borrow(assignedValues.Where(x => !IsReturnBlock(x)).ToArray(), semanticModel, cancellationToken))
-                    {
-                        return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                    }
+                    assignedValues.RemoveAll(x => IsReturnedBefore(x));
                 }
 
                 using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
@@ -107,7 +103,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            bool IsReturnBlock(ExpressionSyntax expression)
+            bool IsReturnedBefore(ExpressionSyntax expression)
             {
                 return expression.TryFirstAncestor(out BlockSyntax block) &&
                        block.Statements.TryFirstOfType(out ReturnStatementSyntax returnStatement) &&

@@ -341,6 +341,11 @@ namespace IDisposableAnalyzers
             }
         }
 
+        internal void RemoveAll(Predicate<ExpressionSyntax> match)
+        {
+            this.values.RemoveAll(match);
+        }
+
         protected override void Clear()
         {
             this.values.Clear();
