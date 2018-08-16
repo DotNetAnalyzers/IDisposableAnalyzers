@@ -81,7 +81,7 @@ namespace IDisposableAnalyzers
         {
             using (var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(assignedValues, context.SemanticModel, context.CancellationToken))
+                using (var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken))
                 {
                     if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {

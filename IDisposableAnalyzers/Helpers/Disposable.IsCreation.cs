@@ -91,7 +91,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
@@ -102,7 +102,7 @@ namespace IDisposableAnalyzers
         {
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, context, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
@@ -144,13 +144,13 @@ namespace IDisposableAnalyzers
                         return IsCreationCore(symbol, semanticModel.Compilation);
                     }
 
-                    using (var recursive = RecursiveValues.Create(new[] { candidate }, semanticModel, cancellationToken))
+                    using (var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken))
                     {
                         return IsAnyCreation(recursive, semanticModel, cancellationToken);
                     }
                 }
 
-                using (var recursive = RecursiveValues.Create(walker, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Borrow(walker, semanticModel, cancellationToken))
                 {
                     return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }

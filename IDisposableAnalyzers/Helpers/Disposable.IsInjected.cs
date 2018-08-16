@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers
             {
                 using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                 {
-                    using (var recursive = RecursiveValues.Create(returnValues, semanticModel, cancellationToken))
+                    using (var recursive = RecursiveValues.Borrow(returnValues, semanticModel, cancellationToken))
                     {
                         return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                     }
@@ -60,7 +60,7 @@ namespace IDisposableAnalyzers
 
                     using (var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken))
                     {
-                        using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                        using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                         {
                             isInjected = IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
                             if (isInjected == Result.Yes)
@@ -158,7 +158,7 @@ namespace IDisposableAnalyzers
         {
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
             {
-                using (var recursive = RecursiveValues.Create(assignedValues, semanticModel, cancellationToken))
+                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                 }

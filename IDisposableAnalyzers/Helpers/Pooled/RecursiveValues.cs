@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers
 
         public ExpressionSyntax Current => this.values[this.recursiveIndex];
 
-        public static RecursiveValues Create(IReadOnlyList<ExpressionSyntax> rawValues, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static RecursiveValues Borrow(IReadOnlyList<ExpressionSyntax> rawValues, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var item = Cache.GetOrCreate(() => new RecursiveValues());
             item.rawValues = rawValues;
