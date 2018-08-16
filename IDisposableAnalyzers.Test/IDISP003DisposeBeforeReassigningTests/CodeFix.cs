@@ -566,7 +566,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnMethodStatementBody()
+        public void NotDisposingFieldAssignedInReturnStatementMethodBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -607,7 +607,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnMethodExpressionBody()
+        public void NotDisposingFieldAssignedInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -645,7 +645,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnStatementInPropertyStamementBody()
+        public void NotDisposingFieldAssignedInReturnStatementInPropertyStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox

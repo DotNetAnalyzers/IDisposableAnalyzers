@@ -924,5 +924,31 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void TryWithEarlyReturn()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private static bool TryGetStream(string fileName, out Stream stream)
+        {
+            if (File.Exists(fileName))
+            {
+                stream = File.OpenRead(fileName);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

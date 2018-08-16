@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Diagnostics;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -24,7 +25,8 @@ namespace IDisposableAnalyzers
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol is IPropertySymbol property &&
                 IsAssignableFrom(property.Type, semanticModel.Compilation) &&
-                property.TryGetSetter(cancellationToken, out var setter))
+                property.TryGetSetter(cancellationToken, out var setter) &&
+                (setter.ExpressionBody != null || setter.Body != null))
             {
                 using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
                 {
@@ -91,10 +93,25 @@ namespace IDisposableAnalyzers
                     }
                 }
 
+                if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
+                {
+                    using (var recursive = RecursiveValues.Borrow(assignedValues.Where(x => !IsReturnBlock(x)).ToArray(), semanticModel, cancellationToken))
+                    {
+                        return IsAnyCreation(recursive, semanticModel, cancellationToken);
+                    }
+                }
+
                 using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                 {
                     return IsAnyCreation(recursive, semanticModel, cancellationToken);
                 }
+            }
+
+            bool IsReturnBlock(ExpressionSyntax expression)
+            {
+                return expression.TryFirstAncestor(out BlockSyntax block) &&
+                       block.Statements.TryFirstOfType(out ReturnStatementSyntax returnStatement) &&
+                       disposable.IsExecutedBefore(returnStatement) == false;
             }
         }
 
@@ -259,9 +276,9 @@ namespace IDisposableAnalyzers
             {
                 switch (symbol)
                 {
-                     case IPropertySymbol _:
-                     case IMethodSymbol _:
-                         return IsCreationCore(symbol, semanticModel.Compilation);
+                    case IPropertySymbol _:
+                    case IMethodSymbol _:
+                        return IsCreationCore(symbol, semanticModel.Compilation);
                 }
             }
 

@@ -176,6 +176,194 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void FieldAfterEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private FileStream stream;
+
+        public bool Bar(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                this.stream = File.OpenRead(fileName);
+                return true;
+            }
+
+            this.stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("this.stream = null").Left;
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
+            public void PropertyAfterEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public FileStream Stream { get; private set; }
+
+        public bool Bar(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                this.Stream = File.OpenRead(fileName);
+                return true;
+            }
+
+            this.Stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("this.Stream = null").Left;
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
+            public void ParameterAfterEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private static bool TryGetStream(string fileName, out Stream stream)
+        {
+            if (File.Exists(fileName))
+            {
+                stream = File.OpenRead(fileName);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
+            public void ParameterBeforeEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private static bool TryGetStream(string fileName, out Stream stream)
+        {
+            if (File.Exists(fileName))
+            {
+                stream = File.OpenRead(fileName);
+                stream = default(Stream);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
+            public void LocalAfterEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private static bool Bar(string fileName)
+        {
+            Stream stream;
+            if (File.Exists(fileName))
+            {
+                stream = File.OpenRead(fileName);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
+            public void LocalBeforeEarlyReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        private static bool Bar(string fileName)
+        {
+            Stream stream;
+            if (File.Exists(fileName))
+            {
+                stream = File.OpenRead(fileName);
+                stream = default(Stream);
+                return true;
+            }
+
+            stream = null;
+            return false;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
+                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
             public void Repro()
             {
                 var testCode = @"
