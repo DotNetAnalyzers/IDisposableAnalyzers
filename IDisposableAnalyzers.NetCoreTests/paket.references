@@ -1,0 +1,11 @@
+group NetCoreTest
+  Microsoft.CodeAnalysis.CSharp.Workspaces
+  Gu.Roslyn.Asserts
+  NUnit
+  Microsoft.ApplicationInsights.AspNetCore
+
+group Analyzers
+  AsyncUsageAnalyzers
+  Gu.Analyzers
+  StyleCop.Analyzers
+

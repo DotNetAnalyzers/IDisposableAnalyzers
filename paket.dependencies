@@ -18,6 +18,14 @@ group Test
   nuget System.Reactive.Linq
   nuget System.Reactive.PlatformServices
 
+group NetCoreTest
+  storage: none
+  source http://www.nuget.org/api/v2/
+  nuget Microsoft.CodeAnalysis.CSharp.Workspaces 2.3.1
+  nuget Gu.Roslyn.Asserts ~> 2
+  nuget NUnit
+  nuget Microsoft.ApplicationInsights.AspNetCore
+
 group Build
   source http://www.nuget.org/api/v2/
   nuget Microsoft.VSSDK.BuildTools
