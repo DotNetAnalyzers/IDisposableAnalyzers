@@ -89,86 +89,67 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (assignedValue is LiteralExpressionSyntax ||
-                assignedValue is DefaultExpressionSyntax ||
-                assignedValue is TypeOfExpressionSyntax ||
-                assignedValue is ObjectCreationExpressionSyntax ||
-                assignedValue is ArrayCreationExpressionSyntax ||
-                assignedValue is ImplicitArrayCreationExpressionSyntax ||
-                assignedValue is InitializerExpressionSyntax)
+            if (assignedValue.Parent is ArgumentSyntax argument &&
+                argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
             {
-                this.values.Add(assignedValue);
-                return true;
-            }
-
-            var argument = assignedValue.Parent as ArgumentSyntax;
-            if (argument?.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) == true)
-            {
-                var invocation = assignedValue.FirstAncestor<InvocationExpressionSyntax>();
-                var invokedMethod = this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken);
-                if (invokedMethod == null ||
-                    invokedMethod.DeclaringSyntaxReferences.Length == 0)
+                if (assignedValue.TryFirstAncestor(out InvocationExpressionSyntax invocation) &&
+                    this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out var target) &&
+                    target.TrySingleMethodDeclaration(this.cancellationToken, out var targetDeclaration))
                 {
-                    this.values.Add(invocation);
-                    return true;
-                }
-
-                var before = this.values.Count;
-                foreach (var reference in invokedMethod.DeclaringSyntaxReferences)
-                {
-                    var methodDeclaration = reference.GetSyntax(this.cancellationToken) as MethodDeclarationSyntax;
-                    if (methodDeclaration.TryFindParameter(argument, out var parameter))
+                    if (targetDeclaration.TryFindParameter(argument, out var parameter) &&
+                        this.semanticModel.TryGetSymbol(parameter, this.cancellationToken, out var parameterSymbol))
                     {
-                        using (var assignedValues = AssignedValueWalker.Borrow(this.semanticModel.GetDeclaredSymbolSafe(parameter, this.cancellationToken), this.semanticModel, this.cancellationToken))
+                        using (var assignedValues = AssignedValueWalker.Borrow(parameterSymbol, this.semanticModel, this.cancellationToken))
                         {
-                            assignedValues.HandleInvoke(invokedMethod, invocation.ArgumentList);
+                            assignedValues.HandleInvoke(target, invocation.ArgumentList);
                             return this.AddManyRecursively(assignedValues);
                         }
                     }
-                }
 
-                return before != this.values.Count;
-            }
-
-            if (assignedValue is BinaryExpressionSyntax binaryExpression)
-            {
-                switch (binaryExpression.Kind())
-                {
-                case SyntaxKind.CoalesceExpression:
-                    var left = this.AddRecursiveValues(binaryExpression.Left);
-                    var right = this.AddRecursiveValues(binaryExpression.Right);
-                    return left || right;
-                case SyntaxKind.AsExpression:
-                    return this.AddRecursiveValues(binaryExpression.Left);
-                default:
                     return false;
                 }
-            }
 
-            if (assignedValue is CastExpressionSyntax cast)
-            {
-                return this.AddRecursiveValues(cast.Expression);
-            }
-
-            if (assignedValue is ConditionalExpressionSyntax conditional)
-            {
-                var whenTrue = this.AddRecursiveValues(conditional.WhenTrue);
-                var whenFalse = this.AddRecursiveValues(conditional.WhenFalse);
-                return whenTrue || whenFalse;
-            }
-
-            if (assignedValue is AwaitExpressionSyntax awaitExpression)
-            {
-                using (var walker = ReturnValueWalker.Borrow(awaitExpression, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
-                {
-                    return this.AddManyRecursively(walker);
-                }
-            }
-
-            if (assignedValue is ElementAccessExpressionSyntax)
-            {
-                this.values.Add(assignedValue);
+                this.values.Add(invocation);
                 return true;
+            }
+
+            switch (assignedValue)
+            {
+                case ArrayCreationExpressionSyntax _:
+                case DefaultExpressionSyntax _:
+                case ElementAccessExpressionSyntax _:
+                case ImplicitArrayCreationExpressionSyntax _:
+                case InitializerExpressionSyntax _:
+                case LiteralExpressionSyntax _:
+                case ObjectCreationExpressionSyntax _:
+                case TypeOfExpressionSyntax _:
+                    this.values.Add(assignedValue);
+                    return true;
+
+                case BinaryExpressionSyntax binaryExpression:
+                    switch (binaryExpression.Kind())
+                    {
+                        case SyntaxKind.CoalesceExpression:
+                            var left = this.AddRecursiveValues(binaryExpression.Left);
+                            var right = this.AddRecursiveValues(binaryExpression.Right);
+                            return left || right;
+                        case SyntaxKind.AsExpression:
+                            return this.AddRecursiveValues(binaryExpression.Left);
+                        default:
+                            return false;
+                    }
+
+                case CastExpressionSyntax cast:
+                    return this.AddRecursiveValues(cast.Expression);
+                case ConditionalExpressionSyntax conditional:
+                    var whenTrue = this.AddRecursiveValues(conditional.WhenTrue);
+                    var whenFalse = this.AddRecursiveValues(conditional.WhenFalse);
+                    return whenTrue || whenFalse;
+                case AwaitExpressionSyntax awaitExpression:
+                    using (var walker = ReturnValueWalker.Borrow(awaitExpression, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
+                    {
+                        return this.AddManyRecursively(walker);
+                    }
             }
 
             if (this.semanticModel.TryGetSymbol(assignedValue, this.cancellationToken, out ISymbol symbol))
