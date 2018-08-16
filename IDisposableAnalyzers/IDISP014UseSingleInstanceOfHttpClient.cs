@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Use a single instance of HttpClient.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Use a single instance of HttpClient.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

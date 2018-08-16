@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Member should not return created and cached instance.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Member should not return created and cached instance.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

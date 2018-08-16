@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Don't dispose injected.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't dispose disposables you do not own.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

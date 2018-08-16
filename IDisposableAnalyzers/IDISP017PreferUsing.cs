@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Prefer using.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Prefer using.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

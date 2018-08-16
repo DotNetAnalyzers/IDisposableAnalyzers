@@ -12,7 +12,7 @@
             messageFormat: "Return type should indicate that the value should be disposed.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Return type should indicate that the value should be disposed.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

@@ -12,7 +12,7 @@
             messageFormat: "Property should not return created disposable.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Property should not return created disposable.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

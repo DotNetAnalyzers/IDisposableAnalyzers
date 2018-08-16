@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Don't return disposed instance.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't return disposed instance.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

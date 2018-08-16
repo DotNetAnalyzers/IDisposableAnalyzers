@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Don't ignore return value of type IDisposable.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't ignore return value of type IDisposable.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 

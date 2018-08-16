@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test
 
     public class HandlesRecursion
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(AnalyzerConstants)
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(AnalyzerCategory)
                                                                                  .Assembly
                                                                                  .GetTypes()
                                                                                  .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)

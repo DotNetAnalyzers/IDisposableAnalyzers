@@ -12,7 +12,7 @@
             messageFormat: "Add IDisposable interface.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The type has a Dispose method but does not implement `IDisposable`.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Don't assign member with injected and created disposables.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Don't assign member with injected and created disposables. It creates a confusing ownership situation.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

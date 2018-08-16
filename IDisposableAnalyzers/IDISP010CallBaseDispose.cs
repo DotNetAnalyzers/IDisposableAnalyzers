@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Call base.Dispose({0})",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Call base.Dispose(disposing)",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

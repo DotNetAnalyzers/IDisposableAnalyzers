@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Dispose created.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "When you create a instance of a type that implements `IDisposable` you are responsible for disposing it.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
 

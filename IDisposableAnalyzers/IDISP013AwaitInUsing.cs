@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Await in using.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Await in using.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

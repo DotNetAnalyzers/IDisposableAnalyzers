@@ -12,7 +12,7 @@
             messageFormat: "Implement IDisposable.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "The member is assigned with a created `IDisposable`s within the type. Implement IDisposable and dispose it.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }

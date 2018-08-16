@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
             messageFormat: "Dispose previous before re-assigning.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
-            isEnabledByDefault: AnalyzerConstants.EnabledByDefault,
+            isEnabledByDefault: true,
             description: "Dispose previous before re-assigning.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
