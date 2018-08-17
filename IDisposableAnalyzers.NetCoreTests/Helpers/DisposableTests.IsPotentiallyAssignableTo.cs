@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+namespace IDisposableAnalyzers.NetCoreTests.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -9,39 +9,18 @@ namespace IDisposableAnalyzers.Test.Helpers
     {
         internal class IsPotentiallyAssignableTo
         {
-            [TestCase("1", false)]
-            [TestCase("null", false)]
-            [TestCase("\"abc\"", false)]
-            public void ShortCircuit(string code, bool expected)
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    internal class Foo
-    {
-        internal Foo()
-        {
-            var value = PLACEHOLDER;
-        }
-    }
-}";
-                testCode = testCode.AssertReplace("PLACEHOLDER", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, null, CancellationToken.None));
-            }
-
             [TestCase("new string(' ', 1)", false)]
             [TestCase("new System.Text.StringBuilder()", false)]
             [TestCase("new System.IO.MemoryStream()", true)]
-            public void ObjectCreation(string code, bool expected)
+            [TestCase("(Microsoft.Extensions.Logging.ILoggerFactory)o", true)]
+            public void Expression(string code, bool expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     internal class Foo
     {
-        internal Foo()
+        internal Foo(object o)
         {
             var value = PLACEHOLDER;
         }

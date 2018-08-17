@@ -373,6 +373,17 @@ namespace IDisposableAnalyzers
                         return Result.AssumeNo;
                     }
 
+                    if (method.TryGetThisParameter(out var thisParameter)&&
+                        thisParameter.Type.Equals(method.ReturnType))
+                    {
+                        if (method.ReturnType == KnownSymbol.ILoggerFactory)
+                        {
+                            return Result.No;
+                        }
+
+                        return Result.AssumeNo;
+                    }
+
                     return IsAssignableFrom(method.ReturnType, compilation)
                                ? Result.AssumeYes
                                : Result.No;

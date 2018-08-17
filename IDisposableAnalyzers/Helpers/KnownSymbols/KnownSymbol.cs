@@ -54,6 +54,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType NUnitOneTimeSetUpAttribute = new QualifiedType("NUnit.Framework.OneTimeSetUpAttribute");
         internal static readonly QualifiedType NUnitOneTimeTearDownAttribute = new QualifiedType("NUnit.Framework.OneTimeTearDownAttribute");
         internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
+        internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
 
         private static QualifiedType Create(string qualifiedName, string alias = null)
         {
