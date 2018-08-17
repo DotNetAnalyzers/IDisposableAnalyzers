@@ -373,7 +373,7 @@ namespace IDisposableAnalyzers
                         return Result.AssumeNo;
                     }
 
-                    if (method.TryGetThisParameter(out var thisParameter)&&
+                    if (method.TryGetThisParameter(out var thisParameter) &&
                         thisParameter.Type.Equals(method.ReturnType))
                     {
                         if (method.ReturnType == KnownSymbol.ILoggerFactory)

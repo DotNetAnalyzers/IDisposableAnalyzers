@@ -503,6 +503,54 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindInvocation("disposable.AddAndReturn(File.OpenRead(string.Empty))");
                 Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
+
+            [Test]
+            public void AssumeYesForExtensionMethodReturningSameTypeAsThisParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Stubs;
+
+    class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var custom = disposable.AsCustom();
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("disposable.AsCustom()");
+                Assert.AreEqual(Result.AssumeYes, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void AssumeNoForExtensionMethodReturningSameTypeAsThisParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Stubs;
+
+    class Foo
+    {
+        public Foo(IDisposable disposable)
+        {
+            var custom = disposable.Fluent();
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("disposable.Fluent()");
+                Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

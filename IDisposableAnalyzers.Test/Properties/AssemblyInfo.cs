@@ -20,4 +20,5 @@ using Gu.Roslyn.Asserts;
     typeof(Ninject.StandardKernel),
     typeof(Gu.Roslyn.AnalyzerExtensions.SyntaxTokenExt),
     typeof(Gu.Roslyn.CodeFixExtensions.Parse),
+    typeof(Stubs.Extensions),
     typeof(NUnit.Framework.Assert))]

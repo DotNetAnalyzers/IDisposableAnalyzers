@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers", "IDi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.NetCoreTests", "IDisposableAnalyzers.NetCoreTests\IDisposableAnalyzers.NetCoreTests.csproj", "{8534B151-C831-4A31-B05B-7B2DAEA94033}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stubs", "Stubs\Stubs.csproj", "{8CC16990-2621-4854-8556-ED648A2D360F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
