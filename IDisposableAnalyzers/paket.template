@@ -5,7 +5,7 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  CLEANUP: One dll.
+  BUGFIX: Handle extension methods in binary references better.
 
 excludedgroups
   Main

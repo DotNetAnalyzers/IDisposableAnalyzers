@@ -20,14 +20,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.0.3.1</Version>
+    <Version>2.0.3.2</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Roslyn analyzers for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
-      BUGFIX: INPC013 return early &amp; return null.
-      FEATURE: New analyzers &amp; fixes.
+      BUGFIX: Handle extension methods in binary references better.
     </PackageReleaseNotes>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</PackageProjectUrl>

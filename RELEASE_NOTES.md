@@ -1,3 +1,6 @@
+#### 2.0.3
+* BUGFIX: Handle extension methods in binary references better.
+
 #### 2.0.1
 * BUGFIX: INPC013 return early & return null.
 * FEATURE: New analyzers & fixes.
