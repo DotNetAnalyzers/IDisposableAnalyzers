@@ -39,13 +39,10 @@ namespace IDisposableAnalyzers
                     if (DisposeMethod.TryFindVirtualDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                         disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                     {
-                        if (TryFindIfDisposing(disposeMethodDeclaration, out var ifDisposing))
-                        {
-                            context.RegisterDocumentEditorFix(
-                                "Dispose member.",
-                                (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, ifDisposing, cancellationToken),
-                                diagnostic);
-                        }
+                        context.RegisterDocumentEditorFix(
+                            "Dispose member.",
+                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                            diagnostic);
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeMethod) &&
                         disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
@@ -77,26 +74,49 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, IfStatementSyntax ifStatement, CancellationToken cancellationToken)
+        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax disposeMethodDeclaration, CancellationToken cancellationToken)
         {
             var disposeStatement = Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
-            if (ifStatement.Statement is BlockSyntax block)
+            if (TryFindIfDisposing(disposeMethodDeclaration, out var ifDisposing))
             {
-                var statements = block.Statements.Add(disposeStatement);
-                var newBlock = block.WithStatements(statements);
-                editor.ReplaceNode(block, newBlock);
+                if (ifDisposing.Statement is BlockSyntax block)
+                {
+                    var statements = block.Statements.Add(disposeStatement);
+                    var newBlock = block.WithStatements(statements);
+                    editor.ReplaceNode(block, newBlock);
+                }
+                else if (ifDisposing.Statement is StatementSyntax statement)
+                {
+                    editor.ReplaceNode(
+                        ifDisposing,
+                        ifDisposing.WithStatement(SyntaxFactory.Block(statement, disposeStatement)));
+                }
+                else
+                {
+                    editor.ReplaceNode(
+                        ifDisposing,
+                        ifDisposing.WithStatement(SyntaxFactory.Block(disposeStatement)));
+                }
             }
-            else if (ifStatement.Statement is StatementSyntax statement)
+            else if (disposeMethodDeclaration.Body is BlockSyntax block)
             {
-                editor.ReplaceNode(
-                    ifStatement,
-                    ifStatement.WithStatement(SyntaxFactory.Block(statement, disposeStatement)));
-            }
-            else
-            {
-                editor.ReplaceNode(
-                    ifStatement,
-                    ifStatement.WithStatement(SyntaxFactory.Block(disposeStatement)));
+                ifDisposing = SyntaxFactory.IfStatement(
+                    SyntaxFactory.IdentifierName(disposeMethodDeclaration.ParameterList.Parameters[0].Identifier),
+                    SyntaxFactory.Block(disposeStatement));
+
+                if (DisposeMethod.TryGetBaseCall(disposeMethodDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                {
+                    if (baseCall.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement))
+                    {
+                        editor.InsertBefore(expressionStatement,ifDisposing);
+                    }
+                }
+                else
+                {
+                    editor.ReplaceNode(
+                        block,
+                        block.AddStatements(ifDisposing));
+                }
             }
         }
 

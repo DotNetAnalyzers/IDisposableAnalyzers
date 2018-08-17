@@ -1,7 +1,9 @@
 namespace IDisposableAnalyzers
 {
+    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposeMethod
     {
@@ -76,6 +78,38 @@ namespace IDisposableAnalyzers
         internal static bool TryFindBaseVirtual(ITypeSymbol type, out IMethodSymbol result)
         {
             return type.TryFindFirstMethodRecursive("Dispose", IsVirtualDispose, out result);
+        }
+
+        internal static bool TryGetBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)
+        {
+            if (virtualDispose.ParameterList is ParameterListSyntax parameterList &&
+                parameterList.Parameters.TrySingle(out var parameter))
+            {
+                using (var invocations = InvocationWalker.Borrow(virtualDispose))
+                {
+                    foreach (var invocation in invocations)
+                    {
+                        if (invocation.TryGetMethodName(out var name) &&
+                            name == virtualDispose.Identifier.ValueText &&
+                            invocation.ArgumentList is ArgumentListSyntax argumentList &&
+                            argumentList.Arguments.TrySingle(out var argument) &&
+                            argument.Expression is IdentifierNameSyntax identifierName &&
+                            identifierName.Identifier.ValueText == parameter.Identifier.ValueText &&
+                            semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
+                            semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
+                            method.IsOverride &&
+                            method.OverriddenMethod is IMethodSymbol overridden &&
+                            target.Equals(overridden))
+                        {
+                            baseCall = invocation;
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            baseCall = null;
+            return false;
         }
 
         internal static bool IsOverrideDispose(IMethodSymbol candidate)

@@ -53,7 +53,7 @@ namespace IDisposableAnalyzers
                     method.OverriddenMethod is IMethodSymbol overridden)
                 {
                     if (overridden.DeclaringSyntaxReferences.Length == 0 &&
-                        !CallsBase(methodDeclaration, overridden, context))
+                        !DisposeMethod.TryGetBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
                     }
@@ -93,29 +93,6 @@ namespace IDisposableAnalyzers
                         candidate.ReturnsVoid &&
                         candidate.DeclaredAccessibility == Accessibility.Public &&
                         candidate.Parameters.Length == 0)
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private static bool CallsBase(MemberDeclarationSyntax method, IMethodSymbol overridden, SyntaxNodeAnalysisContext context)
-        {
-            using (var invocations = InvocationWalker.Borrow(method))
-            {
-                foreach (var invocation in invocations)
-                {
-                    if (invocation.TryGetMethodName(out var name) &&
-                        name != overridden.Name)
-                    {
-                        continue;
-                    }
-
-                    if (context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var target) &&
-                        target.Equals(overridden))
                     {
                         return true;
                     }
