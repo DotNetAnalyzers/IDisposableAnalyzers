@@ -91,7 +91,8 @@ namespace IDisposableAnalyzers
                         {
                             context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
 
-                            if (!TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                            if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
+                                !TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
                             }
