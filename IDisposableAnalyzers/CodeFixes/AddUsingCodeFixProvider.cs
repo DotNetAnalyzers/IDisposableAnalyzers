@@ -109,10 +109,11 @@ namespace IDisposableAnalyzers
             editor.ReplaceNode(
                 statement,
                 SyntaxFactory.UsingStatement(
-                    declaration: statement.Declaration,
-                    expression: null,
-                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
-                                            .WithAdditionalAnnotations(Formatter.Annotation)));
+                                 declaration: statement.Declaration.WithoutLeadingTrivia(),
+                                 expression: null,
+                                 statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
+                                                         .WithAdditionalAnnotations(Formatter.Annotation))
+                             .WithLeadingTriviaFrom(statement.Declaration));
         }
 
         private static void AddUsingToEndOfBlock(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax statement)

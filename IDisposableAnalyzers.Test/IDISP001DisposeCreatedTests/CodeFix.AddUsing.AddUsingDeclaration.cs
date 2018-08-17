@@ -52,6 +52,46 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void LocalWithTrivia()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            // Some comment
+            ↓var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Meh()
+        {
+            // Some comment
+            using (var stream = File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
             public void LocalOneStatementAfter()
             {
                 var testCode = @"
