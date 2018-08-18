@@ -45,8 +45,6 @@ namespace ValidCode
 
         public int Value3 => this.Value1;
 
-
-
         public IDisposable CallingMethod => this.CallingMethod;
 
         public IDisposable Value4
@@ -206,21 +204,21 @@ namespace ValidCode
             }
         }
 
-        public IDisposable RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
-
-        public IDisposable RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
-
         public IDisposable RecursiveStatementBodyMethod()
         {
             return this.RecursiveStatementBodyMethod();
         }
+
+        public IDisposable RecursiveExpressionBodyMethod() => this.RecursiveExpressionBodyMethod();
+
+        public IDisposable RecursiveExpressionBodyMethod(int value) => this.RecursiveExpressionBodyMethod(value);
 
         public IDisposable RecursiveStatementBodyMethod(int value)
         {
             return this.RecursiveStatementBodyMethod(value);
         }
 
-        public void Meh()
+        public void SameStuffAsInCtor()
         {
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;

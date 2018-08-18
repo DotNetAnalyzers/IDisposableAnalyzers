@@ -27,7 +27,6 @@ namespace ValidCode
             }
         }
 
-
         public void UsingDeclarationObservableSubscribe(IObservable<int> observable)
         {
             using (var disposable = observable.Subscribe(x => Console.WriteLine(x)))
