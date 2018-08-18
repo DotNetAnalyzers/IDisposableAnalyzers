@@ -80,7 +80,7 @@ namespace IDisposableAnalyzers
             return type.TryFindFirstMethodRecursive("Dispose", IsVirtualDispose, out result);
         }
 
-        internal static bool TryGetBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)
+        internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)
         {
             if (virtualDispose.ParameterList is ParameterListSyntax parameterList &&
                 parameterList.Parameters.TrySingle(out var parameter))

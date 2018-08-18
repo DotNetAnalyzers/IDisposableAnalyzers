@@ -53,7 +53,7 @@ namespace IDisposableAnalyzers
                     method.OverriddenMethod is IMethodSymbol overridden)
                 {
                     if (overridden.DeclaringSyntaxReferences.Length == 0 &&
-                        !DisposeMethod.TryGetBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                        !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
                     }

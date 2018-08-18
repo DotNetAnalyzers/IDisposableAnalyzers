@@ -104,7 +104,7 @@ namespace IDisposableAnalyzers
                     SyntaxFactory.IdentifierName(disposeMethodDeclaration.ParameterList.Parameters[0].Identifier),
                     SyntaxFactory.Block(disposeStatement));
 
-                if (DisposeMethod.TryGetBaseCall(disposeMethodDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                if (DisposeMethod.TryFindBaseCall(disposeMethodDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
                 {
                     if (baseCall.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement))
                     {
