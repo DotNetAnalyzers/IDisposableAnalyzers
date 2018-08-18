@@ -6,11 +6,6 @@ namespace ValidCode.Recursion
     using System;
     using System.Collections.Generic;
 
-    public class RefAndOut
-    {
-
-    }
-
     public class Recursion
     {
         private IDisposable bar1;
@@ -29,37 +24,6 @@ namespace ValidCode.Recursion
 
         public IDisposable CallingMethod => this.CallingMethod;
 
-        public static bool RecursiveOut(out IDisposable value)
-        {
-            return RecursiveOut(out value);
-        }
-
-        public static bool RecursiveOut(int foo, out IDisposable value)
-        {
-            return RecursiveOut(2, out value);
-        }
-
-        public static bool RecursiveOut(double foo, out IDisposable value)
-        {
-            value = null;
-            return RecursiveOut(3.0, out value);
-        }
-
-        public static bool RecursiveOut(string foo, out IDisposable value)
-        {
-            if (foo == null)
-            {
-                return RecursiveOut(3.0, out value);
-            }
-
-            value = null;
-            return true;
-        }
-
-        public static bool RecursiveRef(ref IDisposable value)
-        {
-            return RecursiveRef(ref value);
-        }
 
         public Disposable RecursiveMethod() => this.RecursiveMethod();
 
@@ -115,11 +79,6 @@ namespace ValidCode.Recursion
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
-            RecursiveOut(out value);
-            RecursiveOut(1, out value);
-            RecursiveOut(1.0, out value);
-            RecursiveOut(string.Empty, out value);
-            RecursiveRef(ref value);
             value = value;
         }
 
