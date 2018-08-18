@@ -4,7 +4,6 @@ namespace IDisposableAnalyzers.Test
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -29,9 +28,7 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void SolutionRepro(DiagnosticAnalyzer analyzer)
         {
-            Cache<SyntaxTree, SemanticModel>.Begin();
             AnalyzerAssert.Valid(analyzer, Solution);
-            Cache<SyntaxTree, SemanticModel>.End();
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
