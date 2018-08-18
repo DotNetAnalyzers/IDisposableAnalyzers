@@ -595,5 +595,76 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(analyzer, testCode);
         }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public async Task ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Constructors : IDisposable
+    {
+        private IDisposable disposable;
+
+        public Constructors()
+            : this()
+        {
+        }
+
+        public Constructors(IDisposable disposable)
+            : this(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public Constructors(int i, IDisposable disposable)
+            : this(disposable, i)
+        {
+            this.disposable = disposable;
+        }
+
+        public Constructors(IDisposable disposable, int i)
+            : this(i, disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, AnalyzerAssert.MetadataReferences).ConfigureAwait(false);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public async Task ConstructorCycle(DiagnosticAnalyzer analyzer)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Constructors : IDisposable
+    {
+        private IDisposable disposable;
+
+        public Constructors(int i, IDisposable disposable)
+            : this(disposable, i)
+        {
+            this.disposable = disposable;
+        }
+
+        public Constructors(IDisposable disposable, int i)
+            : this(i, disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+            await Analyze.GetDiagnosticsAsync(analyzer, new[] { testCode }, AnalyzerAssert.MetadataReferences).ConfigureAwait(false);
+        }
     }
 }
