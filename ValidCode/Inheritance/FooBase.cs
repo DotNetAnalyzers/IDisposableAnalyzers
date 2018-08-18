@@ -1,13 +1,19 @@
 namespace ValidCode.Inheritance
 {
+    using System;
     using System.IO;
 
-    public class FooImpl1 : FooBase
+    public class FooBase : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
 
-        protected override void Dispose(bool disposing)
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
         {
             if (this.disposed)
             {
@@ -15,12 +21,11 @@ namespace ValidCode.Inheritance
             }
 
             this.disposed = true;
+
             if (disposing)
             {
                 this.stream.Dispose();
             }
-
-            base.Dispose(disposing);
         }
     }
 }

@@ -2,7 +2,7 @@ namespace ValidCode.Inheritance
 {
     using System.IO;
 
-    public class FooImpl1 : FooBase
+    public class AbstractFooImpl1 : AbstractFooBase
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;

@@ -1,30 +1,17 @@
-// ReSharper disable UnusedMember.Global Used in HappyPathWithAll.PropertyChangedAnalyzersSln
-// ReSharper disable NotAccessedField.Local
-// ReSharper disable UnusedVariable
-// ReSharper disable UnusedParameter.Local
-// ReSharper disable RedundantAssignment
-// ReSharper disable ArrangeAccessorOwnerBody
-// ReSharper disable FunctionRecursiveOnAllPaths
-// ReSharper disable UnusedParameter.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable ArrangeThisQualifier
-// ReSharper disable PossibleUnintendedReferenceComparison
-// ReSharper disable RedundantCheckBeforeAssignment
-// ReSharper disable UnusedMethodReturnValue.Global
+// ReSharper disable All
 #pragma warning disable 1717
-#pragma warning disable IDE0009 // Member access should be qualified.
-#pragma warning disable IDE0025 // Use expression body for properties.
 namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
 
-    public class RecursiveFoo
+    public class Recursion
     {
         private IDisposable bar1;
         private IDisposable bar2;
 
-        public RecursiveFoo()
+        public Recursion()
+//            : this() compiler checks this so we test it separately.
         {
             var value = this.RecursiveExpressionBodyProperty;
             value = this.RecursiveStatementBodyProperty;
@@ -36,15 +23,6 @@ namespace ValidCode
             value = value;
         }
 
-        public IDisposable RecursiveProperty => this.RecursiveProperty;
-
-        public int Value1 => this.Value1;
-
-        public int Value2 => this.Value2;
-
-        public int Value3 => this.Value1;
-
-        public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
         public IDisposable RecursiveStatementBodyProperty
         {
@@ -53,6 +31,21 @@ namespace ValidCode
                 return this.RecursiveStatementBodyProperty;
             }
         }
+
+        public IDisposable RecursiveExpressionBodyGetter
+        {
+            get => this.RecursiveExpressionBodyGetter;
+        }
+
+        public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
+
+        public int Value1 => this.Value1;
+
+        public int Value2 => this.Value2;
+
+        public int Value3 => this.Value1;
+
+
 
         public IDisposable CallingMethod => this.CallingMethod;
 
@@ -186,7 +179,7 @@ namespace ValidCode
 
         public void NotUsingRecursive()
         {
-            var item1 = this.RecursiveProperty;
+            var item1 = this.RecursiveExpressionBodyGetter;
             var item2 = this.RecursiveMethod();
         }
 
@@ -196,11 +189,11 @@ namespace ValidCode
             {
             }
 
-            using (var item = this.RecursiveProperty)
+            using (var item = this.RecursiveExpressionBodyGetter)
             {
             }
 
-            using (this.RecursiveProperty)
+            using (this.RecursiveExpressionBodyGetter)
             {
             }
 
