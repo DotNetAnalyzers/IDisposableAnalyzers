@@ -1,6 +1,7 @@
 // ReSharper disable All
+#pragma warning disable 169
 #pragma warning disable 1717
-namespace ValidCode
+namespace ValidCode.Recursion
 {
     using System;
     using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace ValidCode
 //            : this() compiler checks this so we test it separately.
         {
             var value = this.RecursiveExpressionBodyProperty;
+            value = this.RecursiveExpressionBodyGetter;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
             value = this.RecursiveExpressionBodyMethod(1);
@@ -22,7 +24,6 @@ namespace ValidCode
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
             value = value;
         }
-
 
         public IDisposable RecursiveStatementBodyProperty
         {
@@ -39,105 +40,7 @@ namespace ValidCode
 
         public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
-        public int Value1 => this.Value1;
-
-        public int Value2 => this.Value2;
-
-        public int Value3 => this.Value1;
-
         public IDisposable CallingMethod => this.CallingMethod;
-
-        public IDisposable Value4
-        {
-            get
-            {
-                return this.Value4;
-            }
-
-            set
-            {
-                if (value == this.Value4)
-                {
-                    return;
-                }
-
-                this.Value4 = value;
-            }
-        }
-
-        public IDisposable Value5
-        {
-            get => this.Value5;
-            set
-            {
-                if (value == this.Value5)
-                {
-                    return;
-                }
-
-                this.Value5 = value;
-            }
-        }
-
-        public IDisposable Value6
-        {
-            get => this.Value5;
-            set
-            {
-                if (value == this.Value5)
-                {
-                    return;
-                }
-
-                this.Value5 = value;
-            }
-        }
-
-        public IDisposable Bar1
-        {
-            get
-            {
-                return this.bar1;
-            }
-
-            set
-            {
-                if (Equals(value, this.bar1))
-                {
-                    return;
-                }
-
-                if (value != null && this.bar2 != null)
-                {
-                    this.Bar2 = null;
-                }
-
-                this.bar1 = value;
-            }
-        }
-
-        public IDisposable Bar2
-        {
-            get
-            {
-                return this.bar2;
-            }
-
-            set
-            {
-                if (Equals(value, this.bar2))
-                {
-                    return;
-                }
-
-                if (value != null && this.bar1 != null)
-                {
-                    this.Bar1 = null;
-                }
-
-                this.bar2 = value;
-            }
-        }
 
         public static bool RecursiveOut(out IDisposable value)
         {
@@ -221,6 +124,7 @@ namespace ValidCode
         public void SameStuffAsInCtor()
         {
             var value = this.RecursiveExpressionBodyProperty;
+            value = this.RecursiveExpressionBodyGetter;
             value = this.RecursiveStatementBodyProperty;
             value = this.RecursiveExpressionBodyMethod();
             value = this.RecursiveExpressionBodyMethod(1);
