@@ -108,7 +108,7 @@ namespace IDisposableAnalyzers
                 {
                     if (baseCall.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement))
                     {
-                        editor.InsertBefore(expressionStatement,ifDisposing);
+                        editor.InsertBefore(expressionStatement, ifDisposing);
                     }
                 }
                 else

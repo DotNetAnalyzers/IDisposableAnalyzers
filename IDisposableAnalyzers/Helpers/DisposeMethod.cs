@@ -89,7 +89,9 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in invocations)
                     {
-                        if (invocation.TryGetMethodName(out var name) &&
+                        if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                            memberAccess.Expression is BaseExpressionSyntax &&
+                            invocation.TryGetMethodName(out var name) &&
                             name == virtualDispose.Identifier.ValueText &&
                             invocation.ArgumentList is ArgumentListSyntax argumentList &&
                             argumentList.Arguments.TrySingle(out var argument) &&
