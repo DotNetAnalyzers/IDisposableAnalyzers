@@ -22,19 +22,179 @@ namespace RoslynSandbox
     }
 }";
 
-        [TestCase("stream.Dispose();")]
-        [TestCase("stream?.Dispose();")]
-        [TestCase("this.stream.Dispose();")]
-        [TestCase("this.stream?.Dispose();")]
-        [TestCase("Stream.Dispose();")]
-        [TestCase("Stream?.Dispose();")]
-        [TestCase("this.Stream.Dispose();")]
-        [TestCase("this.Stream?.Dispose();")]
-        [TestCase("Calculated.Dispose();")]
-        [TestCase("Calculated?.Dispose();")]
-        [TestCase("this.Calculated.Dispose();")]
-        [TestCase("this.Calculated?.Dispose();")]
-        public void DisposingField(string disposeCall)
+        [Test]
+        public void WhenCallingBaseDispose()
+        {
+            var fooBaseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class FooBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo : FooBase
+    {
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public void WhenCallingBaseDisposeAfterCheckDispose()
+        {
+            var fooBaseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class FooBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class Foo : FooBase
+    {
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
+        {
+            var fooBaseCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public abstract class FooBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Foo : FooBase
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public void WhenNoBaseClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -60,7 +220,6 @@ namespace RoslynSandbox
         }
     }
 }";
-            testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -773,55 +932,6 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
-        }
-
-        [Test]
-        public void WhenCallingBaseDispose()
-        {
-            var fooBaseCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public abstract class FooBase : IDisposable
-    {
-        private readonly IDisposable disposable = new Disposable();
-        private bool disposed;
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-                this.disposable.Dispose();
-            }
-        }
-    }
-}";
-            var testCode = @"
-namespace RoslynSandbox
-{
-    public class Foo : FooBase
-    {
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-    }
-}";
-
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
         }
 
         [Test]
