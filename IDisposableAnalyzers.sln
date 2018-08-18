@@ -58,7 +58,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers", "IDi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.NetCoreTests", "IDisposableAnalyzers.NetCoreTests\IDisposableAnalyzers.NetCoreTests.csproj", "{8534B151-C831-4A31-B05B-7B2DAEA94033}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Stubs", "Stubs\Stubs.csproj", "{8CC16990-2621-4854-8556-ED648A2D360F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stubs", "Stubs\Stubs.csproj", "{8CC16990-2621-4854-8556-ED648A2D360F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidCode", "ValidCode\ValidCode.csproj", "{C6A235B1-A780-43D5-BA1F-E31861C019F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -90,6 +92,10 @@ Global
 		{8CC16990-2621-4854-8556-ED648A2D360F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CC16990-2621-4854-8556-ED648A2D360F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8CC16990-2621-4854-8556-ED648A2D360F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

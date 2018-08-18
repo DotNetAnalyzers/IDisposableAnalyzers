@@ -13,11 +13,8 @@
 // ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable CollectionNeverUpdated.Local
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
-#pragma warning disable GU0011 // Don't ignore the return value.
-#pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
-namespace IDisposableAnalyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System.Collections;
     using System.Collections.Generic;

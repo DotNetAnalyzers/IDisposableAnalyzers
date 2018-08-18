@@ -11,34 +11,26 @@
 // ReSharper disable PossibleUnintendedReferenceComparison
 // ReSharper disable RedundantCheckBeforeAssignment
 // ReSharper disable UnusedMethodReturnValue.Global
+// ReSharper disable NotAccessedVariable
+// ReSharper disable InlineOutVariableDeclaration
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
-#pragma warning disable GU0011 // Don't ignore the return value.
-#pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
-namespace IDisposableAnalyzers.Test.HappyPathCode
+namespace ValidCode
 {
-    using System.IO;
+    using System;
+    using System.Reactive.Disposables;
 
-    public class FooImpl : FooBase
+    public static class CompositeDisposableExt
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-        private bool disposed;
-
-        protected override void Dispose(bool disposing)
+        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+            where T : IDisposable
         {
-            if (this.disposed)
+            if (item != null)
             {
-                return;
+                disposable.Add(item);
             }
 
-            this.disposed = true;
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
-
-            base.Dispose(disposing);
+            return item;
         }
     }
 }

@@ -7,15 +7,12 @@
     <IsPackable>false</IsPackable>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.NetCoreTests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
-  <Import Project="..\.paket\Paket.Restore.targets" />
-
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
   </ItemGroup>
+  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

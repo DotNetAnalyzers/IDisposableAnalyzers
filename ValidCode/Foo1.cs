@@ -14,14 +14,10 @@
 // ReSharper disable NotAccessedVariable
 // ReSharper disable InlineOutVariableDeclaration
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
-#pragma warning disable GU0011 // Don't ignore the return value.
-#pragma warning disable GU0010 // Assigning same value.
 #pragma warning disable IDE0009 // Member access should be qualified.
 #pragma warning disable IDE0044
-#pragma warning disable GU0021 // Calculated property allocates reference type.
 #pragma warning disable 169
-namespace IDisposableAnalyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
@@ -45,11 +41,11 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
         {
             this.subscription.Disposable = File.OpenRead(string.Empty);
             this.disposable = Bar(disposable);
-            using (var temp = CreateDisposableProperty)
+            using (var temp = this.CreateDisposableProperty)
             {
             }
 
-            using (var temp = CreateDisposable())
+            using (var temp = this.CreateDisposable())
             {
             }
 

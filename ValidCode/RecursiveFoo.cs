@@ -12,13 +12,9 @@
 // ReSharper disable RedundantCheckBeforeAssignment
 // ReSharper disable UnusedMethodReturnValue.Global
 #pragma warning disable 1717
-#pragma warning disable SA1101 // Prefix local calls with this
-#pragma warning disable GU0010 // Assigning same value.
-#pragma warning disable GU0011 // Don't ignore the return value.
-#pragma warning disable GU0015 // Don't assign same more than once.
 #pragma warning disable IDE0009 // Member access should be qualified.
 #pragma warning disable IDE0025 // Use expression body for properties.
-namespace IDisposableAnalyzers.Test.HappyPathCode
+namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
@@ -44,7 +40,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
 
         public int Value1 => this.Value1;
 
-        public int Value2 => Value2;
+        public int Value2 => this.Value2;
 
         public int Value3 => this.Value1;
 
@@ -58,7 +54,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
             }
         }
 
-        public IDisposable CallingMethod => CallingMethod;
+        public IDisposable CallingMethod => this.CallingMethod;
 
         public IDisposable Value4
         {
@@ -186,7 +182,7 @@ namespace IDisposableAnalyzers.Test.HappyPathCode
 
         public Disposable RecursiveMethod() => this.RecursiveMethod();
 
-        public IDisposable CallingProperty() => CallingMethod;
+        public IDisposable CallingProperty() => this.CallingMethod;
 
         public void NotUsingRecursive()
         {
