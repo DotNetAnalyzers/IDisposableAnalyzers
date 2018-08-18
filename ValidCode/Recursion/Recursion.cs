@@ -6,39 +6,26 @@ namespace ValidCode.Recursion
     using System;
     using System.Collections.Generic;
 
+    public class RefAndOut
+    {
+
+    }
+
     public class Recursion
     {
         private IDisposable bar1;
         private IDisposable bar2;
 
         public Recursion()
-//            : this() compiler checks this so we test it separately.
+        //            : this() compiler checks this so we test it separately.
         {
-            var value = this.RecursiveExpressionBodyProperty;
-            value = this.RecursiveExpressionBodyGetter;
-            value = this.RecursiveStatementBodyProperty;
-            value = this.RecursiveExpressionBodyMethod();
+            var value = this.RecursiveExpressionBodyMethod();
             value = this.RecursiveExpressionBodyMethod(1);
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);
             value = RecursiveStatementBodyMethodWithOptionalParameter(value);
             value = value;
         }
-
-        public IDisposable RecursiveStatementBodyProperty
-        {
-            get
-            {
-                return this.RecursiveStatementBodyProperty;
-            }
-        }
-
-        public IDisposable RecursiveExpressionBodyGetter
-        {
-            get => this.RecursiveExpressionBodyGetter;
-        }
-
-        public IDisposable RecursiveExpressionBodyProperty => this.RecursiveExpressionBodyProperty;
 
         public IDisposable CallingMethod => this.CallingMethod;
 
@@ -80,7 +67,7 @@ namespace ValidCode.Recursion
 
         public void NotUsingRecursive()
         {
-            var item1 = this.RecursiveExpressionBodyGetter;
+            var item1 = this.CallingMethod;
             var item2 = this.RecursiveMethod();
         }
 
@@ -90,11 +77,11 @@ namespace ValidCode.Recursion
             {
             }
 
-            using (var item = this.RecursiveExpressionBodyGetter)
+            using (var item = this.CallingMethod)
             {
             }
 
-            using (this.RecursiveExpressionBodyGetter)
+            using (this.CallingMethod)
             {
             }
 
@@ -123,10 +110,7 @@ namespace ValidCode.Recursion
 
         public void SameStuffAsInCtor()
         {
-            var value = this.RecursiveExpressionBodyProperty;
-            value = this.RecursiveExpressionBodyGetter;
-            value = this.RecursiveStatementBodyProperty;
-            value = this.RecursiveExpressionBodyMethod();
+            var value = this.RecursiveExpressionBodyMethod();
             value = this.RecursiveExpressionBodyMethod(1);
             value = this.RecursiveStatementBodyMethod();
             value = this.RecursiveStatementBodyMethod(1);

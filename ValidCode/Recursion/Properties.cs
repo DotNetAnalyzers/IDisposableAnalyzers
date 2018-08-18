@@ -212,5 +212,98 @@ namespace ValidCode.Recursion
             value = this.WithBackingField1;
             value = this.WithBackingField2;
         }
+
+        public void UsingRecursive()
+        {
+            using (var item = this.StatementBody)
+            {
+            }
+
+            using (this.StatementBody)
+            {
+            }
+
+            using (var item = this.ExpressionBody)
+            {
+            }
+
+            using (this.ExpressionBody)
+            {
+            }
+
+            using (var item = this.ExpressionBodyGetter)
+            {
+            }
+
+            using (this.ExpressionBodyGetter)
+            {
+            }
+
+#pragma warning disable IDISP007 // Don't dispose injected.
+            using (var item = this.StatementBodyRecursiveAccessors)
+            {
+            }
+
+            using (this.StatementBodyRecursiveAccessors)
+            {
+            }
+
+            using (var item = this.ExpressionBodyRecursiveAccessors)
+            {
+            }
+
+            using (this.ExpressionBodyRecursiveAccessors)
+            {
+            }
+
+            using (var item = this.StatementBodyCycle1)
+            {
+            }
+
+            using (this.StatementBodyCycle1)
+            {
+            }
+
+            using (var item = this.ExpressionBodyCycle1)
+            {
+            }
+
+            using (this.ExpressionBodyCycle1)
+            {
+            }
+
+            using (var item = this.WithBackingField1)
+            {
+            }
+
+            using (this.WithBackingField1)
+            {
+            }
+
+            using (var item = this.withBackingField1)
+            {
+            }
+
+            using (this.withBackingField1)
+            {
+            }
+
+            using (var item = this.WithBackingField2)
+            {
+            }
+
+            using (this.WithBackingField2)
+            {
+            }
+
+            using (var item = this.withBackingField2)
+            {
+            }
+
+            using (this.withBackingField2)
+            {
+            }
+#pragma warning restore IDISP007 // Don't dispose injected.
+        }
     }
 }
