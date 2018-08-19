@@ -1,3 +1,4 @@
+// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -5,60 +6,34 @@ namespace ValidCode
 
     public class Using
     {
-        public Using()
+        public Using(IObservable<int> observable)
         {
-            IDisposable disposable;
-            using (disposable = new Disposable())
+            IDisposable temp;
+            using (temp = new Disposable())
             {
             }
-        }
 
-        public void UsingDeclarationNewDisposable()
-        {
-            using (var disposable = new Disposable())
-            {
-            }
-        }
-
-        public void UsingDeclarationFileOpenRead()
-        {
-            using (var disposable = File.OpenRead(string.Empty))
-            {
-            }
-        }
-
-        public void UsingDeclarationObservableSubscribe(IObservable<int> observable)
-        {
-            using (var disposable = observable.Subscribe(x => Console.WriteLine(x)))
-            {
-            }
-        }
-
-        public void DeclareBeforeAssign()
-        {
-            IDisposable disposable;
-            using (disposable = new Disposable())
-            {
-            }
-        }
-
-        public void UsingNewDisposable()
-        {
             using (new Disposable())
             {
             }
-        }
 
-        public void UsingFileOpenRead()
-        {
+            using (var disposable = new Disposable())
+            {
+            }
+
+            using (var disposable = File.OpenRead(string.Empty))
+            {
+            }
+
             using (File.OpenRead(string.Empty))
             {
             }
-        }
 
-        public void UsingObservableSubscribe(IObservable<int> observable)
-        {
-            using (observable.Subscribe(x=> Console.WriteLine(x)))
+            using (var disposable = observable.Subscribe(x => Console.WriteLine(x)))
+            {
+            }
+
+            using (observable.Subscribe(x => Console.WriteLine(x)))
             {
             }
         }
