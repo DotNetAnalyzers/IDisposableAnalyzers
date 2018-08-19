@@ -3,7 +3,6 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
 
     internal partial class HappyPath
     {
