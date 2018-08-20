@@ -31,6 +31,51 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
             }
+
+            [Test]
+            public void UsingFileOpenRead()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                 var b = stream.ReadByte();
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void DisposeInUsing()
+            {
+                // this is weird but should not warn I think
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                stream.Dispose();
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+            }
         }
     }
 }

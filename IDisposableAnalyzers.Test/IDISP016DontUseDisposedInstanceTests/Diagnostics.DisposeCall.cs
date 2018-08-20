@@ -31,6 +31,50 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
+
+            [Test]
+            public void DisposingTwice()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stream.Dispose();
+            stream.↓Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void DisposingTwiceInUsing()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public void Bar()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                stream.Dispose();
+                stream.↓Dispose();
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
         }
     }
 }
