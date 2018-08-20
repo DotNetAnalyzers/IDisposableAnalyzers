@@ -50,10 +50,10 @@ namespace IDisposableAnalyzers
                 if (method.Parameters.TrySingle(out var parameter) &&
                     parameter.Type == KnownSymbol.Boolean &&
                     method.IsOverride &&
-                    method.OverriddenMethod is IMethodSymbol overridden)
+                    method.OverriddenMethod is IMethodSymbol overridden &&
+                    !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
                 {
-                    if (overridden.DeclaringSyntaxReferences.Length == 0 &&
-                        !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                    if (overridden.DeclaringSyntaxReferences.Length == 0)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
                     }
