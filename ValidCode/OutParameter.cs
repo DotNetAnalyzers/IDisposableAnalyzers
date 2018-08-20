@@ -1,3 +1,4 @@
+// ReSharper disable All
 namespace ValidCode
 {
     using System.IO;
@@ -11,10 +12,17 @@ namespace ValidCode
 
         public void Baz()
         {
-            Stream disposable;
-            if (TryGetStreamCore(out disposable))
+            Stream stream1;
+            if (TryGetStreamCore(out stream1))
             {
-                using (disposable)
+                using (stream1)
+                {
+                }
+            }
+
+            if (TryGetStreamCore(out var stream2))
+            {
+                using (stream2)
                 {
                 }
             }

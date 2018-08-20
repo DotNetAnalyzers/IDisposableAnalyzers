@@ -1,10 +1,28 @@
+// ReSharper disable All
 namespace ValidCode
 {
+    using System;
     using System.IO;
     using System.Threading.Tasks;
 
-    public static class Async
+    public class Async
     {
+        public async Task Calls()
+        {
+            var text = await Bar1Async();
+            using (await  CreateDisposableAsync())
+            {
+            }
+
+            using (var disposable = await CreateDisposableAsync())
+            {
+            }
+
+            using (await Task.FromResult(new Disposable()))
+            {
+            }
+        }
+
         public static async Task<string> Bar1Async()
         {
             using (var stream = await ReadAsync(string.Empty))
@@ -27,7 +45,7 @@ namespace ValidCode
             }
         }
 
-        private static async Task<Stream> ReadAsync(this string fileName)
+        private static async Task<Stream> ReadAsync(string fileName)
         {
             var stream = new MemoryStream();
             using (var fileStream = File.OpenRead(fileName))
@@ -38,6 +56,12 @@ namespace ValidCode
 
             stream.Position = 0;
             return stream;
+        }
+
+        private static async Task<IDisposable> CreateDisposableAsync()
+        {
+            await Task.Delay(0).ConfigureAwait(false);
+            return new Disposable();
         }
     }
 }
