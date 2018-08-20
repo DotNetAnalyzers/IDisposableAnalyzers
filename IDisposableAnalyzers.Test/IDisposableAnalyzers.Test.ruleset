@@ -6,8 +6,8 @@
   </Localization>
   <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
     <Rule Id="UseAsyncSuffix" Action="None" />
+    <Rule Id="AvoidAsyncSuffix" Action="None" />
   </Rules>
-
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
     <Rule Id="CA1009" Action="Warning" />
