@@ -5,7 +5,10 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  BUGFIX: Handle extension methods in binary references better.
+  BUGFIX: IDISP013 ignore nunit ThrowAsync
+  BUGFIX: Code fix for IDISP001 doubles the indentation
+  BUGFIX: Code fix for IDISP002 when calling base.Dispose(disposing)
+  BUGFIX: IDISP006 should not warn when overriding Dispose(disposing)
 
 excludedgroups
   Main

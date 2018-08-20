@@ -1,3 +1,9 @@
+#### 2.0.3.3
+* BUGFIX: IDISP013 ignore nunit ThrowAsync
+* BUGFIX: Code fix for IDISP001 doubles the indentation
+* BUGFIX: Code fix for IDISP002 when calling base.Dispose(disposing)
+* BUGFIX: IDISP006 should not warn when overriding Dispose(disposing)
+
 #### 2.0.3
 * BUGFIX: Handle extension methods in binary references better.
 
