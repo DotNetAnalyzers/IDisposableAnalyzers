@@ -156,6 +156,13 @@ namespace IDisposableAnalyzers
 
         private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
+            if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax ancestor) &&
+                ancestor.TryGetMethodName(out var ancestorName) &&
+                ancestorName == "ThrowsAsync")
+            {
+                return false;
+            }
+
             switch (returnValue)
             {
                 case InvocationExpressionSyntax invocation when invocation.TryGetMethodName(out var name) &&

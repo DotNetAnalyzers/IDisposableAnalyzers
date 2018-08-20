@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class HappyPath
+    internal partial class HappyPath
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
 
