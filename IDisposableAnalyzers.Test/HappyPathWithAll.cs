@@ -25,7 +25,7 @@ namespace IDisposableAnalyzers.Test
             AnalyzerAssert.MetadataReferences);
 
         // ReSharper disable once InconsistentNaming
-        private static readonly Solution ValidCodeProj = CodeFactory.CreateSolution(
+        private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
@@ -59,7 +59,7 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, ValidCodeProj);
+            AnalyzerAssert.Valid(analyzer, ValidCodeProjectSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
