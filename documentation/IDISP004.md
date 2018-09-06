@@ -61,9 +61,9 @@ public sealed class Foo
     public Foo()
     {
         using(var file = File.OpenRead("file.txt"))
-		{
-			...
-		}
+        {
+            ...
+        }
     }
 }
 ```
