@@ -559,7 +559,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            Solution solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
+            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
             AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
     }
