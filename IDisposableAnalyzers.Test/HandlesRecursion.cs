@@ -27,7 +27,6 @@ namespace IDisposableAnalyzers.Test
         public void RecursiveSample(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-// ReSharper disable UnusedMember.Global Used in HappyPathWithAll.PropertyChangedAnalyzersSln
 // ReSharper disable NotAccessedField.Local
 // ReSharper disable UnusedVariable
 // ReSharper disable UnusedParameter.Local

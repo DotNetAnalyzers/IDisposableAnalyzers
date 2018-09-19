@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class HappyPathWithAll
+    public class ValidCodeWithAllAnalyzers
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol)
             .Assembly
@@ -19,8 +19,8 @@ namespace IDisposableAnalyzers.Test
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
             .ToImmutableArray();
 
-        private static readonly Solution Solution = CodeFactory.CreateSolution(
-            SolutionFile.Find("IDisposableAnalyzers.sln"),
+        private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
+            ProjectFile.Find("IDisposableAnalyzers.csproj"),
             AllAnalyzers,
             AnalyzerAssert.MetadataReferences);
 
@@ -51,9 +51,9 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void IDisposableAnalyzersSln(DiagnosticAnalyzer analyzer)
+        public void AnalyzersProject(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, Solution);
+            AnalyzerAssert.Valid(analyzer, AnalyzersProjectSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -532,6 +532,8 @@ namespace RoslynSandbox
         public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
+namespace RoslynSandbox
+{
     using System;
     using System.IO;
 
@@ -555,8 +557,10 @@ namespace RoslynSandbox
 
             base.Dispose(disposing);
         }
-    }";
-            AnalyzerAssert.Valid(analyzer, testCode);
+    }
+}";
+            Solution solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
+            AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
     }
 }
