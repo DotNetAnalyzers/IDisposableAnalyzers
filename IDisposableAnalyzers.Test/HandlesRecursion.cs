@@ -28,6 +28,8 @@ namespace IDisposableAnalyzers.Test
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
+
     public class Constructors : IDisposable
     {
         private IDisposable disposable;
@@ -70,6 +72,8 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
+
     public class Constructors : IDisposable
     {
         private IDisposable disposable;

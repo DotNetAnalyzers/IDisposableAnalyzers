@@ -27,14 +27,15 @@ namespace MVVM
     /// </summary>
     public abstract class ViewModelBase : INotifyPropertyChanged, IDisposable
     {
-        protected ViewModelBase()
-        {
-        }
-
         private readonly List<IDisposable> disposables = new List<IDisposable>();
         private readonly object disposeLock = new object();
         private bool isDisposed;
 
+        protected ViewModelBase()
+        {
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
         public void Dispose()
         {
             lock (disposeLock)
@@ -85,7 +86,7 @@ namespace ProjectX.Commands
 {
     using System;
 
-    public sealed class ClosePopupCommand : IDelegateCommand, IDisposable
+    public sealed class ClosePopupCommand : IDisposable
     {
         private readonly object disposeLock = new object();
         private bool isDisposed;
@@ -111,7 +112,12 @@ namespace ProjectX.Commands
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, viewModelBaseCode, popupViewModelCode, closePopupCommandCode);
+
+                var solution = CodeFactory.CreateSolution(
+                    new[] {viewModelBaseCode, popupViewModelCode, closePopupCommandCode},
+                    CodeFactory.DefaultCompilationOptions(Analyzer, AnalyzerAssert.SuppressedDiagnostics),
+                    AnalyzerAssert.MetadataReferences);
+                AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
             }
         }
     }

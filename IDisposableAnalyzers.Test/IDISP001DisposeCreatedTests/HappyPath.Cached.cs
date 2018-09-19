@@ -95,7 +95,7 @@ namespace RoslynSandbox
 
         public static long Bar()
         {
-            if (Cache.TryGetValue(1, var out stream))
+            if (Cache.TryGetValue(1, out var stream))
             {
                 return stream.Length;
             }

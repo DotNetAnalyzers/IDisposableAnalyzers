@@ -479,8 +479,8 @@ namespace RoslynSandbox
 
         public void SetCurrent(int number)
         {
-            this.current = this.Cache[number];
-            this.current = this.Cache[number + 1];
+            this.current = Cache[number];
+            this.current = Cache[number + 1];
         }
     }
 }";

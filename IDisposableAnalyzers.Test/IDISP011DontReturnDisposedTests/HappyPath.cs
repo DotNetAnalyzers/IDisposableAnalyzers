@@ -956,6 +956,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System.Collections.Generic;
     using System.IO;
 
     public class Foo
@@ -982,6 +983,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System.Collections.Generic;
     using System.IO;
 
     public class Foo

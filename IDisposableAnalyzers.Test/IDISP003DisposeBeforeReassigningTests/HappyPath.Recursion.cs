@@ -135,7 +135,7 @@ namespace RoslynSandbox
     {
         public static bool RecursiveOut(double foo, out IDisposable value)
         {
-            value = 2;
+            value = null;
             return RecursiveOut(3.0, out value);
         }
 
