@@ -1,7 +1,7 @@
 STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
-    Gu.Roslyn.Extensions (0.3.4.1-dev)
+    Gu.Roslyn.Extensions (0.3.4.3-dev)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     ManagedEsent (1.9.4) - restriction: >= net46
     Microsoft.CodeAnalysis.Analyzers (2.6.2) - restriction: >= netstandard1.3
@@ -1535,18 +1535,19 @@ NUGET
       System.Diagnostics.StackTrace (>= 4.3) - restriction: && (< net45) (>= netstandard1.3)
       System.Net.Requests (>= 4.3) - restriction: && (< net45) (>= netstandard1.3)
     Microsoft.ApplicationInsights.Agent.Intercept (2.4) - restriction: || (&& (>= net45) (< net451) (>= netstandard1.6)) (&& (>= net451) (< netstandard1.6)) (>= net46)
-    Microsoft.ApplicationInsights.AspNetCore (2.4.1)
-      Microsoft.ApplicationInsights (>= 2.7.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
-      Microsoft.ApplicationInsights.DependencyCollector (>= 2.7.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
-      Microsoft.ApplicationInsights.PerfCounterCollector (>= 2.7.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
-      Microsoft.ApplicationInsights.WindowsServer (>= 2.7.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
-      Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel (>= 2.7.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
+    Microsoft.ApplicationInsights.AspNetCore (2.5)
+      Microsoft.ApplicationInsights (>= 2.8) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
+      Microsoft.ApplicationInsights.DependencyCollector (>= 2.8) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
+      Microsoft.ApplicationInsights.PerfCounterCollector (>= 2.8) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
+      Microsoft.ApplicationInsights.WindowsServer (>= 2.8) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
+      Microsoft.ApplicationInsights.WindowsServer.TelemetryChannel (>= 2.8) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       Microsoft.AspNetCore.Hosting (>= 1.0.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       Microsoft.Extensions.Configuration (>= 1.0.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       Microsoft.Extensions.Configuration.Json (>= 1.0.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       Microsoft.Extensions.DiagnosticAdapter (>= 1.0.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       Microsoft.Extensions.Logging.Abstractions (>= 1.0.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       NETStandard.Library (>= 1.6.1) - restriction: && (< net451) (>= netstandard1.6)
+      System.Diagnostics.DiagnosticSource (>= 4.5) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
       System.Net.Http (>= 4.3.2) - restriction: || (&& (>= net451) (< netstandard1.6)) (>= net46)
       System.Net.NameResolution (>= 4.3) - restriction: && (< net451) (>= netstandard1.6)
       System.Text.Encodings.Web (>= 4.3.1) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (>= net46)
@@ -1939,7 +1940,7 @@ NUGET
       Microsoft.NETCore.Platforms (>= 1.1) - restriction: || (&& (< monoandroid) (< monotouch) (< net45) (>= netstandard1.3) (< win8) (< wpa81) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< monoandroid) (< net45) (>= netstandard1.0) (< netstandard1.3) (< win8) (< wp8) (< wpa81)) (< portable-net45+win8+wp8+wpa81)
       Microsoft.NETCore.Targets (>= 1.1) - restriction: || (&& (< monoandroid) (< monotouch) (< net45) (>= netstandard1.3) (< win8) (< wpa81) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< monoandroid) (< net45) (>= netstandard1.0) (< netstandard1.3) (< win8) (< wp8) (< wpa81)) (< portable-net45+win8+wp8+wpa81)
       System.Runtime (>= 4.3) - restriction: || (&& (< monoandroid) (< monotouch) (< net45) (>= netstandard1.3) (< win8) (< wpa81) (< xamarinios) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< monoandroid) (< net45) (>= netstandard1.0) (< netstandard1.3) (< win8) (< wp8) (< wpa81)) (< portable-net45+win8+wp8+wpa81)
-    System.Diagnostics.DiagnosticSource (4.5.1) - restriction: || (&& (>= net45) (< net451) (< netstandard1.3) (>= netstandard1.6)) (&& (< net45) (>= net451) (>= netstandard1.3) (< netstandard1.6)) (&& (< net45) (< netcoreapp2.0) (>= netstandard2.0) (< xamarinios)) (&& (< net45) (>= netstandard1.6)) (&& (>= net451) (< netstandard1.3)) (&& (>= net451) (< netstandard1.6) (>= netstandard2.0)) (&& (< net451) (>= netstandard2.0)) (>= net46) (&& (>= netcoreapp2.0) (< netcoreapp2.1)) (&& (>= netstandard1.6) (>= uap10.1))
+    System.Diagnostics.DiagnosticSource (4.5.1) - restriction: || (&& (< monoandroid) (< monotouch) (< net45) (>= netstandard1.6) (< netstandard2.0) (< win81) (< wpa81) (< xamarinmac) (< xamarintvos) (< xamarinwatchos)) (&& (< net45) (< netcoreapp2.0) (>= netstandard2.0) (< xamarinios)) (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6)) (&& (< net451) (>= netstandard2.0)) (>= net46) (&& (>= netcoreapp2.0) (< netcoreapp2.1)) (&& (>= netstandard1.6) (>= uap10.1))
       System.Collections (>= 4.3) - restriction: || (&& (< net45) (>= netstandard1.1) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard2.0) (< win8) (< wpa81))
       System.Diagnostics.Debug (>= 4.3) - restriction: && (< net45) (>= netstandard1.3) (< netstandard2.0) (< win8) (< wpa81)
       System.Diagnostics.Tracing (>= 4.3) - restriction: || (&& (< net45) (>= netstandard1.1) (< netstandard1.3) (< win8) (< wpa81)) (&& (< net45) (>= netstandard1.3) (< netstandard2.0) (< win8) (< wpa81))

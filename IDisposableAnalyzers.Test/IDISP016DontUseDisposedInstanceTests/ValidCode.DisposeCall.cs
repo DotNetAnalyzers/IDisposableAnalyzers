@@ -77,6 +77,61 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
             }
+
+            [Test]
+            public void IfDisposeReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar(bool b)
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (b)
+            {
+                stream.Dispose();
+                return;
+            }
+
+            var bb = stream.ReadByte();
+            stream.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            }
+
+            [Test]
+            public void IfDisposeThrow()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar(bool b)
+        {
+            var stream = File.OpenRead(string.Empty);
+            if (b)
+            {
+                stream.Dispose();
+                throw new Exception();
+            }
+
+            var bb = stream.ReadByte();
+            stream.Dispose();
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            }
         }
     }
 }
