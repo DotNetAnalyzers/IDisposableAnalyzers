@@ -170,8 +170,8 @@ namespace IDisposableAnalyzers
                         }
 
                     case IFieldSymbol _:
-                            this.values.Add(assignedValue);
-                            return true;
+                        this.values.Add(assignedValue);
+                        return true;
                     case IPropertySymbol _:
                     case IMethodSymbol _:
                         if (symbol.DeclaringSyntaxReferences.Length == 0)

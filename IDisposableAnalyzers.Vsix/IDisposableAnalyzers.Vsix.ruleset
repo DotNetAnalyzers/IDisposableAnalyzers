@@ -1,15 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="Microsoft Managed Recommended Rules" Description="These rules focus on the most critical problems in your code, including potential security holes, application crashes, and other important logic and design errors. It is recommended to include this rule set in any custom rule set you create for your projects." ToolsVersion="14.0">
+<RuleSet Name="Microsoft Managed Recommended Rules" Description="These rules focus on the most critical problems in your code, including potential security holes, application crashes, and other important logic and design errors. It is recommended to include this rule set in any custom rule set you create for your projects." ToolsVersion="10.0">
   <Localization ResourceAssembly="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.dll" ResourceBaseName="Microsoft.VisualStudio.CodeAnalysis.RuleSets.Strings.Localized">
     <Name Resource="MinimumRecommendedRules_Name" />
     <Description Resource="MinimumRecommendedRules_Description" />
   </Localization>
-  <Rules AnalyzerId="AsyncUsageAnalyzers" RuleNamespace="AsyncUsageAnalyzers">
-    <Rule Id="AvoidAsyncSuffix" Action="Error" />
-    <Rule Id="AvoidAsyncVoid" Action="Error" />
-    <Rule Id="UseAsyncSuffix" Action="Error" />
-    <Rule Id="UseConfigureAwait" Action="Error" />
-  </Rules>
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
     <Rule Id="CA1009" Action="Warning" />
@@ -74,25 +68,7 @@
     <Rule Id="CA2241" Action="Warning" />
     <Rule Id="CA2242" Action="Warning" />
   </Rules>
-  <Rules AnalyzerId="Microsoft.CodeAnalysis.CSharp" RuleNamespace="Microsoft.CodeAnalysis.CSharp">
-    <Rule Id="CS1573" Action="None" />
-  </Rules>
   <Rules AnalyzerId="StyleCop.Analyzers" RuleNamespace="StyleCop.Analyzers">
-    <Rule Id="SA1118" Action="None" />
-    <Rule Id="SA1312" Action="None" />
-    <Rule Id="SA1401" Action="None" />
-    <Rule Id="SA1404" Action="None" />
-    <Rule Id="SA1600" Action="None" />
-    <Rule Id="SA1601" Action="None" />
-    <Rule Id="SA1602" Action="None" />
-    <Rule Id="SA1611" Action="None" />
-    <Rule Id="SA1612" Action="None" />
-    <Rule Id="SA1615" Action="None" />
-    <Rule Id="SA1633" Action="None" />
-    <Rule Id="SA1652" Action="None" />
     <Rule Id="SA0001" Action="None" />
-  </Rules>
-  <Rules AnalyzerId="Gu.Analyzers.Analyzers" RuleNamespace="Gu.Analyzers.Analyzers">
-    <Rule Id="GU0007" Action="None" />
   </Rules>
 </RuleSet>

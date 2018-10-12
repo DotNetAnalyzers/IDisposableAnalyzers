@@ -114,7 +114,7 @@ namespace ProjectX.Commands
 }";
 
                 var solution = CodeFactory.CreateSolution(
-                    new[] {viewModelBaseCode, popupViewModelCode, closePopupCommandCode},
+                    new[] { viewModelBaseCode, popupViewModelCode, closePopupCommandCode },
                     CodeFactory.DefaultCompilationOptions(Analyzer, AnalyzerAssert.SuppressedDiagnostics),
                     AnalyzerAssert.MetadataReferences);
                 AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
