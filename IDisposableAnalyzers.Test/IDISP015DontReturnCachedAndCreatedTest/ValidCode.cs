@@ -1,13 +1,14 @@
 namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP015");
+        private static readonly DiagnosticDescriptor Descriptor = IDISP015DontReturnCachedAndCreated.Descriptor;
 
         [Test]
         public void WhenRetuningCreated()
@@ -26,7 +27,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [Test]
@@ -52,7 +53,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
     }
 }

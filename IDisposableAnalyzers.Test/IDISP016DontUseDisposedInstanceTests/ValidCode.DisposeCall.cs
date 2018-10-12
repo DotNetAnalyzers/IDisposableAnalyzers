@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -9,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
         internal class DisposeCall
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP016");
+            private static readonly DiagnosticDescriptor Descriptor = IDISP016DontUseDisposedInstance.Descriptor;
 
             [Test]
             public void CreateTouchDispose()
@@ -29,7 +30,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -51,7 +52,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -74,7 +75,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic, testCode);
+                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
             }
         }
     }
