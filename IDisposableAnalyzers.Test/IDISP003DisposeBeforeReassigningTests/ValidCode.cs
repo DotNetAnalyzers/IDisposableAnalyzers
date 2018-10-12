@@ -950,5 +950,55 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void DisposingListContent()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class Foo
+    {
+        private List<Stream> streams = new List<Stream>();
+
+        public void Meh()
+        {
+            this.streams[0].Dispose();
+            this.streams[0] = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void DisposingListContentUnderscore()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class Foo
+    {
+        private List<Stream> _streams = new List<Stream>();
+
+        public void Meh()
+        {
+            _streams[0].Dispose();
+            _streams[0] = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

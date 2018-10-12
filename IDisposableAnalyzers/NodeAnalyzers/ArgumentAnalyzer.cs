@@ -20,10 +20,10 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleArgument, SyntaxKind.Argument);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.Argument);
         }
 
-        private static void HandleArgument(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (context.IsExcludedFromAnalysis())
             {

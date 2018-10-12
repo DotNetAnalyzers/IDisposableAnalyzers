@@ -22,17 +22,14 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleAssignment, SyntaxKind.SimpleAssignmentExpression);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.SimpleAssignmentExpression);
         }
 
-        private static void HandleAssignment(SyntaxNodeAnalysisContext context)
+        private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is AssignmentExpressionSyntax assignment &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is AssignmentExpressionSyntax assignment &&
+                !assignment.Left.IsKind(SyntaxKind.ElementAccessExpression) &&
                 context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol assignedSymbol))
             {
                 if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&

@@ -3,7 +3,7 @@ namespace ValidCode
     using System.Collections;
     using System.Collections.Generic;
 
-    internal class Collections<T> : IReadOnlyList<T>
+    internal class CustomCollection<T> : IReadOnlyList<T>
     {
         private readonly List<T> inner = new List<T>();
 

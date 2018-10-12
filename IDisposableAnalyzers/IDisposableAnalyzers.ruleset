@@ -92,4 +92,7 @@
     <Rule Id="SA1652" Action="None" />
     <Rule Id="SA0001" Action="None" />
   </Rules>
+  <Rules AnalyzerId="Gu.Analyzers" RuleNamespace="Gu.Analyzers">
+    <Rule Id="GU0016" Action="Warning" />
+  </Rules>
 </RuleSet>
