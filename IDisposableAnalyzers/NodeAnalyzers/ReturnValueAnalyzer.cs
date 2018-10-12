@@ -23,10 +23,10 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleReturnValue, SyntaxKind.ReturnStatement);
-            context.RegisterSyntaxNodeAction(HandleArrow, SyntaxKind.ArrowExpressionClause);
-            context.RegisterSyntaxNodeAction(HandleLambda, SyntaxKind.ParenthesizedLambdaExpression);
-            context.RegisterSyntaxNodeAction(HandleLambda, SyntaxKind.SimpleLambdaExpression);
+            context.RegisterSyntaxNodeAction(c => HandleReturnValue(c), SyntaxKind.ReturnStatement);
+            context.RegisterSyntaxNodeAction(c => HandleArrow(c), SyntaxKind.ArrowExpressionClause);
+            context.RegisterSyntaxNodeAction(c => HandleLambda(c), SyntaxKind.ParenthesizedLambdaExpression);
+            context.RegisterSyntaxNodeAction(c => HandleLambda(c), SyntaxKind.SimpleLambdaExpression);
         }
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context)

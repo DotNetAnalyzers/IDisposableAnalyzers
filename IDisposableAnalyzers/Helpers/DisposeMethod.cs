@@ -39,10 +39,10 @@ namespace IDisposableAnalyzers
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", IsIDisposableDispose, out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", IsIDisposableDispose, out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
 
             bool IsIDisposableDispose(IMethodSymbol candidate)
             {
@@ -63,10 +63,10 @@ namespace IDisposableAnalyzers
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", IsIDisposableDispose, out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", IsIDisposableDispose, out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
 
             bool IsIDisposableDispose(IMethodSymbol candidate)
             {
@@ -77,7 +77,7 @@ namespace IDisposableAnalyzers
 
         internal static bool TryFindBaseVirtual(ITypeSymbol type, out IMethodSymbol result)
         {
-            return type.TryFindFirstMethodRecursive("Dispose", IsVirtualDispose, out result);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsVirtualDispose(x), out result);
         }
 
         internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)

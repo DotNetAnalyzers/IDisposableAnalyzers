@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers
         public override void Initialize(AnalysisContext context)
         {
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.LocalDeclarationStatement);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.LocalDeclarationStatement);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)

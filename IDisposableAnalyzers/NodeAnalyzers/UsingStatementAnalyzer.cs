@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.UsingStatement);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.UsingStatement);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)

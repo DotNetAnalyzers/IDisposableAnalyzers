@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -13,7 +13,9 @@
             if (objectCreation.Initializer != null ||
                 trivia.Any(SyntaxKind.SingleLineCommentTrivia))
             {
-                SyntaxNode ComputeReplacement(SyntaxNode x, SyntaxGenerator _)
+                editor.ReplaceNode(objectCreation, (x, _) => ComputeReplacement(x));
+
+                SyntaxNode ComputeReplacement(SyntaxNode x)
                 {
                     var oc = ((ObjectCreationExpressionSyntax)x).RemoveEmptyArgumentList();
                     if (oc.Initializer != null &&
@@ -53,12 +55,12 @@
                                                           .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed)));
                     }
                 }
-
-                editor.ReplaceNode(objectCreation, ComputeReplacement);
             }
             else
             {
-                SyntaxNode ComputeReplacement(SyntaxNode x, SyntaxGenerator _)
+                editor.ReplaceNode(objectCreation, (x, _) => ComputeReplacement(x));
+
+                SyntaxNode ComputeReplacement(SyntaxNode x)
                 {
                     return ((ObjectCreationExpressionSyntax)x).RemoveEmptyArgumentList()
                                                               .WithInitializer(
@@ -67,8 +69,6 @@
                                                                       SyntaxFactory
                                                                           .SingletonSeparatedList(expression)));
                 }
-
-                editor.ReplaceNode(objectCreation, ComputeReplacement);
             }
         }
 

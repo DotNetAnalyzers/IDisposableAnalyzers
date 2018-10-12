@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.MethodDeclaration, SyntaxKind.GetAccessorDeclaration);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.MethodDeclaration, SyntaxKind.GetAccessorDeclaration);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -29,8 +29,8 @@ namespace IDisposableAnalyzers
             {
                 using (var walker = ReturnValueWalker.Borrow(context.Node, ReturnValueSearch.RecursiveInside, context.SemanticModel, context.CancellationToken))
                 {
-                    if (walker.TryFirst(IsCreated, out _) &&
-                        walker.TryFirst(IsCachedOrInjected, out _))
+                    if (walker.TryFirst(x => IsCreated(x), out _) &&
+                        walker.TryFirst(x => IsCachedOrInjected(x), out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }

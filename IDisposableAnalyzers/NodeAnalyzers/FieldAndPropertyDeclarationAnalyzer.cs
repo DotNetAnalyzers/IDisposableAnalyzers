@@ -22,8 +22,8 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(HandleField, SyntaxKind.FieldDeclaration);
-            context.RegisterSyntaxNodeAction(HandleProperty, SyntaxKind.PropertyDeclaration);
+            context.RegisterSyntaxNodeAction(c => HandleField(c), SyntaxKind.FieldDeclaration);
+            context.RegisterSyntaxNodeAction(c => HandleProperty(c), SyntaxKind.PropertyDeclaration);
         }
 
         private static void HandleField(SyntaxNodeAnalysisContext context)

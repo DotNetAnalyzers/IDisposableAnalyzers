@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
-            context.RegisterSyntaxNodeAction(Handle, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)

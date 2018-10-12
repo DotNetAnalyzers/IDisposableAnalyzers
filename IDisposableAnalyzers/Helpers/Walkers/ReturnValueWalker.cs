@@ -155,7 +155,7 @@ namespace IDisposableAnalyzers
                         this.AddReturnValue(value);
                     }
 
-                    this.returnValues.RemoveAll(IsParameter);
+                    this.returnValues.RemoveAll(x => IsParameter(x));
                     return true;
 
                     bool IsParameter(ExpressionSyntax value)
@@ -188,7 +188,7 @@ namespace IDisposableAnalyzers
                         this.AddReturnValue(value);
                     }
 
-                    this.returnValues.RemoveAll(IsParameter);
+                    this.returnValues.RemoveAll(x => IsParameter(x));
                     return true;
 
                     bool IsParameter(ExpressionSyntax value)
@@ -245,7 +245,7 @@ namespace IDisposableAnalyzers
                     AwaitValue(invocation);
                 }
 
-                this.returnValues.RemoveAll(IsParameter);
+                this.returnValues.RemoveAll(x => IsParameter(x));
                 return true;
             }
 
