@@ -100,6 +100,38 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
+
+
+            [Test]
+            public void ReassignViaOutAfterDispose()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar()
+        {
+            Stream stream;
+            Create(out stream);
+            var b = stream.ReadByte();
+            stream.Dispose();
+            Create(out stream);
+            b = stream.ReadByte();
+            stream.Dispose();
+            b = ↓stream.ReadByte();
+        }
+
+        private static void Create(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
         }
     }
 }
