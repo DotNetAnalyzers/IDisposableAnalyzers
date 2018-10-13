@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -48,12 +49,7 @@ namespace IDisposableAnalyzers
                         context.ReportDiagnostic(Diagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation(), additionalLocations: locations));
                     }
 
-                    if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
-                        declaration is VariableDeclaratorSyntax declarator &&
-                        declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax localDeclarationStatement) &&
-                        invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
-                        localDeclarationStatement.Parent == expressionStatement.Parent &&
-                        Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes)
+                    if (IsPreferUsing(local, invocation, context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP017PreferUsing.Descriptor, invocation.GetLocation()));
                     }
@@ -123,6 +119,25 @@ namespace IDisposableAnalyzers
                 }
 
                 return false;
+            }
+        }
+
+        private static bool IsPreferUsing(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context)
+        {
+            return local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
+                   declaration is VariableDeclaratorSyntax declarator &&
+                   declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax localDeclarationStatement) &&
+                   invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
+                   localDeclarationStatement.Parent == expressionStatement.Parent &&
+                   Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes &&
+                   !IsMutated();
+
+            bool IsMutated()
+            {
+                using (var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken))
+                {
+                    return walker.All().Any();
+                }
             }
         }
     }
