@@ -40,9 +40,8 @@ namespace ValidCode.Recursion
             return true;
         }
 
-        public void Dispose()
+        public void DispoeAndReassign()
         {
-#pragma warning disable IDISP016 // Don't use disposed instance.
             StatementBody(out var value);
             value.Dispose();
             StatementBody(1, out value);
@@ -51,7 +50,18 @@ namespace ValidCode.Recursion
             value.Dispose();
             StatementBody(string.Empty, out value);
             value.Dispose();
-#pragma warning restore IDISP016 // Don't use disposed instance.
+        }
+
+        public void Dispose()
+        {
+            StatementBody(out var value);
+            value.Dispose();
+            StatementBody(1, out value);
+            value.Dispose();
+            StatementBody(1.0, out value);
+            value.Dispose();
+            StatementBody(string.Empty, out value);
+            value.Dispose();
         }
 
         public void SameAsCtor()

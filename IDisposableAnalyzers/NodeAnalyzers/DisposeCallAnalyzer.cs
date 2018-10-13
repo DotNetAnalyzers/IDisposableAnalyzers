@@ -74,7 +74,9 @@ namespace IDisposableAnalyzers
                         if (identifierName.Identifier.ValueText == local.Name &&
                             invocation.IsExecutedBefore(identifierName) == true &&
                             context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol candidate) &&
-                            local.Equals(candidate))
+                            local.Equals(candidate) &&
+                            !IsAssigned(identifierName) &&
+                            !IsReassigned(identifierName))
                         {
                             if (temp == null)
                             {
@@ -92,6 +94,36 @@ namespace IDisposableAnalyzers
 
             locations = null;
             return false;
+
+            bool IsAssigned(IdentifierNameSyntax identifier)
+            {
+                switch (identifier.Parent)
+                {
+                    case AssignmentExpressionSyntax assignment:
+                        return assignment.Left == identifier;
+                    case ArgumentSyntax argument when argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword):
+                        return true;
+                }
+
+                return false;
+            }
+
+            bool IsReassigned(SyntaxNode location)
+            {
+                using (var walker = AssignedValueWalker.Borrow(local, context.SemanticModel, context.CancellationToken))
+                {
+                    foreach (var value in walker)
+                    {
+                        if (invocation.IsExecutedBefore(value) != false &&
+                            value.IsExecutedBefore(location) != false)
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }
