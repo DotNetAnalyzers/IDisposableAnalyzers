@@ -244,12 +244,21 @@ namespace IDisposableAnalyzers
 
         internal static AssignedValueWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (symbol is IFieldSymbol ||
-                symbol is IPropertySymbol ||
-                symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
+            switch (symbol)
             {
-                return BorrowCore(symbol, null, semanticModel, cancellationToken);
+                case IFieldSymbol field:
+                    return Borrow(field, semanticModel, cancellationToken);
+                case IPropertySymbol property:
+                    return Borrow(property, semanticModel, cancellationToken);
+                case ILocalSymbol _:
+                case IParameterSymbol _:
+                    if (symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration) &&
+                        declaration.TryFirstAncestor(out MemberDeclarationSyntax memberDeclaration))
+                    {
+                        return BorrowCore(symbol, memberDeclaration, semanticModel, cancellationToken);
+                    }
+
+                    break;
             }
 
             return Borrow(() => new AssignedValueWalker());
