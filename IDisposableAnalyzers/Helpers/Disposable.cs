@@ -70,7 +70,7 @@ namespace IDisposableAnalyzers
                    type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
         }
 
-        internal static bool IsDisposedAfter(ISymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposedAfter(ISymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)
             {
@@ -287,7 +287,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        internal static bool ShouldDispose(LocalOrParameter localOrParameter, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool ShouldDispose(LocalOrParameter localOrParameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (localOrParameter.Symbol)
             {
@@ -300,7 +300,7 @@ namespace IDisposableAnalyzers
             throw new InvalidOperationException("Should never get here.");
         }
 
-        internal static bool ShouldDispose(ILocalSymbol local, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool ShouldDispose(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (location is AssignmentExpressionSyntax assignment &&
                 assignment.Left is IdentifierNameSyntax identifierName &&
@@ -330,7 +330,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool ShouldDispose(IParameterSymbol parameter, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool ShouldDispose(IParameterSymbol parameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (location is AssignmentExpressionSyntax assignment &&
                 assignment.Left is IdentifierNameSyntax identifierName &&

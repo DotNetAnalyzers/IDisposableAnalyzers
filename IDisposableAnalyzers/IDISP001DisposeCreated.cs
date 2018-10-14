@@ -48,7 +48,7 @@ namespace IDisposableAnalyzers
                         initializer.Value is ExpressionSyntax value &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local &&
-                        Disposable.ShouldDispose(local, declarator, context.SemanticModel, context.CancellationToken))
+                        Disposable.ShouldDispose(local, value, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptor, localDeclaration.GetLocation()));
                     }

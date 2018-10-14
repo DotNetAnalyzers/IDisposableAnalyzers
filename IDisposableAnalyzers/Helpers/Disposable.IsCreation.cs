@@ -10,9 +10,6 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
         internal static Result IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
         {
             if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
@@ -123,7 +120,7 @@ namespace IDisposableAnalyzers
         }
 
         /// <summary>
-        /// Check if any path returns a created IDisposable
+        /// Check if any path returns a created IDisposable.
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -171,7 +168,7 @@ namespace IDisposableAnalyzers
         }
 
         /// <summary>
-        /// Check if any path returns a created IDisposable
+        /// Check if any path returns a created IDisposable.
         /// </summary>
         internal static Result IsCreation(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -231,7 +228,7 @@ namespace IDisposableAnalyzers
         }
 
         /// <summary>
-        /// Check if any path returns a created IDisposable
+        /// Check if any path returns a created IDisposable.
         /// </summary>
         private static Result IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
