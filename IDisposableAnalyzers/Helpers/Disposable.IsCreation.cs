@@ -108,7 +108,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        internal static Result IsAssignedWithCreated(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsAssignedWithCreated(ISymbol symbol, ExpressionSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, context, semanticModel, cancellationToken))
             {

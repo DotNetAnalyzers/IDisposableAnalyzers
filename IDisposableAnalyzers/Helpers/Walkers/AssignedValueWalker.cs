@@ -53,38 +53,42 @@ namespace IDisposableAnalyzers
                     return true;
                 }
 
-                if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                if (node is ExpressionSyntax expression &&
+                    this.context is ExpressionSyntax contextExpression)
                 {
-                    if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
-                        node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
+                    if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
                     {
-                        return node.IsExecutedBefore(this.context);
-                    }
-
-                    return true;
-                }
-
-                if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
-                {
-                    if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
-                    {
-                        if (this.CurrentSymbol is ILocalSymbol local &&
-                            local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
-                            lambda.Contains(declaration))
+                        if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
+                            node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                         {
-                            return node.IsExecutedBefore(this.context);
+                            return expression.IsExecutedBefore(contextExpression);
                         }
 
                         return true;
                     }
 
-                    return node.IsExecutedBefore(this.context);
-                }
+                    if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                    {
+                        if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
+                        {
+                            if (this.CurrentSymbol is ILocalSymbol local &&
+                                local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                                lambda.Contains(declaration))
+                            {
+                                return expression.IsExecutedBefore(contextExpression);
+                            }
 
-                if (this.context is InvocationExpressionSyntax &&
-                    ReferenceEquals(node, this.context))
-                {
-                    return false;
+                            return true;
+                        }
+
+                        return expression.IsExecutedBefore(this.context);
+                    }
+
+                    if (this.context is InvocationExpressionSyntax &&
+                        ReferenceEquals(node, contextExpression))
+                    {
+                        return false;
+                    }
                 }
 
                 return true;
@@ -239,7 +243,7 @@ namespace IDisposableAnalyzers
             return Borrow(() => new AssignedValueWalker());
         }
 
-        internal static AssignedValueWalker Borrow(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static AssignedValueWalker Borrow(ISymbol symbol, ExpressionSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
             {

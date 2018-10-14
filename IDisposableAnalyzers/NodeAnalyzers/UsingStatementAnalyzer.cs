@@ -41,7 +41,7 @@ namespace IDisposableAnalyzers
                         }
 
                         var value = variableDeclarator.Initializer.Value;
-                        if (Disposable.IsCachedOrInjected(value, usingStatement, context.SemanticModel, context.CancellationToken))
+                        if (Disposable.IsCachedOrInjected(value, value, context.SemanticModel, context.CancellationToken))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, value.GetLocation()));
                         }
@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
                 }
                 else if (usingStatement.Expression is ExpressionSyntax expression)
                 {
-                    if (Disposable.IsCachedOrInjected(expression, usingStatement, context.SemanticModel, context.CancellationToken))
+                    if (Disposable.IsCachedOrInjected(expression, expression, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, usingStatement.Expression.GetLocation()));
                     }

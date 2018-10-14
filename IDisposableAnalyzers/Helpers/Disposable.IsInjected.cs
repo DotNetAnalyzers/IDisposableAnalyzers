@@ -7,10 +7,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        /// <summary>
-        /// Check if any path returns a created IDisposable
-        /// </summary>
-        internal static bool IsCachedOrInjected(ExpressionSyntax value, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsCachedOrInjected(ExpressionSyntax value, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
             if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
@@ -154,7 +151,7 @@ namespace IDisposableAnalyzers
             return Result.No;
         }
 
-        private static bool IsAssignedWithInjected(ISymbol symbol, SyntaxNode location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
             {

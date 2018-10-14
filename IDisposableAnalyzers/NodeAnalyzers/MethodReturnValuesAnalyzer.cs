@@ -45,7 +45,7 @@ namespace IDisposableAnalyzers
 
             bool IsCachedOrInjected(ExpressionSyntax expression)
             {
-                return Disposable.IsCachedOrInjected(expression, context.Node, context.SemanticModel, context.CancellationToken);
+                return Disposable.IsCachedOrInjected(expression, expression, context.SemanticModel, context.CancellationToken);
             }
         }
     }
