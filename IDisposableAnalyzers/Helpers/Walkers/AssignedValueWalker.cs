@@ -203,19 +203,31 @@ namespace IDisposableAnalyzers
 
         internal static AssignedValueWalker Borrow(IPropertySymbol property, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return Borrow(property, null, semanticModel, cancellationToken);
+            if (property.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                declaration.Parent is TypeDeclarationSyntax typeDeclaration)
+            {
+                return BorrowCore(property, typeDeclaration, semanticModel, cancellationToken);
+            }
+
+            return Borrow(() => new AssignedValueWalker());
         }
 
         internal static AssignedValueWalker Borrow(IFieldSymbol field, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return Borrow(field, null, semanticModel, cancellationToken);
+            if (field.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                declaration.Parent is TypeDeclarationSyntax typeDeclaration)
+            {
+                return BorrowCore(field, typeDeclaration, semanticModel, cancellationToken);
+            }
+
+            return Borrow(() => new AssignedValueWalker());
         }
 
         internal static AssignedValueWalker Borrow(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (value is ElementAccessExpressionSyntax elementAccess)
             {
-                return Borrow(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
+                return BorrowCore(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
             }
 
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
@@ -224,7 +236,7 @@ namespace IDisposableAnalyzers
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return Borrow(symbol, value, semanticModel, cancellationToken);
+                return BorrowCore(symbol, value, semanticModel, cancellationToken);
             }
 
             return Borrow(() => new AssignedValueWalker());
@@ -237,13 +249,18 @@ namespace IDisposableAnalyzers
                 symbol is ILocalSymbol ||
                 symbol is IParameterSymbol)
             {
-                return Borrow(symbol, null, semanticModel, cancellationToken);
+                return BorrowCore(symbol, null, semanticModel, cancellationToken);
             }
 
             return Borrow(() => new AssignedValueWalker());
         }
 
         internal static AssignedValueWalker Borrow(ISymbol symbol, ExpressionSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return BorrowCore(symbol, context, semanticModel, cancellationToken);
+        }
+
+        private static AssignedValueWalker BorrowCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol == null)
             {
