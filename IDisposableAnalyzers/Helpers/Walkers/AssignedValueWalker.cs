@@ -41,12 +41,54 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
-            if (this.ShouldVisit(node) == false)
+            if (ShouldVisit() != false)
             {
-                return;
+                base.Visit(node);
             }
 
-            base.Visit(node);
+            bool? ShouldVisit()
+            {
+                if (this.context == null)
+                {
+                    return true;
+                }
+
+                if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                {
+                    if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
+                        node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
+                    {
+                        return node.IsExecutedBefore(this.context);
+                    }
+
+                    return true;
+                }
+
+                if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                {
+                    if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
+                    {
+                        if (this.CurrentSymbol is ILocalSymbol local &&
+                            local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                            lambda.Contains(declaration))
+                        {
+                            return node.IsExecutedBefore(this.context);
+                        }
+
+                        return true;
+                    }
+
+                    return node.IsExecutedBefore(this.context);
+                }
+
+                if (this.context is InvocationExpressionSyntax &&
+                    ReferenceEquals(node, this.context))
+                {
+                    return false;
+                }
+
+                return true;
+            }
         }
 
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
@@ -648,45 +690,6 @@ namespace IDisposableAnalyzers
                            this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.Identifier.ValueText, out result);
                 }
             }
-        }
-
-        private bool? ShouldVisit(SyntaxNode node)
-        {
-            if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
-            {
-                if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
-                    node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
-                {
-                    return node.IsExecutedBefore(this.context);
-                }
-
-                return true;
-            }
-
-            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
-            {
-                if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
-                {
-                    if (this.CurrentSymbol is ILocalSymbol local &&
-                        local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
-                        lambda.Contains(declaration))
-                    {
-                        return node.IsExecutedBefore(this.context);
-                    }
-
-                    return true;
-                }
-
-                return node.IsExecutedBefore(this.context);
-            }
-
-            if (this.context is InvocationExpressionSyntax &&
-                ReferenceEquals(node, this.context))
-            {
-                return false;
-            }
-
-            return true;
         }
 
         private class PublicMemberWalker : CSharpSyntaxWalker
