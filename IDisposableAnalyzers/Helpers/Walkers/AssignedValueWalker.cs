@@ -41,12 +41,12 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
-            if (ShouldVisit() != false)
+            if (ShouldVisit())
             {
                 base.Visit(node);
             }
 
-            bool? ShouldVisit()
+            bool ShouldVisit()
             {
                 if (this.context == null)
                 {
@@ -61,7 +61,7 @@ namespace IDisposableAnalyzers
                         if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
                             node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                         {
-                            return expression.IsExecutedBefore(contextExpression);
+                            return expression.IsExecutedBefore(contextExpression) != false;
                         }
 
                         return true;
@@ -69,23 +69,22 @@ namespace IDisposableAnalyzers
 
                     if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
                     {
-                        if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
+                        if (node.TryFirstAncestor(out AnonymousFunctionExpressionSyntax lambda))
                         {
                             if (this.CurrentSymbol is ILocalSymbol local &&
                                 local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                                 lambda.Contains(declaration))
                             {
-                                return expression.IsExecutedBefore(contextExpression);
+                                return expression.IsExecutedBefore(contextExpression) != false;
                             }
 
                             return true;
                         }
 
-                        return expression.IsExecutedBefore(this.context);
+                        return expression.IsExecutedBefore(contextExpression) != false;
                     }
 
-                    if (this.context is InvocationExpressionSyntax &&
-                        ReferenceEquals(node, contextExpression))
+                    if (ReferenceEquals(expression, contextExpression))
                     {
                         return false;
                     }
