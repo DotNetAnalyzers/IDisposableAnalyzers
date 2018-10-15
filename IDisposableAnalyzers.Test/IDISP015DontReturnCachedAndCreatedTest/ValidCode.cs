@@ -55,5 +55,33 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
+
+        [Test]
+        public void ReturningCachedInDictionary()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class Foo
+    {
+        private readonly Dictionary<int, Stream> streams = new Dictionary<int, Stream>();
+
+        public Foo()
+        {
+            this.streams[0] = File.OpenRead(string.Empty);
+        }
+
+        public Stream Get(int i)
+        {
+            return this.streams[i];
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+        }
     }
 }

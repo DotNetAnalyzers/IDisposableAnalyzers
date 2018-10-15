@@ -39,8 +39,7 @@ namespace IDisposableAnalyzers
 
             bool IsCreated(ExpressionSyntax expression)
             {
-                return Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) == Result.Yes ||
-                       Disposable.IsAlreadyAssignedWithCreated(expression, context.SemanticModel, context.CancellationToken, out _) == Result.Yes;
+                return Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) == Result.Yes;
             }
 
             bool IsCachedOrInjected(ExpressionSyntax expression)
