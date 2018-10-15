@@ -1,3 +1,8 @@
+#### 2.0.4
+* BUGFIX: IDISP003 detect disposal of previous instance copied to local.
+* BUGFIX: IDISP015 when returning from value from dictionary.
+* FEATURE: Understand NOP disposable.
+
 #### 2.0.3.3
 * BUGFIX: IDISP013 ignore nunit ThrowAsync
 * BUGFIX: Code fix for IDISP001 doubles the indentation

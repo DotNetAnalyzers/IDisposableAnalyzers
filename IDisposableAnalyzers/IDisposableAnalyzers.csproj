@@ -20,13 +20,12 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.0.3.3</Version>
+    <Version>2.0.4.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>BUGFIX: IDISP013 ignore nunit ThrowAsync
-BUGFIX: Code fix for IDISP001 doubles the indentation
-BUGFIX: Code fix for IDISP002 when calling base.Dispose(disposing)
-BUGFIX: IDISP006 should not warn when overriding Dispose(disposing)</Description>
+    <Description>BUGFIX: IDISP003 detect disposal of previous instance copied to local.
+BUGFIX: IDISP015 when returning from value from dictionary.
+FEATURE: Understand NOP disposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       BUGFIX: Handle extension methods in binary references better.
