@@ -194,7 +194,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                return left.IsEither<IFieldSymbol, IPropertySymbol>();
+                return left.IsEitherKind(SymbolKind.Field, SymbolKind.Property);
             }
 
             return false;

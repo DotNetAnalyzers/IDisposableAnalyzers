@@ -103,7 +103,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (symbol.IsEither<IFieldSymbol, IPropertySymbol>())
+            if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
             {
                 return Result.No;
             }

@@ -34,7 +34,7 @@ namespace IDisposableAnalyzers
                                 identifierName.Identifier.ValueText == "value" &&
                                 IsPotentiallyAssignableFrom(assigned.Left, semanticModel, cancellationToken) &&
                                 semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
-                                candidate.IsEither<IFieldSymbol, IPropertySymbol>())
+                                candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                             {
                                 assignedSymbols.Add(candidate);
                             }

@@ -169,7 +169,7 @@ namespace IDisposableAnalyzers
                     return identifierName.Identifier.ValueText == symbol.Name;
                 }
 
-                if (symbol.IsEither<IFieldSymbol, IPropertySymbol>() &&
+                if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
                     expression is MemberAccessExpressionSyntax memberAccess &&
                     memberAccess.Expression is InstanceExpressionSyntax &&
                     memberAccess.Name is IdentifierNameSyntax identifier)

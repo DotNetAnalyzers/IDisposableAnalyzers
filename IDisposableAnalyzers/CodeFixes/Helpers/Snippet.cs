@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
     {
         internal static StatementSyntax DisposeStatement(ISymbol member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var prefix = member.IsEither<IFieldSymbol, IPropertySymbol>() &&
+            var prefix = member.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
                          !semanticModel.UnderscoreFields()
                     ? "this."
                     : string.Empty;

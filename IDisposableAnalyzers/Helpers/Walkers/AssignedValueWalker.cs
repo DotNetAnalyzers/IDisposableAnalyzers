@@ -56,7 +56,7 @@ namespace IDisposableAnalyzers
                 if (node is ExpressionSyntax expression &&
                     this.context is ExpressionSyntax contextExpression)
                 {
-                    if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                    if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                     {
                         if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node, out _) &&
                             node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
@@ -428,7 +428,7 @@ namespace IDisposableAnalyzers
             {
                 this.Visit(scope);
             }
-            else if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>() &&
+            else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
                      this.context.TryFirstAncestorOrSelf(out TypeDeclarationSyntax typeDeclaration) &&
                      this.semanticModel.TryGetSymbol(typeDeclaration, this.cancellationToken, out var type))
             {
@@ -438,8 +438,8 @@ namespace IDisposableAnalyzers
                     this.Visit(fieldDeclarationSyntax);
                 }
                 else if (this.CurrentSymbol is IPropertySymbol &&
-                    this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax propertyDeclaration) &&
-                    propertyDeclaration.Initializer != null)
+                         this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax propertyDeclaration) &&
+                         propertyDeclaration.Initializer != null)
                 {
                     this.values.Add(propertyDeclaration.Initializer.Value);
                 }
@@ -531,7 +531,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
+            if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter) &&
                 assigned is DeclarationPatternSyntax declarationPattern &&
                 declarationPattern.Designation is SingleVariableDesignationSyntax singleVariableDesignation &&
                 singleVariableDesignation.Identifier.ValueText == this.CurrentSymbol.Name)
@@ -540,7 +540,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>() &&
+            if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter) &&
                 assigned is MemberAccessExpressionSyntax)
             {
                 return;
@@ -645,7 +645,7 @@ namespace IDisposableAnalyzers
             bool TryGetSetterWalker(out AssignedValueWalker walker)
             {
                 walker = null;
-                if (!this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+                if (!this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                 {
                     return false;
                 }
