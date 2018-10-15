@@ -70,6 +70,51 @@ namespace IDisposableAnalyzers
                    type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
         }
 
+        internal static bool IsNop(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol) &&
+                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
+                fieldOrProperty.IsStatic &&
+                IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
+            {
+                if (fieldOrProperty.Type == KnownSymbol.Task ||
+                    symbol == KnownSymbol.RxDisposable.Empty)
+                {
+                    return true;
+                }
+
+                using (var walker = ReturnValueWalker.Borrow(candidate, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
+                {
+                    if (walker.Count > 0)
+                    {
+                        return walker.TrySingle(out var value) &&
+                               semanticModel.TryGetType(value, cancellationToken, out var type) &&
+                               IsNop(type);
+                    }
+                }
+
+                using (var walker = AssignedValueWalker.Borrow(symbol, semanticModel, cancellationToken))
+                {
+                    return walker.TrySingle(out var value) &&
+                           semanticModel.TryGetType(value, cancellationToken, out var type) &&
+                           IsNop(type);
+                }
+            }
+
+            return false;
+
+            bool IsNop(ITypeSymbol type)
+            {
+                return type.IsSealed &&
+                       type.BaseType == KnownSymbol.Object &&
+                       type.TryFindSingleMethod("Dispose", out var disposeMethod) &&
+                       disposeMethod.Parameters.Length == 0 &&
+                       disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration) &&
+                       declaration.Body is BlockSyntax body &&
+                       body.Statements.Count == 0;
+            }
+        }
+
         internal static bool IsDisposedAfter(ISymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)

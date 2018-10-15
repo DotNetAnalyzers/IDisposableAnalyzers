@@ -27,10 +27,10 @@ namespace IDisposableAnalyzers
                 context.Node is MethodDeclarationSyntax methodDeclaration &&
                 Disposable.IsAssignableFrom(method.ReturnType, context.Compilation))
             {
-                using (var walker = ReturnValueWalker.Borrow(context.Node, ReturnValueSearch.RecursiveInside, context.SemanticModel, context.CancellationToken))
+                using (var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.RecursiveInside, context.SemanticModel, context.CancellationToken))
                 {
                     if (walker.TryFirst(x => IsCreated(x), out _) &&
-                        walker.TryFirst(x => IsCachedOrInjected(x), out _))
+                        walker.TryFirst(x => IsCachedOrInjected(x) && !IsNop(x), out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }
@@ -45,6 +45,11 @@ namespace IDisposableAnalyzers
             bool IsCachedOrInjected(ExpressionSyntax expression)
             {
                 return Disposable.IsCachedOrInjected(expression, expression, context.SemanticModel, context.CancellationToken);
+            }
+
+            bool IsNop(ExpressionSyntax expression)
+            {
+                return Disposable.IsNop(expression, context.SemanticModel, context.CancellationToken);
             }
         }
     }

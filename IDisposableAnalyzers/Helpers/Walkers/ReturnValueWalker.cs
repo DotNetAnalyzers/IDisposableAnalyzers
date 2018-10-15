@@ -318,7 +318,7 @@ namespace IDisposableAnalyzers
 
         private void AddReturnValue(ExpressionSyntax value)
         {
-            if (this.search == ReturnValueSearch.Recursive)
+            if (this.search.IsEither(ReturnValueSearch.Recursive, ReturnValueSearch.RecursiveInside))
             {
                 switch (value)
                 {
