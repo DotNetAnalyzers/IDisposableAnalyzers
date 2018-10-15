@@ -432,8 +432,7 @@ namespace IDisposableAnalyzers
             {
                 this.Visit(scope);
             }
-            else if (this.CurrentSymbol is IFieldSymbol ||
-                     this.CurrentSymbol is IPropertySymbol)
+            else if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
             {
                 var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
                 if (type == null)
@@ -510,8 +509,7 @@ namespace IDisposableAnalyzers
                         {
                             foreach (var reference in type.DeclaringSyntaxReferences)
                             {
-                                var typeDeclaration = (TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken);
-                                this.publicMemberWalker.Visit(typeDeclaration);
+                                this.publicMemberWalker.Visit((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken));
                             }
 
                             type = type.BaseType;
