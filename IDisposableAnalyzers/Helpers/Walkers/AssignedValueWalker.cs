@@ -58,10 +58,10 @@ namespace IDisposableAnalyzers
                 {
                     if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
                     {
-                        if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node) &&
+                        if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node, out _) &&
                             node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
                         {
-                            return expression.IsExecutedBefore(contextExpression) != false;
+                            return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
                         }
 
                         return true;
@@ -75,13 +75,13 @@ namespace IDisposableAnalyzers
                                 local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                                 lambda.Contains(declaration))
                             {
-                                return expression.IsExecutedBefore(contextExpression) != false;
+                                return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
                             }
 
                             return true;
                         }
 
-                        return expression.IsExecutedBefore(contextExpression) != false;
+                        return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
                     }
 
                     if (ReferenceEquals(expression, contextExpression))

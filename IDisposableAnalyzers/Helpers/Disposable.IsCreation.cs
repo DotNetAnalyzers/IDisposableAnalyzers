@@ -104,7 +104,7 @@ namespace IDisposableAnalyzers
             {
                 return expression.TryFirstAncestor(out BlockSyntax block) &&
                        block.Statements.TryFirstOfType(out ReturnStatementSyntax returnStatement) &&
-                       disposable.IsExecutedBefore(returnStatement) == false;
+                       disposable.IsExecutedBefore(returnStatement) == ExecutedBefore.No;
             }
         }
 

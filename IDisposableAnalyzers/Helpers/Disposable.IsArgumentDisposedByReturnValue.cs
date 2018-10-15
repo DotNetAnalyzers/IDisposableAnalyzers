@@ -173,7 +173,9 @@ namespace IDisposableAnalyzers
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
             {
+#pragma warning disable IDISP003
                 using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
                 {
                     if (!visited.Add(memberAccess))
                     {
