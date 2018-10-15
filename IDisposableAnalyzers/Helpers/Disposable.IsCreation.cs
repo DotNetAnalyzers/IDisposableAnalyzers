@@ -184,7 +184,7 @@ namespace IDisposableAnalyzers
                 method.TryFindParameter(candidate, out var parameter) &&
                 IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
             {
-                return IsAssignedWithCreated(parameter, null, semanticModel, cancellationToken);
+                return IsAssignedWithCreated(parameter, candidate.Expression, semanticModel, cancellationToken);
             }
 
             return Result.Unknown;

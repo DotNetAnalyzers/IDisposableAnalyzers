@@ -268,39 +268,6 @@ namespace IDisposableAnalyzers
             return BorrowCore(symbol, context, semanticModel, cancellationToken);
         }
 
-        private static AssignedValueWalker BorrowCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (symbol == null)
-            {
-                return Borrow(() => new AssignedValueWalker());
-            }
-
-            var pooled = Borrow(() => new AssignedValueWalker());
-            pooled.CurrentSymbol = symbol;
-            pooled.context = context;
-            pooled.semanticModel = semanticModel;
-            pooled.cancellationToken = cancellationToken;
-            if (context != null)
-            {
-                pooled.Run();
-            }
-            else
-            {
-                foreach (var reference in symbol.DeclaringSyntaxReferences)
-                {
-                    pooled.context = symbol is IFieldSymbol || symbol is IPropertySymbol
-                                              ? reference.GetSyntax(cancellationToken)
-                                                         .FirstAncestor<TypeDeclarationSyntax>()
-                                              : reference.GetSyntax(cancellationToken)
-                                                         .FirstAncestor<MemberDeclarationSyntax>();
-                    pooled.Run();
-                }
-            }
-
-            pooled.values.PurgeDuplicates();
-            return pooled;
-        }
-
         internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
         {
             if (method != null &&
@@ -428,6 +395,23 @@ namespace IDisposableAnalyzers
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
             this.memberWalkers.Clear();
+        }
+
+        private static AssignedValueWalker BorrowCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (symbol == null || context == null)
+            {
+                return Borrow(() => new AssignedValueWalker());
+            }
+
+            var pooled = Borrow(() => new AssignedValueWalker());
+            pooled.CurrentSymbol = symbol;
+            pooled.context = context;
+            pooled.semanticModel = semanticModel;
+            pooled.cancellationToken = cancellationToken;
+            pooled.Run();
+            pooled.values.PurgeDuplicates();
+            return pooled;
         }
 
         private void Run()
