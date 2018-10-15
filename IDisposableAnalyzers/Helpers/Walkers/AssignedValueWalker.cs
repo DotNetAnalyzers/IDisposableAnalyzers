@@ -156,14 +156,17 @@ namespace IDisposableAnalyzers
                     this.semanticModel.TryGetSymbol(member, this.cancellationToken, out ISymbol memberSymbol) &&
                     memberSymbol.Equals(this.CurrentSymbol))
                 {
-                    if (method.ContainingType.IsAssignableTo(KnownSymbol.IDictionary, this.semanticModel.Compilation) &&
-                        node.ArgumentList?.Arguments.Count == 2)
+                    if (method.Parameters.TrySingle(out var parameter) &&
+                        node.TryFindArgument(parameter, out var argument))
                     {
-                        this.values.Add(node.ArgumentList.Arguments[1].Expression);
+                        this.values.Add(argument.Expression);
                     }
-                    else if (node.ArgumentList?.Arguments.Count == 1)
+                    else if (method.Parameters.Length == 2 &&
+                             method.ContainingType.IsAssignableTo(KnownSymbol.IDictionary, this.semanticModel.Compilation) &&
+                             method.TryFindParameter("value", out parameter) &&
+                             node.TryFindArgument(parameter, out argument))
                     {
-                        this.values.Add(node.ArgumentList.Arguments[0].Expression);
+                        this.values.Add(argument.Expression);
                     }
                 }
 
