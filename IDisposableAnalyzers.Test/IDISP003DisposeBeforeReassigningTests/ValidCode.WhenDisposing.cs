@@ -402,5 +402,33 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void DisposingPreviousAssignedToLocal()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    class Foo : IDisposable
+    {
+        private Disposable current;
+
+        public void Test()
+        {
+            var old = current;
+            current = new Disposable();
+            if (old != current) old.Dispose();
+        }
+
+        public void Dispose()
+        {
+            current?.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }

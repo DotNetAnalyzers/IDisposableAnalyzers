@@ -93,7 +93,33 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
+            if (TryGetAssignedLocal(out var local) &&
+                Disposable.IsDisposedAfter(local, assignment, context.SemanticModel, context.CancellationToken))
+            {
+                return false;
+            }
+
             return true;
+
+            bool TryGetAssignedLocal(out ILocalSymbol result)
+            {
+                result = null;
+                if (assignment.TryFirstAncestor(out MemberDeclarationSyntax memberDeclaration))
+                {
+                    using (var walker = VariableDeclaratorWalker.Borrow(memberDeclaration))
+                    {
+                        return walker.VariableDeclarators.TrySingle(
+                                   x => context.SemanticModel.TryGetSymbol(
+                                            x.Initializer?.Value, context.CancellationToken, out ISymbol symbol) &&
+                                        symbol.Equals(assignedSymbol),
+                                   out var match) &&
+                               match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
+                               context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out result);
+                    }
+                }
+
+                return false;
+            }
         }
 
         private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
