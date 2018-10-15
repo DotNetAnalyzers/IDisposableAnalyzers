@@ -229,11 +229,7 @@ namespace IDisposableAnalyzers
                 return BorrowCore(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
             }
 
-            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-            if (symbol is IFieldSymbol ||
-                symbol is IPropertySymbol ||
-                symbol is ILocalSymbol ||
-                symbol is IParameterSymbol)
+            if (semanticModel.TryGetSymbol(value, cancellationToken, out ISymbol symbol))
             {
                 return BorrowCore(symbol, value, semanticModel, cancellationToken);
             }
