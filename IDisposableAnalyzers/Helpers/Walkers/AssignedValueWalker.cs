@@ -422,32 +422,18 @@ namespace IDisposableAnalyzers
             }
 
             if (this.CurrentSymbol is ILocalSymbol local &&
-                local.TrySingleDeclaration(this.cancellationToken, out var declaration))
+                local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                TryGetScope(declaration, out var scope))
             {
-                var scope = (SyntaxNode)declaration.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                        declaration.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                if (scope != null)
-                {
-                    this.Visit(scope);
-                }
-
-                return;
+                this.Visit(scope);
             }
-
-            if (this.CurrentSymbol is IParameterSymbol)
+            else if (this.CurrentSymbol is IParameterSymbol &&
+                TryGetScope(this.context, out scope))
             {
-                var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                        this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                if (scope != null)
-                {
-                    this.Visit(scope);
-                }
-
-                return;
+                this.Visit(scope);
             }
-
-            if (this.CurrentSymbol is IFieldSymbol ||
-                this.CurrentSymbol is IPropertySymbol)
+            else if (this.CurrentSymbol is IFieldSymbol ||
+                     this.CurrentSymbol is IPropertySymbol)
             {
                 var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
                 if (type == null)
@@ -514,14 +500,10 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                if ((this.CurrentSymbol is IFieldSymbol field &&
-                     !field.IsReadOnly) ||
-                    (this.CurrentSymbol is IPropertySymbol property &&
-                     !property.IsReadOnly))
+                if ((this.CurrentSymbol is IFieldSymbol field && !field.IsReadOnly) ||
+                    (this.CurrentSymbol is IPropertySymbol property && !property.IsReadOnly))
                 {
-                    var scope = (SyntaxNode)this.context?.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                this.context?.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                    if (scope != null &&
+                    if (TryGetScope(this.context, out scope) &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
                         while (type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
@@ -536,6 +518,13 @@ namespace IDisposableAnalyzers
                         }
                     }
                 }
+            }
+
+            bool TryGetScope(SyntaxNode location, out SyntaxNode result)
+            {
+                result = (SyntaxNode)location.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                     location.FirstAncestorOrSelf<MemberDeclarationSyntax>();
+                return result != null;
             }
         }
 
