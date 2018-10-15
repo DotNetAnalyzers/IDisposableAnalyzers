@@ -21,6 +21,8 @@ namespace ValidCode
             this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });
         }
 
+        public IDisposable M(bool b) => b ? new Disposable() : System.Reactive.Disposables.Disposable.Empty;
+
         public void Dispose()
         {
             this.subscription.Dispose();

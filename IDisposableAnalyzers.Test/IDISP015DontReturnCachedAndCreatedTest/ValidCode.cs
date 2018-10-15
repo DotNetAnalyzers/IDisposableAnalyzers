@@ -10,6 +10,28 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = IDISP015DontReturnCachedAndCreated.Descriptor;
 
+        private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public Disposable(string meh)
+            : this()
+        {
+        }
+
+        public Disposable()
+        {
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
         [Test]
         public void WhenRetuningCreated()
         {
@@ -82,6 +104,22 @@ namespace RoslynSandbox
     }
 }";
             AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+        }
+
+        [Test]
+        public void CreatedAndDisposableEmpty()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    class C
+    {
+        public IDisposable M(bool b) => b ? new Disposable() : System.Reactive.Disposables.Disposable.Empty;
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }
