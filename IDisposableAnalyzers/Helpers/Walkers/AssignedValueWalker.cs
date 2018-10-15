@@ -432,14 +432,10 @@ namespace IDisposableAnalyzers
             {
                 this.Visit(scope);
             }
-            else if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>())
+            else if (this.CurrentSymbol.IsEither<IFieldSymbol, IPropertySymbol>() &&
+                     this.context.TryFirstAncestorOrSelf(out TypeDeclarationSyntax typeDeclaration) &&
+                     this.semanticModel.TryGetSymbol(typeDeclaration, this.cancellationToken, out var type))
             {
-                var type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context?.FirstAncestorOrSelf<TypeDeclarationSyntax>(), this.cancellationToken);
-                if (type == null)
-                {
-                    return;
-                }
-
                 if (this.CurrentSymbol is IFieldSymbol &&
                     this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax fieldDeclarationSyntax))
                 {
