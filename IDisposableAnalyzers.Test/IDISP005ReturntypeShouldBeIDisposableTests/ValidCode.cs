@@ -1,6 +1,6 @@
 // ReSharper disable InconsistentNaming
 #pragma warning disable SA1203 // Constants must appear before fields
-namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;

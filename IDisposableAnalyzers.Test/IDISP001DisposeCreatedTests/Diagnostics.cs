@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     internal partial class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox
@@ -44,8 +44,7 @@ namespace RoslynSandbox
             ↓var value = new Disposable();
         }
     }
-}";
-            testCode = testCode.AssertReplace("new Disposable()", code);
+}".AssertReplace("new Disposable()", code);
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
         }
 

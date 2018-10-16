@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP005ReturntypeShouldIndicateIDisposable.Descriptor,
+            IDISP005ReturntypeShouldBeIDisposable.Descriptor,
             IDISP011DontReturnDisposed.Descriptor,
             IDISP012PropertyShouldNotReturnCreated.Descriptor,
             IDISP013AwaitInUsing.Descriptor);
@@ -88,7 +88,7 @@ namespace IDisposableAnalyzers
 
                     if (!IsDisposableReturnTypeOrIgnored(ReturnType(context), context.Compilation))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldIndicateIDisposable.Descriptor, returnValue.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldBeIDisposable.Descriptor, returnValue.GetLocation()));
                     }
                 }
             }

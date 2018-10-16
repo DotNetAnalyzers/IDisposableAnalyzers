@@ -2,7 +2,7 @@
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class IDISP005ReturntypeShouldIndicateIDisposable
+    internal static class IDISP005ReturntypeShouldBeIDisposable
     {
         public const string DiagnosticId = "IDISP005";
 

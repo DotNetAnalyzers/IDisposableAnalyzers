@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldIndicateIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
