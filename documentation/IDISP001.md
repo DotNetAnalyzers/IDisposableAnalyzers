@@ -36,7 +36,7 @@
 
 ## Description
 
-When you create a instance of a type that implements `IDisposable` you are responsible for disposing it.
+When you create an instance of a type that implements `IDisposable` you are responsible for disposing it.
 This rule will warn even if you have an explicit dispose call and try finally.
 The reason for not filtering out those cases is that using reads better.
 

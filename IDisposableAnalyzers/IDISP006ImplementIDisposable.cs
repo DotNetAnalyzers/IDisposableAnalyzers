@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -13,7 +13,7 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The member is assigned with a created `IDisposable`s within the type. Implement IDisposable and dispose it.",
+            description: "The member is assigned with a created IDisposables within the type. Implement IDisposable and dispose it.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }

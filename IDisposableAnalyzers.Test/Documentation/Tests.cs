@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers.Test.Documentation
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -12,7 +13,7 @@ namespace IDisposableAnalyzers.Test.Documentation
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Tests
+    internal class Tests
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
                                                                               .Assembly
@@ -54,17 +55,24 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Title(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual(File.ReadLines(descriptorInfo.DocFileName).Skip(1).First(), $"## {descriptorInfo.Descriptor.Title}");
+            var expected = $"## {descriptorInfo.Descriptor.Title}";
+            var actual = File.ReadLines(descriptorInfo.DocFileName).Skip(1).First().Replace("`", string.Empty);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Description(DescriptorInfo descriptorInfo)
         {
-            var expected = File.ReadLines(descriptorInfo.DocFileName)
-                               .SkipWhile(l => !l.StartsWith("## Description"))
-                               .Skip(1)
-                               .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l));
-            var actual = descriptorInfo.Descriptor.Description.ToString().Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries).First();
+            var expected = descriptorInfo.Descriptor
+                                         .Description
+                                         .ToString(CultureInfo.InvariantCulture)
+                                         .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
+                                         .First();
+            var actual = File.ReadLines(descriptorInfo.DocFileName)
+                             .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
+                             .Skip(1)
+                             .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
+                            ?.Replace("`", string.Empty);
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -101,19 +109,19 @@ namespace IDisposableAnalyzers.Test.Documentation
             var builder = new StringBuilder();
             builder.AppendLine("<!-- start generated table -->")
                    .AppendLine("<table>");
-            foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor).Where(x => x.Id != "SemanticModelCacheAnalyzer").Distinct().OrderBy(x => x.Id))
+            foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor).Distinct().OrderBy(x => x.Id))
             {
-                builder.AppendLine("  <tr>");
-                builder.AppendLine($@"    <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>");
-                builder.AppendLine($"    <td>{descriptor.Title}</td>");
-                builder.AppendLine("  </tr>");
+                builder.AppendLine("  <tr>")
+                       .AppendLine($@"    <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>")
+                       .AppendLine($"    <td>{descriptor.Title}</td>")
+                       .AppendLine("  </tr>");
             }
 
             builder.AppendLine("<table>")
                    .Append("<!-- end generated table -->");
             var expected = builder.ToString();
             DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")));
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md"))).Replace("`", string.Empty);
             CodeAssert.AreEqual(expected, actual);
         }
 
@@ -122,12 +130,12 @@ namespace IDisposableAnalyzers.Test.Documentation
             var descriptor = descriptorInfo.Descriptor;
             var stub = Properties.Resources.DiagnosticDocTemplate
                              .AssertReplace("{ID}", descriptor.Id)
-                             .AssertReplace("## ADD TITLE HERE", $"## {descriptor.Title.ToString()}")
+                             .AssertReplace("## ADD TITLE HERE", $"## {descriptor.Title.ToString(CultureInfo.InvariantCulture)}")
                              .AssertReplace("{SEVERITY}", descriptor.DefaultSeverity.ToString())
                              .AssertReplace("{ENABLED}", descriptor.IsEnabledByDefault ? "true" : "false")
                              .AssertReplace("{CATEGORY}", descriptor.Category)
-                             .AssertReplace("ADD DESCRIPTION HERE", descriptor.Description.ToString())
-                             .AssertReplace("{TITLE}", descriptor.Title.ToString());
+                             .AssertReplace("ADD DESCRIPTION HERE", descriptor.Description.ToString(CultureInfo.InvariantCulture))
+                             .AssertReplace("{TITLE}", descriptor.Title.ToString(CultureInfo.InvariantCulture));
             if (Analyzers.Count(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)) == 1)
             {
                 return stub.AssertReplace("{TYPENAME}", descriptorInfo.Analyzer.GetType().Name)
@@ -205,8 +213,8 @@ namespace IDisposableAnalyzers.Test.Documentation
 
             public static string GetCodeFileUri(DiagnosticAnalyzer analyzer)
             {
-                string fileName = Directory.EnumerateFiles(SolutionDirectory.FullName, analyzer.GetType().Name + ".cs", SearchOption.AllDirectories)
-                                           .FirstOrDefault();
+                var fileName = Directory.EnumerateFiles(SolutionDirectory.FullName, analyzer.GetType().Name + ".cs", SearchOption.AllDirectories)
+                                        .FirstOrDefault();
                 return fileName != null
                     ? "https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master" +
                       fileName.Substring(SolutionDirectory.FullName.Length).Replace("\\", "/")

@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -13,7 +13,7 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The type has a Dispose method but does not implement `IDisposable`.",
+            description: "The type has a Dispose method but does not implement IDisposable.",
             helpLinkUri: HelpLink.ForId(DiagnosticId));
     }
 }
