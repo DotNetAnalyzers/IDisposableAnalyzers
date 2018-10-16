@@ -418,6 +418,15 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is ArgumentSyntax argument)
             {
+                if (argument.Parent is ArgumentListSyntax argumentList &&
+                    argumentList.Parent is InvocationExpressionSyntax invocation &&
+                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                    method.Name == "Add" &&
+                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                {
+                    return false;
+                }
+
                 return IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo) &&
                        IsArgumentAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }

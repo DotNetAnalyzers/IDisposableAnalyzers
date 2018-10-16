@@ -395,5 +395,49 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void AddingFileOpenReadToList()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private List<Stream> streams = new List<Stream>();
+        public Foo()
+        {
+            streams.Add(File.OpenRead(string.Empty));
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void AddingNewDisposableToList()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    public sealed class Foo
+    {
+        private List<IDisposable> disposables = new List<IDisposable>();
+
+        public Foo()
+        {
+            this.disposables.Add(new Disposable());
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }

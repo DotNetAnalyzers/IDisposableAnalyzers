@@ -6,7 +6,12 @@ namespace ValidCode
 
     internal sealed class ListOfDisposable : IDisposable
     {
-        private List<Stream> _streams = new List<Stream> { null };
+        private readonly List<Stream> _streams = new List<Stream> { null };
+
+        public ListOfDisposable()
+        {
+            _streams.Add(File.OpenRead(string.Empty));
+        }
 
         public void Meh()
         {
