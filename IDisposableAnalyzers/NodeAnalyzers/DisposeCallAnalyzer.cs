@@ -102,12 +102,13 @@ namespace IDisposableAnalyzers
 
             bool IsReassigned(ExpressionSyntax location)
             {
-                using (var walker = AssignedValueWalker.Borrow(local, context.SemanticModel, context.CancellationToken))
+                using (var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var value in walker)
+                    foreach (var mutation in walker.All())
                     {
-                        if (invocation.IsExecutedBefore(value) != ExecutedBefore.No &&
-                            value.IsExecutedBefore(location) != ExecutedBefore.No)
+                        if (mutation.TryFirstAncestorOrSelf(out ExpressionSyntax expression) &&
+                            invocation.IsExecutedBefore(expression) != ExecutedBefore.No &&
+                            expression.IsExecutedBefore(location) != ExecutedBefore.No)
                         {
                             return true;
                         }

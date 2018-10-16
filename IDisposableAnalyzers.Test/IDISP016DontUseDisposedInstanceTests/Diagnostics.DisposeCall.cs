@@ -24,7 +24,7 @@ namespace RoslynSandbox
         public void Bar()
         {
             var stream = File.OpenRead(string.Empty);
-            stream.↓Dispose();
+            ↓stream.Dispose();
             var b = stream.ReadByte();
         }
     }
@@ -45,8 +45,8 @@ namespace RoslynSandbox
         public void Bar()
         {
             var stream = File.OpenRead(string.Empty);
+            ↓stream.Dispose();
             stream.Dispose();
-            stream.↓Dispose();
         }
     }
 }";
@@ -67,9 +67,64 @@ namespace RoslynSandbox
         {
             using (var stream = File.OpenRead(string.Empty))
             {
+                ↓stream.Dispose();
                 stream.Dispose();
-                stream.↓Dispose();
             }
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void AssignedViaOut()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar()
+        {
+            Stream stream;
+            Create(out stream);
+            var b = stream.ReadByte();
+            ↓stream.Dispose();
+            b = stream.ReadByte();
+        }
+
+        private static void Create(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void AssignedViaOutVar()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar()
+        {
+            Create(out var stream);
+            var b = stream.ReadByte();
+            ↓stream.Dispose();
+            b = stream.ReadByte();
+        }
+
+        private static void Create(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
         }
     }
 }";
@@ -93,14 +148,43 @@ namespace RoslynSandbox
             stream.Dispose();
             stream = File.OpenRead(string.Empty);
             b = stream.ReadByte();
-            stream.Dispose();
-            b = ↓stream.ReadByte();
+            ↓stream.Dispose();
+            b = stream.ReadByte();
         }
     }
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
+            [Test]
+            public void ReassignViaOutVarAfterDispose()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public void Bar()
+        {
+            Create(out var stream);
+            var b = stream.ReadByte();
+            stream.Dispose();
+            Create(out stream);
+            b = stream.ReadByte();
+            ↓stream.Dispose();
+            b = stream.ReadByte();
+        }
+
+        private static void Create(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
 
             [Test]
             public void ReassignViaOutAfterDispose()
@@ -120,8 +204,8 @@ namespace RoslynSandbox
             stream.Dispose();
             Create(out stream);
             b = stream.ReadByte();
-            stream.Dispose();
-            b = ↓stream.ReadByte();
+            ↓stream.Dispose();
+            b = stream.ReadByte();
         }
 
         private static void Create(out Stream stream)

@@ -6,24 +6,16 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
+
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="TestHelpers\**" />
-    <EmbeddedResource Remove="TestHelpers\**" />
-    <None Remove="TestHelpers\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="IDISP016DontUseDisposedInstanceTests\Diagnostics.DisposeCall.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="IDISP016DontUseDisposedInstanceTests\Diagnostics.DisposeCall.cs" />
-  </ItemGroup>   
+  
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -35,8 +27,10 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
+  
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
+  
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>
