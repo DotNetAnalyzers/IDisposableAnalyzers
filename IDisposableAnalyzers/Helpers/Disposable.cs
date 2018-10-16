@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -424,6 +425,25 @@ namespace IDisposableAnalyzers
                     method.Name == "Add" &&
                     method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
                 {
+                    if (method.ContainingType == KnownSymbol.CompositeDisposable)
+                    {
+                        return false;
+                    }
+
+                    if (!method.ContainingType.TypeArguments.Any(x => x.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation)))
+                    {
+                        if (MemberPath.TryFindRoot(invocation, out var identifierName) &&
+                            semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
+                            FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
+                            argument.TryFirstAncestor(out TypeDeclarationSyntax typeDeclaration) &&
+                            DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken) != Result.No)
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }
+
                     return false;
                 }
 

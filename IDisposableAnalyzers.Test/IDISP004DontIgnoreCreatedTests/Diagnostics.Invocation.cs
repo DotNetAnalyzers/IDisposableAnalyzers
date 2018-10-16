@@ -276,6 +276,29 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
+
+            [Test]
+            public void AddingFileOpenReadToListOfObject()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        private List<object> streams = new List<object>();
+
+        public Foo()
+        {
+            streams.Add(↓File.OpenRead(string.Empty));
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, testCode);
+            }
         }
     }
 }

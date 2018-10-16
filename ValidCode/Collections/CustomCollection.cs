@@ -1,4 +1,4 @@
-namespace ValidCode
+namespace ValidCode.Collections
 {
     using System.Collections;
     using System.Collections.Generic;

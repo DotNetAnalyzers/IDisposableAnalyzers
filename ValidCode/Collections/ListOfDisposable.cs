@@ -1,4 +1,4 @@
-namespace ValidCode
+namespace ValidCode.Collections
 {
     using System;
     using System.Collections.Generic;
@@ -10,23 +10,23 @@ namespace ValidCode
 
         public ListOfDisposable()
         {
-            _streams.Add(File.OpenRead(string.Empty));
+            this._streams.Add(File.OpenRead(string.Empty));
         }
 
         public void Meh()
         {
-            _streams[0].Dispose();
-            _streams[0] = File.OpenRead(string.Empty);
+            this._streams[0].Dispose();
+            this._streams[0] = File.OpenRead(string.Empty);
         }
 
         public void Dispose()
         {
-            foreach (var stream in _streams)
+            foreach (var stream in this._streams)
             {
                 stream?.Dispose();
             }
 
-            _streams.Clear();
+            this._streams.Clear();
         }
     }
 }

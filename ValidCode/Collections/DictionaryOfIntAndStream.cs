@@ -1,13 +1,13 @@
-namespace ValidCode
+namespace ValidCode.Collections
 {
     using System.Collections.Generic;
     using System.IO;
 
-    public class WithDictionary
+    public class DictionaryOfIntAndStream
     {
         private readonly Dictionary<int, Stream> streams = new Dictionary<int, Stream>();
 
-        public WithDictionary()
+        public DictionaryOfIntAndStream()
         {
             this.streams[0] = File.OpenRead(string.Empty);
         }
