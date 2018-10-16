@@ -26,12 +26,8 @@ namespace IDisposableAnalyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.ContainingSymbol is IMethodSymbol method &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is IMethodSymbol method &&
                 context.Node is MethodDeclarationSyntax methodDeclaration &&
                 method.Name == "Dispose" &&
                 method.ReturnsVoid)

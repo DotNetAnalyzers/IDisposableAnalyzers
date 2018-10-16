@@ -31,17 +31,9 @@ namespace IDisposableAnalyzers
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (IsIgnored(context.ContainingSymbol))
-            {
-                return;
-            }
-
-            if (context.Node is ReturnStatementSyntax returnStatement &&
+            if (!context.IsExcludedFromAnalysis() &&
+                !IsIgnored(context.ContainingSymbol) &&
+                context.Node is ReturnStatementSyntax returnStatement &&
                 returnStatement.Expression is ExpressionSyntax expression)
             {
                 HandleReturnValue(context, expression);
@@ -50,17 +42,9 @@ namespace IDisposableAnalyzers
 
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (IsIgnored(context.ContainingSymbol))
-            {
-                return;
-            }
-
-            if (context.Node is ArrowExpressionClauseSyntax arrowExpressionClause &&
+            if (!context.IsExcludedFromAnalysis() &&
+                !IsIgnored(context.ContainingSymbol) &&
+                context.Node is ArrowExpressionClauseSyntax arrowExpressionClause &&
                 arrowExpressionClause.Expression is ExpressionSyntax expression)
             {
                 HandleReturnValue(context, expression);
@@ -69,17 +53,9 @@ namespace IDisposableAnalyzers
 
         private static void HandleLambda(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (IsIgnored(context.ContainingSymbol))
-            {
-                return;
-            }
-
-            if (context.Node is LambdaExpressionSyntax lambda &&
+            if (!context.IsExcludedFromAnalysis() &&
+                !IsIgnored(context.ContainingSymbol) &&
+                context.Node is LambdaExpressionSyntax lambda &&
                 lambda.Body is ExpressionSyntax expression)
             {
                 HandleReturnValue(context, expression);

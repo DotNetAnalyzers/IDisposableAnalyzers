@@ -25,12 +25,8 @@ namespace IDisposableAnalyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is ObjectCreationExpressionSyntax objectCreation)
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is ObjectCreationExpressionSyntax objectCreation)
             {
                 if (context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
                     type.IsAssignableTo(KnownSymbol.HttpClient, context.Compilation) &&

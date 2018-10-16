@@ -28,12 +28,8 @@ namespace IDisposableAnalyzers
 
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.ContainingSymbol is IFieldSymbol field &&
+            if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is IFieldSymbol field &&
                 !field.IsStatic &&
                 !field.IsConst &&
                 FieldOrProperty.TryCreate(field, out var fieldOrProperty) &&
