@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreReturnValueOfTypeIDisposable());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreCreated());
 
                 // Warmup
                 benchmark.Run();
@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreReturnValueOfTypeIDisposable());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreCreated());
                 //// Warmup
                 benchmark.Run();
                 var sw = Stopwatch.StartNew();

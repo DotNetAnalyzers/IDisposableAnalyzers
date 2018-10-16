@@ -15,19 +15,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A965
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6739-4830-BC74-2F8CF785A572}"
 	ProjectSection(SolutionItems) = preProject
-		README.md = README.md
-		.paket\Readme.paket.md = .paket\Readme.paket.md
-		RELEASE_NOTES.md = RELEASE_NOTES.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83-4723-44EA-95EC-D591AF6EC75D}"
-	ProjectSection(SolutionItems) = preProject
-		.paket\tools\install.ps1 = .paket\tools\install.ps1
-		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{86B34826-9404-4170-A381-5855FB3BE4FA}"
-	ProjectSection(SolutionItems) = preProject
 		documentation\IDISP001.md = documentation\IDISP001.md
 		documentation\IDISP002.md = documentation\IDISP002.md
 		documentation\IDISP003.md = documentation\IDISP003.md
@@ -45,7 +32,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{
 		documentation\IDISP015.md = documentation\IDISP015.md
 		documentation\IDISP016.md = documentation\IDISP016.md
 		documentation\IDISP017.md = documentation\IDISP017.md
+		README.md = README.md
+		.paket\Readme.paket.md = .paket\Readme.paket.md
+		RELEASE_NOTES.md = RELEASE_NOTES.md
 		documentation\SemanticModelCacheAnalyzer.md = documentation\SemanticModelCacheAnalyzer.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83-4723-44EA-95EC-D591AF6EC75D}"
+	ProjectSection(SolutionItems) = preProject
+		.paket\tools\install.ps1 = .paket\tools\install.ps1
+		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
@@ -60,7 +56,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.NetCor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stubs", "Stubs\Stubs.csproj", "{8CC16990-2621-4854-8556-ED648A2D360F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValidCode", "ValidCode\ValidCode.csproj", "{C6A235B1-A780-43D5-BA1F-E31861C019F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode", "ValidCode\ValidCode.csproj", "{C6A235B1-A780-43D5-BA1F-E31861C019F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -102,7 +98,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{AB970A83-4723-44EA-95EC-D591AF6EC75D} = {A1A96555-15B1-4A0C-ADC1-059CEAA3F788}
-		{86B34826-9404-4170-A381-5855FB3BE4FA} = {BAD2A4EE-6739-4830-BC74-2F8CF785A572}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74906569-DBB4-4A2A-B83B-D200EB4BEF68}

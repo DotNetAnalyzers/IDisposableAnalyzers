@@ -1,11 +1,11 @@
 #pragma warning disable SA1203 // Constants must appear before fields
-namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(IDISP004DontIgnoreReturnValueOfTypeIDisposable))]
+    [TestFixture(typeof(IDISP004DontIgnoreCreated))]
     [TestFixture(typeof(ObjectCreationAnalyzer))]
     internal partial class ValidCode<T>
         where T : DiagnosticAnalyzer, new()

@@ -1,18 +1,18 @@
-namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     internal partial class CodeFix
     {
-        internal class CreateAndAssignField
+        internal class AddUsingForInvocation
         {
-            private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+            private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
-            private static readonly CreateAndAssignFieldCodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
+            private static readonly AddUsingCodeFixProvider Fix = new AddUsingCodeFixProvider();
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()
+            public void AddUsingForIgnoredFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -20,11 +20,12 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    public sealed class Foo
     {
-        internal Foo()
+        public void Meh()
         {
             ↓File.OpenRead(string.Empty);
+            var i = 1;
         }
     }
 }";
@@ -35,13 +36,14 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    public sealed class Foo
     {
-        private readonly IDisposable disposable;
-
-        internal Foo()
+        public void Meh()
         {
-            this.disposable = File.OpenRead(string.Empty);
+            using (File.OpenRead(string.Empty))
+            {
+                var i = 1;
+            }
         }
     }
 }";
@@ -50,44 +52,37 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenUsesThis()
+            public void AddUsingForIgnoredReturnEmpty()
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
     public sealed class Foo
     {
-        private readonly int value;
-
-        public Foo(int value)
+        public void Meh()
         {
-            this.value = value;
             ↓File.OpenRead(string.Empty);
         }
-
-        public int Value => this.value;
     }
 }";
 
                 var fixedCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
     public sealed class Foo
     {
-        private readonly int value;
-        private readonly System.IDisposable disposable;
-
-        public Foo(int value)
+        public void Meh()
         {
-            this.value = value;
-            this.disposable = File.OpenRead(string.Empty);
+            using (File.OpenRead(string.Empty))
+            {
+            }
         }
-
-        public int Value => this.value;
     }
 }";
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
@@ -95,48 +90,79 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenUnderscore()
+            public void AddUsingForIgnoredReturnManyStatements()
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
     public sealed class Foo
     {
-        private readonly int _value;
-
-        public Foo(int value)
+        public void Meh()
         {
-            _value = value;
             ↓File.OpenRead(string.Empty);
-        }
+            var a = 1;
+            var b = 2;
+            if (a == b)
+            {
+                var c = 3;
+            }
 
-        public int Value => _value;
+            var d = 4;
+        }
     }
 }";
 
                 var fixedCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
     public sealed class Foo
     {
-        private readonly int _value;
-        private readonly System.IDisposable _disposable;
-
-        public Foo(int value)
+        public void Meh()
         {
-            _value = value;
-            _disposable = File.OpenRead(string.Empty);
-        }
+            using (File.OpenRead(string.Empty))
+            {
+                var a = 1;
+                var b = 2;
+                if (a == b)
+                {
+                    var c = 3;
+                }
 
-        public int Value => _value;
+                var d = 4;
+            }
+        }
     }
 }";
                 AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
                 AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public void NoFixForArgument()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        internal static string Bar()
+        {
+            return Meh(↓File.OpenRead(string.Empty));
+        }
+
+        private static string Meh(Stream stream) => stream.ToString();
+    }
+}";
+
+                AnalyzerAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, testCode);
             }
         }
     }

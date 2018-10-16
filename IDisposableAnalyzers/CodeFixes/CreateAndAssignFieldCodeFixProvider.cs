@@ -20,7 +20,7 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP001DisposeCreated.DiagnosticId,
-            IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId);
+            IDISP004DontIgnoreCreated.DiagnosticId);
 
         public override FixAllProvider GetFixAllProvider() => null;
 
@@ -46,7 +46,7 @@ namespace IDisposableAnalyzers
                         (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, type),
                         diagnostic);
                 }
-                else if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId &&
+                else if (diagnostic.Id == IDISP004DontIgnoreCreated.DiagnosticId &&
                          node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
                          statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
                 {

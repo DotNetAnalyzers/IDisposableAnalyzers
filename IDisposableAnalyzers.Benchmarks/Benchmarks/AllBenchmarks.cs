@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
     {
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP001DisposeCreated());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreReturnValueOfTypeIDisposableBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP004DontIgnoreReturnValueOfTypeIDisposable());
+        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP004DontIgnoreCreated());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ArgumentAnalyzer());
 
@@ -34,9 +34,9 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP004DontIgnoreReturnValueOfTypeIDisposable()
+        public void IDISP004DontIgnoreCreated()
         {
-            IDISP004DontIgnoreReturnValueOfTypeIDisposableBenchmark.Run();
+            IDISP004DontIgnoreCreatedBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

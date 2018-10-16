@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP001DisposeCreated.DiagnosticId,
-            IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId,
+            IDISP004DontIgnoreCreated.DiagnosticId,
             IDISP017PreferUsing.DiagnosticId);
 
         public override FixAllProvider GetFixAllProvider() => null;
@@ -75,7 +75,7 @@ namespace IDisposableAnalyzers
                             diagnostic);
                     }
                 }
-                else if (diagnostic.Id == IDISP004DontIgnoreReturnValueOfTypeIDisposable.DiagnosticId &&
+                else if (diagnostic.Id == IDISP004DontIgnoreCreated.DiagnosticId &&
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
                          statement.Parent is BlockSyntax block)
                 {

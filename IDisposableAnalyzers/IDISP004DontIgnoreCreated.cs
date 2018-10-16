@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.Diagnostics;
 
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    internal class IDISP004DontIgnoreReturnValueOfTypeIDisposable : DiagnosticAnalyzer
+    internal class IDISP004DontIgnoreCreated : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "IDISP004";
 

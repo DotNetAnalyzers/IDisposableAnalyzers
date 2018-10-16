@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreReturnValueOfTypeIDisposab
     {
         internal class AddToCompositeDisposable
         {
-            private static readonly IDISP004DontIgnoreReturnValueOfTypeIDisposable Analyzer = new IDISP004DontIgnoreReturnValueOfTypeIDisposable();
+            private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
             private static readonly AddToCompositeDisposableCodeFixProvider Fix = new AddToCompositeDisposableCodeFixProvider();
 

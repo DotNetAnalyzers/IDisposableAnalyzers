@@ -21,7 +21,7 @@
   </tr>
   <tr>
     <td>Code</td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP004DontIgnoreReturnValueOfTypeIDisposable.cs">IDISP004DontIgnoreReturnValueOfTypeIDisposable</a></td>
+     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP004DontIgnoreCreated.cs">IDISP004DontIgnoreCreated</a></td>
   </tr>
   <tr>
     <td></td>
