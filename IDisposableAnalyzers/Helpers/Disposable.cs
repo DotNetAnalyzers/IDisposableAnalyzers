@@ -227,10 +227,9 @@ namespace IDisposableAnalyzers
 
         internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
         {
-            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Scope.Instance, semanticModel, cancellationToken, out var assignment))
+            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Scope.Instance, semanticModel, cancellationToken, out var assignment) &&
+                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol left))
             {
-                var left = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken) ??
-                           semanticModel.GetSymbolSafe((assignment.Left as ElementAccessExpressionSyntax)?.Expression, cancellationToken);
                 if (left.IsEither<IParameterSymbol, ILocalSymbol>())
                 {
                     using (visited = visited.IncrementUsage())
@@ -240,7 +239,7 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                return left.IsEitherKind(SymbolKind.Field, SymbolKind.Property);
+                return left.IsEitherKind(SymbolKind.Field, SymbolKind.Property, SymbolKind.ArrayType);
             }
 
             return false;
