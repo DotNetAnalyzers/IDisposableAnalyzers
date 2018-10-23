@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
             [Test]
             public void LocalExplicitTypeToFieldInCtor()

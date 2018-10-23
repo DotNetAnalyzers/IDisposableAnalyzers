@@ -45,6 +45,11 @@ namespace IDisposableAnalyzers
             {
                 base.Visit(node);
             }
+            else
+            {
+                // for debugging, useful to set bp here.
+                return;
+            }
 
             bool ShouldVisit()
             {
@@ -67,7 +72,7 @@ namespace IDisposableAnalyzers
                         return true;
                     }
 
-                    if (this.CurrentSymbol.IsEither<ILocalSymbol, IParameterSymbol>())
+                    if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter))
                     {
                         if (node.TryFirstAncestor(out AnonymousFunctionExpressionSyntax lambda))
                         {
@@ -78,6 +83,14 @@ namespace IDisposableAnalyzers
                                 return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
                             }
 
+                            return true;
+                        }
+
+                        if (!ReferenceEquals(expression, contextExpression) &&
+                            expression is InvocationExpressionSyntax invocation &&
+                            contextExpression.Parent is ArgumentSyntax &&
+                            invocation.Contains(contextExpression))
+                        {
                             return true;
                         }
 
@@ -427,7 +440,7 @@ namespace IDisposableAnalyzers
                 this.Visit(scope);
             }
             else if (this.CurrentSymbol is IParameterSymbol &&
-                TryGetScope(this.context, out scope))
+                     TryGetScope(this.context, out scope))
             {
                 this.Visit(scope);
             }

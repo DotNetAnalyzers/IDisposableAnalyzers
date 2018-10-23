@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         internal class AddUsingOutParameter
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP001");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
             private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
 
             [Test]

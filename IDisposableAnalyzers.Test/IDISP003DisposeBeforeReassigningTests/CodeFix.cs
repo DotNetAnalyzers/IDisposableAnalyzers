@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
         private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor);
         private static readonly DisposeBeforeAssignCodeFixProvider Fix = new DisposeBeforeAssignCodeFixProvider();
 
         [Test]
@@ -1015,6 +1015,102 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+        }
+
+        [Test]
+        public void AssignedBeforeWhileLoop()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                ↓stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
+        }
+
+        [Test]
+        public void AssignedWithNullBeforeWhileLoop()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo(int i)
+        {
+            Stream stream = null;
+            while (i > 0)
+            {
+                ↓stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo(int i)
+        {
+            Stream stream = null;
+            while (i > 0)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
         }
     }
 }
