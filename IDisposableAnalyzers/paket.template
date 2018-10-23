@@ -5,9 +5,9 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  BUGFIX: IDISP003 detect disposal of previous instance copied to local.
-  BUGFIX: IDISP015 when returning from value from dictionary.
-  FEATURE: Understand NOP disposable.
+  IDISP004 warn on explicit discard.
+  IDISP017 when disposing in finally.
+  IDISP003 when assigning in loop.
 
 excludedgroups
   Main

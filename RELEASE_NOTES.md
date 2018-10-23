@@ -1,3 +1,8 @@
+#### 2.0.5
+* IDISP004 warn on explicit discard.
+* IDISP017 when disposing in finally.
+* IDISP003 when assigning in loop.
+
 #### 2.0.4
 * BUGFIX: IDISP003 detect disposal of previous instance copied to local.
 * BUGFIX: IDISP015 when returning from value from dictionary.
