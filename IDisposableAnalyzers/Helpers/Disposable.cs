@@ -416,6 +416,13 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
+            if (node.Parent is AssignmentExpressionSyntax assignment &&
+                assignment.Left is IdentifierNameSyntax left &&
+                left.Identifier.ValueText == "_")
+            {
+                return true;
+            }
+
             if (node.Parent is ArgumentSyntax argument)
             {
                 if (argument.Parent is ArgumentListSyntax argumentList &&

@@ -299,6 +299,26 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, testCode);
             }
+
+            [Test]
+            public void DiscardFileOpenRead()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Foo
+    {
+        public Foo()
+        {
+            _ = ↓File.OpenRead(string.Empty);
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, testCode);
+            }
         }
     }
 }
