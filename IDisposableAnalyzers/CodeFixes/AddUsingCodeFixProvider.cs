@@ -188,30 +188,66 @@ namespace IDisposableAnalyzers
             if (DisposeCall.TryGetDisposedRootMember(invocation, editor.SemanticModel, cancellationToken, out var root) &&
                 editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol local) &&
                 local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax declaration) &&
-                declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement &&
-                invocation.Parent is ExpressionStatementSyntax expressionStatement &&
-                localDeclarationStatement.Parent is BlockSyntax block)
+                invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
+                declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
-                var statements = new List<StatementSyntax>();
-                foreach (var statement in block.Statements.SkipWhile(x => x != localDeclarationStatement).Skip(1))
+                if (expressionStatement.Parent is BlockSyntax finallyBlock &&
+                    finallyBlock.Parent is FinallyClauseSyntax finallyClause &&
+                    finallyClause.Parent is TryStatementSyntax tryStatement &&
+                    !tryStatement.Catches.Any())
                 {
-                    editor.RemoveNode(statement);
-                    if (statement != expressionStatement)
+                    if (declaration.Variables.TrySingle(out var declarator) &&
+                        declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
+                        tryStatement.Block.Statements.TryFirst(out var statement) &&
+                        statement is ExpressionStatementSyntax assignExpressionStatement &&
+                        assignExpressionStatement.Expression is AssignmentExpressionSyntax assignment)
                     {
-                        statements.Add(statement);
+                        editor.ReplaceNode(
+                            tryStatement,
+                            SyntaxFactory.UsingStatement(
+                                SyntaxFactory.VariableDeclaration(
+                                    SyntaxFactory.ParseTypeName("var"),
+                                    SyntaxFactory.SingletonSeparatedList(
+                                        declarator.WithInitializer(SyntaxFactory.EqualsValueClause(assignment.Right)))),
+                                null,
+                                tryStatement.Block.WithStatements(tryStatement.Block.Statements.RemoveAt(0))));
+                        editor.RemoveNode(localDeclarationStatement);
                     }
                     else
                     {
-                        break;
+                        editor.ReplaceNode(
+                            tryStatement,
+                            SyntaxFactory.UsingStatement(
+                                declaration.WithoutTrailingTrivia(),
+                                null,
+                                tryStatement.Block));
+                        editor.RemoveNode(localDeclarationStatement);
                     }
                 }
+                else if (localDeclarationStatement.Parent is BlockSyntax block &&
+                         block == expressionStatement.Parent)
+                {
+                    var statements = new List<StatementSyntax>();
+                    foreach (var statement in block.Statements.SkipWhile(x => x != localDeclarationStatement).Skip(1))
+                    {
+                        editor.RemoveNode(statement);
+                        if (statement != expressionStatement)
+                        {
+                            statements.Add(statement);
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
 
-                editor.ReplaceNode(
-                    localDeclarationStatement,
-                    SyntaxFactory.UsingStatement(
-                        declaration.WithoutTrailingTrivia(),
-                        null,
-                        SyntaxFactory.Block(statements).WithAdditionalAnnotations(Formatter.Annotation)));
+                    editor.ReplaceNode(
+                        localDeclarationStatement,
+                        SyntaxFactory.UsingStatement(
+                            declaration.WithoutTrailingTrivia(),
+                            null,
+                            SyntaxFactory.Block(statements).WithAdditionalAnnotations(Formatter.Annotation)));
+                }
             }
         }
     }

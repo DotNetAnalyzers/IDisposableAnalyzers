@@ -125,14 +125,38 @@ namespace IDisposableAnalyzers
                    declaration is VariableDeclaratorSyntax declarator &&
                    declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax localDeclarationStatement) &&
                    invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
-                   localDeclarationStatement.Parent == expressionStatement.Parent &&
-                   Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes &&
+                   (DeclarationIsAssignment() || IsTrivialTryFinally()) &&
                    !IsMutated();
+
+            bool DeclarationIsAssignment()
+            {
+                return localDeclarationStatement.Parent == expressionStatement.Parent &&
+                       Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes;
+            }
+
+            bool IsTrivialTryFinally()
+            {
+                return expressionStatement.Parent is BlockSyntax block &&
+                       block.Statements.Count == 1 &&
+                       block.Parent is FinallyClauseSyntax finallyClause &&
+                       finallyClause.Parent is TryStatementSyntax tryStatement &&
+                       !tryStatement.Catches.Any();
+            }
 
             bool IsMutated()
             {
                 using (var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken))
                 {
+                    if (declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
+                        walker.TrySingle(out var mutation) &&
+                        mutation.TryFirstAncestor(out ExpressionStatementSyntax statement) &&
+                        statement.Parent is BlockSyntax block &&
+                        block.Statements[0] == statement &&
+                        block.Parent is TryStatementSyntax)
+                    {
+                        return false;
+                    }
+
                     return walker.All().Any();
                 }
             }
