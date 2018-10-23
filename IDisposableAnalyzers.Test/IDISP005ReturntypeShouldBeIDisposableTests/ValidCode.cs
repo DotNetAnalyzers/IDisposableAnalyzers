@@ -3,12 +3,14 @@
 namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     internal partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
+        private static readonly DiagnosticDescriptor Descriptor = IDISP005ReturntypeShouldBeIDisposable.Descriptor;
 
         private const string DisposableCode = @"
 namespace RoslynSandbox
@@ -969,7 +971,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, ExpectedDiagnostic.Create("IDISP005"), DisposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, DisposableCode, testCode);
         }
     }
 }
