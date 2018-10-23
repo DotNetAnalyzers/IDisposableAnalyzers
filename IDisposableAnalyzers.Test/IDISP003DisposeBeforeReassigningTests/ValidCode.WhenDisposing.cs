@@ -430,5 +430,34 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [TestCase("stream.Dispose();")]
+        [TestCase("stream?.Dispose();")]
+        public void WhileLoop(string call)
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class Foo
+    {
+        public Foo(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                stream.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}".AssertReplace("stream.Dispose();", call);
+
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
     }
 }
