@@ -39,6 +39,23 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void AssigningOutParameterExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
         {
             var testCode = @"

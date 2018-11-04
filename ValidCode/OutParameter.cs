@@ -1,6 +1,7 @@
 // ReSharper disable All
 namespace ValidCode
 {
+    using System;
     using System.IO;
 
     public class OutParameter
@@ -27,6 +28,8 @@ namespace ValidCode
                 }
             }
         }
+
+        public void ExpressionBody(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
 
         private static bool TryGetStreamCore(out Stream stream)
         {
