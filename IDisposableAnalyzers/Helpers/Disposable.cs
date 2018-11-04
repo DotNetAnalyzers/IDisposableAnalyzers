@@ -124,7 +124,7 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (location.IsExecutedBefore(invocation) == ExecutedBefore.Yes &&
+                        if (location.IsExecutedBefore(invocation).IsEither(ExecutedBefore.Maybe, ExecutedBefore.Yes) &&
                             DisposeCall.IsDisposing(invocation, local, semanticModel, cancellationToken))
                         {
                             return true;

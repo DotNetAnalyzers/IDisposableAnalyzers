@@ -26,7 +26,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void CreateVariable()
+        public void LocalDeclaration()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,6 +39,83 @@ namespace RoslynSandbox
         public void Meh()
         {
             var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void LocalAssignedInSwitch()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static IDisposable Bar(int i)
+        {
+            IDisposable result;
+            switch (i)
+            {
+                case 1:
+                    result = File.OpenRead(string.Empty);
+                    break;
+                case 2:
+                    result = File.OpenRead(string.Empty);
+                    break;
+                default:
+                    result = null;
+                    break;
+            }
+
+            return result;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void LocalAssignedInIfElseSwitch()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static IDisposable Bar(int i)
+        {
+            IDisposable result;
+            if (i == 0)
+            {
+                result = null;
+            }
+            else
+            {
+                switch (i)
+                {
+                    case 1:
+                        result = File.OpenRead(string.Empty);
+                        break;
+                    case 2:
+                        result = File.OpenRead(string.Empty);
+                        break;
+                    default:
+                        result = null;
+                        break;
+                }
+            }
+
+            return result;
         }
     }
 }";

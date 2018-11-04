@@ -72,6 +72,32 @@ namespace ValidCode
             }
         }
 
+        public static IDisposable AssignLocalInSwitch(int i)
+        {
+            IDisposable result;
+            if (i == 0)
+            {
+                result = null;
+            }
+            else
+            {
+                switch (i)
+                {
+                    case 1:
+                        result = File.OpenRead(string.Empty);
+                        break;
+                    case 2:
+                        result = File.OpenRead(string.Empty);
+                        break;
+                    default:
+                        result = null;
+                        break;
+                }
+            }
+
+            return result;
+        }
+
         public void Dispose()
         {
             this.subscription.Dispose();
