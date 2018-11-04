@@ -33,5 +33,23 @@ namespace ValidCode
             stream = File.OpenRead(string.Empty);
             return true;
         }
+
+        private static bool TryGetStream(string fileName, out Stream result)
+        {
+            if (File.Exists(fileName))
+            {
+                result = File.OpenRead(fileName);
+                return true;
+            }
+
+            if (File.Exists(fileName))
+            {
+                result = File.OpenRead(fileName);
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
     }
 }

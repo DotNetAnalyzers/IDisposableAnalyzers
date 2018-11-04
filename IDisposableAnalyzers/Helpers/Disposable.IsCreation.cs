@@ -103,8 +103,9 @@ namespace IDisposableAnalyzers
             bool IsReturnedBefore(ExpressionSyntax expression)
             {
                 return expression.TryFirstAncestor(out BlockSyntax block) &&
-                       block.Statements.TryFirstOfType(out ReturnStatementSyntax returnStatement) &&
-                       disposable.IsExecutedBefore(returnStatement) == ExecutedBefore.No;
+                       block.Statements.TryFirstOfType(out ReturnStatementSyntax _) &&
+                       !block.Contains(disposable) &&
+                       block.SharesAncestor(disposable, out MemberDeclarationSyntax _);
             }
         }
 

@@ -274,5 +274,63 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void AssigningReturnOut()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    class Foo
+    {
+        private static bool TryGetStream(string fileName, out Stream result)
+        {
+            if (File.Exists(fileName))
+            {
+                result = File.OpenRead(fileName);
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void AssigningReturnOutTwice()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    class Foo
+    {
+        private static bool TryGetStream(string fileName, out Stream result)
+        {
+            if (File.Exists(fileName))
+            {
+                result = File.OpenRead(fileName);
+                return true;
+            }
+
+            if (File.Exists(fileName))
+            {
+                result = File.OpenRead(fileName);
+                return true;
+            }
+
+            result = null;
+            return false;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }
