@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class TestFixture
+        public class TestFixture
         {
             // ReSharper disable once UnusedMember.Local
             // ReSharper disable once MemberHidesStaticFromOuterClass

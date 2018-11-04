@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public partial class ValidCode
     {
-        internal class Ignore
+        public class Ignore
         {
             [Test]
             public void NUnitAssertThrowsAsync()

@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
     {
         [Test]
         public void SimpleStatementBody()

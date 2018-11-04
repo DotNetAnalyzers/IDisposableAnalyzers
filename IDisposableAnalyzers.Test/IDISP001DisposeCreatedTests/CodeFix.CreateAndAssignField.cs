@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class CreateAndAssignField
+        public class CreateAndAssignField
         {
             private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();

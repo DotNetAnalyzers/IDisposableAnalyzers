@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class Diagnostics
+    public partial class Diagnostics
     {
-        internal class Using
+        public class Using
         {
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");

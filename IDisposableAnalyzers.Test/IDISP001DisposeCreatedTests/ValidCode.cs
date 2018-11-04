@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     [TestFixture(typeof(IDISP001DisposeCreated))]
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();

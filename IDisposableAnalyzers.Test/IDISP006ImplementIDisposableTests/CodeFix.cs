@@ -1,9 +1,9 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using NUnit.Framework;
 
     [TestFixture]
-    internal partial class CodeFix
+    public partial class CodeFix
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox

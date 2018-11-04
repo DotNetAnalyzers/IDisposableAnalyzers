@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
         public class InterfaceOnlyMakeSealed
         {

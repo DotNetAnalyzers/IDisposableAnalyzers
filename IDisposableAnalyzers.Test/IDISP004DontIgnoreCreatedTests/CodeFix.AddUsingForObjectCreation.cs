@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class AddUsingForObjectCreation
+        public class AddUsingForObjectCreation
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");

@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    public class Diagnostics
     {
-        internal class DisposeCall
+        public class DisposeCall
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP016");

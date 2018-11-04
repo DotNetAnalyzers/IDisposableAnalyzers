@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class Diagnostics
+    public partial class Diagnostics
     {
-        internal class Invocation
+        public class Invocation
         {
             private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");

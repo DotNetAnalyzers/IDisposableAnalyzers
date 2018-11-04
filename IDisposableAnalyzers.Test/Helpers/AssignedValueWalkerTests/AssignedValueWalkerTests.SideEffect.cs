@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 
     using NUnit.Framework;
 
-    internal partial class AssignedValueWalkerTests
+    public partial class AssignedValueWalkerTests
     {
-        internal class SideEffect
+        public class SideEffect
         {
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "1")]

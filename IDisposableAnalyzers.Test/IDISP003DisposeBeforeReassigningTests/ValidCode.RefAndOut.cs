@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
     {
         [Test]
         public void AssigningVariableViaOutParameter()

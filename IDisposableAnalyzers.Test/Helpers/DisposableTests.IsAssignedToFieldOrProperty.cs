@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class DisposableTests
+    public partial class DisposableTests
     {
-        internal class IsAssignedToFieldOrProperty
+        public class IsAssignedToFieldOrProperty
         {
             [Test]
             public void WhenNotUsed()

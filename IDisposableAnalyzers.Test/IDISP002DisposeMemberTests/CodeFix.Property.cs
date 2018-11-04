@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class Property
+        public class Property
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberCodeFixProvider();

@@ -1,11 +1,11 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public partial class ValidCode
     {
-        internal class TestFixture
+        public class TestFixture
         {
             [Test]
             public void DisposingFieldInTearDown()

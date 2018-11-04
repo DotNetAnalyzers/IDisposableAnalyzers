@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();

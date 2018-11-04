@@ -1,6 +1,6 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
-    internal partial class CodeFix
+    public partial class CodeFix
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox

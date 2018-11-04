@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class RefAndOut
+        public class RefAndOut
         {
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();

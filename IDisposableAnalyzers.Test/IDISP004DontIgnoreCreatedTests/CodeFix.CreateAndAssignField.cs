@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class CodeFix
+    public partial class CodeFix
     {
-        internal class CreateAndAssignField
+        public class CreateAndAssignField
         {
             private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");

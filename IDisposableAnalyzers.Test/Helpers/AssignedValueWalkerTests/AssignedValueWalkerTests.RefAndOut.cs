@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class AssignedValueWalkerTests
+    public partial class AssignedValueWalkerTests
     {
-        internal class RefAndOut
+        public class RefAndOut
         {
             [Test]
             public void LocalAssignedWithOutParameterSimple()

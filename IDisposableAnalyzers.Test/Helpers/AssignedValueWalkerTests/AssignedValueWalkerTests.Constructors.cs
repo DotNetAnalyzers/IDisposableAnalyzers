@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class AssignedValueWalkerTests
+    public partial class AssignedValueWalkerTests
     {
-        internal class Constructors
+        public class Constructors
         {
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "arg")]

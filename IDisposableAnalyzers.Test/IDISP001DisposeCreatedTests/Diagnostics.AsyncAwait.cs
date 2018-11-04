@@ -1,11 +1,11 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class Diagnostics
+    public partial class Diagnostics
     {
-        internal class AsyncAwait
+        public class AsyncAwait
         {
             [Test]
             public void AwaitTaskRun()

@@ -3,9 +3,9 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public partial class ValidCode
     {
-        internal class Repro
+        public class Repro
         {
             [Test]
             public void Issue63()

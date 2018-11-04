@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class Diagnostics
+    public partial class Diagnostics
     {
-        internal class ObjectCreation
+        public class ObjectCreation
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");

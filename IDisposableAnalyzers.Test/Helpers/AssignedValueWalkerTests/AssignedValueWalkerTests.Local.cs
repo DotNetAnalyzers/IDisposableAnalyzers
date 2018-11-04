@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class AssignedValueWalkerTests
+    public partial class AssignedValueWalkerTests
     {
-        internal class Local
+        public class Local
         {
             [TestCase("1")]
             [TestCase("1 + 1")]
