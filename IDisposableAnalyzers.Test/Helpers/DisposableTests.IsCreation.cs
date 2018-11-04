@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     public partial class DisposableTests
     {
-        public class IsCreation
+        internal class IsCreation
         {
             [TestCase("1", Result.No)]
             [TestCase("new string(' ', 1)", Result.No)]
