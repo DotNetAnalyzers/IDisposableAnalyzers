@@ -17,11 +17,11 @@ namespace RoslynSandbox
 
     public static class Foo
     {
-        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
+        private static readonly ConcurrentDictionary<string, Stream> Cache = new ConcurrentDictionary<string, Stream>();
 
-        public static long Bar()
+        public static long Bar(string fileName)
         {
-            var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+            var stream = Cache.GetOrAdd(fileName, x => File.OpenRead(x));
             return stream.Length;
         }
     }
