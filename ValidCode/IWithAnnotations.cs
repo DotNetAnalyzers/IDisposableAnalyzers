@@ -1,7 +1,7 @@
 namespace ValidCode
 {
     using System;
-    using DisposableAnnotations;
+    using IDisposableAnnotations;
 
     public interface IWithAnnotations
     {

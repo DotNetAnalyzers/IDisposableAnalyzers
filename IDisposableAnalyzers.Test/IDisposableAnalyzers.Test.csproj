@@ -14,6 +14,7 @@
   
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
+    <ProjectReference Include="..\IDisposableAnnotations\IDisposableAnnotations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-namespace DisposableAnnotations
+namespace IDisposableAnnotations
 {
     using System;
 

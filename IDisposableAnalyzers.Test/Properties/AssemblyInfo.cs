@@ -21,4 +21,5 @@ using Gu.Roslyn.Asserts;
     typeof(Gu.Roslyn.AnalyzerExtensions.SyntaxTokenExt),
     typeof(Gu.Roslyn.CodeFixExtensions.Parse),
     typeof(Stubs.Extensions),
+    typeof(IDisposableAnnotations.DisposeAttribute),
     typeof(NUnit.Framework.Assert))]

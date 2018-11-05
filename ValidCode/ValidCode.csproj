@@ -9,6 +9,6 @@
   <Import Project="..\.paket\Paket.Restore.targets" />
 
   <ItemGroup>
-    <ProjectReference Include="..\DisposableAnnotations\DisposableAnnotations.csproj" />
+    <ProjectReference Include="..\IDisposableAnnotations\IDisposableAnnotations.csproj" />
   </ItemGroup>
 </Project>
