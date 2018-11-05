@@ -1,13 +1,11 @@
 ﻿type project
-include-referenced-projects true
 developmentDependency true
 projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  IDISP004 warn on explicit discard.
-  IDISP017 when disposing in finally.
-  IDISP003 when assigning in loop.
+  BUGFIX: IDISP003 figure out when assigned in switch.
+  IDISP003 should not warn when assigning out parameter in if return.
 
 excludedgroups
   Main
