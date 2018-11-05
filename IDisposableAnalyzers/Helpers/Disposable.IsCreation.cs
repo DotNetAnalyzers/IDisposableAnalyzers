@@ -74,6 +74,13 @@ namespace IDisposableAnalyzers
                 }
             }
 
+            if (symbol is IParameterSymbol parameter &&
+                disposable.TryFirstAncestor<ArrowExpressionClauseSyntax>(out _))
+            {
+                assignedSymbol = null;
+                return Result.No;
+            }
+
             using (var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken))
             {
                 assignedSymbol = assignedValues.CurrentSymbol;
