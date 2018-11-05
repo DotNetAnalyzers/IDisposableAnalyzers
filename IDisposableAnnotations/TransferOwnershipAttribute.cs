@@ -3,7 +3,7 @@ namespace IDisposableAnnotations
     using System;
 
     /// <summary>
-    /// The containing method owns the instance and is responsible for disposing it.
+    /// The ownership of instance is transferred and the receiver is responsible for disposing.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class TransferOwnershipAttribute : Attribute
