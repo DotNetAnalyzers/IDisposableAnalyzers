@@ -10,10 +10,10 @@ namespace ValidCode
 
         bool TryCreate([MustDispose]out IDisposable disposable);
 
-        [return: DonNotDispose]
+        [return: DoNotDispose]
         IDisposable GetOrCreate();
 
-        bool TryGet([DonNotDispose]out IDisposable disposable);
+        bool TryGet([DoNotDispose]out IDisposable disposable);
 
         void Add([TransferOwnership] IDisposable disposable);
     }
