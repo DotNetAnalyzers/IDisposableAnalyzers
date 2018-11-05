@@ -5,12 +5,16 @@ namespace ValidCode
 
     public interface IWithAnnotations
     {
-        [return:Dispose]
+        [return:MustDispose]
         IDisposable Create();
 
-        [return: DontDispose]
+        bool TryCreate([MustDispose]out IDisposable disposable);
+
+        [return: DonNotDispose]
         IDisposable GetOrCreate();
 
-        void Add([Disposes] IDisposable disposable);
+        bool TryGet([DonNotDispose]out IDisposable disposable);
+
+        void Add([TransferOwnership] IDisposable disposable);
     }
 }
