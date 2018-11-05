@@ -7,4 +7,8 @@
   </PropertyGroup>
 
   <Import Project="..\.paket\Paket.Restore.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\DisposableAnnotations\DisposableAnnotations.csproj" />
+  </ItemGroup>
 </Project>
