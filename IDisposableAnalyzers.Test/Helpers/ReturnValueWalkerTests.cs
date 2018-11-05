@@ -825,7 +825,7 @@ namespace RoslynSandbox
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
             using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
             {
-                Assert.AreEqual("result.ErrorContent, error.ErrorContent, value", string.Join(", ", returnValues));
+                Assert.AreEqual("error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
             }
         }
     }

@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers
         private readonly PublicMemberWalker publicMemberWalker;
         private readonly CtorArgWalker ctorArgWalker;
 
-        private SyntaxNode context;
+        private Context context;
         private SemanticModel semanticModel;
         private CancellationToken cancellationToken;
 
@@ -47,60 +47,16 @@ namespace IDisposableAnalyzers
             }
             else
             {
-                // for debugging, useful to set bp here.
+                // ReSharper disable once RedundantJumpStatement for debugging, useful to set bp here.
                 return;
             }
 
             bool ShouldVisit()
             {
-                if (this.context == null)
+                if (node is StatementSyntax statement &&
+                    this.context.StopAt != null)
                 {
-                    return true;
-                }
-
-                if (node is ExpressionSyntax expression &&
-                    this.context is ExpressionSyntax contextExpression)
-                {
-                    if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
-                    {
-                        if (this.context.SharesAncestor<ConstructorDeclarationSyntax>(node, out _) &&
-                            node.FirstAncestor<AnonymousFunctionExpressionSyntax>() == null)
-                        {
-                            return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
-                        }
-
-                        return true;
-                    }
-
-                    if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter))
-                    {
-                        if (node.TryFirstAncestor(out AnonymousFunctionExpressionSyntax lambda))
-                        {
-                            if (this.CurrentSymbol is ILocalSymbol local &&
-                                local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
-                                lambda.Contains(declaration))
-                            {
-                                return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
-                            }
-
-                            return true;
-                        }
-
-                        if (!ReferenceEquals(expression, contextExpression) &&
-                            expression is InvocationExpressionSyntax invocation &&
-                            contextExpression.Parent is ArgumentSyntax &&
-                            invocation.Contains(contextExpression))
-                        {
-                            return true;
-                        }
-
-                        return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
-                    }
-
-                    if (ReferenceEquals(expression, contextExpression))
-                    {
-                        return false;
-                    }
+                    return statement.IsExecutedBefore(this.context.StopAt) != ExecutedBefore.No;
                 }
 
                 return true;
@@ -163,7 +119,7 @@ namespace IDisposableAnalyzers
             if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var method))
             {
                 base.VisitInvocationExpression(node);
-                if (this.context is ElementAccessExpressionSyntax &&
+                if (this.context.Node is ElementAccessExpressionSyntax &&
                     method.Name == "Add" &&
                     MemberPath.TrySingle(node, out var member) &&
                     this.semanticModel.TryGetSymbol(member, this.cancellationToken, out ISymbol memberSymbol) &&
@@ -190,7 +146,7 @@ namespace IDisposableAnalyzers
         public override void VisitElementAccessExpression(ElementAccessExpressionSyntax node)
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
-                this.context is ElementAccessExpressionSyntax &&
+                this.context.Node is ElementAccessExpressionSyntax &&
                 this.semanticModel.TryGetSymbol(node.Expression, this.cancellationToken, out ISymbol symbol) &&
                 symbol.Equals(this.CurrentSymbol))
             {
@@ -317,7 +273,9 @@ namespace IDisposableAnalyzers
                         result.CurrentSymbol = this.CurrentSymbol;
                         result.semanticModel = this.semanticModel;
                         result.cancellationToken = this.cancellationToken;
-                        result.context = this.context.FirstAncestorOrSelf<ConstructorDeclarationSyntax>() != null ? this.context : declaration;
+                        result.context = this.context.Node.TryFirstAncestor<ConstructorDeclarationSyntax>(out _)
+                            ? this.context
+                            : new Context(declaration, null);
                         result.memberWalkers.Parent = this.memberWalkers;
                         if (argumentList != null)
                         {
@@ -403,7 +361,7 @@ namespace IDisposableAnalyzers
             this.refParameters.Clear();
             this.outParameters.Clear();
             this.CurrentSymbol = null;
-            this.context = null;
+            this.context = default(Context);
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
             this.memberWalkers.Clear();
@@ -418,7 +376,7 @@ namespace IDisposableAnalyzers
 
             var pooled = Borrow(() => new AssignedValueWalker());
             pooled.CurrentSymbol = symbol;
-            pooled.context = context;
+            pooled.context = Context.Create(context, symbol, cancellationToken);
             pooled.semanticModel = semanticModel;
             pooled.cancellationToken = cancellationToken;
             pooled.Run();
@@ -440,12 +398,12 @@ namespace IDisposableAnalyzers
                 this.Visit(scope);
             }
             else if (this.CurrentSymbol is IParameterSymbol &&
-                     TryGetScope(this.context, out scope))
+                     TryGetScope(this.context.Node, out scope))
             {
                 this.Visit(scope);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
-                     this.context.TryFirstAncestorOrSelf(out TypeDeclarationSyntax typeDeclaration) &&
+                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax typeDeclaration) &&
                      this.semanticModel.TryGetSymbol(typeDeclaration, this.cancellationToken, out var type))
             {
                 if (this.CurrentSymbol is IFieldSymbol &&
@@ -464,7 +422,7 @@ namespace IDisposableAnalyzers
                 {
                     using (var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken))
                     {
-                        if (this.context.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
+                        if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                         {
                             this.Visit(contextCtor);
                             if (contextCtor.ParameterList is ParameterListSyntax parameterList &&
@@ -510,7 +468,7 @@ namespace IDisposableAnalyzers
                 if ((this.CurrentSymbol is IFieldSymbol field && !field.IsReadOnly) ||
                     (this.CurrentSymbol is IPropertySymbol property && !property.IsReadOnly))
                 {
-                    if (TryGetScope(this.context, out scope) &&
+                    if (TryGetScope(this.context.Node, out scope) &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
                         while (type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
@@ -562,7 +520,7 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (this.context is ElementAccessExpressionSyntax)
+            if (this.context.Node is ElementAccessExpressionSyntax)
             {
                 switch (value)
                 {
@@ -681,7 +639,7 @@ namespace IDisposableAnalyzers
                         walker.CurrentSymbol = this.CurrentSymbol;
                         walker.semanticModel = this.semanticModel;
                         walker.cancellationToken = this.cancellationToken;
-                        walker.context = setter;
+                        walker.context = new Context(setter, null);
                         walker.memberWalkers.Parent = this.memberWalkers;
                         walker.Visit(setter);
                     }
@@ -696,6 +654,75 @@ namespace IDisposableAnalyzers
                            MemberPath.TrySingle(assignedExpression, out var assignedMember) &&
                            assignedMember.Identifier.ValueText != this.CurrentSymbol.Name &&
                            this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.Identifier.ValueText, out result);
+                }
+            }
+        }
+
+        private struct Context
+        {
+            internal readonly SyntaxNode Node;
+            internal readonly StatementSyntax StopAt;
+
+            public Context(SyntaxNode node, StatementSyntax stopAt)
+            {
+                this.Node = node;
+                this.StopAt = stopAt;
+            }
+
+            public static Context Create(SyntaxNode node, ISymbol symbol, CancellationToken cancellationToken)
+            {
+                return new Context(node, GetStopAt(node, symbol, cancellationToken));
+            }
+
+            private static StatementSyntax GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
+            {
+                if (location == null)
+                {
+                    return null;
+                }
+
+                if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
+                    !location.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
+                {
+                    return null;
+                }
+
+                if (location.TryFirstAncestor(out AnonymousFunctionExpressionSyntax anonymous) &&
+                    !IsDeclaredIn(anonymous) &&
+                    anonymous.TryFirstAncestor(out StatementSyntax statement))
+                {
+                    return Next(statement);
+                }
+
+                if (location.Parent is ArgumentSyntax argument &&
+                    !argument.RefOrOutKeyword.IsKind(SyntaxKind.None) &&
+                    location.TryFirstAncestor(out statement))
+                {
+                    return Next(statement);
+                }
+
+                return location.FirstAncestorOrSelf<StatementSyntax>();
+
+                bool IsDeclaredIn(AnonymousFunctionExpressionSyntax lambda)
+                {
+                    if (symbol is ILocalSymbol local &&
+                        local.TrySingleDeclaration(cancellationToken, out var declaration))
+                    {
+                        return lambda.Contains(declaration);
+                    }
+
+                    return false;
+                }
+
+                StatementSyntax Next(StatementSyntax current)
+                {
+                    if (current.Parent is BlockSyntax block &&
+                        block.Statements.TryElementAt(block.Statements.IndexOf(current) + 1, out var next))
+                    {
+                        return next;
+                    }
+
+                    return null;
                 }
             }
         }

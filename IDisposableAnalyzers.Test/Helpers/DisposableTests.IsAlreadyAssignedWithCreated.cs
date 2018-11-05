@@ -364,6 +364,27 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public void OutParameterInExpressionBody()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindAssignmentExpression("disposable = File.OpenRead(string.Empty)").Left;
+                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+            }
+
+            [Test]
             public void Repro()
             {
                 var testCode = @"
