@@ -5,7 +5,7 @@ namespace ValidCode
 
     public interface IWithAnnotations
     {
-        [return:MustDispose]
+        [return: MustDispose]
         IDisposable Create();
 
         bool TryCreate([MustDispose]out IDisposable disposable);
