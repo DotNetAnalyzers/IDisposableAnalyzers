@@ -167,6 +167,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "1, 2")]
             [TestCase("var temp2 = value;", "1, 2")]
+            [TestCase("var temp3 = value;", "1, 2")]
             public void Loop(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -184,6 +185,8 @@ namespace RoslynSandbox
                 var temp2 = value;
                 i--;
             }
+
+            var temp3 = value;
         }
     }
 }");

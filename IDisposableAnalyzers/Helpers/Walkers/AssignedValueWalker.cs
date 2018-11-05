@@ -96,11 +96,6 @@ namespace IDisposableAnalyzers
 
                         return expression.IsExecutedBefore(contextExpression) != ExecutedBefore.No;
                     }
-
-                    if (ReferenceEquals(expression, contextExpression))
-                    {
-                        return false;
-                    }
                 }
 
                 return true;
