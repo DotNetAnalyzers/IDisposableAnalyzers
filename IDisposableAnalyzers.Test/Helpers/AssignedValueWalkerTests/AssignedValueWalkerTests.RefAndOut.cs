@@ -37,6 +37,66 @@ internal class Foo
                 }
             }
 
+            [Test]
+            public void LocalAssignedWithOutParameterOtherClass()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+class Foo
+{
+    Foo(Bar bar)
+    {
+        int value;
+        bar.Assign(out value, 1);
+        var temp = value;
+    }
+}
+
+class Bar
+{
+    internal void Assign(out int outValue, int arg)
+    {
+        outValue = arg;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    Assert.AreEqual("1", assignedValues.Single().ToString());
+                }
+            }
+
+            [Test]
+            public void LocalAssignedWithOutParameterOtherClassElvis()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+class Foo
+{
+    Foo(Bar bar)
+    {
+        int value;
+        bar?.Assign(out value, 1);
+        var temp = value;
+    }
+}
+
+class Bar
+{
+    internal void Assign(out int outValue, int arg)
+    {
+        outValue = arg;
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    Assert.AreEqual("1", assignedValues.Single().ToString());
+                }
+            }
+
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
             [TestCase("var temp3 = value;", "")]
