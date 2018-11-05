@@ -20,13 +20,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.0.5.0</Version>
+    <Version>2.0.6.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>IDISP004 warn on explicit discard.
-IDISP017 when disposing in finally.
-IDISP003 when assigning in loop.
-</Description>
+    <Description>BUGFIX: IDISP003 figure out when assigned in switch.
+IDISP003 should not warn when assigning out parameter in if return.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       BUGFIX: Handle extension methods in binary references better.

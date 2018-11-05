@@ -1,3 +1,7 @@
+#### 2.0.6
+* BUGFIX: IDISP003 figure out when assigned in switch.
+* IDISP003 should not warn when assigning out parameter in if return.
+
 #### 2.0.5
 * IDISP004 warn on explicit discard.
 * IDISP017 when disposing in finally.
