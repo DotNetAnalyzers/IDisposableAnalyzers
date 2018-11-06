@@ -6,7 +6,7 @@ namespace IDisposableAnnotations
     /// The ownership of instance is transferred and the receiver is responsible for disposing.
     /// </summary>
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
-    public class TransferOwnershipAttribute : Attribute
+    public class TakesOwnershipAttribute : Attribute
     {
     }
 }
