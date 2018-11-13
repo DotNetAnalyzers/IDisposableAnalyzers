@@ -78,9 +78,18 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
                                           .Single();
-            var destinationFileName = Path.Combine(summary.ResultsDirectoryPath, "..\\..\\..\\..\\..\\Benchmarks", summary.Title + ".md");
+            var destinationFileName = Path.ChangeExtension(FindCsFile(), ".md");
             Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
+
+            string FindCsFile()
+            {
+                return Directory.EnumerateFiles(
+                                    AppDomain.CurrentDomain.BaseDirectory.Split(new[] { "\\bin\\" }, StringSplitOptions.RemoveEmptyEntries).First(),
+                                    $"{summary.Title.Split('.').Last()}.cs",
+                                    SearchOption.AllDirectories)
+                                .Single();
+            }
         }
     }
 }
