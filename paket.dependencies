@@ -10,10 +10,12 @@ nuget Gu.Roslyn.Extensions prerelease
 group Test
   storage: none
   source http://www.nuget.org/api/v2/
+  nuget Microsoft.NET.Test.Sdk
+  nuget NUnit
+  nuget NUnit3TestAdapter
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   nuget Gu.Roslyn.Asserts
   nuget System.Runtime.CompilerServices.Unsafe 4.5.1
-  nuget NUnit
   nuget Moq
   nuget Ninject
   nuget System.Reactive

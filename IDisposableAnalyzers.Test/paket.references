@@ -1,7 +1,9 @@
 group Test
+  Microsoft.NET.Test.Sdk
+  NUnit
+  NUnit3TestAdapter
   Microsoft.CodeAnalysis.CSharp.Workspaces
   Gu.Roslyn.Asserts
-  NUnit
   Moq
   Ninject
   System.Reactive
