@@ -470,8 +470,9 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
-        [Test]
-        public void DisposingInSameStatement()
+        [TestCase("File.Create(fileName).Dispose()")]
+        [TestCase("File.Create(fileName)?.Dispose()")]
+        public void DisposingInSameStatement(string statement)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -486,7 +487,7 @@ namespace RoslynSandbox
             File.Create(fileName).Dispose();
         }
     }
-}";
+}".AssertReplace("File.Create(fileName).Dispose()", statement);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }

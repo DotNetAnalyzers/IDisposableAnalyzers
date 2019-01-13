@@ -113,6 +113,7 @@ namespace ValidCode
         public static void Touch(string fileName)
         {
             File.Create(fileName).Dispose();
+            File.Create(fileName)?.Dispose();
         }
 
         internal string AddAndReturnToString()
