@@ -14,4 +14,3 @@ group Analyzers
   AsyncUsageAnalyzers
   Gu.Analyzers
   StyleCop.Analyzers
-
