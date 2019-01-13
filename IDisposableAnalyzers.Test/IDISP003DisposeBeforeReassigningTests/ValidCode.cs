@@ -1077,5 +1077,34 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void ReturningOutParameterInForeach()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public static bool TryGetStream(string[] fileNames, out Stream result)
+        {
+            foreach (var name in fileNames)
+            {
+                if (name.Length > 5)
+                {
+                    result = File.OpenRead(name);
+                    return true;
+                }
+            }
+
+            result = null;
+            return false;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
     }
 }
