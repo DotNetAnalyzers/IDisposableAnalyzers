@@ -469,5 +469,25 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [Test]
+        public void DisposingInSameStatement()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class C
+    {
+        public static void Touch(string fileName)
+        {
+            File.Create(fileName).Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
     }
 }

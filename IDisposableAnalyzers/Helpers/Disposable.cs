@@ -459,6 +459,12 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
             {
+                if (memberAccess.Parent is InvocationExpressionSyntax invocation &&
+                    DisposeCall.IsIDisposableDispose(invocation, semanticModel, cancellationToken))
+                {
+                    return false;
+                }
+
                 return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 

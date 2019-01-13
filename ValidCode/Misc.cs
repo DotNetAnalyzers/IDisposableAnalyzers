@@ -110,6 +110,11 @@ namespace ValidCode
 
         public IDisposable CreateDisposable() => new Disposable();
 
+        public static void Touch(string fileName)
+        {
+            File.Create(fileName).Dispose();
+        }
+
         internal string AddAndReturnToString()
         {
             return this.compositeDisposable.AddAndReturn(new Disposable()).ToString();
