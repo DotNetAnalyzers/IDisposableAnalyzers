@@ -58,6 +58,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Stubs", "Stubs\Stubs.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode", "ValidCode\ValidCode.csproj", "{C6A235B1-A780-43D5-BA1F-E31861C019F5}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnnotations", "IDisposableAnnotations\IDisposableAnnotations.csproj", "{EF9E9769-BCA4-45C6-A819-21978AFA8EAC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -92,6 +94,10 @@ Global
 		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6A235B1-A780-43D5-BA1F-E31861C019F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EF9E9769-BCA4-45C6-A819-21978AFA8EAC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF9E9769-BCA4-45C6-A819-21978AFA8EAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF9E9769-BCA4-45C6-A819-21978AFA8EAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF9E9769-BCA4-45C6-A819-21978AFA8EAC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
