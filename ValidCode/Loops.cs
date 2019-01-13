@@ -4,6 +4,16 @@ namespace ValidCode
 
     public class Loops
     {
+        public void DisposeAfter(string[] fileNames)
+        {
+            Stream stream = null;
+            foreach (var name in fileNames)
+            {
+                stream = File.OpenRead(name);
+                stream.Dispose();
+            }
+        }
+
         public static bool TryGetStreamForEach(string[] fileNames, out Stream result)
         {
             foreach (var name in fileNames)
