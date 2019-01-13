@@ -20,6 +20,8 @@ namespace IDisposableAnalyzers
     [Shared]
     internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
     {
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System"));
+
         // ReSharper disable once InconsistentNaming
         private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("System.IDisposable")
                                                                                .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
@@ -305,6 +307,7 @@ namespace IDisposableAnalyzers
                     @"public void Dispose()
                           {
                               this.Dispose(true);
+                              GC.SuppressFinalize(this);
                           }",
                     usesUnderscoreNames));
 
@@ -347,6 +350,7 @@ namespace IDisposableAnalyzers
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
 
+            editor.AddUsing(UsingSystem);
             return editor.GetChangedDocument();
         }
 

@@ -128,9 +128,10 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
-    public class Foo : System.IDisposable
+    public class Foo : IDisposable
     {
         private bool disposed;
 
@@ -153,6 +154,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Bar()
@@ -176,7 +178,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
 
@@ -354,9 +356,10 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
 
-    public abstract class Foo : System.IDisposable
+    public abstract class Foo : IDisposable
     {
         private bool disposed;
 
@@ -365,6 +368,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -384,7 +388,7 @@ namespace RoslynSandbox
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
