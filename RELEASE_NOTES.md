@@ -1,3 +1,7 @@
+#### 2.0.7
+* BUGFIX: IDISP003 in loops.
+* BUGFIX: Generate SuppressFinalize when virtual.
+
 #### 2.0.6
 * BUGFIX: IDISP003 figure out when assigned in switch.
 * IDISP003 should not warn when assigning out parameter in if return.

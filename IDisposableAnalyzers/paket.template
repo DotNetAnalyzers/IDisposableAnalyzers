@@ -4,8 +4,8 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  BUGFIX: IDISP003 figure out when assigned in switch.
-  IDISP003 should not warn when assigning out parameter in if return.
+  BUGFIX: IDISP003 in loops.
+  BUGFIX: Generate SuppressFinalize when virtual.
 
 excludedgroups
   Main

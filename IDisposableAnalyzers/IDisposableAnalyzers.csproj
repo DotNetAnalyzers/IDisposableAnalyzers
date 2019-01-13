@@ -20,11 +20,11 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.0.6.0</Version>
+    <Version>2.0.7.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>BUGFIX: IDISP003 figure out when assigned in switch.
-IDISP003 should not warn when assigning out parameter in if return.</Description>
+    <Description>BUGFIX: IDISP003 in loops.
+BUGFIX: Generate SuppressFinalize when virtual.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       BUGFIX: Handle extension methods in binary references better.
