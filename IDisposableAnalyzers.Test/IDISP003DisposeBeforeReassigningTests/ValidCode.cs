@@ -1193,6 +1193,5 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, code);
         }
-
     }
 }
