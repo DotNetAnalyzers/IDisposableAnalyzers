@@ -22,8 +22,7 @@ namespace RoslynSandbox
             var value = PLACEHOLDER;
         }
     }
-}";
-                testCode = testCode.AssertReplace("PLACEHOLDER", code);
+}".AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

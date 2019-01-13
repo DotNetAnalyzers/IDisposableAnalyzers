@@ -46,8 +46,7 @@ namespace RoslynSandbox
             var value = new Disposable();
         }
     }
-}";
-                testCode = testCode.AssertReplace("new Disposable()", code);
+}".AssertReplace("new Disposable()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -88,8 +87,7 @@ namespace RoslynSandbox
             var value = new Disposable();
         }
     }
-}";
-                testCode = testCode.AssertReplace("new Disposable()", code);
+}".AssertReplace("new Disposable()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -252,8 +250,7 @@ namespace RoslynSandbox
             return stream;
         }
     }
-}";
-                testCode = testCode.AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -307,8 +304,7 @@ namespace RoslynSandbox
 
         private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
     }
-}";
-                testCode = testCode.AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -395,8 +391,8 @@ namespace RoslynSandbox
             return new Disposable();
         }
     }
-}";
-                testCode = testCode.AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", code);
+
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -449,8 +445,8 @@ namespace RoslynSandbox
             var value = // Meh();
         }
     }
-}";
-                testCode = testCode.AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", code);
+
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

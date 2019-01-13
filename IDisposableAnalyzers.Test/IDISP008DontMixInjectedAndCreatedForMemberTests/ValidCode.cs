@@ -30,8 +30,7 @@ namespace RoslynSandbox
             this.Stream?.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("private Stream Stream", property);
+}".AssertReplace("private Stream Stream", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -55,8 +54,7 @@ namespace RoslynSandbox
             this.Stream?.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
+}".AssertReplace("public Stream Stream { get; set; }", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -81,8 +79,7 @@ namespace RoslynSandbox
             this.stream.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
+}".AssertReplace("this.stream.Dispose();", disposeCall);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -150,8 +147,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode)
-                      ;
+            AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
@@ -179,8 +175,7 @@ namespace RoslynSandbox
             this.Stream?.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
+}".AssertReplace("public Stream Stream { get; }", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -238,8 +233,7 @@ namespace RoslynSandbox
 
         public Stream Stream { get; }
     }
-}";
-            testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
+}".AssertReplace("public Stream Stream { get; }", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -406,8 +400,7 @@ namespace RoslynSandbox
             private set { this.stream = value; }
         }
     }
-}";
-            testCode = testCode.AssertReplace("private set", setter);
+}".AssertReplace("private set", setter);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

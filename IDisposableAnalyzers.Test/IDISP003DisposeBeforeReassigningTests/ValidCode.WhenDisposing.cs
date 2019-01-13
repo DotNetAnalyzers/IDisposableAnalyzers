@@ -58,8 +58,7 @@ namespace RoslynSandbox
             stream.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+}".AssertReplace("stream.Dispose();", dispose);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -90,8 +89,7 @@ namespace RoslynSandbox
             stream?.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+}".AssertReplace("stream.Dispose();", dispose);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -121,8 +119,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("stream.Dispose();", dispose);
+}".AssertReplace("stream.Dispose();", dispose);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

@@ -678,8 +678,7 @@ namespace RoslynSandbox
             action(stream);
         }
     }
-}";
-            testCode = testCode.AssertReplace("action(stream)", invokeCode);
+}".AssertReplace("action(stream)", invokeCode);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

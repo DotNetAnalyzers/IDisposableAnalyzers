@@ -28,8 +28,7 @@ namespace RoslynSandbox
             this.stream.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.stream.Dispose();", disposeCall);
+}".AssertReplace("this.stream.Dispose();", disposeCall);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
@@ -367,8 +366,7 @@ namespace RoslynSandbox
             _bar = disposables.First();
         }
     }
-}";
-                testCode = testCode.AssertReplace("disposables.First();", linq);
+}".AssertReplace("disposables.First();", linq);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 

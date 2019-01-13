@@ -52,8 +52,7 @@ namespace RoslynSandbox
             this.disposables.Add(disposable);
         }
     }
-}";
-                testCode = testCode.AssertReplace("Add(disposable)", code);
+}".AssertReplace("Add(disposable)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -111,8 +110,7 @@ namespace RoslynSandbox
             this.disposables.Enqueue(disposable);
         }
     }
-}";
-                testCode = testCode.AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", code);
+}".AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -143,8 +141,7 @@ namespace RoslynSandbox
             this.disposables.Add(1, disposable);
         }
     }
-}";
-                testCode = testCode.AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", code);
+}".AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -173,8 +170,7 @@ namespace RoslynSandbox
             this.disposables.TryAdd(1, disposable);
         }
     }
-}";
-                testCode = testCode.AssertReplace("TryAdd(1, disposable)", code);
+}".AssertReplace("TryAdd(1, disposable)", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

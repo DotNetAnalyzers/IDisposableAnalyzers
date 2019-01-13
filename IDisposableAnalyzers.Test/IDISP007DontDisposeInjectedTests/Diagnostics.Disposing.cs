@@ -47,8 +47,7 @@ namespace RoslynSandbox
             ↓(this.stream as IDisposable)?.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
+}".AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -77,8 +76,7 @@ namespace RoslynSandbox
             ↓this.disposable.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
+}".AssertReplace("this.disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -107,8 +105,7 @@ namespace RoslynSandbox
             ↓this.disposable.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.disposable.Dispose();", disposeCall);
+}".AssertReplace("this.disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -130,8 +127,7 @@ namespace RoslynSandbox
             ↓Disposable.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("Disposable.Dispose();", disposeCall);
+}".AssertReplace("Disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -203,8 +199,7 @@ namespace RoslynSandbox
             ↓this.Disposable.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
+}".AssertReplace("this.Disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -246,9 +241,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-
-                testCode = testCode.AssertReplace("public abstract Stream Stream { get; }", property);
+}".AssertReplace("public abstract Stream Stream { get; }", property);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -301,9 +294,8 @@ namespace RoslynSandbox
             ↓this.Disposable.Dispose();
         }
     }
-}";
+}".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
             }
 
@@ -350,9 +342,8 @@ namespace RoslynSandbox
             ↓this.Disposable.Dispose();
         }
     }
-}";
+}".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
             }
 
@@ -397,9 +388,8 @@ namespace RoslynSandbox
             ↓this.foo.Disposable.Dispose();
         }
     }
-}";
+}".AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
 
-                testCode = testCode.AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
             }
 
@@ -423,8 +413,8 @@ namespace RoslynSandbox
             ↓this.Disposable.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("this.Disposable.Dispose();", disposeCall);
+}".AssertReplace("this.Disposable.Dispose();", disposeCall);
+
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -645,8 +635,8 @@ namespace Gu.Reactive
             ↓this.disposable.Dispose();
         }
      }
-}";
-                testCode = testCode.AssertReplace("this.disposable.Dispose();", dispose);
+}".AssertReplace("this.disposable.Dispose();", dispose);
+
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -770,8 +760,8 @@ namespace RoslynSandbox
             ↓((IDisposable)o).Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("((IDisposable)o).Dispose()", cast);
+}".AssertReplace("((IDisposable)o).Dispose()", cast);
+
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 

@@ -94,8 +94,7 @@ namespace RoslynSandbox
 
         public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
-}";
-            testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
+}".AssertReplace("public Stream Stream { get; }", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -146,8 +145,7 @@ namespace RoslynSandbox
 
         public Stream Stream { get; }
     }
-}";
-            testCode = testCode.AssertReplace("public Stream Stream { get; }", property);
+}".AssertReplace("public Stream Stream { get; }", property);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
@@ -314,8 +312,7 @@ namespace RoslynSandbox
             private set { this.stream = value; }
         }
     }
-}";
-            testCode = testCode.AssertReplace("private set", setter);
+}".AssertReplace("private set", setter);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

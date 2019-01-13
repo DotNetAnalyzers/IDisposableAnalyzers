@@ -85,8 +85,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {code}");
+}".AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -142,8 +141,7 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {code}");
+}".AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -378,8 +376,7 @@ namespace RoslynSandbox
             return result;
         }
     }
-}";
-            testCode = testCode.AssertReplace("var temp = Recursive()", $"var temp = {code}");
+}".AssertReplace("var temp = Recursive()", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -465,8 +462,7 @@ namespace RoslynSandbox
             return 1;
         }
     }
-}";
-            testCode = testCode.AssertReplace("Func<int> temp = () => 1", code);
+}".AssertReplace("Func<int> temp = () => 1", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -591,8 +587,8 @@ namespace RoslynSandbox
             }
         }
     }
-}";
-            testCode = testCode.AssertReplace("var value = await CreateStringAsync()", $"var value = {code}");
+}".AssertReplace("var value = await CreateStringAsync()", $"var value = {code}");
+
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -657,8 +653,8 @@ namespace RoslynSandbox
             return await RecursiveAsync3(value);
         }
     }
-}";
-            testCode = testCode.AssertReplace("var value = await RecursiveAsync()", $"var value = {code}");
+}".AssertReplace("var value = await RecursiveAsync()", $"var value = {code}");
+
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);

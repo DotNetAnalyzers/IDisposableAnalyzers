@@ -34,8 +34,7 @@ namespace RoslynSandbox
             var temp = value;
         }
     }
-}";
-                testCode = testCode.AssertReplace("1", code);
+}".AssertReplace("1", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

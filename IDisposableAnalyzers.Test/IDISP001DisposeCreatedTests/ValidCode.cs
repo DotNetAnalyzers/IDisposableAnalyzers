@@ -60,8 +60,7 @@ namespace RoslynSandbox
             var value = new string(' ', 1);
         }
     }
-}";
-            testCode = testCode.AssertReplace("new string(' ', 1)", code);
+}".AssertReplace("new string(' ', 1)", code);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 

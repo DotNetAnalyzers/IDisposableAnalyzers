@@ -167,8 +167,7 @@ namespace RoslynSandbox
             (stream as IDisposable)?.Dispose();
         }
     }
-}";
-            testCode = testCode.AssertReplace("(stream as IDisposable)?.Dispose()", disposeCode);
+}".AssertReplace("(stream as IDisposable)?.Dispose()", disposeCode);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

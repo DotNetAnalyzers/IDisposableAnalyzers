@@ -26,8 +26,7 @@ namespace RoslynSandbox
             var first = disposables.First();
         }
     }
-}";
-            testCode = testCode.AssertReplace("disposables.First();", linq);
+}".AssertReplace("disposables.First();", linq);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

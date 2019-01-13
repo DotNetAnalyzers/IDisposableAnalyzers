@@ -32,8 +32,7 @@ namespace RoslynSandbox
 
         ↓public Stream Stream { get; }
     }
-}";
-                testCode = testCode.AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
+}".AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -98,8 +97,7 @@ namespace RoslynSandbox
     {
         ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
     }
-}";
-                testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
+}".AssertReplace("public Stream Stream { get; set; }", property);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
@@ -123,8 +121,7 @@ namespace RoslynSandbox
             this.Stream?.Dispose();
         }
     }
-}";
-                testCode = testCode.AssertReplace("public Stream Stream { get; set; }", property);
+}".AssertReplace("public Stream Stream { get; set; }", property);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
