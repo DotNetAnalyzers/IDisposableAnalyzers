@@ -1,5 +1,6 @@
 namespace ValidCode
 {
+    using System;
     using System.IO;
 
     public class Loops
@@ -11,6 +12,16 @@ namespace ValidCode
             {
                 stream = File.OpenRead(name);
                 stream.Dispose();
+            }
+        }
+
+        public static void DisposeAfter2()
+        {
+            for (var i = 0; i < 2; i++)
+            {
+                IDisposable result;
+                result = File.OpenRead(string.Empty);
+                result.Dispose();
             }
         }
 

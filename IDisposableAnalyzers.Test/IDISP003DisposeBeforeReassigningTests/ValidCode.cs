@@ -1192,5 +1192,32 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public void LocalAssignedTwoStepInLoop()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class Foo
+    {
+        public static void Bar()
+        {
+            for(var i = 0; i < 2;i++)
+            {
+                IDisposable result;
+                result = File.OpenRead(string.Empty);
+
+                result.Dispose();
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
