@@ -112,7 +112,9 @@ namespace IDisposableAnalyzers
                 if (expression.TryFirstAncestor(out BlockSyntax block) &&
                     block.Statements.TryFirstOfType(out ReturnStatementSyntax _))
                 {
-                    if (expression.TryFirstAncestor<ForEachStatementSyntax>(out _))
+                    if (expression.TryFirstAncestor<ForEachStatementSyntax>(out _) ||
+                        expression.TryFirstAncestor<ForStatementSyntax>(out _) ||
+                        expression.TryFirstAncestor<WhileStatementSyntax>(out _))
                     {
                         return true;
                     }
