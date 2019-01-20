@@ -3,10 +3,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class AllBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP001DisposeCreated());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP004DontIgnoreCreated());
-
         private static readonly Gu.Roslyn.Asserts.Benchmark ArgumentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ArgumentAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark AssignmentAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.AssignmentAnalyzer());
@@ -25,19 +21,11 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark UsingStatementAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.UsingStatementAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP001DisposeCreated());
+
+        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.IDISP004DontIgnoreCreated());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark SemanticModelCacheAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.SemanticModelCacheAnalyzer());
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP001DisposeCreated()
-        {
-            IDISP001DisposeCreatedBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP004DontIgnoreCreated()
-        {
-            IDISP004DontIgnoreCreatedBenchmark.Run();
-        }
 
         [BenchmarkDotNet.Attributes.Benchmark]
         public void ArgumentAnalyzer()
@@ -91,6 +79,18 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void UsingStatementAnalyzer()
         {
             UsingStatementAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void IDISP001DisposeCreated()
+        {
+            IDISP001DisposeCreatedBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void IDISP004DontIgnoreCreated()
+        {
+            IDISP004DontIgnoreCreatedBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]
