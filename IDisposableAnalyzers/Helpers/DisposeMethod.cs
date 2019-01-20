@@ -114,6 +114,28 @@ namespace IDisposableAnalyzers
             return false;
         }
 
+        internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall)
+        {
+            using (var invocations = InvocationWalker.Borrow(disposeMethod))
+            {
+                foreach (var candidate in invocations)
+                {
+                    if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
+                        argumentList.Arguments.Count == 1 &&
+                        candidate.TryGetMethodName(out var name) &&
+                        name == "SuppressFinalize" &&
+                        semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out var target))
+                    {
+                        suppressCall = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            suppressCall = null;
+            return false;
+        }
+
         internal static bool IsOverrideDispose(IMethodSymbol candidate)
         {
             return candidate.IsOverride &&

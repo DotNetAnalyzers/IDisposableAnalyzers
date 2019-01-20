@@ -14,7 +14,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP009IsIDisposable.Descriptor,
-            IDISP010CallBaseDispose.Descriptor);
+            IDISP010CallBaseDispose.Descriptor,
+            IDISP018CallSuppressFinalize.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -43,6 +44,12 @@ namespace IDisposableAnalyzers
                         !IsInterfaceImplementation(method))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                    }
+
+                    if (method.ContainingType.TryFindFirstMethod(x => x.MethodKind == MethodKind.Destructor, out _) &&
+                         !DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP018CallSuppressFinalize.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }
                 }
 

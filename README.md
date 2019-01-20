@@ -80,6 +80,10 @@ Roslyn analyzers for IDisposable
     <td>Prefer using.</td>
   </tr>
   <tr>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP018.md">IDISP018</a></td>
+    <td>Call SuppressFinalize.</td>
+  </tr>
+  <tr>
     <td><a href="">SemanticModelCacheAnalyzer</a></td>
     <td>Controls if Semantic models should be cached for syntax trees.</td>
   </tr>
