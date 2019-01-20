@@ -39,6 +39,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -88,6 +89,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -145,6 +147,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -303,6 +306,7 @@ namespace RoslynSandbox
 
             _disposed = true;
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -545,6 +549,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -900,6 +905,7 @@ namespace RoslynSandbox
 
             this.disposed = true;
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
