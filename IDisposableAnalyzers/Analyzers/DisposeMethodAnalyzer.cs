@@ -33,14 +33,17 @@ namespace IDisposableAnalyzers
                 method.ReturnsVoid)
             {
                 if (method.Parameters.Length == 0 &&
+                    !method.IsStatic &&
                     method.DeclaredAccessibility == Accessibility.Public &&
-                    method.GetAttributes().Length == 0 &&
                     method.ReturnsVoid &&
                     method.OverriddenMethod == null &&
-                    !method.ExplicitInterfaceImplementations.Any() &&
-                    !IsInterfaceImplementation(method))
+                    method.GetAttributes().Length == 0)
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, context.Node.GetLocation()));
+                    if (!method.ExplicitInterfaceImplementations.Any() &&
+                        !IsInterfaceImplementation(method))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                    }
                 }
 
                 if (method.Parameters.TrySingle(out var parameter) &&

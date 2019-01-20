@@ -25,7 +25,7 @@ namespace RoslynSandbox
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
 
-        ↓public void Dispose()
+        public void ↓Dispose()
         {
             if (this.disposed)
             {
@@ -83,7 +83,7 @@ namespace RoslynSandbox
 
         public int Value { get; }
 
-        ↓public void Dispose()
+        public void ↓Dispose()
         {
             if (this.disposed)
             {
