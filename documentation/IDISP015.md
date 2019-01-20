@@ -21,7 +21,7 @@
   </tr>
   <tr>
     <td>Code</td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/MethodReturnValuesAnalyzer.cs">MethodReturnValuesAnalyzer</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/MethodReturnValuesAnalyzer.cs">MethodReturnValuesAnalyzer</a></td>
   </tr>
 </table>
 <!-- end generated table -->

@@ -21,11 +21,11 @@
   </tr>
   <tr>
     <td>Code</td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/DisposeCallAnalyzer.cs">DisposeCallAnalyzer</a></td>
+     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeCallAnalyzer.cs">DisposeCallAnalyzer</a></td>
   </tr>
   <tr>
     <td></td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/UsingStatementAnalyzer.cs">UsingStatementAnalyzer</a></td>
+     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/UsingStatementAnalyzer.cs">UsingStatementAnalyzer</a></td>
   </tr>
 </table>
 <!-- end generated table -->

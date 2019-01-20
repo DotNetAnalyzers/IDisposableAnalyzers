@@ -25,7 +25,7 @@
   </tr>
   <tr>
     <td></td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/NodeAnalyzers/ObjectCreationAnalyzer.cs">ObjectCreationAnalyzer</a></td>
+     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ObjectCreationAnalyzer.cs">ObjectCreationAnalyzer</a></td>
   </tr>
 </table>
 <!-- end generated table -->
