@@ -9,6 +9,53 @@ namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
         [Test]
+        public void SealedSimple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void SealedNoFinalizer()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private bool isDisposed = false;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void SealedWithFinalizer()
         {
             var testCode = @"
@@ -18,16 +65,7 @@ namespace RoslynSandbox
 
     public sealed class C : IDisposable
     {
-
         private bool isDisposed = false;
-
-        void Dispose(bool disposing)
-        {
-            if (!this.isDisposed)
-            {
-                this.isDisposed = true;
-            }
-        }
 
         ~C()
         {
@@ -40,6 +78,13 @@ namespace RoslynSandbox
             GC.SuppressFinalize(this);
         }
 
+        void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+            }
+        }
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
