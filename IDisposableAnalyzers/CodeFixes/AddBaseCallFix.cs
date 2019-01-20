@@ -10,9 +10,9 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddBaseCallCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddBaseCallFix))]
     [Shared]
-    internal class AddBaseCallCodeFixProvider : CodeFixProvider
+    internal class AddBaseCallFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.DiagnosticId);
