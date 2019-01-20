@@ -54,7 +54,7 @@ namespace IDisposableAnalyzers
                 {
                     if (overridden.DeclaringSyntaxReferences.Length == 0)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
                     }
                     else
                     {
@@ -66,7 +66,7 @@ namespace IDisposableAnalyzers
                                     FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
                                     !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
                                 {
-                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, context.Node.GetLocation(), parameter.Name));
+                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
                                     break;
                                 }
                             }

@@ -63,7 +63,7 @@ namespace RoslynSandbox
 {
     public class Foo : FooBase
     {
-        ↓protected override void Dispose(bool disposing)
+        protected override void ↓Dispose(bool disposing)
         {
         }
     }
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         {
         }
 
-        ↓protected override void Dispose(bool disposing)
+        protected override void ↓Dispose(bool disposing)
         {
         }
     }
