@@ -16,7 +16,9 @@ namespace IDisposableAnalyzers
     internal class AddSuppressFinalizeCallFix : CodeFixProvider
     {
         /// <inheritdoc/>
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP018CallSuppressFinalize.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+            IDISP018CallSuppressFinalize.DiagnosticId,
+            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => null;
