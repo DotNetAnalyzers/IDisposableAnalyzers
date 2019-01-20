@@ -8,8 +8,8 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP017");
-        private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP017PreferUsing.Descriptor);
+        private static readonly CodeFixProvider Fix = new AddUsingFix();
 
         [Test]
         public void Local()

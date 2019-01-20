@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
-            private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             [Test]
             public void OutParameter()

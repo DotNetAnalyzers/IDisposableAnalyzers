@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
-            private static readonly CodeFixProvider Fix = new AddUsingCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             private static readonly string DisposableCode = @"
 namespace RoslynSandbox
