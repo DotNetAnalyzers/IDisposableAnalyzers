@@ -1,10 +1,8 @@
 namespace IDisposableAnalyzers
 {
-    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
-    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeActions;
@@ -50,6 +48,21 @@ namespace IDisposableAnalyzers
                                         body,
                                         body.AddStatements(SyntaxFactory.ParseStatement("GC.SuppressFinalize(this);")
                                                                         .WithAdditionalAnnotations(Formatter.Annotation)))));
+                        }
+                        else if (disposeMethod.ExpressionBody is ArrowExpressionClauseSyntax arrowExpression)
+                        {
+                            var block = SyntaxFactory.Block(
+                                SyntaxFactory.ExpressionStatement(arrowExpression.Expression)
+                                             .WithAdditionalAnnotations(Formatter.Annotation),
+                                SyntaxFactory.ParseStatement("GC.SuppressFinalize(this);")
+                                             .WithAdditionalAnnotations(Formatter.Annotation));
+                            return Task.FromResult(
+                                context.Document.WithSyntaxRoot(
+                                    syntaxRoot.ReplaceNode(
+                                        disposeMethod,
+                                        disposeMethod.WithBody(block)
+                                                     .WithExpressionBody(null)
+                                                     .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None)))));
                         }
 
                         return Task.FromResult(context.Document);
