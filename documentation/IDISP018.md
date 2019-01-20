@@ -28,7 +28,7 @@
 
 ## Description
 
-Call SuppressFinalize.
+Call SuppressFinalize(this) as the type has a finalizer.
 
 ## Motivation
 
@@ -36,7 +36,7 @@ Call `GC.SuppressFinalize(this)` if the type has a finalizer.
 
 ## How to fix violations
 
-Use teh code fix.
+Use the code fix.
 
 <!-- start generated config severity -->
 ## Configure severity
