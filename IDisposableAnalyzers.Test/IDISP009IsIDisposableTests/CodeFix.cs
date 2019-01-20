@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly CodeFixProvider Fix = new ImplementIDisposableCodeFixProvider();
+        private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP009");
 
         [Test]

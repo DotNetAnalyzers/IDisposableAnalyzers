@@ -16,9 +16,9 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.Formatting;
     using Microsoft.CodeAnalysis.Simplification;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableFix))]
     [Shared]
-    internal class ImplementIDisposableCodeFixProvider : CodeFixProvider
+    internal class ImplementIDisposableFix : CodeFixProvider
     {
         private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System"));
 
@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers
                                     context,
                                     cancellationToken,
                                     typeDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider) + "add interface"),
+                            nameof(ImplementIDisposableFix) + "add interface"),
                         diagnostic);
                     continue;
                 }
@@ -89,7 +89,7 @@ namespace IDisposableAnalyzers
                                     context,
                                     cancellationToken,
                                     structDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider) + "Struct"),
+                            nameof(ImplementIDisposableFix) + "Struct"),
                         diagnostic);
                 }
                 else if (typeDeclaration is ClassDeclarationSyntax classDeclaration)
@@ -107,7 +107,7 @@ namespace IDisposableAnalyzers
                                         classDeclaration,
                                         baseDispose,
                                         cancellationToken),
-                                nameof(ImplementIDisposableCodeFixProvider) + "override"),
+                                nameof(ImplementIDisposableFix) + "override"),
                             diagnostic);
                         continue;
                     }
@@ -136,7 +136,7 @@ namespace IDisposableAnalyzers
                                         context,
                                         cancellationToken,
                                         classDeclaration),
-                                nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
+                                nameof(ImplementIDisposableFix) + "Sealed"),
                             diagnostic);
                         continue;
                     }
@@ -151,7 +151,7 @@ namespace IDisposableAnalyzers
                                         context,
                                         cancellationToken,
                                         classDeclaration),
-                                nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
+                                nameof(ImplementIDisposableFix) + "Virtual"),
                             diagnostic);
                         continue;
                     }
@@ -164,7 +164,7 @@ namespace IDisposableAnalyzers
                                     context,
                                     cancellationToken,
                                     classDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider) + "Sealed"),
+                            nameof(ImplementIDisposableFix) + "Sealed"),
                         diagnostic);
 
                     context.RegisterCodeFix(
@@ -175,7 +175,7 @@ namespace IDisposableAnalyzers
                                     context,
                                     cancellationToken,
                                     classDeclaration),
-                            nameof(ImplementIDisposableCodeFixProvider) + "Virtual"),
+                            nameof(ImplementIDisposableFix) + "Virtual"),
                         diagnostic);
                 }
             }
@@ -350,7 +350,7 @@ namespace IDisposableAnalyzers
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
 
-            editor.AddUsing(UsingSystem);
+            _ = editor.AddUsing(UsingSystem);
             return editor.GetChangedDocument();
         }
 

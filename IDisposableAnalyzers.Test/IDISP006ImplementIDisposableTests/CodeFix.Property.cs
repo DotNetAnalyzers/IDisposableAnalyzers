@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
         public class Property
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly CodeFixProvider CodeFix = new ImplementIDisposableCodeFixProvider();
+            private static readonly CodeFixProvider CodeFix = new ImplementIDisposableFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 
             [Test]

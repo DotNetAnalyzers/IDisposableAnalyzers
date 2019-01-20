@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     {
         public class InterfaceOnly
         {
-            private static readonly CodeFixProvider Fix = new ImplementIDisposableCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             //// ReSharper disable once InconsistentNaming
             private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
