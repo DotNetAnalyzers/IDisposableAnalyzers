@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         {
             // ReSharper disable once UnusedMember.Local
             // ReSharper disable once MemberHidesStaticFromOuterClass
-            private static readonly DisposeInTearDownCodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
+            private static readonly DisposeInTearDownFix Fix = new DisposeInTearDownFix();
 
             [Test]
             public void AssigningFieldInSetUpCreatesTearDownAndDisposes()

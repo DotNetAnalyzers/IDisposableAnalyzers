@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
-        private static readonly DisposeBeforeAssignCodeFixProvider Fix = new DisposeBeforeAssignCodeFixProvider();
+        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
 
         [Test]
         public void NotDisposingVariable()

@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         public class TestFixture
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly CodeFixProvider Fix = new DisposeInTearDownCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new DisposeInTearDownFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
             [Test]

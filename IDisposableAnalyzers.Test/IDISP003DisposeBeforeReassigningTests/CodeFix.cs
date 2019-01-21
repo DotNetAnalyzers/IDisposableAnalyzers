@@ -34,7 +34,7 @@ namespace RoslynSandbox
 
         private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor);
-        private static readonly DisposeBeforeAssignCodeFixProvider Fix = new DisposeBeforeAssignCodeFixProvider();
+        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
 
         [Test]
         public void NotDisposingVariable()

@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
         public class Field
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly CodeFixProvider Fix = new DisposeMemberCodeFixProvider();
+            private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP002DisposeMember.Descriptor);
 
             [Test]

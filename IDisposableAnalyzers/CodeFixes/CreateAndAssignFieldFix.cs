@@ -13,9 +13,9 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Simplification;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CreateAndAssignFieldCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CreateAndAssignFieldFix))]
     [Shared]
-    internal class CreateAndAssignFieldCodeFixProvider : CodeFixProvider
+    internal class CreateAndAssignFieldFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(

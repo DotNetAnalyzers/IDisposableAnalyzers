@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         {
             private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
-            private static readonly CreateAndAssignFieldCodeFixProvider Fix = new CreateAndAssignFieldCodeFixProvider();
+            private static readonly CreateAndAssignFieldFix Fix = new CreateAndAssignFieldFix();
 
             [Test]
             public void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()

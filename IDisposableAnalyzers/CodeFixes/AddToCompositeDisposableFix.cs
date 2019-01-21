@@ -15,9 +15,9 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.Formatting;
     using Microsoft.CodeAnalysis.Simplification;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddToCompositeDisposableCodeFixProvider))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddToCompositeDisposableFix))]
     [Shared]
-    internal class AddToCompositeDisposableCodeFixProvider : CodeFixProvider
+    internal class AddToCompositeDisposableFix : CodeFixProvider
     {
         private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("System.Reactive.Disposables.CompositeDisposable")
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);

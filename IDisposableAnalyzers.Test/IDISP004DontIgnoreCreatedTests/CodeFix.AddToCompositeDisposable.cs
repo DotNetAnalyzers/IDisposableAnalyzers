@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         {
             private static readonly IDISP004DontIgnoreCreated Analyzer = new IDISP004DontIgnoreCreated();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
-            private static readonly AddToCompositeDisposableCodeFixProvider Fix = new AddToCompositeDisposableCodeFixProvider();
+            private static readonly AddToCompositeDisposableFix Fix = new AddToCompositeDisposableFix();
 
             [Test]
             public void CreateNewCompositeDisposable()
