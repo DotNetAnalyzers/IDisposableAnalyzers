@@ -220,8 +220,5 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
-}";
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
     }
 }
