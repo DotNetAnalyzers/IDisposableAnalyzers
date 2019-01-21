@@ -1,8 +1,9 @@
 namespace ValidCode
 {
+    using System;
     using System.IO;
 
-    public class ReassigningField
+    public sealed class ReassigningField : IDisposable
     {
         private Stream stream;
 
@@ -16,6 +17,11 @@ namespace ValidCode
         {
             this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
         }
     }
 }
