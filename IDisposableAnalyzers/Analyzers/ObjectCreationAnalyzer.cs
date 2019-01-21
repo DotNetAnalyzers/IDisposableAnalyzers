@@ -31,7 +31,8 @@ namespace IDisposableAnalyzers
                 if (context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
                     type.IsAssignableTo(KnownSymbol.HttpClient, context.Compilation) &&
                     !IsStaticFieldInitializer(objectCreation) &&
-                    !IsStaticPropertyInitializer(objectCreation))
+                    !IsStaticPropertyInitializer(objectCreation) &&
+                    !IsStaticCtor(context.ContainingSymbol))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
                 }
@@ -59,5 +60,9 @@ namespace IDisposableAnalyzers
                    equalsValueClause.Parent is PropertyDeclarationSyntax propertyDeclaration &&
                    propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
         }
+
+        private static bool IsStaticCtor(ISymbol containingSymbol) => containingSymbol.IsStatic &&
+                                                                      containingSymbol is IMethodSymbol method &&
+                                                                      method.MethodKind == MethodKind.SharedConstructor;
     }
 }

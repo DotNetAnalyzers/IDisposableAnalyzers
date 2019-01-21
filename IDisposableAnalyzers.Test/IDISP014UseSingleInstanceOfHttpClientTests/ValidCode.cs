@@ -10,13 +10,12 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
         private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
 
         [Test]
-        public void StaticField()
+        public void StaticFieldAssigtnedInInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     using System.Net.Http;
-    using System.Threading.Tasks;
 
     public class Foo
     {
@@ -27,13 +26,56 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticProperty()
+        public void StaticFieldAssignedInStaticCtor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Net.Http;
+
+    public class C
+    {
+        private static readonly HttpClient _client;
+
+        static C()
+        {
+            _client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = false }) { BaseAddress = new Uri(""http://server/"") };
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void StaticPropertyAssignedInInitializer()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Net.Http;
+
+    public class C
+    {
+        static C()
+        {
+            Client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = false }) { BaseAddress = new Uri(""http://server/"") };
+        }
+
+        public static HttpClient Client { get; }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void StaticPropertyAssignedInStaticCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     using System.Net.Http;
-    using System.Threading.Tasks;
 
     public class Foo
     {
@@ -46,7 +88,8 @@ namespace RoslynSandbox
         [Test]
         public void CustomHttpClient()
         {
-            var httpClientCode = @"namespace RoslynSandbox
+            var httpClientCode = @"
+namespace RoslynSandbox
 {
     using System;
 

@@ -34,12 +34,8 @@ namespace IDisposableAnalyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            if (context.Node is LocalDeclarationStatementSyntax localDeclaration)
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is LocalDeclarationStatementSyntax localDeclaration)
             {
                 foreach (var declarator in localDeclaration.Declaration.Variables)
                 {
