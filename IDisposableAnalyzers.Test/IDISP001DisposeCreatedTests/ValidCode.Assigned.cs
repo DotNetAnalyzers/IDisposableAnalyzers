@@ -197,5 +197,31 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void WhenDisposedAndReassigned()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public IDisposable M(string fileName)
+        {
+            var x = File.OpenRead(fileName);
+            x.Dispose();
+            x = File.OpenRead(fileName);
+            return x;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
