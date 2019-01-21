@@ -66,5 +66,38 @@ namespace IDisposableAnalyzers
                 return result != null;
             }
         }
+
+        internal static bool IsDisposedAfter(ISymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)
+            {
+                using (var walker = InvocationWalker.Borrow(scope))
+                {
+                    foreach (var invocation in walker.Invocations)
+                    {
+                        if (location.IsExecutedBefore(invocation).IsEither(ExecutedBefore.Maybe, ExecutedBefore.Yes) &&
+                            DisposeCall.IsDisposing(invocation, local, semanticModel, cancellationToken))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                using (var walker = UsingStatementWalker.Borrow(scope))
+                {
+                    foreach (var usingStatement in walker.UsingStatements)
+                    {
+                        if (location.IsExecutedBefore(usingStatement) == ExecutedBefore.Yes &&
+                            usingStatement.Expression is IdentifierNameSyntax identifierName &&
+                            identifierName.Identifier.ValueText == local.Name)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }
