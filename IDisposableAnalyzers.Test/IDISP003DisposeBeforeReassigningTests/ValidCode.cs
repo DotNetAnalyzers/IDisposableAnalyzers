@@ -544,9 +544,7 @@ namespace RoslynSandbox
             stream.Dispose();
         }
     }
-}";
-
-            testCode = testCode.AssertReplace("Stream stream;", declaration);
+}".AssertReplace("Stream stream;", declaration);
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 

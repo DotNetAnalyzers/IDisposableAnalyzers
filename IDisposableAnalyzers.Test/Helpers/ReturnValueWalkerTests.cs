@@ -283,8 +283,7 @@ namespace RoslynSandbox
             return stream;
         }
     }
-}";
-            testCode = testCode.AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {code}");
+}".AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {code}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);

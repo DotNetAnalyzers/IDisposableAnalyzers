@@ -2,9 +2,9 @@
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class IDISP020DisposeTrue
+    internal static class IDISP021DisposeTrue
     {
-        public const string DiagnosticId = "IDISP020";
+        public const string DiagnosticId = "IDISP021";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

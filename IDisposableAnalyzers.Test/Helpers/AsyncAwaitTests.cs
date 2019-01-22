@@ -59,8 +59,7 @@ namespace RoslynSandbox
 
         internal static string CreateString() => new string(' ', 1);
     }
-}";
-            testCode = testCode.AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", code);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
