@@ -137,5 +137,5 @@ Above is not ideal, sorry about this. Not sure if this is our bug.
 
 ## Current status
 
-Early alpha, finds bugs in the code but there are also bugs in the analyzer. The analyzer will probably never be perfect as it is a pretty hard problem to solve but we can imporve it one testcase at the time.
+Early alpha, finds bugs in the code but there are also bugs in the analyzer. The analyzer will probably never be perfect as it is a pretty hard problem to solve but we can improve it one test case at the time.
 Write issues for places where it should warn but does not or where it warns where there is no bug.
