@@ -11,14 +11,15 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Formatting;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddSuppressFinalizeCallFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressFinalizeFix))]
     [Shared]
-    internal class AddSuppressFinalizeCallFix : CodeFixProvider
+    internal class SuppressFinalizeFix : CodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP018CallSuppressFinalize.DiagnosticId,
-            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId);
+            IDISP018CallSuppressFinalizeWhenFinalizer.DiagnosticId,
+            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId,
+            IDISP020SuppressFinalizeThis.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => null;
@@ -31,13 +32,29 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax disposeMethod))
+                if (diagnostic.Id == IDISP020SuppressFinalizeThis.DiagnosticId)
+                {
+                    if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument))
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Call GC.SuppressFinalize(this)",
+                                _ => Task.FromResult(
+                                    context.Document.WithSyntaxRoot(
+                                        syntaxRoot.ReplaceNode(
+                                            argument.Expression,
+                                            SyntaxFactory.ThisExpression()))),
+                                equivalenceKey: nameof(SuppressFinalizeFix)),
+                            diagnostic);
+                    }
+                }
+                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax disposeMethod))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
                             "Call GC.SuppressFinalize(this)",
                             _ => Update(),
-                            equivalenceKey: nameof(AddSuppressFinalizeCallFix)),
+                            equivalenceKey: nameof(SuppressFinalizeFix)),
                         diagnostic);
 
                     Task<Document> Update()

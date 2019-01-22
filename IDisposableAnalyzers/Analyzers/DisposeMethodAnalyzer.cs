@@ -15,8 +15,9 @@ namespace IDisposableAnalyzers
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             IDISP009IsIDisposable.Descriptor,
             IDISP010CallBaseDispose.Descriptor,
-            IDISP018CallSuppressFinalize.Descriptor,
-            IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor);
+            IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor,
+            IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor,
+            IDISP020SuppressFinalizeThis.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -47,17 +48,22 @@ namespace IDisposableAnalyzers
                         context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }
 
-                    if (method.ContainingType.TryFindFirstMethod(x => x.MethodKind == MethodKind.Destructor, out _))
+                    if (DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out var suppressFinalize))
                     {
-                        if (!DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                        if (suppressFinalize.ArgumentList is ArgumentListSyntax argumentList &&
+                            argumentList.Arguments.TrySingle(out var argument) &&
+                            !argument.Expression.IsKind(SyntaxKind.ThisExpression))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP018CallSuppressFinalize.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP020SuppressFinalizeThis.Descriptor, argument.GetLocation()));
                         }
                     }
-                    else if (method.ContainingType.TryFindFirstMethod(x => DisposeMethod.IsVirtualDispose(x), out _) &&
-                            !DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                    else if (method.ContainingType.TryFindFirstMethod(x => x.MethodKind == MethodKind.Destructor, out _))
                     {
-                         context.ReportDiagnostic(Diagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                    }
+                    else if (method.ContainingType.TryFindFirstMethod(x => DisposeMethod.IsVirtualDispose(x), out _))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }
                 }
 

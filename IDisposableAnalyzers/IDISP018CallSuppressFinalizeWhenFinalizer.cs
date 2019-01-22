@@ -2,7 +2,7 @@ namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
-    internal static class IDISP018CallSuppressFinalize
+    internal static class IDISP018CallSuppressFinalizeWhenFinalizer
     {
         public const string DiagnosticId = "IDISP018";
 

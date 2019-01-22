@@ -8,8 +8,8 @@ namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
     internal class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP018CallSuppressFinalize.Descriptor);
-        private static readonly CodeFixProvider Fix = new AddSuppressFinalizeCallFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor);
+        private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
 
         [Test]
         public void SealedWithFinalizerWhenStatementBody()
