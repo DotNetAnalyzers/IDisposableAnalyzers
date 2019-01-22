@@ -13,7 +13,7 @@
   </tr>
   <tr>
     <td>Enabled</td>
-    <td>true</td>
+    <td>True</td>
   </tr>
   <tr>
     <td>Category</td>
@@ -21,11 +21,11 @@
   </tr>
   <tr>
     <td>Code</td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP004DontIgnoreCreated.cs">IDISP004DontIgnoreCreated</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP004DontIgnoreCreated.cs">IDISP004DontIgnoreCreated</a></td>
   </tr>
   <tr>
     <td></td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ObjectCreationAnalyzer.cs">ObjectCreationAnalyzer</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ObjectCreationAnalyzer.cs">ObjectCreationAnalyzer</a></td>
   </tr>
 </table>
 <!-- end generated table -->

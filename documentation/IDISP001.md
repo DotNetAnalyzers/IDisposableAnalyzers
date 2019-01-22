@@ -13,7 +13,7 @@
   </tr>
   <tr>
     <td>Enabled</td>
-    <td>true</td>
+    <td>True</td>
   </tr>
   <tr>
     <td>Category</td>
@@ -21,15 +21,15 @@
   </tr>
   <tr>
     <td>Code</td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ArgumentAnalyzer.cs">ArgumentAnalyzer</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ArgumentAnalyzer.cs">ArgumentAnalyzer</a></td>
   </tr>
   <tr>
     <td></td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/AssignmentAnalyzer.cs">AssignmentAnalyzer</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/AssignmentAnalyzer.cs">AssignmentAnalyzer</a></td>
   </tr>
   <tr>
     <td></td>
-     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP001DisposeCreated.cs">IDISP001DisposeCreated</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP001DisposeCreated.cs">IDISP001DisposeCreated</a></td>
   </tr>
 </table>
 <!-- end generated table -->

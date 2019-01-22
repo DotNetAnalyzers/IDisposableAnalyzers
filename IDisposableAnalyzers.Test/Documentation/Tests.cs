@@ -1,3 +1,6 @@
+#pragma warning disable CA1055 // Uri return values should not be strings
+#pragma warning disable CA1056 // Uri properties should not be strings
+#pragma warning disable CA1721 // Property names should not match get methods
 namespace IDisposableAnalyzers.Test.Documentation
 {
     using System;
@@ -13,7 +16,7 @@ namespace IDisposableAnalyzers.Test.Documentation
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Tests
+    public class Tests
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
                                                                               .Assembly
@@ -56,7 +59,10 @@ namespace IDisposableAnalyzers.Test.Documentation
         public void Title(DescriptorInfo descriptorInfo)
         {
             var expected = $"## {descriptorInfo.Descriptor.Title}";
-            var actual = File.ReadLines(descriptorInfo.DocFileName).Skip(1).First().Replace("`", string.Empty);
+            var actual = File.ReadLines(descriptorInfo.DocFileName)
+                             .Skip(1)
+                             .First()
+                             .Replace("`", string.Empty);
             Assert.AreEqual(expected, actual);
         }
 
@@ -121,42 +127,97 @@ namespace IDisposableAnalyzers.Test.Documentation
                    .Append("<!-- end generated table -->");
             var expected = builder.ToString();
             DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md"))).Replace("`", string.Empty);
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")));
             CodeAssert.AreEqual(expected, actual);
         }
 
         private static string CreateStub(DescriptorInfo descriptorInfo)
         {
             var descriptor = descriptorInfo.Descriptor;
-            var stub = Properties.Resources.DiagnosticDocTemplate
-                             .AssertReplace("{ID}", descriptor.Id)
-                             .AssertReplace("## ADD TITLE HERE", $"## {descriptor.Title.ToString(CultureInfo.InvariantCulture)}")
-                             .AssertReplace("{SEVERITY}", descriptor.DefaultSeverity.ToString())
-                             .AssertReplace("{ENABLED}", descriptor.IsEnabledByDefault ? "true" : "false")
-                             .AssertReplace("{CATEGORY}", descriptor.Category)
-                             .AssertReplace("ADD DESCRIPTION HERE", descriptor.Description.ToString(CultureInfo.InvariantCulture))
-                             .AssertReplace("{TITLE}", descriptor.Title.ToString(CultureInfo.InvariantCulture));
+            var stub = $@"# {descriptor.Id}
+## {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
+
+<!-- start generated table -->
+<table>
+  <tr>
+    <td>CheckId</td>
+    <td>{descriptor.Id}</td>
+  </tr>
+  <tr>
+    <td>Severity</td>
+    <td>{descriptor.DefaultSeverity.ToString()}</td>
+  </tr>
+  <tr>
+    <td>Enabled</td>
+    <td>{(descriptor.IsEnabledByDefault ? "True" : "False")}</td>
+  </tr>
+  <tr>
+    <td>Category</td>
+    <td>{descriptor.Category}</td>
+  </tr>
+  <tr>
+    <td>Code</td>
+    <td><a href=""<URL>""><TYPENAME></a></td>
+  </tr>
+</table>
+<!-- end generated table -->
+
+## Description
+
+{descriptor.Description.ToString(CultureInfo.InvariantCulture)}
+
+## Motivation
+
+ADD MOTIVATION HERE
+
+## How to fix violations
+
+ADD HOW TO FIX VIOLATIONS HERE
+
+<!-- start generated config severity -->
+## Configure severity
+
+### Via ruleset file.
+
+Configure the severity per project, for more info see [MSDN](https://msdn.microsoft.com/en-us/library/dd264949.aspx).
+
+### Via #pragma directive.
+```C#
+#pragma warning disable {descriptor.Id} // {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
+Code violating the rule here
+#pragma warning restore {descriptor.Id} // {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
+```
+
+Or put this at the top of the file to disable all instances.
+```C#
+#pragma warning disable {descriptor.Id} // {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
+```
+
+### Via attribute `[SuppressMessage]`.
+
+```C#
+[System.Diagnostics.CodeAnalysis.SuppressMessage(""{descriptor.Category}"", 
+    ""{descriptor.Id}:{descriptor.Title.ToString(CultureInfo.InvariantCulture)}"", 
+    Justification = ""Reason..."")]
+```
+<!-- end generated config severity -->";
             if (Analyzers.Count(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)) == 1)
             {
-                return stub.AssertReplace("{TYPENAME}", descriptorInfo.Analyzer.GetType().Name)
-                           .AssertReplace("{URL}", descriptorInfo.CodeFileUri);
+                return stub.AssertReplace("<TYPENAME>", descriptorInfo.Analyzer.GetType().Name)
+                           .AssertReplace("<URL>", descriptorInfo.CodeFileUri);
             }
 
             var builder = StringBuilderPool.Borrow();
-            var first = true;
             foreach (var analyzer in Analyzers.Where(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)))
             {
                 _ = builder.AppendLine("  <tr>")
-                           .AppendLine($"    <td>{(first ? "Code" : string.Empty)}</td>")
-                           .AppendLine($"     <td><a href=\"{DescriptorInfo.GetCodeFileUri(analyzer)}\">{analyzer.GetType().Name}</a></td>")
+                           .AppendLine($"    <td>{(builder.Length <= "  <tr>\r\n".Length ? "Code" : string.Empty)}</td>")
+                           .AppendLine($"    <td><a href=\"{DescriptorInfo.GetCodeFileUri(analyzer)}\">{analyzer.GetType().Name}</a></td>")
                            .AppendLine("  </tr>");
-
-                first = false;
             }
 
-            var text = builder.Return();
-            return stub.Replace("  <tr>\r\n    <td>Code</td>\r\n    <td><a href=\"{URL}\">{TYPENAME}</a></td>\r\n  </tr>\r\n", text)
-                       .Replace("  <tr>\n    <td>Code</td>\n    <td><a href=\"{URL}\">{TYPENAME}</a></td>\n  </tr>\n", text);
+            return stub.Replace("  <tr>\r\n    <td>Code</td>\r\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\r\n  </tr>\r\n", builder.Return())
+                       .Replace("  <tr>\n    <td>Code</td>\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\n  </tr>\n", builder.Return());
         }
 
         private static string GetTable(string doc)
