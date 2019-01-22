@@ -216,6 +216,7 @@ Or put this at the top of the file to disable all instances.
                            .AppendLine("  </tr>");
             }
 
+            Assert.AreNotEqual(0, builder.Length);
             return stub.Replace("  <tr>\r\n    <td>Code</td>\r\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\r\n  </tr>\r\n", builder.Return())
                        .Replace("  <tr>\n    <td>Code</td>\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\n  </tr>\n", builder.Return());
         }
