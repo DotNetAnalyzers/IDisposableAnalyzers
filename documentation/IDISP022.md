@@ -1,11 +1,11 @@
-# IDISP021
-## Call this.Dispose(true).
+﻿# IDISP022
+## Call this.Dispose(false).
 
 <!-- start generated table -->
 <table>
   <tr>
     <td>CheckId</td>
-    <td>IDISP021</td>
+    <td>IDISP022</td>
   </tr>
   <tr>
     <td>Severity</td>
@@ -21,26 +21,31 @@
   </tr>
   <tr>
     <td>Code</td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs">FinalizerAnalyzer</a></td>
   </tr>
 </table>
 <!-- end generated table -->
 
 ## Description
 
-Call this.Dispose(true).
+Call this.Dispose(false).
 
 ## Motivation
 
 ```cs
 public class C : IDisposable
 {
-    public void Dispose()
+    ~C()
     {
-        this.Dispose(false); // should be true here
+        this.Dispose(↓true); // should be false here.
     }
 
-    protected virtual void Dispose(bool disposing)
+    public void Dispose()
+    {
+        this.Dispose(true);
+    }
+
+    private void Dispose(bool disposing)
     {
         ...
     }
@@ -49,7 +54,7 @@ public class C : IDisposable
 
 ## How to fix violations
 
-Use the code fix.
+ADD HOW TO FIX VIOLATIONS HERE
 
 <!-- start generated config severity -->
 ## Configure severity
@@ -60,21 +65,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP021 // Call this.Dispose(true).
+#pragma warning disable IDISP022 // Call this.Dispose(false).
 Code violating the rule here
-#pragma warning restore IDISP021 // Call this.Dispose(true).
+#pragma warning restore IDISP022 // Call this.Dispose(false).
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP021 // Call this.Dispose(true).
+#pragma warning disable IDISP022 // Call this.Dispose(false).
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP021:Call this.Dispose(true).", 
+    "IDISP022:Call this.Dispose(false).", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

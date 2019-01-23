@@ -13,6 +13,8 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark FieldAndPropertyDeclarationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.FieldAndPropertyDeclarationAnalyzer());
 
+        private static readonly Gu.Roslyn.Asserts.Benchmark FinalizerAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.FinalizerAnalyzer());
+
         private static readonly Gu.Roslyn.Asserts.Benchmark MethodReturnValuesAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.MethodReturnValuesAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ObjectCreationAnalyzer());
@@ -55,6 +57,12 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void FieldAndPropertyDeclarationAnalyzer()
         {
             FieldAndPropertyDeclarationAnalyzerBenchmark.Run();
+        }
+
+        [BenchmarkDotNet.Attributes.Benchmark]
+        public void FinalizerAnalyzer()
+        {
+            FinalizerAnalyzerBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

@@ -137,7 +137,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryFindDisposeBoolCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
+        internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
         {
             using (var invocations = InvocationWalker.Borrow(disposeMethod))
             {

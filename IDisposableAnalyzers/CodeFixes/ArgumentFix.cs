@@ -9,7 +9,6 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ArgumentFix))]
     [Shared]
@@ -18,7 +17,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP020SuppressFinalizeThis.DiagnosticId,
-            IDISP021DisposeTrue.DiagnosticId);
+            IDISP021DisposeTrue.DiagnosticId,
+            IDISP022DisposeFalse.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => null;
@@ -56,6 +56,19 @@ namespace IDisposableAnalyzers
                                         syntaxRoot.ReplaceNode(
                                             argument.Expression,
                                             SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))),
+                                equivalenceKey: nameof(SuppressFinalizeFix)),
+                            diagnostic);
+                    }
+                    else if (diagnostic.Id == IDISP022DisposeFalse.DiagnosticId)
+                    {
+                        context.RegisterCodeFix(
+                            CodeAction.Create(
+                                "Call this.Dispose(false)",
+                                _ => Task.FromResult(
+                                    context.Document.WithSyntaxRoot(
+                                        syntaxRoot.ReplaceNode(
+                                            argument.Expression,
+                                            SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))),
                                 equivalenceKey: nameof(SuppressFinalizeFix)),
                             diagnostic);
                     }

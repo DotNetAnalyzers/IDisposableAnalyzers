@@ -96,6 +96,10 @@ Roslyn analyzers for IDisposable
     <td>Call this.Dispose(true).</td>
   </tr>
   <tr>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md">IDISP022</a></td>
+    <td>Call this.Dispose(false).</td>
+  </tr>
+  <tr>
     <td><a href="">SemanticModelCacheAnalyzer</a></td>
     <td>Controls if Semantic models should be cached for syntax trees.</td>
   </tr>
