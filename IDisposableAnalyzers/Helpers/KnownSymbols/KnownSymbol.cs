@@ -34,7 +34,8 @@ namespace IDisposableAnalyzers
 
         internal static readonly ResourceManagerType ResourceManager = new ResourceManagerType();
 
-        internal static readonly FileType File = new FileType();
+        internal static readonly QualifiedType File = new QualifiedType("System.IO.File");
+        internal static readonly QualifiedType FileInfo = new QualifiedType("System.IO.FileInfo");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
         internal static readonly QualifiedType IEnumerator = new QualifiedType("System.Collections.IEnumerator");

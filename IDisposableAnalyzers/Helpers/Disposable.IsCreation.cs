@@ -327,7 +327,9 @@ namespace IDisposableAnalyzers
             {
                 if (method.DeclaringSyntaxReferences.Length == 0)
                 {
-                    if (method == KnownSymbol.IEnumerableOfT.GetEnumerator)
+                    if (method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
+                        method.ContainingType == KnownSymbol.File ||
+                        method.ContainingType == KnownSymbol.FileInfo)
                     {
                         return Result.Yes;
                     }
@@ -376,12 +378,6 @@ namespace IDisposableAnalyzers
                                IsAssignableFrom(typeArg, compilation)
                             ? Result.AssumeYes
                             : Result.No;
-                    }
-
-                    if (method.ContainingType == KnownSymbol.File &&
-                        IsAssignableFrom(method.ReturnType, compilation))
-                    {
-                        return Result.Yes;
                     }
 
                     if (method.IsGenericMethod &&

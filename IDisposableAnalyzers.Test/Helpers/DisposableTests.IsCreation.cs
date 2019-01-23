@@ -491,7 +491,8 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var references = MetadataReferences.FromAttributes().Concat(new[] { MetadataReferences.CreateBinary(binary) });
+                var references = MetadataReferences.FromAttributes()
+                                                   .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.AsCustom()");
@@ -527,14 +528,17 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var references = MetadataReferences.FromAttributes().Concat(new[] { MetadataReferences.CreateBinary(binary) });
+                var references = MetadataReferences.FromAttributes()
+                                                   .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.Fluent()");
                 Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",          Result.Yes)]
             [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.Yes)]
+            [TestCase("System.IO.FileInfo info",                                                            "info.OpenRead()",                                Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                             Result.Yes)]
             [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()", Result.No)]
@@ -565,8 +569,7 @@ namespace RoslynSandbox
   .AssertReplace("value", code);
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(code);
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
