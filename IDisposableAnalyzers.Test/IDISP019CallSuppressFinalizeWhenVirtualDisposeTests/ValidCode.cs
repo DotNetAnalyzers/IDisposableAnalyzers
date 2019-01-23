@@ -18,7 +18,6 @@ namespace RoslynSandbox
 
     public sealed class C : IDisposable
     {
-
         private bool isDisposed = false;
 
         void Dispose(bool disposing)
@@ -28,7 +27,6 @@ namespace RoslynSandbox
                 this.isDisposed = true;
             }
         }
-
 
         public void Dispose()
         {
