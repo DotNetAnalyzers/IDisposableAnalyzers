@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposeMethod
@@ -133,6 +134,30 @@ namespace IDisposableAnalyzers
             }
 
             suppressCall = null;
+            return false;
+        }
+
+        internal static bool TryFindDisposeBoolCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
+        {
+            using (var invocations = InvocationWalker.Borrow(disposeMethod))
+            {
+                foreach (var candidate in invocations)
+                {
+                    if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
+                        argumentList.Arguments.TrySingle(out argument) &&
+                        argument.Expression is ExpressionSyntax expression &&
+                        expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
+                        candidate.TryGetMethodName(out var name) &&
+                        name == "Dispose")
+                    {
+                        suppressCall = candidate;
+                        return true;
+                    }
+                }
+            }
+
+            suppressCall = null;
+            argument = null;
             return false;
         }
 

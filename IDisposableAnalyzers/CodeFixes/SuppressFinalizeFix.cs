@@ -10,7 +10,6 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Formatting;
-
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressFinalizeFix))]
     [Shared]
     internal class SuppressFinalizeFix : CodeFixProvider
@@ -18,8 +17,7 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP018CallSuppressFinalizeWhenFinalizer.DiagnosticId,
-            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId,
-            IDISP020SuppressFinalizeThis.DiagnosticId);
+            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId);
 
         /// <inheritdoc/>
         public override FixAllProvider GetFixAllProvider() => null;
@@ -32,23 +30,7 @@ namespace IDisposableAnalyzers
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (diagnostic.Id == IDISP020SuppressFinalizeThis.DiagnosticId)
-                {
-                    if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument))
-                    {
-                        context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Call GC.SuppressFinalize(this)",
-                                _ => Task.FromResult(
-                                    context.Document.WithSyntaxRoot(
-                                        syntaxRoot.ReplaceNode(
-                                            argument.Expression,
-                                            SyntaxFactory.ThisExpression()))),
-                                equivalenceKey: nameof(SuppressFinalizeFix)),
-                            diagnostic);
-                    }
-                }
-                else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax disposeMethod))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax disposeMethod))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(

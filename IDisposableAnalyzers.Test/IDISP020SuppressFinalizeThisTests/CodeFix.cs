@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP020SuppressFinalizeThisTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP020SuppressFinalizeThis.Descriptor);
-        private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
+        private static readonly CodeFixProvider Fix = new ArgumentFix();
 
         [TestCase("null")]
         public void WhenStatementBody(string expression)
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         public void Dispose()
         {
             this.Dispose(true);
-            GC.SuppressFinalize(null);
+            GC.SuppressFinalize(↓null);
         }
 
         protected virtual void Dispose(bool disposing)

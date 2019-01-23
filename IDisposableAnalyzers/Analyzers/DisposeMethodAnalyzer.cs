@@ -17,7 +17,8 @@ namespace IDisposableAnalyzers
             IDISP010CallBaseDispose.Descriptor,
             IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor,
             IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor,
-            IDISP020SuppressFinalizeThis.Descriptor);
+            IDISP020SuppressFinalizeThis.Descriptor,
+            IDISP021DisposeTrue.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -64,6 +65,12 @@ namespace IDisposableAnalyzers
                     else if (method.ContainingType.TryFindFirstMethod(x => DisposeMethod.IsVirtualDispose(x), out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                    }
+
+                    if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _, out var isDisposing) &&
+                        isDisposing.Expression?.IsKind(SyntaxKind.TrueLiteralExpression) != true)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP021DisposeTrue.Descriptor, isDisposing.GetLocation()));
                     }
                 }
 
