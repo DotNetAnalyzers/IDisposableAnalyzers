@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    public class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new AddBaseCallFix();

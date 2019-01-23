@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP021DisposeTrueTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class ValidCode
+    public class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 

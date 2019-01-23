@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class Diagnostics
+    public class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor);

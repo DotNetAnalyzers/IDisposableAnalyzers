@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    public class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP022DisposeFalse.Descriptor);

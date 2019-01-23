@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal class CodeFixAll
+    public class CodeFixAll
     {
         private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");

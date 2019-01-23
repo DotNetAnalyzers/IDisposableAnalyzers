@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class CodeFix
+    public class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP017PreferUsing.Descriptor);
