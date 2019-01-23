@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers.Test.Helpers
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
@@ -461,11 +462,25 @@ namespace RoslynSandbox
             [Test]
             public void AssumeYesForExtensionMethodReturningSameTypeAsThisParameter()
             {
+                var binary = @"
+namespace BinaryReference
+{
+    using System;
+
+    public static class Extensions
+    {
+        public static ICustomDisposable AsCustom(this IDisposable disposable) => default(ICustomDisposable);
+    }
+
+    public interface ICustomDisposable : IDisposable
+    {
+    }
+}";
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
-    using Stubs;
+    using BinaryReference;
 
     class Foo
     {
@@ -476,8 +491,8 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var references = MetadataReferences.FromAttributes().Concat(new[] { MetadataReferences.CreateBinary(binary) });
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.AsCustom()");
                 Assert.AreEqual(Result.AssumeYes, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -486,11 +501,22 @@ namespace RoslynSandbox
             [Test]
             public void AssumeNoForExtensionMethodReturningSameTypeAsThisParameter()
             {
+                var binary = @"
+namespace BinaryReference
+{
+    using System;
+
+    public static class Extensions
+    {
+        public static IDisposable Fluent(this IDisposable disposable) => disposable;
+    }
+}";
+
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
-    using Stubs;
+    using BinaryReference;
 
     class Foo
     {
@@ -501,8 +527,8 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var references = MetadataReferences.FromAttributes().Concat(new[] { MetadataReferences.CreateBinary(binary) });
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.Fluent()");
                 Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
