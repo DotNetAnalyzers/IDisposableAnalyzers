@@ -359,7 +359,8 @@ namespace IDisposableAnalyzers
                         method == KnownSymbol.Task.Run ||
                         method == KnownSymbol.Task.RunOfT ||
                         method == KnownSymbol.Task.ConfigureAwait ||
-                        method == KnownSymbol.Task.FromResult)
+                        method == KnownSymbol.Task.FromResult ||
+                        method == KnownSymbol.HttpResponseMessage.EnsureSuccessStatusCode)
                     {
                         return Result.No;
                     }

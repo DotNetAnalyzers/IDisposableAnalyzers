@@ -43,6 +43,7 @@ namespace IDisposableAnalyzers
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
+        internal static readonly HttpResponseMessageType HttpResponseMessage = new HttpResponseMessageType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly RxDisposableType RxDisposable = new RxDisposableType();

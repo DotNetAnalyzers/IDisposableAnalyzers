@@ -536,16 +536,17 @@ namespace RoslynSandbox
 
             [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                             Result.Yes)]
+            [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()", Result.No)]
             [TestCase("System.Collections.Generic.List<IDisposable> xs",                                    "xs.First()",                                     Result.No)]
             [TestCase("System.Collections.Generic.Dictionary<int, IDisposable> map",                        "map[0]",                                         Result.No)]
             [TestCase("System.Collections.Generic.IReadOnlyDictionary<int, IDisposable> map",               "map[0]",                                         Result.No)]
             [TestCase("System.Runtime.CompilerServices.ConditionalWeakTable<IDisposable, IDisposable> map", "map.GetOrCreateValue(this.disposable)",          Result.No)]
-            [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null)",                        Result.No)]
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null, null)",                  Result.No)]
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetResourceSet(null, true, true)",       Result.No)]
-            public void CallExternal(string parameter, string code, Result expected)
+            [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",              Result.No)]
+            public void ThirdParty(string parameter, string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
