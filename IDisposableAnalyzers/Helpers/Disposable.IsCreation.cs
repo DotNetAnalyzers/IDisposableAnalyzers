@@ -329,7 +329,8 @@ namespace IDisposableAnalyzers
                 {
                     if (method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
                         method.ContainingType == KnownSymbol.File ||
-                        method.ContainingType == KnownSymbol.FileInfo)
+                        method.ContainingType == KnownSymbol.FileInfo ||
+                        method.ContainingType == KnownSymbol.RegistryKey)
                     {
                         return Result.Yes;
                     }

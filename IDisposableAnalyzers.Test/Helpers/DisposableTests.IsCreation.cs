@@ -539,6 +539,7 @@ namespace RoslynSandbox
             [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",          Result.Yes)]
             [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.Yes)]
             [TestCase("System.IO.FileInfo info",                                                            "info.OpenRead()",                                Result.Yes)]
+            [TestCase("Microsoft.Win32.RegistryKey key",                                                    "key.CreateSubKey(string.Empty)",                 Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                             Result.Yes)]
             [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()", Result.No)]

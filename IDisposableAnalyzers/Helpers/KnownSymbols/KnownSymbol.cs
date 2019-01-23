@@ -36,6 +36,7 @@ namespace IDisposableAnalyzers
 
         internal static readonly QualifiedType File = new QualifiedType("System.IO.File");
         internal static readonly QualifiedType FileInfo = new QualifiedType("System.IO.FileInfo");
+        internal static readonly QualifiedType RegistryKey = new QualifiedType("Microsoft.Win32.RegistryKey");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
         internal static readonly QualifiedType IEnumerator = new QualifiedType("System.Collections.IEnumerator");
