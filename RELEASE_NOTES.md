@@ -1,3 +1,11 @@
+#### 2.1
+* New analyzer: IDISP018.
+* New analyzer: IDISP019.
+* New analyzer: IDISP020.
+* New analyzer: IDISP021.
+* New analyzer: IDISP022.
+* New analyzer: IDISP023.
+
 #### 2.0.7
 * BUGFIX: IDISP003 in loops.
 * BUGFIX: Generate SuppressFinalize when virtual.

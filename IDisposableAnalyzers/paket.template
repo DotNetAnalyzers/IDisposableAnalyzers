@@ -4,8 +4,12 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  BUGFIX: IDISP003 in loops.
-  BUGFIX: Generate SuppressFinalize when virtual.
+  New analyzer: IDISP018.
+  New analyzer: IDISP019.
+  New analyzer: IDISP020.
+  New analyzer: IDISP021.
+  New analyzer: IDISP022.
+  New analyzer: IDISP023.
 
 excludedgroups
   Main
