@@ -7,12 +7,10 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    /// <summary>
-    /// A walker that finds all touched <see cref="IdentifierNameSyntax"/>.
-    /// </summary>
     internal sealed class FinalizerContextWalker : ExecutionWalker<FinalizerContextWalker>
     {
         private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
+        private readonly List<Recursive> recursive = new List<Recursive>();
 
         private FinalizerContextWalker()
         {
@@ -32,10 +30,22 @@ namespace IDisposableAnalyzers
         /// <returns>A walker that has visited <paramref name="node"/>.</returns>
         public static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, Scope.Member, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
             if (node is MethodDeclarationSyntax)
             {
                 walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
+                walker.recursive.RemoveAll(x => IsInIfDisposing(x.Node));
+            }
+
+            foreach (var item in walker.recursive)
+            {
+                using (var recursiveWalker = RecursiveWalker.Borrow(item.Symbol, semanticModel, cancellationToken))
+                {
+                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
+                    {
+                        walker.usedReferenceTypes.Add(item.Node);
+                    }
+                }
             }
 
             return walker;
@@ -68,6 +78,18 @@ namespace IDisposableAnalyzers
         protected override void Clear()
         {
             this.usedReferenceTypes.Clear();
+            this.recursive.Clear();
+            base.Clear();
+        }
+
+        protected override bool TryGetTargetSymbol<TSymbol>(SyntaxNode node, out TSymbol symbol)
+        {
+            if (base.TryGetTargetSymbol(node, out symbol))
+            {
+                this.recursive.Add(new Recursive(node, symbol));
+            }
+
+            return false;
         }
 
         private static bool IsAssignedNull(SyntaxNode node)
@@ -104,6 +126,60 @@ namespace IDisposableAnalyzers
             }
 
             return false;
+        }
+
+        private struct Recursive
+        {
+            internal readonly SyntaxNode Node;
+            internal readonly ISymbol Symbol;
+
+            public Recursive(SyntaxNode node, ISymbol symbol)
+            {
+                this.Node = node;
+                this.Symbol = symbol;
+            }
+        }
+
+        private sealed class RecursiveWalker : ExecutionWalker<RecursiveWalker>
+        {
+            private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
+
+            private RecursiveWalker()
+            {
+            }
+
+            /// <summary>
+            /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
+            /// </summary>
+            public IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
+
+            public static RecursiveWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                return symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode node)
+                    ? BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
+                    : Borrow(() => new RecursiveWalker());
+            }
+
+            /// <inheritdoc />
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                if (!IsAssignedNull(node) &&
+                    this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
+                    type.IsReferenceType &&
+                    type.TypeKind != TypeKind.Error)
+                {
+                    this.usedReferenceTypes.Add(node);
+                }
+
+                base.VisitIdentifierName(node);
+            }
+
+            /// <inheritdoc />
+            protected override void Clear()
+            {
+                this.usedReferenceTypes.Clear();
+                base.Clear();
+            }
         }
     }
 }

@@ -60,6 +60,30 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
+
+            [Test]
+            public void CallingStatic()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Text;
+
+    public class C
+    {
+        private static readonly StringBuilder Builder = new StringBuilder();
+
+        ~C()
+        {
+            ↓M();
+        }
+
+        private static void M() => Builder.Append(1);
+    }
+}";
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
         }
     }
 }

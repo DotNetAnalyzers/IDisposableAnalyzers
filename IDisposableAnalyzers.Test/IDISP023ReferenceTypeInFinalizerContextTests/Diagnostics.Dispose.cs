@@ -102,6 +102,51 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
+
+            [Test]
+            public void CallingStatic()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Text;
+
+    public class C : IDisposable
+    {
+        private static readonly StringBuilder Builder = new StringBuilder();
+
+        private bool isDisposed = false;
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+                if (disposing)
+                {
+                }
+
+                ↓M();
+            }
+        }
+
+        private static void M() => Builder.Append(1);
+    }
+}";
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
         }
     }
 }
