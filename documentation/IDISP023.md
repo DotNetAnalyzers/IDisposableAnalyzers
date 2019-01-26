@@ -21,6 +21,10 @@
   </tr>
   <tr>
     <td>Code</td>
+    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
+  </tr>
+  <tr>
+    <td></td>
     <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs">FinalizerAnalyzer</a></td>
   </tr>
 </table>

@@ -40,7 +40,7 @@ namespace RoslynSandbox
             [TestCase("this.↓Builder.Append(1)")]
             [TestCase("↓Builder.Append(1)")]
             [TestCase("↓Builder.Length")]
-            public void InstanceLogger(string expression)
+            public void Instance(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox

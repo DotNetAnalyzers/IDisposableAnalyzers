@@ -18,7 +18,8 @@ namespace IDisposableAnalyzers
             IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor,
             IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor,
             IDISP020SuppressFinalizeThis.Descriptor,
-            IDISP021DisposeTrue.Descriptor);
+            IDISP021DisposeTrue.Descriptor,
+            IDISP023ReferenceTypeInFinalizerContext.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -80,6 +81,14 @@ namespace IDisposableAnalyzers
                     if (ShouldCallBase(method, methodDeclaration, context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
+                    }
+
+                    using (var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken))
+                    {
+                        foreach (var node in walker.UsedReferenceTypes)
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor, node.GetLocation()));
+                        }
                     }
                 }
             }

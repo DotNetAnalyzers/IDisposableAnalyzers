@@ -30,9 +30,15 @@ namespace IDisposableAnalyzers
         /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A walker that has visited <paramref name="node"/>.</returns>
-        public static FinalizerContextWalker Borrow(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        public static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return BorrowAndVisit(node, Scope.Member, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit(node, Scope.Member, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            if (node is MethodDeclarationSyntax)
+            {
+                walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
+            }
+
+            return walker;
         }
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -49,7 +55,8 @@ namespace IDisposableAnalyzers
         {
             if (!IsAssignedNull(node) &&
                 this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
-                !type.IsValueType)
+                type.IsReferenceType &&
+                type.TypeKind != TypeKind.Error)
             {
                 this.usedReferenceTypes.Add(node);
             }
@@ -76,6 +83,24 @@ namespace IDisposableAnalyzers
                 assignment.Right?.IsKind(SyntaxKind.NullLiteralExpression) == true)
             {
                 return true;
+            }
+
+            return false;
+        }
+
+        private static bool IsInIfDisposing(SyntaxNode node)
+        {
+            if (node.TryFirstAncestor(out IfStatementSyntax ifStatement))
+            {
+                if (ifStatement.Statement.Contains(node) &&
+                    ifStatement.Condition is IdentifierNameSyntax identifierName &&
+                    ifStatement.TryFirstAncestor(out MethodDeclarationSyntax methodDeclaration) &&
+                    methodDeclaration.TryFindParameter(identifierName.Identifier.Text, out _))
+                {
+                    return true;
+                }
+
+                return IsInIfDisposing(ifStatement);
             }
 
             return false;
