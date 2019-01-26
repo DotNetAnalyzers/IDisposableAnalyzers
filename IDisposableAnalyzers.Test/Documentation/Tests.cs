@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers.Test.Documentation
             .SelectMany(DescriptorInfo.Create)
             .ToArray();
 
-        private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => DescriptorInfos.Where(d => d.DocExists).ToArray();
+        private static IReadOnlyList<DescriptorInfo> DescriptorsWithDocs => DescriptorInfos.Where(d => d.DocumentationFile.Exists).ToArray();
 
         private static DirectoryInfo SolutionDirectory => SolutionFile.Find("IDisposableAnalyzers.sln").Directory;
 
@@ -39,12 +39,12 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorInfos))]
         public void MissingDocs(DescriptorInfo descriptorInfo)
         {
-            if (!descriptorInfo.DocExists)
+            if (!descriptorInfo.DocumentationFile.Exists)
             {
                 var descriptor = descriptorInfo.Descriptor;
                 var id = descriptor.Id;
                 DumpIfDebug(CreateStub(descriptorInfo));
-                File.WriteAllText(descriptorInfo.DocFileName + ".generated", CreateStub(descriptorInfo));
+                File.WriteAllText(descriptorInfo.DocumentationFile.Name + ".generated", CreateStub(descriptorInfo));
                 Assert.Fail($"Documentation is missing for {id}");
             }
         }
@@ -52,14 +52,14 @@ namespace IDisposableAnalyzers.Test.Documentation
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void TitleId(DescriptorInfo descriptorInfo)
         {
-            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", File.ReadLines(descriptorInfo.DocFileName).First());
+            Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", descriptorInfo.DocumentationFile.AllLines.First());
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Title(DescriptorInfo descriptorInfo)
         {
             var expected = $"## {descriptorInfo.Descriptor.Title}";
-            var actual = File.ReadLines(descriptorInfo.DocFileName)
+            var actual = descriptorInfo.DocumentationFile.AllLines
                              .Skip(1)
                              .First()
                              .Replace("`", string.Empty);
@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers.Test.Documentation
                                          .ToString(CultureInfo.InvariantCulture)
                                          .Split(new[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries)
                                          .First();
-            var actual = File.ReadLines(descriptorInfo.DocFileName)
+            var actual = descriptorInfo.DocumentationFile.AllLines
                              .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
                              .Skip(1)
                              .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
@@ -90,7 +90,7 @@ namespace IDisposableAnalyzers.Test.Documentation
         {
             var expected = GetTable(CreateStub(descriptorInfo));
             DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(descriptorInfo.DocFileName));
+            var actual = GetTable(descriptorInfo.DocumentationFile.AllText);
             CodeAssert.AreEqual(expected, actual);
         }
 
@@ -99,7 +99,7 @@ namespace IDisposableAnalyzers.Test.Documentation
         {
             var expected = GetConfigSeverity(CreateStub(descriptorInfo));
             DumpIfDebug(expected);
-            var actual = GetConfigSeverity(File.ReadAllText(descriptorInfo.DocFileName));
+            var actual = GetConfigSeverity(descriptorInfo.DocumentationFile.AllText);
             CodeAssert.AreEqual(expected, actual);
         }
 
@@ -252,7 +252,7 @@ Or put this at the top of the file to disable all instances.
             {
                 this.Analyzer = analyzer;
                 this.Descriptor = descriptor;
-                this.DocFileName = Path.Combine(DocumentsDirectory.FullName, descriptor.Id + ".md");
+                this.DocumentationFile = new TextFile(Path.Combine(DocumentsDirectory.FullName, descriptor.Id + ".md"));
                 this.CodeFileName = Directory.EnumerateFiles(
                                                  SolutionDirectory.FullName,
                                                  analyzer.GetType().Name + ".cs",
@@ -263,11 +263,9 @@ Or put this at the top of the file to disable all instances.
 
             public DiagnosticAnalyzer Analyzer { get; }
 
-            public bool DocExists => File.Exists(this.DocFileName);
-
             public DiagnosticDescriptor Descriptor { get; }
 
-            public string DocFileName { get; }
+            public TextFile DocumentationFile { get; }
 
             public string CodeFileName { get; }
 
@@ -292,6 +290,27 @@ Or put this at the top of the file to disable all instances.
             }
 
             public override string ToString() => this.Descriptor.Id;
+        }
+
+        public class TextFile
+        {
+            public TextFile(string name)
+            {
+                this.Name = name;
+                if (File.Exists(name))
+                {
+                    this.AllText = File.ReadAllText(name);
+                    this.AllLines = File.ReadAllLines(name);
+                }
+            }
+
+            public string Name { get; }
+
+            public bool Exists => File.Exists(this.Name);
+
+            public string AllText { get; }
+
+            public IReadOnlyList<string> AllLines { get; }
         }
     }
 }
