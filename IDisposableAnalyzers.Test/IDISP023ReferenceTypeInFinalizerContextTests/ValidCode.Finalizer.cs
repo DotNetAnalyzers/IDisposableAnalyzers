@@ -113,6 +113,50 @@ namespace RoslynSandbox
 }".AssertReplace("isDisposed.Equals(false)", expression);
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void SettingStaticToNull()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Text;
+
+    public class C
+    {
+        private static StringBuilder Builder = new StringBuilder();
+
+        ~C()
+        {
+             Builder = null;
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void SettingInstanceToNull()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Text;
+
+    public class C
+    {
+        private StringBuilder Builder = new StringBuilder();
+
+        ~C()
+        {
+             this.Builder = null;
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }

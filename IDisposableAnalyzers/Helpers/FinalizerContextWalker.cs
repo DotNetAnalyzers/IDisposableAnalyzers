@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     /// <summary>
@@ -46,7 +47,8 @@ namespace IDisposableAnalyzers
         /// <inheritdoc />
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
-            if (this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
+            if (!IsAssignedNull(node) &&
+                this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
                 !type.IsValueType)
             {
                 this.usedReferenceTypes.Add(node);
@@ -59,6 +61,24 @@ namespace IDisposableAnalyzers
         protected override void Clear()
         {
             this.usedReferenceTypes.Clear();
+        }
+
+        private static bool IsAssignedNull(SyntaxNode node)
+        {
+            if (node.Parent is MemberAccessExpressionSyntax memberAccess &&
+                memberAccess.Expression?.IsKind(SyntaxKind.ThisExpression) == true)
+            {
+                return IsAssignedNull(memberAccess);
+            }
+
+            if (node.Parent is AssignmentExpressionSyntax assignment &&
+                assignment.Left.Contains(node) &&
+                assignment.Right?.IsKind(SyntaxKind.NullLiteralExpression) == true)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
