@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
     /// </summary>
     internal sealed class FinalizerContextWalker : ExecutionWalker<FinalizerContextWalker>
     {
-        private readonly List<SyntaxNode> referenceTypes = new List<SyntaxNode>();
+        private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
 
         private FinalizerContextWalker()
         {
@@ -20,7 +20,7 @@ namespace IDisposableAnalyzers
         /// <summary>
         /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
         /// </summary>
-        public IReadOnlyList<SyntaxNode> ReferenceTypes => this.referenceTypes;
+        public IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
         /// <summary>
         /// Get a walker that has visited <paramref name="node"/>.
@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
             if (this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
                 !type.IsValueType)
             {
-                this.referenceTypes.Add(node);
+                this.usedReferenceTypes.Add(node);
             }
 
             base.VisitIdentifierName(node);
@@ -58,7 +58,7 @@ namespace IDisposableAnalyzers
         /// <inheritdoc />
         protected override void Clear()
         {
-            this.referenceTypes.Clear();
+            this.usedReferenceTypes.Clear();
         }
     }
 }

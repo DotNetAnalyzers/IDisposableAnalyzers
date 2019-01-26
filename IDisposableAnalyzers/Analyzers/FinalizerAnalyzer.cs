@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers
 
                 using (var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken))
                 {
-                    foreach (var node in walker.ReferenceTypes)
+                    foreach (var node in walker.UsedReferenceTypes)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor, node.GetLocation()));
                     }
