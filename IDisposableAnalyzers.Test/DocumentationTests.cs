@@ -1,7 +1,7 @@
 #pragma warning disable CA1055 // Uri return values should not be strings
 #pragma warning disable CA1056 // Uri properties should not be strings
 #pragma warning disable CA1721 // Property names should not match get methods
-namespace IDisposableAnalyzers.Test.Documentation
+namespace IDisposableAnalyzers.Test
 {
     using System;
     using System.Collections.Concurrent;
@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.Documentation
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Tests
+    public class DocumentationTests
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
                                                                               .Assembly
