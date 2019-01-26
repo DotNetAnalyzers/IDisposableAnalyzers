@@ -12,7 +12,8 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP022DisposeFalse.Descriptor);
+            IDISP022DisposeFalse.Descriptor,
+            IDISP023ReferenceTypeInFinalizerContext.Descriptor);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -31,6 +32,14 @@ namespace IDisposableAnalyzers
                     isDisposing.Expression?.IsKind(SyntaxKind.FalseLiteralExpression) != true)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP022DisposeFalse.Descriptor, isDisposing.GetLocation()));
+                }
+
+                using (var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken))
+                {
+                    foreach (var node in walker.ReferenceTypes)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor, node.GetLocation()));
+                    }
                 }
             }
         }

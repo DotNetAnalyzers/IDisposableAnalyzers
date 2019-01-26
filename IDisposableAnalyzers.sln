@@ -37,6 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6
 		documentation\IDISP020.md = documentation\IDISP020.md
 		documentation\IDISP021.md = documentation\IDISP021.md
 		documentation\IDISP022.md = documentation\IDISP022.md
+		documentation\IDISP023.md = documentation\IDISP023.md
 		README.md = README.md
 		.paket\Readme.paket.md = .paket\Readme.paket.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
