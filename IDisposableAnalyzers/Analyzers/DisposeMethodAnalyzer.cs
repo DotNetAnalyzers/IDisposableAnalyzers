@@ -75,30 +75,11 @@ namespace IDisposableAnalyzers
                 }
 
                 if (method.Parameters.TrySingle(out var parameter) &&
-                    parameter.Type == KnownSymbol.Boolean &&
-                    method.IsOverride &&
-                    method.OverriddenMethod is IMethodSymbol overridden &&
-                    !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+                    parameter.Type == KnownSymbol.Boolean)
                 {
-                    if (overridden.DeclaringSyntaxReferences.Length == 0)
+                    if (ShouldCallBase(method, methodDeclaration, context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
-                    }
-                    else
-                    {
-                        using (var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
-                        {
-                            foreach (var disposeCall in disposeWalker)
-                            {
-                                if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                                    FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
-                                    !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
-                                {
-                                    context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
-                                    break;
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -122,6 +103,38 @@ namespace IDisposableAnalyzers
                         candidate.Parameters.Length == 0)
                     {
                         return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool ShouldCallBase(IMethodSymbol method, MethodDeclarationSyntax methodDeclaration, SyntaxNodeAnalysisContext context)
+        {
+            if (method.Parameters.TrySingle(out var parameter) &&
+                parameter.Type == KnownSymbol.Boolean &&
+                method.IsOverride &&
+                method.OverriddenMethod is IMethodSymbol overridden &&
+                !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+            {
+                if (overridden.DeclaringSyntaxReferences.Length == 0)
+                {
+                    return true;
+                }
+                else
+                {
+                    using (var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                    {
+                        foreach (var disposeCall in disposeWalker)
+                        {
+                            if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                                FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                                !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
+                            {
+                                return true;
+                            }
+                        }
                     }
                 }
             }
