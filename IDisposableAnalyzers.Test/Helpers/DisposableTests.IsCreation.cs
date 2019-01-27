@@ -12,28 +12,23 @@ namespace IDisposableAnalyzers.Test.Helpers
     {
         internal class IsCreation
         {
-            [TestCase("1",                                         Result.No)]
-            [TestCase("new string(' ', 1)",                        Result.No)]
-            [TestCase("new Disposable()",                          Result.Yes)]
-            [TestCase("new Disposable() as object",                Result.Yes)]
-            [TestCase("(object) new Disposable()",                 Result.Yes)]
-            [TestCase("typeof(IDisposable)",                       Result.No)]
-            [TestCase("(IDisposable)null",                         Result.No)]
-            [TestCase("File.OpenRead(string.Empty) ?? null",       Result.Yes)]
-            [TestCase("null ?? File.OpenRead(string.Empty)",       Result.Yes)]
-            [TestCase("true ? null : File.OpenRead(string.Empty)", Result.Yes)]
-            [TestCase("true ? File.OpenRead(string.Empty) : null", Result.Yes)]
+            [TestCase("1",                                                   Result.No)]
+            [TestCase("new string(' ', 1)",                                  Result.No)]
+            [TestCase("new Disposable()",                                    Result.Yes)]
+            [TestCase("new Disposable() as object",                          Result.Yes)]
+            [TestCase("(object) new Disposable()",                           Result.Yes)]
+            [TestCase("typeof(IDisposable)",                                 Result.No)]
+            [TestCase("(IDisposable)null",                                   Result.No)]
+            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null",       Result.Yes)]
+            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
+            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.Yes)]
+            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.Yes)]
             public void LanguageConstructs(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.IO;
-    using System.Linq;
 
     public class Disposable : IDisposable
     {
@@ -54,8 +49,9 @@ namespace RoslynSandbox
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
+                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
+                Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
