@@ -235,7 +235,7 @@ namespace IDisposableAnalyzers
             var result = Result.No;
             while (values.MoveNext())
             {
-                switch (IsCreationCore(values.Current, semanticModel, cancellationToken))
+                switch (IsCreation(values.Current, semanticModel, cancellationToken))
                 {
                     case Result.Unknown:
                         if (result == Result.No)
