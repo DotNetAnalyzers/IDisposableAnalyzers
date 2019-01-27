@@ -178,26 +178,9 @@ namespace IDisposableAnalyzers
                 return Result.Yes;
             }
 
-            using (var walker = ReturnValueWalker.Borrow(candidate, ReturnValueSearch.RecursiveInside, semanticModel, cancellationToken))
+            using (var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken))
             {
-                if (walker.Count == 0)
-                {
-                    if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol) &&
-                        symbol.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        return IsCreationCore(symbol, semanticModel.Compilation);
-                    }
-
-                    using (var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken))
-                    {
-                        return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                    }
-                }
-
-                using (var recursive = RecursiveValues.Borrow(walker, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                }
+                return IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
         }
 
@@ -250,9 +233,14 @@ namespace IDisposableAnalyzers
                         result = Result.AssumeYes;
                         break;
                     case Result.No:
-                    case Result.AssumeNo:
                         break;
+                    case Result.AssumeNo:
+                        if (result == Result.No)
+                        {
+                            result = Result.AssumeNo;
+                        }
 
+                        break;
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
