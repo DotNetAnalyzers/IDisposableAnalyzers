@@ -25,7 +25,7 @@
 * FEATURE: Understand NOP disposable.
 
 #### 2.0.3.3
-* BUGFIX: IDISP013 ignore nunit ThrowAsync
+* BUGFIX: IDISP013 ignore NUnit ThrowAsync
 * BUGFIX: Code fix for IDISP001 doubles the indentation
 * BUGFIX: Code fix for IDISP002 when calling base.Dispose(disposing)
 * BUGFIX: IDISP006 should not warn when overriding Dispose(disposing)
@@ -61,7 +61,7 @@
 
 #### 0.1.4
 * PERFORMANCE: Merged many analyzers doing the same expensive analysis to fewer.
-* BUGFIX: IDISP004 nag on argument to invcation.
+* BUGFIX: IDISP004 nag on argument to invocation.
 * BUGFIX: IDISP003 handle lazy properties.
 * BUGFIX: Generate correct code for disposing explicit disposable.
 * BUGFIX: IDISP004 nag on chained invocation.
