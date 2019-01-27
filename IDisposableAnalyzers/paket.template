@@ -4,12 +4,7 @@ projectUrl https://github.com/DotNetAnalyzers/IDisposableAnalyzers
 licenseUrl http://opensource.org/licenses/MIT
 
 releaseNotes
-  New analyzer: IDISP018.
-  New analyzer: IDISP019.
-  New analyzer: IDISP020.
-  New analyzer: IDISP021.
-  New analyzer: IDISP022.
-  New analyzer: IDISP023.
+  BUGFIX: File.ReadAllText does not create a disposable.
 
 excludedgroups
   Main

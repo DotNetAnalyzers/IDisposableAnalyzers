@@ -20,15 +20,10 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.1.0.0</Version>
+    <Version>2.1.1.0</Version>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <Description>New analyzer: IDISP018.
-New analyzer: IDISP019.
-New analyzer: IDISP020.
-New analyzer: IDISP021.
-New analyzer: IDISP022.
-New analyzer: IDISP023.</Description>
+    <Description>BUGFIX: File.ReadAllText does not create a disposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       BUGFIX: Handle extension methods in binary references better.

@@ -1,3 +1,6 @@
+#### 2.1.1
+* BUGFIX: File.ReadAllText does not create a disposable.
+
 #### 2.1
 * New analyzer: IDISP018.
 * New analyzer: IDISP019.
