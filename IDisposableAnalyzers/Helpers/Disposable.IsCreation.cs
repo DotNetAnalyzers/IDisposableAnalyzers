@@ -299,14 +299,14 @@ namespace IDisposableAnalyzers
 
         private static Result IsCreationCore(ISymbol candidate, Compilation compilation)
         {
-            if (candidate == null ||
-                candidate is ILocalSymbol)
+            if (candidate == null)
             {
                 return Result.Unknown;
             }
 
             if (candidate is IFieldSymbol ||
-                candidate is IParameterSymbol)
+                candidate is IParameterSymbol ||
+                candidate is ILocalSymbol)
             {
                 return Result.No;
             }
@@ -327,6 +327,11 @@ namespace IDisposableAnalyzers
             {
                 if (method.DeclaringSyntaxReferences.Length == 0)
                 {
+                    if (!IsAssignableFrom(method.ReturnType, compilation))
+                    {
+                        return Result.No;
+                    }
+
                     if (method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
                         method.ContainingType == KnownSymbol.File ||
                         method.ContainingType == KnownSymbol.FileInfo ||
