@@ -143,9 +143,24 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (!IsPotentiallyAssignableFrom(candidate, semanticModel, cancellationToken) ||
-                candidate is ThisExpressionSyntax ||
-                candidate is BaseExpressionSyntax)
+            if (candidate == null)
+            {
+                return Result.Unknown;
+            }
+
+            switch (candidate.Kind())
+            {
+                case SyntaxKind.NullLiteralExpression:
+                case SyntaxKind.StringLiteralExpression:
+                case SyntaxKind.NumericLiteralExpression:
+                case SyntaxKind.TrueLiteralExpression:
+                case SyntaxKind.FalseLiteralExpression:
+                case SyntaxKind.BaseExpression:
+                case SyntaxKind.ThisExpression:
+                    return Result.No;
+            }
+
+            if (!IsPotentiallyAssignableFrom(candidate, semanticModel, cancellationToken))
             {
                 return Result.No;
             }
