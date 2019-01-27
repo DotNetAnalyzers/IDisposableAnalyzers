@@ -98,18 +98,18 @@ namespace RoslynSandbox
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("StaticCreateIntStatementBody()",  Result.No)]
-            [TestCase("StaticCreateIntExpressionBody()", Result.No)]
-            [TestCase("StaticCreateIntWithArg()",        Result.No)]
-            [TestCase("StaticCreateIntId()",             Result.No)]
-            [TestCase("StaticCreateIntSquare()",         Result.No)]
-            [TestCase("this.CreateIntStatementBody()",   Result.No)]
-            [TestCase("CreateIntExpressionBody()",       Result.No)]
-            [TestCase("CreateIntWithArg()",              Result.No)]
-            [TestCase("CreateIntId()",                   Result.No)]
-            [TestCase("CreateIntSquare()",               Result.No)]
-            [TestCase("Id<int>()",                       Result.No)]
-            public void CallMethodInSyntaxTreeReturningNotDisposable(string code, Result expected)
+            [TestCase("StaticCreateIntStatementBody()")]
+            [TestCase("StaticCreateIntExpressionBody()")]
+            [TestCase("StaticCreateIntWithArg()")]
+            [TestCase("StaticCreateIntId()")]
+            [TestCase("StaticCreateIntSquare()")]
+            [TestCase("this.CreateIntStatementBody()")]
+            [TestCase("CreateIntExpressionBody()")]
+            [TestCase("CreateIntWithArg()")]
+            [TestCase("CreateIntId()")]
+            [TestCase("CreateIntSquare()")]
+            [TestCase("Id<int>()")]
+            public void MethodReturningNotDisposable(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -165,7 +165,7 @@ namespace RoslynSandbox
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(code);
-                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
             [TestCase("Id<IDisposable>(null)",                            Result.No)]
@@ -455,8 +455,10 @@ namespace RoslynSandbox
                 Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void AssumeYesForExtensionMethodReturningSameTypeAsThisParameter()
+            [TestCase("disposable.AsCustom()")]
+            [TestCase("disposable.AsCustom() ?? other")]
+            [TestCase("other ?? disposable.AsCustom()")]
+            public void AssumeYesForExtensionMethodReturningDifferentTypeThanThisParameter(string expression)
             {
                 var binary = @"
 namespace BinaryReference
@@ -480,23 +482,25 @@ namespace RoslynSandbox
 
     class Foo
     {
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable disposable, ICustomDisposable other)
         {
-            var custom = disposable.AsCustom();
+            _ = disposable.AsCustom();
         }
     }
-}";
+}".AssertReplace("disposable.AsCustom()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var references = MetadataReferences.FromAttributes()
                                                    .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("disposable.AsCustom()");
+                var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(Result.AssumeYes, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void AssumeNoForExtensionMethodReturningSameTypeAsThisParameter()
+            [TestCase("disposable.Fluent()")]
+            [TestCase("disposable.Fluent() ?? other")]
+            [TestCase("other ?? disposable.Fluent()")]
+            public void AssumeNoForUnknownExtensionMethodReturningSameTypeAsThisParameter(string expression)
             {
                 var binary = @"
 namespace BinaryReference
@@ -517,18 +521,18 @@ namespace RoslynSandbox
 
     class Foo
     {
-        public Foo(IDisposable disposable)
+        public Foo(IDisposable disposable, IDisposable other)
         {
-            var custom = disposable.Fluent();
+            _ = disposable.Fluent();
         }
     }
-}";
+}".AssertReplace("disposable.Fluent()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var references = MetadataReferences.FromAttributes()
                                                    .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("disposable.Fluent()");
+                var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
