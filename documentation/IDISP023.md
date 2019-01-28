@@ -40,7 +40,30 @@ Any use of reference types from a finalizer is hazardous. When that finalizer wa
 
 ## How to fix violations
 
-Avoid touching reference types.
+Invalid:
+
+```cs
+protected virtual void Dispose(bool disposing)
+{
+   if (disposing)
+   {
+   }
+
+   this.logger.Log("In Dispose(bool)"); // violation! ILogger is a ref type and we're not inside the above block
+}
+```
+
+Valid:
+
+```cs
+protected virtual void Dispose(bool disposing)
+{
+   if (disposing)
+   {
+       this.logger.Log("In Dispose(bool)"
+   }
+}
+```
 
 <!-- start generated config severity -->
 ## Configure severity
