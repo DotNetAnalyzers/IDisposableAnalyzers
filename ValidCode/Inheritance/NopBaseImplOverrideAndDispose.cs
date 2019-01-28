@@ -8,7 +8,11 @@ namespace ValidCode.Inheritance
 
         protected override void Dispose(bool disposing)
         {
-            this.stream.Dispose();
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+
             base.Dispose(disposing);
         }
     }

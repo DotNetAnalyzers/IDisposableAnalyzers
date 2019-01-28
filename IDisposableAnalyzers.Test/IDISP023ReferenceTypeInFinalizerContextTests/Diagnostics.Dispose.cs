@@ -58,21 +58,34 @@ namespace RoslynSandbox
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
-            [TestCase("this.↓Builder.Append(1)")]
-            [TestCase("↓Builder.Append(1)")]
-            [TestCase("↓Builder.Length")]
-            public void Instance(string expression)
+            [TestCase("this.↓builder.Append(1)")]
+            [TestCase("↓builder.Append(1)")]
+            [TestCase("↓builder.Length")]
+            [TestCase("↓disposable.Dispose()")]
+            [TestCase("↓disposable?.Dispose()")]
+            [TestCase("this.↓disposable.Dispose()")]
+            [TestCase("this.↓disposable?.Dispose()")]
+            [TestCase("↓Disposable.Dispose()")]
+            [TestCase("↓Disposable?.Dispose()")]
+            [TestCase("this.↓Disposable.Dispose()")]
+            [TestCase("this.↓Disposable?.Dispose()")]
+            public void InstanceOutsideIfDispose(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
+    using System.IO;
     using System.Text;
 
     public class C : IDisposable
     {
-        private readonly StringBuilder Builder = new StringBuilder();
+        private readonly StringBuilder builder = new StringBuilder();
+        private readonly IDisposable disposable = File.OpenRead(string.Empty);
 
         private bool isDisposed = false;
+
+        private readonly IDisposable Disposable { get; } = OpenRead(string.Empty);
 
         ~C()
         {
@@ -94,11 +107,59 @@ namespace RoslynSandbox
                 {
                 }
 
-                this.↓Builder.Append(1);
+                this.↓builder.Append(1);
             }
         }
     }
-}".AssertReplace("this.↓Builder.Append(1)", expression);
+}".AssertReplace("this.↓builder.Append(1)", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [TestCase("this.↓builder.Append(1)")]
+            [TestCase("↓builder.Append(1)")]
+            [TestCase("↓builder.Length")]
+            [TestCase("↓disposable.Dispose()")]
+            [TestCase("↓disposable?.Dispose()")]
+            [TestCase("this.↓disposable.Dispose()")]
+            [TestCase("this.↓disposable?.Dispose()")]
+            [TestCase("↓Disposable.Dispose()")]
+            [TestCase("↓Disposable?.Dispose()")]
+            [TestCase("this.↓Disposable.Dispose()")]
+            [TestCase("this.↓Disposable?.Dispose()")]
+            public void InstanceNoIfDispose(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Text;
+
+    public class C : IDisposable
+    {
+        private readonly StringBuilder builder = new StringBuilder();
+        private readonly IDisposable disposable = File.OpenRead(string.Empty);
+
+        private readonly IDisposable Disposable { get; } = OpenRead(string.Empty);
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            this.↓builder.Append(1);
+        }
+    }
+}".AssertReplace("this.↓builder.Append(1)", expression);
 
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }

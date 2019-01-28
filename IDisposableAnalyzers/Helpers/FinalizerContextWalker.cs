@@ -53,10 +53,17 @@ namespace IDisposableAnalyzers
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            if (node.TryGetMethodName(out var name) &&
-                name != "Dispose")
+            if (!IsDisposeBool(node))
             {
                 base.VisitInvocationExpression(node);
+            }
+
+            bool IsDisposeBool(InvocationExpressionSyntax candidate)
+            {
+                return candidate.TryGetMethodName(out var name) &&
+                        name == "Dispose" &&
+                        candidate.ArgumentList is ArgumentListSyntax argumentList &&
+                        argumentList.Arguments.TrySingle(out var argument);
             }
         }
 

@@ -1,8 +1,10 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposeCall

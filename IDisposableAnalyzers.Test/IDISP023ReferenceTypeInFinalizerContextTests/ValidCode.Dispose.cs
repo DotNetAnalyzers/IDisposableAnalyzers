@@ -405,7 +405,6 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
             }
-
         }
     }
 }
