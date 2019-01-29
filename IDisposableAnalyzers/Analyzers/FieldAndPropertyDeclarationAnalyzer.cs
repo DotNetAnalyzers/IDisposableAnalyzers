@@ -81,9 +81,14 @@ namespace IDisposableAnalyzers
                 {
                     if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
-                        if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                            DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
-                            !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
+                        if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
+                            IsMutableFromOutside(fieldOrProperty))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                        }
+                        else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
+                                 DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                                 !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
 
@@ -92,12 +97,6 @@ namespace IDisposableAnalyzers
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
                             }
-                        }
-
-                        if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                            IsMutableFromOutside(fieldOrProperty))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
                         }
                     }
                 }
