@@ -51,6 +51,34 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
             }
+
+            [Test]
+            public void AssignedWithCreatedAndInjected()
+            {
+                var testCode = @"
+#pragma warning disable IDISP008
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C()
+        {
+            this.disposable = File.OpenRead(string.Empty);
+        }
+
+        public C(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
