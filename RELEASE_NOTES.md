@@ -1,3 +1,9 @@
+#### 2.1.2
+* BUGFIX IDISP011: when disposing before foreach.
+* BUGFIX IDISP003 should not warn when reassigning after dispose.
+* BUGFIX IDISP002 & IDISP006 should not warn when assigned with created and injected.
+* BUGFIX IDISP023: when disposing members.
+
 #### 2.1.1
 * BUGFIX: File.ReadAllText does not create a disposable.
 
