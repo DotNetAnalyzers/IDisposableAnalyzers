@@ -1217,5 +1217,33 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void ChainedConstructorSettingToNullThenInjected()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C(IDisposable disposable)
+             : this(1)
+        {
+            this.disposable = disposable;
+        }
+
+        public C(int n)
+        {
+            this.disposable = null;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
