@@ -1,9 +1,44 @@
 namespace ValidCode
 {
+    using System;
     using System.IO;
+    using System.Threading;
 
-    public class DisposedAndReassigned
+    public abstract class DisposedAndReassigned : IDisposable
     {
+        private bool _disposed;
+        private CancellationTokenSource _cancellationTokenSource;
+
+        public void DisposeAssignDisposeAssignNull()
+        {
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = null;
+        }
+
+        public void DisposeAssignDisposeAssign()
+        {
+            _cancellationTokenSource?.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource = new CancellationTokenSource();
+        }
+
+        public void TryFinally()
+        {
+            try
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = new CancellationTokenSource();
+            }
+            finally
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+            }
+        }
+
         public void Bar()
         {
             var stream = File.OpenRead(string.Empty);
@@ -38,6 +73,26 @@ namespace ValidCode
         private static void Create(out Stream stream)
         {
             stream = File.OpenRead(string.Empty);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+                _cancellationTokenSource?.Dispose();
+            }
         }
     }
 }

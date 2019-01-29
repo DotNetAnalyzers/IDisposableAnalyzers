@@ -1245,5 +1245,89 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void DisposeAssignDisposeAssignNull()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading;
+
+    public sealed class C : IDisposable
+    {
+        private CancellationTokenSource cts;
+
+        public void M()
+        {
+            this.cts?.Dispose();
+            this.cts = new CancellationTokenSource();
+            this.cts.Dispose();
+            this.cts = null;
+        }
+
+        public void Dispose()
+        {
+            this.cts?.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void FieldTryFinally()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Threading;
+
+    public abstract class C : IDisposable
+    {
+        private bool _disposed;
+        private CancellationTokenSource _cancellationTokenSource;
+
+        public void M()
+        {
+            try
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = new CancellationTokenSource();
+            }
+            finally
+            {
+                _cancellationTokenSource?.Dispose();
+                _cancellationTokenSource = null;
+            }
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            _disposed = true;
+            if (disposing)
+            {
+                _cancellationTokenSource?.Dispose();
+            }
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

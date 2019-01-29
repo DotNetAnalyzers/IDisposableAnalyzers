@@ -20,9 +20,10 @@ namespace IDisposableAnalyzers
                             continue;
                         }
 
-                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken))
+                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) &&
+                            !IsReassignedAfter(block, invocation))
                         {
-                            return !IsReassignedAfter(block, invocation);
+                            return true;
                         }
                     }
                 }
@@ -36,10 +37,11 @@ namespace IDisposableAnalyzers
                 {
                     foreach (var invocation in pooled.Invocations)
                     {
-                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
-                            DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken))
+                        if ((DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
+                             DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken)) &&
+                             !IsReassignedAfter(setter, invocation))
                         {
-                            return !IsReassignedAfter(setter, invocation);
+                            return true;
                         }
                     }
                 }
