@@ -5,6 +5,18 @@ namespace ValidCode
 
     public class Loops
     {
+        public Stream DisposeBefore(string[] fileNames)
+        {
+            Stream stream = null;
+            foreach (var name in fileNames)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(name);
+            }
+
+            return stream;
+        }
+
         public void DisposeAfter(string[] fileNames)
         {
             Stream stream = null;

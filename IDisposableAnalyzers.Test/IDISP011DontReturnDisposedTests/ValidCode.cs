@@ -1081,5 +1081,31 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void DisposedBeforeInForeach()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public Stream DisposeBefore(string[] fileNames)
+        {
+            Stream stream = null;
+            foreach (var name in fileNames)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(name);
+            }
+
+            return stream;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
     }
 }
