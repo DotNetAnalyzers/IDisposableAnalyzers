@@ -60,7 +60,7 @@ protected virtual void Dispose(bool disposing)
 {
    if (disposing)
    {
-       this.logger.Log("In Dispose(bool)"
+       this.logger.Log("In Dispose(bool)");
    }
 }
 ```
