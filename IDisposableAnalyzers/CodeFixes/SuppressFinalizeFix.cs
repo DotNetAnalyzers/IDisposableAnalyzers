@@ -49,12 +49,14 @@ namespace IDisposableAnalyzers
                                     syntaxRoot.ReplaceNode(
                                         body,
                                         body.AddStatements(SyntaxFactory.ParseStatement("GC.SuppressFinalize(this);")
+                                                                        .WithTrailingElasticLineFeed()
                                                                         .WithAdditionalAnnotations(Formatter.Annotation)))));
                         }
                         else if (disposeMethod.ExpressionBody is ArrowExpressionClauseSyntax arrowExpression)
                         {
                             var block = SyntaxFactory.Block(
                                 SyntaxFactory.ExpressionStatement(arrowExpression.Expression)
+                                             .WithTrailingElasticLineFeed()
                                              .WithAdditionalAnnotations(Formatter.Annotation),
                                 SyntaxFactory.ParseStatement("GC.SuppressFinalize(this);")
                                              .WithAdditionalAnnotations(Formatter.Annotation));

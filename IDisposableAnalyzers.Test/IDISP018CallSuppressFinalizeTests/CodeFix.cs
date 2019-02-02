@@ -76,6 +76,74 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void SealedWithFinalizerWhenStatementBodyWIthTrivia()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private bool isDisposed = false;
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            // 1
+            this.Dispose(true);
+            // 2
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+            }
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private bool isDisposed = false;
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            // 1
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+            // 2
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+            }
+        }
+    }
+}";
+            AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
         public void SealedWithFinalizerWhenExpressionBody()
         {
             var testCode = @"
