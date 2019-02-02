@@ -2,7 +2,7 @@
 ## Dispose member.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP002
 | Severity | Warning
 | Enabled  | True

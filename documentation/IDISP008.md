@@ -2,7 +2,7 @@
 ## Don't assign member with injected and created disposables.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP008
 | Severity | Warning
 | Enabled  | True

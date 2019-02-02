@@ -2,7 +2,7 @@
 ## Call SuppressFinalize with this.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP020
 | Severity | Warning
 | Enabled  | True

@@ -2,7 +2,7 @@
 ## Don't use disposed instance.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP016
 | Severity | Warning
 | Enabled  | True

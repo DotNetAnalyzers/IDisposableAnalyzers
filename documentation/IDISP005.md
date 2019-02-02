@@ -2,7 +2,7 @@
 ## Return type should indicate that the value should be disposed.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP005
 | Severity | Warning
 | Enabled  | True

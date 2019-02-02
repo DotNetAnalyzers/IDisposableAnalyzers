@@ -2,7 +2,7 @@
 ## Don't dispose injected.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP007
 | Severity | Warning
 | Enabled  | True

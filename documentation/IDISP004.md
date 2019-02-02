@@ -2,7 +2,7 @@
 ## Don't ignore return value of type IDisposable.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP004
 | Severity | Warning
 | Enabled  | True

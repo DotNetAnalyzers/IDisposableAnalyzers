@@ -2,7 +2,7 @@
 ## Implement IDisposable.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP006
 | Severity | Warning
 | Enabled  | True

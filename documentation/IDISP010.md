@@ -2,7 +2,7 @@
 ## Call base.Dispose(disposing)
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP010
 | Severity | Warning
 | Enabled  | True

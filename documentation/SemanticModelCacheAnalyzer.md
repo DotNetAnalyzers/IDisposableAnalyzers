@@ -2,7 +2,7 @@
 ## Controls if Semantic models should be cached for syntax trees.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | SemanticModelCacheAnalyzer
 | Severity | Hidden
 | Enabled  | True

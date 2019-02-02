@@ -134,7 +134,7 @@ namespace IDisposableAnalyzers.Test
             var builder = new StringBuilder();
             const string HeaderRow = "| Id       | Title";
             builder.AppendLine(HeaderRow)
-                   .AppendLine("| :--      | :-- |");
+                   .AppendLine("| :--      | :-- ");
             foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor)
                                                           .Distinct()
                                                           .OrderBy(x => x.Id))
@@ -239,7 +239,7 @@ namespace IDisposableAnalyzers.Test
 ## {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :--
 | Id       | {descriptor.Id}
 | Severity | {descriptor.DefaultSeverity.ToString()}
 | Enabled  | {(descriptor.IsEnabledByDefault ? "True" : "False")}

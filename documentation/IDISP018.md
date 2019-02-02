@@ -2,7 +2,7 @@
 ## Call SuppressFinalize.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP018
 | Severity | Warning
 | Enabled  | True

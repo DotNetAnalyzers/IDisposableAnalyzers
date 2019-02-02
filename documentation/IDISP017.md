@@ -2,7 +2,7 @@
 ## Prefer using.
 
 | Topic    | Value
-| :--      | :-- |
+| :--      | :-- 
 | Id       | IDISP017
 | Severity | Warning
 | Enabled  | True
