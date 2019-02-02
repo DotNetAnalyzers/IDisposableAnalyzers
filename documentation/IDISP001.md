@@ -2,7 +2,7 @@
 ## Dispose created.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP001
 | Severity | Warning
 | Enabled  | True
@@ -21,14 +21,14 @@ The reason for not filtering out those cases is that using reads better.
 
 The following example will leave the file open.
 ```c#
-var reader = new StreamReader("file.txt");
+var reader = new StreamReader(fileName);
 return reader.ReadLine();
 ```
 
 ## How to fix violations
 
 ```c#
-using (var reader = new StreamReader("file.txt"))
+using (var reader = new StreamReader(fileName))
 {
     return reader.ReadLine();
 }

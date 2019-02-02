@@ -134,7 +134,7 @@ namespace IDisposableAnalyzers.Test
             var builder = new StringBuilder();
             const string HeaderRow = "| Id       | Title";
             builder.AppendLine(HeaderRow)
-                   .AppendLine("| :--      | :-- ");
+                   .AppendLine("| :--      | :--");
             foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor)
                                                           .Distinct()
                                                           .OrderBy(x => x.Id))
