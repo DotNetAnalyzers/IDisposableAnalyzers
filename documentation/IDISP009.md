@@ -2,7 +2,7 @@
 ## Add IDisposable interface.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP009
 | Severity | Warning
 | Enabled  | True

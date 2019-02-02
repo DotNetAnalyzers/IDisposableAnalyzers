@@ -2,7 +2,7 @@
 ## Dispose previous before re-assigning.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP003
 | Severity | Warning
 | Enabled  | True

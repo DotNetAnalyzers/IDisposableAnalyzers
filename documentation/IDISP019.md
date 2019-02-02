@@ -2,7 +2,7 @@
 ## Call SuppressFinalize.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP019
 | Severity | Warning
 | Enabled  | True

@@ -2,7 +2,7 @@
 ## Call this.Dispose(false).
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP022
 | Severity | Warning
 | Enabled  | True

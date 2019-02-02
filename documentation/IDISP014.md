@@ -2,7 +2,7 @@
 ## Use a single instance of HttpClient.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP014
 | Severity | Warning
 | Enabled  | True

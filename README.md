@@ -12,7 +12,7 @@ Roslyn analyzers for IDisposable
 * 2.x versions are for Visual Studio 2017.
 
 | Id       | Title
-| :--      | :-- 
+| :--      | :--
 | [IDISP001](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP001.md)| Dispose created.
 | [IDISP002](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP002.md)| Dispose member.
 | [IDISP003](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP003.md)| Dispose previous before re-assigning.

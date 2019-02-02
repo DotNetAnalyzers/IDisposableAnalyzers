@@ -2,7 +2,7 @@
 ## Don't return disposed instance.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP011
 | Severity | Warning
 | Enabled  | True

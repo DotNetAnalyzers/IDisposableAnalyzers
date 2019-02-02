@@ -2,7 +2,7 @@
 ## Member should not return created and cached instance.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP015
 | Severity | Warning
 | Enabled  | True

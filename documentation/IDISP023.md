@@ -2,7 +2,7 @@
 ## Don't use reference types in finalizer context.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP023
 | Severity | Warning
 | Enabled  | True

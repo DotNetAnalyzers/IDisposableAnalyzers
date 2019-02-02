@@ -2,7 +2,7 @@
 ## Property should not return created disposable.
 
 | Topic    | Value
-| :--      | :-- 
+| :--      | :--
 | Id       | IDISP012
 | Severity | Warning
 | Enabled  | True
