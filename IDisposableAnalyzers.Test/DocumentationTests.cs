@@ -107,6 +107,27 @@ namespace IDisposableAnalyzers.Test
             CodeAssert.AreEqual(expected, actual);
         }
 
+        [TestCaseSource(nameof(DescriptorsWithDocs))]
+        public void ConfigSeverity(DescriptorInfo descriptorInfo)
+        {
+            var expected = GetConfigSeverity(descriptorInfo.Stub);
+            DumpIfDebug(expected);
+            var actual = GetConfigSeverity(descriptorInfo.DocumentationFile.AllText);
+            CodeAssert.AreEqual(expected, actual);
+
+            string GetConfigSeverity(string doc)
+            {
+                return GetSection(doc, "<!-- start generated config severity -->", "<!-- end generated config severity -->");
+            }
+
+            string GetSection(string doc, string startToken, string endToken)
+            {
+                var start = doc.IndexOf(startToken, StringComparison.Ordinal);
+                var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
+                return doc.Substring(start, end - start);
+            }
+        }
+
         [Test]
         public void Index()
         {
