@@ -151,40 +151,42 @@ namespace IDisposableAnalyzers.Test
 
         private static string GetTable(string doc, string headerRow)
         {
-            var start = doc.IndexOf(headerRow);
-            if (start < 0)
+            var startIndex = doc.IndexOf(headerRow);
+            if (startIndex < 0)
             {
                 return string.Empty;
             }
 
-            return doc.Substring(start, TableLength(doc, start));
-        }
+            return doc.Substring(startIndex, TableLength());
 
-        private static int TableLength(string doc, int startIndex)
-        {
-            var length = 0;
-            while (startIndex + length < doc.Length)
+            int TableLength()
             {
-                if (doc[startIndex + length] == '\r')
+                var length = 0;
+                while (startIndex + length < doc.Length)
                 {
-                    length++;
-                    if (doc.TryElementAt(startIndex + length + 1, out var c) &&
-                        c != '\n')
+                    if (doc[startIndex + length] == '\r')
+                    {
+                        length++;
+                        if (doc.TryElementAt(startIndex + length, out var c) &&
+                            c != '\n')
+                        {
+                            length++;
+                        }
+
+                        if (doc.TryElementAt(startIndex + length, out c) &&
+                            c != '|')
+                        {
+                            return length;
+                        }
+                    }
+                    else
                     {
                         length++;
                     }
-
-                    if (doc.TryElementAt(startIndex + length, out c) &&
-                        c != '|')
-                    {
-                        return length;
-                    }
                 }
 
-                length++;
+                return length;
             }
-
-            return length;
         }
 
         private static string GetSection(string doc, string startToken, string endToken)
