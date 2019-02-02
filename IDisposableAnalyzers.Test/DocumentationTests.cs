@@ -53,7 +53,6 @@ namespace IDisposableAnalyzers.Test
             }
         }
 
-
         [TestCaseSource(nameof(DescriptorInfos))]
         public void UniqueIds(DescriptorInfo descriptorInfo)
         {
@@ -122,6 +121,7 @@ namespace IDisposableAnalyzers.Test
                 builder.Append($"| [{descriptor.Id}]({descriptor.HelpLinkUri})")
                        .AppendLine($"| {descriptor.Title}");
             }
+
             var expected = builder.ToString();
             DumpIfDebug(expected);
             var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")), HeaderRow);
