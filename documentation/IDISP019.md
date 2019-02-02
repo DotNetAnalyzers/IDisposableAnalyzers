@@ -1,30 +1,13 @@
 # IDISP019
 ## Call SuppressFinalize.
 
-<!-- start generated table -->
-<table>
-  <tr>
-    <td>CheckId</td>
-    <td>IDISP019</td>
-  </tr>
-  <tr>
-    <td>Severity</td>
-    <td>Warning</td>
-  </tr>
-  <tr>
-    <td>Enabled</td>
-    <td>True</td>
-  </tr>
-  <tr>
-    <td>Category</td>
-    <td>IDisposableAnalyzers.Correctness</td>
-  </tr>
-  <tr>
-    <td>Code</td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
-  </tr>
-</table>
-<!-- end generated table -->
+| Topic    | Value
+| :--      | :-- |
+| Id       | IDISP019
+| Severity | Warning
+| Enabled  | True
+| Category | IDisposableAnalyzers.Correctness
+| Code     | [DisposeMethodAnalyzer]([DisposeMethodAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs))
 
 ## Description
 
@@ -32,7 +15,7 @@ Call SuppressFinalize as there is a virtual dispose method.
 
 ## Motivation
 
-Call SuppressFinalize(this) as the type has a virtual dispoe method.
+Call SuppressFinalize(this) as the type has a virtual dispose method.
 In case subclasses add finalizers.
 
 

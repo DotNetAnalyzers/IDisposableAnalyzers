@@ -1,30 +1,13 @@
 # SemanticModelCacheAnalyzer
 ## Controls if Semantic models should be cached for syntax trees.
 
-<!-- start generated table -->
-<table>
-  <tr>
-    <td>CheckId</td>
-    <td>SemanticModelCacheAnalyzer</td>
-  </tr>
-  <tr>
-    <td>Severity</td>
-    <td>Hidden</td>
-  </tr>
-  <tr>
-    <td>Enabled</td>
-    <td>True</td>
-  </tr>
-  <tr>
-    <td>Category</td>
-    <td>SemanticModelCacheAnalyzer</td>
-  </tr>
-  <tr>
-    <td>Code</td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/SemanticModelCacheAnalyzer.cs">SemanticModelCacheAnalyzer</a></td>
-  </tr>
-</table>
-<!-- end generated table -->
+| Topic    | Value
+| :--      | :-- |
+| Id       | SemanticModelCacheAnalyzer
+| Severity | Hidden
+| Enabled  | True
+| Category | SemanticModelCacheAnalyzer
+| Code     | [SemanticModelCacheAnalyzer]([SemanticModelCacheAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/SemanticModelCacheAnalyzer.cs))
 
 ## Description
 

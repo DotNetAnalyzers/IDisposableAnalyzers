@@ -1,14 +1,14 @@
 # IDISP023
 ## Don't use reference types in finalizer context.
 
-| Topic | Value
-| -- | -- |
-| CheckId | IDISP023
+| Topic    | Value
+| :--      | :-- |
+| Id       | IDISP023
 | Severity | Warning
-| Enabled | True
+| Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code | [DisposeMethodAnalyzer](../IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs)
-| | [FinalizerAnalyzer](../IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs)
+| Code     | [DisposeMethodAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs)
+|          | [FinalizerAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs)
 
 ## Description
 

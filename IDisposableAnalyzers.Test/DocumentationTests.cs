@@ -47,10 +47,19 @@ namespace IDisposableAnalyzers.Test
             {
                 var descriptor = descriptorInfo.Descriptor;
                 var id = descriptor.Id;
-                DumpIfDebug(CreateStub(descriptorInfo));
-                File.WriteAllText(descriptorInfo.DocumentationFile.Name + ".generated", CreateStub(descriptorInfo));
+                DumpIfDebug(descriptorInfo.Stub);
+                File.WriteAllText(descriptorInfo.DocumentationFile.Name + ".generated", descriptorInfo.Stub);
                 Assert.Fail($"Documentation is missing for {id}");
             }
+        }
+
+
+        [TestCaseSource(nameof(DescriptorInfos))]
+        public void UniqueIds(DescriptorInfo descriptorInfo)
+        {
+            Assert.AreEqual(1, DescriptorInfos.Select(x => x.Descriptor)
+                                              .Distinct()
+                                              .Count(d => d.Id == descriptorInfo.Descriptor.Id));
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
@@ -92,83 +101,130 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(DescriptorsWithDocs))]
         public void Table(DescriptorInfo descriptorInfo)
         {
-            var expected = GetTable(CreateStub(descriptorInfo));
+            const string HeaderRow = "| Topic    | Value";
+            var expected = GetTable(descriptorInfo.Stub, HeaderRow);
             DumpIfDebug(expected);
-            var actual = GetTable(descriptorInfo.DocumentationFile.AllText);
+            var actual = GetTable(descriptorInfo.DocumentationFile.AllText, HeaderRow);
             CodeAssert.AreEqual(expected, actual);
-        }
-
-        [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void ConfigSeverity(DescriptorInfo descriptorInfo)
-        {
-            var expected = GetConfigSeverity(CreateStub(descriptorInfo));
-            DumpIfDebug(expected);
-            var actual = GetConfigSeverity(descriptorInfo.DocumentationFile.AllText);
-            CodeAssert.AreEqual(expected, actual);
-        }
-
-        [TestCaseSource(nameof(DescriptorInfos))]
-        public void UniqueIds(DescriptorInfo descriptorInfo)
-        {
-            Assert.AreEqual(1, DescriptorInfos.Select(x => x.Descriptor)
-                                              .Distinct()
-                                              .Count(d => d.Id == descriptorInfo.Descriptor.Id));
         }
 
         [Test]
         public void Index()
         {
             var builder = new StringBuilder();
-            builder.AppendLine("<!-- start generated table -->")
-                   .AppendLine("<table>");
+            const string HeaderRow = "| Id       | Title";
+            builder.AppendLine(HeaderRow)
+                   .AppendLine("| :--      | :-- |");
             foreach (var descriptor in DescriptorsWithDocs.Select(x => x.Descriptor)
                                                           .Distinct()
                                                           .OrderBy(x => x.Id))
             {
-                builder.AppendLine("  <tr>")
-                       .AppendLine($@"    <td><a href=""{descriptor.HelpLinkUri}"">{descriptor.Id}</a></td>")
-                       .AppendLine($"    <td>{descriptor.Title}</td>")
-                       .AppendLine("  </tr>");
+                builder.Append($"| [{descriptor.Id}]({descriptor.HelpLinkUri})")
+                       .AppendLine($"| {descriptor.Title}");
             }
-
-            builder.AppendLine("<table>")
-                   .Append("<!-- end generated table -->");
             var expected = builder.ToString();
             DumpIfDebug(expected);
-            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")));
+            var actual = GetTable(File.ReadAllText(Path.Combine(SolutionDirectory.FullName, "Readme.md")), HeaderRow);
             CodeAssert.AreEqual(expected, actual);
         }
 
-        private static string CreateStub(DescriptorInfo descriptorInfo)
+        private static string GetTable(string doc, string headerRow)
         {
-            var descriptor = descriptorInfo.Descriptor;
-            var stub = $@"# {descriptor.Id}
+            var start = doc.IndexOf(headerRow);
+            if (start < 0)
+            {
+                return string.Empty;
+            }
+
+            return doc.Substring(start, TableLength(doc, start));
+        }
+
+        private static int TableLength(string doc, int startIndex)
+        {
+            var length = 0;
+            while (startIndex + length < doc.Length)
+            {
+                if (doc[startIndex + length] == '\r')
+                {
+                    length++;
+                    if (doc.TryElementAt(startIndex + length + 1, out var c) &&
+                        c != '\n')
+                    {
+                        length++;
+                    }
+
+                    if (doc.TryElementAt(startIndex + length, out c) &&
+                        c != '|')
+                    {
+                        return length;
+                    }
+                }
+
+                length++;
+            }
+
+            return length;
+        }
+
+        private static string GetSection(string doc, string startToken, string endToken)
+        {
+            var start = doc.IndexOf(startToken, StringComparison.Ordinal);
+            var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
+            return doc.Substring(start, end - start);
+        }
+
+        [Conditional("DEBUG")]
+        private static void DumpIfDebug(string text)
+        {
+            Console.Write(text);
+            Console.WriteLine();
+            Console.WriteLine();
+        }
+
+        public class DescriptorInfo
+        {
+            private DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
+            {
+                this.Analyzer = analyzer;
+                this.Descriptor = descriptor;
+                this.DocumentationFile = new MarkdownFile(Path.Combine(DocumentsDirectory.FullName, descriptor.Id + ".md"));
+                this.AnalyzerFile = CodeFile.Find(analyzer.GetType());
+                this.Stub = CreateStub(descriptor);
+            }
+
+            public DiagnosticAnalyzer Analyzer { get; }
+
+            public DiagnosticDescriptor Descriptor { get; }
+
+            public MarkdownFile DocumentationFile { get; }
+
+            public CodeFile AnalyzerFile { get; }
+
+            public string Stub { get; }
+
+            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer)
+            {
+                foreach (var descriptor in analyzer.SupportedDiagnostics)
+                {
+                    yield return new DescriptorInfo(analyzer, descriptor);
+                }
+            }
+
+            public override string ToString() => this.Descriptor.Id;
+
+            private static string CreateStub(DiagnosticDescriptor descriptor)
+            {
+                var stub = $@"# {descriptor.Id}
 ## {descriptor.Title.ToString(CultureInfo.InvariantCulture)}
 
-<!-- start generated table -->
-<table>
-  <tr>
-    <td>CheckId</td>
-    <td>{descriptor.Id}</td>
-  </tr>
-  <tr>
-    <td>Severity</td>
-    <td>{descriptor.DefaultSeverity.ToString()}</td>
-  </tr>
-  <tr>
-    <td>Enabled</td>
-    <td>{(descriptor.IsEnabledByDefault ? "True" : "False")}</td>
-  </tr>
-  <tr>
-    <td>Category</td>
-    <td>{descriptor.Category}</td>
-  </tr>
-  <tr>
-    <td>Code</td>
-    <td><a href=""<URL>""><TYPENAME></a></td>
-  </tr>
-</table>
-<!-- end generated table -->
+| Topic    | Value
+| :--      | :-- |
+| Id       | {descriptor.Id}
+| Severity | {descriptor.DefaultSeverity.ToString()}
+| Enabled  | {(descriptor.IsEnabledByDefault ? "True" : "False")}
+| Category | {descriptor.Category}
+| Code     | [<TYPENAME>](<URL>)
+
 
 ## Description
 
@@ -209,78 +265,23 @@ Or put this at the top of the file to disable all instances.
     Justification = ""Reason..."")]
 ```
 <!-- end generated config severity -->";
-            if (Analyzers.Count(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)) == 1)
-            {
-                return stub.AssertReplace("<TYPENAME>", descriptorInfo.Analyzer.GetType().Name)
-                           .AssertReplace("<URL>", descriptorInfo.AnalyzerFile.Uri);
-            }
-
-            var builder = StringBuilderPool.Borrow();
-            foreach (var analyzer in Analyzers.Where(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)))
-            {
-                _ = builder.AppendLine("  <tr>")
-                           .AppendLine($"    <td>{(builder.Length <= "  <tr>\r\n".Length ? "Code" : string.Empty)}</td>")
-                           .AppendLine($"    <td><a href=\"{CodeFile.Find(analyzer.GetType()).Uri}\">{analyzer.GetType().Name}</a></td>")
-                           .AppendLine("  </tr>");
-            }
-
-            var text = builder.Return();
-            return stub.Replace("  <tr>\r\n    <td>Code</td>\r\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\r\n  </tr>\r\n", text)
-                       .Replace("  <tr>\n    <td>Code</td>\n    <td><a href=\"<URL>\"><TYPENAME></a></td>\n  </tr>\n", text);
-        }
-
-        private static string GetTable(string doc)
-        {
-            return GetSection(doc, "<!-- start generated table -->", "<!-- end generated table -->");
-        }
-
-        private static string GetConfigSeverity(string doc)
-        {
-            return GetSection(doc, "<!-- start generated config severity -->", "<!-- end generated config severity -->");
-        }
-
-        private static string GetSection(string doc, string startToken, string endToken)
-        {
-            var start = doc.IndexOf(startToken, StringComparison.Ordinal);
-            var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
-            return doc.Substring(start, end - start);
-        }
-
-        [Conditional("DEBUG")]
-        private static void DumpIfDebug(string text)
-        {
-            Console.Write(text);
-            Console.WriteLine();
-            Console.WriteLine();
-        }
-
-        public class DescriptorInfo
-        {
-            private DescriptorInfo(DiagnosticAnalyzer analyzer, DiagnosticDescriptor descriptor)
-            {
-                this.Analyzer = analyzer;
-                this.Descriptor = descriptor;
-                this.DocumentationFile = new MarkdownFile(Path.Combine(DocumentsDirectory.FullName, descriptor.Id + ".md"));
-                this.AnalyzerFile = CodeFile.Find(analyzer.GetType());
-            }
-
-            public DiagnosticAnalyzer Analyzer { get; }
-
-            public DiagnosticDescriptor Descriptor { get; }
-
-            public MarkdownFile DocumentationFile { get; }
-
-            public CodeFile AnalyzerFile { get; }
-
-            public static IEnumerable<DescriptorInfo> Create(DiagnosticAnalyzer analyzer)
-            {
-                foreach (var descriptor in analyzer.SupportedDiagnostics)
+                if (Analyzers.TrySingle(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id), out var match))
                 {
-                    yield return new DescriptorInfo(analyzer, descriptor);
+                    return stub.AssertReplace("<TYPENAME>", match.GetType().Name)
+                               .AssertReplace("<URL>", $"[{match.GetType().Name}]({CodeFile.Find(match.GetType()).Uri})");
                 }
-            }
 
-            public override string ToString() => this.Descriptor.Id;
+                var builder = StringBuilderPool.Borrow();
+                foreach (var analyzer in Analyzers.Where(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)))
+                {
+                    _ = builder.Append($"|{(builder.Length == 0 ? " Code     " : "          ")}| ")
+                               .AppendLine($"[{analyzer.GetType().Name}]({CodeFile.Find(analyzer.GetType()).Uri})");
+                }
+
+                var text = builder.Return();
+                return stub.Replace("| Code     | [<TYPENAME>](<URL>)\r\n", text)
+                           .Replace("| Code     | [<TYPENAME>](<URL>)\n", text);
+            }
         }
 
         public class MarkdownFile
