@@ -164,15 +164,12 @@ namespace IDisposableAnalyzers.Test
                 var length = 0;
                 while (startIndex + length < doc.Length)
                 {
-                    if (doc[startIndex + length] == '\n')
+                    if (doc[startIndex + length] == '\n' &&
+                        doc.TryElementAt(startIndex + length + 1, out var c) &&
+                        c != '|')
                     {
                         length++;
-
-                        if (doc.TryElementAt(startIndex + length, out var c) &&
-                            c != '|')
-                        {
-                            return length;
-                        }
+                        return length;
                     }
                     else
                     {
