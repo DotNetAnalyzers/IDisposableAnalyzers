@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     public partial class ValidCode<T>
     {
         [TestCase("this.stream == null")]
-        //[TestCase("this.stream == null && file != null")]
+        // [TestCase("this.stream == null && file != null")]
         [TestCase("this.stream is null")]
         [TestCase("ReferenceEquals(this.stream, null)")]
         [TestCase("Equals(this.stream, null)")]
