@@ -189,13 +189,6 @@ namespace IDisposableAnalyzers.Test
             }
         }
 
-        private static string GetSection(string doc, string startToken, string endToken)
-        {
-            var start = doc.IndexOf(startToken, StringComparison.Ordinal);
-            var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
-            return doc.Substring(start, end - start);
-        }
-
         [Conditional("DEBUG")]
         private static void DumpIfDebug(string text)
         {
