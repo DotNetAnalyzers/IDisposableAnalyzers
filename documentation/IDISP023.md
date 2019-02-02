@@ -1,34 +1,14 @@
 # IDISP023
 ## Don't use reference types in finalizer context.
 
-<!-- start generated table -->
-<table>
-  <tr>
-    <td>CheckId</td>
-    <td>IDISP023</td>
-  </tr>
-  <tr>
-    <td>Severity</td>
-    <td>Warning</td>
-  </tr>
-  <tr>
-    <td>Enabled</td>
-    <td>True</td>
-  </tr>
-  <tr>
-    <td>Category</td>
-    <td>IDisposableAnalyzers.Correctness</td>
-  </tr>
-  <tr>
-    <td>Code</td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs">DisposeMethodAnalyzer</a></td>
-  </tr>
-  <tr>
-    <td></td>
-    <td><a href="https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs">FinalizerAnalyzer</a></td>
-  </tr>
-</table>
-<!-- end generated table -->
+| Topic | Value
+| -- | -- |
+| CheckId | IDISP023
+| Severity | Warning
+| Enabled | True
+| Category | IDisposableAnalyzers.Correctness
+| Code | [DisposeMethodAnalyzer](../IDisposableAnalyzers/Analyzers/DisposeMethodAnalyzer.cs)
+| | [FinalizerAnalyzer](../IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs)
 
 ## Description
 
