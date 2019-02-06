@@ -8,6 +8,6 @@ Frequency=3410073 Hz, Resolution=293.2489 ns, Timer=TSC
 
 
 ```
-|                Method |     Mean |    Error |   StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
-|---------------------- |---------:|---------:|---------:|------------:|------------:|------------:|--------------------:|
-| RunOnValidCodeProject | 966.5 us | 23.06 us | 57.42 us |           - |           - |           - |               32 KB |
+|                Method |     Mean |     Error |    StdDev | Gen 0/1k Op | Gen 1/1k Op | Gen 2/1k Op | Allocated Memory/Op |
+|---------------------- |---------:|----------:|----------:|------------:|------------:|------------:|--------------------:|
+| RunOnValidCodeProject | 4.052 us | 0.0908 us | 0.1706 us |           - |           - |           - |                   - |

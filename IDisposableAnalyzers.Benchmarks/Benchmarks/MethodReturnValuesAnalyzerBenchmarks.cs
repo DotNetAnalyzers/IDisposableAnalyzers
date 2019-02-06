@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class MethodReturnValuesAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.MethodReturnValuesAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.MethodReturnValuesAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void RunOnIDisposableAnalyzers()
+        public void RunOnValidCodeProject()
         {
             Benchmark.Run();
         }

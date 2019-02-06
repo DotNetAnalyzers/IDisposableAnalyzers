@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Benchmarks
                                                                                                     .ToArray();
 
         private static IReadOnlyList<Gu.Roslyn.Asserts.Benchmark> AllBenchmarks { get; } = AllAnalyzers
-            .Select(x => Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, x))
+            .Select(x => Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, x))
             .ToArray();
 
         [OneTimeSetUp]

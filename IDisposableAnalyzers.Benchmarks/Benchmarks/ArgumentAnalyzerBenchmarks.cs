@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     public class ArgumentAnalyzerBenchmarks
     {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDisposableAnalyzers.ArgumentAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.ArgumentAnalyzer());
 
         [BenchmarkDotNet.Attributes.Benchmark]
-        public void RunOnIDisposableAnalyzers()
+        public void RunOnValidCodeProject()
         {
             Benchmark.Run();
         }

@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
     using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using Gu.Roslyn.Asserts;
@@ -29,8 +30,12 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                                                     .ToArray();
 
-        public static Solution AnalyzersProject { get; } = CodeFactory.CreateSolution(
-            ProjectFile.Find("IDisposableAnalyzers.csproj"),
+        public static string ProjectDirectory { get; } = ProjectFile.Find("IDisposableAnalyzers.Benchmarks.csproj").DirectoryName;
+
+        public static string BenchmarksDirectory { get; } = Path.Combine(ProjectDirectory, "Benchmarks");
+
+        public static Solution ValidCodeProject { get; } = CodeFactory.CreateSolution(
+            ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
             MetadataReferences);
     }

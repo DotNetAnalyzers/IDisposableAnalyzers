@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreCreated());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDISP004DontIgnoreCreated());
 
                 // Warmup
                 benchmark.Run();
@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.AnalyzersProject, new IDISP004DontIgnoreCreated());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDISP004DontIgnoreCreated());
                 //// Warmup
                 benchmark.Run();
                 var sw = Stopwatch.StartNew();
@@ -42,13 +42,6 @@ namespace IDisposableAnalyzers.Benchmarks
                 Console.WriteLine($"Took: {sw.Elapsed.TotalMilliseconds:F3} ms");
                 Console.WriteLine("Press any key to exit...");
                 Console.ReadKey();
-            }
-            else if (false)
-            {
-                foreach (var summary in RunSingle<AllBenchmarks>())
-                {
-                    CopyResult(summary);
-                }
             }
             else
             {
@@ -79,7 +72,8 @@ namespace IDisposableAnalyzers.Benchmarks
             var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
                                           .Single();
             var destinationFileName = Path.ChangeExtension(FindCsFile(), ".md");
-            Console.WriteLine($"Copy: {sourceFileName} -> {destinationFileName}");
+            Console.WriteLine($"Copy: {sourceFileName}");
+            Console.WriteLine($"   -> {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
 
             string FindCsFile()
