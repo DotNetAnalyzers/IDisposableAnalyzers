@@ -15,7 +15,6 @@ group Test
   nuget NUnit3TestAdapter
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   nuget Gu.Roslyn.Asserts
-  nuget System.Runtime.CompilerServices.Unsafe 4.5.1
   nuget Moq
   nuget Ninject
   nuget System.Reactive
@@ -25,10 +24,11 @@ group Test
 group NetCoreTest
   storage: none
   source http://www.nuget.org/api/v2/
-  nuget Microsoft.CodeAnalysis.CSharp.Workspaces
-  nuget System.Runtime.CompilerServices.Unsafe 4.5.1
-  nuget Gu.Roslyn.Asserts
+  nuget Microsoft.NET.Test.Sdk
   nuget NUnit
+  nuget NUnit3TestAdapter
+  nuget Microsoft.CodeAnalysis.CSharp.Workspaces
+  nuget Gu.Roslyn.Asserts
   nuget Microsoft.ApplicationInsights.AspNetCore
 
 group Build
@@ -47,7 +47,6 @@ group Benchmarks
   source http://www.nuget.org/api/v2/
   nuget BenchmarkDotNet.Diagnostics.Windows
   nuget Microsoft.CodeAnalysis.CSharp.Workspaces
-  nuget System.Runtime.CompilerServices.Unsafe 4.5.1
   nuget NUnit
   nuget Gu.Roslyn.Asserts
   
