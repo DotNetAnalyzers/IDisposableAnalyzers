@@ -289,9 +289,9 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument))
+                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument) &&
+                    semanticModel.TryGetSymbol(initializer, cancellationToken, out var chained))
                 {
-                    var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
                 }
             }
