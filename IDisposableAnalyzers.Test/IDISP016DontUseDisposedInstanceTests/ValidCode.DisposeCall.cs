@@ -249,16 +249,50 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.IO;
     using System.Collections.Generic;
+    using System.IO;
 
     sealed class C : IDisposable
     {
-        private readonly List<(IDisposable, IDisposable)> xs = new List<(IDisposable, IDisposable)>();
+        private readonly List<Tuple<FileStream, FileStream>> xs = new List<Tuple<FileStream, FileStream>>();
 
         public C(string file)
         {
             this.xs.Add(Tuple.Create(File.OpenRead(file), File.OpenRead(file)));
+        }
+
+        public void Dispose()
+        {
+            foreach (var tuple in this.xs)
+            {
+                tuple.Item1.Dispose();
+                tuple.Item2.Dispose();
+            }
+        }
+    }
+}".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
+            [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
+            public void ListOfValueTuple(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    sealed class C : IDisposable
+    {
+        private readonly List<(FileStream, FileStream)> xs = new List<(FileStream, FileStream)>();
+
+        public C(string file)
+        {
+            this.xs.Add((File.OpenRead(file), File.OpenRead(file)));
         }
 
         public void Dispose()
