@@ -277,11 +277,10 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration) &&
-                methodDeclaration.TryFindParameter(argument, out var parameter))
+            if (TryFindParameter(out var parameter) &&
+                method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
             {
-                var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
-                if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                if (AssignmentExecutionWalker.FirstWith(parameter, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
                 {
                     return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
                            FieldOrProperty.TryCreate(symbol, out member);
@@ -290,7 +289,7 @@ namespace IDisposableAnalyzers
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
                     ctor.Initializer is ConstructorInitializerSyntax initializer &&
                     initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Identifier.ValueText, out var chainedArgument))
+                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument))
                 {
                     var chained = semanticModel.GetSymbolSafe(ctor.Initializer, cancellationToken);
                     return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
@@ -298,6 +297,14 @@ namespace IDisposableAnalyzers
             }
 
             return false;
+
+            // https://github.com/GuOrg/Gu.Roslyn.Extensions/issues/40
+            bool TryFindParameter(out IParameterSymbol result)
+            {
+                return method.TryFindParameter(argument, out result) ||
+                       (method.Parameters.TryLast(out result) &&
+                        result.IsParams);
+            }
         }
     }
 }

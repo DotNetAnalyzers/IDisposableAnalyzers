@@ -78,10 +78,10 @@ namespace IDisposableAnalyzers
                 return this.IsMemberDisposed(overridden);
             }
 
-            foreach (var name in this.identifiers)
+            foreach (var identifier in this.identifiers)
             {
-                if (member.Name == name.Identifier.ValueText &&
-                    this.SemanticModel.TryGetSymbol(name, this.CancellationToken, out ISymbol candidate) &&
+                if (member.Name == identifier.Identifier.ValueText &&
+                    this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out ISymbol candidate) &&
                      member.Equals(candidate))
                 {
                     return Result.AssumeYes;
