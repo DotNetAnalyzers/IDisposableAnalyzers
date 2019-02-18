@@ -240,6 +240,39 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
+            [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
+            public void ListOfTuple(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    sealed class C : IDisposable
+    {
+        private readonly List<(IDisposable, IDisposable)> xs = new List<(IDisposable, IDisposable)>();
+
+        public C(string file)
+        {
+            this.xs.Add(Tuple.Create(File.OpenRead(file), File.OpenRead(file)));
+        }
+
+        public void Dispose()
+        {
+            foreach (var tuple in this.xs)
+            {
+                tuple.Item1.Dispose();
+                tuple.Item2.Dispose();
+            }
+        }
+    }
+}".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
