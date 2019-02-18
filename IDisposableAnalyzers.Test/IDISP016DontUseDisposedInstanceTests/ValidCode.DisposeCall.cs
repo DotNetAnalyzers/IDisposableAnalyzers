@@ -249,6 +249,7 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
 
     sealed class C : IDisposable
