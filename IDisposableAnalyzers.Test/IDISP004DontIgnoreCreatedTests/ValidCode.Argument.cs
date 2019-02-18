@@ -474,5 +474,65 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [Test]
+        public void ValueTupleOfLocals()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class ValueTupleOfFileStreams : IDisposable
+    {
+        private readonly (FileStream, FileStream) tuple;
+
+        public ValueTupleOfFileStreams(string file1, string file2)
+        {
+            var stream1 = File.OpenRead(file1);
+            var stream2 = File.OpenRead(file2);
+            this.tuple = (stream1, stream2);
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ValueTuple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class ValueTupleOfFileStreams : IDisposable
+    {
+        private readonly (FileStream, FileStream) tuple;
+
+        public ValueTupleOfFileStreams(string file1, string file2)
+        {
+            this.tuple = (File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
