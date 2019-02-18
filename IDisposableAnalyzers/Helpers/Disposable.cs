@@ -394,30 +394,32 @@ namespace IDisposableAnalyzers
             {
                 if (argument.Parent is ArgumentListSyntax argumentList &&
                     argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
-                    method.Name == "Add" &&
-                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method))
                 {
-                    if (method.ContainingType == KnownSymbol.CompositeDisposable)
+                    if (method == KnownSymbol.CompositeDisposable.Add)
                     {
                         return false;
                     }
 
-                    if (!method.ContainingType.TypeArguments.Any(x => x.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation)))
+                    if (method.Name == "Add" &&
+                        method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
                     {
-                        if (MemberPath.TryFindRoot(invocation, out var identifierName) &&
-                            semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
-                            FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
-                            argument.TryFirstAncestor(out TypeDeclarationSyntax typeDeclaration) &&
-                            DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken) != Result.No)
+                        if (!method.ContainingType.TypeArguments.Any(x => x.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation)))
                         {
-                            return false;
+                            if (MemberPath.TryFindRoot(invocation, out var identifierName) &&
+                                semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
+                                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
+                                argument.TryFirstAncestor(out TypeDeclarationSyntax typeDeclaration) &&
+                                DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken) != Result.No)
+                            {
+                                return false;
+                            }
+
+                            return true;
                         }
 
-                        return true;
+                        return false;
                     }
-
-                    return false;
                 }
 
                 return IsArgumentDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo) &&
