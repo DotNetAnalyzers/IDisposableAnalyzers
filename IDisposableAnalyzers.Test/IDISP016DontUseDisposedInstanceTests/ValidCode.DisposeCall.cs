@@ -216,6 +216,30 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
+            [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
+            public void LocalTuple(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public C(string file)
+        {
+            var tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
+            tuple.Item1.Dispose();
+            tuple.Item2.Dispose();
+        }
+    }
+}".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }

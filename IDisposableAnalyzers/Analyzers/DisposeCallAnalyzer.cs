@@ -38,7 +38,10 @@ namespace IDisposableAnalyzers
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
-                else if (context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol local))
+
+                if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                    memberAccess.Expression is IdentifierNameSyntax &&
+                    context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol local))
                 {
                     if (IsUsedAfter(local, invocation, context, out var locations))
                     {
