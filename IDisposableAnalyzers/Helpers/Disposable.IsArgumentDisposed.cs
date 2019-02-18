@@ -34,14 +34,13 @@ namespace IDisposableAnalyzers
                 if (argumentList.Parent is ObjectCreationExpressionSyntax ||
                     argumentList.Parent is ConstructorInitializerSyntax)
                 {
-                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out var member, out var ctor) &&
-                        FieldOrProperty.TryCreate(member, out var fieldOrProperty))
+                    if (TryGetAssignedFieldOrProperty(argument, semanticModel, cancellationToken, out var fieldOrProperty, out var ctor))
                     {
                         var initializer = argument.FirstAncestorOrSelf<ConstructorInitializerSyntax>();
                         if (initializer != null)
                         {
                             if (semanticModel.GetDeclaredSymbolSafe(initializer.Parent, cancellationToken) is IMethodSymbol chainedCtor &&
-                                chainedCtor.ContainingType != member.ContainingType)
+                                chainedCtor.ContainingType != fieldOrProperty.ContainingType)
                             {
                                 if (DisposeMethod.TryFindFirst(chainedCtor.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
                                 {
@@ -242,14 +241,14 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member, out IMethodSymbol ctor)
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty member, out IMethodSymbol ctor)
         {
             if (TryGetConstructor(argument, semanticModel, cancellationToken, out ctor))
             {
                 return TryGetAssignedFieldOrProperty(argument, ctor, semanticModel, cancellationToken, out member);
             }
 
-            member = null;
+            member = default(FieldOrProperty);
             return false;
         }
 
@@ -270,9 +269,9 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol member)
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty member)
         {
-            member = null;
+            member = default(FieldOrProperty);
             if (method == null)
             {
                 return false;
@@ -284,12 +283,8 @@ namespace IDisposableAnalyzers
                 var parameterSymbol = semanticModel.GetDeclaredSymbolSafe(parameter, cancellationToken);
                 if (AssignmentExecutionWalker.FirstWith(parameterSymbol, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
                 {
-                    member = semanticModel.GetSymbolSafe(assignment.Left, cancellationToken);
-                    if (member is IFieldSymbol ||
-                        member is IPropertySymbol)
-                    {
-                        return true;
-                    }
+                    return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
+                           FieldOrProperty.TryCreate(symbol, out member);
                 }
 
                 if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
