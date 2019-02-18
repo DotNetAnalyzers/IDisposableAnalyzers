@@ -63,7 +63,7 @@ namespace IDisposableAnalyzers
                 return candidate.TryGetMethodName(out var name) &&
                         name == "Dispose" &&
                         candidate.ArgumentList is ArgumentListSyntax argumentList &&
-                        argumentList.Arguments.TrySingle(out var argument);
+                        argumentList.Arguments.TrySingle(out _);
             }
         }
 

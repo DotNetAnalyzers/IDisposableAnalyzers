@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (symbol is IParameterSymbol parameter &&
+            if (symbol is IParameterSymbol &&
                 disposable.TryFirstAncestor<ArrowExpressionClauseSyntax>(out _))
             {
                 assignedSymbol = null;

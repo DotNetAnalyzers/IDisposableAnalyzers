@@ -125,7 +125,7 @@ namespace IDisposableAnalyzers
                         argumentList.Arguments.Count == 1 &&
                         candidate.TryGetMethodName(out var name) &&
                         name == "SuppressFinalize" &&
-                        semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out var target))
+                        semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out _))
                     {
                         suppressCall = candidate;
                         return true;
