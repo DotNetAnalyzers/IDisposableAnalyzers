@@ -16,12 +16,16 @@ namespace IDisposableAnalyzers
                 if (argumentList.Parent is InvocationExpressionSyntax invocation &&
                      semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
                 {
-                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                    if (method.ReturnsVoid)
                     {
-                        return method.ReturnsVoid ||
-                               !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
-                            ? Result.No
-                            : Result.AssumeYes;
+                        return Result.No;
+                    }
+
+                    if (!method.TrySingleMethodDeclaration(cancellationToken, out _))
+                    {
+                        return IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                            ? Result.AssumeYes
+                            : Result.No;
                     }
 
                     if (method.TryFindParameter(argument, out var parameter))
@@ -300,6 +304,12 @@ namespace IDisposableAnalyzers
                 else if (method == KnownSymbol.Tuple.Create)
                 {
                     return method.ReturnType.TryFindProperty(parameter.Name.ToFirstCharUpper(), out var field) &&
+                           FieldOrProperty.TryCreate(field, out member);
+                }
+                else if (method.MethodKind == MethodKind.Constructor &&
+                         method.ContainingType.MetadataName.StartsWith("Tuple`"))
+                {
+                    return method.ContainingType.TryFindProperty(parameter.Name.ToFirstCharUpper(), out var field) &&
                            FieldOrProperty.TryCreate(field, out member);
                 }
             }
