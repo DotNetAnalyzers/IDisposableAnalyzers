@@ -275,9 +275,8 @@ namespace RoslynSandbox
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
 
-            [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
-            [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-            public void ListOfValueTuple(string expression)
+            [Test]
+            public void ListOfValueTuple()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -304,7 +303,7 @@ namespace RoslynSandbox
             }
         }
     }
-}".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
+}";
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
