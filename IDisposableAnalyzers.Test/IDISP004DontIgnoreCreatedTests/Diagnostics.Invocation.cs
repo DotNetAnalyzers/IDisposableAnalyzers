@@ -319,6 +319,54 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, testCode);
             }
+
+            [TestCase("Pair.Create(↓File.OpenRead(file1), ↓File.OpenRead(file2))")]
+            [TestCase("new Pair<FileStream>(↓File.OpenRead(file1), ↓File.OpenRead(file2))")]
+            public void Pair(string expression)
+            {
+                var staticPairCode = @"
+namespace RoslynSandbox
+{
+    public static class Pair
+    {
+        public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
+    }
+}";
+
+                var genericPairCode = @"
+namespace RoslynSandbox
+{
+    public class Pair<T>
+    {
+        public Pair(T item1, T item2)
+        {
+            this.Item1 = item1;
+            this.Item2 = item2;
+        }
+
+        public T Item1 { get; }
+
+        public T Item2 { get; }
+    }
+}";
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        public C(string file1, string file2)
+        {
+            var pair = Pair.Create(↓File.OpenRead(file1), ↓File.OpenRead(file2));
+        }
+    }
+}".AssertReplace("Pair.Create(↓File.OpenRead(file1), ↓File.OpenRead(file2))", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, genericPairCode, staticPairCode, testCode);
+            }
         }
     }
 }
