@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -115,7 +116,7 @@ namespace IDisposableAnalyzers
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
                 if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method)
+                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method))
                 {
                     if (method == KnownSymbol.CompositeDisposable.Add)
                     {
@@ -277,22 +278,29 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (TryFindParameter(out var parameter) &&
-                method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
+            if (TryFindParameter(out var parameter))
             {
-                if (AssignmentExecutionWalker.FirstWith(parameter, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
-                           FieldOrProperty.TryCreate(symbol, out member);
-                }
+                    if (AssignmentExecutionWalker.FirstWith(parameter, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                    {
+                        return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
+                               FieldOrProperty.TryCreate(symbol, out member);
+                    }
 
-                if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
-                    ctor.Initializer is ConstructorInitializerSyntax initializer &&
-                    initializer.ArgumentList != null &&
-                    initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument) &&
-                    semanticModel.TryGetSymbol(initializer, cancellationToken, out var chained))
+                    if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
+                        ctor.Initializer is ConstructorInitializerSyntax initializer &&
+                        initializer.ArgumentList != null &&
+                        initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument) &&
+                        semanticModel.TryGetSymbol(initializer, cancellationToken, out var chained))
+                    {
+                        return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
+                    }
+                }
+                else if (method == KnownSymbol.Tuple.Create)
                 {
-                    return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
+                    return method.ReturnType.TryFindProperty(parameter.Name.ToFirstCharUpper(), out var field) &&
+                           FieldOrProperty.TryCreate(field, out member);
                 }
             }
 

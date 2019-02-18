@@ -484,11 +484,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class ValueTupleOfFileStreams : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly (FileStream, FileStream) tuple;
 
-        public ValueTupleOfFileStreams(string file1, string file2)
+        public C(string file1, string file2)
         {
             var stream1 = File.OpenRead(file1);
             var stream2 = File.OpenRead(file2);
@@ -515,11 +515,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class ValueTupleOfFileStreams : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly (FileStream, FileStream) tuple;
 
-        public ValueTupleOfFileStreams(string file1, string file2)
+        public C(string file1, string file2)
         {
             this.tuple = (File.OpenRead(file1), File.OpenRead(file2));
         }
@@ -531,6 +531,66 @@ namespace RoslynSandbox
         }
     }
 }";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void TupleOfLocals()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Tuple<FileStream, FileStream> tuple;
+
+        public C(string file1, string file2)
+        {
+            var stream1 = File.OpenRead(file1);
+            var stream2 = File.OpenRead(file2);
+            this.tuple = Tuple.Create(stream1, stream2);
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void Tuple(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Tuple<FileStream, FileStream> tuple;
+
+        public C(string file1, string file2)
+        {
+            this.tuple = Tuple.Create(File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }

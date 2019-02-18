@@ -9,6 +9,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType Object = Create("System.Object", "object");
         internal static readonly QualifiedType Boolean = Create("System.Boolean", "bool");
         internal static readonly QualifiedType Func = Create("System.Func");
+        internal static readonly TupleType Tuple = new TupleType();
         internal static readonly DisposableType IDisposable = new DisposableType();
         internal static readonly GCType GC = new GCType();
         internal static readonly QualifiedType IDictionary = Create("System.Collections.IDictionary");
