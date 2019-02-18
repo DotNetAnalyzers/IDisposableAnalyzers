@@ -269,8 +269,10 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
         }
 
-        [Test]
-        public void ReturningNewAssigningAndDisposingParams()
+        [TestCase("new Foo()")]
+        [TestCase("new Foo(new Disposable())")]
+        [TestCase("new Foo(new Disposable(), new Disposable())")]
+        public void ReturningNewAssigningAndDisposingParams(string objectCreation)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -305,7 +307,8 @@ namespace RoslynSandbox
             return new Foo(new Disposable(), new Disposable());
         }
     }
-}";
+}".AssertReplace("new Foo(new Disposable(), new Disposable())", objectCreation);
+
             AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
         }
 
