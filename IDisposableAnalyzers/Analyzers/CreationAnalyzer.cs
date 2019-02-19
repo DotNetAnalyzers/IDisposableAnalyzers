@@ -26,8 +26,7 @@ namespace IDisposableAnalyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is ExpressionSyntax expression &&
-                ShouldCheck(expression, context))
+                ShouldCheck(context, out var expression))
             {
                 if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                     context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
@@ -47,18 +46,25 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool ShouldCheck(ExpressionSyntax expression, SyntaxNodeAnalysisContext context)
+        private static bool ShouldCheck(SyntaxNodeAnalysisContext context, out ExpressionSyntax expression)
         {
-            switch (expression.Kind())
+            if (context.Node is ExpressionSyntax candidate)
             {
-                case SyntaxKind.InvocationExpression:
-                case SyntaxKind.ObjectCreationExpression:
-                    return true;
-                case SyntaxKind.SimpleMemberAccessExpression:
-                    return context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out IPropertySymbol property) &&
-                           Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation);
+                switch (candidate.Kind())
+                {
+                    case SyntaxKind.InvocationExpression:
+                    case SyntaxKind.ObjectCreationExpression:
+                        expression = candidate;
+                        return true;
+                    case SyntaxKind.SimpleMemberAccessExpression when candidate is MemberAccessExpressionSyntax memberAccess &&
+                                                                      context.SemanticModel.TryGetSymbol(memberAccess.Expression, context.CancellationToken, out IPropertySymbol property) &&
+                                                                      Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation):
+                        expression = memberAccess.Expression;
+                        return true;
+                }
             }
 
+            expression = null;
             return false;
         }
 

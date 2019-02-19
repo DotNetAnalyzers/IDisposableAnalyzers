@@ -149,8 +149,30 @@ namespace RoslynSandbox
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
+            [TestCase("Stream.Length")]
+            [TestCase("this.Stream.Length")]
+            public void PropertyCreatingDisposableExpressionBody(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public Stream Stream => File.OpenRead(string.Empty);
+
+        public long Bar()
+        {
+            return ↓Stream.Length;
+        }
+    }
+}".AssertReplace("Stream.Length", expression);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
             [Test]
-            public void PropertyCreatingDisposableExpressionBody()
+            public void StaticPropertyCreatingDisposableExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -298,7 +320,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -318,7 +340,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, testCode);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("Pair.Create(↓File.OpenRead(file1), ↓File.OpenRead(file2))")]
