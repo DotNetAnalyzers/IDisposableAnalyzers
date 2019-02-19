@@ -7,7 +7,7 @@
 | Severity | Hidden
 | Enabled  | True
 | Category | SemanticModelCacheAnalyzer
-| Code     | [SemanticModelCacheAnalyzer]([SemanticModelCacheAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/SemanticModelCacheAnalyzer.cs))
+| Code     | [SemanticModelCacheAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/SemanticModelCacheAnalyzer.cs)
 
 ## Description
 

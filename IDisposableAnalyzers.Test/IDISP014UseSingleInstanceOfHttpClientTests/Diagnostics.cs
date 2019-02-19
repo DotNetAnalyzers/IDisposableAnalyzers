@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
 
     public class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP014");
 
         [Test]

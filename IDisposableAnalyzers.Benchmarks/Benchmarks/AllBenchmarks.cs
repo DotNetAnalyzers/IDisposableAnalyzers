@@ -17,15 +17,13 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark MethodReturnValuesAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.MethodReturnValuesAnalyzer());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.ObjectCreationAnalyzer());
+        private static readonly Gu.Roslyn.Asserts.Benchmark ObjectCreationAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.CreationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark ReturnValueAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.ReturnValueAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark UsingStatementAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.UsingStatementAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.IDISP001DisposeCreated());
-
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP004DontIgnoreCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.IDISP004DontIgnoreCreated());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark SemanticModelCacheAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.SemanticModelCacheAnalyzer());
 
@@ -93,12 +91,6 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         public void IDISP001DisposeCreated()
         {
             IDISP001DisposeCreatedBenchmark.Run();
-        }
-
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void IDISP004DontIgnoreCreated()
-        {
-            IDISP004DontIgnoreCreatedBenchmark.Run();
         }
 
         [BenchmarkDotNet.Attributes.Benchmark]

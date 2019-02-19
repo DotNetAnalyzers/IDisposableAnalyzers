@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     {
         public class ObjectCreation
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new ObjectCreationAnalyzer();
+            private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
 
             private const string DisposableCode = @"

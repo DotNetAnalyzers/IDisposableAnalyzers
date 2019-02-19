@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers.Benchmarks
         {
             if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDISP004DontIgnoreCreated());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new CreationAnalyzer());
 
                 // Warmup
                 benchmark.Run();
@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else if (false)
             {
-                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDISP004DontIgnoreCreated());
+                var benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new CreationAnalyzer());
                 //// Warmup
                 benchmark.Run();
                 var sw = Stopwatch.StartNew();

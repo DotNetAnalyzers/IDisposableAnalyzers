@@ -548,6 +548,5 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
         }
-
     }
 }

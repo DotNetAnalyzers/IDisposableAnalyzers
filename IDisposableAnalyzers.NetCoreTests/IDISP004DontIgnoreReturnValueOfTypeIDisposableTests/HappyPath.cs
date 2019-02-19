@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeI
     using NUnit.Framework;
 
     [TestFixture(typeof(IDISP004DontIgnoreCreated))]
-    [TestFixture(typeof(ObjectCreationAnalyzer))]
+    [TestFixture(typeof(CreationAnalyzer))]
     internal partial class HappyPath<T>
         where T : DiagnosticAnalyzer, new()
     {

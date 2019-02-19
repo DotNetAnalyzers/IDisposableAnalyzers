@@ -5,12 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(IDISP004DontIgnoreCreated))]
-    [TestFixture(typeof(ObjectCreationAnalyzer))]
-    internal partial class ValidCode<T>
-        where T : DiagnosticAnalyzer, new()
+    internal partial class ValidCode
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new T();
+        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         private const string DisposableCode = @"
 namespace RoslynSandbox
