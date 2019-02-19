@@ -7,7 +7,7 @@
 | Severity | Warning
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code     | [FinalizerAnalyzer]([FinalizerAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs))
+| Code     | [FinalizerAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FinalizerAnalyzer.cs)
 
 ## Description
 

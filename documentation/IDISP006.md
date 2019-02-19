@@ -7,7 +7,7 @@
 | Severity | Warning
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code     | [FieldAndPropertyDeclarationAnalyzer]([FieldAndPropertyDeclarationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FieldAndPropertyDeclarationAnalyzer.cs))
+| Code     | [FieldAndPropertyDeclarationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/FieldAndPropertyDeclarationAnalyzer.cs)
 
 ## Description
 

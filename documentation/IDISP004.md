@@ -7,8 +7,7 @@
 | Severity | Warning
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code     | [IDISP004DontIgnoreCreated](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP004DontIgnoreCreated.cs)
-|          | [ObjectCreationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ObjectCreationAnalyzer.cs)
+| Code     | [CreationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/CreationAnalyzer.cs)
 
 ## Description
 

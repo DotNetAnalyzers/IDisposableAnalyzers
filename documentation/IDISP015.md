@@ -7,7 +7,7 @@
 | Severity | Warning
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code     | [MethodReturnValuesAnalyzer]([MethodReturnValuesAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/MethodReturnValuesAnalyzer.cs))
+| Code     | [MethodReturnValuesAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/MethodReturnValuesAnalyzer.cs)
 
 ## Description
 

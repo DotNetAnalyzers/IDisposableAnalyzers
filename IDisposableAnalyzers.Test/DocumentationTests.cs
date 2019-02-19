@@ -273,11 +273,6 @@ Or put this at the top of the file to disable all instances.
     Justification = ""Reason..."")]
 ```
 <!-- end generated config severity -->";
-                if (Analyzers.TrySingle(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id), out var match))
-                {
-                    return stub.AssertReplace("<TYPENAME>", match.GetType().Name)
-                               .AssertReplace("<URL>", $"[{match.GetType().Name}]({CodeFile.Find(match.GetType()).Uri})");
-                }
 
                 var builder = StringBuilderPool.Borrow();
                 foreach (var analyzer in Analyzers.Where(x => x.SupportedDiagnostics.Any(d => d.Id == descriptor.Id)))

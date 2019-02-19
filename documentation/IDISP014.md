@@ -7,7 +7,7 @@
 | Severity | Warning
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
-| Code     | [ObjectCreationAnalyzer]([ObjectCreationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ObjectCreationAnalyzer.cs))
+| Code     | [CreationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/CreationAnalyzer.cs)
 
 ## Description
 
