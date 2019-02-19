@@ -3,8 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    // ReSharper disable once UnusedTypeParameter
-    internal partial class ValidCode<T>
+    internal partial class ValidCode
     {
         [Test]
         public void FileOpenRead()
