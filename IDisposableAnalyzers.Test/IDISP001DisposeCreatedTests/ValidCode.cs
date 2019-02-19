@@ -433,5 +433,121 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void Tuple(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Tuple<FileStream, FileStream> tuple;
+
+        public C(string file1, string file2)
+        {
+            this.tuple = Tuple.Create(File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void ValueTuple(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly (FileStream, FileStream) tuple;
+
+        public C(string file1, string file2)
+        {
+            this.tuple = (File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void Pair(string expression)
+        {
+            var staticPairCode = @"
+namespace RoslynSandbox
+{
+    public static class Pair
+    {
+        public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
+    }
+}";
+
+            var genericPairCode = @"
+namespace RoslynSandbox
+{
+    public class Pair<T>
+    {
+        public Pair(T item1, T item2)
+        {
+            this.Item1 = item1;
+            this.Item2 = item2;
+        }
+
+        public T Item1 { get; }
+
+        public T Item2 { get; }
+    }
+}";
+
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Pair<FileStream> pair;
+
+        public C(string file1, string file2)
+        {
+            this.pair = Pair.Create(File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.pair.Item1.Dispose();
+            this.pair.Item2.Dispose();
+        }
+    }
+}".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
+
+            AnalyzerAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
+        }
+
     }
 }
