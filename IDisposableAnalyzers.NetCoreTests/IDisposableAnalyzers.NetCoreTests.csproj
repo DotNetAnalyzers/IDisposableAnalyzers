@@ -1,18 +1,21 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <IsPackable>false</IsPackable>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.NetCoreTests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
   </ItemGroup>
+  
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

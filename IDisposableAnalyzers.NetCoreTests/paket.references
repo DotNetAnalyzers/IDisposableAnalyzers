@@ -1,7 +1,9 @@
 group NetCoreTest
+  Microsoft.NET.Test.Sdk
+  NUnit
+  NUnit3TestAdapter
   Microsoft.CodeAnalysis.CSharp.Workspaces
   Gu.Roslyn.Asserts
-  NUnit
   Microsoft.ApplicationInsights.AspNetCore
 
 group Analyzers

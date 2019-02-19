@@ -6,12 +6,9 @@ namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeI
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(IDISP004DontIgnoreCreated))]
-    [TestFixture(typeof(CreationAnalyzer))]
-    internal partial class HappyPath<T>
-        where T : DiagnosticAnalyzer, new()
+    public class ValidCode
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new T();
+        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         [Test]
         public void ILoggerFactoryAddApplicationInsights()
