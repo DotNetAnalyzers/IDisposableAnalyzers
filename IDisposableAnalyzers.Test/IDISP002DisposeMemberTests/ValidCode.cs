@@ -911,7 +911,6 @@ namespace ValidCode
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
-
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
         public void Tuple(string expression)
