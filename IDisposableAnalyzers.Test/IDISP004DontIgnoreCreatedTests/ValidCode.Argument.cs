@@ -565,6 +565,30 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCase("(File.OpenRead(file), new object())")]
+        [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
+        public void LocalValueTuple(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public C(string file)
+        {
+            var tuple = (File.OpenRead(file), 1);
+            tuple.Item1.Dispose();
+            (tuple.Item2 as IDisposable)?.Dispose();
+        }
+    }
+}".AssertReplace("(File.OpenRead(file), 1)", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         public void Tuple(string expression)
         {
@@ -593,5 +617,34 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+        [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void FieldValueTuple(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly (FileStream, FileStream) tuple;
+
+        public C(string file1, string file2)
+        {
+            this.tuple = (File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
     }
 }
