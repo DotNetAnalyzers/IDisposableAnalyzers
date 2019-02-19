@@ -590,7 +590,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void Tuple(string expression)
+        public void FieldTuple(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
