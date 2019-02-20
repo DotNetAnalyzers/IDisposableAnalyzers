@@ -10,6 +10,23 @@ namespace IDisposableAnalyzers
     {
         internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (node.Parent is EqualsValueClauseSyntax equalsValueClause)
+            {
+                if (equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                    variableDeclarator.Identifier.Text == "_")
+                {
+                    return true;
+                }
+
+                return false;
+            }
+
+            if (node.Parent is AssignmentExpressionSyntax assignmentExpression)
+            {
+                return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
+                       identifierName.Identifier.Text == "_";
+            }
+
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
                 node.Parent is UsingStatementSyntax ||
                 node.Parent is EqualsValueClauseSyntax ||

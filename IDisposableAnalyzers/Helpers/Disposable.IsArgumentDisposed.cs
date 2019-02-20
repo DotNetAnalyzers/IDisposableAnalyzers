@@ -85,8 +85,7 @@ namespace IDisposableAnalyzers
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
-                if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method))
+                if (semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
                 {
                     if (method == KnownSymbol.CompositeDisposable.Add)
                     {
