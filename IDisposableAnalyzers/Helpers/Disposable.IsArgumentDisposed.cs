@@ -81,112 +81,6 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
-        {
-            if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
-            {
-                if (symbol is IMethodSymbol method)
-                {
-                    if (method.ReturnsVoid)
-                    {
-                        return Result.No;
-                    }
-
-                    if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
-                    {
-                        return Result.Yes;
-                    }
-
-                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        if (method.ReturnType == KnownSymbol.Task)
-                        {
-                            return Result.No;
-                        }
-
-                        if (method.ReturnType == KnownSymbol.TaskOfT &&
-                            method.ReturnType is INamedTypeSymbol namedType &&
-                            namedType.TypeArguments.TrySingle(out var type))
-                        {
-                            return !IsAssignableFrom(type, semanticModel.Compilation)
-                                ? Result.No
-                                : Result.AssumeYes;
-                        }
-
-                        return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
-                            ? Result.No
-                            : Result.AssumeYes;
-                    }
-
-                    if (method.IsExtensionMethod &&
-                        method.ReducedFrom is IMethodSymbol reducedFrom &&
-                        reducedFrom.Parameters.TryFirst(out var parameter))
-                    {
-                        return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
-                    }
-                }
-                else if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
-                {
-                    return Result.No;
-                }
-            }
-
-            return Result.Unknown;
-        }
-
-        private static Result IsChainedDisposingInReturnValue(ConditionalAccessExpressionSyntax conditionalAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
-        {
-            if (semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out ISymbol symbol))
-            {
-                if (symbol is IMethodSymbol method)
-                {
-                    if (method.ReturnsVoid)
-                    {
-                        return Result.No;
-                    }
-
-                    if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
-                    {
-                        return Result.Yes;
-                    }
-
-                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                    {
-                        if (method.ReturnType == KnownSymbol.Task)
-                        {
-                            return Result.No;
-                        }
-
-                        if (method.ReturnType == KnownSymbol.TaskOfT &&
-                            method.ReturnType is INamedTypeSymbol namedType &&
-                            namedType.TypeArguments.TrySingle(out var type))
-                        {
-                            return !IsAssignableFrom(type, semanticModel.Compilation)
-                                ? Result.No
-                                : Result.AssumeYes;
-                        }
-
-                        return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
-                            ? Result.No
-                            : Result.AssumeYes;
-                    }
-
-                    if (method.IsExtensionMethod &&
-                        method.ReducedFrom is IMethodSymbol reducedFrom &&
-                        reducedFrom.Parameters.TryFirst(out var parameter))
-                    {
-                        return CheckReturnValues(parameter, conditionalAccess.Parent, semanticModel, cancellationToken, visited);
-                    }
-                }
-                else if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
-                {
-                    return Result.No;
-                }
-            }
-
-            return Result.Unknown;
-        }
-
         private static Result IsAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
@@ -312,6 +206,11 @@ namespace IDisposableAnalyzers
                 if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
                 {
                     return IsChainedDisposingInReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                }
+
+                if (returnValue is ConditionalAccessExpressionSyntax conditionalAccess)
+                {
+                    return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken, visited);
                 }
 
                 return Result.Unknown;
