@@ -149,6 +149,27 @@ namespace RoslynSandbox
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
+            [TestCase("this.Stream().ReadAsync(null, 0, 0)")]
+            [TestCase("Stream().ReadAsync(null, 0, 0)")]
+            public void MethodCreatingDisposableExpressionBodyAsync(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public Stream Stream() => File.OpenRead(string.Empty);
+
+        public async Task<int> M() => await ↓Stream().ReadAsync(null, 0, 0);
+    }
+}".AssertReplace("Stream().ReadAsync(null, 0, 0)", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
             [TestCase("Stream.Length")]
             [TestCase("this.Stream.Length")]
             public void PropertyCreatingDisposableExpressionBody(string expression)

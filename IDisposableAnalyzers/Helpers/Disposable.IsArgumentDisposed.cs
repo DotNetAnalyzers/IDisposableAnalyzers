@@ -99,15 +99,29 @@ namespace IDisposableAnalyzers
 
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
+                        if (method.ReturnType == KnownSymbol.Task)
+                        {
+                            return Result.No;
+                        }
+
+                        if (method.ReturnType == KnownSymbol.TaskOfT &&
+                            method.ReturnType is INamedTypeSymbol namedType &&
+                            namedType.TypeArguments.TrySingle(out var type))
+                        {
+                            return !IsAssignableFrom(type, semanticModel.Compilation)
+                                ? Result.No
+                                : Result.AssumeYes;
+                        }
+
                         return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
                             ? Result.No
                             : Result.AssumeYes;
                     }
 
                     if (method.IsExtensionMethod &&
-                        method.ReducedFrom is IMethodSymbol reducedFrom)
+                        method.ReducedFrom is IMethodSymbol reducedFrom &&
+                        reducedFrom.Parameters.TryFirst(out var parameter))
                     {
-                        var parameter = reducedFrom.Parameters[0];
                         return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
                     }
                 }
