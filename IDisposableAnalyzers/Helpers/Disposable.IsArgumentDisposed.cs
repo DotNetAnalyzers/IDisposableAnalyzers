@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static Result IsArgumentDisposedByReturnValue(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        internal static Result IsDisposedByReturnValue(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
@@ -81,41 +81,43 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
+        [Obsolete("Remove this or find a name that says what it does.")]
         private static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
-            var symbol = semanticModel.GetSymbolSafe(memberAccess, cancellationToken);
-            if (symbol is IMethodSymbol method)
+            if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
             {
-                if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
+                if (symbol is IMethodSymbol method)
                 {
-                    return Result.Yes;
-                }
+                    if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
+                    {
+                        return Result.Yes;
+                    }
 
-                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                    if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
+                    {
+                        return method.ReturnsVoid ||
+                               !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                            ? Result.No
+                            : Result.AssumeYes;
+                    }
+
+                    if (method.IsExtensionMethod &&
+                        method.ReducedFrom is IMethodSymbol reducedFrom)
+                    {
+                        var parameter = reducedFrom.Parameters[0];
+                        return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
+                    }
+                }
+                else if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                 {
-                    return method.ReturnsVoid ||
-                           !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
-                        ? Result.No
-                        : Result.AssumeYes;
+                    return Result.No;
                 }
-
-                if (method.IsExtensionMethod &&
-                    method.ReducedFrom is IMethodSymbol reducedFrom)
-                {
-                    var parameter = reducedFrom.Parameters[0];
-                    return CheckReturnValues(parameter, memberAccess.Parent, semanticModel, cancellationToken, visited);
-                }
-            }
-
-            if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
-            {
-                return Result.No;
             }
 
             return Result.Unknown;
         }
 
-        private static Result IsArgumentAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        private static Result IsAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (argument?.Parent is ArgumentListSyntax argumentList)
             {
@@ -144,7 +146,7 @@ namespace IDisposableAnalyzers
                                     if (nested.ArgumentList != null &&
                                         nested.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == parameter.Name, out var nestedArg))
                                     {
-                                        switch (IsArgumentAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
+                                        switch (IsAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
                                         {
                                             case Result.Unknown:
                                                 break;
@@ -221,7 +223,7 @@ namespace IDisposableAnalyzers
                 {
                     if (nestedObjectCreation.TryFindArgument(parameter, out var nestedArgument))
                     {
-                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                        return IsDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
 
                     return Result.No;
@@ -231,7 +233,7 @@ namespace IDisposableAnalyzers
                 {
                     if (nestedInvocation.TryFindArgument(parameter, out var nestedArgument))
                     {
-                        return IsArgumentDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
+                        return IsDisposedByReturnValue(nestedArgument, semanticModel, cancellationToken, visited);
                     }
 
                     return Result.No;

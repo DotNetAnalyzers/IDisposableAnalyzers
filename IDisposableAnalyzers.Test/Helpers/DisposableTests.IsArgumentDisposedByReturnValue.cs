@@ -37,7 +37,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
-                Assert.AreEqual(Result.AssumeYes, Disposable.IsArgumentDisposedByReturnValue(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(Result.AssumeYes, Disposable.IsDisposedByReturnValue(value, semanticModel, CancellationToken.None));
             }
 
             [Test]
@@ -68,7 +68,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
-                Assert.AreEqual(Result.No, Disposable.IsArgumentDisposedByReturnValue(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(Result.No, Disposable.IsDisposedByReturnValue(value, semanticModel, CancellationToken.None));
             }
         }
     }
