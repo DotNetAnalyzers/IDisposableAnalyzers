@@ -437,6 +437,11 @@ namespace IDisposableAnalyzers
                 return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
+            if (node.Parent is ConditionalAccessExpressionSyntax conditionalAccess)
+            {
+                return false;
+            }
+
             return false;
         }
     }

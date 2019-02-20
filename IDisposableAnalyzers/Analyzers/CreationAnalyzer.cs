@@ -21,6 +21,7 @@ namespace IDisposableAnalyzers
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression);
+            context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.ObjectCreationExpression, SyntaxKind.InvocationExpression, SyntaxKind.SimpleMemberAccessExpression, SyntaxKind.ConditionalAccessExpression);
         }
 
         private static void Handle(SyntaxNodeAnalysisContext context)
@@ -60,6 +61,11 @@ namespace IDisposableAnalyzers
                                                                       context.SemanticModel.TryGetSymbol(memberAccess.Expression, context.CancellationToken, out IPropertySymbol property) &&
                                                                       Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation):
                         expression = memberAccess.Expression;
+                        return true;
+                    case SyntaxKind.ConditionalAccessExpression when candidate is ConditionalAccessExpressionSyntax conditionalAccess &&
+                                                                 context.SemanticModel.TryGetSymbol(conditionalAccess.Expression, context.CancellationToken, out IPropertySymbol property) &&
+                                                                 Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation):
+                        expression = conditionalAccess.Expression;
                         return true;
                 }
             }

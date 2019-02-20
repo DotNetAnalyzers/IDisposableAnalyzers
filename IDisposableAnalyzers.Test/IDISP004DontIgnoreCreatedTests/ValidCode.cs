@@ -487,5 +487,52 @@ namespace RoslynSandbox
 }".AssertReplace("File.Create(fileName).Dispose()", statement);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
+
+        [TestCase("Stream.Dispose()")]
+        [TestCase("Stream?.Dispose()")]
+        [TestCase("this.Stream.Dispose()")]
+        [TestCase("this.Stream?.Dispose()")]
+        public void DisposingProperty(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public Stream Stream => File.OpenRead(string.Empty);
+
+        public void M()
+        {
+            this.Stream.Dispose();
+        }
+    }
+}".AssertReplace("this.Stream.Dispose()", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("Stream.Dispose()")]
+        [TestCase("Stream?.Dispose()")]
+        public void DisposingStaticProperty(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static Stream Stream => File.OpenRead(string.Empty);
+
+        public static void M()
+        {
+            Stream.Dispose();
+        }
+    }
+}".AssertReplace("Stream.Dispose()", expression);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }
