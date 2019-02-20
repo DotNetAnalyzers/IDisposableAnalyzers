@@ -4,7 +4,9 @@ namespace ValidCode
 
     public class WhenCreatingAndDisposing
     {
+#pragma warning disable IDISP012 // Property should not return created disposable.
         public Stream Stream => File.OpenRead(string.Empty);
+#pragma warning restore IDISP012 // Property should not return created disposable.
 
         public Stream GetStream() => File.OpenRead(string.Empty);
 
