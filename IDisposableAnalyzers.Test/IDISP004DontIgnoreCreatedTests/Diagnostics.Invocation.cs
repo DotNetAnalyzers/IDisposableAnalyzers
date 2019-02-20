@@ -186,6 +186,27 @@ namespace RoslynSandbox
         public long? M() => ↓this.Stream.Length;
     }
 }".AssertReplace("this.Stream.Length", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [TestCase("this.Stream.ReadAsync(null, 0, 0)")]
+            [TestCase("Stream.ReadAsync(null, 0, 0)")]
+            public void PropertyCreatingDisposableExpressionBodyAsync(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public Stream Stream => File.OpenRead(string.Empty);
+
+        public async Task<int> M() => await ↓Stream.ReadAsync(null, 0, 0);
+    }
+}".AssertReplace("Stream.ReadAsync(null, 0, 0)", expression);
+
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
