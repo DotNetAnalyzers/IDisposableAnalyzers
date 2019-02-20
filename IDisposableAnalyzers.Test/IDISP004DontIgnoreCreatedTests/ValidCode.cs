@@ -1,6 +1,7 @@
 #pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
 {
+    using System;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
@@ -488,11 +489,58 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
+        [TestCase("Stream().Dispose()")]
+        [TestCase("Stream()?.Dispose()")]
+        [TestCase("this.Stream().Dispose()")]
+        [TestCase("this.Stream()?.Dispose()")]
+        public void DisposingMethodReturnValue(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public Stream Stream() => File.OpenRead(string.Empty);
+
+        public void M()
+        {
+            this.Stream().Dispose();
+        }
+    }
+}".AssertReplace("this.Stream().Dispose()", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("Stream().Dispose()")]
+        [TestCase("Stream()?.Dispose()")]
+        public void DisposingStaticMethodReturnValue(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static Stream Stream() => File.OpenRead(string.Empty);
+
+        public static void M()
+        {
+            Stream().Dispose();
+        }
+    }
+}".AssertReplace("Stream().Dispose()", expression);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [TestCase("Stream.Dispose()")]
         [TestCase("Stream?.Dispose()")]
         [TestCase("this.Stream.Dispose()")]
         [TestCase("this.Stream?.Dispose()")]
-        public void DisposingProperty(string expression)
+        public void DisposingPropertyReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -515,7 +563,7 @@ namespace RoslynSandbox
 
         [TestCase("Stream.Dispose()")]
         [TestCase("Stream?.Dispose()")]
-        public void DisposingStaticProperty(string expression)
+        public void DisposingStaticPropertyReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox

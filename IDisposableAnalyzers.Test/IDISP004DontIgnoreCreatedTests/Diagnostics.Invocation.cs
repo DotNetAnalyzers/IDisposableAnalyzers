@@ -162,33 +162,27 @@ namespace RoslynSandbox
     {
         public Stream Stream => File.OpenRead(string.Empty);
 
-        public long Bar()
-        {
-            return ↓Stream.Length;
-        }
+        public long? M() => ↓this.Stream.Length;
     }
-}".AssertReplace("Stream.Length", expression);
+}".AssertReplace("this.Stream.Length", expression);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
-            [Test]
-            public void StaticPropertyCreatingDisposableExpressionBody()
+            [TestCase("Stream.Length")]
+            public void StaticPropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         public static Stream Stream => File.OpenRead(string.Empty);
 
-        public static long Bar()
-        {
-            return ↓Stream.Length;
-        }
+        public static long? M() => ↓Stream.Length;
     }
-}";
+}".AssertReplace("Stream.Length", expression);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 

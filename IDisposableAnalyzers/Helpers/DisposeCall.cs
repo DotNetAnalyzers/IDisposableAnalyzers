@@ -81,7 +81,6 @@ namespace IDisposableAnalyzers
                    name == "Dispose" &&
                    candidate.ArgumentList is ArgumentListSyntax argumentList &&
                    argumentList.Arguments.Count == 0 &&
-                   !MemberPath.IsEmpty(candidate) &&
                    semanticModel.TryGetSymbol(candidate, cancellationToken, out var method) &&
                    method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation);
         }

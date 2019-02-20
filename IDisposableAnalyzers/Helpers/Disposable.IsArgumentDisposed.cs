@@ -81,13 +81,17 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        [Obsolete("Remove this or find a name that says what it does.")]
-        private static Result IsArgumentDisposedByInvocationReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
             {
                 if (symbol is IMethodSymbol method)
                 {
+                    if (method.ReturnsVoid)
+                    {
+                        return Result.No;
+                    }
+
                     if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
                     {
                         return Result.Yes;
@@ -95,8 +99,7 @@ namespace IDisposableAnalyzers
 
                     if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
                     {
-                        return method.ReturnsVoid ||
-                               !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                        return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
                             ? Result.No
                             : Result.AssumeYes;
                     }
@@ -241,7 +244,7 @@ namespace IDisposableAnalyzers
 
                 if (returnValue is MemberAccessExpressionSyntax nestedMemberAccess)
                 {
-                    return IsArgumentDisposedByInvocationReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
+                    return IsChainedDisposingInReturnValue(nestedMemberAccess, semanticModel, cancellationToken, visited);
                 }
 
                 return Result.Unknown;

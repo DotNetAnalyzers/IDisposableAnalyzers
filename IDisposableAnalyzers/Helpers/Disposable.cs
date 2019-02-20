@@ -434,11 +434,17 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                return IsArgumentDisposedByInvocationReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is ConditionalAccessExpressionSyntax conditionalAccess)
             {
+                if (conditionalAccess.WhenNotNull is InvocationExpressionSyntax invocation &&
+                    DisposeCall.IsIDisposableDispose(invocation, semanticModel, cancellationToken))
+                {
+                    return false;
+                }
+
                 return false;
             }
 
