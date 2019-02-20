@@ -445,7 +445,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                return false;
+                return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
             return false;

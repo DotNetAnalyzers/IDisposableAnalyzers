@@ -150,7 +150,9 @@ namespace RoslynSandbox
             }
 
             [TestCase("this.Stream().ReadAsync(null, 0, 0)")]
+            [TestCase("this.Stream()?.ReadAsync(null, 0, 0)")]
             [TestCase("Stream().ReadAsync(null, 0, 0)")]
+            [TestCase("Stream()?.ReadAsync(null, 0, 0)")]
             public void MethodCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
@@ -171,7 +173,9 @@ namespace RoslynSandbox
             }
 
             [TestCase("Stream.Length")]
+            [TestCase("Stream?.Length")]
             [TestCase("this.Stream.Length")]
+            [TestCase("this.Stream?.Length")]
             public void PropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
@@ -191,7 +195,9 @@ namespace RoslynSandbox
             }
 
             [TestCase("this.Stream.ReadAsync(null, 0, 0)")]
+            [TestCase("this.Stream?.ReadAsync(null, 0, 0)")]
             [TestCase("Stream.ReadAsync(null, 0, 0)")]
+            [TestCase("Stream?.ReadAsync(null, 0, 0)")]
             public void PropertyCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
@@ -211,6 +217,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("Stream.Length")]
+            [TestCase("Stream?.Length")]
             public void StaticPropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
