@@ -453,5 +453,27 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
+
+        [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
+        [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName))")]
+        [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
+        [TestCase("new CompositeDisposable { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+        [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName)) { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+        public void ReturnedInCompositeDisposable(string expression)
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public class C
+    {
+        public static IDisposable M(string fileName) => new CompositeDisposable(File.OpenRead(fileName));
+    }
+}".AssertReplace("new CompositeDisposable(File.OpenRead(fileName))", expression);
+            AnalyzerAssert.Valid(Analyzer, code);
+        }
     }
 }
