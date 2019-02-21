@@ -36,6 +36,7 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
 
     public sealed class Foo
@@ -63,11 +64,12 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
 
     public sealed class C : IDisposable
     {
-        private readonly object value;
+        private readonly object disposable;
 
         public C(string fileName)
         {
