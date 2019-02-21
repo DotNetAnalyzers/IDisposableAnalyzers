@@ -99,6 +99,12 @@ namespace IDisposableAnalyzers
                 return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
+            if (node.Parent is InitializerExpressionSyntax initializer &&
+                initializer.Parent is ExpressionSyntax creation)
+            {
+                return IsIgnored(creation, semanticModel, cancellationToken);
+            }
+
             return false;
         }
 
@@ -161,7 +167,7 @@ namespace IDisposableAnalyzers
                     method.ReducedFrom is IMethodSymbol reducedFrom &&
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
-                    return CheckReturnValues(parameter, expression.Parent, semanticModel, cancellationToken, visited);
+                    return IsDisposedByReturnValue(parameter, expression.Parent, semanticModel, cancellationToken, visited);
                 }
             }
 

@@ -40,6 +40,7 @@ namespace RoslynSandbox
             [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
             [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+            [TestCase("new FileStream [] { File.OpenRead(fileName) }")]
             public void AssignedToField(string statement)
             {
                 var code = @"

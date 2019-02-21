@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers
 
                     if (method.TryFindParameter(argument, out var parameter))
                     {
-                        return CheckReturnValues(parameter, invocation, semanticModel, cancellationToken, visited);
+                        return IsDisposedByReturnValue(parameter, invocation, semanticModel, cancellationToken, visited);
                     }
 
                     return Result.Unknown;
@@ -81,62 +81,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        private static Result IsAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
-        {
-            if (argument?.Parent is ArgumentListSyntax argumentList)
-            {
-                if (semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
-                {
-                    if (method == KnownSymbol.CompositeDisposable.Add)
-                    {
-                        return Result.Yes;
-                    }
-
-                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out _))
-                    {
-                        return Result.Yes;
-                    }
-
-                    if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                        method.TryFindParameter(argument, out var parameter))
-                    {
-                        using (visited = visited.IncrementUsage())
-                        {
-                            using (var walker = InvocationWalker.Borrow(declaration))
-                            {
-                                foreach (var nested in walker)
-                                {
-                                    if (nested.TryFindArgument(parameter, out var nestedArg))
-                                    {
-                                        switch (IsAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
-                                        {
-                                            case Result.Unknown:
-                                                break;
-                                            case Result.Yes:
-                                                return Result.Yes;
-                                            case Result.AssumeYes:
-                                                return Result.AssumeYes;
-                                            case Result.No:
-                                                break;
-                                            case Result.AssumeNo:
-                                                break;
-                                            default:
-                                                throw new ArgumentOutOfRangeException();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return Result.No;
-                }
-            }
-
-            return Result.No;
-        }
-
-        private static Result CheckReturnValues(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static Result IsDisposedByReturnValue(IParameterSymbol parameter, SyntaxNode memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             var result = Result.No;
             using (var returnWalker = ReturnValueWalker.Borrow(memberAccess, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
@@ -213,6 +158,61 @@ namespace IDisposableAnalyzers
 
                 return Result.Unknown;
             }
+        }
+
+        private static Result IsAssignedToDisposable(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        {
+            if (argument?.Parent is ArgumentListSyntax argumentList)
+            {
+                if (semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
+                {
+                    if (method == KnownSymbol.CompositeDisposable.Add)
+                    {
+                        return Result.Yes;
+                    }
+
+                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out _))
+                    {
+                        return Result.Yes;
+                    }
+
+                    if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
+                        method.TryFindParameter(argument, out var parameter))
+                    {
+                        using (visited = visited.IncrementUsage())
+                        {
+                            using (var walker = InvocationWalker.Borrow(declaration))
+                            {
+                                foreach (var nested in walker)
+                                {
+                                    if (nested.TryFindArgument(parameter, out var nestedArg))
+                                    {
+                                        switch (IsAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
+                                        {
+                                            case Result.Unknown:
+                                                break;
+                                            case Result.Yes:
+                                                return Result.Yes;
+                                            case Result.AssumeYes:
+                                                return Result.AssumeYes;
+                                            case Result.No:
+                                                break;
+                                            case Result.AssumeNo:
+                                                break;
+                                            default:
+                                                throw new ArgumentOutOfRangeException();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    return Result.No;
+                }
+            }
+
+            return Result.No;
         }
 
         private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty member, out IMethodSymbol ctor)

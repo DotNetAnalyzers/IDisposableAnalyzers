@@ -22,22 +22,61 @@ namespace RoslynSandbox
     }
 }";
 
-        [Test]
-        public void AssigningLocal()
+        [TestCase("new Disposable()")]
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+        [TestCase("new List<Disposable> { new Disposable() }")]
+        [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
+        public void AssigningLocal(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
 {
     using System;
+    using System.IO;
 
     public sealed class Foo
     {
-        public Foo()
+        public Foo(string fileName)
         {
             var disposable = new Disposable();
         }
     }
-}";
+}".AssertReplace("new Disposable()", expression);
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [TestCase("new Disposable()")]
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+        [TestCase("new List<Disposable> { new Disposable() }")]
+        [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
+        public void AssigningField(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly object value;
+
+        public C(string fileName)
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose() => (this.disposable as IDisposable)?.Dispose();
+    }
+}".AssertReplace("new Disposable()", expression);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
