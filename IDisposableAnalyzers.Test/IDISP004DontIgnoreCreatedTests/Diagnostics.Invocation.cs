@@ -33,7 +33,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -45,7 +45,30 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FileOpenReadPassedIntoCtor()
+            public void AddingFileOpenReadToListOfObject()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public sealed class C
+    {
+        private readonly List<object> streams = new List<object>();
+
+        public C()
+        {
+            streams.Add(↓File.OpenRead(string.Empty));
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [Test]
+            public void FileOpenReadPassedIntoCtorOfNotDisposing()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -68,7 +91,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public Bar Meh()
         {
@@ -117,7 +140,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Bar()
         {
@@ -136,7 +159,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         public static Stream Stream() => File.OpenRead(string.Empty);
 
@@ -243,7 +266,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         internal static string Bar()
         {
@@ -263,7 +286,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -296,7 +319,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         public void Bar()
         {
@@ -316,9 +339,9 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             ↓Bar(disposable);
         }
@@ -344,29 +367,6 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddingFileOpenReadToListOfObject()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-
-    public sealed class Foo
-    {
-        private List<object> streams = new List<object>();
-
-        public Foo()
-        {
-            streams.Add(↓File.OpenRead(string.Empty));
-        }
-    }
-}";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
-            }
-
-            [Test]
             public void DiscardFileOpenRead()
             {
                 var testCode = @"
@@ -375,9 +375,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
             _ = ↓File.OpenRead(string.Empty);
         }

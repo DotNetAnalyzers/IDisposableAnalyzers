@@ -24,7 +24,10 @@ namespace RoslynSandbox
 
         [TestCase("new Disposable()")]
         [TestCase("File.OpenRead(fileName)")]
+        [TestCase("(File.OpenRead(fileName), 1)")]
+        [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
         [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
         [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
         [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
         [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
@@ -52,7 +55,10 @@ namespace RoslynSandbox
 
         [TestCase("new Disposable()")]
         [TestCase("File.OpenRead(fileName)")]
+        [TestCase("(File.OpenRead(fileName), 1)")]
+        [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
         [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
         [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
         [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
         [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
@@ -67,7 +73,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public sealed class C : IDisposable
+    public sealed class C
     {
         private readonly object disposable;
 
@@ -75,8 +81,6 @@ namespace RoslynSandbox
         {
             this.disposable = new Disposable();
         }
-
-        public void Dispose() => (this.disposable as IDisposable)?.Dispose();
     }
 }".AssertReplace("new Disposable()", expression);
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
@@ -650,6 +654,37 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("Stream.Dispose()", expression);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void AddFileOpenReadToListOfObjectField()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly List<object> streams = new List<object>();
+
+        public C()
+        {
+            this.streams.Add(File.OpenRead(string.Empty));
+        }
+
+        public void Dispose()
+        {
+            foreach (var item in this.streams)
+            {
+                (item as IDisposable)?.Dispose();
+            }
+        }
+    }
+}";
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
     }
