@@ -9,8 +9,11 @@ namespace IDisposableAnalyzers.Test.Helpers
     {
         public class IsIgnored
         {
-            [Test]
-            public void AssignedToLocal()
+            [TestCase("File.OpenRead(fileName)")]
+            [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+            [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+            [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+            public void AssignedToLocal(string statement)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -18,25 +21,55 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal class C
+    public class C
     {
-        internal C(string fileName)
+        public static void M(string fileName)
         {
             var value = File.OpenRead(fileName);
         }
     }
-}";
+}".AssertReplace("File.OpenRead(fileName)", statement);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("_ = File.OpenRead(fileName)")]
             [TestCase("File.OpenRead(fileName)")]
+            [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+            [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+            [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+            public void AssignedToField(string statement)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly object value;
+
+        public static void M(string fileName)
+        {
+            this.value = File.OpenRead(fileName);
+        }
+    }
+}".AssertReplace("File.OpenRead(fileName)", statement);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("File.OpenRead(fileName)")]
+            [TestCase("_ = File.OpenRead(fileName)")]
             [TestCase("var _ = File.OpenRead(fileName)")]
+            [TestCase("M(File.OpenRead(fileName))")]
+            [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
             public void Discarded(string expression)
             {
                 var code = @"
@@ -45,14 +78,62 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal class C
+    public class C
     {
-        internal C(string fileName)
+        public static void M(string fileName)
         {
-            _ = File.OpenRead(fileName);
+            File.OpenRead(fileName);
+        }
+
+        public static void M(IDisposable) { }
+    }
+}".AssertReplace("File.OpenRead(fileName)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("new C(File.OpenRead(fileName))")]
+            [TestCase("_ = new C(File.OpenRead(fileName))")]
+            [TestCase("var _ = new C(File.OpenRead(fileName))")]
+            [TestCase("M(new C(File.OpenRead(fileName)))")]
+            [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
+            [TestCase("_ = new List<IDisposable> { File.OpenRead(fileName) }")]
+            [TestCase("new List<C> { new C(File.OpenRead(fileName)) }")]
+            [TestCase("_ = new List<C> { new C(File.OpenRead(fileName)) }")]
+            public void DiscardedWrapped(string expression)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public C(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public static void M(string fileName)
+        {
+            new C(File.OpenRead(fileName));
+        }
+
+        public static void M(IDisposable) { }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
         }
     }
-}".AssertReplace("_ = File.OpenRead(fileName)", expression);
+}".AssertReplace("new C(File.OpenRead(fileName))", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -75,8 +156,7 @@ namespace RoslynSandbox
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
@@ -159,8 +239,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("new CompositeDisposable(File.OpenRead(fileName))", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
@@ -289,7 +368,7 @@ namespace RoslynSandbox
 
         public static void M(string fileName)
         {
-            var foo = new C(File.OpenRead(fileName));
+            var c = new C(File.OpenRead(fileName));
         }
     }
 }";
@@ -320,7 +399,7 @@ namespace RoslynSandbox
 
         public static void M(string fileName)
         {
-            var foo = new C(File.OpenRead(fileName));
+            var c = new C(File.OpenRead(fileName));
         }
     }
 }";
@@ -355,7 +434,7 @@ namespace RoslynSandbox
 
         public static void M(string fileName)
         {
-            var foo = new C(File.OpenRead(fileName));
+            var c = new C(File.OpenRead(fileName));
         }
     }
 }";
@@ -387,7 +466,7 @@ namespace RoslynSandbox
 
         public static void M(string fileName)
         {
-            var foo = new C(File.OpenRead(fileName));
+            var c = new C(File.OpenRead(fileName));
         }
     }
 }";
@@ -437,32 +516,6 @@ namespace RoslynSandbox
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
-            }
-
-            [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
-            [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
-            public void AssignedToTuple(string expression)
-            {
-                var code = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public static void M(string fileName)
-        {
-             var tuple = Tuple.Create(File.OpenRead(fileName), 1);
-        }
-    }
-}".AssertReplace("Tuple.Create(File.OpenRead(fileName), 1)", expression);
-
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

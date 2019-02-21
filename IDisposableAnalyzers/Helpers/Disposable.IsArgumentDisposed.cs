@@ -106,8 +106,7 @@ namespace IDisposableAnalyzers
                             {
                                 foreach (var nested in walker)
                                 {
-                                    if (nested.ArgumentList != null &&
-                                        nested.ArgumentList.Arguments.TryFirst(x => x.Expression is IdentifierNameSyntax identifierName && identifierName.Identifier.ValueText == parameter.Name, out var nestedArg))
+                                    if (nested.TryFindArgument(parameter, out var nestedArg))
                                     {
                                         switch (IsAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
                                         {

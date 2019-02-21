@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -48,44 +47,34 @@ namespace IDisposableAnalyzers
             }
 
             if (node.Parent is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList)
+                argument.Parent is ArgumentListSyntax argumentList &&
+                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
             {
-                if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var method))
+                if (method == KnownSymbol.CompositeDisposable.Add)
                 {
-                    if (method == KnownSymbol.CompositeDisposable.Add)
-                    {
-                        return false;
-                    }
-
-                    if (method.Name == "Add" &&
-                        method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
-                    {
-                        if (!method.ContainingType.TypeArguments.Any(x => x.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation)))
-                        {
-                            if (MemberPath.TryFindRoot(invocation, out var identifierName) &&
-                                semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
-                                FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
-                                argument.TryFirstAncestor(out TypeDeclarationSyntax typeDeclaration) &&
-                                DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, semanticModel, cancellationToken) != Result.No)
-                            {
-                                return false;
-                            }
-
-                            return true;
-                        }
-
-                        return false;
-                    }
+                    return false;
                 }
 
-                if (IsDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    argumentList.Parent is ExpressionSyntax parentExpression)
+                if (method.Name == "Add" &&
+                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
                 {
-                    return IsIgnored(parentExpression, semanticModel, cancellationToken);
+                    return false;
                 }
 
-                return IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                switch (IsDisposedByReturnValue(argument, semanticModel, cancellationToken))
+                {
+                    case Result.Yes:
+                    case Result.AssumeYes:
+                        return argumentList.Parent is ExpressionSyntax parentExpression &&
+                               IsIgnored(parentExpression, semanticModel, cancellationToken);
+                }
+
+                if (IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                {
+                    return false;
+                }
+
+                return true;
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)

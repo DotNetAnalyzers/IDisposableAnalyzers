@@ -1,5 +1,5 @@
 # IDISP004
-## Don't ignore return value of type IDisposable.
+## Don't ignore created IDisposable.
 
 | Topic    | Value
 | :--      | :--
@@ -11,7 +11,7 @@
 
 ## Description
 
-Don't ignore return value of type IDisposable.
+Don't ignore created IDisposable.
 
 ## Motivation
 
@@ -56,21 +56,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP004 // Don't ignore return value of type IDisposable.
+#pragma warning disable IDISP004 // Don't ignore created IDisposable.
 Code violating the rule here
-#pragma warning restore IDISP004 // Don't ignore return value of type IDisposable.
+#pragma warning restore IDISP004 // Don't ignore created IDisposable.
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP004 // Don't ignore return value of type IDisposable.
+#pragma warning disable IDISP004 // Don't ignore created IDisposable.
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP004:Don't ignore return value of type IDisposable.", 
+    "IDISP004:Don't ignore created IDisposable.", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

@@ -16,7 +16,7 @@ Roslyn analyzers for IDisposable
 | [IDISP001](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP001.md)| Dispose created.
 | [IDISP002](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP002.md)| Dispose member.
 | [IDISP003](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP003.md)| Dispose previous before re-assigning.
-| [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore return value of type IDisposable.
+| [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore created IDisposable.
 | [IDISP005](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP005.md)| Return type should indicate that the value should be disposed.
 | [IDISP006](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP006.md)| Implement IDisposable.
 | [IDISP007](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP007.md)| Don't dispose injected.

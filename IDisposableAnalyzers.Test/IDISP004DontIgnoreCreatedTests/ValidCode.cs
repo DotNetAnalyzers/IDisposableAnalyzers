@@ -438,6 +438,36 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void AddingNewDisposableToListThatIsDisposed()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal sealed class ListOfObject : IDisposable
+    {
+        private readonly List<object> disposables = new List<object>();
+
+        public ListOfObject()
+        {
+            this.disposables.Add(new Disposable());
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in this.disposables)
+            {
+                (disposable as IDisposable)?.Dispose();
+            }
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
         public void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
         {
             var testCode = @"
