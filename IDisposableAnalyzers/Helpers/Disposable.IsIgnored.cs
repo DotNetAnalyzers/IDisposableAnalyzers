@@ -29,7 +29,6 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is AnonymousFunctionExpressionSyntax ||
                 node.Parent is UsingStatementSyntax ||
-                node.Parent is EqualsValueClauseSyntax ||
                 node.Parent is ReturnStatementSyntax ||
                 node.Parent is ArrowExpressionClauseSyntax)
             {
@@ -48,10 +47,10 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            if (node.Parent is ArgumentSyntax argument)
+            if (node.Parent is ArgumentSyntax argument &&
+                argument.Parent is ArgumentListSyntax argumentList)
             {
-                if (argument.Parent is ArgumentListSyntax argumentList &&
-                    argumentList.Parent is InvocationExpressionSyntax invocation &&
+                if (argumentList.Parent is InvocationExpressionSyntax invocation &&
                     semanticModel.TryGetSymbol(invocation, cancellationToken, out var method))
                 {
                     if (method == KnownSymbol.CompositeDisposable.Add)
@@ -80,10 +79,13 @@ namespace IDisposableAnalyzers
                     }
                 }
 
-                return IsDisposedByReturnValue(argument, semanticModel, cancellationToken)
-                           .IsEither(Result.No, Result.AssumeNo) &&
-                       IsAssignedToDisposable(argument, semanticModel, cancellationToken)
-                           .IsEither(Result.No, Result.AssumeNo);
+                if (IsDisposedByReturnValue(argument, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    argumentList.Parent is ExpressionSyntax parentExpression)
+                {
+                    return IsIgnored(parentExpression, semanticModel, cancellationToken);
+                }
+
+                return IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
