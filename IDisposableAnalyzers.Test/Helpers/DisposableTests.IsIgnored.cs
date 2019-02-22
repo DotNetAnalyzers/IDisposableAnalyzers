@@ -36,6 +36,36 @@ namespace RoslynSandbox
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
+            [Test]
+            public void AssignedToTempLocal(string statement)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public static void M(string fileName)
+        {
+            var value = M(File.OpenRead(fileName));
+        }
+
+        public static int M(IDisposable disposable)
+        {
+            var value = Tuple.Create(disposable, 1);
+            return 1;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
             [TestCase("File.OpenRead(fileName)")]
             [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
@@ -264,10 +294,7 @@ namespace RoslynSandbox
             this.disposable = disposable;
         }
 
-        public static C Create(string fileName)
-        {
-            return new C(File.OpenRead(fileName));
-        }
+        public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
@@ -299,10 +326,7 @@ namespace RoslynSandbox
         {
         }
 
-        public static C Create(string fileName)
-        {
-            return new C(File.OpenRead(fileName));
-        }
+        public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
@@ -397,7 +421,10 @@ namespace RoslynSandbox
         {
             this.disposable = disposable;
         }
+    }
 
+    public static class C2
+    {
         public static void M(string fileName)
         {
             var c = new C(File.OpenRead(fileName));
@@ -432,7 +459,10 @@ namespace RoslynSandbox
         public void Dispose()
         {
         }
+    }
 
+    public static class C2
+    {
         public static void M(string fileName)
         {
             var c = new C(File.OpenRead(fileName));

@@ -567,8 +567,8 @@ namespace RoslynSandbox
 
         [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
-        [TestCase("new Tuple<FileStream, int>(File.OpenRead(file), new object())")]
-        [TestCase("new Tuple<FileStream, int>(File.OpenRead(file), File.OpenRead(file))")]
+        [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]
+        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
         public void LocalTuple(string expression)
         {
             var testCode = @"
@@ -581,12 +581,12 @@ namespace RoslynSandbox
     {
         public C(string file)
         {
-            var tuple = Tuple.Create(File.OpenRead(file), 1);
+            var tuple = Tuple.Create(File.OpenRead(file), new object());
             tuple.Item1.Dispose();
             (tuple.Item2 as IDisposable)?.Dispose();
         }
     }
-}".AssertReplace("Tuple.Create(File.OpenRead(file), 1)", expression);
+}".AssertReplace("Tuple.Create(File.OpenRead(file), new object())", expression);
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
@@ -605,12 +605,12 @@ namespace RoslynSandbox
     {
         public C(string file)
         {
-            var tuple = (File.OpenRead(file), 1);
+            var tuple = (File.OpenRead(file), new object());
             tuple.Item1.Dispose();
             (tuple.Item2 as IDisposable)?.Dispose();
         }
     }
-}".AssertReplace("(File.OpenRead(file), 1)", expression);
+}".AssertReplace("(File.OpenRead(file), new object())", expression);
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }

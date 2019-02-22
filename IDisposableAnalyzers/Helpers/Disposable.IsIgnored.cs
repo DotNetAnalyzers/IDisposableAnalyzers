@@ -69,12 +69,13 @@ namespace IDisposableAnalyzers
                                IsIgnored(parentExpression, semanticModel, cancellationToken);
                 }
 
-                if (IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var fieldOrProperty) &&
+                    IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
                 {
-                    return false;
+                    return !semanticModel.IsAccessible(node.SpanStart, fieldOrProperty.Symbol);
                 }
 
-                return true;
+                return IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
