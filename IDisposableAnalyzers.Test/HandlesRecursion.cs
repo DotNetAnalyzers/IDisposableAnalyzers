@@ -30,28 +30,28 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Constructors : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Constructors()
+        public C()
             : this()
         {
         }
 
-        public Constructors(IDisposable disposable)
+        public C(IDisposable disposable)
             : this(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public Constructors(int i, IDisposable disposable)
+        public C(int i, IDisposable disposable)
             : this(disposable, i)
         {
             this.disposable = disposable;
         }
 
-        public Constructors(IDisposable disposable, int i)
+        public C(IDisposable disposable, int i)
             : this(i, disposable)
         {
             this.disposable = disposable;
@@ -60,6 +60,8 @@ namespace RoslynSandbox
         public void Dispose()
         {
         }
+
+        public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
             var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
@@ -74,17 +76,17 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Constructors : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Constructors(int i, IDisposable disposable)
+        public C(int i, IDisposable disposable)
             : this(disposable, i)
         {
             this.disposable = disposable;
         }
 
-        public Constructors(IDisposable disposable, int i)
+        public C(IDisposable disposable, int i)
             : this(i, disposable)
         {
             this.disposable = disposable;
