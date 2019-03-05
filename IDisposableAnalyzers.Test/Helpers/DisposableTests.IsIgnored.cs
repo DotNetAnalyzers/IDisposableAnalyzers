@@ -38,8 +38,12 @@ namespace RoslynSandbox
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void AssignedToTempLocal()
+            [TestCase("disposable")]
+            [TestCase("true ? disposable : (IDisposable)null")]
+            [TestCase("Tuple.Create(disposable, 1)")]
+            [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
+            [TestCase("new List<IDisposable> { disposable }")]
+            public void AssignedToTempLocal(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -60,7 +64,7 @@ namespace RoslynSandbox
             return 1;
         }
     }
-}";
+}".AssertReplace("Tuple.Create(disposable, 1)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
