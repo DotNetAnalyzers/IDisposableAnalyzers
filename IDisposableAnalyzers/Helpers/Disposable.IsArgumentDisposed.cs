@@ -30,7 +30,13 @@ namespace IDisposableAnalyzers
 
                     if (method.TryFindParameter(argument, out var parameter))
                     {
-                        return IsDisposedByReturnValue(parameter, invocation, semanticModel, cancellationToken, visited);
+                        using (visited = visited.IncrementUsage())
+                        {
+                            if (visited.Add(argument))
+                            {
+                                return IsDisposedByReturnValue(parameter, invocation, semanticModel, cancellationToken, visited);
+                            }
+                        }
                     }
 
                     return Result.Unknown;
@@ -90,11 +96,6 @@ namespace IDisposableAnalyzers
                 using (visited = visited.IncrementUsage())
 #pragma warning restore IDISP003
                 {
-                    if (!visited.Add(memberAccess))
-                    {
-                        return Result.Unknown;
-                    }
-
                     foreach (var returnValue in returnWalker)
                     {
                         switch (CheckReturnValue(returnValue))
@@ -185,7 +186,8 @@ namespace IDisposableAnalyzers
                             {
                                 foreach (var nested in walker)
                                 {
-                                    if (nested.TryFindArgument(parameter, out var nestedArg))
+                                    if (nested.TryFindArgument(parameter, out var nestedArg) &&
+                                        visited.Add(nestedArg))
                                     {
                                         switch (IsAssignedToDisposable(nestedArg, semanticModel, cancellationToken, visited))
                                         {

@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -46,46 +47,9 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            if (node.Parent is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList &&
-                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
+            if (node.Parent is ArgumentSyntax argument)
             {
-                if (method == KnownSymbol.CompositeDisposable.Add)
-                {
-                    return false;
-                }
-
-                if (method.Name == "Add" &&
-                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
-                {
-                    return false;
-                }
-
-                switch (IsDisposedByReturnValue(argument, semanticModel, cancellationToken))
-                {
-                    case Result.Yes:
-                    case Result.AssumeYes:
-#pragma warning disable IDISP003 // Dispose previous before re - assigning.
-                        using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
-                        {
-                            if (argumentList.Parent is ExpressionSyntax parentExpression &&
-                                visited.Add(parentExpression))
-                            {
-                                return IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
-                            }
-
-                            return false;
-                        }
-                }
-
-                if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var fieldOrProperty) &&
-                    IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
-                {
-                    return !semanticModel.IsAccessible(node.SpanStart, fieldOrProperty.Symbol);
-                }
-
-                return IsAssignedToDisposable(argument, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                return IsIgnored(argument, semanticModel, cancellationToken, visited);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
@@ -124,6 +88,65 @@ namespace IDisposableAnalyzers
 
                     return false;
                 }
+            }
+
+            return false;
+        }
+
+        internal static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            if (argument != null &&
+                argument.Parent is ArgumentListSyntax argumentList &&
+                argumentList.Parent is ExpressionSyntax parentExpression &&
+                semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol method))
+            {
+                if (method == KnownSymbol.CompositeDisposable.Add)
+                {
+                    return false;
+                }
+
+                if (method.Name == "Add" &&
+                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                {
+                    return false;
+                }
+
+                switch (IsDisposedByReturnValue(argument, semanticModel, cancellationToken))
+                {
+                    case Result.Yes:
+                    case Result.AssumeYes:
+#pragma warning disable IDISP003 // Dispose previous before re - assigning.
+                        using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                        {
+                            if (visited.Add(parentExpression))
+                            {
+                                return IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                            }
+
+                            return false;
+                        }
+                }
+
+                if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var fieldOrProperty) &&
+                    IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
+                {
+                    switch (parentExpression.Parent.Kind())
+                    {
+                        case SyntaxKind.ArrowExpressionClause:
+                        case SyntaxKind.ReturnStatement:
+                            return true;
+                        case SyntaxKind.EqualsValueClause:
+                            return parentExpression.Parent.Parent.IsKind(SyntaxKind.VariableDeclarator) &&
+                                   !semanticModel.IsAccessible(argument.SpanStart, fieldOrProperty.Symbol);
+                        case SyntaxKind.SimpleAssignmentExpression:
+                            return !semanticModel.IsAccessible(argument.SpanStart, fieldOrProperty.Symbol);
+                    }
+
+                    return false;
+                }
+
+                return IsAssignedToDisposable(argument, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
             }
 
             return false;
