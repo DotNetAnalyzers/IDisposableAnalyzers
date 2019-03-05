@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
         {
             if (node.Parent is EqualsValueClauseSyntax equalsValueClause)
             {
@@ -65,8 +65,18 @@ namespace IDisposableAnalyzers
                 {
                     case Result.Yes:
                     case Result.AssumeYes:
-                        return argumentList.Parent is ExpressionSyntax parentExpression &&
-                               IsIgnored(parentExpression, semanticModel, cancellationToken);
+#pragma warning disable IDISP003 // Dispose previous before re - assigning.
+                        using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                        {
+                            if (argumentList.Parent is ExpressionSyntax parentExpression &&
+                                visited.Add(parentExpression))
+                            {
+                                return IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                            }
+
+                            return false;
+                        }
                 }
 
                 if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var fieldOrProperty) &&
@@ -75,7 +85,7 @@ namespace IDisposableAnalyzers
                     return !semanticModel.IsAccessible(node.SpanStart, fieldOrProperty.Symbol);
                 }
 
-                return IsAssignedToDisposable(argument, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                return IsAssignedToDisposable(argument, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
@@ -86,7 +96,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is ConditionalAccessExpressionSyntax conditionalAccess)
@@ -97,13 +107,23 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
             }
 
             if (node.Parent is InitializerExpressionSyntax initializer &&
                 initializer.Parent is ExpressionSyntax creation)
             {
-                return IsIgnored(creation, semanticModel, cancellationToken);
+#pragma warning disable IDISP003 // Dispose previous before re - assigning.
+                using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                {
+                    if (visited.Add(creation))
+                    {
+                        return IsIgnored(creation, semanticModel, cancellationToken, visited);
+                    }
+
+                    return false;
+                }
             }
 
             return false;
