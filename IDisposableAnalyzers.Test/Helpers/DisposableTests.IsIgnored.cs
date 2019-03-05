@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         public class IsIgnored
         {
             [TestCase("File.OpenRead(fileName)")]
+            [TestCase("true ? File.OpenRead(fileName) : (FileStream)null")]
             [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
             [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
@@ -29,6 +30,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("File.OpenRead(fileName)", statement);
+
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -37,7 +39,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedToTempLocal(string statement)
+            public void AssignedToTempLocal()
             {
                 var code = @"
 namespace RoslynSandbox
