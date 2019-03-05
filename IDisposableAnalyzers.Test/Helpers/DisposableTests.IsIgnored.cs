@@ -60,7 +60,7 @@ namespace RoslynSandbox
 
         public static int M(IDisposable disposable)
         {
-            var value = Tuple.Create(disposable, 1);
+            var temp = Tuple.Create(disposable, 1);
             return 1;
         }
     }
