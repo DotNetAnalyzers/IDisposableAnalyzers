@@ -514,8 +514,9 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public void CompositeDisposableExtAddAndReturn()
+            [TestCase("disposable.AddAndReturn(File.OpenRead(fileName))")]
+            [TestCase("disposable.AddAndReturn(File.OpenRead(fileName)).ToString()")]
+            public void CompositeDisposableExtAddAndReturn(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -547,12 +548,12 @@ namespace RoslynSandbox
             this.disposable.Dispose();
         }
 
-        internal string AddAndReturnToString(string fileName)
+        internal object M(string fileName)
         {
-            return disposable.AddAndReturn(File.OpenRead(fileName)).ToString();
+            return disposable.AddAndReturn(File.OpenRead(fileName));
         }
     }
-}";
+}".AssertReplace("disposable.AddAndReturn(File.OpenRead(fileName))", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
