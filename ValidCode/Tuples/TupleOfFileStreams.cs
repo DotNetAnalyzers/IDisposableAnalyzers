@@ -1,4 +1,4 @@
-﻿namespace ValidCode.Tuples
+namespace ValidCode.Tuples
 {
     using System;
     using System.IO;
@@ -22,6 +22,13 @@
         public TupleOfFileStreams(int file)
         {
             this.tuple = new Tuple<FileStream, FileStream>(File.OpenRead(file.ToString()), File.OpenRead(file.ToString()));
+        }
+
+        public static void LocalTupleOfFileStreams(string file)
+        {
+            var tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
+            tuple.Item1.Dispose();
+            (tuple.Item2 as IDisposable)?.Dispose();
         }
 
         public void Dispose()
