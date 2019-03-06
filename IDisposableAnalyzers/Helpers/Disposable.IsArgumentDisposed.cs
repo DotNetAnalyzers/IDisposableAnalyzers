@@ -257,7 +257,7 @@ namespace IDisposableAnalyzers
             {
                 if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    if (AssignmentExecutionWalker.FirstWith(parameter, methodDeclaration.Body, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                    if (AssignmentExecutionWalker.FirstWith(parameter.OriginalDefinition, (SyntaxNode)methodDeclaration.Body ?? methodDeclaration?.ExpressionBody, Scope.Member, semanticModel, cancellationToken, out var assignment))
                     {
                         return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
                                FieldOrProperty.TryCreate(symbol, out member);
