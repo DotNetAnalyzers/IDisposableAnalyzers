@@ -386,9 +386,56 @@ namespace RoslynSandbox
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
+            [TestCase("Tuple.Create(↓File.OpenRead(file), 1)")]
+            [TestCase("Tuple.Create(↓File.OpenRead(file), ↓File.OpenRead(file))")]
+            [TestCase("new Tuple<FileStream, int>(↓File.OpenRead(file1), 1)")]
+            [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), ↓File.OpenRead(file1))")]
+            public void LocalTuple(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        public C(string file)
+        {
+            var tuple = Tuple.Create(↓File.OpenRead(file), 1);
+        }
+    }
+}".AssertReplace("Tuple.Create(↓File.OpenRead(file), 1)", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
+            [TestCase("(↓File.OpenRead(file), 1)")]
+            [TestCase("(↓File.OpenRead(file), ↓File.OpenRead(file))")]
+            [TestCase("(1, ↓File.OpenRead(file))")]
+            public void LocalValueTuple(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        public C(string file)
+        {
+            var tuple = (↓File.OpenRead(file), 1);
+        }
+    }
+}".AssertReplace("(↓File.OpenRead(file), 1)", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            }
+
             [TestCase("Pair.Create(↓File.OpenRead(file1), ↓File.OpenRead(file2))")]
             [TestCase("new Pair<FileStream>(↓File.OpenRead(file1), ↓File.OpenRead(file2))")]
-            public void Pair(string expression)
+            public void LocalPair(string expression)
             {
                 var staticPairCode = @"
 namespace RoslynSandbox
