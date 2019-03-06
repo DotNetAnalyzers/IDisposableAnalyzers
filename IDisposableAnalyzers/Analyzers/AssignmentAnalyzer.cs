@@ -124,34 +124,24 @@ namespace IDisposableAnalyzers
 
         private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var ifStatement = context.FirstAncestor<IfStatementSyntax>();
-            if (ifStatement == null ||
-                !ifStatement.Statement.Contains(context))
-            {
-                return false;
-            }
-
-            switch (ifStatement.Condition)
-            {
-                case IsPatternExpressionSyntax isPattern:
-                    if (IsSymbol(isPattern.Expression) &&
-                        isPattern.Pattern is ConstantPatternSyntax constantPattern &&
-                        constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
-                    {
-                        return !IsAssignedBefore(ifStatement);
-                    }
-
-                    break;
-                case ExpressionSyntax expression:
-                    return IsNullCheck(expression);
-            }
-
-            return IsNullChecked(symbol, ifStatement, semanticModel, cancellationToken);
+            return context.TryFirstAncestor(out IfStatementSyntax ifStatement) &&
+                   ifStatement.Statement.Contains(context) &&
+                   IsNullCheck(ifStatement.Condition);
 
             bool IsNullCheck(ExpressionSyntax candidate)
             {
-                switch (ifStatement.Condition)
+                switch (candidate)
                 {
+                    case IsPatternExpressionSyntax isPattern:
+                        if (IsSymbol(isPattern.Expression) &&
+                            isPattern.Pattern is ConstantPatternSyntax constantPattern &&
+                            constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
+                        {
+                            return !IsAssignedBefore(ifStatement);
+                        }
+
+                        break;
+
                     case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.EqualsExpression):
                         if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
                             IsSymbol(binary.Right))
