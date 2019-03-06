@@ -133,20 +133,6 @@ namespace IDisposableAnalyzers
 
             switch (ifStatement.Condition)
             {
-                case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.EqualsExpression):
-                    if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
-                        IsSymbol(binary.Right))
-                    {
-                        return !IsAssignedBefore(ifStatement);
-                    }
-
-                    if (IsSymbol(binary.Left) &&
-                        binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
-                    {
-                        return !IsAssignedBefore(ifStatement);
-                    }
-
-                    break;
                 case IsPatternExpressionSyntax isPattern:
                     if (IsSymbol(isPattern.Expression) &&
                         isPattern.Pattern is ConstantPatternSyntax constantPattern &&
@@ -156,37 +142,64 @@ namespace IDisposableAnalyzers
                     }
 
                     break;
-                case InvocationExpressionSyntax invocation:
-                    if (invocation.Expression is IdentifierNameSyntax identifierName &&
-                        invocation.ArgumentList != null &&
-                        invocation.ArgumentList.Arguments.Count == 2 &&
-                        (identifierName.Identifier.ValueText == nameof(ReferenceEquals) ||
-                         identifierName.Identifier.ValueText == nameof(Equals)))
-                    {
-                        if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                            invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
-                        {
-                            return !IsAssignedBefore(ifStatement);
-                        }
-                    }
-                    else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                             memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
-                             invocation.ArgumentList != null &&
-                             invocation.ArgumentList.Arguments.Count == 2 &&
-                             (memberIdentifier.Identifier.ValueText == nameof(ReferenceEquals) ||
-                              memberIdentifier.Identifier.ValueText == nameof(Equals)))
-                    {
-                        if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
-                            invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
-                        {
-                            return !IsAssignedBefore(ifStatement);
-                        }
-                    }
-
-                    break;
+                case ExpressionSyntax expression:
+                    return IsNullCheck(expression);
             }
 
             return IsNullChecked(symbol, ifStatement, semanticModel, cancellationToken);
+
+            bool IsNullCheck(ExpressionSyntax candidate)
+            {
+                switch (ifStatement.Condition)
+                {
+                    case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.EqualsExpression):
+                        if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
+                            IsSymbol(binary.Right))
+                        {
+                            return !IsAssignedBefore(ifStatement);
+                        }
+
+                        if (IsSymbol(binary.Left) &&
+                            binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
+                        {
+                            return !IsAssignedBefore(ifStatement);
+                        }
+
+                        break;
+                    case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.LogicalAndExpression):
+                        return IsNullCheck(binary.Left) || IsNullCheck(binary.Right);
+                    case InvocationExpressionSyntax invocation:
+                        if (invocation.Expression is IdentifierNameSyntax identifierName &&
+                            invocation.ArgumentList != null &&
+                            invocation.ArgumentList.Arguments.Count == 2 &&
+                            (identifierName.Identifier.ValueText == nameof(ReferenceEquals) ||
+                             identifierName.Identifier.ValueText == nameof(Equals)))
+                        {
+                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                                invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
+                            {
+                                return !IsAssignedBefore(ifStatement);
+                            }
+                        }
+                        else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
+                                 memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
+                                 invocation.ArgumentList != null &&
+                                 invocation.ArgumentList.Arguments.Count == 2 &&
+                                 (memberIdentifier.Identifier.ValueText == nameof(ReferenceEquals) ||
+                                  memberIdentifier.Identifier.ValueText == nameof(Equals)))
+                        {
+                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                                invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
+                            {
+                                return !IsAssignedBefore(ifStatement);
+                            }
+                        }
+
+                        break;
+                }
+
+                return false;
+            }
 
             bool IsSymbol(ExpressionSyntax expression)
             {
