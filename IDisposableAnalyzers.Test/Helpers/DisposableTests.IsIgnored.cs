@@ -38,6 +38,27 @@ namespace RoslynSandbox
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("string.Format(\"{0}\", File.OpenRead(fileName))")]
+            public void ArgumentPassedTo(string expression)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public static class C
+    {
+        public static object M() => string.Format(""{0}"", File.OpenRead(fileName));
+    }
+}".AssertReplace("string.Format(\"{0}\", File.OpenRead(fileName))", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
             [TestCase("disposable")]
             [TestCase("true ? disposable : (IDisposable)null")]
             [TestCase("Tuple.Create(disposable, 1)")]

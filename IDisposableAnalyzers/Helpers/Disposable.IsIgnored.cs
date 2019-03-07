@@ -185,11 +185,17 @@ namespace IDisposableAnalyzers
                 {
                     if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))
                     {
-                        return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
+                        return !IsAssignableFrom(assignedMember.Type, semanticModel.Compilation) ||
+                               !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                     }
-                }
 
-                return false;
+                    if (method.MethodKind == MethodKind.Constructor)
+                    {
+                        return !IsAssignableFrom(method.ContainingType, semanticModel.Compilation);
+                    }
+
+                    return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
+                }
             }
 
             return false;
