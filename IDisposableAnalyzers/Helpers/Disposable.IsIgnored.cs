@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -165,22 +164,7 @@ namespace IDisposableAnalyzers
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator:
-                                    if (variableDeclarator.TryFirstAncestor<UsingStatementSyntax>(out _))
-                                    {
-                                        return false;
-                                    }
-
-                                    using (var invocations = InvocationWalker.Borrow(methodDeclaration))
-                                    {
-                                        // Just checking if there is a dispose call in the scope for now.
-                                        if (invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
-                                        {
-                                            return false;
-                                        }
-                                    }
-
-                                    break;
-                                    // return Disposable.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
+                                    return Disposable.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 
                             if (Disposable.IsIgnored(candidate, semanticModel, cancellationToken, visited))
@@ -212,6 +196,51 @@ namespace IDisposableAnalyzers
                        (method.Parameters.TryLast(out result) &&
                         result.IsParams);
             }
+        }
+
+        private static bool IsIgnored(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            if (declarator.TryFirstAncestor(out BlockSyntax block) &&
+                semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local))
+            {
+                if (declarator.TryFirstAncestor<UsingStatementSyntax>(out _))
+                {
+                    return false;
+                }
+
+                using (var invocations = InvocationWalker.Borrow(block))
+                {
+                    // Just checking if there is a dispose call in the scope for now.
+                    if (invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
+                    {
+                        return false;
+                    }
+                }
+
+                using (var walker = IdentifierNameWalker.Borrow(block))
+                {
+                    walker.RemoveAll(x => !IsMatch(x));
+                    if (walker.IdentifierNames.Count == 0)
+                    {
+                        return true;
+                    }
+
+                    return walker.IdentifierNames.All(x => IsIgnored(x, semanticModel, cancellationToken, visited));
+                }
+
+                bool IsMatch(IdentifierNameSyntax candidate)
+                {
+                    if (candidate.Identifier.Text != local.Name)
+                    {
+                        return false;
+                    }
+
+                    return semanticModel.TryGetSymbol(candidate, cancellationToken, out ILocalSymbol other) &&
+                           other.Equals(local);
+                }
+            }
+
+            return false;
         }
 
         private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
