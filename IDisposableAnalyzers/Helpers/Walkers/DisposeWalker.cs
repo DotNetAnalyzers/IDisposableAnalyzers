@@ -62,6 +62,16 @@ namespace IDisposableAnalyzers
             return Borrow(() => new DisposeWalker());
         }
 
+        internal static DisposeWalker Borrow(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (disposeMethod != null)
+            {
+                return BorrowAndVisit(disposeMethod, Scope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+            }
+
+            return Borrow(() => new DisposeWalker());
+        }
+
         internal Result IsMemberDisposed(ISymbol member)
         {
             foreach (var invocation in this.invocations)

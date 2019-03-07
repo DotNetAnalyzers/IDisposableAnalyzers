@@ -32,14 +32,39 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            using (var walker = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken))
+            if (disposeMethod.TrySingleMethodDeclaration(cancellationToken, out var disposeMethodDeclaration))
             {
-                foreach (var invocation in walker)
+                if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
                 {
-                    if (DisposeCall.IsDisposing(invocation, member.Symbol, semanticModel, cancellationToken))
+                    using (var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken))
                     {
-                        return true;
+                        foreach (var candidate in walker)
+                        {
+                            if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
+                            {
+                                return true;
+                            }
+                        }
                     }
+
+                    return false;
+                }
+                else
+                {
+                    using (var walker = IdentifierNameExecutionWalker.Borrow(disposeMethodDeclaration, Scope.Recursive, semanticModel, cancellationToken))
+                    {
+                        foreach (var candidate in walker.IdentifierNames)
+                        {
+                            if (candidate.Identifier.Text == member.Name &&
+                               semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol candidateSymbol) &&
+                               candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
                 }
             }
 
