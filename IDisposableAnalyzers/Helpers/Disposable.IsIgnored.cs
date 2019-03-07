@@ -102,7 +102,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             if (argument != null &&
                 argument.Parent is ArgumentListSyntax argumentList &&
@@ -160,6 +160,11 @@ namespace IDisposableAnalyzers
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
                                         return Disposable.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                                    }
+
+                                    if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
+                                    {
+                                        return true;
                                     }
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
