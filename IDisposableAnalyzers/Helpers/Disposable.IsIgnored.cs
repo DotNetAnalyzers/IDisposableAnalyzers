@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -154,26 +155,32 @@ namespace IDisposableAnalyzers
                             switch (candidate.Parent)
                             {
                                 case AssignmentExpressionSyntax assignment when assignment.Right == candidate &&
-                                                                                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol):
-                                    if (FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember))
+                                                                                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol) &&
+                                                                                FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
+                                    if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
+                                        DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
-                                        if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
-                                        {
-                                            if (DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
-                                            {
-                                                return Disposable.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
-                                            }
-                                        }
-                                        else
-                                        {
-                                            return semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
-                                        }
+                                        return Disposable.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
                                     }
-                                    else
-                                    {
 
+                                    return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
+                                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator:
+                                    if (variableDeclarator.TryFirstAncestor<UsingStatementSyntax>(out _))
+                                    {
+                                        return false;
                                     }
+
+                                    using (var invocations = InvocationWalker.Borrow(methodDeclaration))
+                                    {
+                                        // Just checking if there is a dispose call in the scope for now.
+                                        if (invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
+                                        {
+                                            return false;
+                                        }
+                                    }
+
                                     break;
+                                    // return Disposable.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 
                             if (Disposable.IsIgnored(candidate, semanticModel, cancellationToken, visited))
@@ -187,7 +194,10 @@ namespace IDisposableAnalyzers
                 }
                 else
                 {
-
+                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))
+                    {
+                        return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
+                    }
                 }
 
                 return false;

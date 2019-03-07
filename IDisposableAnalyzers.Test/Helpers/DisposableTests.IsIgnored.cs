@@ -72,6 +72,71 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("var temp = disposable")]
+            [TestCase("var temp = true ? disposable : (IDisposable)null")]
+            public void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public static void M(string fileName)
+        {
+            var value = M(File.OpenRead(fileName));
+        }
+
+        public static int M(IDisposable disposable)
+        {
+            var temp = disposable;
+            temp.Dispose();
+            return 1;
+        }
+    }
+}".AssertReplace("var temp = disposable", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
+            public void ArgumentAssignedTempLocalInUsing(string expression)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public static void M(string fileName)
+        {
+            var value = M(File.OpenRead(fileName));
+        }
+
+        public static int M(IDisposable disposable)
+        {
+            using (var temp = disposable)
+            {
+            }
+
+            temp.Dispose();
+            return 1;
+        }
+    }
+}".AssertReplace("var temp = disposable", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
             [TestCase("File.OpenRead(fileName)")]
             [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
