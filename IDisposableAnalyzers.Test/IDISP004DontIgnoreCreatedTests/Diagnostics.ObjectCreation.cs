@@ -30,7 +30,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -49,11 +49,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Bar
+    public class M
     {
         private readonly IDisposable disposable;
 
-        public Bar(IDisposable disposable)
+        public M(IDisposable disposable)
         {
            this.disposable = disposable;
         }
@@ -63,11 +63,11 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Bar Meh()
+        public M Meh()
         {
-            return new Bar(↓new Disposable());
+            return new M(↓new Disposable());
         }
     }
 }";
@@ -82,11 +82,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -101,9 +101,9 @@ namespace RoslynSandbox
 {
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
-            return new Foo(↓new Disposable());
+            return new C(↓new Disposable());
         }
     }
 }";
@@ -118,9 +118,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
         }
 
@@ -134,9 +134,9 @@ namespace RoslynSandbox
 {
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
-            return new Foo(↓new Disposable());
+            return new C(↓new Disposable());
         }
     }
 }";
@@ -149,12 +149,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public static class C
     {
-        public void Bar()
-        {
-            string.Format(""{0}"", ↓new Disposable());
-        }
+        public static string M() => string.Format(""{0}"", ↓new Disposable());
     }
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
@@ -166,9 +163,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var text = ↓new Disposable().ToString();
         }
@@ -183,9 +180,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public static string Bar()
+        public static string M()
         {
             return ↓new Disposable().ToString();
         }
@@ -203,11 +200,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private List<object> disposables = new List<object>();
 
-        public Foo()
+        public C()
         {
             this.disposables.Add(↓new Disposable());
         }
