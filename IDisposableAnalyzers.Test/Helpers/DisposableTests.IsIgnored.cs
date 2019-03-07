@@ -104,6 +104,8 @@ namespace RoslynSandbox
                 Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("var temp = disposable")]
+            [TestCase("var temp = true ? disposable : (IDisposable)null")]
             public void ArgumentAssignedTempLocalInUsing(string expression)
             {
                 var code = @"
