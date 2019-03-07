@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -49,7 +50,15 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is ArgumentSyntax argument)
             {
-                return IsIgnored(argument, semanticModel, cancellationToken, visited);
+#pragma warning disable IDISP003 // Dispose previous before re - assigning.
+                using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                {
+                    if (visited.Add(argument))
+                    {
+                        return IsIgnored(argument, semanticModel, cancellationToken, visited);
+                    }
+                }
             }
 
             if (node.Parent is MemberAccessExpressionSyntax memberAccess)
@@ -111,45 +120,88 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                switch (IsDisposedByReturnValue(argument, semanticModel, cancellationToken))
+                if (TryFindParameter(out var parameter) &&
+                    method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    case Result.Yes:
-                    case Result.AssumeYes:
-#pragma warning disable IDISP003 // Dispose previous before re - assigning.
-                        using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    using (var walker = IdentifierNameWalker.Borrow(methodDeclaration))
+                    {
+                        walker.RemoveAll(x => !IsMatch(x));
+                        if (walker.IdentifierNames.Count == 0)
                         {
-                            if (visited.Add(parentExpression))
+                            return true;
+                        }
+
+                        return walker.IdentifierNames.All(x => IsIgnored(x));
+
+                        bool IsMatch(IdentifierNameSyntax candidate)
+                        {
+                            if (candidate.Identifier.Text != parameter.Name)
                             {
-                                return IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                                return false;
+                            }
+
+                            return semanticModel.TryGetSymbol<IParameterSymbol>(candidate, cancellationToken, out _);
+                        }
+
+                        bool IsIgnored(IdentifierNameSyntax candidate)
+                        {
+                            switch (candidate.Parent.Kind())
+                            {
+                                case SyntaxKind.NotEqualsExpression:
+                                    return true;
+                            }
+
+                            switch (candidate.Parent)
+                            {
+                                case AssignmentExpressionSyntax assignment when assignment.Right == candidate &&
+                                                                                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol):
+                                    if (FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember))
+                                    {
+                                        if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod))
+                                        {
+                                            if (DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
+                                            {
+                                                return Disposable.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            return semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
+                                        }
+                                    }
+                                    else
+                                    {
+
+                                    }
+                                    break;
+                            }
+
+                            if (Disposable.IsIgnored(candidate, semanticModel, cancellationToken, visited))
+                            {
+                                return true;
                             }
 
                             return false;
                         }
-                }
-
-                if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var fieldOrProperty) &&
-                    IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
-                {
-                    switch (parentExpression.Parent.Kind())
-                    {
-                        case SyntaxKind.ArrowExpressionClause:
-                        case SyntaxKind.ReturnStatement:
-                            return true;
-                        case SyntaxKind.EqualsValueClause:
-                            return parentExpression.Parent.Parent.IsKind(SyntaxKind.VariableDeclarator) &&
-                                   !semanticModel.IsAccessible(argument.SpanStart, fieldOrProperty.Symbol);
-                        case SyntaxKind.SimpleAssignmentExpression:
-                            return !semanticModel.IsAccessible(argument.SpanStart, fieldOrProperty.Symbol);
                     }
+                }
+                else
+                {
 
-                    return false;
                 }
 
-                return IsAssignedToDisposable(argument, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                return false;
             }
 
             return false;
+
+            // https://github.com/GuOrg/Gu.Roslyn.Extensions/issues/40
+            bool TryFindParameter(out IParameterSymbol result)
+            {
+                return method.TryFindParameter(argument, out result) ||
+                       (method.Parameters.TryLast(out result) &&
+                        result.IsParams);
+            }
         }
 
         private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
