@@ -43,7 +43,7 @@ namespace RoslynSandbox
             [TestCase("Tuple.Create(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
             [TestCase("new List<IDisposable> { disposable }")]
-            public void AssignedToTempLocal(string expression)
+            public void ArgumentAssignedToTempLocal(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -163,7 +163,7 @@ namespace RoslynSandbox
             new C(File.OpenRead(fileName));
         }
 
-        public static void M(IDisposable) { }
+        public static void M(IDisposable _) { }
 
         public void Dispose()
         {
@@ -283,7 +283,41 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedNotDisposableCtorArg()
+            public void CtorArgAssignedNotDisposable()
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+    }
+
+    public static class C2
+    {
+        public static void M(string fileName)
+        {
+            var c = new C(File.OpenRead(fileName));
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void CtorArgAssignedNotDisposableFactoryMethod()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -311,7 +345,45 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedNotDisposedCtorArg()
+            public void CtorArgAssignedNotDisposed()
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public C(IDisposable disposable)
+        {
+            this.disposable = disposable;
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    public static class C2
+    {
+        public static void M(string fileName)
+        {
+            var c = new C(File.OpenRead(fileName));
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public void CtorArgAssignedNotDisposedFactoryMethod()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -343,7 +415,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedNotAssignedCtorArg()
+            public void CtorArgNotAssigned()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -375,7 +447,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedDisposedCtorArg()
+            public void CtorArgAssignedDisposed()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -411,79 +483,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedNotDisposableCtorArg()
-            {
-                var code = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private readonly IDisposable disposable;
-
-        public C(IDisposable disposable)
-        {
-            this.disposable = disposable;
-        }
-    }
-
-    public static class C2
-    {
-        public static void M(string fileName)
-        {
-            var c = new C(File.OpenRead(fileName));
-        }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
-            }
-
-            [Test]
-            public void AssignedNotDisposedCtorArg()
-            {
-                var code = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C : IDisposable
-    {
-        private readonly IDisposable disposable;
-
-        public C(IDisposable disposable)
-        {
-            this.disposable = disposable;
-        }
-
-        public void Dispose()
-        {
-        }
-    }
-
-    public static class C2
-    {
-        public static void M(string fileName)
-        {
-            var c = new C(File.OpenRead(fileName));
-        }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
-            }
-
-            [Test]
-            public void AssignedNotAssignedCtorArg()
+            public void CtorArgAssignedNotAssigned()
             {
                 var code = @"
 namespace RoslynSandbox
