@@ -7,10 +7,4 @@
   </PropertyGroup>
 
   <Import Project="..\.paket\Paket.Restore.targets" />
-
-  <ItemGroup>
-    <Compile Remove="Tuples\**" />
-    <EmbeddedResource Remove="Tuples\**" />
-    <None Remove="Tuples\**" />
-  </ItemGroup>
 </Project>
