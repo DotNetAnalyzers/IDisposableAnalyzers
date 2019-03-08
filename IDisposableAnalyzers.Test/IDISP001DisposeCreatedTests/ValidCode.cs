@@ -434,6 +434,29 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [Test]
+        public void LocalAssignedToLocalThatIsDisposed()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public C(string file)
+        {
+            var stream = File.OpenRead(file);
+            var temp = stream;
+            temp.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
         [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]

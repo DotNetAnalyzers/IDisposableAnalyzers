@@ -99,18 +99,35 @@ namespace IDisposableAnalyzers
                    IsDisposedAfter(localOrParameter, location, semanticModel, cancellationToken);
         }
 
-        internal static bool IsDisposedAfter(LocalOrParameter local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposedAfter(LocalOrParameter localOrParameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (local.TryGetScope(cancellationToken, out var scope))
+            if (localOrParameter.TryGetScope(cancellationToken, out var scope))
             {
                 using (var walker = DisposeWalker.Borrow(scope, Scope.Member, semanticModel, cancellationToken))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
                         if (location.IsExecutedBefore(invocation).IsEither(ExecutedBefore.Maybe, ExecutedBefore.Yes) &&
-                            DisposeCall.IsDisposing(invocation, local.Symbol, semanticModel, cancellationToken))
+                            DisposeCall.IsDisposing(invocation, localOrParameter.Symbol, semanticModel, cancellationToken))
                         {
                             return true;
+                        }
+                    }
+                }
+
+                using (var declaratorWalker = VariableDeclaratorWalker.Borrow(scope))
+                {
+                    foreach (var declarator in declaratorWalker.VariableDeclarators)
+                    {
+                        if (declarator.Initializer is EqualsValueClauseSyntax equalsValueClause &&
+                            equalsValueClause.Value is IdentifierNameSyntax identifierName &&
+                            identifierName.Identifier.Text == localOrParameter.Name &&
+                            declarator.TryFirstAncestor(out StatementSyntax statement) &&
+                            location.IsExecutedBefore(statement).IsEither(ExecutedBefore.Maybe, ExecutedBefore.Yes) &&
+                            semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local) &&
+                            LocalOrParameter.TryCreate(local, out var temp))
+                        {
+                            return IsDisposedAfter(temp, location, semanticModel, cancellationToken);
                         }
                     }
                 }
@@ -121,7 +138,7 @@ namespace IDisposableAnalyzers
                     {
                         if (location.IsExecutedBefore(usingStatement) == ExecutedBefore.Yes &&
                             usingStatement.Expression is IdentifierNameSyntax identifierName &&
-                            identifierName.Identifier.ValueText == local.Name)
+                            identifierName.Identifier.ValueText == localOrParameter.Name)
                         {
                             return true;
                         }
