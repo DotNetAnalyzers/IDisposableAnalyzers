@@ -149,6 +149,9 @@ namespace IDisposableAnalyzers
                             {
                                 case SyntaxKind.NotEqualsExpression:
                                     return true;
+                                case SyntaxKind.Argument:
+                                    // Stopping analysis here assuming it is handled
+                                    return false;
                             }
 
                             switch (candidate.Parent)
