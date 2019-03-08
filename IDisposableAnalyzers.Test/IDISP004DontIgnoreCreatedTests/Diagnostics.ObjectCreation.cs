@@ -190,28 +190,6 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
-
-            [Test]
-            public void AddingNewDisposableToListOfObject()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.Collections.Generic;
-
-    public sealed class C
-    {
-        private List<object> disposables = new List<object>();
-
-        public C()
-        {
-            this.disposables.Add(↓new Disposable());
-        }
-    }
-}";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
-            }
         }
     }
 }

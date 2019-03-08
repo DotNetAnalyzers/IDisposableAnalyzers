@@ -45,29 +45,6 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddingFileOpenReadToListOfObject()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-
-    public sealed class C
-    {
-        private readonly List<object> streams = new List<object>();
-
-        public C()
-        {
-            streams.Add(↓File.OpenRead(string.Empty));
-        }
-    }
-}";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
-            }
-
-            [Test]
             public void FileOpenReadPassedIntoCtorOfNotDisposing()
             {
                 var barCode = @"
