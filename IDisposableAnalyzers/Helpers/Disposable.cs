@@ -191,17 +191,18 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAssignedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited = null)
+        internal static bool IsAssignedToFieldOrProperty(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited)
         {
-            if (AssignmentExecutionWalker.FirstWith(symbol, scope, Scope.Instance, semanticModel, cancellationToken, out var assignment) &&
+            if (localOrParameter.TryGetScope(cancellationToken, out var scope) &&
+                AssignmentExecutionWalker.FirstWith(localOrParameter.Symbol, scope, Scope.Instance, semanticModel, cancellationToken, out var assignment) &&
                 semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol left))
             {
-                if (left.IsEither<IParameterSymbol, ILocalSymbol>())
+                if (LocalOrParameter.TryCreate(left, out var leftLocalOrParameter))
                 {
                     using (visited = visited.IncrementUsage())
                     {
                         return visited.Add(left) &&
-                               IsAssignedToFieldOrProperty(left, scope, semanticModel, cancellationToken, visited);
+                               IsAssignedToFieldOrProperty(leftLocalOrParameter, semanticModel, cancellationToken, visited);
                     }
                 }
 
@@ -329,10 +330,11 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (local.TryGetScope(cancellationToken, out var scope))
+                if (LocalOrParameter.TryCreate(local, out var localOrParameter) &&
+                    local.TryGetScope(cancellationToken, out var scope))
                 {
                     return !IsReturned(local, scope, semanticModel, cancellationToken) &&
-                           !IsAssignedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
+                           !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                            !IsAddedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
                            !IsDisposedAfter(local, location, semanticModel, cancellationToken);
                 }
@@ -355,10 +357,11 @@ namespace IDisposableAnalyzers
                 parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                methodDeclaration.Body is BlockSyntax block)
+                methodDeclaration.Body is BlockSyntax block &&
+                LocalOrParameter.TryCreate(parameter, out var localOrParameter))
             {
                 return !IsReturned(parameter, block, semanticModel, cancellationToken) &&
-                       !IsAssignedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
+                       !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                        !IsAddedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
                        !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
             }
