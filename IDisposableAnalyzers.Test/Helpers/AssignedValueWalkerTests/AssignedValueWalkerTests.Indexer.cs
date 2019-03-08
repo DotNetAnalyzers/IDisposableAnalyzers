@@ -14,9 +14,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public void InitializedArrayIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         var ints = new int[] { 1, 2 };
         var temp1 = ints[0];
@@ -39,9 +39,9 @@ internal class Foo
             public void InitializedTypedArrayIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         int[] ints = { 1, 2 };
         var temp1 = ints[0];
@@ -69,9 +69,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var ints = new List<int> { 1, 2 };
             var temp1 = ints[0];
@@ -100,9 +100,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var ints = new List<int> { 1, 2 };
             var temp1 = ints[0];
@@ -131,9 +131,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var ints = new Dictionary<int, int> 
             { 
@@ -166,9 +166,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var ints = new Dictionary<int, int> 
             {
@@ -201,9 +201,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var ints = new Dictionary<int, int> 
             {

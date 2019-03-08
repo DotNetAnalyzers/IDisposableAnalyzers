@@ -18,9 +18,9 @@ namespace RoslynSandbox
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        static async Task<HttpResponseMessage> Bar()
+        static async Task<HttpResponseMessage> M()
         {
             using(var client = ↓new HttpClient())
             {
@@ -41,9 +41,9 @@ namespace RoslynSandbox
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        static async Task<HttpResponseMessage> Bar()
+        static async Task<HttpResponseMessage> M()
         {
             using(var client = ↓new System.Net.Http.HttpClient())
             {
@@ -63,7 +63,7 @@ namespace RoslynSandbox
 {
     using System.Net.Http;
 
-    public class Foo
+    public class C
     {
        private readonly HttpClient client = ↓new HttpClient();
     }
@@ -79,7 +79,7 @@ namespace RoslynSandbox
 {
     using System.Net.Http;
 
-    public class Foo
+    public class C
     {
        public HttpClient Client { get; } = ↓new HttpClient();
     }

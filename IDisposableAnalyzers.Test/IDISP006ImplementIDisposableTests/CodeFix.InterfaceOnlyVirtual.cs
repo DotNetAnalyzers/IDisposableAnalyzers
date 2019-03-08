@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
     }
 }";
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private bool disposed;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         public const int Value1 = 1;
         private const int Value2 = 2;
@@ -85,13 +85,13 @@ namespace RoslynSandbox
         private readonly int value5;
         private int value6;
 
-        public Foo()
+        public C()
         {
             value5 = Value2;
             value6 = Value2;
         }
 
-        public int Bar => this.value5 + this.value6;
+        public int M => this.value5 + this.value6;
     }
 }";
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         public const int Value1 = 1;
         private const int Value2 = 2;
@@ -112,13 +112,13 @@ namespace RoslynSandbox
         private int value6;
         private bool disposed;
 
-        public Foo()
+        public C()
         {
             value5 = Value2;
             value6 = Value2;
         }
 
-        public int Bar => this.value5 + this.value6;
+        public int M => this.value5 + this.value6;
 
         public void Dispose()
         {
@@ -160,21 +160,21 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
-        public void Bar1()
+        public void M1()
         {
         }
 
-        internal void Bar2()
+        internal void M2()
         {
         }
 
-        protected void Bar3()
+        protected void M3()
         {
         }
 
-        private void Bar4()
+        private void M4()
         {
         }
     }
@@ -185,11 +185,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private bool disposed;
 
-        public void Bar1()
+        public void M1()
         {
         }
 
@@ -199,11 +199,11 @@ namespace RoslynSandbox
             GC.SuppressFinalize(this);
         }
 
-        internal void Bar2()
+        internal void M2()
         {
         }
 
-        protected void Bar3()
+        protected void M3()
         {
         }
 
@@ -228,7 +228,7 @@ namespace RoslynSandbox
             }
         }
 
-        private void Bar4()
+        private void M4()
         {
         }
     }
@@ -245,7 +245,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
     }
 }";
@@ -255,7 +255,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private bool disposed;
 

@@ -17,11 +17,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private int value;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.value;
             this.Meh += (o, e) => this.value = 1;
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 
         public event EventHandler Meh;
 
-        internal void Bar()
+        internal void M()
         {
             var temp3 = this.value;
         }

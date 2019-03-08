@@ -34,7 +34,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -55,9 +55,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar(int i)
+        public static IDisposable M(int i)
         {
             IDisposable result;
             switch (i)
@@ -90,9 +90,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar(int i)
+        public static IDisposable M(int i)
         {
             IDisposable result;
             if (i == 0)
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -157,7 +157,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -180,9 +180,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
         }
@@ -202,9 +202,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
         }
@@ -228,11 +228,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         private readonly List<int> ints = new List<int>();
 
-        public Foo()
+        public C()
         {
             this[1] = 1;
         }
@@ -256,11 +256,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly List<int> ints = new List<int>();
 
-        public Foo()
+        public C()
         {
             this[1] = 1;
         }
@@ -288,11 +288,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
         }
@@ -316,11 +316,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = File.OpenRead(string.Empty);
         }
@@ -338,7 +338,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
 
@@ -363,7 +363,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
 
@@ -401,7 +401,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
 
@@ -424,7 +424,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
 
@@ -451,7 +451,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh(bool b)
         {
@@ -482,11 +482,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
             TryGetStream(out stream);
         }
@@ -511,7 +511,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public bool TryGetStream(out Stream stream)
         {
@@ -535,7 +535,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -557,20 +557,20 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         private IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
-            this.disposable = Bar(disposable);
+            this.disposable = M(disposable);
         }
 
-        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        private static IDisposable M(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
         {
             if (disposables == null)
             {
-                return Bar(disposable, new[] { disposable });
+                return M(disposable, new[] { disposable });
             }
 
             return disposable;
@@ -589,26 +589,26 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         private IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
-            this.disposable = Bar(disposable);
+            this.disposable = M(disposable);
         }
 
-        private static IDisposable Bar(IDisposable disposable)
+        private static IDisposable M(IDisposable disposable)
         {
             if (disposable == null)
             {
-                return Bar(disposable, new[] { disposable });
+                return M(disposable, new[] { disposable });
             }
 
             return disposable;
         }
 
-        private static IDisposable Bar(IDisposable disposable, IDisposable[] list)
+        private static IDisposable M(IDisposable disposable, IDisposable[] list)
         {
             return disposable;
         }
@@ -625,13 +625,13 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
-            this.disposable = Helper.Bar(disposable);
+            this.disposable = Helper.M(disposable);
         }
     }
 }";
@@ -644,17 +644,17 @@ namespace RoslynSandbox
 
     public static class Helper
     {
-        public static IDisposable Bar(IDisposable disposable)
+        public static IDisposable M(IDisposable disposable)
         {
             if (disposable == null)
             {
-                return Bar(disposable, new[] { disposable });
+                return M(disposable, new[] { disposable });
             }
 
             return disposable;
         }
 
-        public static IDisposable Bar(IDisposable disposable, IDisposable[] list)
+        public static IDisposable M(IDisposable disposable, IDisposable[] list)
         {
             return disposable;
         }
@@ -791,11 +791,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
             this.Stream = File.OpenRead(string.Empty);
@@ -823,7 +823,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private IDisposable disposable;
         private bool disposed;
@@ -854,12 +854,12 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Lazy<int> lazy;
         private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.lazy = new Lazy<int>(
                 () =>
@@ -886,9 +886,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             disposable = new Disposable();
@@ -907,9 +907,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (o, e) =>
             {
@@ -931,9 +931,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             using (disposable = new Disposable())
@@ -953,11 +953,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new Disposable();
         }
@@ -979,11 +979,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.DataContext = disposable = new Disposable();
         }
@@ -1007,7 +1007,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private static bool TryGetStream(string fileName, out Stream stream)
         {
@@ -1035,7 +1035,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private List<Stream> streams = new List<Stream>();
 
@@ -1060,7 +1060,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private List<Stream> _streams = new List<Stream>();
 
@@ -1200,9 +1200,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static void Bar()
+        public static void M()
         {
             for(var i = 0; i < 2;i++)
             {

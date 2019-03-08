@@ -71,7 +71,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : SyntaxError
+    public class C : SyntaxError
     {
         private readonly Stream stream = File.SyntaxError(string.Empty);
         private bool disposed;

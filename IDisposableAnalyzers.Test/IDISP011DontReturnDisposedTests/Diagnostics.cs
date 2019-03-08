@@ -17,7 +17,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh()
         {
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh()
         {
@@ -61,7 +61,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public IEnumerable<string> F()
         {
@@ -92,7 +92,7 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public IEnumerable<string> F()
         {

@@ -24,11 +24,11 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
                 var testCode = @"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private const int Value = 2;
 
-        internal Foo()
+        internal C()
         {
             var value = 1;
             var temp = value;
@@ -51,9 +51,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo<T>
+    internal class C<T>
     {
-        internal Foo()
+        internal C()
         {
             var value = default(T);
             var temp = value;
@@ -77,9 +77,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             int value;
             var temp1 = value;
@@ -107,9 +107,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (o, e) =>
             {
@@ -140,9 +140,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             int value = 1;
             Console.CancelKeyPress += (o, e) =>
@@ -172,9 +172,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             int value = 1;
             while (i > 0)
@@ -205,9 +205,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo(int meh)
+        internal C(int meh)
         {
             var temp = meh;
             var value = temp;
@@ -230,9 +230,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo(int meh)
+        internal C(int meh)
         {
             var @operator = meh;
             var value = @operator;
@@ -254,9 +254,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal void Bar<T>(T meh)
+        internal void M<T>(T meh)
         {
             var temp = meh;
             var value = temp;
@@ -279,9 +279,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo<T>
+    internal class C<T>
     {
-        internal Foo(T meh)
+        internal C(T meh)
         {
             var temp = meh;
             var value = temp;
@@ -306,7 +306,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly object gate;
 

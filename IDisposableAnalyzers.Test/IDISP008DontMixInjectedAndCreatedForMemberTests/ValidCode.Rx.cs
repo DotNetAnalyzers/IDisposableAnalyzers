@@ -18,11 +18,11 @@ namespace Gu.Reactive
     using System.IO;
     using System.Reactive.Disposables;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
 
-        protected Foo()
+        protected C()
         {
             this.subscription.Disposable = File.OpenRead(string.Empty);
         }
@@ -46,11 +46,11 @@ namespace Gu.Reactive
     using System.IO;
     using System.Reactive.Disposables;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
 
-        protected Foo(IObservable<object> observable)
+        protected C(IObservable<object> observable)
         {
             this.subscription.Disposable = observable.Subscribe(_ => { });
         }
@@ -74,14 +74,14 @@ namespace Gu.Reactive
     using System.IO;
     using System.Reactive.Disposables;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private readonly Lazy<int> lazy;
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
 
         private bool disposed;
 
-        protected Foo()
+        protected C()
         {
             this.lazy = new Lazy<int>(
                 () =>

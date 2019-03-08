@@ -22,9 +22,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -38,11 +38,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -62,9 +62,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty); // trivia
         }
@@ -78,11 +78,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         const int value1 = 2;
 
@@ -114,7 +114,7 @@ namespace RoslynSandbox
 
         private int value4;
 
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -127,7 +127,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         const int value1 = 2;
 
@@ -137,7 +137,7 @@ namespace RoslynSandbox
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;
         private int value4;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new System.Reactive.Disposables.CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -156,7 +156,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         const int value1 = 2;
 
@@ -166,7 +166,7 @@ namespace RoslynSandbox
 
         private int _value4;
 
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -179,7 +179,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         const int value1 = 2;
 
@@ -189,7 +189,7 @@ namespace RoslynSandbox
         private readonly System.Reactive.Disposables.CompositeDisposable _disposable;
         private int _value4;
 
-        internal Foo()
+        internal C()
         {
             _disposable = new System.Reactive.Disposables.CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -208,11 +208,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable();
             ↓File.OpenRead(string.Empty);
@@ -226,11 +226,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -249,11 +249,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable(1);
             ↓File.OpenRead(string.Empty);
@@ -267,11 +267,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable(1) { File.OpenRead(string.Empty) };
         }
@@ -290,11 +290,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable(); // trivia1
             ↓File.OpenRead(string.Empty); // trivia2
@@ -308,11 +308,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -334,11 +334,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
             ↓File.OpenRead(string.Empty);
@@ -352,11 +352,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -379,11 +379,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
             ↓File.OpenRead(string.Empty); // trivia
@@ -397,11 +397,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -424,11 +424,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable()
             {
@@ -445,11 +445,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -472,11 +472,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable(1)
             {
@@ -493,11 +493,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable(1)
             {
@@ -521,11 +521,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable()
             {
@@ -543,11 +543,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -572,11 +572,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -590,11 +590,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             this.disposable.Add(File.OpenRead(string.Empty));
         }
@@ -614,11 +614,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -632,11 +632,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable _disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             _disposable.Add(File.OpenRead(string.Empty));
         }
@@ -655,11 +655,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable();
             ↓File.OpenRead(string.Empty);
@@ -673,11 +673,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -696,11 +696,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
             var i = 1;
@@ -715,11 +715,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly CompositeDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
             var i = 1;

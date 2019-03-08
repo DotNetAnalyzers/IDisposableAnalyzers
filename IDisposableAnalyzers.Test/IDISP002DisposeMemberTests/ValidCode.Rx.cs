@@ -17,7 +17,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly SerialDisposable disposable = new SerialDisposable();
 

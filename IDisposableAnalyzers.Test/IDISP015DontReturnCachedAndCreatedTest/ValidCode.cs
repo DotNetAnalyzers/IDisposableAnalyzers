@@ -41,9 +41,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public IDisposable Bar()
+        public IDisposable M()
         {
             return File.OpenRead(string.Empty);
         }
@@ -60,16 +60,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public IDisposable Bar()
+        public IDisposable M()
         {
             return this.disposable;
         }
@@ -88,11 +88,11 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Dictionary<int, Stream> streams = new Dictionary<int, Stream>();
 
-        public Foo()
+        public C()
         {
             this.streams[0] = File.OpenRead(string.Empty);
         }

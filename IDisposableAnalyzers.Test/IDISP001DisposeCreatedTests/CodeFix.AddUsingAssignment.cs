@@ -34,9 +34,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             ↓disposable = new Disposable();
@@ -49,9 +49,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             using (disposable = new Disposable())
@@ -72,9 +72,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             ↓disposable = new Disposable();
         }
@@ -86,9 +86,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             using (disposable = new Disposable())
             {
@@ -108,9 +108,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (_, __) =>
             {
@@ -126,9 +126,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (_, __) =>
             {

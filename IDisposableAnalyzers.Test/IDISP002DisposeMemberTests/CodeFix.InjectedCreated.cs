@@ -21,16 +21,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -46,16 +46,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -78,18 +78,18 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public static Foo Create()
+        public static C Create()
         {
-            return new Foo(new Disposable());
+            return new C(new Disposable());
         }
 
         public void Dispose()
@@ -103,18 +103,18 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public static Foo Create()
+        public static C Create()
         {
-            return new Foo(new Disposable());
+            return new C(new Disposable());
         }
 
         public void Dispose()
@@ -149,11 +149,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        public Foo(object value)
+        public C(object value)
         {
             this.disposable = value.AsDisposable();
         }
@@ -169,11 +169,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(object value)
+        public C(object value)
         {
             this.disposable = value.AsDisposable();
         }
@@ -210,11 +210,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        public Foo(object value)
+        public C(object value)
         {
             this.disposable = value.AsDisposable();
         }
@@ -230,11 +230,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(object value)
+        public C(object value)
         {
             this.disposable = value.AsDisposable();
         }
@@ -258,11 +258,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         ↓private readonly IEnumerator<int> current;
 
-        public Foo(List<int> list)
+        public C(List<int> list)
         {
             this.current = list.GetEnumerator();
         }
@@ -279,11 +279,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IEnumerator<int> current;
 
-        public Foo(List<int> list)
+        public C(List<int> list)
         {
             this.current = list.GetEnumerator();
         }

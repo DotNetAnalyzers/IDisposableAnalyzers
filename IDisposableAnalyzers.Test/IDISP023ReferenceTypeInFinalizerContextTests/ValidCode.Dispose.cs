@@ -240,7 +240,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -270,7 +270,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo : FooBase
+    public class C : CBase
     {
         protected override void Dispose(bool disposing)
         {
@@ -290,7 +290,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -320,7 +320,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo : FooBase
+    public class C : CBase
     {
         private bool disposed;
 
@@ -348,7 +348,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -380,7 +380,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;

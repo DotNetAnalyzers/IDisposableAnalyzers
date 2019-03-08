@@ -37,9 +37,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             ↓var value = new Disposable();
         }
@@ -56,11 +56,11 @@ namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
-    public class Foo
+    public class C
     {
         public PasswordBox PasswordBox { get; } = new PasswordBox();
 
-        public long Bar()
+        public long M()
         {
             ↓var pwd = PasswordBox.SecurePassword;
             return pwd.Length;
@@ -79,11 +79,11 @@ namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
-    public class Foo
+    public class C
     {
         public static PasswordBox PasswordBox { get; } = new PasswordBox();
 
-        public long Bar()
+        public long M()
         {
             ↓var pwd = PasswordBox.SecurePassword;
             return pwd.Length;
@@ -102,9 +102,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public long Bar()
+        public long M()
         {
             ↓var stream = File.OpenRead(string.Empty);
             return stream.Length;
@@ -121,9 +121,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             ↓var disposable = new Disposable();
             return 1;
@@ -141,9 +141,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = GetStream();
             return stream.Length;
@@ -166,9 +166,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = GetStream();
             return stream.Length;
@@ -192,9 +192,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = GetStream();
             return stream.Length;
@@ -214,14 +214,14 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         public static Stream Stream 
         {
            get { return File.OpenRead(string.Empty); }
         }
 
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = Stream;
             return stream.Length;
@@ -239,7 +239,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         public static Stream Stream 
         {
@@ -250,7 +250,7 @@ namespace RoslynSandbox
            }
         }
 
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = Stream;
             return stream.Length;
@@ -268,11 +268,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         public static Stream Stream => File.OpenRead(string.Empty);
 
-        public static long Bar()
+        public static long M()
         {
             ↓var stream = Stream;
             return stream.Length;

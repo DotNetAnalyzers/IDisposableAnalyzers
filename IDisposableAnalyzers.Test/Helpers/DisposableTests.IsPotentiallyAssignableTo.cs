@@ -17,9 +17,9 @@ namespace IDisposableAnalyzers.Test.Helpers
                 var testCode = @"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var value = PLACEHOLDER;
         }
@@ -38,9 +38,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var value = PLACEHOLDER;
         }

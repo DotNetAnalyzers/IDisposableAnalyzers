@@ -12,9 +12,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var temp = 1;
         }
@@ -30,11 +30,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly Disposable disposable;
 
-        public Foo()
+        public C()
         {
             disposable = new Disposable();
         }
@@ -49,11 +49,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly Disposable disposable;
 
-        public Foo()
+        public C()
         {
             var temp = new Disposable();
             this.disposable = temp;
@@ -70,9 +70,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             this.Disposable = new Disposable();
         }
@@ -90,9 +90,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var temp = new Disposable();
             this.Disposable = temp;
@@ -111,11 +111,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private Disposable[] disposables = new Disposable[2];
 
-        public Foo()
+        public C()
         {
             for (var i = 0; i < 2; i++)
             {
@@ -137,11 +137,11 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    public class Foo
+    public class C
     {
         private List<Disposable> disposables = new List<Disposable>();
 
-        public Foo()
+        public C()
         {
             for (var i = 0; i < 2; i++)
             {
@@ -163,9 +163,9 @@ namespace RoslynSandbox
 {
     using System.Reflection;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var assembly = Assembly.Load(string.Empty);
         }
@@ -182,11 +182,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             var temp = File.OpenRead(string.Empty);
             this.stream = true

@@ -14,11 +14,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly Stream Stream = File.OpenRead(string.Empty);
 
-        public static long Bar()
+        public static long M()
         {
             var stream = Stream;
             return stream.Length;
@@ -36,11 +36,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream;
 
-        public Foo(bool flag)
+        public C(bool flag)
         {
             var temp = File.OpenRead(string.Empty);
             this.stream = flag 
@@ -60,11 +60,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public void Bar()
+        public void M()
         {
             this.stream.Dispose();
             this.stream = File.OpenRead(string.Empty);
@@ -82,11 +82,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public void Bar()
+        public void M()
         {
             var newStream = File.OpenRead(string.Empty);
             this.stream?.Dispose();
@@ -106,11 +106,11 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly List<Stream> streams = new List<Stream>();
 
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             this.streams.Add(stream);
@@ -128,11 +128,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly Stream Stream = File.OpenRead(string.Empty);
 
-        public static long Bar()
+        public static long M()
         {
             var stream = GetStream();
             return stream.Length;
@@ -155,11 +155,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream cachedStream = File.OpenRead(string.Empty);
 
-        public long Bar()
+        public long M()
         {
             var stream = GetStream();
             return stream.Length;
@@ -183,11 +183,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly Stream Stream = File.OpenRead(string.Empty);
 
-        public static long Bar()
+        public static long M()
         {
             var stream = GetStream(FileAccess.Read);
             return stream.Length;
@@ -218,11 +218,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private Disposable[] disposables = new Disposable[2];
 
-        public Foo()
+        public C()
         {
             for (var i = 0; i < 2; i++)
             {
@@ -242,11 +242,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private Disposable[] disposables;
 
-        public Foo()
+        public C()
         {
             var items = new Disposable[2];
             for (var i = 0; i < 2; i++)

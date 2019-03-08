@@ -22,7 +22,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -37,7 +37,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -60,7 +60,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -76,7 +76,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -100,7 +100,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -140,7 +140,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -161,7 +161,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -190,9 +190,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (_, __) =>
             {
@@ -208,9 +208,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (_, __) =>
             {
@@ -234,9 +234,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    class Foo
+    class C
     {
-        public Foo(StringComparison comparison)
+        public C(StringComparison comparison)
         {
             switch (comparison)
             {
@@ -266,9 +266,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    class Foo
+    class C
     {
-        public Foo(StringComparison comparison)
+        public C(StringComparison comparison)
         {
             switch (comparison)
             {
@@ -307,9 +307,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             ↓var stream = Create();
 
@@ -327,9 +327,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             using (var stream = Create())
             {

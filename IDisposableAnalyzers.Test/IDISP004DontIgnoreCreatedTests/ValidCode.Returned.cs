@@ -20,9 +20,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Factory.Create<int>();
         }
@@ -46,9 +46,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public object Bar()
+        public object M()
         {
             var meh1 = new Meh();
             var meh2 = new Meh();
@@ -74,9 +74,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public object Bar()
+        public object M()
         {
             var meh1 = new Meh();
             var meh2 = new Meh();
@@ -106,9 +106,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public bool Bar()
+        public bool M()
         {
             var meh1 = new Meh();
             var meh2 = new Meh();
@@ -125,9 +125,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -144,9 +144,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh(""Meh"");
         }
@@ -163,11 +163,11 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
-            Id(new Foo());
+            Id(new C());
         }
 
         private static object Id(object arg) => arg;
@@ -184,9 +184,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Stream Bar()
+        public Stream M()
         {
             return File.OpenRead(string.Empty);
         }
@@ -203,9 +203,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Stream Bar()
+        public Stream M()
         {
             var stream = File.OpenRead(string.Empty);
             return stream;
@@ -223,9 +223,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Stream Bar() => File.OpenRead(string.Empty);
+        public Stream M() => File.OpenRead(string.Empty);
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
@@ -239,11 +239,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -259,18 +259,18 @@ namespace RoslynSandbox
 {
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
-            return new Foo(new Disposable());
+            return new C(new Disposable());
         }
     }
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
         }
 
-        [TestCase("new Foo()")]
-        [TestCase("new Foo(new Disposable())")]
-        [TestCase("new Foo(new Disposable(), new Disposable())")]
+        [TestCase("new C()")]
+        [TestCase("new C(new Disposable())")]
+        [TestCase("new C(new Disposable(), new Disposable())")]
         public void ReturningNewAssigningAndDisposingParams(string objectCreation)
         {
             var fooCode = @"
@@ -278,11 +278,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable[] disposables;
 
-        public Foo(params IDisposable[] disposables)
+        public C(params IDisposable[] disposables)
         {
             this.disposables = disposables;
         }
@@ -301,12 +301,12 @@ namespace RoslynSandbox
 {
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
-            return new Foo(new Disposable(), new Disposable());
+            return new C(new Disposable(), new Disposable());
         }
     }
-}".AssertReplace("new Foo(new Disposable(), new Disposable())", objectCreation);
+}".AssertReplace("new C(new Disposable(), new Disposable())", objectCreation);
 
             AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
         }
@@ -319,11 +319,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -341,12 +341,12 @@ namespace RoslynSandbox
 
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
             return Create(new Disposable());
         }
 
-        private static Foo Create(IDisposable disposable) => new Foo(disposable);
+        private static C Create(IDisposable disposable) => new C(disposable);
     }
 }";
             AnalyzerAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
@@ -362,7 +362,7 @@ namespace RoslynSandbox
 
     public class Meh
     {
-        public StreamReader Bar()
+        public StreamReader M()
         {
             return Create(File.OpenRead(string.Empty));
         }
@@ -381,16 +381,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(int value, IDisposable disposable)
+        public C(int value, IDisposable disposable)
             : this(disposable)
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -406,9 +406,9 @@ namespace RoslynSandbox
 {
     public class Meh
     {
-        public Foo Bar()
+        public C M()
         {
-            return new Foo(1, new Disposable());
+            return new C(1, new Disposable());
         }
     }
 }";
@@ -423,9 +423,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public StreamReader Bar()
+        public StreamReader M()
         {
             return new StreamReader(File.OpenRead(string.Empty));
         }
@@ -442,9 +442,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public StreamReader Bar()
+        public StreamReader M()
         {
             var reader = new StreamReader(File.OpenRead(string.Empty));
             return reader;

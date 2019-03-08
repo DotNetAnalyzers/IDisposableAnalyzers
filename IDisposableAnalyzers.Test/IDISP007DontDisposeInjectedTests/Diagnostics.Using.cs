@@ -19,11 +19,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
             using (↓disposable)
@@ -43,11 +43,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
             using (var meh = ↓disposable)

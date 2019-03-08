@@ -30,11 +30,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable[] disposables;
 
-        public void Bar()
+        public void M()
         {
             var disposable = disposables[0];
             disposable.Dispose();
@@ -57,11 +57,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
 
-        public void Bar()
+        public void M()
         {
             var disposable = map[0];
             disposable.Dispose();
@@ -84,7 +84,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed = false;
@@ -117,7 +117,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class FooImpl : FooBase
+    public class CImpl : CBase
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -150,21 +150,21 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private bool disposed = false;
 
-        public FooBase()
+        public CBase()
             : this(null)
         {
         }
 
-        public FooBase(object bar)
+        public CBase(object bar)
         {
-            this.Bar = bar;
+            this.M = bar;
         }
 
-        public object Bar { get; }
+        public object M { get; }
 
         public void Dispose()
         {
@@ -189,14 +189,14 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
-        public Foo(int no)
+        public C(int no)
             : this(no.ToString())
         {
         }
 
-        public Foo(string fileName)
+        public C(string fileName)
             : base(File.OpenRead(fileName))
         {
         }
@@ -205,7 +205,7 @@ namespace RoslynSandbox
         {
             if (disposing)
             {
-                (this.Bar as IDisposable)?.Dispose();
+                (this.M as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -223,22 +223,22 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private readonly object bar;
         private bool disposed = false;
 
-        public FooBase()
+        public CBase()
             : this(null)
         {
         }
 
-        public FooBase(object bar)
+        public CBase(object bar)
         {
             this.bar = bar;
         }
 
-        public object Bar => this.bar;
+        public object M => this.bar;
 
         public void Dispose()
         {
@@ -263,14 +263,14 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
-        public Foo(int no)
+        public C(int no)
             : this(no.ToString())
         {
         }
 
-        public Foo(string fileName)
+        public C(string fileName)
             : base(File.OpenRead(fileName))
         {
         }
@@ -279,7 +279,7 @@ namespace RoslynSandbox
         {
             if (disposing)
             {
-                (this.Bar as IDisposable)?.Dispose();
+                (this.M as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -297,24 +297,24 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private static IDisposable Empty = new Disposable();
 
         private readonly object bar;
         private bool disposed = false;
 
-        public FooBase(string text)
+        public CBase(string text)
         {
             this.bar = Empty;
         }
 
-        public FooBase(object bar)
+        public CBase(object bar)
         {
             this.bar = bar;
         }
 
-        public object Bar => this.bar;
+        public object M => this.bar;
 
         public void Dispose()
         {
@@ -339,9 +339,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
-        public Foo(string fileName)
+        public C(string fileName)
             : base(File.OpenRead(fileName))
         {
         }
@@ -350,7 +350,7 @@ namespace RoslynSandbox
         {
             if (disposing)
             {
-                (this.Bar as IDisposable)?.Dispose();
+                (this.M as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -368,11 +368,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -389,11 +389,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -414,26 +414,26 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
             : this(disposable, ""meh"")
         {
         }
 
-        public Foo(IDisposable disposable, IDisposable gah, int meh)
+        public C(IDisposable disposable, IDisposable gah, int meh)
             : this(disposable, meh)
         {
         }
 
-        private Foo(IDisposable disposable, int meh)
+        private C(IDisposable disposable, int meh)
             : this(disposable, meh.ToString())
         {
         }
 
-        private Foo(IDisposable disposable, string meh)
+        private C(IDisposable disposable, string meh)
         {
             this.disposable = disposable;
         }
@@ -454,11 +454,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private object meh;
 
-        public Foo(object meh)
+        public C(object meh)
         {
             this.meh = meh;
         }
@@ -481,12 +481,12 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable disposable;
         private bool disposed;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -542,16 +542,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -574,12 +574,12 @@ namespace RoslynSandbox
     using System;
     using System.ComponentModel;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private bool isDirty;
 
-        public Foo()
+        public C()
         {
         }
 
@@ -620,15 +620,15 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool isDirty;
 
-        public Foo()
+        public C()
         {
         }
 
-        public void Bar(IDisposable meh)
+        public void M(IDisposable meh)
         {
         }
 
@@ -648,9 +648,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Action<IDisposable> action = x => x.Dispose();
         }
@@ -669,9 +669,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Action<IDisposable> action = x => x.Dispose();
             var stream = File.OpenRead(string.Empty);
@@ -690,9 +690,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Meh(x => x.Dispose());
         }

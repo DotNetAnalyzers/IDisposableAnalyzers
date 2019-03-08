@@ -17,11 +17,11 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public void MethodInjected(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
     private int value;
 
-    internal Foo()
+    internal C()
     {
         var temp1 = this.value;
         this.Update(1);
@@ -30,7 +30,7 @@ internal class Foo
         var temp3 = this.value;
     }
 
-    internal void Bar()
+    internal void M()
     {
         var temp4 = this.value;
     }
@@ -57,11 +57,11 @@ internal class Foo
             public void MethodInjectedWithOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
     private int value;
 
-    internal Foo()
+    internal C()
     {
         var temp1 = this.value;
         this.Update(1);
@@ -70,7 +70,7 @@ internal class Foo
         var temp3 = this.value;
     }
 
-    internal void Bar()
+    internal void M()
     {
         var temp4 = this.value;
     }
@@ -97,11 +97,11 @@ internal class Foo
             public void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
     private string text;
 
-    internal Foo()
+    internal C()
     {
         var temp1 = this.text;
         this.Update(1);
@@ -110,7 +110,7 @@ internal class Foo
         var temp3 = this.text;
     }
 
-    internal void Bar()
+    internal void M()
     {
         var temp4 = this.text;
     }

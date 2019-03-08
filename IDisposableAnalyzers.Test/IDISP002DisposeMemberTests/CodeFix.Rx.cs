@@ -23,7 +23,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly SerialDisposable disposable = new SerialDisposable();
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly SerialDisposable disposable = new SerialDisposable();
 
@@ -72,11 +72,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.disposable = observable.Subscribe(_ => { });
         }
@@ -92,11 +92,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.disposable = observable.Subscribe(_ => { });
         }

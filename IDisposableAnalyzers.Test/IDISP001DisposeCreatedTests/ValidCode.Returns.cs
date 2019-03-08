@@ -14,9 +14,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar()
+        public static Stream M()
         {
             return File.OpenRead(string.Empty);
         }
@@ -33,9 +33,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar() => File.OpenRead(string.Empty);
+        public static Stream M() => File.OpenRead(string.Empty);
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
@@ -49,9 +49,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar()
+        public static Stream M()
         {
             var stream = File.OpenRead(string.Empty);
             return stream;
@@ -70,9 +70,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar()
+        public static IDisposable M()
         {
             var stream = File.OpenRead(string.Empty);
             return stream;
@@ -91,9 +91,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar()
+        public static IDisposable M()
         {
             var stream = File.OpenRead(string.Empty);
             return stream as IDisposable;
@@ -112,9 +112,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar()
+        public static IDisposable M()
         {
             var stream = File.OpenRead(string.Empty);
             return (IDisposable)stream;
@@ -132,9 +132,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar()
+        public static Stream M()
         {
             var stream = File.OpenRead(string.Empty);
             var length = stream.Length;
@@ -153,9 +153,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar()
+        public static Stream M()
         {
             var stream = File.OpenRead(string.Empty);
             if (true)
@@ -178,9 +178,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar(string text)
+        public static Stream M(string text)
         {
             var stream = File.OpenRead(string.Empty);
             if (text == null)
@@ -204,9 +204,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static StreamReader Bar()
+        public static StreamReader M()
         {
             var stream = File.OpenRead(string.Empty);
             return new StreamReader(stream);
@@ -224,9 +224,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static StreamReader Bar()
+        public static StreamReader M()
         {
             var stream = File.OpenRead(string.Empty);
             return new StreamReader(stream);
@@ -245,9 +245,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public static class Foo
+    public static class C
     {
-        public static CompositeDisposable Bar()
+        public static CompositeDisposable M()
         {
             var stream = File.OpenRead(string.Empty);
             return new CompositeDisposable { stream };
@@ -265,9 +265,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar
+        public static Stream M
         {
             get
             {
@@ -287,9 +287,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar
+        public static Stream M
         {
             get
             {
@@ -310,9 +310,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar => File.OpenRead(string.Empty);
+        public static Stream M => File.OpenRead(string.Empty);
     }
 }";
             AnalyzerAssert.Valid(Analyzer, testCode);
@@ -326,11 +326,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Lazy<IDisposable> disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new Lazy<IDisposable>(() =>
             {
@@ -360,7 +360,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    class Foo
+    class C
     {
         public static IDisposable Create()
         {
@@ -385,7 +385,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    class Foo
+    class C
     {
         public static IDisposable Create()
         {
@@ -407,7 +407,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    class Foo
+    class C
     {
         public static IDisposable Create()
         {

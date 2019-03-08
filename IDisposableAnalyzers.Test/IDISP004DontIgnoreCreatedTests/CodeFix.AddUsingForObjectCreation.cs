@@ -32,7 +32,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -45,7 +45,7 @@ namespace RoslynSandbox
                 var fixedCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -68,7 +68,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -82,7 +82,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -126,7 +126,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -156,9 +156,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        internal static string Bar()
+        internal static string M()
         {
             return Meh(↓new Disposable());
         }

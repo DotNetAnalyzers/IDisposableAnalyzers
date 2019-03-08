@@ -22,9 +22,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
-        internal Foo()
+        internal C()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -37,11 +37,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal sealed class Foo
+    internal sealed class C
     {
         private readonly IDisposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = File.OpenRead(string.Empty);
         }
@@ -59,11 +59,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly int value;
 
-        public Foo(int value)
+        public C(int value)
         {
             this.value = value;
             ↓File.OpenRead(string.Empty);
@@ -78,12 +78,12 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly int value;
         private readonly System.IDisposable disposable;
 
-        public Foo(int value)
+        public C(int value)
         {
             this.value = value;
             this.disposable = File.OpenRead(string.Empty);
@@ -104,11 +104,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly int _value;
 
-        public Foo(int value)
+        public C(int value)
         {
             _value = value;
             ↓File.OpenRead(string.Empty);
@@ -123,12 +123,12 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly int _value;
         private readonly System.IDisposable _disposable;
 
-        public Foo(int value)
+        public C(int value)
         {
             _value = value;
             _disposable = File.OpenRead(string.Empty);

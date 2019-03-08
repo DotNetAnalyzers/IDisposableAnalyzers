@@ -8,26 +8,26 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 
     public partial class AssignedValueWalkerTests
     {
-        [TestCase("var temp1 = this.Bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "1, 2")]
-        [TestCase("var temp3 = this.Bar;", "1, 2")]
+        [TestCase("var temp1 = this.M;", "1")]
+        [TestCase("var temp2 = this.M;", "1, 2")]
+        [TestCase("var temp3 = this.M;", "1, 2")]
         public void AutoPropertyGetSetAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+public sealed class C
 {
-    public Foo()
+    public C()
     {
-        var temp1 = this.Bar;
-        this.Bar = 2;
-        var temp2 = this.Bar;
+        var temp1 = this.M;
+        this.M = 2;
+        var temp2 = this.M;
     }
 
-    public int Bar { get; set; } = 1;
+    public int M { get; set; } = 1;
 
     public void Meh()
     {
-        var temp3 = this.Bar;
+        var temp3 = this.M;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -40,26 +40,26 @@ public sealed class Foo
             }
         }
 
-        [TestCase("var temp1 = this.Bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "1, 2")]
-        [TestCase("var temp3 = this.Bar;", "1, 2")]
+        [TestCase("var temp1 = this.M;", "1")]
+        [TestCase("var temp2 = this.M;", "1, 2")]
+        [TestCase("var temp3 = this.M;", "1, 2")]
         public void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+public sealed class C
 {
-    public Foo()
+    public C()
     {
-        var temp1 = this.Bar;
-        this.Bar = 2;
-        var temp2 = this.Bar;
+        var temp1 = this.M;
+        this.M = 2;
+        var temp2 = this.M;
     }
 
-    public int Bar { get; } = 1;
+    public int M { get; } = 1;
 
     public void Meh()
     {
-        var temp3 = this.Bar;
+        var temp3 = this.M;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -73,28 +73,28 @@ public sealed class Foo
         }
 
         [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "")]
+        [TestCase("var temp2 = this.M;", "")]
         [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.Bar;", "")]
+        [TestCase("var temp4 = this.M;", "")]
         [TestCase("var temp5 = this.bar;", "1, 2")]
-        [TestCase("var temp6 = this.Bar;", "")]
+        [TestCase("var temp6 = this.M;", "")]
         public void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+public sealed class C
 {
     private int bar = 1;
 
-    public Foo()
+    public C()
     {
         var temp1 = this.bar;
-        var temp2 = this.Bar;
+        var temp2 = this.M;
         this.bar = 2;
         var temp3 = this.bar;
-        var temp4 = this.Bar;
+        var temp4 = this.M;
     }
 
-    public int Bar
+    public int M
     {
         get { return this.bar; }
         private set { this.bar = value; }
@@ -103,7 +103,7 @@ public sealed class Foo
     public void Meh()
     {
         var temp5 = this.bar;
-        var temp6 = this.Bar;
+        var temp6 = this.M;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -117,30 +117,30 @@ public sealed class Foo
         }
 
         [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "")]
+        [TestCase("var temp2 = this.M;", "")]
         [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.Bar;", "")]
+        [TestCase("var temp4 = this.M;", "")]
         [TestCase("var temp5 = this.bar;", "1, 2, value")]
-        [TestCase("var temp6 = this.Bar;", "")]
+        [TestCase("var temp6 = this.M;", "")]
         public void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         private int bar = 1;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.bar;
-            var temp2 = this.Bar;
+            var temp2 = this.M;
             this.bar = 2;
             var temp3 = this.bar;
-            var temp4 = this.Bar;
+            var temp4 = this.M;
         }
 
-        public int Bar
+        public int M
         {
             get { return this.bar; }
             set { this.bar = value; }
@@ -149,7 +149,7 @@ namespace RoslynSandbox
         public void Meh()
         {
             var temp5 = this.bar;
-            var temp6 = this.Bar;
+            var temp6 = this.M;
         }
     }
 }");
@@ -169,11 +169,11 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         private int bar;
 
-        public int Bar
+        public int M
         {
             get { return this.bar; }
             set { this.bar = value; }
@@ -203,11 +203,11 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         private int bar;
 
-        public int Bar
+        public int M
         {
             get { return this.bar; }
             private set { this.bar = value; }
@@ -230,28 +230,28 @@ namespace RoslynSandbox
         }
 
         [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "")]
+        [TestCase("var temp2 = this.M;", "")]
         [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.Bar;", "2")]
+        [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2")]
-        [TestCase("var temp6 = this.Bar;", "2")]
+        [TestCase("var temp6 = this.M;", "2")]
         public void BackingFieldPrivateSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+public sealed class C
 {
     private int bar = 1;
 
-    public Foo()
+    public C()
     {
         var temp1 = this.bar;
-        var temp2 = this.Bar;
-        this.Bar = 2;
+        var temp2 = this.M;
+        this.M = 2;
         var temp3 = this.bar;
-        var temp4 = this.Bar;
+        var temp4 = this.M;
     }
 
-    public int Bar
+    public int M
     {
         get { return this.bar; }
         private set { this.bar = value; }
@@ -260,7 +260,7 @@ public sealed class Foo
     public void Meh()
     {
         var temp5 = this.bar;
-        var temp6 = this.Bar;
+        var temp6 = this.M;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -274,28 +274,28 @@ public sealed class Foo
         }
 
         [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "")]
+        [TestCase("var temp2 = this.M;", "")]
         [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.Bar;", "2")]
+        [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2, value")]
-        [TestCase("var temp6 = this.Bar;", "2")]
+        [TestCase("var temp6 = this.M;", "2")]
         public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class Foo
+public sealed class C
 {
     private int bar = 1;
 
-    public Foo()
+    public C()
     {
         var temp1 = this.bar;
-        var temp2 = this.Bar;
-        this.Bar = 2;
+        var temp2 = this.M;
+        this.M = 2;
         var temp3 = this.bar;
-        var temp4 = this.Bar;
+        var temp4 = this.M;
     }
 
-    public int Bar
+    public int M
     {
         get { return this.bar; }
         set { this.bar = value; }
@@ -304,7 +304,7 @@ public sealed class Foo
     public void Meh()
     {
         var temp5 = this.bar;
-        var temp6 = this.Bar;
+        var temp6 = this.M;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -318,30 +318,30 @@ public sealed class Foo
         }
 
         [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.Bar;", "")]
+        [TestCase("var temp2 = this.M;", "")]
         [TestCase("var temp3 = this.bar;", "1, 2, value / 2, 3")]
-        [TestCase("var temp4 = this.Bar;", "2")]
+        [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2, value / 2, 3, value, value")]
-        [TestCase("var temp6 = this.Bar;", "2")]
+        [TestCase("var temp6 = this.M;", "2")]
         public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         private int bar = 1;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.bar;
-            var temp2 = this.Bar;
-            this.Bar = 2;
+            var temp2 = this.M;
+            this.M = 2;
             var temp3 = this.bar;
-            var temp4 = this.Bar;
+            var temp4 = this.M;
         }
 
-        public int Bar
+        public int M
         {
             get { return this.bar; }
             set
@@ -363,7 +363,7 @@ namespace RoslynSandbox
         public void Meh()
         {
             var temp5 = this.bar;
-            var temp6 = this.Bar;
+            var temp6 = this.M;
         }
     }
 }");
@@ -377,32 +377,32 @@ namespace RoslynSandbox
             }
         }
 
-        [TestCase("var temp1 = this.Bar;", "")]
-        [TestCase("var temp2 = this.Bar;", "2")]
-        [TestCase("var temp3 = this.Bar;", "2, value")]
+        [TestCase("var temp1 = this.M;", "")]
+        [TestCase("var temp2 = this.M;", "2")]
+        [TestCase("var temp3 = this.M;", "2, value")]
         public void RecursiveGetAndSet(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
-            var temp1 = this.Bar;
-            this.Bar = 2;
-            var temp2 = this.Bar;
+            var temp1 = this.M;
+            this.M = 2;
+            var temp2 = this.M;
         }
 
-        public int Bar
+        public int M
         {
-            get { return this.Bar; }
-            set { this.Bar = value; }
+            get { return this.M; }
+            set { this.M = value; }
         }
 
         public void Meh()
         {
-            var temp3 = this.Bar;
+            var temp3 = this.M;
         }
     }
 }");
@@ -422,12 +422,12 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        private Bar bar1;
-        private Bar bar2;
+        private M bar1;
+        private M bar2;
 
-        public Bar Bar1
+        public M M1
         {
             get
             {
@@ -443,7 +443,7 @@ namespace RoslynSandbox
 
                 if (value != null && this.bar2 != null)
                 {
-                    this.Bar2 = null;
+                    this.M2 = null;
                 }
 
                 if (this.bar1 != null)
@@ -459,7 +459,7 @@ namespace RoslynSandbox
             }
         }
 
-        public Bar Bar2
+        public M M2
         {
             get
             {
@@ -475,7 +475,7 @@ namespace RoslynSandbox
 
                 if (value != null && this.bar1 != null)
                 {
-                    this.Bar1 = null;
+                    this.M1 = null;
                 }
 
                 if (this.bar2 != null)
@@ -492,7 +492,7 @@ namespace RoslynSandbox
         }
     }
 
-    public class Bar
+    public class M
     {
         public bool Selected { get; set; }
     }

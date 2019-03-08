@@ -21,9 +21,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -31,7 +31,7 @@ namespace RoslynSandbox
 
         public int Value { get; }
 
-        protected virtual void Bar()
+        protected virtual void M()
         {
         }
 
@@ -46,11 +46,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo : System.IDisposable
+    public sealed class C : System.IDisposable
     {
         private bool disposed;
 
-        public Foo()
+        public C()
         {
         }
 
@@ -68,7 +68,7 @@ namespace RoslynSandbox
             this.disposed = true;
         }
 
-        private void Bar()
+        private void M()
         {
         }
 
@@ -97,9 +97,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
         }
 
@@ -115,7 +115,7 @@ namespace RoslynSandbox
             }
         }
 
-        protected virtual void Bar()
+        protected virtual void M()
         {
         }
 
@@ -131,11 +131,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private bool disposed;
 
-        public Foo()
+        public C()
         {
         }
 
@@ -157,7 +157,7 @@ namespace RoslynSandbox
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Bar()
+        protected virtual void M()
         {
         }
 
@@ -198,7 +198,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
@@ -209,7 +209,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo : System.IDisposable
+    public sealed class C : System.IDisposable
     {
         private bool disposed;
 
@@ -246,7 +246,7 @@ using System.IO;
 
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
@@ -257,7 +257,7 @@ using System.IO;
 
 namespace RoslynSandbox
 {
-    public sealed class Foo : System.IDisposable
+    public sealed class C : System.IDisposable
     {
         private bool disposed;
 
@@ -294,7 +294,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public const int Value = 2;
         private readonly int _value = 1;
@@ -308,7 +308,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo : System.IDisposable
+    public sealed class C : System.IDisposable
     {
         public const int Value = 2;
         private readonly int _value = 1;
@@ -347,7 +347,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public abstract class Foo
+    public abstract class C
     {
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
@@ -359,7 +359,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private bool disposed;
 
@@ -405,7 +405,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
 
@@ -426,16 +426,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        private Foo(IDisposable value)
+        private C(IDisposable value)
         {
             this.Value = value;
         }
 
         ↓public IDisposable Value { get; }
 
-        public static Foo Create() => new Foo(new Disposable());
+        public static C Create() => new C(new Disposable());
     }
 }";
 
@@ -444,18 +444,18 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
-        private Foo(IDisposable value)
+        private C(IDisposable value)
         {
             this.Value = value;
         }
 
         public IDisposable Value { get; }
 
-        public static Foo Create() => new Foo(new Disposable());
+        public static C Create() => new C(new Disposable());
 
         public void Dispose()
         {

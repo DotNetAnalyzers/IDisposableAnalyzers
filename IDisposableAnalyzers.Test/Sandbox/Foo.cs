@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.Sandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly Stream StaticStream = File.OpenRead(string.Empty);
         private Stream stream;
 
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.stream = stream;
             this.stream = StaticStream;

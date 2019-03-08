@@ -27,7 +27,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public int Value
         {
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public object Value
         {
@@ -69,7 +69,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public int Value
         {
@@ -92,7 +92,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public TimeSpan Value
         {
@@ -115,7 +115,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         public TimeSpan Value => new TimeSpan(1);
     }
@@ -132,7 +132,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
 
@@ -159,7 +159,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
 
@@ -183,11 +183,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly Func<IDisposable> func;
 
-        public Foo(Func<IDisposable> func)
+        public C(Func<IDisposable> func)
         {
             this.func = func;
         }

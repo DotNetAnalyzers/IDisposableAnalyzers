@@ -53,11 +53,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Bar
+    public class M
     {
         private readonly Stream stream;
 
-        public Bar(Stream stream)
+        public M(Stream stream)
         {
            this.stream = stream;
         }
@@ -70,9 +70,9 @@ namespace RoslynSandbox
 
     public sealed class C
     {
-        public Bar Meh()
+        public M Meh()
         {
-            return new Bar(↓File.OpenRead(string.Empty));
+            return new M(↓File.OpenRead(string.Empty));
         }
     }
 }";
@@ -119,7 +119,7 @@ namespace RoslynSandbox
 
     public class C
     {
-        public void Bar()
+        public void M()
         {
             ↓Factory.Create<int>();
         }
@@ -140,7 +140,7 @@ namespace RoslynSandbox
     {
         public static Stream Stream() => File.OpenRead(string.Empty);
 
-        public static long Bar()
+        public static long M()
         {
             return ↓Stream().Length;
         }
@@ -245,7 +245,7 @@ namespace RoslynSandbox
 
     public class C
     {
-        internal static string Bar()
+        internal static string M()
         {
             return Meh(↓File.OpenRead(string.Empty));
         }
@@ -298,7 +298,7 @@ namespace RoslynSandbox
 {
     public class C
     {
-        public void Bar()
+        public void M()
         {
             ↓Factory.Create<Disposable>();
         }
@@ -320,10 +320,10 @@ namespace RoslynSandbox
     {
         public C(IDisposable disposable)
         {
-            ↓Bar(disposable);
+            ↓M(disposable);
         }
 
-        private static IDisposable Bar(IDisposable disposable, List<IDisposable> list = null)
+        private static IDisposable M(IDisposable disposable, List<IDisposable> list = null)
         {
             if (list == null)
             {
@@ -336,7 +336,7 @@ namespace RoslynSandbox
             }
 
             list.Add(disposable);
-            return Bar(disposable, list);
+            return M(disposable, list);
         }
     }
 }";

@@ -17,7 +17,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private Stream stream = File.OpenRead(string.Empty);
 
@@ -46,11 +46,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable[] disposables;
 
-        public void Bar()
+        public void M()
         {
             var disposable = disposables[0];
             disposable.Dispose();
@@ -73,11 +73,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
 
-        public void Bar()
+        public void M()
         {
             var disposable = map[0];
             disposable.Dispose();
@@ -99,9 +99,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             var b = stream.ReadByte();
@@ -123,9 +123,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             Create(out stream);

@@ -17,9 +17,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
         }
     }
@@ -27,7 +27,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(false, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -41,9 +41,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             var temp = disposable;
         }
@@ -52,7 +52,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(false, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -66,11 +66,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private IDisposable disposable;
 
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -79,7 +79,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -93,11 +93,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private IDisposable[] disposables = new IDisposable[1];
 
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             this.disposables[0] = disposable;
         }
@@ -106,7 +106,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -120,11 +120,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private IDisposable disposable;
 
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             this.Initialize(disposable);
         }
@@ -138,7 +138,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -152,11 +152,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private IDisposable disposable;
 
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             var temp = disposable;
             this.disposable = temp;
@@ -166,7 +166,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));
@@ -180,9 +180,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo(IDisposable disposable)
+        internal C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -193,7 +193,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var ctor = syntaxTree.FindConstructorDeclaration("internal Foo(IDisposable disposable)");
+                var ctor = syntaxTree.FindConstructorDeclaration("internal C(IDisposable disposable)");
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, Disposable.IsAssignedToFieldOrProperty(symbol, ctor, semanticModel, CancellationToken.None));

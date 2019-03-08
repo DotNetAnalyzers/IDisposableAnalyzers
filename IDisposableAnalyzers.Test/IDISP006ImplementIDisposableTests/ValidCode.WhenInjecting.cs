@@ -13,16 +13,16 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         private readonly bool value;
 
-        private Foo(bool value)
+        private C(bool value)
         {
             this.value = value;
         }
 
-        public static Foo Create() => new Foo(true);
+        public static C Create() => new C(true);
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
@@ -36,17 +36,17 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly IDisposable Cached = new Disposable();
         private readonly IDisposable value;
 
-        private Foo(IDisposable value)
+        private C(IDisposable value)
         {
             this.value = value;
         }
 
-        public static Foo Create() => new Foo(Cached);
+        public static C Create() => new C(Cached);
     }
 }";
                 AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);

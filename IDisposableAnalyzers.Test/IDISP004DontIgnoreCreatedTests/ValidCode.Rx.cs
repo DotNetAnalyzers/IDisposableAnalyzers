@@ -15,7 +15,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly SerialDisposable disposable = new SerialDisposable();
 
@@ -44,7 +44,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
 
@@ -73,11 +73,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new CompositeDisposable
             {
@@ -106,11 +106,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new CompositeDisposable(
                 File.OpenRead(string.Empty),
@@ -136,11 +136,11 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.disposable.Add(observable.Subscribe(_ => { }));
         }
@@ -163,11 +163,11 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Foo()
+        public C()
         {
             this.disposable.Add(new SingleAssignmentDisposable());
         }
@@ -191,11 +191,11 @@ namespace RoslynSandbox
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.disposable.Add(observable.Throttle(TimeSpan.FromMilliseconds(100))
                                           .Subscribe(_ => { }));
@@ -239,7 +239,7 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
@@ -286,7 +286,7 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 

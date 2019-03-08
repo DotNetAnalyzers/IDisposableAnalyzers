@@ -16,7 +16,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal sealed class Foo : IDisposable
+    internal sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -42,9 +42,9 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("Foo"));
+            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.Foo.Dispose()", match.ToString());
+            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
         }
 
         [Explicit("Not sure if we want to find explicit.")]
@@ -57,7 +57,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal sealed class Foo : IDisposable
+    internal sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -83,9 +83,9 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("Foo"));
+            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.Foo.Dispose()", match.ToString());
+            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
         }
 
         [TestCase(Search.TopLevel)]
@@ -97,7 +97,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo : IDisposable
+    internal class C : IDisposable
     {
         private bool disposed;
 
@@ -131,9 +131,9 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("Foo"));
+            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindVirtualDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.Foo.Dispose(bool)", match.ToString());
+            Assert.AreEqual("RoslynSandbox.C.Dispose(bool)", match.ToString());
         }
 
         [TestCase(Search.TopLevel)]
@@ -145,7 +145,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo : IDisposable
+    internal class C : IDisposable
     {
         private bool disposed;
 
@@ -179,9 +179,9 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("Foo"));
+            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindFirst(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.Foo.Dispose()", match.ToString());
+            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
         }
     }
 }

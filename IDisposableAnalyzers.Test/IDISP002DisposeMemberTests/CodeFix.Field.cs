@@ -22,7 +22,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
 
@@ -38,7 +38,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
@@ -60,7 +60,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable = new Disposable();
 
@@ -75,7 +75,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
 
@@ -97,11 +97,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    class Foo : IDisposable
+    class C : IDisposable
     {
         ↓IDisposable _disposable;
 
-        public void Bar() => _disposable = new Disposable();
+        public void M() => _disposable = new Disposable();
 
         public void Dispose()
         {
@@ -114,11 +114,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    class Foo : IDisposable
+    class C : IDisposable
     {
         IDisposable _disposable;
 
-        public void Bar() => _disposable = new Disposable();
+        public void M() => _disposable = new Disposable();
 
         public void Dispose()
         {
@@ -139,7 +139,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private Stream stream = File.OpenRead(string.Empty);
 
@@ -161,7 +161,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private Stream stream = File.OpenRead(string.Empty);
 
@@ -190,11 +190,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = File.OpenRead(string.Empty);
         }
@@ -211,11 +211,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = File.OpenRead(string.Empty);
         }
@@ -239,11 +239,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new Disposable();
         }
@@ -260,11 +260,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new Disposable();
         }
@@ -288,11 +288,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo(bool condition)
+        public C(bool condition)
         {
             if (condition)
             {
@@ -312,11 +312,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo(bool condition)
+        public C(bool condition)
         {
             if (condition)
             {
@@ -343,11 +343,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = null ?? File.OpenRead(string.Empty);
         }
@@ -364,11 +364,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = null ?? File.OpenRead(string.Empty);
         }
@@ -392,11 +392,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo(bool value)
+        public C(bool value)
         {
             this.stream = value ? null : File.OpenRead(string.Empty);
         }
@@ -413,11 +413,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo(bool value)
+        public C(bool value)
         {
             this.stream = value ? null : File.OpenRead(string.Empty);
         }
@@ -441,7 +441,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓protected Stream stream = File.OpenRead(string.Empty);
 
@@ -457,7 +457,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         protected Stream stream = File.OpenRead(string.Empty);
 
@@ -480,7 +480,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -498,7 +498,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -523,7 +523,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -538,7 +538,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -563,7 +563,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly object stream = File.OpenRead(string.Empty);
 
@@ -579,7 +579,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly object stream = File.OpenRead(string.Empty);
 
@@ -602,11 +602,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private Stream _stream;
 
-        public Foo()
+        public C()
         {
             Stream = File.OpenRead(string.Empty);
         }
@@ -629,11 +629,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private Stream _stream;
 
-        public Foo()
+        public C()
         {
             Stream = File.OpenRead(string.Empty);
         }
@@ -662,7 +662,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         ↓private readonly IDisposable _disposable = new Disposable();
 
@@ -701,7 +701,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private readonly IDisposable _disposable = new Disposable();
 
@@ -783,7 +783,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -813,7 +813,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -886,7 +886,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         ↓private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -914,7 +914,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream1 = File.OpenRead(string.Empty);
         private readonly Stream stream2 = File.OpenRead(string.Empty);
@@ -951,7 +951,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Bar : Disposable
+    public sealed class M : Disposable
     {
     }
 }";
@@ -960,9 +960,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
-        ↓private readonly Bar bar = new Bar();
+        ↓private readonly M bar = new M();
 
         public void Dispose()
         {
@@ -975,9 +975,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
-        private readonly Bar bar = new Bar();
+        private readonly M bar = new M();
 
         public void Dispose()
         {
@@ -997,7 +997,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Bar<T> : Disposable
+    public sealed class M<T> : Disposable
     {
     }
 }";
@@ -1006,9 +1006,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo<T> : IDisposable
+    public sealed class C<T> : IDisposable
     {
-        ↓private readonly Bar<T> bar = new Bar<T>();
+        ↓private readonly M<T> bar = new M<T>();
 
         public void Dispose()
         {
@@ -1021,9 +1021,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo<T> : IDisposable
+    public sealed class C<T> : IDisposable
     {
-        private readonly Bar<T> bar = new Bar<T>();
+        private readonly M<T> bar = new M<T>();
 
         public void Dispose()
         {
@@ -1043,7 +1043,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private IDisposable disposable;
         private bool disposed;
@@ -1067,7 +1067,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private IDisposable disposable;
         private bool disposed;
@@ -1098,12 +1098,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly IDisposable created;
         private bool disposed;
 
-        public Foo(IDisposable injected)
+        public C(IDisposable injected)
         {
             this.Disposable = injected ?? (this.created = new Disposable());
         }
@@ -1127,12 +1127,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable created;
         private bool disposed;
 
-        public Foo(IDisposable injected)
+        public C(IDisposable injected)
         {
             this.Disposable = injected ?? (this.created = new Disposable());
         }
@@ -1164,11 +1164,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             var temp = File.OpenRead(string.Empty);
             this.stream = true
@@ -1188,11 +1188,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             var temp = File.OpenRead(string.Empty);
             this.stream = true
@@ -1219,7 +1219,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1258,7 +1258,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1339,7 +1339,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1366,7 +1366,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1436,7 +1436,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1463,7 +1463,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -1497,7 +1497,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -1528,7 +1528,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
         ↓private readonly IDisposable disposable = new Disposable();
 
@@ -1544,7 +1544,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
         private readonly IDisposable disposable = new Disposable();
 

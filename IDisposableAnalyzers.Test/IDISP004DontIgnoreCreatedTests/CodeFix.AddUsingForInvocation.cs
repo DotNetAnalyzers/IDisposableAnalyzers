@@ -21,7 +21,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -37,7 +37,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -61,7 +61,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -76,7 +76,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -99,7 +99,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -122,7 +122,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public void Meh()
         {
@@ -152,9 +152,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        internal static string Bar()
+        internal static string M()
         {
             return Meh(↓File.OpenRead(string.Empty));
         }

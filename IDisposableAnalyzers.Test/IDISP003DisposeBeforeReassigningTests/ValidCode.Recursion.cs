@@ -14,7 +14,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -55,11 +55,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -83,11 +83,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -110,7 +110,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveMethod() => RecursiveMethod();
 
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class Foo
+    public abstract class C
     {
         public static bool RecursiveOut(double foo, out IDisposable value)
         {

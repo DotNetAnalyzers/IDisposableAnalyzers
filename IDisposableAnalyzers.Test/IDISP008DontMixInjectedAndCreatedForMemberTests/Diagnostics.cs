@@ -29,7 +29,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public bool TryGetStream(ref Stream stream)
         {

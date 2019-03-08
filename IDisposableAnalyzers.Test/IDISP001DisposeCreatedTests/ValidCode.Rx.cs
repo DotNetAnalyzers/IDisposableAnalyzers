@@ -16,11 +16,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
         }
@@ -45,11 +45,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Foo()
+        public C()
         {
             this.disposable.Add(File.OpenRead(string.Empty));
         }
@@ -72,7 +72,7 @@ using System;
 using System.IO;
 using System.Reactive.Disposables;
 
-public sealed class Foo : IDisposable
+public sealed class C : IDisposable
 {
     private readonly SerialDisposable disposable = new SerialDisposable();
 
@@ -100,11 +100,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly SerialDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new SerialDisposable { Disposable = File.OpenRead(string.Empty) };
         }
@@ -127,7 +127,7 @@ using System;
 using System.IO;
 using System.Reactive.Disposables;
 
-public sealed class Foo : IDisposable
+public sealed class C : IDisposable
 {
     private readonly SingleAssignmentDisposable disposable = new SingleAssignmentDisposable();
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public sealed class Foo
+    public sealed class C
     {
         public IObservable<object> Create()
         {
@@ -184,7 +184,7 @@ namespace RoslynSandbox
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public sealed class Foo
+    public sealed class C
     {
         public IObservable<object> Create()
         {
@@ -213,7 +213,7 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public class Foo
+    public class C
     {
         internal static IDisposable Create()
         {
@@ -235,11 +235,11 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Lazy<IDisposable> disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = new Lazy<IDisposable>(() =>
             {

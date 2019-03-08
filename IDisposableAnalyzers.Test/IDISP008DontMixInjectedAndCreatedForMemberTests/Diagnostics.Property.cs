@@ -21,11 +21,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly Stream StaticStream = File.OpenRead(string.Empty);
 
-        public Foo(Stream arg)
+        public C(Stream arg)
         {
             this.Stream = arg ?? File.OpenRead(string.Empty);
         }
@@ -44,9 +44,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.Stream = stream;
         }
@@ -65,14 +65,14 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.Stream = stream;
         }
@@ -93,7 +93,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
     }
@@ -112,7 +112,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
 
@@ -133,16 +133,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
-            this.Bar = bar;
+            this.M = bar;
         }
 
-        ↓public IDisposable Bar { get; }
+        ↓public IDisposable M { get; }
 
-        public static Foo Create() => new Foo(new Disposable());
+        public static C Create() => new C(new Disposable());
     }
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);

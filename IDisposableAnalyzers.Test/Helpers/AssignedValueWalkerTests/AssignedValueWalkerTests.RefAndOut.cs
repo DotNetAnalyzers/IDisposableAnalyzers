@@ -14,9 +14,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public void LocalAssignedWithOutParameterSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         int value;
         Assign(out value, 1);
@@ -41,9 +41,9 @@ internal class Foo
             public void LocalAssignedWithOutParameterOtherClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-class Foo
+class C
 {
-    Foo(Bar bar)
+    C(M bar)
     {
         int value;
         bar.Assign(out value, 1);
@@ -51,7 +51,7 @@ class Foo
     }
 }
 
-class Bar
+class M
 {
     internal void Assign(out int outValue, int arg)
     {
@@ -71,9 +71,9 @@ class Bar
             public void LocalAssignedWithOutParameterOtherClassElvis()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-class Foo
+class C
 {
-    Foo(Bar bar)
+    C(M bar)
     {
         int value;
         bar?.Assign(out value, 1);
@@ -81,7 +81,7 @@ class Foo
     }
 }
 
-class Bar
+class M
 {
     internal void Assign(out int outValue, int arg)
     {
@@ -104,9 +104,9 @@ class Bar
             public void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         int value;
         var temp1 = value;
@@ -114,7 +114,7 @@ internal class Foo
         var temp2 = value;
     }
 
-    internal void Bar()
+    internal void M()
     {
         int value;
         var temp3 = value;
@@ -141,9 +141,9 @@ internal class Foo
             public void LocalAssignedWithOutParameterGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo<T>
+internal class C<T>
 {
-    internal Foo()
+    internal C()
     {
         T value;
         Assign(out value);
@@ -171,9 +171,9 @@ internal class Foo<T>
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             int value = 0;
             var temp1 = value;
@@ -207,9 +207,9 @@ namespace RoslynSandbox
             public void LocalAssignedWithChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         int value;
         var temp1 = value;
@@ -242,9 +242,9 @@ internal class Foo
             public void LocalAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class Foo
+internal class C
 {
-    internal Foo()
+    internal C()
     {
         int value;
         var temp1 = value;
@@ -276,18 +276,18 @@ internal class Foo
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private int value = 1;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.value;
             this.Assign(out this.value, 2);
             var temp2 = this.value;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp3 = this.value;
             this.Assign(out this.value, 3);
@@ -319,18 +319,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private int value = 1;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.value;
             this.Assign(ref this.value);
             var temp2 = this.value;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp3 = this.value;
             this.Assign(ref this.value);
@@ -362,18 +362,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private int value = 1;
 
-        public Foo()
+        public C()
         {
             var temp1 = this.value;
             this.Assign(ref this.value, 2);
             var temp2 = this.value;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp3 = this.value;
             this.Assign(ref this.value, 3);
@@ -402,9 +402,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             int value = 0;
             Assign(ref value, out value);
@@ -434,9 +434,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             int value;
             RecursiveOut(out value);
@@ -472,9 +472,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal void Bar()
+        internal void M()
         {
             int value;
             RecursiveOut(1.0, out value);

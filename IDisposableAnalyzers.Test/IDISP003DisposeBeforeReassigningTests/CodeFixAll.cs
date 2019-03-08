@@ -17,7 +17,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -54,7 +54,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {

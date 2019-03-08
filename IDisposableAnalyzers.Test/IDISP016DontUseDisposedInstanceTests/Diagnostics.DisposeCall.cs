@@ -19,9 +19,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             ↓stream.Dispose();
@@ -40,9 +40,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             ↓stream.Dispose();
@@ -61,9 +61,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -84,9 +84,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             Create(out stream);
@@ -112,9 +112,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Create(out var stream);
             var b = stream.ReadByte();
@@ -139,9 +139,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             var b = stream.ReadByte();
@@ -164,9 +164,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Create(out var stream);
             var b = stream.ReadByte();
@@ -194,9 +194,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             Create(out stream);

@@ -14,7 +14,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public bool Update()
         {
@@ -63,9 +63,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             TryGetStream(out stream);
@@ -93,7 +93,7 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
@@ -117,7 +117,7 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
@@ -142,7 +142,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -170,9 +170,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream = null;
             this.Assign(ref stream);
@@ -197,9 +197,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream = null;
             Assign(ref stream);
@@ -225,7 +225,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public static bool TryGetStream(out Stream stream)
         {
@@ -250,9 +250,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             using (disposable = new Disposable())
@@ -272,9 +272,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             if (TryGetStream(out var stream))
             {
@@ -300,7 +300,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    class Foo
+    class C
     {
         private static bool TryGetStream(string fileName, out Stream result)
         {
@@ -326,7 +326,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    class Foo
+    class C
     {
         private static bool TryGetStream(string fileName, out Stream result)
         {

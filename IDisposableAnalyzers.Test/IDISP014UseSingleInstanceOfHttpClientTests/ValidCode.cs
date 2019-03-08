@@ -17,7 +17,7 @@ namespace RoslynSandbox
 {
     using System.Net.Http;
 
-    public class Foo
+    public class C
     {
         public static readonly HttpClient Client = new HttpClient();
     }
@@ -77,7 +77,7 @@ namespace RoslynSandbox
 {
     using System.Net.Http;
 
-    public class Foo
+    public class C
     {
         public static HttpClient Client { get; } = new HttpClient();
     }
@@ -103,9 +103,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             using (var client = new HttpClient())
             {

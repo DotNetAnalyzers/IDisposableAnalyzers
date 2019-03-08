@@ -13,14 +13,14 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -44,14 +44,14 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
         {
             this.Disposable = disposable ?? disposable;
         }
@@ -75,21 +75,21 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly int meh;
 
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
             : this(disposable, 1)
         {
         }
 
-        private Foo(IDisposable disposable, int meh)
+        private C(IDisposable disposable, int meh)
         {
             this.meh = meh;
             this.Disposable = disposable;
@@ -114,12 +114,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private readonly IDisposable disposable;
         private bool disposed;
 
-        protected FooBase(IDisposable disposable)
+        protected CBase(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -148,16 +148,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : FooBase
+    public sealed class C : CBase
     {
         private bool disposed;
 
-        public Foo()
+        public C()
             : this(new Disposable())
         {
         }
 
-        private Foo(IDisposable disposable)
+        private C(IDisposable disposable)
             : base(disposable)
         {
         }
@@ -190,17 +190,17 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private readonly object disposable;
         private bool disposed;
 
-        protected FooBase(IDisposable disposable)
+        protected CBase(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public object Bar
+        public object M
         {
             get
             {
@@ -230,11 +230,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : FooBase
+    public sealed class C : CBase
     {
         private bool disposed;
 
-        public Foo()
+        public C()
             : base(new Disposable())
         {
         }
@@ -249,7 +249,7 @@ namespace RoslynSandbox
             this.disposed = true;
             if (disposing)
             {
-                (this.Bar as IDisposable)?.Dispose();
+                (this.M as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -267,9 +267,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public string Bar()
+        public string M()
         {
             using (var reader = new StreamReader(File.OpenRead(string.Empty)))
             {
@@ -289,9 +289,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (System.Reactive.Disposables.Disposable.Create(() => File.OpenRead(string.Empty)))
             {
@@ -311,7 +311,7 @@ namespace RoslynSandbox
     using System;
     using Ninject.Modules;
 
-    public class FooModule : NinjectModule
+    public class CModule : NinjectModule
     {
         public override void Load()
         {
@@ -325,11 +325,11 @@ namespace RoslynSandbox
 {
     using Ninject;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
-            using (new StandardKernel(new FooModule()))
+            using (new StandardKernel(new CModule()))
             {
             }
         }
@@ -346,9 +346,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public string Bar()
+        public string M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {
@@ -374,9 +374,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public string Bar()
+        public string M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {
@@ -399,13 +399,13 @@ namespace RoslynSandbox
 {
     using System;
     using System.Threading.Tasks;
-    public class Foo
+    public class C
     {
         public void Meh()
         {
-            this.Bar(() => Task.Delay(0));
+            this.M(() => Task.Delay(0));
         }
-        public void Bar(Func<Task> func)
+        public void M(Func<Task> func)
         {
         }
     }
@@ -423,14 +423,14 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
-            this.Bar(() => File.OpenRead(string.Empty));
+            this.M(() => File.OpenRead(string.Empty));
         }
 
-        public void Bar(Func<Stream> func)
+        public void M(Func<Stream> func)
         {
         }
     }
@@ -448,22 +448,22 @@ namespace RoslynSandbox
     using Ninject;
     using Ninject.Modules;
 
-    public static class Foo
+    public static class C
     {
-        public static IKernel Kernel { get; } = new FooKernel(
+        public static IKernel Kernel { get; } = new CKernel(
             new NinjectSettings(),
-            new FooModule());
+            new CModule());
     }
 
-    public class FooKernel : StandardKernel
+    public class CKernel : StandardKernel
     {
-        public FooKernel(INinjectSettings settings, params INinjectModule[] modules)
+        public CKernel(INinjectSettings settings, params INinjectModule[] modules)
             : base(settings, modules)
         {
         }
     }
 
-    public class FooModule : NinjectModule
+    public class CModule : NinjectModule
     {
         public override void Load()
         {

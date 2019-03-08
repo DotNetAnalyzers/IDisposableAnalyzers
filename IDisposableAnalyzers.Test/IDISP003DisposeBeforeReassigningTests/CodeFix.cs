@@ -44,7 +44,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -61,7 +61,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -83,7 +83,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -98,7 +98,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -120,7 +120,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -139,7 +139,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -165,7 +165,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -180,7 +180,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -203,9 +203,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar(Stream stream)
+        public void M(Stream stream)
         {
             stream = File.OpenRead(string.Empty);
             ↓stream = File.OpenRead(string.Empty);
@@ -219,9 +219,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar(Stream stream)
+        public void M(Stream stream)
         {
             stream = File.OpenRead(string.Empty);
             stream?.Dispose();
@@ -241,7 +241,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -264,7 +264,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -295,11 +295,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             ↓this.stream = File.OpenRead(string.Empty);
         }
@@ -312,11 +312,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
@@ -336,9 +336,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             ↓this.Stream = File.OpenRead(string.Empty);
         }
@@ -353,9 +353,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             this.Stream?.Dispose();
             this.Stream = File.OpenRead(string.Empty);
@@ -377,11 +377,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             ↓this.Stream = File.OpenRead(string.Empty);
         }
@@ -400,11 +400,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             this.stream?.Dispose();
             this.Stream = File.OpenRead(string.Empty);
@@ -430,11 +430,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
             ↓this.Stream = File.OpenRead(string.Empty);
@@ -454,11 +454,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Stream = File.OpenRead(string.Empty);
             this.stream?.Dispose();
@@ -485,7 +485,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -502,7 +502,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -526,16 +526,16 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
-            this.Bar += (o, e) => ↓this.stream = File.OpenRead(string.Empty);
+            this.M += (o, e) => ↓this.stream = File.OpenRead(string.Empty);
         }
 
-        public event EventHandler Bar;
+        public event EventHandler M;
     }
 }";
 
@@ -545,20 +545,20 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
-        public Foo()
+        public C()
         {
-            this.Bar += (o, e) =>
+            this.M += (o, e) =>
             {
                 this.stream?.Dispose();
                 this.stream = File.OpenRead(string.Empty);
             };
         }
 
-        public event EventHandler Bar;
+        public event EventHandler M;
     }
 }";
             AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
@@ -574,7 +574,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -591,7 +591,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -615,7 +615,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -629,7 +629,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -653,7 +653,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -673,7 +673,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -700,7 +700,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -714,7 +714,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -740,12 +740,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private Disposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -766,12 +766,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private Disposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -799,12 +799,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private Disposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ => ↓this.disposable = new Disposable());
         }
@@ -822,12 +822,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private Disposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -855,12 +855,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private IDisposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -886,12 +886,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private IDisposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -926,9 +926,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             if (this.TryGetStream(out stream))
@@ -951,9 +951,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             if (this.TryGetStream(out stream))
@@ -982,9 +982,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Disposable disposable = null;
             Console.CancelKeyPress += (_, __) =>
@@ -1000,9 +1000,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Disposable disposable = null;
             Console.CancelKeyPress += (_, __) =>
@@ -1025,9 +1025,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             Stream stream = File.OpenRead(string.Empty);
             while (i > 0)
@@ -1046,9 +1046,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             Stream stream = File.OpenRead(string.Empty);
             while (i > 0)
@@ -1073,9 +1073,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             Stream stream = null;
             while (i > 0)
@@ -1094,9 +1094,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             Stream stream = null;
             while (i > 0)

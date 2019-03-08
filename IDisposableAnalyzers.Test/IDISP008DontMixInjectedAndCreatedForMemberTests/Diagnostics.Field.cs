@@ -21,13 +21,13 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly Stream Stream = File.OpenRead(string.Empty);
 
         ↓private readonly Stream stream;
 
-        public Foo(Stream arg)
+        public C(Stream arg)
         {
             this.stream = arg ?? File.OpenRead(string.Empty);
         }
@@ -46,7 +46,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓public Stream Stream = File.OpenRead(string.Empty);
 
@@ -67,11 +67,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.stream = stream;
         }
@@ -88,16 +88,16 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.stream = File.OpenRead(string.Empty);
         }
 
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.stream = stream;
         }
@@ -114,7 +114,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         ↓protected Stream stream = File.OpenRead(string.Empty);
     }
@@ -130,11 +130,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         ↓private Stream stream = File.OpenRead(string.Empty);
 
-        public Foo(Stream arg)
+        public C(Stream arg)
         {
             this.Stream = arg;
         }
@@ -157,11 +157,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         ↓private Stream stream;
 
-        public Foo(Stream arg)
+        public C(Stream arg)
         {
             this.stream = arg;
             this.Stream = File.OpenRead(string.Empty);
@@ -185,16 +185,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         ↓private readonly IDisposable bar;
 
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             this.bar = bar;
         }
 
-        public static Foo Create() => new Foo(new Disposable());
+        public static C Create() => new C(new Disposable());
     }
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);

@@ -20,9 +20,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             var b = stream.ReadByte();
@@ -41,9 +41,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -64,9 +64,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -86,9 +86,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar(bool b)
+        public void M(bool b)
         {
             var stream = File.OpenRead(string.Empty);
             if (b)
@@ -114,9 +114,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar(bool b)
+        public void M(bool b)
         {
             var stream = File.OpenRead(string.Empty);
             if (b)
@@ -141,9 +141,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             var b = stream.ReadByte();
@@ -165,9 +165,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             Create(out stream);

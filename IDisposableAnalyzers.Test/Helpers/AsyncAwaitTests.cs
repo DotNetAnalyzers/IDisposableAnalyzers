@@ -19,9 +19,9 @@ namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 
-    internal class Foo
+    internal class C
     {
-        internal async Task Bar()
+        internal async Task M()
         {
             var value = // Meh();
         }
@@ -50,9 +50,9 @@ namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 
-    internal class Foo
+    internal class C
     {
-        internal async Task Bar()
+        internal async Task M()
         {
             var value = // Meh();
         }

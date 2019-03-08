@@ -16,13 +16,13 @@ namespace IDisposableAnalyzers.Test.Helpers
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
         }
@@ -30,11 +30,11 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindTypeDeclaration("Foo");
+            var type = syntaxTree.FindTypeDeclaration("C");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
-                Assert.AreEqual("internal Foo(), internal Foo(string text)", actual);
+                Assert.AreEqual("internal C(), internal C(string text)", actual);
                 Assert.AreEqual(0, walker.ObjectCreations.Count);
             }
         }
@@ -45,13 +45,13 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        private Foo()
+        private C()
         {
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
         }
@@ -59,11 +59,11 @@ namespace RoslynSandbox
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindTypeDeclaration("Foo");
+            var type = syntaxTree.FindTypeDeclaration("C");
             using (var pooled = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", pooled.NonPrivateCtors.Select(c => c.ToString().Split(new[] { "\n", "\r\n" }, StringSplitOptions.RemoveEmptyEntries)[0]));
-                Assert.AreEqual("internal Foo(string text)", actual);
+                Assert.AreEqual("internal C(string text)", actual);
                 Assert.AreEqual(0, pooled.ObjectCreations.Count);
             }
         }
@@ -74,26 +74,26 @@ namespace RoslynSandbox
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        private Foo()
+        private C()
         {
         }
 
-        internal Foo Create()
+        internal C Create()
         {
-            return new Foo();
+            return new C();
         }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var type = syntaxTree.FindTypeDeclaration("Foo");
+            var type = syntaxTree.FindTypeDeclaration("C");
             using (var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", walker.NonPrivateCtors.Select(c => c.ToString().Split('\r')[0]));
                 Assert.AreEqual(string.Empty, actual);
-                Assert.AreEqual("new Foo()", string.Join(", ", walker.ObjectCreations));
+                Assert.AreEqual("new C()", string.Join(", ", walker.ObjectCreations));
             }
         }
     }

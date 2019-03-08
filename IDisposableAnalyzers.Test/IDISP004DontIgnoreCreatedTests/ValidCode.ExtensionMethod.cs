@@ -13,9 +13,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(int i)
+        public void M(int i)
         {
             using (new Disposable().AsDisposable())
             {
@@ -67,9 +67,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(int i)
+        public void M(int i)
         {
             using (new Disposable().AsDisposable(1))
             {
@@ -121,9 +121,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(int i)
+        public void M(int i)
         {
             using (1.AsDisposable(new Disposable()))
             {
@@ -175,9 +175,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(int i)
+        public void M(int i)
         {
             using (i.AsDisposable().AsDisposable())
             {

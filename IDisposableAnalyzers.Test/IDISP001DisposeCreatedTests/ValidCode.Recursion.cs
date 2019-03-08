@@ -14,7 +14,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -43,24 +43,24 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
-            var temp1 = this.Bar;
-            this.Bar = new Disposable();
-            var temp2 = this.Bar;
+            var temp1 = this.M;
+            this.M = new Disposable();
+            var temp2 = this.M;
         }
 
-        public IDisposable Bar
+        public IDisposable M
         {
-            get { return this.Bar; }
-            set { this.Bar = value; }
+            get { return this.M; }
+            set { this.M = value; }
         }
 
         public void Meh()
         {
-            var temp3 = this.Bar;
+            var temp3 = this.M;
         }
     }
 }";
@@ -73,9 +73,9 @@ namespace RoslynSandbox
             var testCode = @"
     using System;
 
-    public static class Foo
+    public static class C
     {
-        public static void Bar()
+        public static void M()
         {
             var disposable = Forever();
             Forever();
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable Forever() => Forever();
 
@@ -135,9 +135,9 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public abstract class Foo
+    public abstract class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             var value = disposable;
             value = WithOptionalParameter(value);

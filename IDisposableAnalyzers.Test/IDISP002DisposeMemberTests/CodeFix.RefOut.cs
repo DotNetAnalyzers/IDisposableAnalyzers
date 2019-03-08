@@ -22,11 +22,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (TryGetStream(out this.stream))
             {
@@ -52,11 +52,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (TryGetStream(out this.stream))
             {
@@ -89,11 +89,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         ↓private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (TryGetStream(ref this.stream))
             {
@@ -119,11 +119,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (TryGetStream(ref this.stream))
             {

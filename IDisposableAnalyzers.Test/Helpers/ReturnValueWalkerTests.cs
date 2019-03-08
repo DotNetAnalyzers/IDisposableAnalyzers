@@ -15,9 +15,9 @@ namespace IDisposableAnalyzers.Test.Helpers
             var testCode = @"
 using System.Threading.Tasks;
 
-internal class Foo
+internal class C
 {
-    internal static async Task Bar()
+    internal static async Task M()
     {
         var text = await CreateAsync().ConfigureAwait(false);
     }
@@ -54,11 +54,11 @@ internal class Foo
             var testCode = @"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private readonly int value = 1;
 
-        internal Foo()
+        internal C()
         {
             var temp = CalculatedExpressionBody;
         }
@@ -73,7 +73,7 @@ namespace RoslynSandbox
             }
         }
 
-        public Foo ThisExpressionBody => this;
+        public C ThisExpressionBody => this;
 
         public int CalculatedReturningFieldExpressionBody => this.value;
 
@@ -114,9 +114,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var temp = StaticRecursiveExpressionBody;
         }
@@ -193,9 +193,9 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var temp = StaticCreateIntStatementBody();
         }
@@ -270,7 +270,7 @@ namespace RoslynSandbox
             return 3;
         }
 
-        public Foo ThisExpressionBody() => this;
+        public C ThisExpressionBody() => this;
 
         public static Stream ReturningFileOpenRead()
         {
@@ -322,9 +322,9 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var temp = Recursive();
         }
@@ -396,9 +396,9 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public abstract class Foo
+    public abstract class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             var local = disposable;
             local = WithOptionalParameter(local);
@@ -449,9 +449,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             Func<int> temp = () => 1;
         }
@@ -538,9 +538,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal async Task Bar()
+        internal async Task M()
         {
             var value = await CreateStringAsync();
         }
@@ -621,9 +621,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal async Task Bar()
+        internal async Task M()
         {
             var value = await RecursiveAsync();
         }
@@ -672,9 +672,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(int i)
+        public void M(int i)
         {
             var value = i.AsDisposable().AsDisposable();
         }
@@ -718,9 +718,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var temp = ReturnTernary(true);
         }
@@ -747,9 +747,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             var temp = ReturnNullCoalesce(null);
         }

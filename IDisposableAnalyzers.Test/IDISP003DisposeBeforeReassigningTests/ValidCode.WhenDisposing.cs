@@ -15,7 +15,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh(bool b)
         {
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Meh(bool b)
         {
@@ -102,7 +102,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream = File.OpenRead(string.Empty);
 
@@ -132,9 +132,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar(Stream stream)
+        public void M(Stream stream)
         {
             stream = File.OpenRead(string.Empty);
             stream?.Dispose();
@@ -155,10 +155,10 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
-        public Foo()
+        public C()
         {
             stream.Dispose();
             stream = File.OpenRead(string.Empty);
@@ -177,7 +177,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -200,7 +200,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -223,7 +223,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream _stream;
 
@@ -246,7 +246,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream _stream;
 
@@ -268,12 +268,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private Disposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -300,12 +300,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private IDisposable disposable;
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -339,12 +339,12 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private readonly SerialDisposable disposable = new SerialDisposable();
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -377,12 +377,12 @@ namespace RoslynSandbox
     using System;
     using System.Reactive.Disposables;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
         private readonly SerialDisposable disposable = new SerialDisposable();
 
-        public Foo(IObservable<object> observable)
+        public C(IObservable<object> observable)
         {
             this.subscription = observable.Subscribe(_ =>
             {
@@ -408,7 +408,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    class Foo : IDisposable
+    class C : IDisposable
     {
         private Disposable current;
 
@@ -437,9 +437,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo(int i)
+        public C(int i)
         {
             Stream stream = File.OpenRead(string.Empty);
             while (i > 0)

@@ -16,9 +16,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             ↓var disposable = await Task.Run(() => new Disposable());
         }
@@ -36,9 +36,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             ↓var disposable = await Task.FromResult(new Disposable());
         }
@@ -56,9 +56,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             ↓var stream = await CreateAsync();
         }
@@ -81,9 +81,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             ↓var stream = await CreateAsync();
         }
@@ -106,9 +106,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
   
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             ↓var stream = await ReadAsync(string.Empty);
         }

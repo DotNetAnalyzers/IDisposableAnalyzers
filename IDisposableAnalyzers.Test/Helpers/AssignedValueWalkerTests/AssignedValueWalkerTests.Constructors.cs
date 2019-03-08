@@ -18,18 +18,18 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private readonly int value;
 
-        internal Foo(int arg)
+        internal C(int arg)
         {
             var temp1 = this.value;
             this.value = arg;
             var temp2 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp3 = this.value;
         }
@@ -53,18 +53,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private readonly int value;
 
-        internal Foo(int arg)
+        internal C(int arg)
         {
             var temp1 = this.value;
             this.value = Id(arg);
             var temp2 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp3 = this.value;
         }
@@ -95,18 +95,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
             this.value = 2;
             var temp2 = this.value;
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
             var temp3 = this.value;
@@ -116,7 +116,7 @@ namespace RoslynSandbox
             var temp5 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp6 = this.value;
             this.value = 5;
@@ -149,11 +149,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
             : this(2)
         {
             var temp1 = this.value;
@@ -163,14 +163,14 @@ namespace RoslynSandbox
             var temp3 = this.value;
         }
 
-        private Foo(int ctorArg)
+        private C(int ctorArg)
         {
             var temp4 = this.value;
             this.value = ctorArg;
             var temp5 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp6 = this.value;
             this.value = 5;
@@ -203,11 +203,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
             : this(2)
         {
             var temp1 = this.value;
@@ -217,14 +217,14 @@ namespace RoslynSandbox
             var temp3 = this.value;
         }
 
-        internal Foo(int ctorArg)
+        internal C(int ctorArg)
         {
             var temp4 = this.value;
             this.value = ctorArg;
             var temp5 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp6 = this.value;
             this.value = 5;
@@ -251,20 +251,20 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        private Foo(int ctorArg)
+        private C(int ctorArg)
         {
             var temp1 = this.value;
             this.value = ctorArg;
             var temp2 = this.value;
         }
 
-        internal static Foo Create()
+        internal static C Create()
         {
-            return new Foo(2);
+            return new C(2);
         }
     }
 }");
@@ -285,20 +285,20 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        public Foo(int ctorArg)
+        public C(int ctorArg)
         {
             var temp1 = this.value;
             this.value = ctorArg;
             var temp2 = this.value;
         }
 
-        internal static Foo Create()
+        internal static C Create()
         {
-            return new Foo(2);
+            return new C(2);
         }
     }
 }");
@@ -325,18 +325,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo<T>
+    internal class C<T>
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
             this.value = 2;
             var temp2 = this.value;
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
             var temp3 = this.value;
@@ -346,7 +346,7 @@ namespace RoslynSandbox
             var temp5 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp6 = this.value;
             this.value = 5;
@@ -380,11 +380,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
             this.Initialize(2);
@@ -395,7 +395,7 @@ namespace RoslynSandbox
             var temp6 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp7 = this.value;
             this.value = 5;
@@ -436,11 +436,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         public int value = 1;
 
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
             this.Initialize(2);
@@ -451,7 +451,7 @@ namespace RoslynSandbox
             var temp6 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp7 = this.value;
             this.value = 5;
@@ -494,18 +494,18 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var temp1 = this.Value;
             this.Value = 2;
             var temp2 = this.Value;
-            this.Bar(3);
+            this.M(3);
             var temp3 = this.Value;
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
             var temp4 = this.Value;
@@ -513,15 +513,15 @@ namespace RoslynSandbox
             var temp5 = this.Value;
             this.Value = 5;
             var temp6 = this.Value;
-            this.Bar(6);
+            this.M(6);
             var temp7 = this.Value;
-            this.Bar(7);
+            this.M(7);
             var temp8 = this.Value;
         }
 
         public int Value { get; set; } = 1;
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp9 = this.Value;
             this.Value = 8;
@@ -552,12 +552,12 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo
+    internal class C
     {
         private readonly int value = 1;
         private readonly int temp1;
 
-        internal Foo()
+        internal C()
         {
             this.temp1 = this.value;
             var temp1 = this.value;
@@ -567,7 +567,7 @@ namespace RoslynSandbox
             var temp4 = this.temp1;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp5 = this.value;
             var temp6 = this.temp1;
@@ -591,14 +591,14 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class Foo<T>
+    internal class C<T>
     {
-        internal Foo()
+        internal C()
         {
             this.Value = 2;
         }
 
-        internal Foo(string text)
+        internal C(string text)
             : this()
         {
             this.Value = 3;
@@ -608,7 +608,7 @@ namespace RoslynSandbox
 
         public int Value { get; set; } = 1;
 
-        internal void Bar()
+        internal void M()
         {
             var temp2 = this.Value;
         }
@@ -633,11 +633,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase
+    internal class CBase
     {
         protected int value = 1;
 
-        internal FooBase()
+        internal CBase()
         {
             var temp1 = this.value;
             this.value = 2;
@@ -645,9 +645,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo : FooBase
+    internal class C : CBase
     {
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp3 = this.value;
             this.value = 3;
@@ -679,11 +679,11 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase
+    internal class CBase
     {
         protected int value = 1;
 
-        internal FooBase()
+        internal CBase()
         {
             var temp1 = this.value;
             this.value = 2;
@@ -691,9 +691,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo : FooBase
+    internal class C : CBase
     {
-        internal Foo()
+        internal C()
         {
             var temp3 = this.value;
             this.value = 3;
@@ -702,7 +702,7 @@ namespace RoslynSandbox
             var temp5 = this.value;
         }
 
-        internal void Bar(int arg)
+        internal void M(int arg)
         {
             var temp6 = this.value;
             this.value = 5;
@@ -729,31 +729,31 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase
+    internal class CBase
     {
         protected int value = 1;
 
-        internal FooBase()
+        internal CBase()
         {
             this.value = 2;
         }
 
-        internal FooBase(int value)
+        internal CBase(int value)
         {
             this.value = value;
         }
     }
 
-    internal class Foo : FooBase
+    internal class C : CBase
     {
-        internal Foo()
+        internal C()
         {
             this.value = 3;
             var temp1 = this.value;
             this.value = 4;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp2 = this.value;
         }
@@ -776,24 +776,24 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase
+    internal class CBase
     {
         protected int value = 1;
 
-        public FooBase()
+        public CBase()
         {
             this.value = -1;
         }
 
-        public FooBase(int value)
+        public CBase(int value)
         {
             this.value = value;
         }
     }
 
-    internal class Foo : FooBase
+    internal class C : CBase
     {
-        internal Foo()
+        internal C()
             : base(2)
         {
             this.value = 3;
@@ -801,7 +801,7 @@ namespace RoslynSandbox
             this.value = 4;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp2 = this.value;
         }
@@ -823,19 +823,19 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase<T>
+    internal class CBase<T>
     {
         protected readonly T value;
 
-        internal FooBase()
+        internal CBase()
         {
             this.value = default(T);
         }
     }
 
-    internal class Foo : FooBase<int>
+    internal class C : CBase<int>
     {
-        internal Foo()
+        internal C()
         {
             var temp = this.value;
         }
@@ -857,9 +857,9 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    public abstract class FooBase<T>
+    public abstract class CBase<T>
     {
-        protected FooBase()
+        protected CBase()
         {
             this.Value = default(T);
         }
@@ -867,9 +867,9 @@ namespace RoslynSandbox
         public abstract T Value { get; set; }
     }
 
-    public class Foo : FooBase<int>
+    public class C : CBase<int>
     {
-        public Foo()
+        public C()
         {
             var temp = this.Value;
         }
@@ -894,29 +894,29 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase<T>
+    internal class CBase<T>
     {
         protected readonly T value;
 
-        internal FooBase()
+        internal CBase()
         {
             this.value = default(T);
         }
 
-        internal FooBase(T value)
+        internal CBase(T value)
         {
             this.value = value;
         }
     }
 
-    internal class Foo : FooBase<int>
+    internal class C : CBase<int>
     {
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp2 = this.value;
         }
@@ -939,29 +939,29 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
 {
-    internal class FooBase<T>
+    internal class CBase<T>
     {
         protected readonly T value;
 
-        internal FooBase()
+        internal CBase()
         {
             this.value = default(T);
         }
 
-        internal FooBase(T value)
+        internal CBase(T value)
         {
             this.value = value;
         }
     }
 
-    internal class Foo<T> : FooBase<T>
+    internal class C<T> : CBase<T>
     {
-        internal Foo()
+        internal C()
         {
             var temp1 = this.value;
         }
 
-        internal void Bar()
+        internal void M()
         {
             var temp2 = this.value;
         }
@@ -985,11 +985,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private int value;
 
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (o, e) =>
             {

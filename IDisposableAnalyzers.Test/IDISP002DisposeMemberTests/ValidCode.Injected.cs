@@ -15,11 +15,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable bar;
         
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             this.bar = bar;
         }
@@ -36,11 +36,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable bar;
         
-        public Foo(IDisposable[] bars)
+        public C(IDisposable[] bars)
         {
             this.bar = bars[0];
         }
@@ -57,19 +57,19 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable bar;
 
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             this.bar = bar;
         }
 
-        public static Foo Create()
+        public static C Create()
         {
             var disposables = new[] { new Disposable() };
-            return new Foo(disposables[0]);
+            return new C(disposables[0]);
         }
     }
 }";
@@ -85,11 +85,11 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly Stream current;
 
-        public Foo(ConcurrentDictionary<int, Stream> streams)
+        public C(ConcurrentDictionary<int, Stream> streams)
         {
             this.current = streams[1];
         }
@@ -106,11 +106,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable _bar;
         
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             _bar = bar;
         }
@@ -127,11 +127,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable _bar;
         
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             _bar = bar;
         }

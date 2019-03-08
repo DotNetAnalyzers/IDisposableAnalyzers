@@ -37,9 +37,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var value = new Disposable();
         }
@@ -81,9 +81,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             var value = new Disposable();
         }
@@ -124,9 +124,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             // Meh();
         }
@@ -195,11 +195,11 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
         private readonly IDisposable disposable = new Disposable();
 
-        internal Foo()
+        internal C()
         {
             // Meh();
         }
@@ -283,9 +283,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             // Meh();
         }
@@ -326,9 +326,9 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public abstract class Foo
+    public abstract class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             var value = disposable;
             value = WithOptionalParameter(value);
@@ -378,9 +378,9 @@ namespace RoslynSandbox
         }
     }
 
-    internal class Foo
+    internal class C
     {
-        internal async Task Bar()
+        internal async Task M()
         {
             var value = // Meh();
         }
@@ -432,11 +432,11 @@ namespace RoslynSandbox
         }
     }
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public Foo()
+        public C()
         {
             disposable.AddAndReturn(File.OpenRead(string.Empty));
         }
@@ -480,9 +480,9 @@ namespace RoslynSandbox
     using System;
     using BinaryReference;
 
-    class Foo
+    class C
     {
-        public Foo(IDisposable disposable, ICustomDisposable other)
+        public C(IDisposable disposable, ICustomDisposable other)
         {
             _ = disposable.AsCustom();
         }
@@ -519,9 +519,9 @@ namespace RoslynSandbox
     using System;
     using BinaryReference;
 
-    class Foo
+    class C
     {
-        public Foo(IDisposable disposable, IDisposable other)
+        public C(IDisposable disposable, IDisposable other)
         {
             _ = disposable.Fluent();
         }
@@ -560,9 +560,9 @@ namespace RoslynSandbox
     using System;
     using System.Linq;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo(int value)
+        internal C(int value)
         {
             _ = value;
         }

@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers.Test
             var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
     }
 }";

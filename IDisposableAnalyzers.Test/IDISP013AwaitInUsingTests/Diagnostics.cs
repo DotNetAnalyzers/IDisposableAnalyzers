@@ -19,9 +19,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task<string> Bar()
+        public Task<string> M()
         {
             using (var client = new WebClient())
             {
@@ -41,9 +41,9 @@ namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
-        public static ValueTask<int> BarAsync()
+        public static ValueTask<int> MAsync()
         {
             using (System.IO.File.OpenRead(string.Empty))
             {
@@ -70,9 +70,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task<string> Bar()
+        public Task<string> M()
         {
             using (var client = new WebClient())
             {
@@ -93,9 +93,9 @@ namespace RoslynSandbox
 {
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        static Task Bar()
+        static Task M()
         {
             var tcs = new TaskCompletionSource<bool>();
             using (var disposable = new Disposable())

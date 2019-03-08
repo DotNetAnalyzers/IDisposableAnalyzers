@@ -18,9 +18,9 @@ namespace RoslynSandbox
     using System.Threading.Tasks;
     using NUnit.Framework;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {

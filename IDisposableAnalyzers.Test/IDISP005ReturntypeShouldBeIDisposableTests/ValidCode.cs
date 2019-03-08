@@ -153,9 +153,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -175,9 +175,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -197,9 +197,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -219,7 +219,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo<T>
+    public class C<T>
     {
         private readonly T item1;
         private readonly T item2;
@@ -236,7 +236,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo<T>
+    public class C<T>
     {
         private readonly T item1;
         private readonly T item2;
@@ -275,7 +275,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh()
         {
@@ -295,7 +295,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly IDisposable disposable = new Disposable();
 
@@ -316,7 +316,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly IDisposable[] disposable = { new Disposable() };
 
@@ -365,7 +365,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly DisposableList<IDisposable> disposable = new DisposableList<IDisposable> { new Disposable() };
 
@@ -414,7 +414,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private readonly DisposableList<IDisposable> disposable = new DisposableList<IDisposable> { new Disposable() };
 
@@ -440,9 +440,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -462,9 +462,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Meh();
         }
@@ -481,9 +481,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var meh = Meh;
         }
@@ -506,9 +506,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var meh = this[0];
         }
@@ -534,9 +534,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             CreateDisposableAsync();
         }
@@ -559,7 +559,7 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
         private static Task<IDisposable> Meh()
         {
@@ -576,9 +576,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Id(1);
         }
@@ -598,9 +598,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var meh = Meh;
         }
@@ -619,9 +619,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Stream Bar()
+        public Stream M()
         {
             return File.OpenRead(string.Empty);
         }
@@ -638,14 +638,14 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static Stream Bar()
+        public static Stream M()
         {
-            return string.Empty.Bar();
+            return string.Empty.M();
         }
 
-        public static Stream Bar(this string name)
+        public static Stream M(this string name)
         {
             return File.OpenRead(name);
         }
@@ -662,9 +662,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public static class Foo
+    public static class C
     {
-        public static IDisposable Bar()
+        public static IDisposable M()
         {
             return new Disposable().Id();
         }
@@ -687,7 +687,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
@@ -709,7 +709,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly static Stream Stream = File.OpenRead(string.Empty);
 
@@ -728,9 +728,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M()
         {
             int value;
             if(Try(out value))
@@ -758,7 +758,7 @@ namespace RoslynSandbox
     using System.Collections;
     using System.Collections.Generic;
 
-    public class Foo : IEnumerable<int>
+    public class C : IEnumerable<int>
     {
         private readonly List<int> ints = new List<int>();
 
@@ -786,7 +786,7 @@ namespace RoslynSandbox
     using System.Collections;
     using System.Collections.Generic;
 
-    public class Foo : IEnumerable
+    public class C : IEnumerable
     {
         private readonly List<int> ints = new List<int>();
 
@@ -809,7 +809,7 @@ namespace RoslynSandbox
     using System.Collections;
     using System.Collections.Generic;
 
-    public class Foo : IEnumerable<int>
+    public class C : IEnumerable<int>
     {
         private readonly List<int> ints = new List<int>();
 
@@ -832,7 +832,7 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    internal static class Foo
+    internal static class C
     {
         internal static async Task<Stream> ReadAsync(string file)
         {
@@ -861,9 +861,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static void Bar()
+        internal static void M()
         {
             Func<IDisposable> f = () =>
             {
@@ -885,9 +885,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
             var text = Get(""abc"", 1, (s, i) => s.Substring(i));
         }
@@ -911,14 +911,14 @@ namespace RoslynSandbox
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task Bar(string source, int expected, CancellationToken cancellationToken)
+        public Task M(string source, int expected, CancellationToken cancellationToken)
         {
-            return this.Bar(source, new[] { expected }, cancellationToken);
+            return this.M(source, new[] { expected }, cancellationToken);
         }
 
-        public Task Bar(string source, int[] expected, CancellationToken cancellationToken)
+        public Task M(string source, int[] expected, CancellationToken cancellationToken)
         {
             return Task.FromResult(0);
         }
@@ -938,7 +938,7 @@ namespace RoslynSandbox
     using System.Diagnostics.CodeAnalysis;
     using NUnit.Framework;
 
-    public class FooTests
+    public class CTests
     {
         [Test]
         [SuppressMessage(""ReSharper"", ""ObjectCreationAsStatement"")]
@@ -959,7 +959,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         public static object Meh()
         {

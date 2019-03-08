@@ -21,11 +21,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : StreamReader
+    public class C : StreamReader
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo(string path)
+        public C(string path)
             : base(path)
         {
         }
@@ -37,12 +37,12 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : StreamReader
+    public class C : StreamReader
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
 
-        public Foo(string path)
+        public C(string path)
             : base(path)
         {
         }
@@ -119,7 +119,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         ↓private readonly Stream stream = File.OpenRead(string.Empty);
     }
@@ -130,7 +130,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -209,7 +209,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         ↓private readonly Stream _stream = File.OpenRead(string.Empty);
     }
@@ -220,7 +220,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -289,7 +289,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         ↓private readonly Stream _stream = File.OpenRead(string.Empty);
     }
@@ -300,7 +300,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : BaseClass
+    public class C : BaseClass
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -344,7 +344,7 @@ namespace RoslynSandbox
     using System;
     using Ninject.Modules;
 
-    internal class Foo : NinjectModule
+    internal class C : NinjectModule
     {
         ↓private readonly IDisposable disposable = new Disposable();
 
@@ -361,7 +361,7 @@ namespace RoslynSandbox
     using System;
     using Ninject.Modules;
 
-    internal class Foo : NinjectModule
+    internal class C : NinjectModule
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;

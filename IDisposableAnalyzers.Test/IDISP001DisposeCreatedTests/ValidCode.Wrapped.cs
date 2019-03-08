@@ -1,11 +1,10 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     public partial class ValidCode<T>
     {
-
         [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
         [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]

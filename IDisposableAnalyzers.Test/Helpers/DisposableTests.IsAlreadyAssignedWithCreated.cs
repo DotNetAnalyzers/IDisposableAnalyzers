@@ -17,11 +17,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
         private Disposable disposable;
 
-        internal Foo()
+        internal C()
         {
             this.disposable = new Disposable();
         }
@@ -49,11 +49,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         private Disposable disposable;
 
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (o, e) =>
             {
@@ -84,9 +84,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal class Foo
+    internal class C
     {
-        internal Foo()
+        internal C()
         {
             IDisposable disposable;
             disposable = new Disposable();
@@ -115,9 +115,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Console.CancelKeyPress += (o, e) =>
             {
@@ -149,9 +149,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             Console.CancelKeyPress += (o, e) =>
@@ -183,11 +183,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private FileStream stream;
 
-        public bool Bar(string fileName)
+        public bool M(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -215,11 +215,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public FileStream Stream { get; private set; }
 
-        public bool Bar(string fileName)
+        public bool M(string fileName)
         {
             if (File.Exists(fileName))
             {
@@ -247,7 +247,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private static bool TryGetStream(string fileName, out Stream stream)
         {
@@ -277,7 +277,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private static bool TryGetStream(string fileName, out Stream stream)
         {
@@ -308,9 +308,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        private static bool Bar(string fileName)
+        private static bool M(string fileName)
         {
             Stream stream;
             if (File.Exists(fileName))
@@ -339,9 +339,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        private static bool Bar(string fileName)
+        private static bool M(string fileName)
         {
             Stream stream;
             if (File.Exists(fileName))
@@ -390,12 +390,12 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        private Bar bar1;
-        private Bar bar2;
+        private M bar1;
+        private M bar2;
 
-        public Bar Bar1
+        public M M1
         {
             get
             {
@@ -411,7 +411,7 @@ namespace RoslynSandbox
 
                 if (value != null && this.bar2 != null)
                 {
-                    this.Bar2 = null;
+                    this.M2 = null;
                 }
 
                 if (this.bar1 != null)
@@ -427,7 +427,7 @@ namespace RoslynSandbox
             }
         }
 
-        public Bar Bar2
+        public M M2
         {
             get
             {
@@ -443,7 +443,7 @@ namespace RoslynSandbox
 
                 if (value != null && this.bar1 != null)
                 {
-                    this.Bar1 = null;
+                    this.M1 = null;
                 }
 
                 if (this.bar2 != null)
@@ -460,7 +460,7 @@ namespace RoslynSandbox
         }
     }
 
-    public class Bar
+    public class M
     {
         public bool Selected { get; set; }
     }
@@ -468,7 +468,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.Bar1 = null;").Left;
+                var value = syntaxTree.FindAssignmentExpression("this.M1 = null;").Left;
                 Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
         }

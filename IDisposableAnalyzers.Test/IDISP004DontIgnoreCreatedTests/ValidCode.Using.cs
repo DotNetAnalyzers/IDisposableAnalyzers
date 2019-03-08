@@ -13,9 +13,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -34,9 +34,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             using (var reader = new StreamReader(File.OpenRead(string.Empty)))
             {
@@ -57,7 +57,7 @@ namespace RoslynSandbox
     using System.Threading;
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
         public static async Task<T> WithCancellation<T>(this Task<T> task, CancellationToken cancellationToken)
         {

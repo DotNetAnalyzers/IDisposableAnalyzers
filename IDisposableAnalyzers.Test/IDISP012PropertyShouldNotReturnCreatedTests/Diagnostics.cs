@@ -17,7 +17,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public Stream Meh
         {
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public Stream Meh => ↓File.OpenRead(string.Empty);
     }
@@ -55,7 +55,7 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public Stream Meh
         {

@@ -21,9 +21,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Stream stream;
             if (TryGetStream(↓out stream))
@@ -44,9 +44,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Stream stream;
             if (TryGetStream(out stream))
@@ -76,9 +76,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             if (TryGetStream(↓out var stream))
             {
@@ -98,9 +98,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             if (TryGetStream(out var stream))
             {

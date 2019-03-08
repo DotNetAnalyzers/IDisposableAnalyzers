@@ -18,9 +18,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public async Task<string> Bar()
+        public async Task<string> M()
         {
             using (var client = new WebClient())
             {
@@ -41,9 +41,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public static async Task<string> BarAsync()
+        public static async Task<string> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -80,9 +80,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task<int> Bar()
+        public Task<int> M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -103,9 +103,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task Bar()
+        public Task M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewBarTaskRun()
+        public void UsingNewMTaskRun()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -126,9 +126,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    public struct Bar : IDisposable
+    public struct M : IDisposable
     {
-        public Bar(Task task)
+        public M(Task task)
         {
             this.Task = task;
         }
@@ -140,11 +140,11 @@ namespace RoslynSandbox
         }
     }
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
-            using (new Bar(Task.Run(() => 1)))
+            using (new M(Task.Run(() => 1)))
             {
             }
         }
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewBarLocalTaskRun()
+        public void UsingNewMLocalTaskRun()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -162,9 +162,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    public struct Bar : IDisposable
+    public struct M : IDisposable
     {
-        public Bar(Task task)
+        public M(Task task)
         {
             this.Task = task;
         }
@@ -176,11 +176,11 @@ namespace RoslynSandbox
         }
     }
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
-            using (var bar = new Bar(Task.Run(() => 1)))
+            using (var bar = new M(Task.Run(() => 1)))
             {
             }
         }
@@ -190,7 +190,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewBarLocalFuncTask()
+        public void UsingNewMLocalFuncTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -198,9 +198,9 @@ namespace RoslynSandbox
     using System;
     using System.Threading.Tasks;
 
-    public struct Bar : IDisposable
+    public struct M : IDisposable
     {
-        public Bar(Func<Task> task)
+        public M(Func<Task> task)
         {
             this.Task = task();
         }
@@ -212,12 +212,12 @@ namespace RoslynSandbox
         }
     }
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo()
+        public C()
         {
             var fromResult = Task.FromResult(1);
-            using (var bar = new Bar(() => fromResult))
+            using (var bar = new M(() => fromResult))
             {
             }
         }
@@ -235,9 +235,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public async Task<string> Bar()
+        public async Task<string> M()
         {
             using (var client = new WebClient())
             {
@@ -259,9 +259,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public Task<string> Bar()
+        public Task<string> M()
         {
             using (var client = new WebClient())
             {
@@ -284,7 +284,7 @@ namespace RoslynSandbox
     using System.Net.Http;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
         private async Task<string> Retrieve(HttpClient client, Uri location)
         {

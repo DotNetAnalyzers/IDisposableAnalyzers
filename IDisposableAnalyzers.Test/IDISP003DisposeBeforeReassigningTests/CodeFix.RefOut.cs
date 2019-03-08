@@ -20,7 +20,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -43,7 +43,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private Stream stream;
 
@@ -73,7 +73,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Update()
         {
@@ -95,7 +95,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         public void Update()
         {
@@ -124,9 +124,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             TryGetStream(out stream);
@@ -147,9 +147,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             Stream stream;
             TryGetStream(out stream);
@@ -177,11 +177,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             this.Assign(↓ref this.stream);
         }
@@ -204,11 +204,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public Foo()
+        public C()
         {
             this.stream?.Dispose();
             this.Assign(ref this.stream);
@@ -238,11 +238,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Assign(ref this.stream);
             this.Assign(↓ref this.stream);
@@ -266,11 +266,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Assign(ref this.stream);
             this.stream?.Dispose();
@@ -301,11 +301,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Assign1(ref this.stream);
             this.Assign2(↓ref this.stream);
@@ -334,11 +334,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             this.Assign1(ref this.stream);
             this.stream?.Dispose();
@@ -374,11 +374,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        private Foo()
+        private C()
         {
             this.Assign(↓ref this.stream);
         }
@@ -401,11 +401,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        private Foo()
+        private C()
         {
             this.stream?.Dispose();
             this.Assign(ref this.stream);

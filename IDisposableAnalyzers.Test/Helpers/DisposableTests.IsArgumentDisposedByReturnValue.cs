@@ -17,9 +17,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public string Bar()
+        public string M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {
@@ -48,9 +48,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public string Bar()
+        public string M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {

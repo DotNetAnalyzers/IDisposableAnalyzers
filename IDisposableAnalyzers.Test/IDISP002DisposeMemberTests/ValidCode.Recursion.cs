@@ -15,7 +15,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -56,11 +56,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -84,11 +84,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private IDisposable disposable;
 
-        public Foo()
+        public C()
         {
             this.disposable = this.RecursiveProperty;
         }
@@ -111,7 +111,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveMethod() => RecursiveMethod();
 
@@ -132,7 +132,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable Recursive1() => Recursive2();
 
@@ -156,11 +156,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (this.TryGetStream(out this.stream))
             {
@@ -185,11 +185,11 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public sealed class Foo 
+    public sealed class C 
     {
         private readonly Stream stream;
 
-        public Foo()
+        public C()
         {
             if (this.TryGetStream1(out this.stream))
             {

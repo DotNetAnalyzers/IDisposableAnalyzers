@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public struct Foo : IDisposable
+    public struct C : IDisposable
     {
     }
 }";
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public struct Foo : IDisposable
+    public struct C : IDisposable
     {
         public void Dispose()
         {

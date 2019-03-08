@@ -32,7 +32,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -61,7 +61,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo : FooBase
+    public class C : CBase
     {
         protected override void ↓Dispose(bool disposing)
         {
@@ -72,7 +72,7 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    public class Foo : FooBase
+    public class C : CBase
     {
         protected override void Dispose(bool disposing)
         {
@@ -92,9 +92,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : StreamReader
+    public class C : StreamReader
     {
-        public Foo(Stream stream)
+        public C(Stream stream)
             : base(stream)
         {
         }
@@ -110,9 +110,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo : StreamReader
+    public class C : StreamReader
     {
-        public Foo(Stream stream)
+        public C(Stream stream)
             : base(stream)
         {
         }

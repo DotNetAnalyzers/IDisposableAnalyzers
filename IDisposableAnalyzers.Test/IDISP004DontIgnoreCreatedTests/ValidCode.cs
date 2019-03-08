@@ -42,9 +42,9 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(string fileName)
+        public C(string fileName)
         {
             var disposable = new Disposable();
         }
@@ -214,9 +214,9 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        private void Bar()
+        private void M()
         {
             int value;
             if(Try(out value))
@@ -244,9 +244,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
-        public static async Task<string> BarAsync()
+        public static async Task<string> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -285,9 +285,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
-        public static async Task<string> BarAsync()
+        public static async Task<string> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -325,7 +325,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
         private int value;
@@ -364,9 +364,9 @@ namespace RoslynSandbox
         }
     }
 
-    class Bar
+    class M
     {
-        public Bar(Foo foo)
+        public M(C foo)
         {
             var fooValue = foo.Value;
         }
@@ -384,7 +384,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
         private int value;
@@ -423,15 +423,15 @@ namespace RoslynSandbox
         }
     }
 
-    class Bar
+    class M
     {
-        public Bar(Foo foo)
+        public M(C foo)
         {
-            this.Foo = foo;
-            var fooValue = this.Foo.Value;
+            this.C = foo;
+            var fooValue = this.C.Value;
         }
 
-        public Foo Foo { get; }
+        public C C { get; }
     }
 }";
 
@@ -448,10 +448,10 @@ namespace RoslynSandbox
     using System.Collections.Generic;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         private List<Stream> streams = new List<Stream>();
-        public Foo()
+        public C()
         {
             streams.Add(File.OpenRead(string.Empty));
         }
@@ -469,11 +469,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private List<IDisposable> disposables = new List<IDisposable>();
 
-        public Foo()
+        public C()
         {
             this.disposables.Add(new Disposable());
         }
@@ -521,11 +521,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private List<object> disposables = new List<object>();
 
-        public Foo()
+        public C()
         {
             this.disposables.Add(new Disposable());
         }

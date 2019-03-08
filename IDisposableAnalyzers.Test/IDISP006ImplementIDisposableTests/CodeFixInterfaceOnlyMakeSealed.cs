@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
     }
 }";
@@ -30,7 +30,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -62,11 +62,11 @@ namespace RoslynSandbox
                 var barCode = @"
 namespace RoslynSandbox
 {
-    public class Bar
+    public class M
     {
         private int _value;
 
-        public Bar(int value)
+        public M(int value)
         {
             _value = value;
         }
@@ -78,7 +78,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : ↓IDisposable
+    public class C : ↓IDisposable
     {
     }
 }";
@@ -88,7 +88,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool _disposed;
 
@@ -122,7 +122,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private void ThrowIfDisposed()
         {
@@ -135,7 +135,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -165,7 +165,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         protected int Value { get; private set; }
     }
@@ -176,7 +176,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -210,7 +210,7 @@ namespace RoslynSandbox
                 var baseCode = @"
 namespace RoslynSandbox
 {
-    public abstract class FooBase
+    public abstract class CBase
     {
         public virtual int Value1 { get; protected set; }
 
@@ -225,7 +225,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : FooBase, ↓IDisposable
+    public class C : CBase, ↓IDisposable
     {
         public override int Value1 { get; protected set; }
 
@@ -240,7 +240,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : FooBase, IDisposable
+    public sealed class C : CBase, IDisposable
     {
         private bool disposed;
 
@@ -280,9 +280,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
-        public virtual void Bar()
+        public virtual void M()
         {
         }
     }
@@ -293,11 +293,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
-        public void Bar()
+        public void M()
         {
         }
 
@@ -331,9 +331,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
-        protected virtual void Bar()
+        protected virtual void M()
         {
         }
     }
@@ -344,7 +344,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -358,7 +358,7 @@ namespace RoslynSandbox
             this.disposed = true;
         }
 
-        private void Bar()
+        private void M()
         {
         }
 

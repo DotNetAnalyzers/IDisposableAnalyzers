@@ -19,9 +19,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             using (File.OpenRead(string.Empty))
             {
@@ -40,9 +40,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -62,9 +62,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
-        public static async Task Bar()
+        public static async Task M()
         {
             using (await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -97,9 +97,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public static class Foo
+    public static class C
     {
-        public static async Task<long> Bar()
+        public static async Task<long> M()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -132,9 +132,9 @@ namespace RoslynSandbox
 {
     using System.Collections.Generic;
 
-    public static class Foo
+    public static class C
     {
-        public static IEnumerable<T> Bar<T>(this IEnumerable<T> source)
+        public static IEnumerable<T> M<T>(this IEnumerable<T> source)
         {
             using (var e = source.GetEnumerator())
             {
@@ -181,9 +181,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(Factory factory)
+        public C(Factory factory)
         {
             using (factory.Create())
             {
@@ -202,11 +202,11 @@ namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
-    internal class Foo
+    internal class C
     {
         private readonly PasswordBox passwordBox;
 
-        internal Foo(PasswordBox passwordBox)
+        internal C(PasswordBox passwordBox)
         {
             this.passwordBox = passwordBox;
             using (this.passwordBox.SecurePassword)
@@ -260,9 +260,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(IFactory factory)
+        public C(IFactory factory)
         {
             using (factory.Create())
             {
@@ -315,9 +315,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(FactoryBase factory)
+        public C(FactoryBase factory)
         {
             using (factory.Create())
             {
@@ -358,9 +358,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public static void Bar<T>(FactoryBase<T> factory)
+        public static void M<T>(FactoryBase<T> factory)
         {
             using (factory.Create())
             {
@@ -401,9 +401,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(FactoryBase factory)
+        public C(FactoryBase factory)
         {
             using (factory.Create())
             {
@@ -444,9 +444,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(FactoryBase<int> factory)
+        public C(FactoryBase<int> factory)
         {
             using (factory.Create())
             {
@@ -499,9 +499,9 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
-        public Foo(FactoryBase factory)
+        public C(FactoryBase factory)
         {
             using (factory.Create())
             {
@@ -520,7 +520,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
@@ -549,7 +549,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
         public IDisposable RecursiveMethod() => RecursiveMethod();
 

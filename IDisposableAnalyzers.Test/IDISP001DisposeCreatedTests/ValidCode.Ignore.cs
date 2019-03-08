@@ -19,9 +19,9 @@ namespace RoslynSandbox
     using System;
     using System.Linq;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IDisposable[] disposables)
+        public C(IDisposable[] disposables)
         {
             var first = disposables.First();
         }
@@ -40,7 +40,7 @@ namespace RoslynSandbox
     using Moq;
     using NUnit.Framework;
 
-    public sealed class Foo
+    public sealed class C
     {
         [Test]
         public void Test()
@@ -61,9 +61,9 @@ namespace RoslynSandbox
     using System;
     using Ninject;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IKernel kernel)
+        public C(IKernel kernel)
         {
             var mocked = kernel.Get<IDisposable>();
         }

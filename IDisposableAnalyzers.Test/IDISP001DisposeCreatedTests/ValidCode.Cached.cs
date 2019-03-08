@@ -15,11 +15,11 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly ConcurrentDictionary<string, Stream> Cache = new ConcurrentDictionary<string, Stream>();
 
-        public static long Bar(string fileName)
+        public static long M(string fileName)
         {
             var stream = Cache.GetOrAdd(fileName, x => File.OpenRead(x));
             return stream.Length;
@@ -38,11 +38,11 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public class Foo
+    public class C
     {
         private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-        public long Bar()
+        public long M()
         {
             var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
             return stream.Length;
@@ -61,11 +61,11 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-        public static long Bar()
+        public static long M()
         {
             Stream stream;
             if (Cache.TryGetValue(1, out stream))
@@ -89,11 +89,11 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
         private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-        public static long Bar()
+        public static long M()
         {
             if (Cache.TryGetValue(1, out var stream))
             {
@@ -116,11 +116,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Runtime.CompilerServices;
 
-    public static class Foo
+    public static class C
     {
         private static readonly ConditionalWeakTable<string, Stream> Cache = new ConditionalWeakTable<string, Stream>();
 
-        public static long Bar()
+        public static long M()
         {
             Stream stream;
             if (Cache.TryGetValue(""1"", out stream))
@@ -144,11 +144,11 @@ namespace RoslynSandbox
     using System.IO;
     using System.Runtime.CompilerServices;
 
-    public static class Foo
+    public static class C
     {
         private static readonly ConditionalWeakTable<string, Stream> Cache = new ConditionalWeakTable<string, Stream>();
 
-        public static long Bar()
+        public static long M()
         {
             if (Cache.TryGetValue(""1"", out var stream))
             {
@@ -171,11 +171,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    internal sealed class Foo : IDisposable
+    internal sealed class C : IDisposable
     {
         private readonly Cache cache = new Cache();
 
-        private Foo()
+        private C()
         {
         }
 
@@ -184,7 +184,7 @@ namespace RoslynSandbox
             this.cache.Clear();
         }
 
-        public string Bar(int location)
+        public string M(int location)
         {
             if (this.cache.TryGetValue(location, out var foo))
             {
@@ -196,9 +196,9 @@ namespace RoslynSandbox
 
         private class Cache
         {
-            private readonly Dictionary<int, Foo> map = new Dictionary<int, Foo>();
+            private readonly Dictionary<int, C> map = new Dictionary<int, C>();
 
-            public bool TryGetValue(int location, out Foo walker)
+            public bool TryGetValue(int location, out C walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }
@@ -229,9 +229,9 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.Diagnostics;
 
-    internal class Foo : IDisposable
+    internal class C : IDisposable
     {
-        private static readonly ConcurrentQueue<Foo> Cache = new ConcurrentQueue<Foo>();
+        private static readonly ConcurrentQueue<C> Cache = new ConcurrentQueue<C>();
         private int refCount;
 
         public void Dispose()
@@ -239,7 +239,7 @@ namespace RoslynSandbox
             this.Dispose(true);
         }
 
-        protected static Foo Borrow(Func<Foo> create)
+        protected static C Borrow(Func<C> create)
         {
             if (!Cache.TryDequeue(out var walker))
             {
@@ -287,9 +287,9 @@ namespace RoslynSandbox
     using System.Collections.Concurrent;
     using System.Diagnostics;
 
-    internal class Foo : IDisposable
+    internal class C : IDisposable
     {
-        private static readonly ConcurrentQueue<Foo> Cache = new ConcurrentQueue<Foo>();
+        private static readonly ConcurrentQueue<C> Cache = new ConcurrentQueue<C>();
         private int refCount;
 
         public void Dispose()
@@ -297,13 +297,13 @@ namespace RoslynSandbox
             this.Dispose(true);
         }
 
-        protected static Foo BorrowAndVisit(Func<Foo> create)
+        protected static C BorrowAndVisit(Func<C> create)
         {
             var walker = Borrow(create);
             return walker;
         }
 
-        protected static Foo Borrow(Func<Foo> create)
+        protected static C Borrow(Func<C> create)
         {
             if (!Cache.TryDequeue(out var walker))
             {
@@ -349,11 +349,11 @@ namespace RoslynSandbox
     using System;
     using System.Collections.Generic;
 
-    internal sealed class Foo : IDisposable
+    internal sealed class C : IDisposable
     {
-        private readonly RecursiveFoos recursiveFoos = new RecursiveFoos();
+        private readonly RecursiveCs recursiveCs = new RecursiveCs();
 
-        private Foo()
+        private C()
         {
         }
 
@@ -366,28 +366,28 @@ namespace RoslynSandbox
             return this.TryGetRecursive(location, out var walker);
         }
 
-        private bool TryGetRecursive(int location, out Foo walker)
+        private bool TryGetRecursive(int location, out C walker)
         {
-            if (this.recursiveFoos.TryGetValue(location, out walker))
+            if (this.recursiveCs.TryGetValue(location, out walker))
             {
                 return false;
             }
 
-            walker = new Foo();
-            this.recursiveFoos.Add(location, walker);
+            walker = new C();
+            this.recursiveCs.Add(location, walker);
             return true;
         }
 
-        private class RecursiveFoos
+        private class RecursiveCs
         {
-            private readonly Dictionary<int, Foo> map = new Dictionary<int, Foo>();
+            private readonly Dictionary<int, C> map = new Dictionary<int, C>();
 
-            public void Add(int location, Foo walker)
+            public void Add(int location, C walker)
             {
                 this.map.Add(location, walker);
             }
 
-            public bool TryGetValue(int location, out Foo walker)
+            public bool TryGetValue(int location, out C walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }

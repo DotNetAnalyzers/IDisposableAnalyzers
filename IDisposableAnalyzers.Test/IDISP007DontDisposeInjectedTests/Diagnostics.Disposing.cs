@@ -31,12 +31,12 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private static readonly Stream Stream = File.OpenRead(string.Empty);
         private readonly object stream;
 
-        public Foo(Stream stream)
+        public C(Stream stream)
         {
             this.stream = stream ?? File.OpenRead(string.Empty);
         }
@@ -62,11 +62,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public Foo(IDisposable arg)
+        public C(IDisposable arg)
         {
             this.disposable = arg;
         }
@@ -91,11 +91,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         public IDisposable disposable;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -118,7 +118,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private static readonly IDisposable Disposable;
 
@@ -139,7 +139,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly object gate;
 
@@ -185,9 +185,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -215,7 +215,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public abstract class FooBase : IDisposable
+    public abstract class CBase : IDisposable
     {
         private bool disposed;
 
@@ -256,9 +256,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -272,11 +272,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Bar : IDisposable
+    public sealed class M : IDisposable
     {
-        private readonly Foo foo;
+        private readonly C foo;
 
-        public Bar(Foo foo)
+        public M(C foo)
         {
             this.foo = foo;
         }
@@ -310,9 +310,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -326,11 +326,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Bar : IDisposable
+    public sealed class M : IDisposable
     {
-        private readonly Foo foo;
+        private readonly C foo;
 
-        public Bar(Foo foo)
+        public M(C foo)
         {
             this.foo = foo;
         }
@@ -358,9 +358,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -374,11 +374,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Bar : IDisposable
+    public sealed class M : IDisposable
     {
-        private readonly Foo foo;
+        private readonly C foo;
 
-        public Bar(Foo arg)
+        public M(C arg)
         {
             this.foo = arg;
         }
@@ -404,7 +404,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         public IDisposable Disposable { get; set; }
 
@@ -426,9 +426,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo(IDisposable meh)
+        public C(IDisposable meh)
         {
             ↓meh.Dispose();
         }
@@ -446,9 +446,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public void Bar(IDisposable meh)
+        public void M(IDisposable meh)
         {
             ↓meh.Dispose();
         }
@@ -466,21 +466,21 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class FooBase : IDisposable
+    public class CBase : IDisposable
     {
         private bool disposed = false;
 
-        public FooBase()
+        public CBase()
             : this(null)
         {
         }
 
-        public FooBase(object bar)
+        public CBase(object bar)
         {
-            this.Bar = bar;
+            this.M = bar;
         }
 
-        public object Bar { get; }
+        public object M { get; }
 
         public void Dispose()
         {
@@ -505,9 +505,9 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Foo : FooBase
+    public class C : CBase
     {
-        public Foo(Stream stream)
+        public C(Stream stream)
             : base(stream)
         {
         }
@@ -516,7 +516,7 @@ namespace RoslynSandbox
         {
             if (disposing)
             {
-                ↓(this.Bar as IDisposable)?.Dispose();
+                ↓(this.M as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
@@ -534,7 +534,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo : IDisposable
+    public sealed class C : IDisposable
     {
         private IDisposable disposable;
 
@@ -560,12 +560,12 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo : IDisposable
+    public class C : IDisposable
     {
         private readonly IDisposable disposable;
         private bool disposed;
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -621,11 +621,11 @@ namespace Gu.Reactive
     using System.IO;
     using System.Reactive.Disposables;
 
-    public abstract class Foo : IDisposable
+    public abstract class C : IDisposable
     {
         private readonly SingleAssignmentDisposable disposable;
 
-        protected Foo(SingleAssignmentDisposable disposable)
+        protected C(SingleAssignmentDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -648,16 +648,16 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly IDisposable[] disposables = new IDisposable[1];
 
-        public Foo(IDisposable disposable)
+        public C(IDisposable disposable)
         {
             this.disposables[0] = disposable;
         }
 
-        public void Bar()
+        public void M()
         {
             var disposable = this.disposables[0];
             ↓disposable.Dispose();
@@ -675,11 +675,11 @@ namespace RoslynSandbox
 {
     using System;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly IDisposable[] Disposables = new IDisposable[1];
 
-        public void Bar()
+        public void M()
         {
             var disposable = Disposables[0];
             ↓disposable.Dispose();
@@ -699,16 +699,16 @@ namespace RoslynSandbox
 
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
 
-        public Foo(IDisposable bar)
+        public C(IDisposable bar)
         {
             this.map[1] = bar;
         }
 
-        public void Bar()
+        public void M()
         {
             var disposable = map[0];
             ↓disposable.Dispose();
@@ -728,11 +728,11 @@ namespace RoslynSandbox
 
     using System.Collections.Generic;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly Dictionary<int, IDisposable> Map = new Dictionary<int, IDisposable>();
 
-        public void Bar()
+        public void M()
         {
             var disposable = Map[0];
             ↓disposable.Dispose();
@@ -753,9 +753,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public static void Bar(object o)
+        public static void M(object o)
         {
             ↓((IDisposable)o).Dispose();
         }
@@ -773,9 +773,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public static void Bar(object o)
+        public static void M(object o)
         {
             if (o is IDisposable disposable)
             {
@@ -795,9 +795,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public static void Bar(object o)
+        public static void M(object o)
         {
             switch (o)
             {

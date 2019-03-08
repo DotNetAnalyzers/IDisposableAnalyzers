@@ -18,7 +18,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh()
         {
@@ -38,7 +38,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public dynamic Meh()
         {
@@ -57,7 +57,7 @@ namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
-    public sealed class Foo
+    public sealed class C
     {
         private static readonly PasswordBox PasswordBox = new PasswordBox();
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
 {
     using System.Windows.Controls;
 
-    public sealed class Foo
+    public sealed class C
     {
         private readonly PasswordBox PasswordBox = new PasswordBox();
 
@@ -99,9 +99,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             var meh = this[0];
         }
@@ -127,7 +127,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh() => ↓File.OpenRead(string.Empty);
     }
@@ -144,7 +144,7 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class Foo
+    public sealed class C
     {
         public object Meh => ↓File.OpenRead(string.Empty);
     }
@@ -160,9 +160,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static void Bar()
+        internal static void M()
         {
             Func<object> f = () =>
                 {
@@ -183,9 +183,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static void Bar()
+        internal static void M()
         {
             Func<object> f = () => ↓System.IO.File.OpenRead(null);
         }
@@ -203,9 +203,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    internal static class Foo
+    internal static class C
     {
-        internal static void Bar()
+        internal static void M()
         {
             Func<int,object> f = x => ↓System.IO.File.OpenRead(null);
         }
