@@ -53,9 +53,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    internal class Foo
+    internal class C
     {
-        internal async void Bar()
+        internal async void M()
         {
             var value = new string(' ', 1);
         }
@@ -70,7 +70,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
-    public class Foo
+    public class C
     {
         public void Meh()
         {
@@ -91,9 +91,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -126,9 +126,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public static class Foo
+    public static class C
     {
-        public static long Bar()
+        public static long M()
         {
             using (var meh = new Disposable())
             {
@@ -149,9 +149,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
   
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -185,9 +185,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
   
-    internal static class Foo
+    internal static class C
     {
-        internal static async Task Bar()
+        internal static async Task M()
         {
             var text = await ReadAsync(string.Empty);
         }
@@ -211,9 +211,9 @@ namespace RoslynSandbox
     using System.Net;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public async Task Bar()
+        public async Task M()
         {
             using (var client = new WebClient())
             {
@@ -275,9 +275,9 @@ namespace RoslynSandbox
 {
     using System.Data.Common;
 
-    public class Foo
+    public class C
     {
-        public static void Bar(DbConnection conn)
+        public static void M(DbConnection conn)
         {
             using(var command = conn.CreateCommand())
             {
@@ -296,16 +296,16 @@ namespace RoslynSandbox
 {
     using System.Data.Common;
 
-    public class Foo
+    public class C
     {
         private readonly DbConnection connection;
 
-        public Foo(DbConnection connection)
+        public C(DbConnection connection)
         {
             this.connection = connection;
         }
 
-        public void Bar()
+        public void M()
         {
             using(var command = this.connection.CreateCommand())
             {
@@ -325,7 +325,7 @@ namespace RoslynSandbox
     using System.Diagnostics;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
         static Task RunProcessAsync(string fileName)
         {
@@ -361,9 +361,9 @@ namespace RoslynSandbox
 {
     using System.IO;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             Stream stream;
             if (TryGetStream(out stream))
@@ -392,9 +392,9 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class Foo
+    public class C
     {
-        public Foo()
+        public C()
         {
             IDisposable disposable;
             using (disposable = new Disposable())
@@ -415,9 +415,9 @@ namespace RoslynSandbox
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Foo
+    public class C
     {
-        public void Bar()
+        public void M()
         {
             FileStream currentStream = null;
             try
@@ -516,11 +516,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class ValueTupleOfFileStreams : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Tuple<FileStream, FileStream> tuple;
 
-        public ValueTupleOfFileStreams(string file)
+        public C(string file)
         {
             this.tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
         }
@@ -545,11 +545,11 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public sealed class ValueTupleOfFileStreams : IDisposable
+    public sealed class C : IDisposable
     {
         private readonly (FileStream, FileStream) tuple;
 
-        public ValueTupleOfFileStreams(string file)
+        public C(string file)
         {
             this.tuple = (File.OpenRead(file), File.OpenRead(file));
         }
