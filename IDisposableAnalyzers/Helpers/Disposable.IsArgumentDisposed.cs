@@ -184,7 +184,7 @@ namespace IDisposableAnalyzers
                         {
                             using (var walker = InvocationWalker.Borrow(declaration))
                             {
-                                foreach (var nested in walker)
+                                foreach (var nested in walker.Invocations)
                                 {
                                     if (nested.TryFindArgument(parameter, out var nestedArg) &&
                                         visited.Add(nestedArg))

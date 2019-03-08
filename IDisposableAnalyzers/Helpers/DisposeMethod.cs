@@ -86,9 +86,9 @@ namespace IDisposableAnalyzers
             if (virtualDispose.ParameterList is ParameterListSyntax parameterList &&
                 parameterList.Parameters.TrySingle(out var parameter))
             {
-                using (var invocations = InvocationWalker.Borrow(virtualDispose))
+                using (var walker = InvocationWalker.Borrow(virtualDispose))
                 {
-                    foreach (var invocation in invocations)
+                    foreach (var invocation in walker.Invocations)
                     {
                         if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
                             memberAccess.Expression is BaseExpressionSyntax &&
@@ -117,9 +117,9 @@ namespace IDisposableAnalyzers
 
         internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall)
         {
-            using (var invocations = InvocationWalker.Borrow(disposeMethod))
+            using (var walker = InvocationWalker.Borrow(disposeMethod))
             {
-                foreach (var candidate in invocations)
+                foreach (var candidate in walker.Invocations)
                 {
                     if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
                         argumentList.Arguments.Count == 1 &&
@@ -139,9 +139,9 @@ namespace IDisposableAnalyzers
 
         internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
         {
-            using (var invocations = InvocationWalker.Borrow(disposeMethod))
+            using (var walker = InvocationWalker.Borrow(disposeMethod))
             {
-                foreach (var candidate in invocations)
+                foreach (var candidate in walker.Invocations)
                 {
                     if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
                         argumentList.Arguments.TrySingle(out argument) &&

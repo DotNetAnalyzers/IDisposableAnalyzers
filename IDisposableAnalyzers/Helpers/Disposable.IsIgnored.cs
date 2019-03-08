@@ -225,7 +225,7 @@ namespace IDisposableAnalyzers
                 using (var invocations = InvocationWalker.Borrow(block))
                 {
                     // Just checking if there is a dispose call in the scope for now.
-                    if (invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
+                    if (invocations.Invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
                     {
                         return false;
                     }
