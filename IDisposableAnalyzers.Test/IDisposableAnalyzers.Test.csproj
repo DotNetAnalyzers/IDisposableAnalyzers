@@ -11,14 +11,6 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="IDISP001DisposeCreatedTests\ValidCode.Wrapped.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="IDISP001DisposeCreatedTests\ValidCode.Wrapped.cs" />
-  </ItemGroup>
   
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
