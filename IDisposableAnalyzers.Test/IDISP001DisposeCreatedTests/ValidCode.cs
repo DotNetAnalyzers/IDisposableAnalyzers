@@ -507,6 +507,35 @@ namespace RoslynSandbox
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
 
+        [Test]
+        public void FieldValueTuple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class ValueTupleOfFileStreams : IDisposable
+    {
+        private readonly (FileStream, FileStream) tuple;
+
+        public ValueTupleOfFileStreams(string file)
+        {
+            this.tuple = (File.OpenRead(file), File.OpenRead(file));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
         public void LocalPairThatIsDisposed(string expression)
