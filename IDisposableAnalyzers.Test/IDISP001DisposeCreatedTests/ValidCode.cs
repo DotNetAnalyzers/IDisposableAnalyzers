@@ -508,6 +508,35 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void FieldTuple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class ValueTupleOfFileStreams : IDisposable
+    {
+        private readonly Tuple<FileStream, FileStream> tuple;
+
+        public ValueTupleOfFileStreams(string file)
+        {
+            this.tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
+        }
+
+        public void Dispose()
+        {
+            this.tuple.Item1.Dispose();
+            this.tuple.Item2.Dispose();
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void FieldValueTuple()
         {
             var testCode = @"
