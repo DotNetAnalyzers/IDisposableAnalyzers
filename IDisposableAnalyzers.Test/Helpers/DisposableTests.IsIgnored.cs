@@ -60,14 +60,14 @@ namespace RoslynSandbox
             }
 
             [TestCase("disposable")]
-            [TestCase("disposable ?? disposable")]
-            [TestCase("true ? disposable : (IDisposable)null")]
-            [TestCase("Tuple.Create(disposable, 1)")]
-            [TestCase("(disposable, 1)")]
-            [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            [TestCase("new List<IDisposable> { disposable }")]
-            [TestCase("new List<IDisposable>() { disposable }")]
-            [TestCase("new List<IDisposable> { disposable, null }")]
+            ////[TestCase("disposable ?? disposable")]
+            ////[TestCase("true ? disposable : (IDisposable)null")]
+            ////[TestCase("Tuple.Create(disposable, 1)")]
+            ////[TestCase("(disposable, 1)")]
+            ////[TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
+            ////[TestCase("new List<IDisposable> { disposable }")]
+            ////[TestCase("new List<IDisposable>() { disposable }")]
+            ////[TestCase("new List<IDisposable> { disposable, null }")]
             public void ArgumentAssignedToTempLocal(string expression)
             {
                 var code = @"
