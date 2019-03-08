@@ -60,10 +60,14 @@ namespace RoslynSandbox
             }
 
             [TestCase("disposable")]
+            [TestCase("disposable ?? disposable")]
             [TestCase("true ? disposable : (IDisposable)null")]
             [TestCase("Tuple.Create(disposable, 1)")]
+            [TestCase("(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
             [TestCase("new List<IDisposable> { disposable }")]
+            [TestCase("new List<IDisposable>() { disposable }")]
+            [TestCase("new List<IDisposable> { disposable, null }")]
             public void ArgumentAssignedToTempLocal(string expression)
             {
                 var code = @"
@@ -81,11 +85,11 @@ namespace RoslynSandbox
 
         public static int M(IDisposable disposable)
         {
-            var temp = Tuple.Create(disposable, 1);
+            var temp = new List<IDisposable> { disposable };
             return 1;
         }
     }
-}".AssertReplace("Tuple.Create(disposable, 1)", expression);
+}".AssertReplace("new List<IDisposable> { disposable }", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
