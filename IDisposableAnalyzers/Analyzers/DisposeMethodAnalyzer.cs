@@ -135,7 +135,7 @@ namespace IDisposableAnalyzers
                 {
                     using (var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
                     {
-                        foreach (var disposeCall in disposeWalker)
+                        foreach (var disposeCall in disposeWalker.Invocations)
                         {
                             if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
                                 FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&

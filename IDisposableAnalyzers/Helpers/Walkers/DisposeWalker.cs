@@ -1,13 +1,13 @@
 namespace IDisposableAnalyzers
 {
-    using System.Collections;
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>, IReadOnlyList<InvocationExpressionSyntax>
+    internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>
     {
         private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
         private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
@@ -17,13 +17,13 @@ namespace IDisposableAnalyzers
             this.Scope = Scope.Instance;
         }
 
-        public int Count => this.invocations.Count;
+        public IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
 
-        public InvocationExpressionSyntax this[int index] => this.invocations[index];
+        public IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
 
-        public IEnumerator<InvocationExpressionSyntax> GetEnumerator() => this.invocations.GetEnumerator();
+        public void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.invocations).GetEnumerator();
+        public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -67,6 +67,16 @@ namespace IDisposableAnalyzers
             if (disposeMethod != null)
             {
                 return BorrowAndVisit(disposeMethod, Scope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+            }
+
+            return Borrow(() => new DisposeWalker());
+        }
+
+        internal static DisposeWalker Borrow(SyntaxNode scope, Scope search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (scope != null)
+            {
+                return BorrowAndVisit(scope, search, semanticModel, cancellationToken, () => new DisposeWalker());
             }
 
             return Borrow(() => new DisposeWalker());

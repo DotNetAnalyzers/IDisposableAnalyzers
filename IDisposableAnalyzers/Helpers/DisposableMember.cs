@@ -34,33 +34,28 @@ namespace IDisposableAnalyzers
 
             if (disposeMethod.TrySingleMethodDeclaration(cancellationToken, out var disposeMethodDeclaration))
             {
-                if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
+                using (var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken))
                 {
-                    using (var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken))
+                    if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
                     {
-                        foreach (var candidate in walker)
+                        foreach (var candidate in walker.Invocations)
                         {
                             if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
                             {
                                 return true;
                             }
                         }
+
+                        return false;
                     }
 
-                    return false;
-                }
-                else
-                {
-                    using (var walker = IdentifierNameExecutionWalker.Borrow(disposeMethodDeclaration, Scope.Recursive, semanticModel, cancellationToken))
+                    foreach (var candidate in walker.Identifiers)
                     {
-                        foreach (var candidate in walker.IdentifierNames)
+                        if (candidate.Identifier.Text == member.Name &&
+                            semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol candidateSymbol) &&
+                            candidateSymbol.OriginalDefinition.Equals(member.Symbol))
                         {
-                            if (candidate.Identifier.Text == member.Name &&
-                               semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol candidateSymbol) &&
-                               candidateSymbol.OriginalDefinition.Equals(member.Symbol))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
 

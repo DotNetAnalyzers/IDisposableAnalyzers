@@ -103,7 +103,7 @@ namespace IDisposableAnalyzers
         {
             if (local.TryGetScope(cancellationToken, out var scope))
             {
-                using (var walker = InvocationWalker.Borrow(scope))
+                using (var walker = DisposeWalker.Borrow(scope, Scope.Member, semanticModel, cancellationToken))
                 {
                     foreach (var invocation in walker.Invocations)
                     {

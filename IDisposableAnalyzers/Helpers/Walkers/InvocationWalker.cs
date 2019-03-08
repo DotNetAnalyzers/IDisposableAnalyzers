@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -29,6 +30,8 @@ namespace IDisposableAnalyzers
             this.invocations.Add(node);
             base.VisitInvocationExpression(node);
         }
+
+        public void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
 
         internal static InvocationWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new InvocationWalker());
 
