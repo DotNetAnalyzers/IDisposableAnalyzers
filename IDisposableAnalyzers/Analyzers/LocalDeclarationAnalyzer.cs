@@ -31,7 +31,7 @@ namespace IDisposableAnalyzers
                     if (declarator.Initializer is EqualsValueClauseSyntax initializer &&
                         initializer.Value is ExpressionSyntax value &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        context.SemanticModel.GetDeclaredSymbolSafe(declarator, context.CancellationToken) is ILocalSymbol local &&
+                        context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol local) &&
                         Disposable.ShouldDispose(local, value, context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, localDeclaration.GetLocation()));
