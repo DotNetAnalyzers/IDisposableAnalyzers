@@ -87,16 +87,28 @@ namespace IDisposableAnalyzers
             }
         }
 
-        internal static bool IsDisposedAfter(ISymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposedAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (location.FirstAncestorOrSelf<MemberDeclarationSyntax>() is MemberDeclarationSyntax scope)
+            return LocalOrParameter.TryCreate(local, out var localOrParameter) &&
+                   IsDisposedAfter(localOrParameter, location, semanticModel, cancellationToken);
+        }
+
+        internal static bool IsDisposedAfter(IParameterSymbol parameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return LocalOrParameter.TryCreate(parameter, out var localOrParameter) &&
+                   IsDisposedAfter(localOrParameter, location, semanticModel, cancellationToken);
+        }
+
+        internal static bool IsDisposedAfter(LocalOrParameter local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (local.TryGetScope(cancellationToken, out var scope))
             {
                 using (var walker = InvocationWalker.Borrow(scope))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
                         if (location.IsExecutedBefore(invocation).IsEither(ExecutedBefore.Maybe, ExecutedBefore.Yes) &&
-                            DisposeCall.IsDisposing(invocation, local, semanticModel, cancellationToken))
+                            DisposeCall.IsDisposing(invocation, local.Symbol, semanticModel, cancellationToken))
                         {
                             return true;
                         }
