@@ -9,7 +9,7 @@
 | Category | IDisposableAnalyzers.Correctness
 | Code     | [ArgumentAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/ArgumentAnalyzer.cs)
 |          | [AssignmentAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/AssignmentAnalyzer.cs)
-|          | [IDISP001DisposeCreated](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/IDISP001DisposeCreated.cs)
+|          | [LocalDeclarationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/LocalDeclarationAnalyzer.cs)
 
 ## Description
 

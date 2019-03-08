@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 
     public partial class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
+        private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
         private static readonly string DisposableCode = @"

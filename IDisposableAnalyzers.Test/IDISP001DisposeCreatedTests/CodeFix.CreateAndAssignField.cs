@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     {
         public class CreateAndAssignField
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new IDISP001DisposeCreated();
+            private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 

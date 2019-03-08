@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 
         private static readonly Gu.Roslyn.Asserts.Benchmark UsingStatementAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.UsingStatementAnalyzer());
 
-        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.IDISP001DisposeCreated());
+        private static readonly Gu.Roslyn.Asserts.Benchmark IDISP001DisposeCreatedBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.LocalDeclarationAnalyzer());
 
         private static readonly Gu.Roslyn.Asserts.Benchmark SemanticModelCacheAnalyzerBenchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.SemanticModelCacheAnalyzer());
 

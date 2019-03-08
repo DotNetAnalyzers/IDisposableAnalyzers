@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    [TestFixture(typeof(IDISP001DisposeCreated))]
+    [TestFixture(typeof(LocalDeclarationAnalyzer))]
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
     public partial class ValidCode<T>
@@ -462,7 +462,7 @@ namespace RoslynSandbox
 
         [TestCase("(File.OpenRead(file), new object())")]
         [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
-        public void LocalValueTupleThatIsDisposed(string expression)
+        public void LocalValueTupleThatDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -651,7 +651,7 @@ namespace RoslynSandbox
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void Tuple(string expression)
+        public void FieldTuple(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -680,7 +680,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void ValueTuple(string expression)
+        public void FieldValueTuple(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
