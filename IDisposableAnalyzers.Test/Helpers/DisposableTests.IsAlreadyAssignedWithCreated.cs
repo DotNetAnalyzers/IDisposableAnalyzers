@@ -392,75 +392,75 @@ namespace RoslynSandbox
 {
     public class C
     {
-        private M bar1;
-        private M bar2;
+        private C1 c1;
+        private C1 c2;
 
-        public M M1
+        public C1 P1
         {
             get
             {
-                return this.bar1;
+                return this.c1;
             }
 
             set
             {
-                if (Equals(value, this.bar1))
+                if (Equals(value, this.c1))
                 {
                     return;
                 }
 
-                if (value != null && this.bar2 != null)
+                if (value != null && this.c2 != null)
                 {
-                    this.M2 = null;
+                    this.P2 = null;
                 }
 
-                if (this.bar1 != null)
+                if (this.c1 != null)
                 {
-                    this.bar1.Selected = false;
+                    this.c1.Selected = false;
                 }
 
-                this.bar1 = value;
-                if (this.bar1 != null)
+                this.c1 = value;
+                if (this.c1 != null)
                 {
-                    this.bar1.Selected = true;
+                    this.c1.Selected = true;
                 }
             }
         }
 
-        public M M2
+        public C1 P2
         {
             get
             {
-                return this.bar2;
+                return this.c2;
             }
 
             set
             {
-                if (Equals(value, this.bar2))
+                if (Equals(value, this.c2))
                 {
                     return;
                 }
 
-                if (value != null && this.bar1 != null)
+                if (value != null && this.c1 != null)
                 {
-                    this.M1 = null;
+                    this.P1 = null;
                 }
 
-                if (this.bar2 != null)
+                if (this.c2 != null)
                 {
-                    this.bar2.Selected = false;
+                    this.c2.Selected = false;
                 }
 
-                this.bar2 = value;
-                if (this.bar2 != null)
+                this.c2 = value;
+                if (this.c2 != null)
                 {
-                    this.bar2.Selected = true;
+                    this.c2.Selected = true;
                 }
             }
         }
     }
 
-    public class M
+    public class C1
     {
         public bool Selected { get; set; }
     }
@@ -468,7 +468,7 @@ namespace RoslynSandbox
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.M1 = null;").Left;
+                var value = syntaxTree.FindAssignmentExpression("this.P1 = null;").Left;
                 Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
         }
