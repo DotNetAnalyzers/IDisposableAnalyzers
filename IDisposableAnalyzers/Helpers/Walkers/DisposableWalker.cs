@@ -12,25 +12,18 @@ namespace IDisposableAnalyzers
     {
         private readonly List<IdentifierNameSyntax> usages = new List<IdentifierNameSyntax>();
 
-        public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
-
-        public override void VisitIdentifierName(IdentifierNameSyntax node)
-        {
-            this.usages.Add(node);
-        }
-
         public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsReturned(usage))
+                    if (IsReturned(usage, semanticModel, cancellationToken, null))
                     {
                         return false;
                     }
 
-                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, out _))
+                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, null, out _))
                     {
                         return false;
                     }
@@ -40,13 +33,13 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        public static bool IsAssigned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
+        public static bool IsReturned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, out first))
+                    if (IsReturned(usage, semanticModel, cancellationToken, visited))
                     {
                         return true;
                     }
@@ -54,6 +47,29 @@ namespace IDisposableAnalyzers
             }
 
             return false;
+        }
+
+        public static bool IsAssigned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
+        {
+            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, null, out first))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
+
+        public override void VisitIdentifierName(IdentifierNameSyntax node)
+        {
+            this.usages.Add(node);
         }
 
         protected override void Clear()
@@ -80,7 +96,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool IsReturned(ExpressionSyntax candidate)
+        private static bool IsReturned(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             switch (candidate.Parent.Kind())
             {
@@ -93,22 +109,29 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.CoalesceExpression:
                 case SyntaxKind.CollectionInitializerExpression:
                 case SyntaxKind.ObjectCreationExpression:
-                    return IsReturned((ExpressionSyntax)candidate.Parent);
+                    return IsReturned((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
             }
 
-            if (candidate.Parent is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList)
+            switch (candidate.Parent)
             {
-                if (argumentList.Parent is ObjectCreationExpressionSyntax objectCreation)
-                {
-                    return IsReturned(objectCreation);
-                }
-            }
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is ObjectCreationExpressionSyntax objectCreation:
+                    return IsReturned(objectCreation, semanticModel, cancellationToken, visited);
+                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
+                                                                    LocalOrParameter.TryCreate(symbol, out var localOrParameter):
+                    using (visited = visited.IncrementUsage())
+                    {
+                        return visited.Add(variableDeclarator) &&
+                               IsReturned(localOrParameter, semanticModel, cancellationToken, visited);
+                    }
 
-            return false;
+                default:
+                    return false;
+            }
         }
 
-        private static bool IsAssignedToFieldOrProperty(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty fieldOrProperty)
+        private static bool IsAssignedToFieldOrProperty(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
         {
             switch (candidate.Parent.Kind())
             {
@@ -116,7 +139,7 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                    return IsAssignedToFieldOrProperty((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, out fieldOrProperty);
+                    return IsAssignedToFieldOrProperty((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out fieldOrProperty);
             }
 
             if (candidate.Parent is AssignmentExpressionSyntax assignment &&

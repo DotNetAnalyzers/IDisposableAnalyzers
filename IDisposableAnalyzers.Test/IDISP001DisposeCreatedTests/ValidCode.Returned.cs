@@ -249,6 +249,27 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void LocalInLocalStreamReader()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static StreamReader M()
+        {
+            var stream = File.OpenRead(string.Empty);
+            var reader = new StreamReader(stream);
+            return reader;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void LocalInStreamReaderMethodBodyAsDisposable()
         {
             var testCode = @"
