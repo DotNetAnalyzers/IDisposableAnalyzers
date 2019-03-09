@@ -18,12 +18,17 @@ namespace IDisposableAnalyzers
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsReturned(usage, semanticModel, cancellationToken, null))
+                    if (Returns(usage, semanticModel, cancellationToken, null))
                     {
                         return false;
                     }
 
-                    if (IsAssigned(usage, semanticModel, cancellationToken, null, out _))
+                    if (Assigns(usage, semanticModel, cancellationToken, null, out _))
+                    {
+                        return false;
+                    }
+
+                    if (Stores(usage, semanticModel, cancellationToken, null))
                     {
                         return false;
                     }
@@ -33,13 +38,13 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        public static bool IsReturned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        public static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsReturned(usage, semanticModel, cancellationToken, visited))
+                    if (Returns(usage, semanticModel, cancellationToken, visited))
                     {
                         return true;
                     }
@@ -49,13 +54,29 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool IsAssigned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty first)
+        public static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty first)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsAssigned(usage, semanticModel, cancellationToken, null, out first))
+                    if (Assigns(usage, semanticModel, cancellationToken, visited, out first))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (Stores(usage, semanticModel, cancellationToken, visited))
                     {
                         return true;
                     }
@@ -96,7 +117,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool IsReturned(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
             switch (candidate.Parent.Kind())
             {
@@ -109,14 +130,14 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.CoalesceExpression:
                 case SyntaxKind.CollectionInitializerExpression:
                 case SyntaxKind.ObjectCreationExpression:
-                    return IsReturned((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
+                    return Returns((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
             }
 
             switch (candidate.Parent)
             {
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is ObjectCreationExpressionSyntax objectCreation:
-                    return IsReturned(objectCreation, semanticModel, cancellationToken, visited);
+                    return Returns(objectCreation, semanticModel, cancellationToken, visited);
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
@@ -125,7 +146,7 @@ namespace IDisposableAnalyzers
 #pragma warning restore IDISP003
                     {
                         return visited.Add(variableDeclarator) &&
-                               IsReturned(localOrParameter, semanticModel, cancellationToken, visited);
+                               Returns(localOrParameter, semanticModel, cancellationToken, visited);
                     }
 
                 default:
@@ -133,7 +154,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool IsAssigned(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
+        private static bool Assigns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
         {
             switch (candidate.Parent.Kind())
             {
@@ -141,7 +162,7 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                    return IsAssigned((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                    return Assigns((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out fieldOrProperty);
             }
 
             switch (candidate.Parent)
@@ -158,7 +179,7 @@ namespace IDisposableAnalyzers
 #pragma warning restore IDISP003
                     {
                         return visited.Add(argument) &&
-                               IsAssigned(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                               Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
                     }
 
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
@@ -169,12 +190,70 @@ namespace IDisposableAnalyzers
 #pragma warning restore IDISP003
                     {
                         return visited.Add(variableDeclarator) &&
-                               IsAssigned(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                               Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
                     }
 
                 default:
                     return false;
             }
+        }
+
+        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            switch (candidate.Parent.Kind())
+            {
+                case SyntaxKind.CastExpression:
+                case SyntaxKind.AsExpression:
+                case SyntaxKind.ConditionalExpression:
+                case SyntaxKind.CoalesceExpression:
+                    return Stores((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
+            }
+
+            switch (candidate.Parent)
+            {
+                case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) &&
+                                                                assignment.Left.IsKind(SyntaxKind.ElementAccessExpression):
+                    return true;
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+
+                    if (!method.TrySingleMethodDeclaration(cancellationToken, out _) &&
+                        method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                    {
+                        return true;
+                    }
+
+                    if (method.TryFindParameter(argument, out var parameter) &&
+                        LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                    {
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                        using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                        {
+                            return visited.Add(argument) &&
+                                   Stores(localOrParameter, semanticModel, cancellationToken, visited);
+                        }
+                    }
+
+                    break;
+
+                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
+                                                                    LocalOrParameter.TryCreate(symbol, out var local):
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                    using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                    {
+                        return visited.Add(variableDeclarator) &&
+                               Stores(local, semanticModel, cancellationToken, visited);
+                    }
+
+                default:
+                    return false;
+            }
+
+            return false;
         }
     }
 }

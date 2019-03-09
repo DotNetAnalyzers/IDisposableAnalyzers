@@ -4,6 +4,7 @@ namespace IDisposableAnalyzers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -114,93 +115,6 @@ namespace IDisposableAnalyzers
             }
         }
 
-        internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> recursion = null)
-        {
-            using (var pooledInvocations = InvocationWalker.Borrow(scope))
-            {
-                foreach (var invocation in pooledInvocations.Invocations)
-                {
-                    if (TryGetArgument(invocation, out var argument) &&
-                        semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol candidate)
-                    {
-                        if (IsAddMethod(candidate) &&
-                            symbol.Equals(semanticModel.GetSymbolSafe(argument.Expression, cancellationToken)))
-                        {
-                            return true;
-                        }
-
-                        if (candidate.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax declaration) &&
-                            candidate.TryFindParameter(argument, out var parameter))
-                        {
-                            using (var visited = recursion.IncrementUsage())
-                            {
-                                if (visited.Add(parameter) &&
-                                    IsAddedToFieldOrProperty(parameter, declaration, semanticModel, cancellationToken, visited))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
-
-            bool TryGetArgument(InvocationExpressionSyntax invocation, out ArgumentSyntax argument)
-            {
-                argument = null;
-                if (invocation.ArgumentList is ArgumentListSyntax argumentList)
-                {
-                    foreach (var candidate in argumentList.Arguments)
-                    {
-                        if (symbol.IsEither<ILocalSymbol, IParameterSymbol>())
-                        {
-                            if (candidate.Expression is IdentifierNameSyntax identifierName &&
-                                identifierName.Identifier.ValueText == symbol.Name)
-                            {
-                                argument = candidate;
-                                return true;
-                            }
-
-                            if (candidate.Expression is DeclarationExpressionSyntax declaration &&
-                                declaration.Designation is SingleVariableDesignationSyntax singleVariable &&
-                                singleVariable.Identifier.ValueText == symbol.Name)
-                            {
-                                argument = candidate;
-                                return true;
-                            }
-                        }
-                        else if (semanticModel.TryGetSymbol(candidate.Expression, cancellationToken, out ISymbol candidateSymbol) &&
-                                 symbol.Equals(candidateSymbol))
-                        {
-                            argument = candidate;
-                            return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
-            bool IsAddMethod(IMethodSymbol candidate)
-            {
-                switch (candidate.Name)
-                {
-                    case "Add":
-                    case "Insert":
-                    case "Push":
-                    case "Enqueue":
-                    case "TryAdd":
-                    case "TryUpdate":
-                        return candidate.DeclaringSyntaxReferences.Length == 0 &&
-                               candidate.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation);
-                }
-
-                return false;
-            }
-        }
-
         internal static bool ShouldDispose(LocalOrParameter localOrParameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (localOrParameter.Symbol)
@@ -232,11 +146,9 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (LocalOrParameter.TryCreate(local, out var localOrParameter) &&
-                    local.TryGetScope(cancellationToken, out var scope))
+                if (LocalOrParameter.TryCreate(local, out var localOrParameter))
                 {
                     return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                           !IsAddedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
                            !IsDisposedAfter(local, location, semanticModel, cancellationToken);
                 }
             }
@@ -258,11 +170,10 @@ namespace IDisposableAnalyzers
                 parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is ParameterListSyntax parameterList &&
                 parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                methodDeclaration.Body is BlockSyntax block &&
+                methodDeclaration.Body.IsKind(SyntaxKind.Block) &&
                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
             {
                 return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                       !IsAddedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
                        !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
             }
 

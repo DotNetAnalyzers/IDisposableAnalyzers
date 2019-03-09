@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableTests
+    public partial class DisposableWalkerTests
     {
-        public class IsAssignedToFieldOrProperty
+        public class Assigns
         {
             [Test]
             public void WhenNotUsed()
@@ -31,7 +31,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out _));
             }
 
             [Test]
@@ -56,7 +56,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out _));
             }
 
             [Test]
@@ -83,36 +83,8 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
                 Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
-            }
-
-            [Test]
-            public void ArrayFieldAssignedInCtor()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    internal class C
-    {
-        private IDisposable[] disposables = new IDisposable[1];
-
-        internal C(IDisposable disposable)
-        {
-            this.disposables[0] = disposable;
-        }
-    }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("", field.Symbol.ToString());
             }
 
             [Test]
@@ -144,7 +116,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
                 Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
             }
 
@@ -173,7 +145,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
                 Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
             }
 
@@ -201,7 +173,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.IsAssigned(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
                 Assert.AreEqual("RoslynSandbox.C.Disposable", field.Symbol.ToString());
             }
         }

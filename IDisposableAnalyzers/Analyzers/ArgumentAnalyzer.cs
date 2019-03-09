@@ -31,12 +31,10 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method) &&
-                method.TrySingleDeclaration(context.CancellationToken, out BaseMethodDeclarationSyntax declaration) &&
                 method.TryFindParameter(argument, out var parameter) &&
                 Disposable.IsPotentiallyAssignableFrom(parameter.Type, context.Compilation))
             {
                 if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    !Disposable.IsAddedToFieldOrProperty(parameter, declaration, context.SemanticModel, context.CancellationToken) &&
                     context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
                 {
                     if (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
