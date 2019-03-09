@@ -42,6 +42,38 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void ReturnedTernary()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static Stream M(string fileName) => fileName == null ? File.OpenRead(string.Empty) : File.OpenRead(fileName);
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void ReturnedNullConditional()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static Stream M(string fileName) => File.OpenRead(string.Empty) ?? File.OpenRead(fileName);
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void LocalFileOpenRead()
         {
             var testCode = @"

@@ -175,7 +175,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Ternary()
+        public void AssignedTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -192,6 +192,28 @@ namespace RoslynSandbox
             this.stream = true
                 ? temp
                 : temp;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void AssignedCoalesce()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        private readonly Stream stream;
+
+        public C()
+        {
+            var temp = File.OpenRead(string.Empty);
+            this.stream = temp ?? temp;
         }
     }
 }";

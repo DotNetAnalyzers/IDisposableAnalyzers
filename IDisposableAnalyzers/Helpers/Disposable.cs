@@ -1,11 +1,9 @@
 namespace IDisposableAnalyzers
 {
     using System;
-    using System.Collections.Generic;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
@@ -114,27 +112,6 @@ namespace IDisposableAnalyzers
                        declaration.Body is BlockSyntax body &&
                        body.Statements.Count == 0;
             }
-        }
-
-        internal static bool IsAssignedToFieldOrProperty(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited)
-        {
-            if (localOrParameter.TryGetScope(cancellationToken, out var scope) &&
-                AssignmentExecutionWalker.FirstWith(localOrParameter.Symbol, scope, Scope.Instance, semanticModel, cancellationToken, out var assignment) &&
-                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol left))
-            {
-                if (LocalOrParameter.TryCreate(left, out var leftLocalOrParameter))
-                {
-                    using (visited = visited.IncrementUsage())
-                    {
-                        return visited.Add(left) &&
-                               IsAssignedToFieldOrProperty(leftLocalOrParameter, semanticModel, cancellationToken, visited);
-                    }
-                }
-
-                return left.IsEitherKind(SymbolKind.Field, SymbolKind.Property, SymbolKind.ArrayType);
-            }
-
-            return false;
         }
 
         internal static bool IsAddedToFieldOrProperty(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> recursion = null)
@@ -259,7 +236,6 @@ namespace IDisposableAnalyzers
                     local.TryGetScope(cancellationToken, out var scope))
                 {
                     return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                           !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                            !IsAddedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
                            !IsDisposedAfter(local, location, semanticModel, cancellationToken);
                 }
@@ -286,79 +262,11 @@ namespace IDisposableAnalyzers
                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
             {
                 return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                       !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                        !IsAddedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
                        !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
             }
 
             return false;
-        }
-
-        private class DisposableWalker : PooledWalker<DisposableWalker>
-        {
-            private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
-
-            public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifierNames.RemoveAll(match);
-
-            public override void VisitIdentifierName(IdentifierNameSyntax node)
-            {
-                this.identifierNames.Add(node);
-            }
-
-            public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                if (localOrParameter.TryGetScope(cancellationToken, out var scope))
-                {
-                    using (var walker = BorrowAndVisit(scope, () => new DisposableWalker()))
-                    {
-                        foreach (var identifierName in walker.identifierNames)
-                        {
-                            if (identifierName.Identifier.Text == localOrParameter.Name &&
-                                semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
-                                symbol.Equals(localOrParameter.Symbol) &&
-                                IsReturned(identifierName))
-                            {
-                                return false;
-                            }
-                        }
-                    }
-
-                    return true;
-                }
-
-                return false;
-            }
-
-            protected override void Clear()
-            {
-                this.identifierNames.Clear();
-            }
-
-            private static bool IsReturned(ExpressionSyntax candidate)
-            {
-                switch (candidate.Parent.Kind())
-                {
-                    case SyntaxKind.ReturnStatement:
-                    case SyntaxKind.ArrowExpressionClause:
-                        return true;
-                    case SyntaxKind.CastExpression:
-                    case SyntaxKind.AsExpression:
-                    case SyntaxKind.CollectionInitializerExpression:
-                    case SyntaxKind.ObjectCreationExpression:
-                        return IsReturned((ExpressionSyntax)candidate.Parent);
-                }
-
-                if (candidate.Parent is ArgumentSyntax argument &&
-                    argument.Parent is ArgumentListSyntax argumentList)
-                {
-                    if (argumentList.Parent is ObjectCreationExpressionSyntax objectCreation)
-                    {
-                        return IsReturned(objectCreation);
-                    }
-                }
-
-                return false;
-            }
         }
     }
 }
