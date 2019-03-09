@@ -32,11 +32,11 @@ namespace RoslynSandbox
 {
     public class C
     {
-        private readonly Disposable disposable;
+        private readonly Disposable _disposable;
 
         public C()
         {
-            disposable = new Disposable();
+            _disposable = new Disposable();
         }
     }
 }";
@@ -62,6 +62,54 @@ namespace RoslynSandbox
 }";
 
             AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void AssignFieldViaLocal()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        private readonly Disposable disposable;
+
+        public C()
+        {
+            var temp = new Disposable();
+            var temp2 = temp;
+            this.disposable = temp2;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+        }
+
+        [Test]
+        public void AssignFieldViaParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    public class C
+    {
+        private Disposable disposable;
+
+        public C()
+        {
+            var temp = new Disposable();
+            M(temp);
+        }
+
+        private void M(Disposable disposable)
+        {
+            this.disposable = disposable;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, IDISP001DisposeCreated.Descriptor, DisposableCode, testCode);
         }
 
         [Test]

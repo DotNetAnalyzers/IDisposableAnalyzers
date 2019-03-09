@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers
                         return false;
                     }
 
-                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, null, out _))
+                    if (IsAssigned(usage, semanticModel, cancellationToken, null, out _))
                     {
                         return false;
                     }
@@ -49,13 +49,13 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool IsAssigned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
+        public static bool IsAssigned(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty first)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (IsAssignedToFieldOrProperty(usage, semanticModel, cancellationToken, null, out first))
+                    if (IsAssigned(usage, semanticModel, cancellationToken, null, out first))
                     {
                         return true;
                     }
@@ -120,7 +120,9 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
                     using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
                     {
                         return visited.Add(variableDeclarator) &&
                                IsReturned(localOrParameter, semanticModel, cancellationToken, visited);
@@ -131,7 +133,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool IsAssignedToFieldOrProperty(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
+        private static bool IsAssigned(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
         {
             switch (candidate.Parent.Kind())
             {
@@ -139,17 +141,40 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                    return IsAssignedToFieldOrProperty((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                    return IsAssigned((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out fieldOrProperty);
             }
 
-            if (candidate.Parent is AssignmentExpressionSyntax assignment &&
-                assignment.Right.Contains(candidate) &&
-                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol))
+            switch (candidate.Parent)
             {
-                return FieldOrProperty.TryCreate(symbol, out fieldOrProperty);
-            }
+                case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) && semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol):
+                    return FieldOrProperty.TryCreate(symbol, out fieldOrProperty);
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
+                                                  method.TryFindParameter(argument, out var parameter) &&
+                                                  LocalOrParameter.TryCreate(parameter, out var localOrParameter):
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                    using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                    {
+                        return visited.Add(argument) &&
+                               IsAssigned(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                    }
 
-            return false;
+                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
+                                                                    LocalOrParameter.TryCreate(symbol, out var localOrParameter):
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                    using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                    {
+                        return visited.Add(variableDeclarator) &&
+                               IsAssigned(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                    }
+
+                default:
+                    return false;
+            }
         }
     }
 }
