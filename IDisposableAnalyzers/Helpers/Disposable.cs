@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -113,82 +114,6 @@ namespace IDisposableAnalyzers
                        declaration.Body is BlockSyntax body &&
                        body.Statements.Count == 0;
             }
-        }
-
-        internal static bool IsReturned(ISymbol symbol, SyntaxNode scope, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var walker = ReturnValueWalker.Borrow(scope, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
-            {
-                foreach (var value in walker)
-                {
-                    var candidate = value;
-                    switch (candidate)
-                    {
-                        case CastExpressionSyntax castExpression:
-                            candidate = castExpression.Expression;
-                            break;
-                        case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.AsExpression):
-                            candidate = binary.Left;
-                            break;
-                    }
-
-                    if (candidate is ObjectCreationExpressionSyntax objectCreation)
-                    {
-                        if (objectCreation.ArgumentList != null)
-                        {
-                            foreach (var argument in objectCreation.ArgumentList.Arguments)
-                            {
-                                if (semanticModel.TryGetSymbol(argument.Expression, cancellationToken, out ISymbol argumentSymbol) &&
-                                    symbol.Equals(argumentSymbol))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        if (objectCreation.Initializer != null)
-                        {
-                            foreach (var expression in objectCreation.Initializer.Expressions)
-                            {
-                                if (semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol expressionSymbol) &&
-                                    symbol.Equals(expressionSymbol))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-
-                    if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol returnedSymbol) &&
-                        symbol.Equals(returnedSymbol))
-                    {
-                        return true;
-                    }
-
-                    if (candidate is InvocationExpressionSyntax invocation)
-                    {
-                        if (returnedSymbol == KnownSymbol.RxDisposable.Create &&
-                            invocation.ArgumentList != null &&
-                            invocation.ArgumentList.Arguments.TrySingle(out var argument) &&
-                            argument.Expression is ParenthesizedLambdaExpressionSyntax lambda)
-                        {
-                            var body = lambda.Body;
-                            using (var pooledInvocations = InvocationWalker.Borrow(body))
-                            {
-                                foreach (var disposeCandidate in pooledInvocations.Invocations)
-                                {
-                                    if (DisposeCall.IsDisposing(disposeCandidate, symbol, semanticModel, cancellationToken))
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         internal static bool IsAssignedToFieldOrProperty(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<ISymbol> visited)
@@ -333,7 +258,7 @@ namespace IDisposableAnalyzers
                 if (LocalOrParameter.TryCreate(local, out var localOrParameter) &&
                     local.TryGetScope(cancellationToken, out var scope))
                 {
-                    return !IsReturned(local, scope, semanticModel, cancellationToken) &&
+                    return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
                            !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                            !IsAddedToFieldOrProperty(local, scope, semanticModel, cancellationToken) &&
                            !IsDisposedAfter(local, location, semanticModel, cancellationToken);
@@ -360,13 +285,80 @@ namespace IDisposableAnalyzers
                 methodDeclaration.Body is BlockSyntax block &&
                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
             {
-                return !IsReturned(parameter, block, semanticModel, cancellationToken) &&
+                return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
                        !IsAssignedToFieldOrProperty(localOrParameter, semanticModel, cancellationToken, null) &&
                        !IsAddedToFieldOrProperty(parameter, block, semanticModel, cancellationToken) &&
                        !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
             }
 
             return false;
+        }
+
+        private class DisposableWalker : PooledWalker<DisposableWalker>
+        {
+            private readonly List<IdentifierNameSyntax> identifierNames = new List<IdentifierNameSyntax>();
+
+            public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifierNames.RemoveAll(match);
+
+            public override void VisitIdentifierName(IdentifierNameSyntax node)
+            {
+                this.identifierNames.Add(node);
+            }
+
+            public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                if (localOrParameter.TryGetScope(cancellationToken, out var scope))
+                {
+                    using (var walker = BorrowAndVisit(scope, () => new DisposableWalker()))
+                    {
+                        foreach (var identifierName in walker.identifierNames)
+                        {
+                            if (identifierName.Identifier.Text == localOrParameter.Name &&
+                                semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
+                                symbol.Equals(localOrParameter.Symbol) &&
+                                IsReturned(identifierName))
+                            {
+                                return false;
+                            }
+                        }
+                    }
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            protected override void Clear()
+            {
+                this.identifierNames.Clear();
+            }
+
+            private static bool IsReturned(ExpressionSyntax candidate)
+            {
+                switch (candidate.Parent.Kind())
+                {
+                    case SyntaxKind.ReturnStatement:
+                    case SyntaxKind.ArrowExpressionClause:
+                        return true;
+                    case SyntaxKind.CastExpression:
+                    case SyntaxKind.AsExpression:
+                    case SyntaxKind.CollectionInitializerExpression:
+                    case SyntaxKind.ObjectCreationExpression:
+                        return IsReturned((ExpressionSyntax)candidate.Parent);
+                }
+
+                if (candidate.Parent is ArgumentSyntax argument &&
+                    argument.Parent is ArgumentListSyntax argumentList)
+                {
+                    if (argumentList.Parent is ObjectCreationExpressionSyntax objectCreation)
+                    {
+                        return IsReturned(objectCreation);
+                    }
+                }
+
+                return false;
+            }
         }
     }
 }
