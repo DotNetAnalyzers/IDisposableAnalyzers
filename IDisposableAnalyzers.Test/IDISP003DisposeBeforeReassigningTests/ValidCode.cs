@@ -474,7 +474,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OutParameterInCtor()
+        public void AssignFieldViaOutParameterInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -488,31 +488,9 @@ namespace RoslynSandbox
 
         public C()
         {
-            TryGetStream(out stream);
+            TryGetStream(out this.stream);
         }
 
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-            AnalyzerAssert.Valid(Analyzer, testCode);
-        }
-
-        [Test]
-        public void OutParameter()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
         public bool TryGetStream(out Stream stream)
         {
             stream = File.OpenRead(string.Empty);

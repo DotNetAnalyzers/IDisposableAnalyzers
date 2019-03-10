@@ -6,6 +6,28 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     // ReSharper disable once UnusedTypeParameter
     public partial class ValidCode<T>
     {
+        [Test]
+        public void OutParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, IDISP003DisposeBeforeReassigning.Descriptor, testCode);
+        }
+
         [TestCase("out _")]
         [TestCase("out var temp")]
         [TestCase("out var _")]
@@ -34,7 +56,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void OutParameter(string expression)
+        public void CallWithOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +76,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            AnalyzerAssert.Valid(Analyzer, IDISP003DisposeBeforeReassigning.Descriptor, testCode);
         }
 
         [TestCase("out _")]
@@ -62,7 +84,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void CachedOutParameter(string expression)
+        public void CachedInlineOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -89,6 +111,42 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("out _", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void CachedOutParameter()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.IO;
+
+    public static class C
+    {
+        public static readonly Dictionary<int, FileStream> Map = new Dictionary<int, FileStream>();
+
+        public static bool M(int i)
+        {
+            FileStream stream;
+            return TryGet(i, out stream);
+        }
+
+        private static bool TryGet(int i, out FileStream stream)
+        {
+            if (Map.TryGetValue(i, out stream))
+            {
+                return true;
+            }
+
+            stream = File.OpenRead(string.Empty);
+            Map.Add(i, stream);
+            return true;
+        }
+    }
+}";
 
             AnalyzerAssert.Valid(Analyzer, testCode);
         }
