@@ -35,6 +35,18 @@ namespace IDisposableAnalyzers
                 }
             }
 
+            if (localOrParameter.Symbol is ILocalSymbol local &&
+                local.TrySingleDeclaration(cancellationToken, out SingleVariableDesignationSyntax designation) &&
+                designation.Parent is DeclarationExpressionSyntax declaration &&
+                declaration.Parent is ArgumentSyntax argument &&
+                argument.Parent is ArgumentListSyntax argumentList &&
+                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method) &&
+                method.TryFindParameter(argument, out var parameter) &&
+                LocalOrParameter.TryCreate(parameter, out localOrParameter))
+            {
+                return ShouldDispose(localOrParameter, semanticModel, cancellationToken);
+            }
+
             return true;
         }
 

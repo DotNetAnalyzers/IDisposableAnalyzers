@@ -1,7 +1,6 @@
 namespace IDisposableAnalyzers
 {
     using System;
-    using System.Diagnostics;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -182,29 +181,6 @@ namespace IDisposableAnalyzers
             {
                 return IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
-        }
-
-        /// <summary>
-        /// Check if any path returns a created IDisposable.
-        /// </summary>
-        internal static Result IsCreation(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (candidate == null)
-            {
-                return Result.No;
-            }
-
-            Debug.Assert(!candidate.RefOrOutKeyword.IsKind(SyntaxKind.None), "Only valid for ref or out parameter.");
-            if (candidate.Parent is ArgumentListSyntax argumentList &&
-                argumentList.Parent is InvocationExpressionSyntax invocation &&
-                semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
-                method.TryFindParameter(candidate, out var parameter) &&
-                IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
-            {
-                return IsAssignedWithCreated(parameter, candidate.Expression, semanticModel, cancellationToken);
-            }
-
-            return Result.Unknown;
         }
 
         internal static Result IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)

@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+    using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -30,26 +31,42 @@ namespace IDisposableAnalyzers
                 argument.Parent is ArgumentListSyntax argumentList &&
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
-                context.SemanticModel.TryGetSymbol(invocation, context.CancellationToken, out var method) &&
-                method.TryFindParameter(argument, out var parameter) &&
-                Disposable.IsPotentiallyAssignableFrom(parameter.Type, context.Compilation))
+                IsCreation(argument, context.SemanticModel, context.CancellationToken) &&
+                context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
             {
-                if (Disposable.IsCreation(argument, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
+                if (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
+                    Disposable.ShouldDispose(localOrParameter, argument.Expression, context.SemanticModel, context.CancellationToken))
                 {
-                    if (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
-                        Disposable.ShouldDispose(localOrParameter, argument.Expression, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
-                    }
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
+                }
 
-                    if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        !Disposable.IsDisposedBefore(symbol, invocation, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    !Disposable.IsDisposedBefore(symbol, invocation, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
+                }
+            }
+        }
+
+        private static bool IsCreation(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (candidate.Parent is ArgumentListSyntax argumentList &&
+                argumentList.Parent is InvocationExpressionSyntax invocation &&
+                semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                method.TryFindParameter(candidate, out var parameter) &&
+                Disposable.IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
+            {
+                using (var assignedValues = AssignedValueWalker.Borrow(parameter, semanticModel, cancellationToken))
+                {
+                    using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
+                        return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                               Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
                     }
                 }
             }
+
+            return false;
         }
     }
 }

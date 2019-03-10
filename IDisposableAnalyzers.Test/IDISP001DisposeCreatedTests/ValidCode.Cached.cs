@@ -23,7 +23,42 @@ namespace RoslynSandbox
     {
         private static readonly Dictionary<int, FileStream> Map = new Dictionary<int, FileStream>();
 
-        public static bool Exists(int i) => Map.TryGetValue(i, out _);
+        public static bool M(int i) => Map.TryGetValue(i, out _);
+    }
+}".AssertReplace("out _", expression);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream _")]
+        public void CachedOutParameter(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.IO;
+
+    public static class C
+    {
+        public static readonly Dictionary<int, FileStream> Map = new Dictionary<int, FileStream>();
+
+        public static bool M(int i) => TryGet(i, out _);
+
+        private static bool TryGet(int i, out FileStream stream)
+        {
+            if (Map.TryGetValue(i, out stream))
+            {
+                return true;
+            }
+
+            stream = File.OpenRead(string.Empty);
+            Map.Add(i, stream);
+            return true;
+        }
     }
 }".AssertReplace("out _", expression);
             AnalyzerAssert.Valid(Analyzer, testCode);

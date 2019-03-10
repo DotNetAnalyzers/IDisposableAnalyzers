@@ -281,5 +281,33 @@ namespace RoslynSandbox
 }";
             AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
+
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream _")]
+        public void OutParameter(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.IO;
+
+    public static class C
+    {
+        public static bool M(int i) => TryGet(i, ↓out _);
+
+        private static bool TryGet(int i, out FileStream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}".AssertReplace("out _", expression);
+
+            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+        }
     }
 }

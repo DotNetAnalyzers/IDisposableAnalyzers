@@ -11,6 +11,120 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
 
+#pragma warning disable SA1203 // Constants must appear before fields
+            private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            [Test]
+            public void AssigningLocalVariableViaObjectCreationThenOutParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        public void M()
+        {
+            var disposable = new Disposable();
+            TryM(↓out disposable);
+        }
+
+        public static bool TryM(out Disposable disposable)
+        {
+            disposable = new Disposable();
+            return true;
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        public void M()
+        {
+            var disposable = new Disposable();
+            disposable?.Dispose();
+            TryM(out disposable);
+        }
+
+        public static bool TryM(out Disposable disposable)
+        {
+            disposable = new Disposable();
+            return true;
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            }
+
+            [Test]
+            public void AssigningLocalVariableViaInvocationThenOutParameter()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void Update()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void Update()
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
             [Test]
             public void AssigningFieldViaOutParameterInPublicMethod()
             {
@@ -56,57 +170,6 @@ namespace RoslynSandbox
         public bool TryGetStream(out Stream outValue)
         {
             outValue = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-                AnalyzerAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            }
-
-            [Test]
-            public void AssigningVariableViaOutParameterAfter()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public void Update()
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            TryGetStream(↓out stream);
-        }
-
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-                var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public void Update()
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            stream?.Dispose();
-            TryGetStream(out stream);
-        }
-
-        public bool TryGetStream(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
             return true;
         }
     }
