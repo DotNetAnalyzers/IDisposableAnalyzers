@@ -6,6 +6,29 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     // ReSharper disable once UnusedTypeParameter
     public partial class ValidCode<T>
     {
+        [TestCase("out _")]
+        [TestCase("out var stream")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream stream")]
+        [TestCase("out FileStream _")]
+        public void DictionaryTryGetValue(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+    using System.IO;
+
+    public static class C
+    {
+        private static readonly Dictionary<int, FileStream> Map = new Dictionary<int, FileStream>();
+
+        public static bool Exists(int i) => Map.TryGetValue(i, out _);
+    }
+}".AssertReplace("out _", expression);
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
         [Test]
         public void StaticConcurrentDictionaryGetOrAdd()
         {
