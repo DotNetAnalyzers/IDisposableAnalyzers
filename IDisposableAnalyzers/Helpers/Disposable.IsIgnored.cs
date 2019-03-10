@@ -120,7 +120,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                if (TryFindParameter(out var parameter) &&
+                if (method.TryFindParameter(argument, out var parameter) &&
                     method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
                     using (var walker = IdentifierNameWalker.Borrow(methodDeclaration))
@@ -202,14 +202,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-
-            // https://github.com/GuOrg/Gu.Roslyn.Extensions/issues/40
-            bool TryFindParameter(out IParameterSymbol result)
-            {
-                return method.TryFindParameter(argument, out result) ||
-                       (method.Parameters.TryLast(out result) &&
-                        result.IsParams);
-            }
         }
 
         private static bool IsIgnored(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)

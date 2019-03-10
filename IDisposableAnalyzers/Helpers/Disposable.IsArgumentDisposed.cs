@@ -253,11 +253,11 @@ namespace IDisposableAnalyzers
                 return false;
             }
 
-            if (TryFindParameter(out var parameter))
+            if (method.TryFindParameter(argument, out var parameter))
             {
                 if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
-                    if (AssignmentExecutionWalker.FirstWith(parameter.OriginalDefinition, (SyntaxNode)methodDeclaration.Body ?? methodDeclaration?.ExpressionBody, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                    if (AssignmentExecutionWalker.FirstWith(parameter.OriginalDefinition, (SyntaxNode)methodDeclaration.Body ?? methodDeclaration.ExpressionBody, Scope.Member, semanticModel, cancellationToken, out var assignment))
                     {
                         return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
                                FieldOrProperty.TryCreate(symbol, out member);
@@ -286,14 +286,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-
-            // https://github.com/GuOrg/Gu.Roslyn.Extensions/issues/40
-            bool TryFindParameter(out IParameterSymbol result)
-            {
-                return method.TryFindParameter(argument, out result) ||
-                       (method.Parameters.TryLast(out result) &&
-                        result.IsParams);
-            }
         }
     }
 }
