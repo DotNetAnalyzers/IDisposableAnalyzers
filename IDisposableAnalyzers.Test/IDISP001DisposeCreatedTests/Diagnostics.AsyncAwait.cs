@@ -1,12 +1,29 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public partial class Diagnostics
     {
         public class AsyncAwait
         {
+            private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
+
+            private static readonly string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
             [Test]
             public void AwaitTaskRun()
             {
