@@ -34,8 +34,9 @@ namespace IDisposableAnalyzers
                 IsCreation(argument, context.SemanticModel, context.CancellationToken) &&
                 context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
             {
-                if (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
-                    Disposable.ShouldDispose(localOrParameter, argument.Expression, context.SemanticModel, context.CancellationToken))
+                if (symbol.Kind == SymbolKind.Discard ||
+                    (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
+                     Disposable.ShouldDispose(localOrParameter, argument.Expression, context.SemanticModel, context.CancellationToken)))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
                 }

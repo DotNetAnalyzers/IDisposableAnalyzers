@@ -11,12 +11,25 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
+            private const string DisposableCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
             [TestCase("out _")]
             [TestCase("out var temp")]
             [TestCase("out var _")]
-            [TestCase("out FileStream temp")]
-            [TestCase("out FileStream _")]
-            public void Discarded(string expression)
+            [TestCase("out Disposable temp")]
+            [TestCase("out Disposable _")]
+            public void DiscardedNewDisposable(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -25,12 +38,44 @@ namespace RoslynSandbox
 
     public static class C
     {
-        public static bool M(int i) => TryGet(i, ↓out _);
+        public static bool M() => TryM(↓out _);
 
-        private static bool TryGet(int i, out FileStream stream)
+        private static bool TryM(out Disposable disposable)
         {
-            stream = File.OpenRead(string.Empty);
-            return true;
+            disposable = new Disposable();
+        }
+    }
+}".AssertReplace("out _", expression);
+
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            }
+
+            [TestCase("out _")]
+            [TestCase("out var temp")]
+            [TestCase("out var _")]
+            [TestCase("out FileStream temp")]
+            [TestCase("out FileStream _")]
+            public void DiscardedFileOpenRead(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static bool M(string fileName) => TryM(fileName, ↓out _);
+
+        private static bool TryM(string fileName, out FileStream stream)
+        {
+            if (File.Exists(fileName)
+            {
+                stream = File.OpenRead(string.Empty);
+                return true;
+            }
+
+            stream = null;
+            return false;
         }
     }
 }".AssertReplace("out _", expression);
