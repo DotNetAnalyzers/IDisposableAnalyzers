@@ -2,6 +2,7 @@
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -12,6 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();
+        private static readonly DiagnosticDescriptor Descriptor = IDISP001DisposeCreated.Descriptor;
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

@@ -25,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, IDISP003DisposeBeforeReassigning.Descriptor, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("out _")]
@@ -76,7 +76,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-            AnalyzerAssert.Valid(Analyzer, IDISP003DisposeBeforeReassigning.Descriptor, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("out _")]

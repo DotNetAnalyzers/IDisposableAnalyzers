@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -10,6 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
+        private static readonly DiagnosticDescriptor Descriptor = IDISP003DisposeBeforeReassigning.Descriptor;
 
 #pragma warning disable SA1203 // Constants must appear before fields
         private const string DisposableCode = @"

@@ -109,7 +109,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, IDISP001DisposeCreated.Descriptor, DisposableCode, testCode);
+            AnalyzerAssert.Valid(Analyzer, Descriptor, DisposableCode, testCode);
         }
 
         [Test]
