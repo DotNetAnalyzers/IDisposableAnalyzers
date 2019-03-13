@@ -397,7 +397,12 @@ namespace IDisposableAnalyzers
             {
                 this.Visit(scope);
             }
-            else if (this.CurrentSymbol is IParameterSymbol &&
+            else if (this.CurrentSymbol.Kind == SymbolKind.Discard &&
+                     TryGetScope(this.context.Node, out scope))
+            {
+                this.Visit(scope);
+            }
+            else if (this.CurrentSymbol.Kind == SymbolKind.Parameter &&
                      TryGetScope(this.context.Node, out scope))
             {
                 this.Visit(scope);
