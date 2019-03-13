@@ -34,8 +34,6 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
-    using System.IO;
-
     public static class C
     {
         public static bool M() => TryM(↓out _);
@@ -43,6 +41,7 @@ namespace RoslynSandbox
         private static bool TryM(out Disposable disposable)
         {
             disposable = new Disposable();
+            return true;
         }
     }
 }".AssertReplace("out _", expression);
