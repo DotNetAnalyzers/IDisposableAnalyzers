@@ -94,7 +94,7 @@ namespace IDisposableAnalyzers
             }
 
             if (TryGetAssignedLocal(out var local) &&
-                Disposable.IsDisposedAfter(local, assignment, context.SemanticModel, context.CancellationToken))
+                DisposableWalker.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken, null))
             {
                 return false;
             }

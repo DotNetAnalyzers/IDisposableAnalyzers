@@ -26,7 +26,31 @@ namespace RoslynSandbox
             stream.Dispose();
         }
     }
-}";
+}".AssertReplace("stream.Dispose()", expression);
+
+            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+        }
+
+        [TestCase("using (var stream = File.OpenRead(string.Empty))")]
+        [TestCase("using (File.OpenRead(string.Empty))")]
+        public void UsedLocal(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+            }
+        }
+    }
+}".AssertReplace("using (var stream = File.OpenRead(string.Empty))", expression);
 
             AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
         }

@@ -148,8 +148,7 @@ namespace IDisposableAnalyzers
 
                 if (LocalOrParameter.TryCreate(local, out var localOrParameter))
                 {
-                    return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                           !IsDisposedAfter(local, location, semanticModel, cancellationToken);
+                    return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
                 }
             }
 
@@ -173,8 +172,7 @@ namespace IDisposableAnalyzers
                 methodDeclaration.Body.IsKind(SyntaxKind.Block) &&
                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
             {
-                return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken) &&
-                       !IsDisposedAfter(parameter, location, semanticModel, cancellationToken);
+                return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
             }
 
             return false;

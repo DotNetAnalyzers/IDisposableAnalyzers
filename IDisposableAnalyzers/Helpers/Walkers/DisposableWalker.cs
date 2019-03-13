@@ -32,6 +32,11 @@ namespace IDisposableAnalyzers
                     {
                         return false;
                     }
+
+                    if (Disposes(usage, semanticModel, cancellationToken, null))
+                    {
+                        return false;
+                    }
                 }
             }
 
@@ -89,6 +94,56 @@ namespace IDisposableAnalyzers
                 foreach (var usage in walker.usages)
                 {
                     if (Stores(usage, semanticModel, cancellationToken, visited))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                        Disposes(usage, semanticModel, cancellationToken, visited))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                        Disposes(usage, semanticModel, cancellationToken, visited))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (Disposes(usage, semanticModel, cancellationToken, visited))
                     {
                         return true;
                     }
@@ -266,6 +321,44 @@ namespace IDisposableAnalyzers
             }
 
             return false;
+        }
+
+        private static bool Disposes(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        {
+            switch (candidate.Parent.Kind())
+            {
+                case SyntaxKind.CastExpression:
+                case SyntaxKind.AsExpression:
+                case SyntaxKind.ParenthesizedExpression:
+                    return Disposes((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
+            }
+
+            switch (candidate.Parent)
+            {
+                case ConditionalAccessExpressionSyntax conditionalAccess when conditionalAccess.WhenNotNull is InvocationExpressionSyntax invocation:
+                    return IsDispose(invocation);
+                case MemberAccessExpressionSyntax memberAccess when memberAccess.Parent is InvocationExpressionSyntax invocation:
+                    return IsDispose(invocation);
+                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                    using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                    {
+                        return visited.Add(candidate) &&
+                               Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
+                    }
+            }
+
+            return false;
+
+            bool IsDispose(InvocationExpressionSyntax invocation)
+            {
+                return invocation.ArgumentList is ArgumentListSyntax argumentList &&
+                        argumentList.Arguments.Count == 0 &&
+                        invocation.TryGetMethodName(out var name) &&
+                        name == "Dispose";
+            }
         }
     }
 }
