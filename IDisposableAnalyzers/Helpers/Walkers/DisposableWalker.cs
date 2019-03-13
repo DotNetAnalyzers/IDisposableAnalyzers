@@ -281,14 +281,17 @@ namespace IDisposableAnalyzers
                 case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) &&
                                                                 assignment.Left.IsKind(SyntaxKind.ElementAccessExpression):
                     return true;
+                case ArgumentSyntax argument when argument.Parent is TupleExpressionSyntax tupleExpression:
+                    return Stores(tupleExpression, semanticModel, cancellationToken, visited) ||
+                           Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is InvocationExpressionSyntax invocation &&
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
 
-                    if (!method.TrySingleMethodDeclaration(cancellationToken, out _) &&
-                        method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                    if (!method.TrySingleMethodDeclaration(cancellationToken, out _))
                     {
-                        return true;
+                        return method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) ||
+                               method.ContainingType == KnownSymbol.Tuple;
                     }
 
                     if (method.TryFindParameter(argument, out var parameter) &&
