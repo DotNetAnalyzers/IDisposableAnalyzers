@@ -180,7 +180,7 @@ namespace IDisposableAnalyzers
             {
                 return identifierName.Identifier.Text == localOrParameter.Name &&
                        semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
-                       symbol.Equals(localOrParameter.Symbol);
+                       symbol.Equals(localOrParameter.Symbol.OriginalDefinition);
             }
         }
 
