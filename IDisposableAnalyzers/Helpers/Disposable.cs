@@ -117,65 +117,21 @@ namespace IDisposableAnalyzers
 
         internal static bool ShouldDispose(LocalOrParameter localOrParameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (localOrParameter.Symbol)
-            {
-                case ILocalSymbol local:
-                    return ShouldDispose(local, location, semanticModel, cancellationToken);
-                case IParameterSymbol parameter:
-                    return ShouldDispose(parameter, location, semanticModel, cancellationToken);
-            }
-
-            throw new InvalidOperationException("Should never get here.");
-        }
-
-        internal static bool ShouldDispose(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
             if (location is AssignmentExpressionSyntax assignment &&
                 assignment.Left is IdentifierNameSyntax identifierName &&
-                identifierName.Identifier.ValueText == local.Name &&
+                identifierName.Identifier.ValueText == localOrParameter.Name &&
                 assignment.Parent is UsingStatementSyntax)
             {
                 return false;
             }
 
-            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
-            {
-                if (declaration.Parent is UsingStatementSyntax ||
-                    declaration.Parent is AnonymousFunctionExpressionSyntax)
-                {
-                    return false;
-                }
-
-                if (LocalOrParameter.TryCreate(local, out var localOrParameter))
-                {
-                    return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
-                }
-            }
-
-            return false;
-        }
-
-        internal static bool ShouldDispose(IParameterSymbol parameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (location is AssignmentExpressionSyntax assignment &&
-                assignment.Left is IdentifierNameSyntax identifierName &&
-                identifierName.Identifier.ValueText == parameter.Name &&
-                assignment.Parent is UsingStatementSyntax)
+            if (localOrParameter.Symbol is IParameterSymbol parameter &&
+                parameter.RefKind != RefKind.None)
             {
                 return false;
             }
 
-            if (parameter.RefKind == RefKind.None &&
-                parameter.TrySingleDeclaration(cancellationToken, out var declaration) &&
-                declaration.Parent is ParameterListSyntax parameterList &&
-                parameterList.Parent is BaseMethodDeclarationSyntax methodDeclaration &&
-                methodDeclaration.Body.IsKind(SyntaxKind.Block) &&
-                LocalOrParameter.TryCreate(parameter, out var localOrParameter))
-            {
-                return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
-            }
-
-            return false;
+            return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
         }
     }
 }
