@@ -69,6 +69,45 @@ namespace RoslynSandbox
                 }
             }
 
+            [TestCase("out _")]
+            [TestCase("out var _")]
+            [TestCase("out var temp")]
+            [TestCase("out int temp")]
+            public void DiscardedOutCachedAndAssigned(string expression)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public static class C
+    {
+        public static readonly Dictionary<int, int> Map = new Dictionary<int, int>();
+
+        public static bool M(int i) => TryGet(i, out _);
+
+        private static bool TryGet(int i, out int result)
+        {
+            if (Map.TryGetValue(i, out result))
+            {
+                return true;
+            }
+
+            result = 1;
+            Map.Add(i, result);
+            return true;
+        }
+    }
+}".AssertReplace("out _", expression));
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindArgument(expression).Expression;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    CollectionAssert.AreEqual(new[] { "value", "1" }, assignedValues.Select(x => x.ToString()));
+                }
+            }
+
             [Test]
             public void LocalAssignedWithOutParameterOtherClass()
             {
