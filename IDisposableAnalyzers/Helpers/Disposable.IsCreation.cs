@@ -128,6 +128,11 @@ namespace IDisposableAnalyzers
 
         internal static Result IsAssignedWithCreated(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (symbol?.Kind == SymbolKind.Discard)
+            {
+                return Result.No;
+            }
+
             using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
             {
                 using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
