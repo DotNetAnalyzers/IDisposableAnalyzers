@@ -17,27 +17,30 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public void MethodInjected(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    private int value;
-
-    internal C()
+    internal class C
     {
-        var temp1 = this.value;
-        this.Update(1);
-        var temp2 = this.value;
-        this.Update(2);
-        var temp3 = this.value;
-    }
+        private int value;
 
-    internal void M()
-    {
-        var temp4 = this.value;
-    }
+        internal C()
+        {
+            var temp1 = this.value;
+            this.Update(1);
+            var temp2 = this.value;
+            this.Update(2);
+            var temp3 = this.value;
+        }
 
-    internal void Update(int arg)
-    {
-        this.value = arg;
+        internal void M()
+        {
+            var temp4 = this.value;
+        }
+
+        internal void Update(int arg)
+        {
+            this.value = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -57,27 +60,30 @@ internal class C
             public void MethodInjectedWithOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    private int value;
-
-    internal C()
+    internal class C
     {
-        var temp1 = this.value;
-        this.Update(1);
-        var temp2 = this.value;
-        this.Update(2, ""abc"");
-        var temp3 = this.value;
-    }
+        private int value;
 
-    internal void M()
-    {
-        var temp4 = this.value;
-    }
+        internal C()
+        {
+            var temp1 = this.value;
+            this.Update(1);
+            var temp2 = this.value;
+            this.Update(2, ""abc"");
+            var temp3 = this.value;
+        }
 
-    internal void Update(int arg, string text = null)
-    {
-        this.value = arg;
+        internal void M()
+        {
+            var temp4 = this.value;
+        }
+
+        internal void Update(int arg, string text = null)
+        {
+            this.value = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -97,27 +103,30 @@ internal class C
             public void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    private string text;
-
-    internal C()
+    internal class C
     {
-        var temp1 = this.text;
-        this.Update(1);
-        var temp2 = this.text;
-        this.Update(2, ""abc"");
-        var temp3 = this.text;
-    }
+        private string text;
 
-    internal void M()
-    {
-        var temp4 = this.text;
-    }
+        internal C()
+        {
+            var temp1 = this.text;
+            this.Update(1);
+            var temp2 = this.text;
+            this.Update(2, ""abc"");
+            var temp3 = this.text;
+        }
 
-    internal void Update(int arg, string textArg = null)
-    {
-        this.text = textArg;
+        internal void M()
+        {
+            var temp4 = this.text;
+        }
+
+        internal void Update(int arg, string textArg = null)
+        {
+            this.text = textArg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());

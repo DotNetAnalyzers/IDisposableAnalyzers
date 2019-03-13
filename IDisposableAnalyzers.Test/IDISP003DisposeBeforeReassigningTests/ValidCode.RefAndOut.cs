@@ -84,7 +84,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void CachedInlineOutParameter(string expression)
+        public void CachedDiscardedOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -14,20 +14,23 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
         public void AutoPropertyGetSetAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class C
+namespace RoslynSandbox
 {
-    public C()
+    public sealed class C
     {
-        var temp1 = this.M;
-        this.M = 2;
-        var temp2 = this.M;
-    }
+        public C()
+        {
+            var temp1 = this.M;
+            this.M = 2;
+            var temp2 = this.M;
+        }
 
-    public int M { get; set; } = 1;
+        public int M { get; set; } = 1;
 
-    public void Meh()
-    {
-        var temp3 = this.M;
+        public void Meh()
+        {
+            var temp3 = this.M;
+        }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -46,20 +49,23 @@ public sealed class C
         public void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class C
+namespace RoslynSandbox
 {
-    public C()
+    public sealed class C
     {
-        var temp1 = this.M;
-        this.M = 2;
-        var temp2 = this.M;
-    }
+        public C()
+        {
+            var temp1 = this.M;
+            this.M = 2;
+            var temp2 = this.M;
+        }
 
-    public int M { get; } = 1;
+        public int M { get; } = 1;
 
-    public void Meh()
-    {
-        var temp3 = this.M;
+        public void Meh()
+        {
+            var temp3 = this.M;
+        }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -81,29 +87,32 @@ public sealed class C
         public void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-public sealed class C
+namespace RoslynSandbox
 {
-    private int bar = 1;
-
-    public C()
+    public sealed class C
     {
-        var temp1 = this.bar;
-        var temp2 = this.M;
-        this.bar = 2;
-        var temp3 = this.bar;
-        var temp4 = this.M;
-    }
+        private int bar = 1;
 
-    public int M
-    {
-        get { return this.bar; }
-        private set { this.bar = value; }
-    }
+        public C()
+        {
+            var temp1 = this.bar;
+            var temp2 = this.M;
+            this.bar = 2;
+            var temp3 = this.bar;
+            var temp4 = this.M;
+        }
 
-    public void Meh()
-    {
-        var temp5 = this.bar;
-        var temp6 = this.M;
+        public int M
+        {
+            get { return this.bar; }
+            private set { this.bar = value; }
+        }
+
+        public void Meh()
+        {
+            var temp5 = this.bar;
+            var temp6 = this.M;
+        }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());

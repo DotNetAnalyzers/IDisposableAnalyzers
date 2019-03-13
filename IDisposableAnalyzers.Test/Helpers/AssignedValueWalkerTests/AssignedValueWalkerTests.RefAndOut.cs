@@ -14,18 +14,21 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public void LocalAssignedWithOutParameterSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    internal C()
+    internal class C
     {
-        int value;
-        Assign(out value, 1);
-        var temp = value;
-    }
+        internal C()
+        {
+            int value;
+            Assign(out value, 1);
+            var temp = value;
+        }
 
-    internal void Assign(out int outValue, int arg)
-    {
-        outValue = arg;
+        internal void Assign(out int outValue, int arg)
+        {
+            outValue = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -41,21 +44,24 @@ internal class C
             public void LocalAssignedWithOutParameterOtherClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-class C
+namespace RoslynSandbox
 {
-    C(M bar)
+    class C
     {
-        int value;
-        bar.Assign(out value, 1);
-        var temp = value;
+        C(M bar)
+        {
+            int value;
+            bar.Assign(out value, 1);
+            var temp = value;
+        }
     }
-}
 
-class M
-{
-    internal void Assign(out int outValue, int arg)
+    class M
     {
-        outValue = arg;
+        internal void Assign(out int outValue, int arg)
+        {
+            outValue = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -71,21 +77,24 @@ class M
             public void LocalAssignedWithOutParameterOtherClassElvis()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-class C
+namespace RoslynSandbox
 {
-    C(M bar)
+    class C
     {
-        int value;
-        bar?.Assign(out value, 1);
-        var temp = value;
+        C(M bar)
+        {
+            int value;
+            bar?.Assign(out value, 1);
+            var temp = value;
+        }
     }
-}
 
-class M
-{
-    internal void Assign(out int outValue, int arg)
+    class M
     {
-        outValue = arg;
+        internal void Assign(out int outValue, int arg)
+        {
+            outValue = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -104,27 +113,30 @@ class M
             public void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    internal C()
+    internal class C
     {
-        int value;
-        var temp1 = value;
-        Assign(out value, 1);
-        var temp2 = value;
-    }
+        internal C()
+        {
+            int value;
+            var temp1 = value;
+            Assign(out value, 1);
+            var temp2 = value;
+        }
 
-    internal void M()
-    {
-        int value;
-        var temp3 = value;
-        Assign(out value, 2);
-        var temp4 = value;
-    }
+        internal void M()
+        {
+            int value;
+            var temp3 = value;
+            Assign(out value, 2);
+            var temp4 = value;
+        }
 
-    internal void Assign(out int outValue, int arg)
-    {
-        outValue = arg;
+        internal void Assign(out int outValue, int arg)
+        {
+            outValue = arg;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -141,18 +153,21 @@ internal class C
             public void LocalAssignedWithOutParameterGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C<T>
+namespace RoslynSandbox
 {
-    internal C()
+    internal class C<T>
     {
-        T value;
-        Assign(out value);
-        var temp = value;
-    }
+        internal C()
+        {
+            T value;
+            Assign(out value);
+            var temp = value;
+        }
 
-    internal void Assign(out T outValue)
-    {
-        outValue = default(T);
+        internal void Assign(out T outValue)
+        {
+            outValue = default(T);
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -207,24 +222,27 @@ namespace RoslynSandbox
             public void LocalAssignedWithChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    internal C()
+    internal class C
     {
-        int value;
-        var temp1 = value;
-        Assign1(ref value);
-        var temp2 = value;
-    }
+        internal C()
+        {
+            int value;
+            var temp1 = value;
+            Assign1(ref value);
+            var temp2 = value;
+        }
 
-    internal void Assign1(ref int value1)
-    {
-         Assign2(ref value1);
-    }
+        internal void Assign1(ref int value1)
+        {
+             Assign2(ref value1);
+        }
 
-    internal void Assign2(ref int value2)
-    {
-        value2 = 1;
+        internal void Assign2(ref int value2)
+        {
+            value2 = 1;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -242,19 +260,22 @@ internal class C
             public void LocalAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-internal class C
+namespace RoslynSandbox
 {
-    internal C()
+    internal class C
     {
-        int value;
-        var temp1 = value;
-        Assign(ref value);
-        var temp2 = value;
-    }
+        internal C()
+        {
+            int value;
+            var temp1 = value;
+            Assign(ref value);
+            var temp2 = value;
+        }
 
-    internal void Assign(ref int value)
-    {
-        value = 1;
+        internal void Assign(ref int value)
+        {
+            value = 1;
+        }
     }
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
