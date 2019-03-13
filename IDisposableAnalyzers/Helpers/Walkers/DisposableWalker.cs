@@ -302,7 +302,9 @@ namespace IDisposableAnalyzers
 #pragma warning restore IDISP003
                         {
                             return visited.Add(argument) &&
-                                   Stores(localOrParameter, semanticModel, cancellationToken, visited);
+                                   (Stores(localOrParameter, semanticModel, cancellationToken, visited) ||
+                                    (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                     semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol)));
                         }
                     }
 
