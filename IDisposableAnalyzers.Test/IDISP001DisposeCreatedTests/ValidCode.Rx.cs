@@ -174,6 +174,34 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void DisposableCreateClosureElvis()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    public sealed class C
+    {
+        public IObservable<object> Create()
+        {
+            return Observable.Create<object>(
+                o =>
+                    {
+                        var stream = File.OpenRead(string.Empty);
+                        return Disposable.Create(() => stream?.Dispose());
+                    });
+        }
+    }
+}";
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void DisposableCreateClosureStatementBody()
         {
             var testCode = @"

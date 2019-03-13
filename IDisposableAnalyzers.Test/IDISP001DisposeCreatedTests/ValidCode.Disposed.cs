@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [TestCase("stream?.Dispose()")]
         [TestCase("((IDisposable)stream)?.Dispose()")]
         [TestCase("(stream as IDisposable)?.Dispose()")]
-        public void Disposed(string expression)
+        public void DisposedLocal(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
