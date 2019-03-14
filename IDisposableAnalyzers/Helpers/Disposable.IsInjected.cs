@@ -72,18 +72,15 @@ namespace IDisposableAnalyzers
                         }
                     }
                 }
-                else
+                else if (semanticModel.TryGetSymbol(values.Current, cancellationToken, out var symbol))
                 {
-                    var symbol = semanticModel.GetSymbolSafe(values.Current, cancellationToken);
-                    var isInjected = IsInjectedCore(symbol);
-                    if (isInjected == Result.Yes)
+                    switch (IsInjectedCore(symbol))
                     {
-                        return Result.Yes;
-                    }
-
-                    if (isInjected == Result.AssumeYes)
-                    {
-                        result = Result.AssumeYes;
+                        case Result.Yes:
+                            return Result.Yes;
+                        case Result.AssumeYes:
+                            result = Result.AssumeYes;
+                            break;
                     }
                 }
             }
