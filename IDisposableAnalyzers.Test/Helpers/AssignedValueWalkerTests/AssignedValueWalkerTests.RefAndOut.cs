@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Linq;
     using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
@@ -104,7 +105,42 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindArgument(expression).Expression;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    CollectionAssert.AreEqual(new[] { "value", "1" }, assignedValues.Select(x => x.ToString()));
+                    CollectionAssert.AreEqual(new[] { "result", "1" }, assignedValues.Select(x => x.ToString()));
+                }
+            }
+
+            [Test]
+            public void OutParameterCachedAndAssigned()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    using System.Collections.Generic;
+
+    public static class C
+    {
+        public static readonly Dictionary<int, int> Map = new Dictionary<int, int>();
+
+        private static bool TryGet(int i, out int result)
+        {
+            if (Map.TryGetValue(i, out result))
+            {
+                return true;
+            }
+
+            result = 1;
+            Map.Add(i, result);
+            return true;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("result");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var parameter));
+                using (var assignedValues = AssignedValueWalker.Borrow(parameter, semanticModel, CancellationToken.None))
+                {
+                    CollectionAssert.AreEqual(new[] { "result", "1" }, assignedValues.Select(x => x.ToString()));
                 }
             }
 
@@ -532,15 +568,15 @@ namespace RoslynSandbox
             var temp = value;
         }
 
-        public static bool RecursiveOut(out int value)
+        private static bool M(out int result)
         {
-            value = 0;
-            if (value < 0)
+            result = 0;
+            if (result < 0)
             {
-                return RecursiveOut(out value);
+                return M(out result);
             }
 
-            value = 1;
+            result = 1;
             return true;
         }
     }
@@ -570,10 +606,10 @@ namespace RoslynSandbox
             var temp = value;
         }
 
-        public static bool RecursiveOut(double foo, out int value)
+        private static bool M(double foo, out int result)
         {
-            value = 0;
-            return RecursiveOut(3.0, out value);
+            result = 0;
+            return M(3.0, out result);
         }
     }
 }");
