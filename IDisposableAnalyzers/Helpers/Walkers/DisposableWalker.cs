@@ -289,13 +289,25 @@ namespace IDisposableAnalyzers
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                                                  argumentList.Parent is ExpressionSyntax invocationOrObjectCreation &&
+                                                  semanticModel.TryGetSymbol(invocationOrObjectCreation, cancellationToken, out IMethodSymbol method):
 
                     if (!method.TrySingleMethodDeclaration(cancellationToken, out _))
                     {
-                        return method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) ||
-                               method.ContainingType == KnownSymbol.Tuple;
+                        if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
+                        {
+                            return true;
+                        }
+
+                        if (method == KnownSymbol.Tuple.Create ||
+                            (method.MethodKind == MethodKind.Constructor &&
+                             method.ContainingType.FullName().StartsWith("System.Tuple`")))
+                        {
+                            return Assigns(invocationOrObjectCreation, semanticModel, cancellationToken, visited, out _) ||
+                                   Stores(invocationOrObjectCreation, semanticModel, cancellationToken, visited);
+                        }
+
+                        return false;
                     }
 
                     if (method.TryFindParameter(argument, out var parameter) &&
