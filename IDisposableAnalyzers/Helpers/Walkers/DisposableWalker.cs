@@ -269,6 +269,10 @@ namespace IDisposableAnalyzers
         {
             switch (candidate.Parent.Kind())
             {
+                case SyntaxKind.ArrayInitializerExpression:
+                case SyntaxKind.CollectionInitializerExpression:
+                    return Assigns((ExpressionSyntax)candidate.Parent.Parent, semanticModel, cancellationToken, visited, out _) ||
+                           Stores((ExpressionSyntax)candidate.Parent.Parent, semanticModel, cancellationToken, visited);
                 case SyntaxKind.CastExpression:
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
@@ -301,10 +305,19 @@ namespace IDisposableAnalyzers
                         using (visited = visited.IncrementUsage())
 #pragma warning restore IDISP003
                         {
-                            return visited.Add(argument) &&
-                                   (Stores(localOrParameter, semanticModel, cancellationToken, visited) ||
-                                    (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                     semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol)));
+                            if (visited.Add(argument))
+                            {
+                                if (Stores(localOrParameter, semanticModel, cancellationToken, visited))
+                                {
+                                    return true;
+                                }
+
+                                if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                    semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
+                                {
+                                    return true;
+                                }
+                            }
                         }
                     }
 

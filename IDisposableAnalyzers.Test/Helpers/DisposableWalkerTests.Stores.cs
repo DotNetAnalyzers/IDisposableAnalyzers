@@ -36,7 +36,7 @@ namespace RoslynSandbox
 
             [TestCase("Add(disposable)")]
             [TestCase("Insert(1, disposable)")]
-            public void WhenListOfT(string code)
+            public void InListOfTAdd(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,125 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenStackOfT()
+            public void ListOfTAddInInitialize()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        private List<IDisposable> disposables = new List<IDisposable>();
+
+        internal C(IDisposable disposable)
+        {
+            this.Initialize(disposable);
+        }
+
+        private void Initialize(IDisposable disposable)
+        {
+            this.disposables.Add(disposable);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [Test]
+            public void ListOfTAssignIndexer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        private List<IDisposable> disposables = new List<IDisposable> { null };
+
+        internal C(IDisposable disposable)
+        {
+            this.disposables[0] = disposable;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [Test]
+            public void ListOfTInitializer()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        private List<IDisposable> disposables;
+
+        internal C(IDisposable disposable)
+        {
+            this.disposables = new List<IDisposable> { disposable };
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [TestCase("new Disposable[] { disposable }")]
+            [TestCase("new[] { disposable }")]
+            public void ArrayOfTInitializer(string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        private IDisposable[] disposables;
+
+        internal C(IDisposable disposable)
+        {
+            this.disposables =  new Disposable[] { disposable };
+        }
+    }
+}".AssertReplace("new Disposable[] { disposable }", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [Test]
+            public void InStackOfT()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -93,7 +211,7 @@ namespace RoslynSandbox
 
             [TestCase("private Queue<IDisposable> disposables = new Queue<IDisposable>()")]
             [TestCase("private ConcurrentQueue<IDisposable> disposables = new ConcurrentQueue<IDisposable>()")]
-            public void WhenQueueOfT(string code)
+            public void InQueueOfT(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +242,7 @@ namespace RoslynSandbox
             [TestCase("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary disposables = new Dictionary<int, IDisposable>()")]
-            public void WhenDictionaryAdd(string code)
+            public void InDictionaryAdd(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -154,7 +272,7 @@ namespace RoslynSandbox
 
             [TestCase("TryAdd(1, disposable)")]
             [TestCase("TryUpdate(1, disposable, disposable)")]
-            public void WhenConcurrentDictionary(string code)
+            public void InConcurrentDictionary(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -172,39 +290,6 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("TryAdd(1, disposable)", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
-            }
-
-            [Test]
-            public void WhenAddListOfTInitialize()
-            {
-                var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.Collections.Generic;
-
-    internal class C
-    {
-        private List<IDisposable> disposables = new List<IDisposable>();
-
-        internal C(IDisposable disposable)
-        {
-            this.Initialize(disposable);
-        }
-
-        private void Initialize(IDisposable disposable)
-        {
-            this.disposables.Add(disposable);
-        }
-    }
-}";
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -239,6 +324,63 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [TestCase("Tuple.Create(disposable, 1)")]
+            [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
+            public void InTuple(string code)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        private readonly Tuple<IDisposable, int> tuple;
+
+        internal C(IDisposable disposable)
+        {
+            this.tuple = Tuple.Create(disposable, 1);
+        }
+    }
+}".AssertReplace("Tuple.Create(disposable, 1)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
+            }
+
+            [TestCase("_ = Tuple.Create(disposable, 1)")]
+            [TestCase("Tuple.Create(disposable, 1)")]
+            [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
+            public void InDiscardedTuple(string code)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class C
+    {
+        internal C(IDisposable disposable)
+        {
+            _ = Tuple.Create(disposable, 1);
+        }
+    }
+}".AssertReplace("Tuple.Create(disposable, 1)", code);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(false, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null));
             }
         }
     }
