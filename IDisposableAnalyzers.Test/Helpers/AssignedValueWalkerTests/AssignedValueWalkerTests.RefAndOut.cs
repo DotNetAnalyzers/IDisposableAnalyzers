@@ -66,7 +66,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindArgument(expression).Expression;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    Assert.AreEqual("1", assignedValues.Single().ToString());
+                    Assert.AreEqual("1", string.Join(", ", assignedValues));
                 }
             }
 
@@ -105,7 +105,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindArgument(expression).Expression;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    CollectionAssert.AreEqual(new[] { "result", "1" }, assignedValues.Select(x => x.ToString()));
+                    Assert.AreEqual("result, 1", string.Join(", ", assignedValues));
                 }
             }
 
@@ -140,7 +140,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var parameter));
                 using (var assignedValues = AssignedValueWalker.Borrow(parameter, semanticModel, CancellationToken.None))
                 {
-                    CollectionAssert.AreEqual(new[] { "result", "1" }, assignedValues.Select(x => x.ToString()));
+                    Assert.AreEqual("result, 1", string.Join(", ", assignedValues));
                 }
             }
 
@@ -248,8 +248,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
+                    Assert.AreEqual(expected, string.Join(", ", assignedValues));
                 }
             }
 
@@ -473,8 +472,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
+                    Assert.AreEqual(expected, string.Join(", ", assignedValues));
                 }
             }
 
@@ -516,8 +514,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
+                    Assert.AreEqual(expected, string.Join(", ", assignedValues));
                 }
             }
 
@@ -548,8 +545,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("0, 1, 2", actual);
+                    Assert.AreEqual("0, 1, 2", string.Join(", ", assignedValues));
                 }
             }
 
@@ -586,8 +582,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("0, 1", actual);
+                    Assert.AreEqual("0, 1", string.Join(", ", assignedValues));
                 }
             }
 
@@ -618,8 +613,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("0", actual);
+                    Assert.AreEqual("0", string.Join(", ", assignedValues));
                 }
             }
         }
