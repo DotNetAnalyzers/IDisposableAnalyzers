@@ -62,7 +62,7 @@ namespace IDisposableAnalyzers
                     using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
                     {
                         return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                               Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.No, Result.AssumeNo);
+                               !Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
                     }
                 }
             }
