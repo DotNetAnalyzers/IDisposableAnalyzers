@@ -57,7 +57,7 @@ namespace RoslynSandbox
 
             stream = File.OpenRead(string.Empty);
             Map.Add(i, stream);
-            return true;
+            return false;
         }
     }
 }".AssertReplace("out _", expression);
