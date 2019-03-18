@@ -105,6 +105,13 @@ namespace IDisposableAnalyzers
 
         public static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
+                declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
+                variableDeclaration.Parent is UsingStatementSyntax)
+            {
+                return true;
+            }
+
             using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
@@ -139,6 +146,13 @@ namespace IDisposableAnalyzers
 
         public static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
         {
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
+               declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
+               variableDeclaration.Parent is UsingStatementSyntax)
+            {
+                return true;
+            }
+
             using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
