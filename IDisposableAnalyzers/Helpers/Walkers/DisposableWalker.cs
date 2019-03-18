@@ -357,6 +357,8 @@ namespace IDisposableAnalyzers
         {
             switch (candidate.Parent.Kind())
             {
+                case SyntaxKind.UsingStatement:
+                    return true;
                 case SyntaxKind.CastExpression:
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ParenthesizedExpression:
