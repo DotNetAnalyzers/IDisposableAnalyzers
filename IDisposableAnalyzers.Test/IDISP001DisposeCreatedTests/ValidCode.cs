@@ -387,6 +387,36 @@ namespace RoslynSandbox
         }
 
         [Test]
+        public void UsingOutVar()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C()
+        {
+            if (TryGetStream(out var stream))
+            {
+                using (stream)
+                {
+                }
+            }
+        }
+
+        private static bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
         public void NewDisposableSplitDeclarationAndAssignment()
         {
             var testCode = @"
