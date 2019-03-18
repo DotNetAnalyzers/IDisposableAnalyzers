@@ -582,7 +582,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    Assert.AreEqual("0, 1", string.Join(", ", assignedValues));
+                    Assert.AreEqual("0, result, 1", string.Join(", ", assignedValues));
                 }
             }
 
@@ -613,7 +613,7 @@ namespace RoslynSandbox
                 var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    Assert.AreEqual("0", string.Join(", ", assignedValues));
+                    Assert.AreEqual("0, result", string.Join(", ", assignedValues));
                 }
             }
         }

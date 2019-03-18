@@ -254,6 +254,34 @@ namespace IDisposableAnalyzers
                         this.values.Add(GetArgumentValue(outValue));
                     }
                 }
+                else
+                {
+                    foreach (var outParameter in this.outParameters)
+                    {
+                        foreach (var argument in argumentList.Arguments)
+                        {
+                            if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
+                                argument.Expression is IdentifierNameSyntax identifierName &&
+                                identifierName.Identifier.Text == outParameter.Name)
+                            {
+                                this.outValues.Add(GetArgumentValue(argument.Expression));
+                            }
+                        }
+                    }
+
+                    if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter))
+                    {
+                        foreach (var argument in argumentList.Arguments)
+                        {
+                            if (argument.Expression is IdentifierNameSyntax identifierName &&
+                                identifierName.Identifier.Text == this.CurrentSymbol.Name &&
+                                argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword))
+                            {
+                                this.values.Add(GetArgumentValue(argument.Expression));
+                            }
+                        }
+                    }
+                }
             }
 
             bool TryGetWalker(out AssignedValueWalker result)
@@ -331,7 +359,8 @@ namespace IDisposableAnalyzers
             ExpressionSyntax GetArgumentValue(ExpressionSyntax value)
             {
                 if (value is IdentifierNameSyntax identifierName &&
-                    method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
+                    method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter) &&
+                    parameter.RefKind != RefKind.Out)
                 {
                     if (argumentList.TryFind(parameter, out var argument))
                     {

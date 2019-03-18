@@ -41,9 +41,9 @@ namespace IDisposableAnalyzers
             values.Reset();
             while (values.MoveNext())
             {
-                if (values.Current is ElementAccessExpressionSyntax elementAccess)
+                if (values.Current is ElementAccessExpressionSyntax elementAccess &&
+                    semanticModel.TryGetSymbol(elementAccess.Expression, cancellationToken, out var symbol))
                 {
-                    var symbol = semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken);
                     var isInjected = IsInjectedCore(symbol);
                     if (isInjected == Result.Yes)
                     {
@@ -72,7 +72,7 @@ namespace IDisposableAnalyzers
                         }
                     }
                 }
-                else if (semanticModel.TryGetSymbol(values.Current, cancellationToken, out var symbol))
+                else if (semanticModel.TryGetSymbol(values.Current, cancellationToken, out symbol))
                 {
                     switch (IsInjectedCore(symbol))
                     {

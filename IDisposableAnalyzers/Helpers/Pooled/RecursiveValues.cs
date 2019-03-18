@@ -109,7 +109,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                this.values.Add(invocation);
+                this.values.Add(assignedValue);
                 return true;
             }
 
