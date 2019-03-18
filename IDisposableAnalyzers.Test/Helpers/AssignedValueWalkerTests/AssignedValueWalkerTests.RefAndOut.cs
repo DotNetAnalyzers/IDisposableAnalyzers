@@ -560,7 +560,7 @@ namespace RoslynSandbox
         internal C()
         {
             int value;
-            RecursiveOut(out value);
+            M(out value);
             var temp = value;
         }
 
@@ -597,7 +597,7 @@ namespace RoslynSandbox
         internal void M()
         {
             int value;
-            RecursiveOut(1.0, out value);
+            M(1.0, out value);
             var temp = value;
         }
 
