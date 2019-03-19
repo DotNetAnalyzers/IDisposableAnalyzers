@@ -42,7 +42,6 @@ namespace ValidCode.Tuples
 
         private class Pair<T> : IDisposable where T : IDisposable
         {
-
             private readonly T item1;
             private readonly T item2;
 
