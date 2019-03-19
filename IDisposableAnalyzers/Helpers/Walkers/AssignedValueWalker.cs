@@ -41,7 +41,7 @@ namespace IDisposableAnalyzers
 
         public override void Visit(SyntaxNode node)
         {
-            if (ShouldVisit())
+            if (this.context.ShouldVisit(node))
             {
                 base.Visit(node);
             }
@@ -49,17 +49,6 @@ namespace IDisposableAnalyzers
             {
                 // ReSharper disable once RedundantJumpStatement for debugging, useful to set bp here.
                 return;
-            }
-
-            bool ShouldVisit()
-            {
-                if (node is StatementSyntax statement &&
-                    this.context.StopAt != null)
-                {
-                    return statement.IsExecutedBefore(this.context.StopAt) != ExecutedBefore.No;
-                }
-
-                return true;
             }
         }
 
@@ -695,20 +684,37 @@ namespace IDisposableAnalyzers
         private struct Context
         {
             internal readonly SyntaxNode Node;
-            internal readonly StatementSyntax StopAt;
+            private readonly SyntaxNode stopAt;
 
-            public Context(SyntaxNode node, StatementSyntax stopAt)
+            private Context(SyntaxNode node, SyntaxNode stopAt)
             {
                 this.Node = node;
-                this.StopAt = stopAt;
+                this.stopAt = stopAt;
             }
 
-            public static Context Create(SyntaxNode node, ISymbol symbol, CancellationToken cancellationToken)
+            internal Context(SyntaxNode node, StatementSyntax stopAt)
+            {
+                this.Node = node;
+                this.stopAt = stopAt;
+            }
+
+            internal static Context Create(SyntaxNode node, ISymbol symbol, CancellationToken cancellationToken)
             {
                 return new Context(node, GetStopAt(node, symbol, cancellationToken));
             }
 
             private static StatementSyntax GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
+            internal bool ShouldVisit(SyntaxNode node)
+            {
+                if (this.stopAt is StatementSyntax stopAtStatement &&
+                    node is StatementSyntax statement)
+                {
+                    return statement.IsExecutedBefore(stopAtStatement) != ExecutedBefore.No;
+                }
+
+                return true;
+            }
+
             {
                 if (location == null)
                 {
