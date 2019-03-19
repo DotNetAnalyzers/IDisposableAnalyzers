@@ -306,7 +306,7 @@ namespace IDisposableAnalyzers
                                                   argumentList.Parent is ExpressionSyntax invocationOrObjectCreation &&
                                                   semanticModel.TryGetSymbol(invocationOrObjectCreation, cancellationToken, out IMethodSymbol method):
 
-                    if (!method.TrySingleMethodDeclaration(cancellationToken, out _))
+                    if (method.DeclaringSyntaxReferences.IsEmpty)
                     {
                         if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
                            invocationOrObjectCreation is InvocationExpressionSyntax invocationExpression &&
@@ -315,9 +315,29 @@ namespace IDisposableAnalyzers
                             return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
                         }
 
-                        if (method == KnownSymbol.Tuple.Create ||
-                            (method.MethodKind == MethodKind.Constructor &&
-                             method.ContainingType.FullName().StartsWith("System.Tuple`")))
+                        if (method.MethodKind == MethodKind.Constructor)
+                        {
+                            if (method.ContainingType == KnownSymbol.BinaryReader ||
+                                method.ContainingType == KnownSymbol.BinaryWriter ||
+                                method.ContainingType == KnownSymbol.StreamReader ||
+                                method.ContainingType == KnownSymbol.StreamWriter ||
+                                method.ContainingType == KnownSymbol.CryptoStream ||
+                                method.ContainingType == KnownSymbol.DeflateStream ||
+                                method.ContainingType == KnownSymbol.GZipStream ||
+                                method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                            {
+                                return StoresOrAssigns(invocationOrObjectCreation, out container);
+                            }
+
+                            if (method.ContainingType.FullName().StartsWith("System.Tuple`") ||
+                                method.ContainingType == KnownSymbol.CompositeDisposable ||
+                                method.ContainingType == KnownSymbol.SerialDisposable)
+                            {
+                                return StoresOrAssigns(invocationOrObjectCreation, out container);
+                            }
+                        }
+
+                        if (method == KnownSymbol.Tuple.Create)
                         {
                             return StoresOrAssigns(invocationOrObjectCreation, out container);
                         }
@@ -337,14 +357,14 @@ namespace IDisposableAnalyzers
                             {
                                 if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
                                 {
+                                    _ = StoresOrAssigns(invocationOrObjectCreation, out container);
                                     return true;
                                 }
 
                                 if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
                                     semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
                                 {
-                                    container = fieldOrProperty.Symbol;
-                                    return true;
+                                    return StoresOrAssigns(invocationOrObjectCreation, out container);
                                 }
                             }
                         }

@@ -9,6 +9,17 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType Object = Create("System.Object", "object");
         internal static readonly QualifiedType Boolean = Create("System.Boolean", "bool");
         internal static readonly QualifiedType Func = Create("System.Func");
+        internal static readonly QualifiedType BinaryReader = Create("System.IO.BinaryReader");
+        internal static readonly QualifiedType BinaryWriter = Create("System.IO.BinaryWriter");
+        internal static readonly QualifiedType StreamReader = Create("System.IO.StreamReader");
+        internal static readonly QualifiedType StreamWriter = Create("System.IO.StreamWriter");
+        internal static readonly QualifiedType File = new QualifiedType("System.IO.File");
+        internal static readonly QualifiedType FileInfo = new QualifiedType("System.IO.FileInfo");
+        internal static readonly QualifiedType CryptoStream = Create("System.Security.Cryptography.CryptoStream");
+        internal static readonly QualifiedType DeflateStream = Create("System.IO.Compression.DeflateStream");
+        internal static readonly QualifiedType GZipStream = Create("System.IO.Compression.GZipStream");
+        internal static readonly QualifiedType StreamMemoryBlockProvider = Create("System.Reflection.Internal.StreamMemoryBlockProvider");
+
         internal static readonly TupleType Tuple = new TupleType();
         internal static readonly DisposableType IDisposable = new DisposableType();
         internal static readonly GCType GC = new GCType();
@@ -35,8 +46,6 @@ namespace IDisposableAnalyzers
 
         internal static readonly ResourceManagerType ResourceManager = new ResourceManagerType();
 
-        internal static readonly QualifiedType File = new QualifiedType("System.IO.File");
-        internal static readonly QualifiedType FileInfo = new QualifiedType("System.IO.FileInfo");
         internal static readonly QualifiedType RegistryKey = new QualifiedType("Microsoft.Win32.RegistryKey");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
