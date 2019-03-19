@@ -162,7 +162,7 @@ namespace RoslynSandbox
     {
         public static bool M(string fileName)
         {
-            return TryGet(File.OpenRead(string.Empty), ↓out _);
+            return TryGet(File.OpenRead(fileName), ↓out _);
         }
 
         private static bool TryGet(FileStream arg, out FileStream result)
@@ -190,7 +190,7 @@ namespace RoslynSandbox
 
     public static class C
     {
-        public static bool M(string fileName) => TryGet(File.OpenRead(string.Empty), ↓out _);
+        public static bool M(string fileName) => TryGet(File.OpenRead(fileName), ↓out _);
 
         private static bool TryGet(FileStream arg, out FileStream result)
         {
