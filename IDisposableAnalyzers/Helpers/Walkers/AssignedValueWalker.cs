@@ -684,13 +684,7 @@ namespace IDisposableAnalyzers
         private struct Context
         {
             internal readonly SyntaxNode Node;
-            private readonly SyntaxNode stopAt;
-
-            private Context(SyntaxNode node, SyntaxNode stopAt)
-            {
-                this.Node = node;
-                this.stopAt = stopAt;
-            }
+            private readonly StatementSyntax stopAt;
 
             internal Context(SyntaxNode node, StatementSyntax stopAt)
             {
@@ -703,7 +697,6 @@ namespace IDisposableAnalyzers
                 return new Context(node, GetStopAt(node, symbol, cancellationToken));
             }
 
-            private static StatementSyntax GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
             internal bool ShouldVisit(SyntaxNode node)
             {
                 if (this.stopAt is StatementSyntax stopAtStatement &&
@@ -715,6 +708,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
+            private static StatementSyntax GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
             {
                 if (location == null)
                 {
