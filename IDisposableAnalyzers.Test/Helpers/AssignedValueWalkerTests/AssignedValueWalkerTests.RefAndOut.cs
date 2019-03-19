@@ -74,6 +74,35 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out var temp")]
             [TestCase("out int temp")]
+            public void DiscardedOutAssignedWithArgument(string expression)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace RoslynSandbox
+{
+    public static class C
+    {
+        public static bool M() => TryGet(1, out _);
+
+        private static bool TryGet(int arg, out int i)
+        {
+            i = arg;
+            return true;
+        }
+    }
+}".AssertReplace("out _", expression));
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindArgument(expression).Expression;
+                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
+                {
+                    CollectionAssert.AreEqual("1", string.Join(", ", assignedValues));
+                }
+            }
+
+            [TestCase("out _")]
+            [TestCase("out var _")]
+            [TestCase("out var temp")]
+            [TestCase("out int temp")]
             public void DiscardedOutCachedAndAssigned(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
