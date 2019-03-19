@@ -54,5 +54,21 @@ namespace ValidCode
             result = null;
             return false;
         }
+
+        public void  CallTryId(string fileName)
+        {
+            if (TryId(File.OpenRead(fileName), out var stream))
+            {
+                using (stream)
+                {
+                }
+            }
+        }
+
+        public static bool TryId<T>(T item, out T result)
+        {
+            result = item;
+            return true;
+        }
     }
 }
