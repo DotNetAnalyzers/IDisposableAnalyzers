@@ -69,7 +69,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void VarOutParameter()
+            public void OutVarParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
