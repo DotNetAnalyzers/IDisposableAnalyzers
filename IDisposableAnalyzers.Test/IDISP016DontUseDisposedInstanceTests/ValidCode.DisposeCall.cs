@@ -307,6 +307,70 @@ namespace RoslynSandbox
 
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void LeaveOpenLocals()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Text;
+
+    public class C
+    {
+        public C(string fileName)
+        {
+            using (var stream = File.OpenRead(fileName))
+            {
+                using (var reader = new StreamReader(stream, new UTF8Encoding(), true, 1024, leaveOpen: true))
+                {
+                    _ = reader.ReadLine();
+                }
+
+                _ = stream.ReadByte();
+            }
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
+
+            [Test]
+            public void LeaveOpenFields()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Text;
+
+    public sealed class C : IDisposable
+    {
+        private readonly FileStream stream;
+        private readonly StreamReader reader;
+
+        public C(string fileName)
+        {
+            this.stream = File.OpenRead(fileName);
+            this.reader = new StreamReader(stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
+        }
+
+        public string ReadLine() => this.reader.ReadLine();
+ 
+        public int ReadByte() => this.stream.ReadByte();
+
+        public void Dispose()
+        {
+            this.stream.Dispose();
+            this.reader.Dispose();
+        }
+    }
+}";
+
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
