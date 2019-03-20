@@ -27,10 +27,12 @@ namespace RoslynSandbox
             [TestCase("new Disposable()")]
             [TestCase("new Disposable() as object")]
             [TestCase("(object) new Disposable()")]
-            [TestCase("File.OpenRead(string.Empty) ?? null")]
-            [TestCase("null ?? File.OpenRead(string.Empty)")]
-            [TestCase("true ? null : File.OpenRead(string.Empty)")]
-            [TestCase("true ? File.OpenRead(string.Empty) : null")]
+            [TestCase("System.IO.File.OpenRead(string.Empty)")]
+            [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
+            [TestCase("System.IOFile.OpenRead(string.Empty) ?? null")]
+            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)")]
+            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)")]
+            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null")]
             public void LanguageConstructs(string code)
             {
                 var testCode = @"
@@ -44,6 +46,26 @@ namespace RoslynSandbox
         internal C()
         {
             ↓var value = new Disposable();
+        }
+    }
+}".AssertReplace("new Disposable()", code);
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            }
+
+            [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
+            public void KnownArguments(string code)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    internal class C
+    {
+        internal C()
+        {
+            var value = new Disposable();
         }
     }
 }".AssertReplace("new Disposable()", code);

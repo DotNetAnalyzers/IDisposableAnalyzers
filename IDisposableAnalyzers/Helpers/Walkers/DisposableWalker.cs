@@ -326,6 +326,15 @@ namespace IDisposableAnalyzers
                                 method.ContainingType == KnownSymbol.GZipStream ||
                                 method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
                             {
+                                if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                                    argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                                    leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                    literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                                {
+                                    container = null;
+                                    return false;
+                                }
+
                                 return StoresOrAssigns(invocationOrObjectCreation, out container);
                             }
 
