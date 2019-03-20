@@ -249,10 +249,13 @@ namespace IDisposableAnalyzers
 
             switch (candidate.Parent)
             {
-                case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) && semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol):
-                    return FieldOrProperty.TryCreate(symbol, out fieldOrProperty);
+                case AssignmentExpressionSyntax assignment:
+                    return assignment.Right.Contains(candidate) &&
+                           semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol) &&
+                           FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                  invocation.IsPotentialThisOrBase() &&
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
                                                   method.TryFindParameter(argument, out var parameter) &&
                                                   LocalOrParameter.TryCreate(parameter, out var localOrParameter):
@@ -303,19 +306,64 @@ namespace IDisposableAnalyzers
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is ExpressionSyntax invocationOrObjectCreation &&
-                                                  semanticModel.TryGetSymbol(invocationOrObjectCreation, cancellationToken, out IMethodSymbol method):
-
-                    if (method.DeclaringSyntaxReferences.IsEmpty)
+                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method):
                     {
-                        if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
-                           invocationOrObjectCreation is InvocationExpressionSyntax invocationExpression &&
-                           invocationExpression.Expression is MemberAccessExpressionSyntax memberAccess)
+                        if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
-                            return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                            if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
+                               invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+                            {
+                                return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                            }
+
+                            if (method == KnownSymbol.Tuple.Create)
+                            {
+                                return StoresOrAssigns(invocation, out container);
+                            }
+
+                            container = null;
+                            return false;
+                        }
+                        else if (method.TryFindParameter(argument, out var parameter) &&
+                                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                        {
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                            using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                            {
+                                if (visited.Add(argument))
+                                {
+                                    if (invocation.IsPotentialThisOrBase() &&
+                                        Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
+                                    {
+                                        return true;
+                                    }
+
+                                    if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out _))
+                                    {
+                                        _ = StoresOrAssigns(invocation, out container);
+                                        return true;
+                                    }
+
+                                    if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                        semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
+                                    {
+                                        return StoresOrAssigns(invocation, out container);
+                                    }
+                                }
+                            }
                         }
 
-                        if (method.MethodKind == MethodKind.Constructor)
+                        container = null;
+                        return false;
+                    }
+
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is ObjectCreationExpressionSyntax objectCreation &&
+                                                  semanticModel.TryGetSymbol(objectCreation, cancellationToken, out IMethodSymbol method):
+                    {
+                        if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
                             if (method.ContainingType == KnownSymbol.BinaryReader ||
                                 method.ContainingType == KnownSymbol.BinaryWriter ||
@@ -335,51 +383,46 @@ namespace IDisposableAnalyzers
                                     return false;
                                 }
 
-                                return StoresOrAssigns(invocationOrObjectCreation, out container);
+                                return StoresOrAssigns(objectCreation, out container);
                             }
 
                             if (method.ContainingType.FullName().StartsWith("System.Tuple`") ||
                                 method.ContainingType == KnownSymbol.CompositeDisposable ||
                                 method.ContainingType == KnownSymbol.SerialDisposable)
                             {
-                                return StoresOrAssigns(invocationOrObjectCreation, out container);
+                                return StoresOrAssigns(objectCreation, out container);
                             }
-                        }
 
-                        if (method == KnownSymbol.Tuple.Create)
+                            container = null;
+                            return false;
+                        }
+                        else if (method.TryFindParameter(argument, out var parameter) &&
+                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
-                            return StoresOrAssigns(invocationOrObjectCreation, out container);
+#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+                            using (visited = visited.IncrementUsage())
+#pragma warning restore IDISP003
+                            {
+                                if (visited.Add(argument))
+                                {
+                                    if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
+                                    {
+                                        _ = StoresOrAssigns(objectCreation, out container);
+                                        return true;
+                                    }
+
+                                    if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                        semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
+                                    {
+                                        return StoresOrAssigns(objectCreation, out container);
+                                    }
+                                }
+                            }
                         }
 
                         container = null;
                         return false;
                     }
-
-                    if (method.TryFindParameter(argument, out var parameter) &&
-                        LocalOrParameter.TryCreate(parameter, out var localOrParameter))
-                    {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                        using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
-                        {
-                            if (visited.Add(argument))
-                            {
-                                if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
-                                {
-                                    _ = StoresOrAssigns(invocationOrObjectCreation, out container);
-                                    return true;
-                                }
-
-                                if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                    semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
-                                {
-                                    return StoresOrAssigns(invocationOrObjectCreation, out container);
-                                }
-                            }
-                        }
-                    }
-
-                    break;
 
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&

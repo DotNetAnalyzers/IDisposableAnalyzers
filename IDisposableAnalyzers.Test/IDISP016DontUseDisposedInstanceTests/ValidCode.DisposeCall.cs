@@ -343,6 +343,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.IO;
     using System.Text;
 

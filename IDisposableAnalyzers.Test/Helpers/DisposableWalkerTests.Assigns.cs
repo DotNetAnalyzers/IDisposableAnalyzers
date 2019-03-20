@@ -176,6 +176,39 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
                 Assert.AreEqual("RoslynSandbox.C.Disposable", field.Symbol.ToString());
             }
+
+            [Test]
+            public void PropertyAssignedInCalledMethod()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class C
+    {
+        internal C(IDisposable disposable)
+        {
+            this.M(disposable);
+        }
+
+        public IDisposable Disposable { get; private set; }
+
+        private void M(IDisposable arg)
+        {
+            this.Disposable = arg;
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual("RoslynSandbox.C.Disposable", field.Symbol.ToString());
+            }
         }
     }
 }

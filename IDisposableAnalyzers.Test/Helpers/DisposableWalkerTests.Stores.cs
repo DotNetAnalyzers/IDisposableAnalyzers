@@ -3,6 +3,7 @@ namespace IDisposableAnalyzers.Test.Helpers
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
@@ -131,7 +132,8 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual(null, container);
+                Assert.AreEqual(SymbolKind.Parameter, container.Kind);
+                Assert.AreEqual("disposables", container.Name);
             }
 
             [TestCase("Initialize(disposables, disposable)")]
@@ -164,7 +166,8 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual(null, container);
+                Assert.AreEqual(SymbolKind.Parameter, container.Kind);
+                Assert.AreEqual("disposables", container.Name);
             }
 
             [Test]

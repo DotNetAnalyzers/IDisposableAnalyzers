@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
         public class DisposeCall
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP016");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor);
 
             [Test]
             public void CreateTouchDispose()
