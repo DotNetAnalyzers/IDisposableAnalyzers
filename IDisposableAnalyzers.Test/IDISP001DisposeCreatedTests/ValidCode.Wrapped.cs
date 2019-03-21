@@ -454,5 +454,55 @@ namespace RoslynSandbox
 
             AnalyzerAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
         }
+
+        [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+        public void DisposingPair(string expression)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    internal sealed class C : IDisposable
+    {
+        private readonly Pair<FileStream> pair;
+
+        public C(string file1, string file2)
+        {
+            this.pair = Create(File.OpenRead(file1), File.OpenRead(file2));
+        }
+
+        public void Dispose()
+        {
+            this.pair.Dispose();
+        }
+
+        private static Pair<T> Create<T>(T x, T y) where T : IDisposable => new Pair<T>(x, y);
+
+        private class Pair<T> : IDisposable
+            where T : IDisposable
+        {
+            private readonly T item1;
+            private readonly T item2;
+
+            public Pair(T item1, T item2)
+            {
+                this.item1 = item1;
+                this.item2 = item2;
+            }
+
+            public void Dispose()
+            {
+                this.item1.Dispose();
+                (this.item2 as IDisposable)?.Dispose();
+            }
+        }
+    }
+}".AssertReplace("Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
+
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
     }
 }

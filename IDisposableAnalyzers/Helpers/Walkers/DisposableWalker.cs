@@ -169,6 +169,101 @@ namespace IDisposableAnalyzers
             return false;
         }
 
+        public static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        {
+            if (candidate.Parent is ArgumentListSyntax argumentList &&
+                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
+            {
+                if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
+                    method.ContainingType == KnownSymbol.RxDisposable ||
+                    method.ContainingType == KnownSymbol.CompositeDisposable)
+                {
+                    return true;
+                }
+
+                if (method.MethodKind == MethodKind.Constructor &&
+                    Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
+                {
+                    if (method.ContainingType == KnownSymbol.BinaryReader ||
+                        method.ContainingType == KnownSymbol.BinaryWriter ||
+                        method.ContainingType == KnownSymbol.StreamReader ||
+                        method.ContainingType == KnownSymbol.StreamWriter ||
+                        method.ContainingType == KnownSymbol.CryptoStream ||
+                        method.ContainingType == KnownSymbol.DeflateStream ||
+                        method.ContainingType == KnownSymbol.GZipStream ||
+                        method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                    {
+                        if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                            argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                            leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                            literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                    else if (method.TryFindParameter(candidate, out var parameter) &&
+                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                    {
+                        return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                    }
+                }
+                else if (method.MethodKind == MethodKind.Ordinary &&
+                         Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
+                         method.TryFindParameter(candidate, out var parameter) &&
+                         LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                {
+                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                }
+            }
+
+            return false;
+        }
+
+        public static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        {
+            if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
+                candidate.ContainingSymbol is IMethodSymbol method)
+            {
+                if (CanVisit(parameterSyntax, visited, out visited))
+                {
+                    using (visited)
+                    {
+                        using (var walker = CreateWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
+                        {
+                            foreach (var usage in walker.usages)
+                            {
+                                switch (usage.Parent.Kind())
+                                {
+                                    case SyntaxKind.ReturnStatement:
+                                    case SyntaxKind.ArrowExpressionClause:
+                                        return true;
+                                }
+
+                                if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                    DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                                {
+                                    return true;
+                                }
+
+                                if (usage.Parent is ArgumentSyntax argument &&
+                                    argument.Parent is ArgumentListSyntax argumentList &&
+                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited) &&
+                                    argumentList.Parent is ExpressionSyntax parentExpression &&
+                                    Returns(parentExpression, semanticModel, cancellationToken, visited))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
 
         public override void VisitIdentifierName(IdentifierNameSyntax node)
@@ -488,101 +583,6 @@ namespace IDisposableAnalyzers
                         invocation.TryGetMethodName(out var name) &&
                         name == "Dispose";
             }
-        }
-
-        private static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
-        {
-            if (candidate.Parent is ArgumentListSyntax argumentList &&
-                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
-            {
-                if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
-                    method.ContainingType == KnownSymbol.RxDisposable ||
-                    method.ContainingType == KnownSymbol.CompositeDisposable)
-                {
-                    return true;
-                }
-
-                if (method.MethodKind == MethodKind.Constructor &&
-                    Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
-                {
-                    if (method.ContainingType == KnownSymbol.BinaryReader ||
-                        method.ContainingType == KnownSymbol.BinaryWriter ||
-                        method.ContainingType == KnownSymbol.StreamReader ||
-                        method.ContainingType == KnownSymbol.StreamWriter ||
-                        method.ContainingType == KnownSymbol.CryptoStream ||
-                        method.ContainingType == KnownSymbol.DeflateStream ||
-                        method.ContainingType == KnownSymbol.GZipStream ||
-                        method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
-                    {
-                        if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                            argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
-                            leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                            literal.IsKind(SyntaxKind.TrueLiteralExpression))
-                        {
-                            return false;
-                        }
-
-                        return true;
-                    }
-                    else if (method.TryFindParameter(candidate, out var parameter) &&
-                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
-                    {
-                        return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
-                    }
-                }
-                else if (method.MethodKind == MethodKind.Ordinary &&
-                         Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                         method.TryFindParameter(candidate, out var parameter) &&
-                         LocalOrParameter.TryCreate(parameter, out var localOrParameter))
-                {
-                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
-                }
-            }
-
-            return false;
-        }
-
-        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
-        {
-            if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
-                candidate.ContainingSymbol is IMethodSymbol method)
-            {
-                if (CanVisit(parameterSyntax, visited, out visited))
-                {
-                    using (visited)
-                    {
-                        using (var walker = CreateWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
-                        {
-                            foreach (var usage in walker.usages)
-                            {
-                                switch (usage.Parent.Kind())
-                                {
-                                    case SyntaxKind.ReturnStatement:
-                                    case SyntaxKind.ArrowExpressionClause:
-                                        return true;
-                                }
-
-                                if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                    DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-                                {
-                                    return true;
-                                }
-
-                                if (usage.Parent is ArgumentSyntax argument &&
-                                    argument.Parent is ArgumentListSyntax argumentList &&
-                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited) &&
-                                    argumentList.Parent is ExpressionSyntax parentExpression &&
-                                    Returns(parentExpression, semanticModel, cancellationToken, visited))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            return false;
         }
 
         private static bool CanVisit(SyntaxNode node, PooledSet<(string, SyntaxNode)> visited, out PooledSet<(string, SyntaxNode)> incremented, [CallerMemberName] string caller = null)

@@ -308,7 +308,7 @@ namespace IDisposableAnalyzers
                     method.ReducedFrom is IMethodSymbol reducedFrom &&
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
-                    return IsDisposedByReturnValue(parameter, expression.Parent, semanticModel, cancellationToken, visited);
+                    return DisposableWalker.DisposedByReturnValue(parameter, semanticModel, cancellationToken, null) ? Result.Yes : Result.No;
                 }
             }
 
