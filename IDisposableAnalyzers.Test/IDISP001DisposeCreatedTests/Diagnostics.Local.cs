@@ -66,7 +66,7 @@ namespace RoslynSandbox
     {
         internal C()
         {
-            var value = ↓new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty));
+            ↓var value = new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty));
         }
     }
 }".AssertReplace("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))", code);
