@@ -29,7 +29,7 @@ namespace RoslynSandbox
             [TestCase("(object) new Disposable()")]
             [TestCase("System.IO.File.OpenRead(string.Empty)")]
             [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
-            [TestCase("System.IOFile.OpenRead(string.Empty) ?? null")]
+            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null")]
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null")]
@@ -52,6 +52,7 @@ namespace RoslynSandbox
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
+            [TestCase("new BinaryReader(System.IO.File.OpenRead(string.Empty))")]
             [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
             public void KnownArguments(string code)
             {
@@ -65,10 +66,10 @@ namespace RoslynSandbox
     {
         internal C()
         {
-            var value = new Disposable();
+            var value = ↓new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty));
         }
     }
-}".AssertReplace("new Disposable()", code);
+}".AssertReplace("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))", code);
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 

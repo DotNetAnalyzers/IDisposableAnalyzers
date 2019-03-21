@@ -2,6 +2,7 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -55,7 +56,7 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        public static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        public static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
@@ -71,7 +72,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty first)
+        public static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out FieldOrProperty first)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
@@ -87,7 +88,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out ISymbol container)
+        public static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ISymbol container)
         {
             using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
             {
@@ -104,7 +105,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        public static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
@@ -128,7 +129,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        public static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
@@ -145,7 +146,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        public static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
@@ -199,7 +200,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             switch (candidate.Parent.Kind())
             {
@@ -223,20 +224,21 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                    using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    if (CanVisit(candidate, visited, out visited))
                     {
-                        return visited.Add(variableDeclarator) &&
-                               Returns(localOrParameter, semanticModel, cancellationToken, visited);
+                        using (visited)
+                        {
+                            return Returns(localOrParameter, semanticModel, cancellationToken, visited);
+                        }
                     }
 
+                    return false;
                 default:
                     return false;
             }
         }
 
-        private static bool Assigns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out FieldOrProperty fieldOrProperty)
+        private static bool Assigns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out FieldOrProperty fieldOrProperty)
         {
             switch (candidate.Parent.Kind())
             {
@@ -259,31 +261,35 @@ namespace IDisposableAnalyzers
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
                                                   method.TryFindParameter(argument, out var parameter) &&
                                                   LocalOrParameter.TryCreate(parameter, out var localOrParameter):
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                    using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    if (CanVisit(candidate, visited, out visited))
                     {
-                        return visited.Add(argument) &&
-                               Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                        using (visited)
+                        {
+                            return Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                        }
                     }
+
+                    return false;
 
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                    using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    if (CanVisit(candidate, visited, out visited))
                     {
-                        return visited.Add(variableDeclarator) &&
-                               Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                        using (visited)
+                        {
+                            return Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
+                        }
                     }
+
+                    return false;
 
                 default:
                     return false;
             }
         }
 
-        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited, out ISymbol container)
+        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ISymbol container)
         {
             switch (candidate.Parent.Kind())
             {
@@ -302,6 +308,10 @@ namespace IDisposableAnalyzers
                 case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) &&
                                                                 assignment.Left is ElementAccessExpressionSyntax elementAccess:
                     return semanticModel.TryGetSymbol(elementAccess.Expression, cancellationToken, out container);
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is ExpressionSyntax invocationOrObjectCreation &&
+                                                  DisposedByReturnValue(argument, semanticModel, cancellationToken, visited):
+                    return StoresOrAssigns(invocationOrObjectCreation, out container);
                 case ArgumentSyntax argument when argument.Parent is TupleExpressionSyntax tupleExpression:
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
@@ -328,11 +338,9 @@ namespace IDisposableAnalyzers
                         else if (method.TryFindParameter(argument, out var parameter) &&
                                  LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                            using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                            if (CanVisit(candidate, visited, out visited))
                             {
-                                if (visited.Add(argument))
+                                using (visited)
                                 {
                                     if (invocation.IsPotentialThisOrBase() &&
                                         Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
@@ -353,6 +361,9 @@ namespace IDisposableAnalyzers
                                     }
                                 }
                             }
+
+                            container = null;
+                            return false;
                         }
 
                         container = null;
@@ -365,27 +376,6 @@ namespace IDisposableAnalyzers
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
-                            if (method.ContainingType == KnownSymbol.BinaryReader ||
-                                method.ContainingType == KnownSymbol.BinaryWriter ||
-                                method.ContainingType == KnownSymbol.StreamReader ||
-                                method.ContainingType == KnownSymbol.StreamWriter ||
-                                method.ContainingType == KnownSymbol.CryptoStream ||
-                                method.ContainingType == KnownSymbol.DeflateStream ||
-                                method.ContainingType == KnownSymbol.GZipStream ||
-                                method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
-                            {
-                                if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                                    argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
-                                    leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                    literal.IsKind(SyntaxKind.TrueLiteralExpression))
-                                {
-                                    container = null;
-                                    return false;
-                                }
-
-                                return StoresOrAssigns(objectCreation, out container);
-                            }
-
                             if (method.ContainingType.FullName().StartsWith("System.Tuple`") ||
                                 method.ContainingType == KnownSymbol.CompositeDisposable ||
                                 method.ContainingType == KnownSymbol.SerialDisposable)
@@ -397,13 +387,11 @@ namespace IDisposableAnalyzers
                             return false;
                         }
                         else if (method.TryFindParameter(argument, out var parameter) &&
-                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                            using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                            if (CanVisit(candidate, visited, out visited))
                             {
-                                if (visited.Add(argument))
+                                using (visited)
                                 {
                                     if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
                                     {
@@ -427,21 +415,20 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
                                                                     LocalOrParameter.TryCreate(container, out var local):
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                    using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    if (CanVisit(candidate, visited, out visited))
                     {
-                        return visited.Add(variableDeclarator) &&
-                               Stores(local, semanticModel, cancellationToken, visited, out container);
+                        using (visited)
+                        {
+                            return Stores(local, semanticModel, cancellationToken, visited, out container);
+                        }
                     }
 
+                    container = null;
+                    return false;
                 default:
                     container = null;
                     return false;
             }
-
-            container = null;
-            return false;
 
             bool StoresOrAssigns(ExpressionSyntax expression, out ISymbol result)
             {
@@ -461,7 +448,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool Disposes(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool Disposes(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             switch (candidate.Parent.Kind())
             {
@@ -481,13 +468,15 @@ namespace IDisposableAnalyzers
                     return IsDispose(invocation);
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                 semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
-                    using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                    if (CanVisit(candidate, visited, out visited))
                     {
-                        return visited.Add(candidate) &&
-                               Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
+                        using (visited)
+                        {
+                            return Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
+                        }
                     }
+
+                    return false;
             }
 
             return false;
@@ -499,6 +488,97 @@ namespace IDisposableAnalyzers
                         invocation.TryGetMethodName(out var name) &&
                         name == "Dispose";
             }
+        }
+
+        private static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        {
+            if (candidate.Parent is ArgumentListSyntax argumentList &&
+                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
+            {
+                if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
+                    method.ContainingType == KnownSymbol.RxDisposable ||
+                    method.ContainingType == KnownSymbol.CompositeDisposable)
+                {
+                    return true;
+                }
+
+                if (method.MethodKind == MethodKind.Constructor &&
+                    Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
+                {
+                    if (method.ContainingType == KnownSymbol.BinaryReader ||
+                        method.ContainingType == KnownSymbol.BinaryWriter ||
+                        method.ContainingType == KnownSymbol.StreamReader ||
+                        method.ContainingType == KnownSymbol.StreamWriter ||
+                        method.ContainingType == KnownSymbol.CryptoStream ||
+                        method.ContainingType == KnownSymbol.DeflateStream ||
+                        method.ContainingType == KnownSymbol.GZipStream ||
+                        method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                    {
+                        if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                            argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                            leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                            literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                        {
+                            return false;
+                        }
+
+                        return true;
+                    }
+                    else if (method.TryFindParameter(candidate, out var parameter) &&
+                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                    {
+                        return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                    }
+                }
+                else if (method.MethodKind == MethodKind.Ordinary &&
+                         Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
+                         method.TryFindParameter(candidate, out var parameter) &&
+                         LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                {
+                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                }
+            }
+
+            return false;
+        }
+
+        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        {
+            if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
+                candidate.ContainingSymbol is IMethodSymbol method)
+            {
+                if (CanVisit(parameterSyntax, visited, out visited))
+                {
+                    using (visited)
+                    {
+                        if (Assigns(new LocalOrParameter(candidate), semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                            DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                        {
+                            return true;
+                        }
+
+                        using (var walker = CreateWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
+                        {
+                            foreach (var usage in walker.usages)
+                            {
+                                if (usage.Parent is ArgumentSyntax argument &&
+                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited))
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool CanVisit(SyntaxNode node, PooledSet<(string, SyntaxNode)> visited, out PooledSet<(string, SyntaxNode)> incremented, [CallerMemberName] string caller = null)
+        {
+            incremented = visited.IncrementUsage();
+            return incremented.Add((caller ?? string.Empty, node));
         }
     }
 }

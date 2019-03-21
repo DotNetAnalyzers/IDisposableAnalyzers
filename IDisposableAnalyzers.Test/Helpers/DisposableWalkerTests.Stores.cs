@@ -478,7 +478,7 @@ namespace RoslynSandbox
 
     internal class C
     {
-        private readonly Pair<IDisposable, IDisposable> pair;
+        private readonly Pair<IDisposable> pair;
 
         internal C(IDisposable disposable1, IDisposable disposable2)
         {
@@ -521,14 +521,14 @@ namespace RoslynSandbox
 
     internal class C
     {
-        private readonly Pair<IDisposable, IDisposable> pair;
+        private readonly Pair<IDisposable> pair;
 
         internal C(IDisposable disposable1, IDisposable disposable2)
         {
             this.pair = Create<IDisposable>(disposable1, disposable2);
         }
 
-        public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
+        public static Pair<T> Create<T>(T x, T y) => new Pair<T>(x, y);
 
         public class Pair<T>
         {
@@ -541,6 +541,104 @@ namespace RoslynSandbox
             public T Item1 { get; }
 
             public T Item2 { get; }
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter(parameter);
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+            }
+
+            [TestCase("disposable1")]
+            [TestCase("disposable2")]
+            public void InDisposingPairWhenNew(string parameter)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class C
+    {
+        private readonly Pair<IDisposable> pair;
+
+        internal C(IDisposable disposable1, IDisposable disposable2)
+        {
+            this.pair = new Pair<IDisposable>(disposable1, disposable2);
+        }
+
+        private class Pair<T> : IDisposable
+            where T : IDisposable
+        {
+            private readonly T item1;
+            private readonly T item2;
+
+            public Pair(T item1, T item2)
+            {
+                this.item1 = item1;
+                this.item2 = item2;
+            }
+
+            public void Dispose()
+            {
+                this.item1.Dispose();
+                (this.item2 as IDisposable)?.Dispose();
+            }
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter(parameter);
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+            }
+
+            [TestCase("disposable1")]
+            [TestCase("disposable2")]
+            public void InDisposingPairWhenFactoryMethod(string parameter)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class C
+    {
+        private readonly Pair<IDisposable> pair;
+
+        internal C(IDisposable disposable1, IDisposable disposable2)
+        {
+            this.pair = Create<IDisposable>(disposable1, disposable2);
+        }
+
+        private static Pair<T> Create<T>(T x, T y) where T : IDisposable => new Pair<T>(x, y);
+
+        private class Pair<T> : IDisposable
+            where T : IDisposable
+        {
+            private readonly T item1;
+            private readonly T item2;
+
+            public Pair(T item1, T item2)
+            {
+                this.item1 = item1;
+                this.item2 = item2;
+            }
+
+            public void Dispose()
+            {
+                this.item1.Dispose();
+                (this.item2 as IDisposable)?.Dispose();
+            }
         }
     }
 }";
