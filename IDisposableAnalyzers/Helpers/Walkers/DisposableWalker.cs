@@ -551,18 +551,28 @@ namespace IDisposableAnalyzers
                 {
                     using (visited)
                     {
-                        if (Assigns(new LocalOrParameter(candidate), semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                            DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-                        {
-                            return true;
-                        }
-
                         using (var walker = CreateWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
                         {
                             foreach (var usage in walker.usages)
                             {
+                                switch (usage.Parent.Kind())
+                                {
+                                    case SyntaxKind.ReturnStatement:
+                                    case SyntaxKind.ArrowExpressionClause:
+                                        return true;
+                                }
+
+                                if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                    DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                                {
+                                    return true;
+                                }
+
                                 if (usage.Parent is ArgumentSyntax argument &&
-                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited))
+                                    argument.Parent is ArgumentListSyntax argumentList &&
+                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited) &&
+                                    argumentList.Parent is ExpressionSyntax parentExpression &&
+                                    Returns(parentExpression, semanticModel, cancellationToken, visited))
                                 {
                                     return true;
                                 }
