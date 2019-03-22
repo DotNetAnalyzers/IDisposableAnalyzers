@@ -11,14 +11,6 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
 
-            [TestCase("stream ?? File.OpenRead(string.Empty)")]
-            [TestCase("Stream ?? File.OpenRead(string.Empty)")]
-            [TestCase("File.OpenRead(string.Empty) ?? stream")]
-            [TestCase("File.OpenRead(string.Empty) ?? Stream")]
-            [TestCase("true ? stream : File.OpenRead(string.Empty)")]
-            [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
-            [TestCase("true ? File.OpenRead(string.Empty) : stream")]
-            [TestCase("true ? File.OpenRead(string.Empty) : Stream")]
             [TestCase("(object) stream")]
             [TestCase("(object) Stream")]
             [TestCase("stream as object")]

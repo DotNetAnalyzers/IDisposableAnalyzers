@@ -7,6 +7,24 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
+        internal static bool IsCachedOrInjectedOnly(ExpressionSyntax value, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
+            {
+                using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
+                {
+                    using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
+                    {
+                        return (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
+                                IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)) &&
+                              !IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                    }
+                }
+            }
+
+            return false;
+        }
+
         internal static bool IsCachedOrInjected(ExpressionSyntax value, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);

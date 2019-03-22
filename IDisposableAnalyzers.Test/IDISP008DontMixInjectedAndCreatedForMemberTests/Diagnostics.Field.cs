@@ -14,6 +14,9 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("true ? arg : File.OpenRead(string.Empty)")]
             [TestCase("true ? File.OpenRead(string.Empty) : arg")]
+            [TestCase("Stream ?? File.OpenRead(string.Empty)")]
+            [TestCase("File.OpenRead(string.Empty) ?? Stream")]
+            [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
             public void InjectedAndCreated(string code)
             {
                 var testCode = @"

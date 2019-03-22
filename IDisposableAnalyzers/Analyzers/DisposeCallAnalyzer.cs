@@ -34,7 +34,7 @@ namespace IDisposableAnalyzers
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 DisposeCall.TryGetDisposedRootMember(invocation, context.SemanticModel, context.CancellationToken, out var root))
             {
-                if (Disposable.IsCachedOrInjected(root, invocation, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsCachedOrInjectedOnly(root, invocation, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
