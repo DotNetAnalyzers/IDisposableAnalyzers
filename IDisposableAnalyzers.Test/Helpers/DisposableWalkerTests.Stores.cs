@@ -705,6 +705,100 @@ namespace RoslynSandbox
                     Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
                 }
             }
+
+            [Test]
+            public void CallWrappingStreamInReader()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C(Stream stream)
+        {
+            this.disposable = GetReader(stream);
+        }
+
+        private static StreamReader GetReader(Stream arg)
+        {
+            return new StreamReader(arg);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("Stream stream");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
+            }
+
+            [Test]
+            public void DisposedByReturnValueCallWrappingStreamInReader()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public string M()
+        {
+            using (var reader = GetReader(File.OpenRead(string.Empty)))
+            {
+                return reader.ReadLine();
+            }
+        }
+
+        private static StreamReader GetReader(Stream stream)
+        {
+            return new StreamReader(stream);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
+                Assert.AreEqual(true, DisposableWalker.DisposedByReturnValue(value, semanticModel, CancellationToken.None, null));
+            }
+
+            [Test]
+            public void Recursive()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(Stream stream)
+        {
+            this.disposable = GetReader(stream);
+        }
+
+        private static StreamReader GetReader(Stream arg)
+        {
+            return GetReader(arg);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("Stream stream");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(false, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+            }
         }
     }
 }
