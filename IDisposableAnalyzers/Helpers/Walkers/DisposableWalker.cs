@@ -411,7 +411,7 @@ namespace IDisposableAnalyzers
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is InvocationExpressionSyntax invocation  &&
+                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
@@ -491,45 +491,70 @@ namespace IDisposableAnalyzers
                 switch (argumentList.Parent)
                 {
                     case InvocationExpressionSyntax invocation when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
-                        if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
-                            return method == KnownSymbol.Tuple.Create;
-                        }
+                            if (method.DeclaringSyntaxReferences.IsEmpty)
+                            {
+                                return method == KnownSymbol.Tuple.Create;
+                            }
 
-                        if (method.ReturnsVoid)
-                        {
+                            if (method.ReturnsVoid ||
+                                invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
+                            {
+                                return false;
+                            }
+
+                            if (method.TryFindParameter(candidate, out var parameter) &&
+                                CanVisit(candidate, visited, out visited))
+                            {
+                                using (visited)
+                                {
+                                    using (var walker = CreateWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
+                                    {
+                                        foreach (var usage in walker.usages)
+                                        {
+                                            if (usage.Parent is ArgumentSyntax parentArgument &&
+                                                parentArgument.Parent is ArgumentListSyntax parentArgumentList &&
+                                                parentArgumentList.Parent is ExpressionSyntax parentInvocationOrObjectCreation &&
+                                                ReturnedInAccessible(parentArgument, semanticModel, cancellationToken, visited) &&
+                                                Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
+                                            {
+                                                return true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
                             return false;
                         }
 
-                        return false;
                     case ObjectCreationExpressionSyntax objectCreation when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var method):
-                        if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
-                            return method.ContainingType.FullName().StartsWith("System.Tuple`");
-                        }
+                            if (method.DeclaringSyntaxReferences.IsEmpty)
+                            {
+                                return method.ContainingType.FullName().StartsWith("System.Tuple`");
+                            }
 
-                        return method.TryFindParameter(candidate, out var parameter) &&
-                               ReturnedInAccessible(new LocalOrParameter(parameter));
+                            if (method.TryFindParameter(candidate, out var parameter))
+                            {
+                                if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container))
+                                {
+                                    return FieldOrProperty.TryCreate(container, out var containerMember) &&
+                                           semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
+                                }
+
+                                if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty))
+                                {
+                                    return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
+                                }
+                            }
+
+                            return false;
+                        }
                 }
             }
 
             return false;
-
-            bool ReturnedInAccessible(LocalOrParameter localOrParameter)
-            {
-                if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out var container))
-                {
-                    return FieldOrProperty.TryCreate(container, out var containerMember) &&
-                           semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
-                }
-
-                if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty))
-                {
-                    return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
-                }
-
-                return false;
-            }
         }
 
         private static bool Disposes(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)

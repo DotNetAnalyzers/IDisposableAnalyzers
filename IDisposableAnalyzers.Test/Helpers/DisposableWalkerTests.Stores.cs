@@ -517,7 +517,6 @@ namespace RoslynSandbox
 namespace RoslynSandbox
 {
     using System;
-    using System.Collections.Generic;
 
     internal class C
     {
