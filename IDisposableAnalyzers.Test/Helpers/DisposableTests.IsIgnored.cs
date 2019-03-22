@@ -35,7 +35,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("string.Format(\"{0}\", File.OpenRead(fileName))")]
@@ -56,7 +56,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("disposable")]
@@ -94,7 +94,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("var temp = disposable")]
@@ -126,7 +126,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("var temp = disposable")]
@@ -161,7 +161,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("File.OpenRead(fileName)")]
@@ -191,7 +191,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("File.OpenRead(fileName)")]
@@ -221,7 +221,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("new C(File.OpenRead(fileName))")]
@@ -267,7 +267,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -288,7 +288,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -312,7 +312,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -348,7 +348,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
@@ -371,7 +371,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -405,7 +405,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -433,7 +433,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -471,7 +471,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -503,7 +503,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -535,7 +535,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -571,7 +571,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [Test]
@@ -603,7 +603,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(true, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
 
             [TestCase("disposable.AddAndReturn(File.OpenRead(fileName))")]
@@ -650,7 +650,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsIgnored(value, semanticModel, CancellationToken.None, null));
             }
         }
     }

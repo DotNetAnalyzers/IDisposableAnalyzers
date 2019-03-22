@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
 
     internal static partial class Disposable
     {
-        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (node.Parent is EqualsValueClauseSyntax equalsValueClause)
             {
@@ -50,11 +50,9 @@ namespace IDisposableAnalyzers
 
             if (node.Parent is ArgumentSyntax argument)
             {
-#pragma warning disable IDISP003 // Dispose previous before re - assigning.
-                using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                if (visited.CanVisit(argument, out visited))
                 {
-                    if (visited.Add(argument))
+                    using (visited)
                     {
                         return IsIgnored(argument, semanticModel, cancellationToken, visited);
                     }
@@ -86,23 +84,19 @@ namespace IDisposableAnalyzers
             if (node.Parent is InitializerExpressionSyntax initializer &&
                 initializer.Parent is ExpressionSyntax creation)
             {
-#pragma warning disable IDISP003 // Dispose previous before re - assigning.
-                using (visited = visited.IncrementUsage())
-#pragma warning restore IDISP003
+                if (visited.CanVisit(creation, out visited))
                 {
-                    if (visited.Add(creation))
+                    using (visited)
                     {
                         return IsIgnored(creation, semanticModel, cancellationToken, visited);
                     }
-
-                    return false;
                 }
             }
 
             return false;
         }
 
-        private static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (argument != null &&
                 argument.Parent is ArgumentListSyntax argumentList &&
@@ -204,7 +198,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool IsIgnored(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static bool IsIgnored(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax block) &&
                 semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local))
@@ -249,7 +243,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
             {
@@ -259,7 +253,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        private static Result IsChainedDisposingInReturnValue(ConditionalAccessExpressionSyntax conditionalAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static Result IsChainedDisposingInReturnValue(ConditionalAccessExpressionSyntax conditionalAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out ISymbol symbol))
             {
@@ -269,7 +263,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
-        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited)
+        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (symbol is IMethodSymbol method)
             {

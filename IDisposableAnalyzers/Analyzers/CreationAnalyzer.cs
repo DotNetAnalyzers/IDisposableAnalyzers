@@ -39,7 +39,7 @@ namespace IDisposableAnalyzers
                 }
 
                 if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    Disposable.IsIgnored(expression, context.SemanticModel, context.CancellationToken))
+                    Disposable.IsIgnored(expression, context.SemanticModel, context.CancellationToken, null))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP004DontIgnoreCreated.Descriptor, context.Node.GetLocation()));
                 }
