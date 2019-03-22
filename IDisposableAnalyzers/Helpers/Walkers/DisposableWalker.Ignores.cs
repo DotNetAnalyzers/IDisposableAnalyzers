@@ -13,7 +13,9 @@ namespace IDisposableAnalyzers
     {
         internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            if (Disposes(node, semanticModel, cancellationToken, visited))
+            if (Disposes(node, semanticModel, cancellationToken, visited) ||
+                Assigns(node, semanticModel, cancellationToken, visited, out _) ||
+                Stores(node, semanticModel, cancellationToken, visited, out _))
             {
                 return false;
             }
@@ -44,6 +46,10 @@ namespace IDisposableAnalyzers
                     return false;
                 case StatementSyntax _:
                     return true;
+                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
+                                                  argumentList.Parent is ExpressionSyntax invocationOrCreation &&
+                                                  DisposedByReturnValue(argument, semanticModel, cancellationToken, visited):
+                    return Ignores(invocationOrCreation, semanticModel, cancellationToken, visited);
                 case ArgumentSyntax argument:
                     if (visited.CanVisit(argument, out visited))
                     {
@@ -81,17 +87,6 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is ExpressionSyntax parentExpression &&
                 semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol method))
             {
-                if (method == KnownSymbol.CompositeDisposable.Add)
-                {
-                    return false;
-                }
-
-                if (method.Name == "Add" &&
-                    method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation))
-                {
-                    return false;
-                }
-
                 if (method.DeclaringSyntaxReferences.IsEmpty)
                 {
                     if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))

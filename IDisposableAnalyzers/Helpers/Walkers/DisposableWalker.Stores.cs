@@ -30,39 +30,41 @@ namespace IDisposableAnalyzers
             if (candidate.Parent is ArgumentListSyntax argumentList &&
                 semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
             {
-                if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
-                    method.ContainingType == KnownSymbol.RxDisposable ||
-                    method.ContainingType == KnownSymbol.CompositeDisposable)
+                if (method.MethodKind == MethodKind.Constructor)
                 {
-                    return true;
-                }
-
-                if (method.MethodKind == MethodKind.Constructor &&
-                    Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
-                {
-                    if (method.ContainingType == KnownSymbol.BinaryReader ||
-                        method.ContainingType == KnownSymbol.BinaryWriter ||
-                        method.ContainingType == KnownSymbol.StreamReader ||
-                        method.ContainingType == KnownSymbol.StreamWriter ||
-                        method.ContainingType == KnownSymbol.CryptoStream ||
-                        method.ContainingType == KnownSymbol.DeflateStream ||
-                        method.ContainingType == KnownSymbol.GZipStream ||
-                        method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                    if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
+                        method.ContainingType == KnownSymbol.RxDisposable ||
+                        method.ContainingType == KnownSymbol.CompositeDisposable)
                     {
-                        if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                            argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
-                            leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                            literal.IsKind(SyntaxKind.TrueLiteralExpression))
-                        {
-                            return false;
-                        }
-
                         return true;
                     }
 
-                    if (method.TryFindParameter(candidate, out var parameter))
+                    if (Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
                     {
-                        return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                        if (method.ContainingType == KnownSymbol.BinaryReader ||
+                            method.ContainingType == KnownSymbol.BinaryWriter ||
+                            method.ContainingType == KnownSymbol.StreamReader ||
+                            method.ContainingType == KnownSymbol.StreamWriter ||
+                            method.ContainingType == KnownSymbol.CryptoStream ||
+                            method.ContainingType == KnownSymbol.DeflateStream ||
+                            method.ContainingType == KnownSymbol.GZipStream ||
+                            method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                        {
+                            if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                                argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                            {
+                                return false;
+                            }
+
+                            return true;
+                        }
+
+                        if (method.TryFindParameter(candidate, out var parameter))
+                        {
+                            return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                        }
                     }
                 }
                 else if (method.MethodKind == MethodKind.Ordinary &&
