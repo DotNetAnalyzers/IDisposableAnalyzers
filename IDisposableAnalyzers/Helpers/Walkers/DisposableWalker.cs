@@ -2,7 +2,6 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Generic;
-    using System.Runtime.CompilerServices;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -225,7 +224,7 @@ namespace IDisposableAnalyzers
             if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
                 candidate.ContainingSymbol is IMethodSymbol method)
             {
-                if (CanVisit(parameterSyntax, visited, out visited))
+                if (visited.CanVisit(parameterSyntax, out visited))
                 {
                     using (visited)
                     {
@@ -318,7 +317,7 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-                    if (CanVisit(candidate, visited, out visited))
+                    if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
                         {
@@ -355,7 +354,7 @@ namespace IDisposableAnalyzers
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
                                                   method.TryFindParameter(argument, out var parameter) &&
                                                   LocalOrParameter.TryCreate(parameter, out var localOrParameter):
-                    if (CanVisit(candidate, visited, out visited))
+                    if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
                         {
@@ -368,7 +367,7 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-                    if (CanVisit(candidate, visited, out visited))
+                    if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
                         {
@@ -429,7 +428,7 @@ namespace IDisposableAnalyzers
                         if (method.TryFindParameter(argument, out var parameter) &&
                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
-                            if (CanVisit(candidate, visited, out visited))
+                            if (visited.CanVisit(candidate, out visited))
                             {
                                 using (visited)
                                 {
@@ -451,7 +450,7 @@ namespace IDisposableAnalyzers
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                                                                     semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
                                                                     LocalOrParameter.TryCreate(container, out var local):
-                    if (CanVisit(candidate, visited, out visited))
+                    if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
                         {
@@ -504,7 +503,7 @@ namespace IDisposableAnalyzers
                             }
 
                             if (method.TryFindParameter(candidate, out var parameter) &&
-                                CanVisit(candidate, visited, out visited))
+                                visited.CanVisit(candidate, out visited))
                             {
                                 using (visited)
                                 {
@@ -577,7 +576,7 @@ namespace IDisposableAnalyzers
                     return IsDispose(invocation);
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
                 semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
-                    if (CanVisit(candidate, visited, out visited))
+                    if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
                         {
@@ -597,12 +596,6 @@ namespace IDisposableAnalyzers
                         invocation.TryGetMethodName(out var name) &&
                         name == "Dispose";
             }
-        }
-
-        private static bool CanVisit(SyntaxNode node, PooledSet<(string, SyntaxNode)> visited, out PooledSet<(string, SyntaxNode)> incremented, [CallerMemberName] string caller = null)
-        {
-            incremented = visited.IncrementUsage();
-            return incremented.Add((caller ?? string.Empty, node));
         }
     }
 }
