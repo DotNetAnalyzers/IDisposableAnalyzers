@@ -426,8 +426,7 @@ namespace IDisposableAnalyzers
                             return false;
                         }
 
-                        if (invocation.IsPotentialThisOrBase() &&
-                            method.TryFindParameter(argument, out var parameter) &&
+                        if (method.TryFindParameter(argument, out var parameter) &&
                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
                             if (CanVisit(candidate, visited, out visited))
