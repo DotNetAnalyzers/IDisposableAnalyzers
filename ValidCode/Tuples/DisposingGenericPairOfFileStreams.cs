@@ -1,3 +1,4 @@
+// ReSharper disable All
 namespace ValidCode.Tuples
 {
     using System;
@@ -26,8 +27,9 @@ namespace ValidCode.Tuples
 
         public static void LocalPairOfFileStreams(string file)
         {
-            var pair = Pair.Create(File.OpenRead(file), File.OpenRead(file));
-            pair.Dispose();
+            using (var pair = Pair.Create(File.OpenRead(file), File.OpenRead(file)))
+            {
+            }
         }
 
         public void Dispose()
@@ -53,8 +55,10 @@ namespace ValidCode.Tuples
 
             public void Dispose()
             {
+#pragma warning disable IDISP007 // Don't dispose injected.
                 this.item1.Dispose();
                 (this.item2 as IDisposable)?.Dispose();
+#pragma warning restore IDISP007
             }
         }
     }
