@@ -152,24 +152,33 @@ namespace IDisposableAnalyzers
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
-                            if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
+                            if (method.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
                                 invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                             {
-                                return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                                switch (method.Name)
+                                {
+                                    case "Add":
+                                    case "Insert":
+                                    case "Push":
+                                    case "Enqueue":
+                                    case "TryAdd":
+                                    case "TryUpdate":
+                                        return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+
+                                }
                             }
 
                             container = null;
                             return false;
                         }
 
-                        if (method.TryFindParameter(argument, out var parameter) &&
-                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                        if (method.TryFindParameter(argument, out var parameter))
                         {
                             if (visited.CanVisit(candidate, out visited))
                             {
                                 using (visited)
                                 {
-                                    if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
+                                    if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
                                     {
                                         return true;
                                     }

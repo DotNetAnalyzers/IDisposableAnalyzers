@@ -35,6 +35,40 @@ namespace RoslynSandbox
                 Assert.AreEqual(false, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out _));
             }
 
+            [TestCase("string", "string.Format(\"{0}\", disposable)")]
+            [TestCase("string", "disposable.ToString()")]
+            [TestCase("bool", "disposable is null")]
+            [TestCase("bool", "disposable == null")]
+            [TestCase("bool", "Equals(disposable, null)")]
+            [TestCase("bool", "this.Equals(disposable)")]
+            [TestCase("bool", "object.Equals(disposable, null)")]
+            public void WhenNotUsed(string type, string expression)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    internal class C
+    {
+        private readonly bool value;
+
+        internal C(IDisposable disposable)
+        {
+            this.value = Equals(disposable, null);
+        }
+    }
+}".AssertReplace("bool", type)
+  .AssertReplace("Equals(disposable, null)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(false, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+            }
+
             [TestCase("Add(disposable)")]
             [TestCase("Insert(1, disposable)")]
             public void InListOfTAdd(string code)
