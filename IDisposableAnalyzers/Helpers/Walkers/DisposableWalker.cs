@@ -203,16 +203,15 @@ namespace IDisposableAnalyzers
 
                         return true;
                     }
-                    else if (method.TryFindParameter(candidate, out var parameter) &&
-                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+
+                    if (method.TryFindParameter(candidate, out var parameter))
                     {
                         return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
                     }
                 }
                 else if (method.MethodKind == MethodKind.Ordinary &&
                          Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                         method.TryFindParameter(candidate, out var parameter) &&
-                         LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                         method.TryFindParameter(candidate, out var parameter))
                 {
                     return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
                 }
