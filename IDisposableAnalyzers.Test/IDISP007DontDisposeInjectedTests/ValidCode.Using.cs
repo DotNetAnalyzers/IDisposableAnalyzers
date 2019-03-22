@@ -622,6 +622,38 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Valid(Analyzer, testCode);
             }
+
+            [Test]
+            public void ReassignedParameterViaOutAnd()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    internal class C
+    {
+        public static void ReassignParameter(IDisposable disposable)
+        {
+            if (disposable == null &&
+                TryReassign(disposable, out disposable))
+            {
+                using (disposable)
+                {
+                }
+            }
+        }
+
+        private static bool TryReassign(IDisposable old, out IDisposable result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+                AnalyzerAssert.Valid(Analyzer, testCode);
+            }
         }
     }
 }
