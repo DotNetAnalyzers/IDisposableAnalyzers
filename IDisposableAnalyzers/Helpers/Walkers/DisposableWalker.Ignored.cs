@@ -13,84 +13,63 @@ namespace IDisposableAnalyzers
     {
         internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            if (node?.Parent == null)
+            if (Disposes(node, semanticModel, cancellationToken, visited))
             {
                 return false;
             }
 
-            if (node.Parent is EqualsValueClauseSyntax equalsValueClause)
+            switch (node.Parent)
             {
-                if (equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                    variableDeclarator.Identifier.Text == "_")
-                {
+                case EqualsValueClauseSyntax equalsValueClause:
+                    {
+                        if (equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                            variableDeclarator.Identifier.Text == "_")
+                        {
+                            return true;
+                        }
+
+                        return false;
+                    }
+
+                case AssignmentExpressionSyntax assignmentExpression:
+                    {
+                        return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
+                               identifierName.Identifier.Text == "_";
+                    }
+
+                case AnonymousFunctionExpressionSyntax _:
+                case UsingStatementSyntax _:
+                case ReturnStatementSyntax _:
+                case ArrowExpressionClauseSyntax _:
+                    return false;
+                case StatementSyntax _:
                     return true;
-                }
-
-                return false;
-            }
-
-            if (node.Parent is AssignmentExpressionSyntax assignmentExpression)
-            {
-                return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
-                       identifierName.Identifier.Text == "_";
-            }
-
-            if (node.Parent is AnonymousFunctionExpressionSyntax ||
-                node.Parent is UsingStatementSyntax ||
-                node.Parent is ReturnStatementSyntax ||
-                node.Parent is ArrowExpressionClauseSyntax)
-            {
-                return false;
-            }
-
-            if (node.Parent is StatementSyntax)
-            {
-                return true;
-            }
-
-            if (node.Parent is ArgumentSyntax argument)
-            {
-                if (visited.CanVisit(argument, out visited))
-                {
-                    using (visited)
+                case ArgumentSyntax argument:
+                    if (visited.CanVisit(argument, out visited))
                     {
-                        return IsIgnored(argument, semanticModel, cancellationToken, visited);
+                        using (visited)
+                        {
+                            return IsIgnored(argument, semanticModel, cancellationToken, visited);
+                        }
                     }
-                }
-            }
 
-            if (node.Parent is MemberAccessExpressionSyntax memberAccess)
-            {
-                if (memberAccess.Parent is InvocationExpressionSyntax invocation &&
-                    DisposeCall.IsIDisposableDispose(invocation, semanticModel, cancellationToken))
-                {
-                    return false;
-                }
+                    break;
+                case MemberAccessExpressionSyntax memberAccess:
+                    return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                case ConditionalAccessExpressionSyntax conditionalAccess:
+                    return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken, visited)
+                        .IsEither(Result.No, Result.AssumeNo);
 
-                return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-            }
-
-            if (node.Parent is ConditionalAccessExpressionSyntax conditionalAccess)
-            {
-                if (conditionalAccess.WhenNotNull is InvocationExpressionSyntax invocation &&
-                    DisposeCall.IsIDisposableDispose(invocation, semanticModel, cancellationToken))
-                {
-                    return false;
-                }
-
-                return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-            }
-
-            if (node.Parent is InitializerExpressionSyntax initializer &&
-                initializer.Parent is ExpressionSyntax creation)
-            {
-                if (visited.CanVisit(creation, out visited))
-                {
-                    using (visited)
+                case InitializerExpressionSyntax initializer when initializer.Parent is ExpressionSyntax creation:
+                    if (visited.CanVisit(creation, out visited))
                     {
-                        return IsIgnored(creation, semanticModel, cancellationToken, visited);
+                        using (visited)
+                        {
+                            return IsIgnored(creation, semanticModel, cancellationToken, visited);
+                        }
                     }
-                }
+
+                    break;
             }
 
             return false;
