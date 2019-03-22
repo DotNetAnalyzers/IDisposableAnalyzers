@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (Disposes(node, semanticModel, cancellationToken, visited))
             {
@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
                     {
                         using (visited)
                         {
-                            return IsIgnored(argument, semanticModel, cancellationToken, visited);
+                            return Ignores(argument, semanticModel, cancellationToken, visited);
                         }
                     }
 
@@ -64,7 +64,7 @@ namespace IDisposableAnalyzers
                     {
                         using (visited)
                         {
-                            return IsIgnored(creation, semanticModel, cancellationToken, visited);
+                            return Ignores(creation, semanticModel, cancellationToken, visited);
                         }
                     }
 
@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool IsIgnored(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (argument != null &&
                 argument.Parent is ArgumentListSyntax argumentList &&
@@ -134,7 +134,7 @@ namespace IDisposableAnalyzers
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
-                                        return DisposableWalker.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                                        return DisposableWalker.Ignores(parentExpression, semanticModel, cancellationToken, visited);
                                     }
 
                                     if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
@@ -144,10 +144,10 @@ namespace IDisposableAnalyzers
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator:
-                                    return DisposableWalker.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
+                                    return DisposableWalker.Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 
-                            if (DisposableWalker.IsIgnored(candidate, semanticModel, cancellationToken, visited))
+                            if (DisposableWalker.Ignores(candidate, semanticModel, cancellationToken, visited))
                             {
                                 return true;
                             }
@@ -176,7 +176,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool IsIgnored(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax block) &&
                 semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local))
@@ -203,7 +203,7 @@ namespace IDisposableAnalyzers
                         return true;
                     }
 
-                    return walker.IdentifierNames.All(x => IsIgnored(x, semanticModel, cancellationToken, visited));
+                    return walker.IdentifierNames.All(x => Ignores(x, semanticModel, cancellationToken, visited));
                 }
 
                 bool IsMatch(IdentifierNameSyntax candidate)
