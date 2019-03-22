@@ -15,18 +15,6 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            if (symbol is IPropertySymbol property &&
-                !property.IsAutoProperty())
-            {
-                using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Borrow(returnValues, semanticModel, cancellationToken))
-                    {
-                        return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                    }
-                }
-            }
-
             return IsAssignedWithInjected(symbol, location, semanticModel, cancellationToken);
         }
 
