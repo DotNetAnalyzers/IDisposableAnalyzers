@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers
 
         public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -57,7 +57,7 @@ namespace IDisposableAnalyzers
 
         public static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -73,7 +73,7 @@ namespace IDisposableAnalyzers
 
         public static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out FieldOrProperty first)
         {
-            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -89,7 +89,7 @@ namespace IDisposableAnalyzers
 
         public static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ISymbol container)
         {
-            using (var walker = CreateWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -113,7 +113,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
 
         public static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -154,7 +154,7 @@ namespace IDisposableAnalyzers
                 return true;
             }
 
-            using (var walker = CreateWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -228,7 +228,7 @@ namespace IDisposableAnalyzers
                 {
                     using (visited)
                     {
-                        using (var walker = CreateWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
+                        using (var walker = CreateUsagesWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
                         {
                             foreach (var usage in walker.usages)
                             {
@@ -272,25 +272,6 @@ namespace IDisposableAnalyzers
         protected override void Clear()
         {
             this.usages.Clear();
-        }
-
-        private static DisposableWalker CreateWalker(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (localOrParameter.TryGetScope(cancellationToken, out var scope))
-            {
-                var walker = BorrowAndVisit(scope, () => new DisposableWalker());
-                walker.RemoveAll(x => !IsMatch(x));
-                return walker;
-            }
-
-            return Borrow(() => new DisposableWalker());
-
-            bool IsMatch(IdentifierNameSyntax identifierName)
-            {
-                return identifierName.Identifier.Text == localOrParameter.Name &&
-                       semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
-                       symbol.Equals(localOrParameter.Symbol.OriginalDefinition);
-            }
         }
 
         private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
@@ -507,7 +488,7 @@ namespace IDisposableAnalyzers
                             {
                                 using (visited)
                                 {
-                                    using (var walker = CreateWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
+                                    using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
                                     {
                                         foreach (var usage in walker.usages)
                                         {
@@ -595,6 +576,25 @@ namespace IDisposableAnalyzers
                         argumentList.Arguments.Count == 0 &&
                         invocation.TryGetMethodName(out var name) &&
                         name == "Dispose";
+            }
+        }
+
+        private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (localOrParameter.TryGetScope(cancellationToken, out var scope))
+            {
+                var walker = BorrowAndVisit(scope, () => new DisposableWalker());
+                walker.RemoveAll(x => !IsMatch(x));
+                return walker;
+            }
+
+            return Borrow(() => new DisposableWalker());
+
+            bool IsMatch(IdentifierNameSyntax identifierName)
+            {
+                return identifierName.Identifier.Text == localOrParameter.Name &&
+                       semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
+                       symbol.Equals(localOrParameter.Symbol.OriginalDefinition);
             }
         }
     }
