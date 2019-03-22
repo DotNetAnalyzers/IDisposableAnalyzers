@@ -411,7 +411,7 @@ namespace IDisposableAnalyzers
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
+                                                  argumentList.Parent is InvocationExpressionSyntax invocation  &&
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
@@ -426,40 +426,8 @@ namespace IDisposableAnalyzers
                             return false;
                         }
 
-                        if (method.TryFindParameter(argument, out var parameter) &&
-                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
-                        {
-                            if (CanVisit(candidate, visited, out visited))
-                            {
-                                using (visited)
-                                {
-                                    if (invocation.IsPotentialThisOrBase() &&
-                                        Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
-                                    {
-                                        return true;
-                                    }
-
-                                    if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out _))
-                                    {
-                                        _ = StoresOrAssigns(invocation, out container);
-                                        return true;
-                                    }
-                                }
-                            }
-
-                            container = null;
-                            return false;
-                        }
-
-                        container = null;
-                        return false;
-                    }
-
-                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is ObjectCreationExpressionSyntax objectCreation &&
-                                                  semanticModel.TryGetSymbol(objectCreation, cancellationToken, out IMethodSymbol method):
-                    {
-                        if (method.TryFindParameter(argument, out var parameter) &&
+                        if (invocation.IsPotentialThisOrBase() &&
+                            method.TryFindParameter(argument, out var parameter) &&
                             LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
                             if (CanVisit(candidate, visited, out visited))
@@ -468,11 +436,13 @@ namespace IDisposableAnalyzers
                                 {
                                     if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out container))
                                     {
-                                        _ = StoresOrAssigns(objectCreation, out container);
                                         return true;
                                     }
                                 }
                             }
+
+                            container = null;
+                            return false;
                         }
 
                         container = null;
