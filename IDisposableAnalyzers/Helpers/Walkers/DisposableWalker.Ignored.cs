@@ -249,7 +249,7 @@ namespace IDisposableAnalyzers
         {
             if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
             {
-                return IsChainedDisposingInReturnValue(symbol, memberAccess, semanticModel, cancellationToken, visited);
+                return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited);
             }
 
             return Result.Unknown;
@@ -259,13 +259,13 @@ namespace IDisposableAnalyzers
         {
             if (semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out ISymbol symbol))
             {
-                return IsChainedDisposingInReturnValue(symbol, conditionalAccess, semanticModel, cancellationToken, visited);
+                return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited);
             }
 
             return Result.Unknown;
         }
 
-        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (symbol is IMethodSymbol method)
             {
@@ -304,7 +304,7 @@ namespace IDisposableAnalyzers
                     method.ReducedFrom is IMethodSymbol reducedFrom &&
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
-                    return DisposableWalker.DisposedByReturnValue(parameter, semanticModel, cancellationToken, null) ? Result.Yes : Result.No;
+                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
                 }
             }
 
