@@ -54,11 +54,10 @@ namespace IDisposableAnalyzers
                     }
 
                     break;
-                case MemberAccessExpressionSyntax memberAccess:
-                    return IsChainedDisposingInReturnValue(memberAccess, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-                case ConditionalAccessExpressionSyntax conditionalAccess:
-                    return IsChainedDisposingInReturnValue(conditionalAccess, semanticModel, cancellationToken, visited)
-                        .IsEither(Result.No, Result.AssumeNo);
+                case MemberAccessExpressionSyntax memberAccess when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
+                    return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                case ConditionalAccessExpressionSyntax conditionalAccess when semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out var symbol):
+                    return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
 
                 case InitializerExpressionSyntax initializer when initializer.Parent is ExpressionSyntax creation:
                     if (visited.CanVisit(creation, out visited))
@@ -220,26 +219,6 @@ namespace IDisposableAnalyzers
             }
 
             return false;
-        }
-
-        private static Result IsChainedDisposingInReturnValue(MemberAccessExpressionSyntax memberAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
-        {
-            if (semanticModel.TryGetSymbol(memberAccess, cancellationToken, out ISymbol symbol))
-            {
-                return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited);
-            }
-
-            return Result.Unknown;
-        }
-
-        private static Result IsChainedDisposingInReturnValue(ConditionalAccessExpressionSyntax conditionalAccess, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
-        {
-            if (semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out ISymbol symbol))
-            {
-                return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited);
-            }
-
-            return Result.Unknown;
         }
 
         [Obsolete("Use DisposableWalker")]
