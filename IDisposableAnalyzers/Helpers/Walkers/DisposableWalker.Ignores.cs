@@ -92,6 +92,22 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
+                if (method.DeclaringSyntaxReferences.IsEmpty)
+                {
+                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))
+                    {
+                        return !Disposable.IsAssignableFrom(assignedMember.Type, semanticModel.Compilation) ||
+                               !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
+                    }
+
+                    if (method.MethodKind == MethodKind.Constructor)
+                    {
+                        return !Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation);
+                    }
+
+                    return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
+                }
+
                 if (method.TryFindParameter(argument, out var parameter) &&
                     method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
                 {
@@ -155,21 +171,6 @@ namespace IDisposableAnalyzers
                             return false;
                         }
                     }
-                }
-                else
-                {
-                    if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))
-                    {
-                        return !Disposable.IsAssignableFrom(assignedMember.Type, semanticModel.Compilation) ||
-                               !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
-                    }
-
-                    if (method.MethodKind == MethodKind.Constructor)
-                    {
-                        return !Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation);
-                    }
-
-                    return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
                 }
             }
 
