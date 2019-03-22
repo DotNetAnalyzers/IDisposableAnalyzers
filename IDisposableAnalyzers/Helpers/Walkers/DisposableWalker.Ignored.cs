@@ -13,6 +13,11 @@ namespace IDisposableAnalyzers
     {
         internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
+            if (node?.Parent == null)
+            {
+                return false;
+            }
+
             if (node.Parent is EqualsValueClauseSyntax equalsValueClause)
             {
                 if (equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
@@ -39,13 +44,6 @@ namespace IDisposableAnalyzers
             }
 
             if (node.Parent is StatementSyntax)
-            {
-                return true;
-            }
-
-            if (node.Parent is AssignmentExpressionSyntax assignment &&
-                assignment.Left is IdentifierNameSyntax left &&
-                left.Identifier.ValueText == "_")
             {
                 return true;
             }
@@ -265,6 +263,7 @@ namespace IDisposableAnalyzers
             return Result.Unknown;
         }
 
+        [Obsolete("Use DisposableWalker")]
         private static Result IsChainedDisposingInReturnValue(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (symbol is IMethodSymbol method)
