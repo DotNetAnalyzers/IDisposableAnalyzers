@@ -719,9 +719,8 @@ namespace RoslynSandbox
     {
         public static void ReassignParameter(IDisposable disposable)
         {
-            using (disposable = File.OpenRead(string.Empty))
-            {
-            }
+            disposable = File.OpenRead(string.Empty);
+            disposable.Dispose();
         }
     }
 }";
@@ -743,9 +742,7 @@ namespace RoslynSandbox
         {
             if (TryReassign(disposable, out disposable))
             {
-                using (disposable)
-                {
-                }
+                disposable.Dispose();
             }
         }
 
