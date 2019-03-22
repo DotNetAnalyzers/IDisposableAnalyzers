@@ -103,7 +103,7 @@ namespace IDisposableAnalyzers
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
                         {
-                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
+                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken, null))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
                             }
@@ -151,7 +151,7 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<SyntaxNode> visited = null)
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
@@ -164,15 +164,17 @@ namespace IDisposableAnalyzers
 
                 using (var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
                 {
-                    using (visited = visited.IncrementUsage())
+                    foreach (var returnValue in walker)
                     {
-                        foreach (var returnValue in walker)
+                        if (returnValue is InvocationExpressionSyntax nestedInvocation &&
+                            visited.CanVisit(invocation, out visited))
                         {
-                            if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                                visited.Add(returnValue) &&
-                                IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken, visited))
+                            using (visited)
                             {
-                                return true;
+                                if (IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken, visited))
+                                {
+                                    return true;
+                                }
                             }
                         }
                     }
