@@ -404,33 +404,30 @@ namespace IDisposableAnalyzers
                     return semanticModel.TryGetSymbol(elementAccess.Expression, cancellationToken, out container);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is ExpressionSyntax invocationOrObjectCreation &&
-                                                  DisposedByReturnValue(argument, semanticModel, cancellationToken, visited):
+                                                  (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited) ||
+                                                   ReturnedInAccessible(argument, semanticModel, cancellationToken, visited)):
                     return StoresOrAssigns(invocationOrObjectCreation, out container);
                 case ArgumentSyntax argument when argument.Parent is TupleExpressionSyntax tupleExpression:
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method):
+                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
                             if (method.ContainingType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
-                               invocation.Expression is MemberAccessExpressionSyntax memberAccess)
+                                invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                             {
                                 return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
-                            }
-
-                            if (method == KnownSymbol.Tuple.Create)
-                            {
-                                return StoresOrAssigns(invocation, out container);
                             }
 
                             container = null;
                             return false;
                         }
-                        else if (method.TryFindParameter(argument, out var parameter) &&
-                                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+
+                        if (method.TryFindParameter(argument, out var parameter) &&
+                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
                             if (CanVisit(candidate, visited, out visited))
                             {
@@ -447,12 +444,6 @@ namespace IDisposableAnalyzers
                                         _ = StoresOrAssigns(invocation, out container);
                                         return true;
                                     }
-
-                                    if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                        semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
-                                    {
-                                        return StoresOrAssigns(invocation, out container);
-                                    }
                                 }
                             }
 
@@ -468,20 +459,8 @@ namespace IDisposableAnalyzers
                                                   argumentList.Parent is ObjectCreationExpressionSyntax objectCreation &&
                                                   semanticModel.TryGetSymbol(objectCreation, cancellationToken, out IMethodSymbol method):
                     {
-                        if (method.DeclaringSyntaxReferences.IsEmpty)
-                        {
-                            if (method.ContainingType.FullName().StartsWith("System.Tuple`") ||
-                                method.ContainingType == KnownSymbol.CompositeDisposable ||
-                                method.ContainingType == KnownSymbol.SerialDisposable)
-                            {
-                                return StoresOrAssigns(objectCreation, out container);
-                            }
-
-                            container = null;
-                            return false;
-                        }
-                        else if (method.TryFindParameter(argument, out var parameter) &&
-                                 LocalOrParameter.TryCreate(parameter, out var localOrParameter))
+                        if (method.TryFindParameter(argument, out var parameter) &&
+                            LocalOrParameter.TryCreate(parameter, out var localOrParameter))
                         {
                             if (CanVisit(candidate, visited, out visited))
                             {
@@ -491,12 +470,6 @@ namespace IDisposableAnalyzers
                                     {
                                         _ = StoresOrAssigns(objectCreation, out container);
                                         return true;
-                                    }
-
-                                    if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                        semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
-                                    {
-                                        return StoresOrAssigns(objectCreation, out container);
                                     }
                                 }
                             }
@@ -538,6 +511,54 @@ namespace IDisposableAnalyzers
                 }
 
                 result = null;
+                return false;
+            }
+        }
+
+        private static bool ReturnedInAccessible(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        {
+            if (candidate.Parent is ArgumentListSyntax argumentList)
+            {
+                switch (argumentList.Parent)
+                {
+                    case InvocationExpressionSyntax invocation when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                        if (method.DeclaringSyntaxReferences.IsEmpty)
+                        {
+                            return method == KnownSymbol.Tuple.Create;
+                        }
+
+                        if (method.ReturnsVoid)
+                        {
+                            return false;
+                        }
+
+                        return false;
+                    case ObjectCreationExpressionSyntax objectCreation when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var method):
+                        if (method.DeclaringSyntaxReferences.IsEmpty)
+                        {
+                            return method.ContainingType.FullName().StartsWith("System.Tuple`");
+                        }
+
+                        return method.TryFindParameter(candidate, out var parameter) &&
+                               ReturnedInAccessible(new LocalOrParameter(parameter));
+                }
+            }
+
+            return false;
+
+            bool ReturnedInAccessible(LocalOrParameter localOrParameter)
+            {
+                if (Stores(localOrParameter, semanticModel, cancellationToken, visited, out var container))
+                {
+                    return FieldOrProperty.TryCreate(container, out var containerMember) &&
+                           semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
+                }
+
+                if (Assigns(localOrParameter, semanticModel, cancellationToken, visited, out var fieldOrProperty))
+                {
+                    return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
+                }
+
                 return false;
             }
         }
