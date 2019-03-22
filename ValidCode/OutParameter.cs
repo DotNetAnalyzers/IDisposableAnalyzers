@@ -55,7 +55,7 @@ namespace ValidCode
             return false;
         }
 
-        public void  CallTryId(string fileName)
+        public void CallTryId(string fileName)
         {
             if (TryId(File.OpenRead(fileName), out var stream))
             {
@@ -68,6 +68,22 @@ namespace ValidCode
         public static bool TryId<T>(T item, out T result)
         {
             result = item;
+            return true;
+        }
+
+        public static void ReassignParameter(IDisposable disposable)
+        {
+            if (TryReassign(disposable, out disposable))
+            {
+                using (disposable)
+                {
+                }
+            }
+        }
+
+        private static bool TryReassign(IDisposable old, out IDisposable result)
+        {
+            result = new Disposable();
             return true;
         }
     }
