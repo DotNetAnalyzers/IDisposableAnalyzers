@@ -164,7 +164,6 @@ namespace IDisposableAnalyzers
                                     case "TryAdd":
                                     case "TryUpdate":
                                         return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
-
                                 }
                             }
 
