@@ -1,13 +1,15 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static partial class Disposable
+    internal sealed partial class DisposableWalker
     {
         internal static bool IsIgnored(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
@@ -156,7 +158,7 @@ namespace IDisposableAnalyzers
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
-                                        return Disposable.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
+                                        return DisposableWalker.IsIgnored(parentExpression, semanticModel, cancellationToken, visited);
                                     }
 
                                     if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
@@ -166,10 +168,10 @@ namespace IDisposableAnalyzers
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator:
-                                    return Disposable.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
+                                    return DisposableWalker.IsIgnored(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 
-                            if (Disposable.IsIgnored(candidate, semanticModel, cancellationToken, visited))
+                            if (DisposableWalker.IsIgnored(candidate, semanticModel, cancellationToken, visited))
                             {
                                 return true;
                             }
@@ -182,16 +184,16 @@ namespace IDisposableAnalyzers
                 {
                     if (TryGetAssignedFieldOrProperty(argument, method, semanticModel, cancellationToken, out var assignedMember))
                     {
-                        return !IsAssignableFrom(assignedMember.Type, semanticModel.Compilation) ||
+                        return !Disposable.IsAssignableFrom(assignedMember.Type, semanticModel.Compilation) ||
                                !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                     }
 
                     if (method.MethodKind == MethodKind.Constructor)
                     {
-                        return !IsAssignableFrom(method.ContainingType, semanticModel.Compilation);
+                        return !Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation);
                     }
 
-                    return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
+                    return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
                 }
             }
 
@@ -288,12 +290,12 @@ namespace IDisposableAnalyzers
                         method.ReturnType is INamedTypeSymbol namedType &&
                         namedType.TypeArguments.TrySingle(out var type))
                     {
-                        return !IsAssignableFrom(type, semanticModel.Compilation)
+                        return !Disposable.IsAssignableFrom(type, semanticModel.Compilation)
                             ? Result.No
                             : Result.AssumeYes;
                     }
 
-                    return !IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                    return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
                         ? Result.No
                         : Result.AssumeYes;
                 }
@@ -307,6 +309,50 @@ namespace IDisposableAnalyzers
             }
 
             return Result.AssumeNo;
+        }
+
+        [Obsolete("Use DisposableWalker")]
+        private static bool TryGetAssignedFieldOrProperty(ArgumentSyntax argument, IMethodSymbol method, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty member)
+        {
+            member = default(FieldOrProperty);
+            if (method == null)
+            {
+                return false;
+            }
+
+            if (method.TryFindParameter(argument, out var parameter))
+            {
+                if (method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
+                {
+                    if (AssignmentExecutionWalker.FirstWith(parameter.OriginalDefinition, (SyntaxNode)methodDeclaration.Body ?? methodDeclaration.ExpressionBody, Scope.Member, semanticModel, cancellationToken, out var assignment))
+                    {
+                        return semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol symbol) &&
+                               FieldOrProperty.TryCreate(symbol, out member);
+                    }
+
+                    if (methodDeclaration is ConstructorDeclarationSyntax ctor &&
+                        ctor.Initializer is ConstructorInitializerSyntax initializer &&
+                        initializer.ArgumentList != null &&
+                        initializer.ArgumentList.Arguments.TrySingle(x => x.Expression is IdentifierNameSyntax identifier && identifier.Identifier.ValueText == parameter.Name, out var chainedArgument) &&
+                        semanticModel.TryGetSymbol(initializer, cancellationToken, out var chained))
+                    {
+                        return TryGetAssignedFieldOrProperty(chainedArgument, chained, semanticModel, cancellationToken, out member);
+                    }
+                }
+                else if (method == KnownSymbol.Tuple.Create)
+                {
+                    return method.ReturnType.TryFindProperty(parameter.Name.ToFirstCharUpper(), out var field) &&
+                           FieldOrProperty.TryCreate(field, out member);
+                }
+                else if (method.MethodKind == MethodKind.Constructor &&
+                         method.ContainingType.MetadataName.StartsWith("Tuple`"))
+                {
+                    return method.ContainingType.TryFindProperty(parameter.Name.ToFirstCharUpper(), out var field) &&
+                           FieldOrProperty.TryCreate(field, out member);
+                }
+            }
+
+            return false;
         }
     }
 }
