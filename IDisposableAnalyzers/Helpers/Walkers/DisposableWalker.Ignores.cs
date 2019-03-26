@@ -23,22 +23,11 @@ namespace IDisposableAnalyzers
             switch (node.Parent)
             {
                 case EqualsValueClauseSyntax equalsValueClause:
-                    {
-                        if (equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                            variableDeclarator.Identifier.Text == "_")
-                        {
-                            return true;
-                        }
-
-                        return false;
-                    }
-
+                    return equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
+                           variableDeclarator.Identifier.Text == "_";
                 case AssignmentExpressionSyntax assignmentExpression:
-                    {
-                        return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
-                               identifierName.Identifier.Text == "_";
-                    }
-
+                    return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
+                           identifierName.Identifier.Text == "_";
                 case AnonymousFunctionExpressionSyntax _:
                 case UsingStatementSyntax _:
                 case ReturnStatementSyntax _:
