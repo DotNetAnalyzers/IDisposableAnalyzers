@@ -190,6 +190,42 @@ namespace RoslynSandbox
 }";
                 AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
+
+            [Test]
+            public void NewStandardKernelNewModuleArgument()
+            {
+                var moduleCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using Ninject.Modules;
+
+    public class CModule : NinjectModule
+    {
+        public override void Load()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
+
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using Ninject;
+
+    public sealed class C
+    {
+        public C()
+        {
+            using (new StandardKernel(↓new CModule()))
+            {
+            }
+        }
+    }
+}";
+                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, moduleCode, testCode);
+            }
         }
     }
 }

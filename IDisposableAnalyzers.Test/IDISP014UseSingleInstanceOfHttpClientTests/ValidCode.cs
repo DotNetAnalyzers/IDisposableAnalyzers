@@ -40,7 +40,7 @@ namespace RoslynSandbox
 
         static C()
         {
-            _client = new HttpClient(new HttpClientHandler() { UseDefaultCredentials = false }) { BaseAddress = new Uri(""http://server/"") };
+            _client = new HttpClient(new HttpClientHandler { UseDefaultCredentials = false }) { BaseAddress = new Uri(""http://server/"") };
         }
     }
 }";

@@ -63,6 +63,20 @@ namespace IDisposableAnalyzers
 
                         if (method.TryFindParameter(candidate, out var parameter))
                         {
+                            if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
+                                method.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
+                            {
+                                if (method.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
+                                    argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                                    leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                    literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                                {
+                                    return false;
+                                }
+
+                                return true;
+                            }
+
                             return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
                         }
                     }
@@ -78,7 +92,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
                 candidate.ContainingSymbol is IMethodSymbol method)

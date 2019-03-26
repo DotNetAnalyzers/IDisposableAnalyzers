@@ -734,6 +734,41 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(stores, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("stream"), semanticModel, CancellationToken.None, null));
+                if (stores)
+                {
+                    Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
+                }
+            }
+
+            [TestCase("new HttpClient(handler)", true)]
+            [TestCase("new HttpClient(handler, disposeHandler: true)", true)]
+            [TestCase("new HttpClient(handler, disposeHandler: false)", false)]
+            public void InHttpClient(string expression, bool stores)
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System.Net.Http;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C(HttpClientHandler handler)
+        {
+            this.disposable = new HttpClient(handler);
+        }
+    }
+}".AssertReplace("new HttpClient(handler)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("handler");
+                Assert.AreEqual(true,   semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true,   LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(stores, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("handler"), semanticModel, CancellationToken.None, null));
                 if (stores)
                 {
                     Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
