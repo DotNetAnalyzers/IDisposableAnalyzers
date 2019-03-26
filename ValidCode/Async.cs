@@ -21,6 +21,18 @@ namespace ValidCode
             using (await Task.FromResult(new Disposable()))
             {
             }
+
+            using (await Task.FromResult(new Disposable()).ConfigureAwait(false))
+            {
+            }
+
+            using (var disposable = await Task.FromResult(new Disposable()))
+            {
+            }
+
+            using (var disposable = await Task.FromResult(new Disposable()).ConfigureAwait(false))
+            {
+            }
         }
 
         public static async Task<string> Bar1Async()
