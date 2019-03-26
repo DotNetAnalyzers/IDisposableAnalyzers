@@ -32,7 +32,7 @@ namespace IDisposableAnalyzers
                         initializer.Value is ExpressionSyntax value &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol local) &&
-                        Disposable.ShouldDispose(new LocalOrParameter(local), value, context.SemanticModel, context.CancellationToken))
+                        DisposableWalker.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, localDeclaration.GetLocation()));
                     }

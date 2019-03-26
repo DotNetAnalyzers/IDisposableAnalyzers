@@ -34,7 +34,7 @@ namespace IDisposableAnalyzers
             {
                 if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&
                     Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    Disposable.ShouldDispose(localOrParameter, assignment, context.SemanticModel, context.CancellationToken))
+                    DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
                 }

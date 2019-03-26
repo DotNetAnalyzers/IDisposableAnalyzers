@@ -85,9 +85,9 @@ namespace RoslynSandbox
             }
         }
 
-        private static bool TryGetStream(out Stream stream)
+        private static bool TryGetStream(out Stream result)
         {
-            stream = File.OpenRead(string.Empty);
+            result = File.OpenRead(string.Empty);
             return true;
         }
     }
@@ -110,9 +110,9 @@ namespace RoslynSandbox
             }
         }
 
-        private static bool TryGetStream(out Stream stream)
+        private static bool TryGetStream(out Stream result)
         {
-            stream = File.OpenRead(string.Empty);
+            result = File.OpenRead(string.Empty);
             return true;
         }
     }

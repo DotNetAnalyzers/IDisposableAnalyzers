@@ -112,24 +112,5 @@ namespace IDisposableAnalyzers
                        body.Statements.Count == 0;
             }
         }
-
-        internal static bool ShouldDispose(LocalOrParameter localOrParameter, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (location is AssignmentExpressionSyntax assignment &&
-                assignment.Left is IdentifierNameSyntax identifierName &&
-                identifierName.Identifier.ValueText == localOrParameter.Name &&
-                assignment.Parent is UsingStatementSyntax)
-            {
-                return false;
-            }
-
-            if (localOrParameter.Symbol is IParameterSymbol parameter &&
-                parameter.RefKind != RefKind.None)
-            {
-                return false;
-            }
-
-            return DisposableWalker.ShouldDispose(localOrParameter, semanticModel, cancellationToken);
-        }
     }
 }

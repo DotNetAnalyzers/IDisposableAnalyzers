@@ -10,6 +10,12 @@ namespace IDisposableAnalyzers
     {
         public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
+            if (localOrParameter.Symbol is IParameterSymbol parameter &&
+                parameter.RefKind != RefKind.None)
+            {
+                return false;
+            }
+
             using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
                 foreach (var usage in walker.usages)
@@ -39,18 +45,6 @@ namespace IDisposableAnalyzers
                         return false;
                     }
                 }
-            }
-
-            if (localOrParameter.Symbol is ILocalSymbol local &&
-                local.TrySingleDeclaration(cancellationToken, out SingleVariableDesignationSyntax designation) &&
-                designation.Parent is DeclarationExpressionSyntax declaration &&
-                declaration.Parent is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList &&
-                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method) &&
-                method.TryFindParameter(argument, out var parameter) &&
-                LocalOrParameter.TryCreate(parameter, out localOrParameter))
-            {
-                return ShouldDispose(localOrParameter, semanticModel, cancellationToken);
             }
 
             return true;
@@ -138,8 +132,10 @@ namespace IDisposableAnalyzers
                     return IsDispose(invocation);
                 case MemberAccessExpressionSyntax memberAccess when memberAccess.Parent is InvocationExpressionSyntax invocation:
                     return IsDispose(invocation);
+                case AssignmentExpressionSyntax assignment when assignment.Left == candidate:
+                    return Disposes(assignment, semanticModel, cancellationToken, visited);
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
