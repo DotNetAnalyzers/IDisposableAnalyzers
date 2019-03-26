@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
             bool IsMatch(IdentifierNameSyntax identifierName)
             {
                 return identifierName.Identifier.Text == localOrParameter.Name &&
-                       semanticModel.TryGetSymbol(identifierName, cancellationToken, out ISymbol symbol) &&
+                       semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol) &&
                        symbol.Equals(localOrParameter.Symbol.OriginalDefinition);
             }
         }

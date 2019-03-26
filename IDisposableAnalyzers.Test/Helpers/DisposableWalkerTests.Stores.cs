@@ -833,6 +833,56 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(false, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out _));
             }
+
+            [TestCase("disposable.AddAndReturn(stream)")]
+            [TestCase("disposable.AddAndReturn(stream).ToString()")]
+            public void CompositeDisposableExtAddAndReturn(string expression)
+            {
+                var code = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    public static class CompositeDisposableExt
+    {
+        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+            where T : IDisposable
+        {
+            if (item != null)
+            {
+                disposable.Add(item);
+            }
+
+            return item;
+        }
+    }
+
+    public sealed class C : IDisposable
+    {
+        private readonly CompositeDisposable disposable = new CompositeDisposable();
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+
+        internal object M(Stream stream)
+        {
+            return this.disposable.AddAndReturn(stream);
+        }
+    }
+}".AssertReplace("disposable.AddAndReturn(stream)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("Stream stream");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
+                Assert.AreEqual(null, container);
+            }
         }
     }
 }

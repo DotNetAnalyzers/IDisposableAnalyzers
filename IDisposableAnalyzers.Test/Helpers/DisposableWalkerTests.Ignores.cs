@@ -642,7 +642,7 @@ namespace RoslynSandbox
 
         internal object M(string fileName)
         {
-            return disposable.AddAndReturn(File.OpenRead(fileName));
+            return this.disposable.AddAndReturn(File.OpenRead(fileName));
         }
     }
 }".AssertReplace("disposable.AddAndReturn(File.OpenRead(fileName))", expression);
