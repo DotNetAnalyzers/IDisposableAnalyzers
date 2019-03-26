@@ -509,6 +509,15 @@ namespace IDisposableAnalyzers
 
             bool TryGetScope(SyntaxNode location, out SyntaxNode result)
             {
+                if (location is SingleVariableDesignationSyntax designation &&
+                    this.context.Node is ExpressionSyntax expression &&
+                    expression.Kind() != SyntaxKind.DeclarationExpression &&
+                    expression.Contains(designation))
+                {
+                    result = null;
+                    return false;
+                }
+
                 result = (SyntaxNode)location.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
                                      location.FirstAncestorOrSelf<MemberDeclarationSyntax>();
                 return result != null;
