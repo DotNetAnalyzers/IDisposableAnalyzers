@@ -36,9 +36,19 @@ namespace IDisposableAnalyzers
 
             bool IsMatch(IdentifierNameSyntax identifierName)
             {
-                return identifierName.Identifier.Text == localOrParameter.Name &&
-                       semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol) &&
-                       symbol.Equals(localOrParameter.Symbol.OriginalDefinition);
+                if (identifierName.Identifier.Text == localOrParameter.Name &&
+                    semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol))
+                {
+                    switch (symbol)
+                    {
+                        case ILocalSymbol local:
+                            return local.Equals(localOrParameter.Symbol);
+                        case IParameterSymbol _:
+                            return localOrParameter.Symbol.Kind == SymbolKind.Parameter;
+                    }
+                }
+
+                return false;
             }
         }
     }

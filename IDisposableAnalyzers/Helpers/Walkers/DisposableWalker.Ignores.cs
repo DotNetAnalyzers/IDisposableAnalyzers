@@ -92,28 +92,16 @@ namespace IDisposableAnalyzers
                     return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation);
                 }
 
-                if (method.TryFindParameter(argument, out var parameter) &&
-                    method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax methodDeclaration))
+                if (method.TryFindParameter(argument, out var parameter))
                 {
-                    using (var walker = IdentifierNameWalker.Borrow(methodDeclaration))
+                    using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
                     {
-                        walker.RemoveAll(x => !IsMatch(x));
-                        if (walker.IdentifierNames.Count == 0)
+                        if (walker.usages.Count == 0)
                         {
                             return true;
                         }
 
-                        return walker.IdentifierNames.All(x => IsIgnored(x));
-
-                        bool IsMatch(IdentifierNameSyntax candidate)
-                        {
-                            if (candidate.Identifier.Text != parameter.Name)
-                            {
-                                return false;
-                            }
-
-                            return semanticModel.TryGetSymbol<IParameterSymbol>(candidate, cancellationToken, out _);
-                        }
+                        return walker.usages.All(x => IsIgnored(x));
 
                         bool IsIgnored(IdentifierNameSyntax candidate)
                         {

@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System.Runtime.InteropServices.ComTypes;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -163,9 +164,12 @@ namespace IDisposableAnalyzers
                                     case "Insert":
                                     case "Push":
                                     case "Enqueue":
+                                    case "GetOrAdd":
+                                    case "AddOrUpdate":
                                     case "TryAdd":
                                     case "TryUpdate":
-                                        return semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                                        _ = semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                                        return true;
                                 }
                             }
 

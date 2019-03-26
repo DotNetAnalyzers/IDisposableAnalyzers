@@ -874,6 +874,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("disposable.AddAndReturn(stream)", expression);
+
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -881,7 +882,8 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual(null, container);
+                Assert.AreEqual("disposable", container.Name);
+                Assert.AreEqual(SymbolKind.Parameter, container.Kind);
             }
         }
     }
