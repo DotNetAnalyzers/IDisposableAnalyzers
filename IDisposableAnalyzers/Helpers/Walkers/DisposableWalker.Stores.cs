@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers
 {
-    using System.Runtime.InteropServices.ComTypes;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
