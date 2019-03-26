@@ -173,16 +173,14 @@ namespace IDisposableAnalyzers
                             return false;
                         }
 
-                        if (method.TryFindParameter(argument, out var parameter))
+                        if (method.TryFindParameter(argument, out var parameter) &&
+                            visited.CanVisit(candidate, out visited))
                         {
-                            if (visited.CanVisit(candidate, out visited))
+                            using (visited)
                             {
-                                using (visited)
+                                if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
                                 {
-                                    if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
-                                    {
-                                        return true;
-                                    }
+                                    return true;
                                 }
                             }
 
