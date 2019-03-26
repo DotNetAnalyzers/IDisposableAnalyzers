@@ -734,7 +734,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(stores, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("stream"), semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("stream"), semanticModel, CancellationToken.None, null, out _));
                 if (stores)
                 {
                     Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
@@ -768,7 +768,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true,   semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true,   LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(stores, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("handler"), semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("handler"), semanticModel, CancellationToken.None, null, out _));
                 if (stores)
                 {
                     Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
@@ -836,7 +836,7 @@ namespace RoslynSandbox
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
-                Assert.AreEqual(true, DisposableWalker.DisposedByReturnValue(value, semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(true, DisposableWalker.DisposedByReturnValue(value, semanticModel, CancellationToken.None, null, out _));
             }
 
             [Test]

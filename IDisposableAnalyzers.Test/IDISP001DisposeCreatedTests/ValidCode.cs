@@ -236,12 +236,12 @@ namespace RoslynSandbox
     using System;
     using System.IO;
 
-    public class Disposal : IDisposable
+    public sealed class Disposal : IDisposable
     {
-        private Stream stream;
+        private readonly Stream stream;
 
-        public Disposal() :
-            this(File.OpenRead(string.Empty))
+        public Disposal()
+            : this(File.OpenRead(string.Empty))
         {
         }
 
@@ -250,7 +250,7 @@ namespace RoslynSandbox
             this.stream = stream;
         }
 
-        public static Disposal CreateNew()
+        public static Disposal Create()
         {
             Stream stream = File.OpenRead(string.Empty);
             return new Disposal(stream);
@@ -258,11 +258,41 @@ namespace RoslynSandbox
 
         public void Dispose()
         {
-            if (stream != null)
-            {
-                stream.Dispose();
-                stream = null;
-            }
+            this.stream.Dispose();
+        }
+    }
+}";
+            AnalyzerAssert.Valid(Analyzer, testCode);
+        }
+
+        [Test]
+        public void FactoryMethodExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class Disposal : IDisposable
+    {
+        private readonly Stream stream;
+
+        public Disposal()
+            : this(File.OpenRead(string.Empty))
+        {
+        }
+
+        private Disposal(Stream stream)
+        {
+            this.stream = stream;
+        }
+
+        public static Disposal Create() => new Disposal(File.OpenRead(string.Empty));
+
+        public void Dispose()
+        {
+            this.stream.Dispose();
         }
     }
 }";

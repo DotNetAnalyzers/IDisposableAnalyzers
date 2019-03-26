@@ -14,7 +14,8 @@ namespace IDisposableAnalyzers
         {
             if (Disposes(node, semanticModel, cancellationToken, visited) ||
                 Assigns(node, semanticModel, cancellationToken, visited, out _) ||
-                Stores(node, semanticModel, cancellationToken, visited, out _))
+                Stores(node, semanticModel, cancellationToken, visited, out _) ||
+                Returns(node, semanticModel, cancellationToken, visited))
             {
                 return false;
             }
@@ -66,8 +67,8 @@ namespace IDisposableAnalyzers
                 {
                     if (!Ignores(parentExpression, semanticModel, cancellationToken, visited))
                     {
-                        return !DisposedByReturnValue(argument, semanticModel, cancellationToken, visited) &&
-                               !ReturnedInAccessible(argument, semanticModel, cancellationToken, visited);
+                        return !DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out _) &&
+                               !AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out _);
                     }
 
                     return true;
@@ -130,6 +131,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
+        [Obsolete("Use DisposableWalker")]
         private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax block) &&

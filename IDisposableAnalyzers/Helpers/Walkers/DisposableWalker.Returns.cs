@@ -35,18 +35,13 @@ namespace IDisposableAnalyzers
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                case SyntaxKind.CollectionInitializerExpression:
-                case SyntaxKind.ObjectCreationExpression:
                     return Returns((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
             }
 
             switch (candidate.Parent)
             {
-                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is ObjectCreationExpressionSyntax objectCreation:
-                    return Returns(objectCreation, semanticModel, cancellationToken, visited);
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
                     {

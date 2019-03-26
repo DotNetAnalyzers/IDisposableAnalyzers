@@ -33,6 +33,11 @@ namespace IDisposableAnalyzers
                     {
                         return false;
                     }
+
+                    if (DisposedByReturnValue(usage, semanticModel, cancellationToken, null, out _))
+                    {
+                        return false;
+                    }
                 }
             }
 
