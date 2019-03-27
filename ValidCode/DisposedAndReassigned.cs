@@ -9,6 +9,14 @@ namespace ValidCode
         private bool _disposed;
         private CancellationTokenSource _cancellationTokenSource;
 
+        public static IDisposable DisposedAndReassignedThenReturned(string fileName)
+        {
+            var x = File.OpenRead(fileName);
+            x.Dispose();
+            x = File.OpenRead(fileName);
+            return x;
+        }
+
         public void DisposeAssignDisposeAssignNull()
         {
             _cancellationTokenSource?.Dispose();
@@ -70,11 +78,6 @@ namespace ValidCode
             stream.Dispose();
         }
 
-        private static void Create(out Stream stream)
-        {
-            stream = File.OpenRead(string.Empty);
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -93,6 +96,11 @@ namespace ValidCode
             {
                 _cancellationTokenSource?.Dispose();
             }
+        }
+
+        private static void Create(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
         }
     }
 }
