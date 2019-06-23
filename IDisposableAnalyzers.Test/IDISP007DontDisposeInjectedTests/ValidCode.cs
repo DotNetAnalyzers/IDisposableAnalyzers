@@ -45,7 +45,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -286,7 +286,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -357,7 +357,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, fooImplCode);
         }
 
         [Test]
@@ -378,7 +378,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -403,7 +403,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -443,7 +443,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -469,7 +469,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -518,7 +518,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -562,7 +562,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -609,7 +609,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -637,7 +637,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -656,7 +656,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("action(stream)")]
@@ -679,7 +679,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("action(stream)", invokeCode);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -703,7 +703,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -724,7 +724,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -753,7 +753,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

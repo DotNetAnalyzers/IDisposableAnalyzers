@@ -25,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("out _")]
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         public static bool M(int i) => Map.TryGetValue(i, out _);
     }
 }".AssertReplace("out _", expression);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("out _")]
@@ -79,7 +79,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("out _")]
@@ -107,7 +107,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("out _")]
@@ -143,7 +143,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -228,7 +228,7 @@ namespace RoslynSandbox
         public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -257,7 +257,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -281,7 +281,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -306,7 +306,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -335,7 +335,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -361,7 +361,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -390,7 +390,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -415,7 +415,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -437,7 +437,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -465,7 +465,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -491,7 +491,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -523,7 +523,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }

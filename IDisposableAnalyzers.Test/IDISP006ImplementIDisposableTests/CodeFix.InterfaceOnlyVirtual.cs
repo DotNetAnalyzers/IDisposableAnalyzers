@@ -62,8 +62,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
             }
 
             [Test]
@@ -148,8 +148,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
             }
 
             [Test]
@@ -233,8 +233,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
             }
 
             [Test]
@@ -287,7 +287,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
             }
         }
     }

@@ -64,8 +64,8 @@ namespace RoslynSandbox
         public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
-            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
-            AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
+            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -97,8 +97,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
-            AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
+            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
     }
 }

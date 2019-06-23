@@ -62,7 +62,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [TestCase("isDisposed.Equals(false)")]
@@ -143,7 +143,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("isDisposed.Equals(false)", expression);
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -186,7 +186,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -229,7 +229,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -279,7 +279,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
             }
 
             [Test]
@@ -337,7 +337,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
             }
 
             [Test]
@@ -403,7 +403,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
             }
         }
     }

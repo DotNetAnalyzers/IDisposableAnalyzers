@@ -34,7 +34,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("this.stream == null", nullCheck);
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
     }
 }

@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, new[] { barCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { barCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -201,7 +201,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -269,7 +269,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, new[] { baseCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { baseCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -320,7 +320,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -371,7 +371,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
         }
     }

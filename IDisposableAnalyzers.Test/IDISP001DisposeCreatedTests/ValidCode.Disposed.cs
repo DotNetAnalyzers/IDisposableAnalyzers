@@ -28,7 +28,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("stream.Dispose()", expression);
 
-            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
         }
 
         [TestCase("using (var stream = File.OpenRead(string.Empty))")]
@@ -52,7 +52,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("using (var stream = File.OpenRead(string.Empty))", expression);
 
-            AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
         }
     }
 }

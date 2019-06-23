@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public IDisposable ↓M(bool b) => b ? new Disposable() : this.disposable;
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
         }
 
         [Test]
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         public IDisposable ↓P() => this.disposable ?? new Disposable();
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

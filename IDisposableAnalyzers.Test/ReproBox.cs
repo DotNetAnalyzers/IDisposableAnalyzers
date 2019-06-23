@@ -23,12 +23,12 @@ namespace IDisposableAnalyzers.Test
         private static readonly Solution Solution = CodeFactory.CreateSolution(
             new FileInfo("C:\\Git\\_GuOrg\\Gu.Reactive\\Gu.Reactive.sln"),
             AllAnalyzers,
-            AnalyzerAssert.MetadataReferences);
+            RoslynAssert.MetadataReferences);
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void SolutionRepro(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, Solution);
+            RoslynAssert.Valid(analyzer, Solution);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -41,7 +41,7 @@ namespace RoslynSandbox
     {
     }
 }";
-            AnalyzerAssert.Valid(analyzer, testCode);
+            RoslynAssert.Valid(analyzer, testCode);
         }
     }
 }

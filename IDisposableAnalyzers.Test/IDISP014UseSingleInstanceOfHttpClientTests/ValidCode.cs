@@ -22,7 +22,7 @@ namespace RoslynSandbox
         public static readonly HttpClient Client = new HttpClient();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -66,7 +66,7 @@ namespace RoslynSandbox
         public static HttpClient Client { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         public static HttpClient Client { get; } = new HttpClient();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, httpClientCode, testCode);
+            RoslynAssert.Valid(Analyzer, httpClientCode, testCode);
         }
     }
 }

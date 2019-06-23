@@ -116,9 +116,9 @@ namespace ProjectX.Commands
 
                 var solution = CodeFactory.CreateSolution(
                     new[] { viewModelBaseCode, popupViewModelCode, closePopupCommandCode },
-                    CodeFactory.DefaultCompilationOptions(Analyzer, AnalyzerAssert.SuppressedDiagnostics),
-                    AnalyzerAssert.MetadataReferences);
-                AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
+                    CodeFactory.DefaultCompilationOptions(Analyzer, RoslynAssert.SuppressedDiagnostics),
+                    RoslynAssert.MetadataReferences);
+                RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
             }
 
             public void Issue150()
@@ -150,7 +150,7 @@ namespace ValidCode
         public IReadOnlyList<string> AllLines { get; }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
         }
     }

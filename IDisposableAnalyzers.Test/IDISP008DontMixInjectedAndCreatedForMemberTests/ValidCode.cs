@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("private Stream Stream", property);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; protected set; }")]
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("public Stream Stream { get; set; }", property);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("this.stream.Dispose();")]
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("this.stream.Dispose();", disposeCall);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -126,7 +126,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -147,7 +147,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
@@ -176,7 +176,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("public Stream Stream { get; }", property);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("public Stream Stream { get; }")]
@@ -234,7 +234,7 @@ namespace RoslynSandbox
         public Stream Stream { get; }
     }
 }".AssertReplace("public Stream Stream { get; }", property);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -256,7 +256,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -278,7 +278,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -299,7 +299,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -324,7 +324,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -368,7 +368,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [TestCase("private set")]
@@ -401,7 +401,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("private set", setter);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -438,7 +438,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -478,7 +478,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
         }
 
         [Test]
@@ -497,7 +497,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -516,7 +516,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("new Disposable()", code);
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
             [TestCase("new BinaryReader(System.IO.File.OpenRead(string.Empty))")]
@@ -70,7 +70,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))", code);
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
             [Test]
@@ -93,7 +93,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -116,7 +116,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -137,7 +137,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
             [Test]
@@ -180,7 +180,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -206,7 +206,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -228,7 +228,7 @@ namespace RoslynSandbox
         public static Stream GetStream() => File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -253,7 +253,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -282,7 +282,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -304,7 +304,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
         }
     }

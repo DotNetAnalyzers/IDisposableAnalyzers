@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
             }
 
             [Test]
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
             }
         }
     }

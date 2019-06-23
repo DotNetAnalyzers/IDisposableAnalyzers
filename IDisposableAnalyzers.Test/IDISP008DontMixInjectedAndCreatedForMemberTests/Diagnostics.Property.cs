@@ -33,7 +33,7 @@ namespace RoslynSandbox
         ↓public Stream Stream { get; }
     }
 }".AssertReplace("arg ?? File.OpenRead(string.Empty)", code);
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -54,7 +54,7 @@ namespace RoslynSandbox
         ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         ↓public Stream Stream { get; }
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("public Stream Stream { get; protected set; }")]
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         ↓public Stream Stream { get; set; } = File.OpenRead(string.Empty);
     }
 }".AssertReplace("public Stream Stream { get; set; }", property);
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("internal Stream Stream { get; set; }")]
@@ -122,7 +122,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("public Stream Stream { get; set; }", property);
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -145,7 +145,7 @@ namespace RoslynSandbox
         public static C Create() => new C(new Disposable());
     }
 }";
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
         }
     }

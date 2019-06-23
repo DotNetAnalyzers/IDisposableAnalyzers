@@ -86,7 +86,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
             }
 
             [Test]
@@ -234,8 +234,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -282,8 +282,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -335,8 +335,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -393,8 +393,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, testCode, fixedCode);
             }
 
             [Test]
@@ -415,7 +415,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
+                RoslynAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
             }
 
             [Test]
@@ -476,8 +476,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                AnalyzerAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
             }
 
             [Test]
@@ -526,7 +526,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
             }
         }
     }

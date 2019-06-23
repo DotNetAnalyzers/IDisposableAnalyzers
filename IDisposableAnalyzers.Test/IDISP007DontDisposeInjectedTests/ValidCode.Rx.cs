@@ -32,7 +32,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -71,7 +71,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -99,7 +99,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -127,7 +127,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -155,7 +155,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -191,7 +191,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
         }
     }

@@ -49,7 +49,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
             [TestCase("out _")]
@@ -74,7 +74,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
             }
 
             [TestCase("out _")]
@@ -110,7 +110,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("out _")]
@@ -143,7 +143,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("out _")]
@@ -173,7 +173,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
 
             [TestCase("out _")]
@@ -200,7 +200,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("out _", expression);
 
-                AnalyzerAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
         }
     }

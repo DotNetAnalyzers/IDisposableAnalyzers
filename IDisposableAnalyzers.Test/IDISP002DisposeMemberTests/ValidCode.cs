@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("this.stream.Dispose();", disposeCall);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -106,7 +106,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -162,7 +162,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -187,7 +187,7 @@ namespace RoslynSandbox
         public void Dispose() => _disposable.Dispose();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
         }
 
         [Test]
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -255,7 +255,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -277,7 +277,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -305,7 +305,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -328,7 +328,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -363,7 +363,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, baseClassCode, testCode);
+            RoslynAssert.Valid(Analyzer, baseClassCode, testCode);
         }
 
         [Test]
@@ -423,7 +423,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, baseClassCode, testCode);
+            RoslynAssert.Valid(Analyzer, baseClassCode, testCode);
         }
 
         [TestCase("disposables.First();")]
@@ -446,7 +446,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("disposables.First();", linq);
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -463,7 +463,7 @@ namespace RoslynSandbox
         private readonly IDisposable bar;
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -485,7 +485,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -514,7 +514,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -528,7 +528,7 @@ namespace RoslynSandbox
         private readonly object bar = new object();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -544,7 +544,7 @@ namespace RoslynSandbox
         private static object Meh() => new object();
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -558,7 +558,7 @@ namespace RoslynSandbox
         private readonly object bar = string.Copy(string.Empty);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -574,7 +574,7 @@ namespace RoslynSandbox
         private static Stream stream = File.OpenRead(string.Empty);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -590,7 +590,7 @@ namespace RoslynSandbox
         private readonly Task stream = Task.Delay(0);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -606,7 +606,7 @@ namespace RoslynSandbox
         private readonly Task<int> stream = Task.FromResult(0);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -620,7 +620,7 @@ namespace RoslynSandbox
         private readonly int[] ints = new[] { 1, 2, 3 };
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -649,7 +649,7 @@ namespace RoslynSandbox
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -670,7 +670,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -692,7 +692,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -714,7 +714,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [Test]
@@ -770,7 +770,7 @@ namespace RoslynSandbox
         public override Stream Stream { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, fooCode, barCode);
         }
 
         [Test]
@@ -819,7 +819,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
         }
 
         [Test]
@@ -847,7 +847,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -875,7 +875,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
         }
 
         [Test]
@@ -908,7 +908,7 @@ namespace ValidCode
         public IReadOnlyList<string> AllLines { get; }
     }
 }";
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -938,7 +938,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -967,7 +967,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            AnalyzerAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, testCode);
         }
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -1023,7 +1023,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            AnalyzerAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
+            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
         }
     }
 }

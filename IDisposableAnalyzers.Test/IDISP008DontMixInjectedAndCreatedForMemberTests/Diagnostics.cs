@@ -39,7 +39,7 @@ namespace RoslynSandbox
     }
 }";
 
-            AnalyzerAssert.Diagnostics<AssignmentAnalyzer>(ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics<AssignmentAnalyzer>(ExpectedDiagnostic, testCode);
         }
     }
 }

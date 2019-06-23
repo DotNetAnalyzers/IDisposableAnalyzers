@@ -22,13 +22,13 @@ namespace IDisposableAnalyzers.Test
         private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("IDisposableAnalyzers.csproj"),
             AllAnalyzers,
-            AnalyzerAssert.MetadataReferences);
+            RoslynAssert.MetadataReferences);
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
-            AnalyzerAssert.MetadataReferences);
+            RoslynAssert.MetadataReferences);
 
         [SetUp]
         public void Setup()
@@ -53,13 +53,13 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersProject(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, AnalyzersProjectSln);
+            RoslynAssert.Valid(analyzer, AnalyzersProjectSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
-            AnalyzerAssert.Valid(analyzer, ValidCodeProjectSln);
+            RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -93,8 +93,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, AnalyzerAssert.SuppressedDiagnostics), AnalyzerAssert.MetadataReferences);
-            AnalyzerAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer, RoslynAssert.SuppressedDiagnostics), RoslynAssert.MetadataReferences);
+            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
     }
 }

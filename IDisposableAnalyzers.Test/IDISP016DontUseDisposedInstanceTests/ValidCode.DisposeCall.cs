@@ -30,7 +30,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [Test]
@@ -184,7 +184,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                AnalyzerAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -214,7 +214,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
@@ -238,7 +238,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
@@ -272,7 +272,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -305,7 +305,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -334,7 +334,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
 
             [Test]
@@ -370,7 +370,7 @@ namespace RoslynSandbox
     }
 }";
 
-                AnalyzerAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, testCode);
             }
         }
     }
