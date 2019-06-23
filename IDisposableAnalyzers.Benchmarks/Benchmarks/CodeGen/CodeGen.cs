@@ -26,6 +26,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
             var code = new StringBuilder().AppendLine("// ReSharper disable RedundantNameQualifier")
                                           .AppendLine($"namespace {this.GetType().Namespace}")
                                           .AppendLine("{")
+                                          .AppendLine("    [BenchmarkDotNet.Attributes.MemoryDiagnoser]")
                                           .AppendLine($"    public class {expectedName}")
                                           .AppendLine("    {")
                                           .AppendLine($"        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new {analyzer.GetType().FullName}());")
@@ -54,6 +55,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
             builder.AppendLine("// ReSharper disable RedundantNameQualifier")
                    .AppendLine($"namespace {this.GetType().Namespace}")
                    .AppendLine("{")
+                   .AppendLine("    [BenchmarkDotNet.Attributes.MemoryDiagnoser]")
                    .AppendLine("    public class AllBenchmarks")
                    .AppendLine("    {");
             foreach (var analyzer in AllAnalyzers)
