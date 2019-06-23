@@ -744,7 +744,7 @@ NUGET
       BenchmarkDotNet (>= 0.11.5) - restriction: >= netstandard2.0
       Microsoft.Diagnostics.Tracing.TraceEvent (>= 2.0.34) - restriction: >= netstandard2.0
     CommandLineParser (2.5) - restriction: >= netstandard2.0
-    Gu.Roslyn.Asserts (2.7)
+    Gu.Roslyn.Asserts (2.7.1)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     Microsoft.CodeAnalysis.Analyzers (2.9.3) - restriction: >= netstandard1.3
     Microsoft.CodeAnalysis.Common (2.10)
@@ -1582,7 +1582,7 @@ GROUP NetCoreTest
 STORAGE: NONE
 NUGET
   remote: http://www.nuget.org/api/v2
-    Gu.Roslyn.Asserts (2.7)
+    Gu.Roslyn.Asserts (2.7.1)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     Microsoft.ApplicationInsights (2.10) - restriction: || (&& (>= net451) (< netstandard1.6)) (&& (< net451) (>= netstandard1.6) (< netstandard2.0)) (&& (< net451) (>= netstandard2.0)) (>= net46)
       NETStandard.Library (>= 1.6.1) - restriction: && (< net45) (>= netstandard1.3) (< netstandard2.0)
@@ -2892,7 +2892,7 @@ NUGET
       System.Reflection.Emit (>= 4.3) - restriction: || (&& (< net35) (>= netstandard1.3) (< netstandard1.5)) (&& (< net35) (>= netstandard1.5))
       System.Reflection.TypeExtensions (>= 4.3) - restriction: || (&& (< net35) (>= netstandard1.3) (< netstandard1.5)) (&& (< net35) (>= netstandard1.5))
       System.Xml.XmlDocument (>= 4.3) - restriction: || (&& (< net35) (>= netstandard1.3) (< netstandard1.5)) (&& (< net35) (>= netstandard1.5))
-    Gu.Roslyn.Asserts (2.7)
+    Gu.Roslyn.Asserts (2.7.1)
       Microsoft.CodeAnalysis.CSharp.Workspaces (>= 2.0)
     Microsoft.CodeAnalysis.Analyzers (2.9.3) - restriction: >= netstandard1.3
     Microsoft.CodeAnalysis.Common (2.10)
