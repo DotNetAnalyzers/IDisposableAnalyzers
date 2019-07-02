@@ -17,6 +17,12 @@ namespace IDisposableAnalyzers
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
+            if (context == null)
+            {
+                throw new System.ArgumentNullException(nameof(context));
+            }
+
+            context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.LocalDeclarationStatement);
         }

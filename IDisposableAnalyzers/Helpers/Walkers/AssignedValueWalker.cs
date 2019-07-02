@@ -827,7 +827,7 @@ namespace IDisposableAnalyzers
             {
                 if (node.Initializer is ConstructorInitializerSyntax initializer &&
                     this.inner.semanticModel.TryGetSymbol(initializer, this.inner.cancellationToken, out var chained) &&
-                    chained.ContainingType == this.inner.CurrentSymbol.ContainingType)
+                    Equals(chained.ContainingType, this.inner.CurrentSymbol.ContainingType))
                 {
                     this.inner.HandleInvoke(chained, node.Initializer.ArgumentList);
                 }
@@ -836,7 +836,7 @@ namespace IDisposableAnalyzers
             public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
             {
                 if (this.inner.semanticModel.TryGetSymbol(node, this.inner.cancellationToken, out var ctor) &&
-                    ctor.ContainingType == this.inner.CurrentSymbol.ContainingType)
+                    Equals(ctor.ContainingType, this.inner.CurrentSymbol.ContainingType))
                 {
                     this.inner.HandleInvoke(ctor, node.ArgumentList);
                 }
