@@ -4,13 +4,13 @@ namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP012");
 
         [Test]
-        public void ReturnFileOpenReadGetBody()
+        public static void ReturnFileOpenReadGetBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadExpressionBody()
+        public static void ReturnFileOpenReadExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadGetExpressionBody()
+        public static void ReturnFileOpenReadGetExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox

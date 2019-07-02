@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class DocumentationTests
+    public static class DocumentationTests
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
                                                                               .Assembly
@@ -41,7 +41,7 @@ namespace IDisposableAnalyzers.Test
                                                                             .Single();
 
         [TestCaseSource(nameof(DescriptorInfos))]
-        public void MissingDocs(DescriptorInfo descriptorInfo)
+        public static void MissingDocs(DescriptorInfo descriptorInfo)
         {
             if (!descriptorInfo.DocumentationFile.Exists)
             {
@@ -54,7 +54,7 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(DescriptorInfos))]
-        public void UniqueIds(DescriptorInfo descriptorInfo)
+        public static void UniqueIds(DescriptorInfo descriptorInfo)
         {
             Assert.AreEqual(1, DescriptorInfos.Select(x => x.Descriptor)
                                               .Distinct()
@@ -62,13 +62,13 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void TitleId(DescriptorInfo descriptorInfo)
+        public static void TitleId(DescriptorInfo descriptorInfo)
         {
             Assert.AreEqual($"# {descriptorInfo.Descriptor.Id}", descriptorInfo.DocumentationFile.AllLines.First());
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void Title(DescriptorInfo descriptorInfo)
+        public static void Title(DescriptorInfo descriptorInfo)
         {
             var expected = $"## {descriptorInfo.Descriptor.Title}";
             var actual = descriptorInfo.DocumentationFile.AllLines
@@ -79,7 +79,7 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void Description(DescriptorInfo descriptorInfo)
+        public static void Description(DescriptorInfo descriptorInfo)
         {
             var expected = descriptorInfo.Descriptor
                                          .Description
@@ -98,7 +98,7 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void Table(DescriptorInfo descriptorInfo)
+        public static void Table(DescriptorInfo descriptorInfo)
         {
             const string HeaderRow = "| Topic    | Value";
             var expected = GetTable(descriptorInfo.Stub, HeaderRow);
@@ -108,7 +108,7 @@ namespace IDisposableAnalyzers.Test
         }
 
         [TestCaseSource(nameof(DescriptorsWithDocs))]
-        public void ConfigSeverity(DescriptorInfo descriptorInfo)
+        public static void ConfigSeverity(DescriptorInfo descriptorInfo)
         {
             var expected = GetConfigSeverity(descriptorInfo.Stub);
             DumpIfDebug(expected);
@@ -129,7 +129,7 @@ namespace IDisposableAnalyzers.Test
         }
 
         [Test]
-        public void Index()
+        public static void Index()
         {
             var builder = new StringBuilder();
             const string HeaderRow = "| Id       | Title";

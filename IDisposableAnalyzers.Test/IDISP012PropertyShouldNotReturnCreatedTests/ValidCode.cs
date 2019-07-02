@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
 
@@ -22,7 +22,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void PropertyReturning1()
+        public static void PropertyReturning1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningBoxed1()
+        public static void PropertyReturningBoxed1()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturning1ExpressionBody()
+        public static void PropertyReturning1ExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningNewTimeSpan()
+        public static void PropertyReturningNewTimeSpan()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -108,7 +108,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningNewTimeSpanExpressionBody()
+        public static void PropertyReturningNewTimeSpanExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -125,7 +125,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningBackingFieldExpressionBody()
+        public static void PropertyReturningBackingFieldExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -152,7 +152,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningBackingField()
+        public static void PropertyReturningBackingField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -176,7 +176,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningBackingFieldFunc()
+        public static void PropertyReturningBackingFieldFunc()
         {
             var testCode = @"
 namespace RoslynSandbox

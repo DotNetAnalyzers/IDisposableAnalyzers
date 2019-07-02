@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class OverrideDispose
+        public static class OverrideDispose
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 
             [Test]
-            public void SubclassStreamReader()
+            public static void SubclassStreamReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void StyleCopCallingBaseThrowIfDisposed()
+            public static void StyleCopCallingBaseThrowIfDisposed()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -166,7 +166,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UnderscoreWhenThrowIsNotVirtual()
+            public static void UnderscoreWhenThrowIsNotVirtual()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -246,7 +246,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UnderscoreWhenThrowIsVirtual()
+            public static void UnderscoreWhenThrowIsVirtual()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -336,7 +336,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SubclassingNinjectModule()
+            public static void SubclassingNinjectModule()
             {
                 var testCode = @"
 namespace RoslynSandbox

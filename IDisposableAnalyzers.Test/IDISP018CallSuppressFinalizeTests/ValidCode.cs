@@ -4,12 +4,12 @@ namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
         [Test]
-        public void SealedSimple()
+        public static void SealedSimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SealedNoFinalizer()
+        public static void SealedNoFinalizer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SealedWithFinalizer()
+        public static void SealedWithFinalizer()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Disposing
+        public static class Disposing
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             [TestCase("(object) Stream")]
             [TestCase("stream as object")]
             [TestCase("Stream as object")]
-            public void InjectedAndCreatedField(string code)
+            public static void InjectedAndCreatedField(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
             [TestCase("this.disposable?.Dispose();")]
             [TestCase("disposable.Dispose();")]
             [TestCase("disposable?.Dispose();")]
-            public void DisposingFieldAssignedWithInjected(string disposeCall)
+            public static void DisposingFieldAssignedWithInjected(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
             [TestCase("this.disposable?.Dispose();")]
             [TestCase("disposable.Dispose();")]
             [TestCase("disposable?.Dispose();")]
-            public void DisposingPublicField(string disposeCall)
+            public static void DisposingPublicField(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -103,7 +103,7 @@ namespace RoslynSandbox
 
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
-            public void DisposingStaticField(string disposeCall)
+            public static void DisposingStaticField(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingPublicFieldOutsideOfLock()
+            public static void DisposingPublicFieldOutsideOfLock()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -170,7 +170,7 @@ namespace RoslynSandbox
             [TestCase("this.Disposable?.Dispose();")]
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
-            public void DisposingPropertyAssignedWithInjected(string disposeCall)
+            public static void DisposingPropertyAssignedWithInjected(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -199,7 +199,7 @@ namespace RoslynSandbox
             [TestCase("public abstract Stream Stream { get; set; }")]
             [TestCase("public virtual Stream Stream { get; }")]
             [TestCase("public virtual Stream Stream { get; set; }")]
-            public void DisposingAbstractOrVirtualProperty(string property)
+            public static void DisposingAbstractOrVirtualProperty(string property)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -241,7 +241,7 @@ namespace RoslynSandbox
             [TestCase("this.Disposable?.Dispose();")]
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
-            public void DisposingCalculatedPropertyNestedStatementBody(string disposeCall)
+            public static void DisposingCalculatedPropertyNestedStatementBody(string disposeCall)
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -295,7 +295,7 @@ namespace RoslynSandbox
             [TestCase("this.Disposable?.Dispose();")]
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
-            public void DisposingCalculatedPropertyNestedExpressionBody(string disposeCall)
+            public static void DisposingCalculatedPropertyNestedExpressionBody(string disposeCall)
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -343,7 +343,7 @@ namespace RoslynSandbox
             [TestCase("this.foo?.Disposable.Dispose()")]
             [TestCase("this.foo?.Disposable?.Dispose()")]
             [TestCase("this.foo.Disposable?.Dispose()")]
-            public void DisposingNestedField(string disposeCall)
+            public static void DisposingNestedField(string disposeCall)
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -389,7 +389,7 @@ namespace RoslynSandbox
             [TestCase("this.Disposable?.Dispose();")]
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
-            public void DisposingMutableProperty(string disposeCall)
+            public static void DisposingMutableProperty(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -411,7 +411,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingCtorParameter()
+            public static void DisposingCtorParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -431,7 +431,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingParameter()
+            public static void DisposingParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -451,7 +451,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingInjectedPropertyInBaseClass()
+            public static void DisposingInjectedPropertyInBaseClass()
             {
                 var fooBaseCode = @"
 namespace RoslynSandbox
@@ -519,7 +519,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedViaMethod()
+            public static void InjectedViaMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -545,7 +545,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInVirtualDispose()
+            public static void DisposingFieldInVirtualDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -604,7 +604,7 @@ namespace RoslynSandbox
             [TestCase("disposable.Disposable.Dispose();")]
             [TestCase("disposable?.Disposable.Dispose();")]
             [TestCase("disposable?.Disposable?.Dispose();")]
-            public void InjectedSingleAssignmentDisposable(string dispose)
+            public static void InjectedSingleAssignmentDisposable(string dispose)
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -633,7 +633,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void DisposingArrayItemAssignedWithInjected()
+            public static void DisposingArrayItemAssignedWithInjected()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -660,7 +660,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingStaticArrayItem()
+            public static void DisposingStaticArrayItem()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -682,7 +682,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingDictionaryItem()
+            public static void DisposingDictionaryItem()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -711,7 +711,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingStaticDictionaryItem()
+            public static void DisposingStaticDictionaryItem()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -738,7 +738,7 @@ namespace RoslynSandbox
             [TestCase("((IDisposable)o)?.Dispose()")]
             [TestCase("(o as IDisposable).Dispose().Dispose()")]
             [TestCase("(o as IDisposable).Dispose()?.Dispose()")]
-            public void Cast(string cast)
+            public static void Cast(string cast)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -758,7 +758,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IfPatternMatchedInjected()
+            public static void IfPatternMatchedInjected()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -780,7 +780,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SwitchPatternMatchedInjected()
+            public static void SwitchPatternMatchedInjected()
             {
                 var testCode = @"
 namespace RoslynSandbox

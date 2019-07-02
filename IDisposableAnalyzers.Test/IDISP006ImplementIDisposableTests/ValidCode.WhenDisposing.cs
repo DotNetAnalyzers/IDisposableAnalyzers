@@ -3,15 +3,15 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class WhenDisposing
+        public static class WhenDisposing
         {
             [TestCase("this.stream.Dispose();")]
             [TestCase("this.stream?.Dispose();")]
             [TestCase("stream.Dispose();")]
             [TestCase("stream?.Dispose();")]
-            public void DisposingField(string disposeCall)
+            public static void DisposingField(string disposeCall)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInVirtualDispose()
+            public static void DisposingFieldInVirtualDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -79,7 +79,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInVirtualDispose2()
+            public static void DisposingFieldInVirtualDispose2()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -123,7 +123,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInExpressionBodyDispose()
+            public static void DisposingFieldInExpressionBodyDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -140,7 +140,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldAsCast()
+            public static void DisposingFieldAsCast()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -163,7 +163,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInlineAsCast()
+            public static void DisposingFieldInlineAsCast()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -185,7 +185,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldExplicitCast()
+            public static void DisposingFieldExplicitCast()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -208,7 +208,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInlineExplicitCast()
+            public static void DisposingFieldInlineExplicitCast()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -230,7 +230,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingPropertyWhenInitializedInProperty()
+            public static void DisposingPropertyWhenInitializedInProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -258,7 +258,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingPropertyWhenInitializedInline()
+            public static void DisposingPropertyWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -281,7 +281,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnorePassedInViaCtor1()
+            public static void IgnorePassedInViaCtor1()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -302,7 +302,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnorePassedInViaCtor2()
+            public static void IgnorePassedInViaCtor2()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -323,7 +323,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnorePassedInViaCtor3()
+            public static void IgnorePassedInViaCtor3()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -349,7 +349,7 @@ namespace RoslynSandbox
 
             [TestCase("disposables.First();")]
             [TestCase("disposables.Single();")]
-            public void IgnoreLinq(string linq)
+            public static void IgnoreLinq(string linq)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -371,7 +371,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoredWhenNotAssigned()
+            public static void IgnoredWhenNotAssigned()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -388,7 +388,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoredWhenBackingField()
+            public static void IgnoredWhenBackingField()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -410,7 +410,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreFieldThatIsNotDisposable()
+            public static void IgnoreFieldThatIsNotDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -424,7 +424,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
+            public static void IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -440,7 +440,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
+            public static void IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -454,7 +454,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoredStaticField()
+            public static void IgnoredStaticField()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -470,7 +470,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreTask()
+            public static void IgnoreTask()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -486,7 +486,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreTaskOfInt()
+            public static void IgnoreTaskOfInt()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -502,7 +502,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldOfTypeArrayOfInt()
+            public static void FieldOfTypeArrayOfInt()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -516,7 +516,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyWithBackingFieldOfTypeArrayOfInt()
+            public static void PropertyWithBackingFieldOfTypeArrayOfInt()
             {
                 var testCode = @"
 namespace RoslynSandbox

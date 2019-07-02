@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     public partial class ValidCode<T>
     {
         [Test]
-        public void IgnoresRecursiveCalculatedProperty()
+        public static void IgnoresRecursiveCalculatedProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresRecursiveGetSetProperty()
+        public static void IgnoresRecursiveGetSetProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodStatementBody()
+        public static void MethodStatementBody()
         {
             var testCode = @"
     using System;
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodExpressionBody()
+        public static void MethodExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -127,7 +127,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WithOptionalParameter()
+        public static void WithOptionalParameter()
         {
             var testCode = @"
 namespace RoslynSandbox

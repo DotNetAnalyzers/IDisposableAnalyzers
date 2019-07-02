@@ -7,12 +7,12 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableWalkerTests
+    public static partial class DisposableWalkerTests
     {
-        public class Stores
+        public static class Stores
         {
             [Test]
-            public void WhenNotUsed()
+            public static void WhenNotUsed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
             [TestCase("bool", "Equals(disposable, null)")]
             [TestCase("bool", "this.Equals(disposable)")]
             [TestCase("bool", "object.Equals(disposable, null)")]
-            public void WhenNotUsed(string type, string expression)
+            public static void WhenNotUsed(string type, string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 
             [TestCase("Add(disposable)")]
             [TestCase("Insert(1, disposable)")]
-            public void InListOfTAdd(string code)
+            public static void InListOfTAdd(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -101,7 +101,7 @@ namespace RoslynSandbox
 
             [TestCase("Initialize(disposable)")]
             [TestCase("this.Initialize(disposable)")]
-            public void ListOfTAddInInitialize(string call)
+            public static void ListOfTAddInInitialize(string call)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -136,7 +136,7 @@ namespace RoslynSandbox
 
             [TestCase("Initialize(disposables, disposable)")]
             [TestCase("this.Initialize(this.disposables, disposable)")]
-            public void ListOfTAddInInitializePassField(string call)
+            public static void ListOfTAddInInitializePassField(string call)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -172,7 +172,7 @@ namespace RoslynSandbox
 
             [TestCase("Initialize(disposables, disposable)")]
             [TestCase("this.Initialize(disposables, disposable)")]
-            public void ListOfTAddInInitializeParameter(string call)
+            public static void ListOfTAddInInitializeParameter(string call)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -205,7 +205,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ListOfTAssignIndexer()
+            public static void ListOfTAssignIndexer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -234,7 +234,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ListOfTInitializer()
+            public static void ListOfTInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -264,7 +264,7 @@ namespace RoslynSandbox
 
             [TestCase("new Disposable[] { disposable }")]
             [TestCase("new[] { disposable }")]
-            public void ArrayOfTInitializer(string expression)
+            public static void ArrayOfTInitializer(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -293,7 +293,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InStackOfT()
+            public static void InStackOfT()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -323,7 +323,7 @@ namespace RoslynSandbox
 
             [TestCase("private Queue<IDisposable> disposables = new Queue<IDisposable>()")]
             [TestCase("private ConcurrentQueue<IDisposable> disposables = new ConcurrentQueue<IDisposable>()")]
-            public void InQueueOfT(string code)
+            public static void InQueueOfT(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -355,7 +355,7 @@ namespace RoslynSandbox
             [TestCase("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary disposables = new Dictionary<int, IDisposable>()")]
-            public void InDictionaryAdd(string code)
+            public static void InDictionaryAdd(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -386,7 +386,7 @@ namespace RoslynSandbox
 
             [TestCase("TryAdd(1, disposable)")]
             [TestCase("TryUpdate(1, disposable, disposable)")]
-            public void InConcurrentDictionary(string code)
+            public static void InConcurrentDictionary(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -415,7 +415,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ArrayFieldAssignedInCtor()
+            public static void ArrayFieldAssignedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -444,7 +444,7 @@ namespace RoslynSandbox
 
             [TestCase("Tuple.Create(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            public void InTuple(string code)
+            public static void InTuple(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -475,7 +475,7 @@ namespace RoslynSandbox
             [TestCase("_ = Tuple.Create(disposable, 1)")]
             [TestCase("Tuple.Create(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            public void InDiscardedTuple(string code)
+            public static void InDiscardedTuple(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -502,7 +502,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable1")]
             [TestCase("disposable2")]
-            public void InPairWhenNew(string parameter)
+            public static void InPairWhenNew(string parameter)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -545,7 +545,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable1")]
             [TestCase("disposable2")]
-            public void InPairWhenFactoryMethod(string parameter)
+            public static void InPairWhenFactoryMethod(string parameter)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -589,7 +589,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable1")]
             [TestCase("disposable2")]
-            public void InDisposingPairWhenNew(string parameter)
+            public static void InDisposingPairWhenNew(string parameter)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -637,7 +637,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable1")]
             [TestCase("disposable2")]
-            public void InDisposingPairWhenFactoryMethod(string parameter)
+            public static void InDisposingPairWhenFactoryMethod(string parameter)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -706,7 +706,7 @@ namespace RoslynSandbox
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest)", true)]
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest, leaveOpen: true)", false)]
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest, leaveOpen: false)", true)]
-            public void InLeaveOpen(string expression, bool stores)
+            public static void InLeaveOpen(string expression, bool stores)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -744,7 +744,7 @@ namespace RoslynSandbox
             [TestCase("new HttpClient(handler)", true)]
             [TestCase("new HttpClient(handler, disposeHandler: true)", true)]
             [TestCase("new HttpClient(handler, disposeHandler: false)", false)]
-            public void InHttpClient(string expression, bool stores)
+            public static void InHttpClient(string expression, bool stores)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -776,7 +776,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallWrappingStreamInReader()
+            public static void CallWrappingStreamInReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -809,7 +809,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposedByReturnValueCallWrappingStreamInReader()
+            public static void DisposedByReturnValueCallWrappingStreamInReader()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -840,7 +840,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void Recursive()
+            public static void Recursive()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -871,7 +871,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable.AddAndReturn(stream)")]
             [TestCase("disposable.AddAndReturn(stream).ToString()")]
-            public void CompositeDisposableExtAddAndReturn(string expression)
+            public static void CompositeDisposableExtAddAndReturn(string expression)
             {
                 var code = @"
 namespace RoslynSandbox

@@ -4,15 +4,15 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public partial class ValidCode
     {
-        public class Using
+        public static class Using
         {
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
 
             [Test]
-            public void FileOpenRead()
+            public static void FileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FileOpenReadVariable()
+            public static void FileOpenReadVariable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitedStream()
+            public static void AwaitedStream()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -89,7 +89,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitedStreamVariable()
+            public static void AwaitedStreamVariable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -125,7 +125,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedIEnumerableOfTGetEnumerator()
+            public static void InjectedIEnumerableOfTGetEnumerator()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -150,7 +150,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedConcreteFactory()
+            public static void CreatedUsingInjectedConcreteFactory()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -195,7 +195,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedPasswordBoxSecurePassword()
+            public static void InjectedPasswordBoxSecurePassword()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -219,7 +219,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedInterfaceFactory()
+            public static void CreatedUsingInjectedInterfaceFactory()
             {
                 var iFactoryCode = @"
 namespace RoslynSandbox
@@ -274,7 +274,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedAbstractFactoryWIthImplementation()
+            public static void CreatedUsingInjectedAbstractFactoryWIthImplementation()
             {
                 var abstractFactoryCode = @"
 namespace RoslynSandbox
@@ -329,7 +329,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
+            public static void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
             {
                 var abstractFactoryCode = @"
 namespace RoslynSandbox
@@ -372,7 +372,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedAbstractFactoryNoImplementation()
+            public static void CreatedUsingInjectedAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
 namespace RoslynSandbox
@@ -415,7 +415,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
+            public static void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
 namespace RoslynSandbox
@@ -458,7 +458,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreatedUsingInjectedVirtualFactory()
+            public static void CreatedUsingInjectedVirtualFactory()
             {
                 var abstractFactoryCode = @"
 namespace RoslynSandbox
@@ -513,7 +513,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresRecursiveProperty()
+            public static void IgnoresRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -542,7 +542,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresRecursiveMethod()
+            public static void IgnoresRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -571,7 +571,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignedParameter()
+            public static void ReassignedParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -593,7 +593,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignedParameterViaOut()
+            public static void ReassignedParameterViaOut()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -624,7 +624,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignedParameterViaOutAnd()
+            public static void ReassignedParameterViaOutAnd()
             {
                 var testCode = @"
 namespace RoslynSandbox

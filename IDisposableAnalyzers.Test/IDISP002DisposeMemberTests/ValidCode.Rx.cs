@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Rx
+        public static class Rx
         {
             [Test]
-            public void SerialDisposable()
+            public static void SerialDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox

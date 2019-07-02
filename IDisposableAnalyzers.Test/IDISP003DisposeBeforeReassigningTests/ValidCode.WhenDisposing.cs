@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void DisposingVariable()
+        public static void DisposingVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public void DisposeBeforeAssigningInIfElse(string dispose)
+        public static void DisposeBeforeAssigningInIfElse(string dispose)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,7 @@ namespace RoslynSandbox
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public void DisposeBeforeAssigningBeforeIfElse(string dispose)
+        public static void DisposeBeforeAssigningBeforeIfElse(string dispose)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public void DisposeFieldBeforeIfElseReassigning(string dispose)
+        public static void DisposeFieldBeforeIfElseReassigning(string dispose)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingParameter()
+        public static void DisposingParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -147,7 +147,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingFieldInCtor()
+        public static void DisposingFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -169,7 +169,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingFieldInMethod()
+        public static void DisposingFieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -192,7 +192,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConditionallyDisposingFieldInMethod()
+        public static void ConditionallyDisposingFieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -215,7 +215,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConditionallyDisposingUnderscoreFieldInMethod()
+        public static void ConditionallyDisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -238,7 +238,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingUnderscoreFieldInMethod()
+        public static void DisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -261,7 +261,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldInLambda()
+        public static void AssigningFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -293,7 +293,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningBackingFieldInLambda()
+        public static void AssigningBackingFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -331,7 +331,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningSerialDisposableBackingFieldInLambda()
+        public static void AssigningSerialDisposableBackingFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -369,7 +369,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningSerialDisposableFieldInLambda()
+        public static void AssigningSerialDisposableFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -401,7 +401,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingPreviousAssignedToLocal()
+        public static void DisposingPreviousAssignedToLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -430,7 +430,7 @@ namespace RoslynSandbox
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
-        public void WhileLoop(string call)
+        public static void WhileLoop(string call)
         {
             var code = @"
 namespace RoslynSandbox

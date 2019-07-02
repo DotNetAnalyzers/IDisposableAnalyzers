@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class Property
+        public static class Property
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP002DisposeMember.Descriptor);
 
             [Test]
-            public void PropertyWhenInitializedInline()
+            public static void PropertyWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetOnlyPropertyWhenInitializedInline()
+            public static void GetOnlyPropertyWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetSetPropertyInSealedOfTypeObjectWhenInitializedInline()
+            public static void GetSetPropertyInSealedOfTypeObjectWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -131,7 +131,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetOnlyPropertyOfTypeObjectWhenInitializedInline()
+            public static void GetOnlyPropertyOfTypeObjectWhenInitializedInline()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -170,7 +170,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetSetPropertyWhenInitializedInCtor()
+            public static void GetSetPropertyWhenInitializedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -219,7 +219,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetOnlyPropertyWhenInitializedInCtorVirtualDisposeUnderscoreNames()
+            public static void GetOnlyPropertyWhenInitializedInCtorVirtualDisposeUnderscoreNames()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -316,7 +316,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetOnlyPropertyWhenInitializedInCtor()
+            public static void GetOnlyPropertyWhenInitializedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox

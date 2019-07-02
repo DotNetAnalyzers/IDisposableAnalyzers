@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     [TestFixture(typeof(LocalDeclarationAnalyzer))]
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
         [TestCase("await Task.Run(() => this.GetType())")]
-        public void LanguageConstructs(string code)
+        public static void LanguageConstructs(string code)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDisposingVariable()
+        public static void WhenDisposingVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingFileStream()
+        public static void UsingFileStream()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -108,7 +108,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewDisposable()
+        public static void UsingNewDisposable()
         {
             var disposableCode = @"
 namespace RoslynSandbox
@@ -143,7 +143,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Awaiting()
+        public static void Awaiting()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -179,7 +179,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AwaitingMethodReturningString()
+        public static void AwaitingMethodReturningString()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -205,7 +205,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AwaitDownloadDataTask()
+        public static void AwaitDownloadDataTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -228,7 +228,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FactoryMethod()
+        public static void FactoryMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -266,7 +266,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FactoryMethodExpressionBody()
+        public static void FactoryMethodExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -300,7 +300,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedDbConnectionCreateCommand()
+        public static void InjectedDbConnectionCreateCommand()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -321,7 +321,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedMemberDbConnectionCreateCommand()
+        public static void InjectedMemberDbConnectionCreateCommand()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -349,7 +349,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposedInEventLambda()
+        public static void DisposedInEventLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -386,7 +386,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingOutParameter()
+        public static void UsingOutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -417,7 +417,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingOutVar()
+        public static void UsingOutVar()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -447,7 +447,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NewDisposableSplitDeclarationAndAssignment()
+        public static void NewDisposableSplitDeclarationAndAssignment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -469,7 +469,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposeInFinally()
+        public static void DisposeInFinally()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -497,7 +497,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalAssignedToLocalThatIsDisposed()
+        public static void LocalAssignedToLocalThatIsDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -520,7 +520,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PairOfFileStreams()
+        public static void PairOfFileStreams()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableTests
+    public static partial class DisposableTests
     {
-        public class IsPotentiallyAssignableTo
+        public static class IsPotentiallyAssignableTo
         {
             [TestCase("1", false)]
             [TestCase("null", false)]
             [TestCase("\"abc\"", false)]
-            public void ShortCircuit(string code, bool expected)
+            public static void ShortCircuit(string code, bool expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             [TestCase("new string(' ', 1)", false)]
             [TestCase("new System.Text.StringBuilder()", false)]
             [TestCase("new System.IO.MemoryStream()", true)]
-            public void ObjectCreation(string code, bool expected)
+            public static void ObjectCreation(string code, bool expected)
             {
                 var testCode = @"
 namespace RoslynSandbox

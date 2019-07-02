@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Inheritance
+        public static class Inheritance
         {
             [Test]
-            public void WhenNotCallingBaseDispose()
+            public static void WhenNotCallingBaseDispose()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -61,7 +61,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDisposeAfterIfDisposedReturn()
+            public static void WhenCallingBaseDisposeAfterIfDisposedReturn()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDispose()
+            public static void WhenCallingBaseDispose()
             {
                 var baseCode = @"
 namespace RoslynSandbox

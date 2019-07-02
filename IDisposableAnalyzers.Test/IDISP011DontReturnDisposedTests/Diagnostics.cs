@@ -4,13 +4,13 @@ namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP011");
 
         [Test]
-        public void ReturnFileOpenReadFromUsing()
+        public static void ReturnFileOpenReadFromUsing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadDisposed()
+        public static void ReturnFileOpenReadDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnLazyFromUsing()
+        public static void ReturnLazyFromUsing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnLazyFromUsingNested()
+        public static void ReturnLazyFromUsingNested()
         {
             var testCode = @"
 namespace RoslynSandbox

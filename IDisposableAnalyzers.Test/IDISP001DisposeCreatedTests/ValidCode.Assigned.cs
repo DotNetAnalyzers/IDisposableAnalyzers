@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void AssignLocalWithInt()
+        public static void AssignLocalWithInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -25,7 +25,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignField()
+        public static void AssignField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -44,7 +44,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldLocal()
+        public static void AssignFieldLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldViaLocal()
+        public static void AssignFieldViaLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldViaParameter()
+        public static void AssignFieldViaParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignProperty()
+        public static void AssignProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -133,7 +133,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignPropertyLocal()
+        public static void AssignPropertyLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldIndexer()
+        public static void AssignFieldIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -178,7 +178,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldListAdd()
+        public static void AssignFieldListAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -204,7 +204,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignAssemblyLoadToLocal()
+        public static void AssignAssemblyLoadToLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -223,7 +223,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedTernary()
+        public static void AssignedTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -247,7 +247,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedCoalesce()
+        public static void AssignedCoalesce()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -269,7 +269,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDisposedAndReassigned()
+        public static void WhenDisposedAndReassigned()
         {
             var testCode = @"
 namespace RoslynSandbox

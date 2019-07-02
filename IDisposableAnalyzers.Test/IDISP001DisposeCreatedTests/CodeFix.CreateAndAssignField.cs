@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class CreateAndAssignField
+        public static class CreateAndAssignField
         {
             private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
             [Test]
-            public void LocalExplicitTypeToFieldInCtor()
+            public static void LocalExplicitTypeToFieldInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalVarToFieldInCtor()
+            public static void LocalVarToFieldInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox

@@ -3,16 +3,16 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class TestFixture
+        public static class TestFixture
         {
             // ReSharper disable once UnusedMember.Local
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DisposeInTearDownFix Fix = new DisposeInTearDownFix();
 
             [Test]
-            public void AssigningFieldInSetUpCreatesTearDownAndDisposes()
+            public static void AssigningFieldInSetUpCreatesTearDownAndDisposes()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldInSetUpCreatesTearDownAndDisposesExplicitDisposable()
+            public static void AssigningFieldInSetUpCreatesTearDownAndDisposesExplicitDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldInSetUpdDisposesInTearDown()
+            public static void AssigningFieldInSetUpdDisposesInTearDown()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -185,7 +185,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldInSetUpdDisposesInTearDownExplicitDisposable()
+            public static void AssigningFieldInSetUpdDisposesInTearDownExplicitDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -246,7 +246,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldInOneTimeSetUp()
+            public static void AssigningFieldInOneTimeSetUp()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -302,7 +302,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldInOneTimeSetUpWhenOneTimeTearDownExists()
+            public static void AssigningFieldInOneTimeSetUpWhenOneTimeTearDownExists()
             {
                 var testCode = @"
 namespace RoslynSandbox

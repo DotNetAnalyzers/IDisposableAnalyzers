@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class AddUsingAssignment
+        public static class AddUsingAssignment
         {
             private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
@@ -27,7 +27,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void NewDisposableSplitDeclarationAndAssignment()
+            public static void NewDisposableSplitDeclarationAndAssignment()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenAssigningParameter()
+            public static void WhenAssigningParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -101,7 +101,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenAssigningLocalInLambda()
+            public static void WhenAssigningLocalInLambda()
             {
                 var testCode = @"
 namespace RoslynSandbox

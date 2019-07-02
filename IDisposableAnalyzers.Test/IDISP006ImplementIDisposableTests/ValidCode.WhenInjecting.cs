@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class WhenInjecting
+        public static class WhenInjecting
         {
             [Test]
-            public void FactoryMethodCallingPrivateCtor()
+            public static void FactoryMethodCallingPrivateCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FactoryMethodCallingPrivateCtorWithCachedDisposable()
+            public static void FactoryMethodCallingPrivateCtorWithCachedDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithCreatedAndInjected()
+            public static void AssignedWithCreatedAndInjected()
             {
                 var testCode = @"
 #pragma warning disable IDISP008

@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
         private static readonly string DisposableCode = @"
 namespace RoslynSandbox
@@ -21,7 +21,7 @@ namespace RoslynSandbox
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
         [Test]
-        public void PublicMethodRefParameter()
+        public static void PublicMethodRefParameter()
         {
             var testCode = @"
 namespace RoslynSandbox

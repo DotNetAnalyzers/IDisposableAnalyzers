@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
@@ -23,7 +23,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void DisposingArrayItem()
+        public static void DisposingArrayItem()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingDictionaryItem()
+        public static void DisposingDictionaryItem()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingWithBaseClass()
+        public static void DisposingWithBaseClass()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -143,7 +143,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingInjectedPropertyInBaseClass()
+        public static void DisposingInjectedPropertyInBaseClass()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -216,7 +216,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingInjectedPropertyInBaseClassFieldExpressionBody()
+        public static void DisposingInjectedPropertyInBaseClassFieldExpressionBody()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -290,7 +290,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
+        public static void DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -361,7 +361,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInClassThatIsNotIDisposable()
+        public static void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -382,7 +382,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInClassThatIsIDisposable()
+        public static void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -407,7 +407,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInClassThatIsIDisposableManyCtors()
+        public static void InjectedInClassThatIsIDisposableManyCtors()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -447,7 +447,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
+        public static void InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -473,7 +473,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldInVirtualDispose()
+        public static void NotDisposingFieldInVirtualDispose()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -522,7 +522,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectingIntoPrivateCtor()
+        public static void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
 namespace RoslynSandbox
@@ -566,7 +566,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BoolProperty()
+        public static void BoolProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -613,7 +613,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInMethod()
+        public static void InjectedInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -641,7 +641,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreLambdaCreation()
+        public static void IgnoreLambdaCreation()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -661,7 +661,7 @@ namespace RoslynSandbox
 
         [TestCase("action(stream)")]
         [TestCase("action.Invoke(stream)")]
-        public void IgnoreLambdaUsageOnLocal(string invokeCode)
+        public static void IgnoreLambdaUsageOnLocal(string invokeCode)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -683,7 +683,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreInLambdaMethod()
+        public static void IgnoreInLambdaMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -707,7 +707,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReassignedParameter()
+        public static void ReassignedParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -728,7 +728,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReassignedParameterViaOut()
+        public static void ReassignedParameterViaOut()
         {
             var testCode = @"
 namespace RoslynSandbox

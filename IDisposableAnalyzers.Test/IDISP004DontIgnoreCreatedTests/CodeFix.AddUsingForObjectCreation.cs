@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class AddUsingForObjectCreation
+        public static class AddUsingForObjectCreation
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
@@ -27,7 +27,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void AddUsingForIgnoredFileOpenRead()
+            public static void AddUsingForIgnoredFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -61,7 +61,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddUsingForIgnoredReturnEmpty()
+            public static void AddUsingForIgnoredReturnEmpty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,7 +97,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddUsingForIgnoredReturnManyStatements()
+            public static void AddUsingForIgnoredReturnManyStatements()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -149,7 +149,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NoFixForArgument()
+            public static void NoFixForArgument()
             {
                 var testCode = @"
 namespace RoslynSandbox

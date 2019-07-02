@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class AsyncAwait
+        public static class AsyncAwait
         {
             private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
@@ -25,7 +25,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void AwaitTaskRun()
+            public static void AwaitTaskRun()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitTaskFromResult()
+            public static void AwaitTaskFromResult()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitCreate()
+            public static void AwaitCreate()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitCreateAsyncTaskFromResult()
+            public static void AwaitCreateAsyncTaskFromResult()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AwaitRead()
+            public static void AwaitRead()
             {
                 var testCode = @"
 namespace RoslynSandbox

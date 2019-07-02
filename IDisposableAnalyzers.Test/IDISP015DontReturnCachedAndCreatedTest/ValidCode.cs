@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = IDISP015DontReturnCachedAndCreated.Descriptor;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void WhenRetuningCreated()
+        public static void WhenRetuningCreated()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenRetuningInjected()
+        public static void WhenRetuningInjected()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningCachedInDictionary()
+        public static void ReturningCachedInDictionary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CreatedAndDisposableEmpty()
+        public static void CreatedAndDisposableEmpty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -123,7 +123,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CreatedAndNopDisposable()
+        public static void CreatedAndNopDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox

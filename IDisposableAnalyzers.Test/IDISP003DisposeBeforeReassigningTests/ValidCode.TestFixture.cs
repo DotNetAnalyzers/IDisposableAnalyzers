@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void DisposingFieldInTearDown()
+        public static void DisposingFieldInTearDown()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingFieldInOneTimeTearDown()
+        public static void DisposingFieldInOneTimeTearDown()
         {
             var testCode = @"
 namespace RoslynSandbox

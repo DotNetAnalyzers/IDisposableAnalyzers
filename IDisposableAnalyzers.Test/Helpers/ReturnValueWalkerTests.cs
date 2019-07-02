@@ -6,11 +6,11 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal class ReturnValueWalkerTests
+    internal static class ReturnValueWalkerTests
     {
         [TestCase(ReturnValueSearch.Recursive, "")]
         [TestCase(ReturnValueSearch.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
-        public void AwaitSyntaxError(ReturnValueSearch search, string expected)
+        public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
         {
             var testCode = @"
 using System.Threading.Tasks;
@@ -49,7 +49,7 @@ internal class C
         [TestCase("this.CalculatedReturningFieldExpressionBody", ReturnValueSearch.TopLevel, "this.value")]
         [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.Recursive, "this.value")]
         [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.TopLevel, "this.value")]
-        public void Property(string code, ReturnValueSearch search, string expected)
+        public static void Property(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -109,7 +109,7 @@ namespace RoslynSandbox
         [TestCase("this.RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
         [TestCase("RecursiveStatementBody", ReturnValueSearch.Recursive, "")]
         [TestCase("RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
-        public void PropertyRecursive(string code, ReturnValueSearch search, string expected)
+        public static void PropertyRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -184,7 +184,7 @@ namespace RoslynSandbox
         [TestCase("this.ReturningFileOpenRead()", ReturnValueSearch.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
         [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
         [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
-        public void Call(string code, ReturnValueSearch search, string expected)
+        public static void Call(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -313,7 +313,7 @@ namespace RoslynSandbox
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", ReturnValueSearch.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("Flatten(null, null)", ReturnValueSearch.TopLevel, "null")]
         [TestCase("Flatten(null, null)", ReturnValueSearch.Recursive, "null, new List<IDisposable>()")]
-        public void CallRecursive(string code, ReturnValueSearch search, string expected)
+        public static void CallRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -388,7 +388,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RecursiveWithOptionalParameter()
+        public static void RecursiveWithOptionalParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -442,7 +442,7 @@ namespace RoslynSandbox
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", ReturnValueSearch.TopLevel, "1, x")]
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.Recursive, "1, 2")]
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.TopLevel, "1, 2")]
-        public void Lambda(string code, ReturnValueSearch search, string expected)
+        public static void Lambda(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -523,7 +523,7 @@ namespace RoslynSandbox
         [TestCase("await Task.FromResult(CreateInt())", ReturnValueSearch.TopLevel, "CreateInt()")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "CreateInt()")]
-        public void AsyncAwait(string code, ReturnValueSearch search, string expected)
+        public static void AsyncAwait(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -606,7 +606,7 @@ namespace RoslynSandbox
         [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.TopLevel, "await RecursiveAsync2(value)")]
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Recursive, "")]
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.TopLevel, "RecursiveAsync4(value)")]
-        public void AsyncAwaitRecursive(string code, ReturnValueSearch search, string expected)
+        public static void AsyncAwaitRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -665,7 +665,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedExtensionMethod()
+        public static void ChainedExtensionMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -713,7 +713,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnTernary()
+        public static void ReturnTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -742,7 +742,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnNullCoalesce()
+        public static void ReturnNullCoalesce()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -771,7 +771,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ValidationErrorToStringConverter()
+        public static void ValidationErrorToStringConverter()
         {
             var testCode = @"
 namespace RoslynSandbox

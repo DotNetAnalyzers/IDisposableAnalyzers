@@ -1,17 +1,16 @@
 // ReSharper disable InconsistentNaming
-#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         [Test]
-        public void ILoggerFactoryAddApplicationInsights()
+        public static void ILoggerFactoryAddApplicationInsights()
         {
             var testCode = @"
 namespace RoslynSandbox

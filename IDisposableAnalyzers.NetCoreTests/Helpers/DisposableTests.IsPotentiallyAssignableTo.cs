@@ -5,15 +5,15 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class DisposableTests
+    internal static partial class DisposableTests
     {
-        internal class IsPotentiallyAssignableTo
+        internal static class IsPotentiallyAssignableTo
         {
             [TestCase("new string(' ', 1)", false)]
             [TestCase("new System.Text.StringBuilder()", false)]
             [TestCase("new System.IO.MemoryStream()", true)]
             [TestCase("(Microsoft.Extensions.Logging.ILoggerFactory)o", true)]
-            public void Expression(string code, bool expected)
+            public static void Expression(string code, bool expected)
             {
                 var testCode = @"
 namespace RoslynSandbox

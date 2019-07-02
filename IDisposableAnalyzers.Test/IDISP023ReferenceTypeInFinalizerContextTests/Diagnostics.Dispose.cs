@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Dispose
+        public static class Dispose
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor);
@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 
             [TestCase("Builder.Append(1)")]
             [TestCase("Builder.Length")]
-            public void Static(string expression)
+            public static void Static(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
             [TestCase("↓Disposable?.Dispose()")]
             [TestCase("this.↓Disposable.Dispose()")]
             [TestCase("this.↓Disposable?.Dispose()")]
-            public void InstanceOutsideIfDispose(string expression)
+            public static void InstanceOutsideIfDispose(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -127,7 +127,7 @@ namespace RoslynSandbox
             [TestCase("↓Disposable?.Dispose()")]
             [TestCase("this.↓Disposable.Dispose()")]
             [TestCase("this.↓Disposable?.Dispose()")]
-            public void InstanceNoIfDispose(string expression)
+            public static void InstanceNoIfDispose(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -165,7 +165,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallingStatic()
+            public static void CallingStatic()
             {
                 var testCode = @"
 namespace RoslynSandbox

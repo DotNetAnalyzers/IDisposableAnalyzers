@@ -4,13 +4,13 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP005ReturntypeShouldBeIDisposable.Descriptor);
 
         [Test]
-        public void ReturnFileOpenReadAsObject()
+        public static void ReturnFileOpenReadAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadAsDynamic()
+        public static void ReturnFileOpenReadAsDynamic()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
+        public static void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFieldPasswordBoxSecurePasswordAsObject()
+        public static void ReturnFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IndexerReturningObject()
+        public static void IndexerReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadAsObjectExpressionBody()
+        public static void ReturnFileOpenReadAsObjectExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturnFileOpenReadAsObjectExpressionBody()
+        public static void PropertyReturnFileOpenReadAsObjectExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -153,7 +153,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StatementLambda()
+        public static void StatementLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -176,7 +176,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ParenthesizedLambdaExpression()
+        public static void ParenthesizedLambdaExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -196,7 +196,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SimpleLambdaExpression()
+        public static void SimpleLambdaExpression()
         {
             var testCode = @"
 namespace RoslynSandbox

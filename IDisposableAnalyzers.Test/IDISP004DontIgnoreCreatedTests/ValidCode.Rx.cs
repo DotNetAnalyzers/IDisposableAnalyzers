@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         [Test]
-        public void SerialDisposable()
+        public static void SerialDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SingleAssignmentDisposable()
+        public static void SingleAssignmentDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableInitializer()
+        public static void CompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableCtor()
+        public static void CompositeDisposableCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -128,7 +128,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableAddIObservableSubscribe()
+        public static void CompositeDisposableAddIObservableSubscribe()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableAddNewSingleAssignmentDisposable()
+        public static void CompositeDisposableAddNewSingleAssignmentDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -182,7 +182,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableAddThrottleSubscribe()
+        public static void CompositeDisposableAddThrottleSubscribe()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -211,7 +211,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableExtAddAndReturn()
+        public static void CompositeDisposableExtAddAndReturn()
         {
             var compositeDisposableExtCode = @"
 namespace RoslynSandbox
@@ -258,7 +258,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableExtAddAndReturnToString()
+        public static void CompositeDisposableExtAddAndReturnToString()
         {
             var compositeDisposableExtCode = @"
 namespace RoslynSandbox

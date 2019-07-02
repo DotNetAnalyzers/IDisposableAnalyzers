@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableWalkerTests
+    public static partial class DisposableWalkerTests
     {
-        public class Ignores
+        public static class Ignores
         {
             [TestCase("File.OpenRead(fileName)")]
             [TestCase("true ? File.OpenRead(fileName) : (FileStream)null")]
             [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
             [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
-            public void AssignedToLocal(string statement)
+            public static void AssignedToLocal(string statement)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -39,7 +39,7 @@ namespace RoslynSandbox
             }
 
             [TestCase("string.Format(\"{0}\", File.OpenRead(fileName))")]
-            public void ArgumentPassedTo(string expression)
+            public static void ArgumentPassedTo(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
             ////[TestCase("new List<IDisposable> { disposable }")]
             ////[TestCase("new List<IDisposable>() { disposable }")]
             ////[TestCase("new List<IDisposable> { disposable, null }")]
-            public void ArgumentAssignedToTempLocal(string expression)
+            public static void ArgumentAssignedToTempLocal(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -99,7 +99,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp = disposable")]
             [TestCase("var temp = true ? disposable : (IDisposable)null")]
-            public void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
+            public static void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp = disposable")]
             [TestCase("var temp = true ? disposable : (IDisposable)null")]
-            public void ArgumentAssignedTempLocalInUsing(string expression)
+            public static void ArgumentAssignedTempLocalInUsing(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -169,7 +169,7 @@ namespace RoslynSandbox
             [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
             [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
             [TestCase("new FileStream [] { File.OpenRead(fileName) }")]
-            public void AssignedToField(string statement)
+            public static void AssignedToField(string statement)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -199,7 +199,7 @@ namespace RoslynSandbox
             [TestCase("var _ = File.OpenRead(fileName)")]
             [TestCase("M(File.OpenRead(fileName))")]
             [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
-            public void Discarded(string expression)
+            public static void Discarded(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -232,7 +232,7 @@ namespace RoslynSandbox
             [TestCase("_ = new List<IDisposable> { File.OpenRead(fileName) }")]
             [TestCase("new List<C> { new C(File.OpenRead(fileName)) }")]
             [TestCase("_ = new List<C> { new C(File.OpenRead(fileName)) }")]
-            public void DiscardedWrapped(string expression)
+            public static void DiscardedWrapped(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -271,7 +271,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedExpressionBody()
+            public static void ReturnedExpressionBody()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -292,7 +292,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedStatementBody()
+            public static void ReturnedStatementBody()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -316,7 +316,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnedDisposableCtorArg()
+            public static void ReturnedDisposableCtorArg()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -353,7 +353,7 @@ namespace RoslynSandbox
 
             [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
             [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
-            public void ReturnedInCompositeDisposable(string expression)
+            public static void ReturnedInCompositeDisposable(string expression)
             {
                 var code = @"
 namespace RoslynSandbox
@@ -375,7 +375,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedNotDisposable()
+            public static void CtorArgAssignedNotDisposable()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -409,7 +409,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedNotDisposableFactoryMethod()
+            public static void CtorArgAssignedNotDisposableFactoryMethod()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -437,7 +437,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedNotDisposed()
+            public static void CtorArgAssignedNotDisposed()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -475,7 +475,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedNotDisposedFactoryMethod()
+            public static void CtorArgAssignedNotDisposedFactoryMethod()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -507,7 +507,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgNotAssigned()
+            public static void CtorArgNotAssigned()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -539,7 +539,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedDisposed()
+            public static void CtorArgAssignedDisposed()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -575,7 +575,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CtorArgAssignedNotAssigned()
+            public static void CtorArgAssignedNotAssigned()
             {
                 var code = @"
 namespace RoslynSandbox
@@ -608,7 +608,7 @@ namespace RoslynSandbox
 
             [TestCase("disposable.AddAndReturn(File.OpenRead(fileName))")]
             [TestCase("disposable.AddAndReturn(File.OpenRead(fileName)).ToString()")]
-            public void CompositeDisposableExtAddAndReturn(string expression)
+            public static void CompositeDisposableExtAddAndReturn(string expression)
             {
                 var code = @"
 namespace RoslynSandbox

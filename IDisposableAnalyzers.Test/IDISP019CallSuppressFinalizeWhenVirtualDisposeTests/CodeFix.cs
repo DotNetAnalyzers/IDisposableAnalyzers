@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP019CallSuppressFinalizeWhenVirtualDispo
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor);
         private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
 
         [Test]
-        public void WhenStatementBody()
+        public static void WhenStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -66,7 +66,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenStatementBodyAndTrivia()
+        public static void WhenStatementBodyAndTrivia()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SealedWithFinalizerWhenExpressionBody()
+        public static void SealedWithFinalizerWhenExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -5,12 +5,12 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         [Test]
-        public void StaticFieldAssigtnedInInitializer()
+        public static void StaticFieldAssignedInInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticFieldAssignedInStaticCtor()
+        public static void StaticFieldAssignedInStaticCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticPropertyAssignedInInitializer()
+        public static void StaticPropertyAssignedInInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -70,7 +70,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticPropertyAssignedInStaticCtor()
+        public static void StaticPropertyAssignedInStaticCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CustomHttpClient()
+        public static void CustomHttpClient()
         {
             var httpClientCode = @"
 namespace RoslynSandbox

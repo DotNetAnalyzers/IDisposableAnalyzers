@@ -4,14 +4,14 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [TestCase("disposables.First();")]
         [TestCase("disposables.First(x => x != null);")]
         [TestCase("disposables.Where(x => x != null);")]
         [TestCase("disposables.Single();")]
         [TestCase("Enumerable.Empty<IDisposable>();")]
-        public void Linq(string linq)
+        public static void Linq(string linq)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MockOf()
+        public static void MockOf()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Ninject()
+        public static void Ninject()
         {
             var testCode = @"
 namespace RoslynSandbox

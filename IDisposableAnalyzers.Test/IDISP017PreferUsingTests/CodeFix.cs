@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP017PreferUsing.Descriptor);
         private static readonly CodeFixProvider Fix = new AddUsingFix();
 
         [Test]
-        public void Local()
+        public static void Local()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InitializedLocalDisposeInFinally()
+        public static void InitializedLocalDisposeInFinally()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -94,7 +94,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedInTryDisposeInFinally()
+        public static void AssignedInTryDisposeInFinally()
         {
             var testCode = @"
 namespace RoslynSandbox

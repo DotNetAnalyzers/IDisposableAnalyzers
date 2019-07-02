@@ -6,12 +6,12 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
         [TestCase("var temp1 = this.M;", "1")]
         [TestCase("var temp2 = this.M;", "1, 2")]
         [TestCase("var temp3 = this.M;", "1, 2")]
-        public void AutoPropertyGetSetAssignedInCtor(string code, string expected)
+        public static void AutoPropertyGetSetAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         [TestCase("var temp1 = this.M;", "1")]
         [TestCase("var temp2 = this.M;", "1, 2")]
         [TestCase("var temp3 = this.M;", "1, 2")]
-        public void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
+        public static void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -84,7 +84,7 @@ namespace RoslynSandbox
         [TestCase("var temp4 = this.M;", "")]
         [TestCase("var temp5 = this.bar;", "1, 2")]
         [TestCase("var temp6 = this.M;", "")]
-        public void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
+        public static void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -131,7 +131,7 @@ namespace RoslynSandbox
         [TestCase("var temp4 = this.M;", "")]
         [TestCase("var temp5 = this.bar;", "1, 2, value")]
         [TestCase("var temp6 = this.M;", "")]
-        public void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
+        public static void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -173,7 +173,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BackingFieldPublicSetSimple()
+        public static void BackingFieldPublicSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -207,7 +207,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BackingFieldPrivateSetSimple()
+        public static void BackingFieldPrivateSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -244,7 +244,7 @@ namespace RoslynSandbox
         [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2")]
         [TestCase("var temp6 = this.M;", "2")]
-        public void BackingFieldPrivateSetInitializedAndPropertyAssignedInCtor(string code, string expected)
+        public static void BackingFieldPrivateSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 public sealed class C
@@ -288,7 +288,7 @@ public sealed class C
         [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2, value")]
         [TestCase("var temp6 = this.M;", "2")]
-        public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
+        public static void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 public sealed class C
@@ -332,7 +332,7 @@ public sealed class C
         [TestCase("var temp4 = this.M;", "2")]
         [TestCase("var temp5 = this.bar;", "1, 2, value / 2, 3, value, value")]
         [TestCase("var temp6 = this.M;", "2")]
-        public void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
+        public static void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -389,7 +389,7 @@ namespace RoslynSandbox
         [TestCase("var temp1 = this.M;", "")]
         [TestCase("var temp2 = this.M;", "2")]
         [TestCase("var temp3 = this.M;", "2, value")]
-        public void RecursiveGetAndSet(string code, string expected)
+        public static void RecursiveGetAndSet(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -426,7 +426,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Recursive()
+        public static void Recursive()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

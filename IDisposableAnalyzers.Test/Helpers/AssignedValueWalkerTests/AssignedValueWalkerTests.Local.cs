@@ -6,9 +6,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
-        public class Local
+        public static class Local
         {
             [TestCase("1")]
             [TestCase("1 + 1")]
@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("nameof(int)")]
             [TestCase("new int[] { 1 , 2 , 3 }")]
             [TestCase("new int[2]")]
-            public void InitializedWithConstant(string code)
+            public static void InitializedWithConstant(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InitializedWithDefaultGeneric()
+            public static void InitializedWithDefaultGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -72,7 +72,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
-            public void NotInitialized(string code, string expected)
+            public static void NotInitialized(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -100,7 +100,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
-            public void NotInitializedInLambda(string code, string expected)
+            public static void NotInitializedInLambda(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -133,7 +133,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "1, 2")]
             [TestCase("var temp2 = value;", "1, 2")]
-            public void LambdaClosure(string code, string expected)
+            public static void LambdaClosure(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -167,7 +167,7 @@ namespace RoslynSandbox
             [TestCase("var temp1 = value;", "1, 2")]
             [TestCase("var temp2 = value;", "1, 2")]
             [TestCase("var temp3 = value;", "1, 2")]
-            public void Loop(string code, string expected)
+            public static void Loop(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -200,7 +200,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithArg()
+            public static void AssignedWithArg()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -225,7 +225,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void VerbatimIdentifierAssignedWithArg()
+            public static void VerbatimIdentifierAssignedWithArg()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -249,7 +249,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithArgGenericMethod()
+            public static void AssignedWithArgGenericMethod()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -274,7 +274,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithArgGenericClass()
+            public static void AssignedWithArgGenericClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -299,7 +299,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInLock()
+            public static void AssignedInLock()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

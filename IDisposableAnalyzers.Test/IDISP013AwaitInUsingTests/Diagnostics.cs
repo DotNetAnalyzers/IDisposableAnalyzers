@@ -5,13 +5,13 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP013");
 
         [Test]
-        public void WebClientDownloadStringTaskAsync()
+        public static void WebClientDownloadStringTaskAsync()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ValueTask()
+        public static void ValueTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalTask()
+        public static void LocalTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TaskCompletionSourceTask()
+        public static void TaskCompletionSourceTask()
         {
             var testCode = @"
 namespace RoslynSandbox

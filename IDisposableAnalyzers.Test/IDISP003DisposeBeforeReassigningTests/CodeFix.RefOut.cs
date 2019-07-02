@@ -4,29 +4,15 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class RefAndOut
+        public static class RefAndOut
         {
             // ReSharper disable once MemberHidesStaticFromOuterClass
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
 
-#pragma warning disable SA1203 // Constants must appear before fields
-            private const string DisposableCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-}";
-
             [Test]
-            public void AssigningLocalVariableViaObjectCreationThenOutParameter()
+            public static void AssigningLocalVariableViaObjectCreationThenOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -75,7 +61,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningLocalVariableViaInvocationThenOutParameter()
+            public static void AssigningLocalVariableViaInvocationThenOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +112,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldViaOutParameterInPublicMethod()
+            public static void AssigningFieldViaOutParameterInPublicMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -179,7 +165,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningVariableViaOutParameterTwice()
+            public static void AssigningVariableViaOutParameterTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -232,7 +218,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallPrivateMethodRefParameter()
+            public static void CallPrivateMethodRefParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -293,7 +279,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallPrivateMethodRefParameterTwice()
+            public static void CallPrivateMethodRefParameterTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -356,7 +342,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallPrivateMethodRefParameterTwiceDifferentMethods()
+            public static void CallPrivateMethodRefParameterTwiceDifferentMethods()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -429,7 +415,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallPublicMethodRefParameter()
+            public static void CallPublicMethodRefParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox

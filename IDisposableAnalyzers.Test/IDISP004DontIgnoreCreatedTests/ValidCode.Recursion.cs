@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         [Test]
-        public void IgnoresWhenDisposingRecursiveProperty()
+        public static void IgnoresWhenDisposingRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenNotDisposingRecursiveProperty()
+        public static void IgnoresWhenNotDisposingRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+        public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+        public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenDisposingRecursiveMethod()
+        public static void IgnoresWhenDisposingRecursiveMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -123,7 +123,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ValidationErrorToStringConverter()
+        public static void ValidationErrorToStringConverter()
         {
             var testCode = @"
 namespace RoslynSandbox

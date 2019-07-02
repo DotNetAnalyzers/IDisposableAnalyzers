@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void IgnoresWhenDisposingRecursiveProperty()
+        public static void IgnoresWhenDisposingRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenNotDisposingRecursiveProperty()
+        public static void IgnoresWhenNotDisposingRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+        public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+        public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -103,7 +103,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoresWhenDisposingRecursiveMethod()
+        public static void IgnoresWhenDisposingRecursiveMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RecursiveOut()
+        public static void RecursiveOut()
         {
             var testCode = @"
 namespace RoslynSandbox

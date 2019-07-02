@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Dispose
+        public static class Dispose
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
@@ -24,7 +24,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void TouchingReferenceTypeInIfBlock()
+            public static void TouchingReferenceTypeInIfBlock()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -66,7 +66,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void TouchingReferenceTypeInIfExpression()
+            public static void TouchingReferenceTypeInIfExpression()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
 
             [TestCase("isDisposed.Equals(false)")]
             [TestCase("isDisposed.Equals(this)")]
-            public void TouchingStruct(string expression)
+            public static void TouchingStruct(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -147,7 +147,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SettingStaticToNull()
+            public static void SettingStaticToNull()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -190,7 +190,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SettingInstanceToNull()
+            public static void SettingInstanceToNull()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -233,7 +233,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDispose()
+            public static void WhenCallingBaseDispose()
             {
                 var fooBaseCode = @"
 namespace RoslynSandbox
@@ -283,7 +283,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDisposeAfterCheckDispose()
+            public static void WhenCallingBaseDisposeAfterCheckDispose()
             {
                 var fooBaseCode = @"
 namespace RoslynSandbox
@@ -341,7 +341,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
+            public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
             {
                 var fooBaseCode = @"
 namespace RoslynSandbox

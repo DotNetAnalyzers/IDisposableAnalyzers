@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class AddUsingDeclaration
+        public static class AddUsingDeclaration
         {
             private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
             private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             [Test]
-            public void Local()
+            public static void Local()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalWithTrivia()
+            public static void LocalWithTrivia()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalOneStatementAfter()
+            public static void LocalOneStatementAfter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalManyStatements()
+            public static void LocalManyStatements()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -182,7 +182,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalInLambda()
+            public static void LocalInLambda()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -226,7 +226,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalInSwitchCase()
+            public static void LocalInSwitchCase()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -299,7 +299,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalFactoryMethod()
+            public static void LocalFactoryMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox

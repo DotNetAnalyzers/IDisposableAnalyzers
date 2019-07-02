@@ -7,12 +7,12 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableWalkerTests
+    public static partial class DisposableWalkerTests
     {
-        public class Disposes
+        public static class Disposes
         {
             [Test]
-            public void WhenNotUsed()
+            public static void WhenNotUsed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -40,7 +40,7 @@ namespace RoslynSandbox
             [TestCase("disposable?.Dispose()")]
             [TestCase("(disposable as IDisposable)?.Dispose()")]
             [TestCase("((IDisposable)disposable)?.Dispose()")]
-            public void WhenDisposed(string expression)
+            public static void WhenDisposed(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -66,7 +66,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsing()
+            public static void WhenUsing()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenUsingAfterDeclaration()
+            public static void WhenUsingAfterDeclaration()
             {
                 var testCode = @"
 namespace RoslynSandbox

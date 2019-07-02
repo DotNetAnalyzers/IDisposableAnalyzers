@@ -5,13 +5,13 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
-        public class Indexer
+        public static class Indexer
         {
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedArrayIndexer(string code, string expected)
+            public static void InitializedArrayIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class C
@@ -36,7 +36,7 @@ internal class C
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedTypedArrayIndexer(string code, string expected)
+            public static void InitializedTypedArrayIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class C
@@ -62,7 +62,7 @@ internal class C
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
+            public static void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -93,7 +93,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
+            public static void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -124,7 +124,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedElementStyleDictionaryIndexer(string code, string expected)
+            public static void InitializedElementStyleDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -159,7 +159,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedDictionaryIndexer(string code, string expected)
+            public static void InitializedDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -194,7 +194,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = ints[0];", "1, 2")]
             [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public void InitializedDictionaryAfterAdd(string code, string expected)
+            public static void InitializedDictionaryAfterAdd(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

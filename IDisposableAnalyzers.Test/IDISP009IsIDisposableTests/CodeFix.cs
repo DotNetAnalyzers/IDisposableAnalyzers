@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP009");
 
         [Test]
-        public void AddInterfaceSimple()
+        public static void AddInterfaceSimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddInterface()
+        public static void AddInterface()
         {
             var testCode = @"
 namespace RoslynSandbox

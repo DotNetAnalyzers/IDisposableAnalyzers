@@ -5,15 +5,15 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
-        public class DisposeCall
+        public static class DisposeCall
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly DiagnosticDescriptor Descriptor = IDISP016DontUseDisposedInstance.Descriptor;
 
             [Test]
-            public void CreateTouchDispose()
+            public static void CreateTouchDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UsingFileOpenRead()
+            public static void UsingFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeInUsing()
+            public static void DisposeInUsing()
             {
                 // this is weird but should not warn I think
                 var testCode = @"
@@ -79,7 +79,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IfDisposeReturn()
+            public static void IfDisposeReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -106,7 +106,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IfDisposeThrow()
+            public static void IfDisposeThrow()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -134,7 +134,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignAfterDispose()
+            public static void ReassignAfterDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignViaOutAfterDispose()
+            public static void ReassignViaOutAfterDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -189,7 +189,7 @@ namespace RoslynSandbox
 
             [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-            public void Tuple(string expression)
+            public static void Tuple(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -219,7 +219,7 @@ namespace RoslynSandbox
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-            public void LocalTuple(string expression)
+            public static void LocalTuple(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -243,7 +243,7 @@ namespace RoslynSandbox
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-            public void ListOfTuple(string expression)
+            public static void ListOfTuple(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -276,7 +276,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ListOfValueTuple()
+            public static void ListOfValueTuple()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -309,7 +309,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LeaveOpenLocals()
+            public static void LeaveOpenLocals()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -338,7 +338,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LeaveOpenFields()
+            public static void LeaveOpenFields()
             {
                 var testCode = @"
 namespace RoslynSandbox

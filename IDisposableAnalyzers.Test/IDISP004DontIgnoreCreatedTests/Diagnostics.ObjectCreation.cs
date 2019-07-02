@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class ObjectCreation
+        public static class ObjectCreation
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
@@ -25,7 +25,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void NewDisposable()
+            public static void NewDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NewDisposablePassedIntoCtor()
+            public static void NewDisposablePassedIntoCtor()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -75,7 +75,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturningNewAssigningNotDisposing()
+            public static void ReturningNewAssigningNotDisposing()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -111,7 +111,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturningNewNotAssigning()
+            public static void ReturningNewNotAssigning()
             {
                 var fooCode = @"
 namespace RoslynSandbox
@@ -144,7 +144,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void StringFormatArgument()
+            public static void StringFormatArgument()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NewDisposableToString()
+            public static void NewDisposableToString()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -175,7 +175,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReturnNewDisposableToString()
+            public static void ReturnNewDisposableToString()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -192,7 +192,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NewStandardKernelNewModuleArgument()
+            public static void NewStandardKernelNewModuleArgument()
             {
                 var moduleCode = @"
 namespace RoslynSandbox

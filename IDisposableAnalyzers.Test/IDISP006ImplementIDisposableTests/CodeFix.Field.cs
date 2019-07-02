@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class Field
+        public static class Field
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 
             [Test]
-            public void ImplementIDisposableAndMakeSealed()
+            public static void ImplementIDisposableAndMakeSealed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -89,7 +89,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableWithVirtualDisposeMethod()
+            public static void ImplementIDisposableWithVirtualDisposeMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -189,7 +189,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableSealedClassUsingsInside()
+            public static void ImplementIDisposableSealedClassUsingsInside()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -236,7 +236,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableSealedClassUsingsOutside()
+            public static void ImplementIDisposableSealedClassUsingsOutside()
             {
                 var testCode = @"
 using System.IO;
@@ -283,7 +283,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableSealedClassUnderscore()
+            public static void ImplementIDisposableSealedClassUnderscore()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -330,7 +330,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableSealedClassUnderscoreWithConst()
+            public static void ImplementIDisposableSealedClassUnderscoreWithConst()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -381,7 +381,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableAbstractClass()
+            public static void ImplementIDisposableAbstractClass()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -438,7 +438,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ImplementIDisposableAbstractClassUnderscore()
+            public static void ImplementIDisposableAbstractClassUnderscore()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -495,7 +495,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenInterfaceIsMissing()
+            public static void WhenInterfaceIsMissing()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -516,7 +516,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
+            public static void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -577,7 +577,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void Issue111PartialUserControl()
+            public static void Issue111PartialUserControl()
             {
                 var testCode = @"
 namespace RoslynSandbox

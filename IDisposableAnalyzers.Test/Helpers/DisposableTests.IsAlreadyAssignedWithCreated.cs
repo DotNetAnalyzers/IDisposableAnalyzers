@@ -5,12 +5,12 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableTests
+    public static partial class DisposableTests
     {
-        public class IsAlreadyAssignedWithCreated
+        public static class IsAlreadyAssignedWithCreated
         {
             [Test]
-            public void FieldAssignedInCtor()
+            public static void FieldAssignedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedInLambdaCtor()
+            public static void FieldAssignedInLambdaCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalSeparateDeclarationAndAssignment()
+            public static void LocalSeparateDeclarationAndAssignment()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -108,7 +108,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalSeparateDeclarationAndAssignmentInLambda()
+            public static void LocalSeparateDeclarationAndAssignmentInLambda()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -142,7 +142,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalAssignmentInLambda()
+            public static void LocalAssignmentInLambda()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -176,7 +176,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAfterEarlyReturn()
+            public static void FieldAfterEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -208,7 +208,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyAfterEarlyReturn()
+            public static void PropertyAfterEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -240,7 +240,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ParameterAfterEarlyReturn()
+            public static void ParameterAfterEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -270,7 +270,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ParameterBeforeEarlyReturn()
+            public static void ParameterBeforeEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -301,7 +301,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalAfterEarlyReturn()
+            public static void LocalAfterEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -332,7 +332,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalBeforeEarlyReturn()
+            public static void LocalBeforeEarlyReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -364,7 +364,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void OutParameterInExpressionBody()
+            public static void OutParameterInExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -385,7 +385,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void Repro()
+            public static void Repro()
             {
                 var testCode = @"
 namespace RoslynSandbox

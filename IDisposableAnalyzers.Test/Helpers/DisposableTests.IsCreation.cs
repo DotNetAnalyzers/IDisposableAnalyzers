@@ -8,9 +8,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableTests
+    public static partial class DisposableTests
     {
-        internal class IsCreation
+        internal static class IsCreation
         {
             [TestCase("1",                                                   Result.No)]
             [TestCase("new string(' ', 1)",                                  Result.No)]
@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.Yes)]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.Yes)]
-            public void LanguageConstructs(string code, Result expected)
+            public static void LanguageConstructs(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
             [TestCase("new List<IDisposable>()[0]",                       Result.No)]
             [TestCase("Moq.Mock.Of<IDisposable>()",                       Result.AssumeNo)]
             [TestCase("ImmutableList<IDisposable>.Empty[0]",              Result.No)]
-            public void Ignored(string code, Result expected)
+            public static void Ignored(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -109,7 +109,7 @@ namespace RoslynSandbox
             [TestCase("CreateIntId()")]
             [TestCase("CreateIntSquare()")]
             [TestCase("Id<int>()")]
-            public void MethodReturningNotDisposable(string code)
+            public static void MethodReturningNotDisposable(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -180,7 +180,7 @@ namespace RoslynSandbox
             [TestCase("CreateDisposableInIf(true)",                       Result.Yes)]
             [TestCase("CreateDisposableInElse(true)",                     Result.Yes)]
             [TestCase("ReturningLocal()",                                 Result.Yes)]
-            public void Call(string code, Result expected)
+            public static void Call(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -268,7 +268,7 @@ namespace RoslynSandbox
             [TestCase("RecursiveTernary(true)",          Result.Yes)]
             [TestCase("this.RecursiveExpressionBody()",  Result.No)]
             [TestCase("this.RecursiveStatementBody()",   Result.No)]
-            public void CallRecursiveMethod(string code, Result expected)
+            public static void CallRecursiveMethod(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -318,7 +318,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void RecursiveWithOptionalParameter()
+            public static void RecursiveWithOptionalParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -362,7 +362,7 @@ namespace RoslynSandbox
             [TestCase("await Task.Run(() => new Disposable())",    Result.Yes)]
             [TestCase("await Task.FromResult(new Disposable())",   Result.Yes)]
             [TestCase("await CreateDisposableAsync()",             Result.Yes)]
-            public void AsyncAwait(string code, Result expected)
+            public static void AsyncAwait(string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -409,7 +409,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CompositeDisposableExtAddAndReturn()
+            public static void CompositeDisposableExtAddAndReturn()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -458,7 +458,7 @@ namespace RoslynSandbox
             [TestCase("disposable.AsCustom()")]
             [TestCase("disposable.AsCustom() ?? other")]
             [TestCase("other ?? disposable.AsCustom()")]
-            public void AssumeYesForExtensionMethodReturningDifferentTypeThanThisParameter(string expression)
+            public static void AssumeYesForExtensionMethodReturningDifferentTypeThanThisParameter(string expression)
             {
                 var binary = @"
 namespace BinaryReference
@@ -500,7 +500,7 @@ namespace RoslynSandbox
             [TestCase("disposable.Fluent()")]
             [TestCase("disposable.Fluent() ?? other")]
             [TestCase("other ?? disposable.Fluent()")]
-            public void AssumeNoForUnknownExtensionMethodReturningSameTypeAsThisParameter(string expression)
+            public static void AssumeNoForUnknownExtensionMethodReturningSameTypeAsThisParameter(string expression)
             {
                 var binary = @"
 namespace BinaryReference
@@ -552,7 +552,7 @@ namespace RoslynSandbox
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null, null)",                  Result.No)]
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetResourceSet(null, true, true)",       Result.No)]
             [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",              Result.No)]
-            public void ThirdParty(string parameter, string code, Result expected)
+            public static void ThirdParty(string parameter, string code, Result expected)
             {
                 var testCode = @"
 namespace RoslynSandbox

@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         [Test]
-        public void Generic()
+        public static void Generic()
         {
             var factoryCode = @"
 namespace RoslynSandbox
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Operator()
+        public static void Operator()
         {
             var mehCode = @"
 namespace RoslynSandbox
@@ -60,7 +60,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OperatorNestedCall()
+        public static void OperatorNestedCall()
         {
             var mehCode = @"
 namespace RoslynSandbox
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void OperatorEquals()
+        public static void OperatorEquals()
         {
             var mehCode = @"
 namespace RoslynSandbox
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningObject()
+        public static void MethodReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodWithArgReturningObject()
+        public static void MethodWithArgReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodWithObjArgReturningObject()
+        public static void MethodWithObjArgReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningStatementBody()
+        public static void ReturningStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -196,7 +196,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningLocalStatementBody()
+        public static void ReturningLocalStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -216,7 +216,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningExpressionBody()
+        public static void ReturningExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningNewAssigningAndDisposing()
+        public static void ReturningNewAssigningAndDisposing()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -271,7 +271,7 @@ namespace RoslynSandbox
         [TestCase("new C()")]
         [TestCase("new C(new Disposable())")]
         [TestCase("new C(new Disposable(), new Disposable())")]
-        public void ReturningNewAssigningAndDisposingParams(string objectCreation)
+        public static void ReturningNewAssigningAndDisposingParams(string objectCreation)
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -312,7 +312,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningCreateNewAssigningAndDisposing()
+        public static void ReturningCreateNewAssigningAndDisposing()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -353,7 +353,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningCreateNewStreamReader()
+        public static void ReturningCreateNewStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -374,7 +374,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningAssigningPrivateChained()
+        public static void ReturningAssigningPrivateChained()
         {
             var fooCode = @"
 namespace RoslynSandbox
@@ -416,7 +416,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StreamInStreamReader()
+        public static void StreamInStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -435,7 +435,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StreamInStreamReaderLocal()
+        public static void StreamInStreamReaderLocal()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -459,7 +459,7 @@ namespace RoslynSandbox
         [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
         [TestCase("new CompositeDisposable { File.OpenRead(fileName), File.OpenRead(fileName) }")]
         [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName)) { File.OpenRead(fileName), File.OpenRead(fileName) }")]
-        public void ReturnedInCompositeDisposable(string expression)
+        public static void ReturnedInCompositeDisposable(string expression)
         {
             var code = @"
 namespace RoslynSandbox

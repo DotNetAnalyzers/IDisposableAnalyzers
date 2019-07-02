@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = IDISP006ImplementIDisposable.Descriptor;

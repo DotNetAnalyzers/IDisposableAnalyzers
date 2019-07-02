@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class Field
+        public static class Field
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP002DisposeMember.Descriptor);
 
             [Test]
-            public void PrivateReadonlyInitializedWithFileOpenRead()
+            public static void PrivateReadonlyInitializedWithFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PrivateReadonlyFieldInitializedWithNewDisposable()
+            public static void PrivateReadonlyFieldInitializedWithNewDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInExpressionBody()
+            public static void AssignedInExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -131,7 +131,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InitializedAndSetToNullInCtor()
+            public static void InitializedAndSetToNullInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -182,7 +182,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithFileOpenReadInCtor()
+            public static void AssignedWithFileOpenReadInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -231,7 +231,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithNewDisposableInCtor()
+            public static void AssignedWithNewDisposableInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -280,7 +280,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ConditionallyAssignedInCtor()
+            public static void ConditionallyAssignedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -335,7 +335,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInCtorNullCoalescing()
+            public static void AssignedInCtorNullCoalescing()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -384,7 +384,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInCtorTernary()
+            public static void AssignedInCtorTernary()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -433,7 +433,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ProtectedSealedInitialized()
+            public static void ProtectedSealedInitialized()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -472,7 +472,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenAlreadyDisposingOther()
+            public static void WhenAlreadyDisposingOther()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -515,7 +515,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeMethodExpressionBody()
+            public static void DisposeMethodExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -555,7 +555,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void OfTypeObject()
+            public static void OfTypeObject()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -594,7 +594,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
+            public static void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -655,7 +655,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
+            public static void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -740,7 +740,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeSecondMemberWhenOverriddenDisposeMethod()
+            public static void DisposeSecondMemberWhenOverriddenDisposeMethod()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -843,7 +843,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
+            public static void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -944,7 +944,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
+            public static void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -990,7 +990,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
+            public static void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -1036,7 +1036,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LazyPropertyBackingField()
+            public static void LazyPropertyBackingField()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -1091,7 +1091,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInCoalesce()
+            public static void AssignedInCoalesce()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -1156,7 +1156,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedInTernary()
+            public static void AssignedInTernary()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -1211,7 +1211,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeMemberWhenVirtualDisposeMethod()
+            public static void DisposeMemberWhenVirtualDisposeMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -1296,7 +1296,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeFirstMemberWhenOverriddenDisposeMethod()
+            public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -1393,7 +1393,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
+            public static void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -1490,7 +1490,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WhenCallingBaseDispose()
+            public static void WhenCallingBaseDispose()
             {
                 var baseCode = @"
 namespace RoslynSandbox

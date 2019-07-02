@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Recursion
+        public static class Recursion
         {
             [Test]
-            public void IgnoresWhenDisposingRecursiveProperty()
+            public static void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenNotDisposingRecursiveProperty()
+            public static void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -49,7 +49,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -104,7 +104,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingRecursiveMethod()
+            public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -125,7 +125,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingRecursiveMethodChain()
+            public static void IgnoresWhenDisposingRecursiveMethodChain()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -148,7 +148,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresRecursiveOutParameter()
+            public static void IgnoresRecursiveOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -178,7 +178,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresRecursiveOutParameterChain()
+            public static void IgnoresRecursiveOutParameterChain()
             {
                 var testCode = @"
 namespace RoslynSandbox

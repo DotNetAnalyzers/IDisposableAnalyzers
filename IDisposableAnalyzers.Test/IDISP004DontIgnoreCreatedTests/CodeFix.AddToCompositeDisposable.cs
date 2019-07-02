@@ -4,16 +4,16 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class AddToCompositeDisposable
+        public static class AddToCompositeDisposable
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP004DontIgnoreCreated.Descriptor);
             private static readonly AddToCompositeDisposableFix Fix = new AddToCompositeDisposableFix();
 
             [Test]
-            public void CreateNewCompositeDisposable()
+            public static void CreateNewCompositeDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreateNewCompositeDisposableWithTrivia()
+            public static void CreateNewCompositeDisposableWithTrivia()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -96,7 +96,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreateNewCompositeDisposableWhenUsingsAndFields()
+            public static void CreateNewCompositeDisposableWhenUsingsAndFields()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -148,7 +148,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
+            public static void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -200,7 +200,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddToExistingCompositeDisposableInitializer()
+            public static void AddToExistingCompositeDisposableInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -241,7 +241,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddToExistingCompositeDisposableInitializerWithCtorArg()
+            public static void AddToExistingCompositeDisposableInitializerWithCtorArg()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -282,7 +282,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddToExistingCompositeDisposableInitializerWithTrivia()
+            public static void AddToExistingCompositeDisposableInitializerWithTrivia()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -326,7 +326,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddToExistingCompositeDisposableWithInitializerOneLine()
+            public static void AddToExistingCompositeDisposableWithInitializerOneLine()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -371,7 +371,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
+            public static void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -416,7 +416,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
+            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -464,7 +464,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithCtorArg()
+            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithCtorArg()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -512,7 +512,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
+            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -563,7 +563,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
+            public static void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -605,7 +605,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
+            public static void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -647,7 +647,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddIgnoredReturnValueToCompositeDisposableInitializer()
+            public static void AddIgnoredReturnValueToCompositeDisposableInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -688,7 +688,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
+            public static void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
             {
                 var testCode = @"
 namespace RoslynSandbox

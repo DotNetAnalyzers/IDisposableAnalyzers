@@ -4,14 +4,14 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [TestCase("out _")]
         [TestCase("out var stream")]
         [TestCase("out var _")]
         [TestCase("out FileStream stream")]
         [TestCase("out FileStream _")]
-        public void DictionaryTryGetValue(string expression)
+        public static void DictionaryTryGetValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void DiscardCachedOutParameter(string expression)
+        public static void DiscardCachedOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void StaticConcurrentDictionaryGetOrAdd()
+        public static void StaticConcurrentDictionaryGetOrAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConcurrentDictionaryGetOrAdd()
+        public static void ConcurrentDictionaryGetOrAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConcurrentDictionaryTryGetValue()
+        public static void ConcurrentDictionaryTryGetValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConcurrentDictionaryTryGetValueVarOut()
+        public static void ConcurrentDictionaryTryGetValueVarOut()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -166,7 +166,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConditionalWeakTableTryGetValue()
+        public static void ConditionalWeakTableTryGetValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -194,7 +194,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ConditionalWeakTableTryGetValueVarOut()
+        public static void ConditionalWeakTableTryGetValueVarOut()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -221,7 +221,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CustomCacheWrappingDictionary()
+        public static void CustomCacheWrappingDictionary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -277,7 +277,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PooledConcurrentQueueTryDequeue()
+        public static void PooledConcurrentQueueTryDequeue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -335,7 +335,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PooledConcurrentQueueTryDequeue2()
+        public static void PooledConcurrentQueueTryDequeue2()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -399,7 +399,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TryGetRecursive()
+        public static void TryGetRecursive()
         {
             var testCode = @"
 namespace RoslynSandbox

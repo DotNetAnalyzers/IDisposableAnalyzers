@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new AddBaseCallFix();
@@ -25,7 +25,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void WhenNotCallingBaseDisposeWithBaseCode()
+        public static void WhenNotCallingBaseDisposeWithBaseCode()
         {
             var fooBaseCode = @"
 namespace RoslynSandbox
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNotCallingBaseDisposeWithoutBaseCode()
+        public static void WhenNotCallingBaseDisposeWithoutBaseCode()
         {
             var testCode = @"
 namespace RoslynSandbox

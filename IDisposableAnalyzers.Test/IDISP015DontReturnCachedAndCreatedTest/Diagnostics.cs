@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor);
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void Ternary()
+        public static void Ternary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NullCoalesce()
+        public static void NullCoalesce()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -80,7 +80,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnFileOpenReadFromUsing()
+        public static void ReturnFileOpenReadFromUsing()
         {
             var testCode = @"
 namespace RoslynSandbox

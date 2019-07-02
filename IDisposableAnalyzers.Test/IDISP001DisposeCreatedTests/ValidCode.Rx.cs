@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void CompositeDisposableInitializer()
+        public static void CompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CompositeDisposableAdd()
+        public static void CompositeDisposableAdd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SerialDisposable()
+        public static void SerialDisposable()
         {
             var testCode = @"
 using System;
@@ -91,7 +91,7 @@ public sealed class C : IDisposable
         }
 
         [Test]
-        public void SerialDisposableObjectInitializer()
+        public static void SerialDisposableObjectInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -120,7 +120,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SingleAssignmentDisposable()
+        public static void SingleAssignmentDisposable()
         {
             var testCode = @"
 using System;
@@ -146,7 +146,7 @@ public sealed class C : IDisposable
         }
 
         [Test]
-        public void DisposableCreateClosure()
+        public static void DisposableCreateClosure()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposableCreateClosureElvis()
+        public static void DisposableCreateClosureElvis()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -202,7 +202,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposableCreateClosureStatementBody()
+        public static void DisposableCreateClosureStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -233,7 +233,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnsCompositeDisposableInitializer()
+        public static void ReturnsCompositeDisposableInitializer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -255,7 +255,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnsCompositeDisposableLazy()
+        public static void ReturnsCompositeDisposableLazy()
         {
             var testCode = @"
 namespace RoslynSandbox

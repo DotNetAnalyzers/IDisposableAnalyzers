@@ -4,12 +4,12 @@ namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         [Test]
-        public void DisposingCreatedFieldInVirtualDispose()
+        public static void DisposingCreatedFieldInVirtualDispose()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -55,7 +55,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void HandlesRecursion()
+        public static void HandlesRecursion()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -78,7 +78,7 @@ namespace RoslynSandbox
 
         [TestCase("public Stream Stream { get; }")]
         [TestCase("public Stream Stream { get; private set; }")]
-        public void PropertyWithCreatedValue(string property)
+        public static void PropertyWithCreatedValue(string property)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -99,7 +99,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyWithBackingFieldCreatedValue()
+        public static void PropertyWithBackingFieldCreatedValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -129,7 +129,7 @@ namespace RoslynSandbox
         [TestCase("public Stream Stream { get; private set; }")]
         [TestCase("public Stream Stream { get; protected set; }")]
         [TestCase("public Stream Stream { get; set; }")]
-        public void PropertyWithInjectedValue(string property)
+        public static void PropertyWithInjectedValue(string property)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedListOfInt()
+        public static void InjectedListOfInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -172,7 +172,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedListOfT()
+        public static void InjectedListOfT()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -194,7 +194,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInClassThatIsNotIDisposable()
+        public static void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -215,7 +215,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectedInClassThatIsIDisposable()
+        public static void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -240,7 +240,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InjectingIntoPrivateCtor()
+        public static void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
 namespace RoslynSandbox
@@ -286,7 +286,7 @@ namespace RoslynSandbox
         [TestCase("private set")]
         [TestCase("protected set")]
         [TestCase("set")]
-        public void PropertyWithBackingFieldInjectedValue(string setter)
+        public static void PropertyWithBackingFieldInjectedValue(string setter)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -317,7 +317,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericTypeWithPropertyAndIndexer()
+        public static void GenericTypeWithPropertyAndIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -354,7 +354,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalSwapCachedDisposableDictionary()
+        public static void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
 namespace RoslynSandbox
@@ -394,7 +394,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IgnoreTestMethod()
+        public static void IgnoreTestMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -414,7 +414,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenImplementingInterface()
+        public static void WhenImplementingInterface()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -462,7 +462,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenImplementingIHttpModule()
+        public static void WhenImplementingIHttpModule()
         {
             var testCode = @"
 namespace System.Web
@@ -478,7 +478,7 @@ namespace System.Web
         }
 
         [Test]
-        public void WhenSubclassingAndImplementingTwoInterfaces()
+        public static void WhenSubclassingAndImplementingTwoInterfaces()
         {
             var testCode = @"
 namespace RoslynSandbox

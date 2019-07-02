@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class CreateAndAssignField
+        public static class CreateAndAssignField
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP004DontIgnoreCreated.Descriptor);
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldFix();
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()
+            public static void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenUsesThis()
+            public static void AssignIgnoredReturnValueToFieldInCtorWhenUsesThis()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,7 +97,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignIgnoredReturnValueToFieldInCtorWhenUnderscore()
+            public static void AssignIgnoredReturnValueToFieldInCtorWhenUnderscore()
             {
                 var testCode = @"
 namespace RoslynSandbox

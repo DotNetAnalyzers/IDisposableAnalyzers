@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Field
+        public static class Field
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             [TestCase("Stream ?? File.OpenRead(string.Empty)")]
             [TestCase("File.OpenRead(string.Empty) ?? Stream")]
             [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
-            public void InjectedAndCreated(string code)
+            public static void InjectedAndCreated(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -41,7 +41,7 @@ namespace RoslynSandbox
 
             [TestCase("public Stream Stream")]
             [TestCase("internal Stream Stream")]
-            public void MutableFieldInSealed(string property)
+            public static void MutableFieldInSealed(string property)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -63,7 +63,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedCtorAndInitializer()
+            public static void InjectedAndCreatedCtorAndInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -84,7 +84,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedTwoCtors()
+            public static void InjectedAndCreatedTwoCtors()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -110,7 +110,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ProtectedMutable()
+            public static void ProtectedMutable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +126,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
+            public static void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -153,7 +153,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
+            public static void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -181,7 +181,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedViaFactory()
+            public static void InjectedAndCreatedViaFactory()
             {
                 var testCode = @"
 namespace RoslynSandbox

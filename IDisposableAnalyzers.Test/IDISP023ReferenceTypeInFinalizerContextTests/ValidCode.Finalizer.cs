@@ -4,14 +4,14 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Finalizer
+        public static class Finalizer
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
 
             [Test]
-            public void SealedWithFinalizerStatementBody()
+            public static void SealedWithFinalizerStatementBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -46,7 +46,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SealedWithFinalizerExpressionBody()
+            public static void SealedWithFinalizerExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -79,7 +79,7 @@ namespace RoslynSandbox
 
             [TestCase("isDisposed.Equals(false)")]
             [TestCase("isDisposed.Equals(this)")]
-            public void TouchingStruct(string expression)
+            public static void TouchingStruct(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SettingStaticToNull()
+            public static void SettingStaticToNull()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -137,7 +137,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void SettingInstanceToNull()
+            public static void SettingInstanceToNull()
             {
                 var testCode = @"
 namespace RoslynSandbox

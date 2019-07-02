@@ -4,15 +4,15 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class Diagnostics
+    public static class Diagnostics
     {
-        public class DisposeCall
+        public static class DisposeCall
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor);
 
             [Test]
-            public void CreateTouchDispose()
+            public static void CreateTouchDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingTwice()
+            public static void DisposingTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingTwiceInUsing()
+            public static void DisposingTwiceInUsing()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedViaOut()
+            public static void AssignedViaOut()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -105,7 +105,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedViaOutVar()
+            public static void AssignedViaOutVar()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignAfterDispose()
+            public static void ReassignAfterDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -157,7 +157,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignViaOutVarAfterDispose()
+            public static void ReassignViaOutVarAfterDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -187,7 +187,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ReassignViaOutAfterDispose()
+            public static void ReassignViaOutAfterDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox

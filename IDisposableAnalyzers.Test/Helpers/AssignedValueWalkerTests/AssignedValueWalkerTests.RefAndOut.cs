@@ -7,12 +7,12 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
-        public class RefAndOut
+        public static class RefAndOut
         {
             [Test]
-            public void LocalAssignedWithOutParameterSimple()
+            public static void LocalAssignedWithOutParameterSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out var temp")]
             [TestCase("out int temp")]
-            public void DiscardedOut(string expression)
+            public static void DiscardedOut(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -74,7 +74,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out var temp")]
             [TestCase("out int temp")]
-            public void DiscardedOutAssignedWithArgument(string expression)
+            public static void DiscardedOutAssignedWithArgument(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -103,7 +103,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out var temp")]
             [TestCase("out int temp")]
-            public void DiscardedOutCachedAndAssigned(string expression)
+            public static void DiscardedOutCachedAndAssigned(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -139,7 +139,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void OutParameterCachedAndAssigned()
+            public static void OutParameterCachedAndAssigned()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalAssignedWithOutParameterOtherClass()
+            public static void LocalAssignedWithOutParameterOtherClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -207,7 +207,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalAssignedWithOutParameterOtherClassElvis()
+            public static void LocalAssignedWithOutParameterOtherClassElvis()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -243,7 +243,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = value;", "1")]
             [TestCase("var temp3 = value;", "")]
             [TestCase("var temp4 = value;", "2")]
-            public void LocalAssignedWithOutParameter(string code, string expected)
+            public static void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -282,7 +282,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void LocalAssignedWithOutParameterGeneric()
+            public static void LocalAssignedWithOutParameterGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -313,7 +313,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "0")]
             [TestCase("var temp2 = value;", "0, 1")]
-            public void LocalAssignedWithChainedOutParameter(string code, string expected)
+            public static void LocalAssignedWithChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -351,7 +351,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
-            public void LocalAssignedWithChainedRefParameter(string code, string expected)
+            public static void LocalAssignedWithChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -389,7 +389,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = value", "")]
             [TestCase("var temp2 = value", "1")]
-            public void LocalAssignedWithRefParameter(string code, string expected)
+            public static void LocalAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -424,7 +424,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2, 3")]
             [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public void FieldAssignedWithOutParameter(string code, string expected)
+            public static void FieldAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -467,7 +467,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2")]
             [TestCase("var temp4 = this.value;", "1, 2")]
-            public void FieldAssignedWithRefParameter(string code, string expected)
+            public static void FieldAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -509,7 +509,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2, 3")]
             [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public void FieldAssignedWithRefParameterArgument(string code, string expected)
+            public static void FieldAssignedWithRefParameterArgument(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -548,7 +548,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void RefBeforeOut()
+            public static void RefBeforeOut()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -579,7 +579,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void RecursiveOutAssigned()
+            public static void RecursiveOutAssigned()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -616,7 +616,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void RecursiveOut()
+            public static void RecursiveOut()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

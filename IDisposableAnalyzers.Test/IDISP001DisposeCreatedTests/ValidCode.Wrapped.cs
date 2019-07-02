@@ -3,13 +3,13 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
         [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-        public void LocalTupleThatIsDisposed(string expression)
+        public static void LocalTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 
         [TestCase("(File.OpenRead(file), new object())")]
         [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
-        public void LocalValueTupleThatDisposed(string expression)
+        public static void LocalValueTupleThatDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldTuple()
+        public static void FieldTuple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -85,7 +85,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldTupleWithLocals()
+        public static void FieldTupleWithLocals()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldValueTuple()
+        public static void FieldValueTuple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -145,7 +145,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldValueTupleWithLocals()
+        public static void FieldValueTupleWithLocals()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -177,7 +177,7 @@ namespace RoslynSandbox
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void LocalPairThatIsDisposed(string expression)
+        public static void LocalPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
 namespace RoslynSandbox
@@ -227,7 +227,7 @@ namespace RoslynSandbox
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldTupleThatIsDisposed(string expression)
+        public static void FieldTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -256,7 +256,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldValueTupleThatIsDisposed(string expression)
+        public static void FieldValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -286,7 +286,7 @@ namespace RoslynSandbox
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldPairThatIsDisposed(string expression)
+        public static void FieldPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
 namespace RoslynSandbox
@@ -342,7 +342,7 @@ namespace RoslynSandbox
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldTuple(string expression)
+        public static void FieldTuple(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -371,7 +371,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldValueTuple(string expression)
+        public static void FieldValueTuple(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -401,7 +401,7 @@ namespace RoslynSandbox
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void Pair(string expression)
+        public static void Pair(string expression)
         {
             var staticPairCode = @"
 namespace RoslynSandbox
@@ -457,7 +457,7 @@ namespace RoslynSandbox
 
         [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void DisposingPair(string expression)
+        public static void DisposingPair(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox

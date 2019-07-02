@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Finalizer
+        public static class Finalizer
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor);
@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 
             [TestCase("Builder.Append(1)")]
             [TestCase("Builder.Length")]
-            public void Static(string expression)
+            public static void Static(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -40,7 +40,7 @@ namespace RoslynSandbox
             [TestCase("this.↓Builder.Append(1)")]
             [TestCase("↓Builder.Append(1)")]
             [TestCase("↓Builder.Length")]
-            public void Instance(string expression)
+            public static void Instance(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void CallingStatic()
+            public static void CallingStatic()
             {
                 var testCode = @"
 namespace RoslynSandbox

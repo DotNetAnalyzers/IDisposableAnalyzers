@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public partial class ValidCode
     {
-        public class Rx
+        public static class Rx
         {
             [Test]
-            public void InjectedSubscribe()
+            public static void InjectedSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -36,7 +36,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void ChainedCtorInjectedSubscribe()
+            public static void ChainedCtorInjectedSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -75,7 +75,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void InjectedConditionalSubscribe()
+            public static void InjectedConditionalSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -103,7 +103,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void SingleAssignmentDisposable()
+            public static void SingleAssignmentDisposable()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -131,7 +131,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void SingleAssignmentDisposableAssignedWithObservableSubscribe()
+            public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -159,7 +159,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void SingleAssignmentDisposableAssignedInAction()
+            public static void SingleAssignmentDisposableAssignedInAction()
             {
                 var testCode = @"
 namespace Gu.Reactive

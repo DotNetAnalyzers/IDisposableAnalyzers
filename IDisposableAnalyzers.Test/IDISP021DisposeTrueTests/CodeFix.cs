@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP021DisposeTrueTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP021DisposeTrue.Descriptor);
         private static readonly CodeFixProvider Fix = new ArgumentFix();
 
         [Test]
-        public void WhenVirtual()
+        public static void WhenVirtual()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenPrivate()
+        public static void WhenPrivate()
         {
             var testCode = @"
 namespace RoslynSandbox

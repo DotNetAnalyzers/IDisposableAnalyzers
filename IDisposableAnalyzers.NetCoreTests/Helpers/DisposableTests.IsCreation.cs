@@ -5,12 +5,12 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal partial class DisposableTests
+    internal static partial class DisposableTests
     {
-        internal class IsCreation
+        internal static class IsCreation
         {
             [TestCase("Microsoft.Extensions.Logging.ApplicationInsightsLoggerFactoryExtensions.AddApplicationInsights(((Microsoft.Extensions.Logging.ILoggerFactory)o), null)")]
-            public void WhiteList(string code)
+            public static void WhiteList(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox

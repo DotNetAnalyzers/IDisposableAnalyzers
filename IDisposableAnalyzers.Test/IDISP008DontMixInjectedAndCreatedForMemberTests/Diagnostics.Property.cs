@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Property
+        public static class Property
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             [TestCase("File.OpenRead(string.Empty) ?? arg")]
             [TestCase("true ? arg : File.OpenRead(string.Empty)")]
             [TestCase("true ? File.OpenRead(string.Empty) : arg")]
-            public void InjectedAndCreated(string code)
+            public static void InjectedAndCreated(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -37,7 +37,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedCtorAndInitializer()
+            public static void InjectedAndCreatedCtorAndInitializer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -58,7 +58,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedTwoCtors()
+            public static void InjectedAndCreatedTwoCtors()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -86,7 +86,7 @@ namespace RoslynSandbox
             [TestCase("public Stream Stream { get; protected set; }")]
             [TestCase("public Stream Stream { get; set; }")]
             [TestCase("protected Stream Stream { get; set; }")]
-            public void Mutable(string property)
+            public static void Mutable(string property)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -104,7 +104,7 @@ namespace RoslynSandbox
             [TestCase("internal Stream Stream { get; set; }")]
             [TestCase("public Stream Stream { get; set; }")]
             [TestCase("public Stream Stream { get; internal set; }")]
-            public void MutablePropertyInSealed(string property)
+            public static void MutablePropertyInSealed(string property)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +126,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InjectedAndCreatedInFactory()
+            public static void InjectedAndCreatedInFactory()
             {
                 var testCode = @"
 namespace RoslynSandbox

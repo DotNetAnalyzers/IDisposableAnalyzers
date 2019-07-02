@@ -3,14 +3,14 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public class CodeFixAll
+    public static class CodeFixAll
     {
         private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
         private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
 
         [Test]
-        public void NotDisposingVariable()
+        public static void NotDisposingVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingVariables()
+        public static void NotDisposingVariables()
         {
             var testCode = @"
 namespace RoslynSandbox

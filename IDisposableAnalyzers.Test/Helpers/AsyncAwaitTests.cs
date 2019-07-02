@@ -7,12 +7,12 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    public class AsyncAwaitTests
+    public static class AsyncAwaitTests
     {
         [TestCase("Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", false, null)]
         [TestCase("Task.FromResult(new string(' ', 1))", true, "new string(' ', 1)")]
         [TestCase("Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", true, "new string(' ', 1)")]
-        public void TryAwaitTaskFromResult(string code, bool expected, string expectedCode)
+        public static void TryAwaitTaskFromResult(string code, bool expected, string expectedCode)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -43,7 +43,7 @@ namespace RoslynSandbox
         [TestCase("Task.Run(() => CreateString()).ConfigureAwait(false)", true, "() => CreateString()")]
         [TestCase("Task.FromResult(new string(' ', 1))", false, null)]
         [TestCase("Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", false, null)]
-        public void TryAwaitTaskRun(string code, bool expected, string expectedCode)
+        public static void TryAwaitTaskRun(string code, bool expected, string expectedCode)
         {
             var testCode = @"
 namespace RoslynSandbox

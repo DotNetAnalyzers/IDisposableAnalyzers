@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class TestFixture
+        public static class TestFixture
         {
             [Test]
-            public void DisposingFieldInTearDown()
+            public static void DisposingFieldInTearDown()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DisposingFieldInOneTimeTearDown()
+            public static void DisposingFieldInOneTimeTearDown()
             {
                 var testCode = @"
 namespace RoslynSandbox

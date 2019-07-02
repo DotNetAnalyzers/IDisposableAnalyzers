@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Repro
+        public static class Repro
         {
             [Test]
-            public void Issue63()
+            public static void Issue63()
             {
                 var viewModelBaseCode = @"
 namespace MVVM
@@ -121,7 +121,7 @@ namespace ProjectX.Commands
                 RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
             }
 
-            public void Issue150()
+            public static void Issue150()
             {
                 var testCode = @"
 namespace ValidCode

@@ -4,16 +4,16 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class InterfaceOnlyMakeSealed
+        public static class InterfaceOnlyMakeSealed
         {
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             //// ReSharper disable once InconsistentNaming
             private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
             [Test]
-            public void EmptyClass()
+            public static void EmptyClass()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void EmptyClassFigureOutUnderscoreFromOtherClass()
+            public static void EmptyClassFigureOutUnderscoreFromOtherClass()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithThrowIfDisposed()
+            public static void WithThrowIfDisposed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithProtectedPrivateSetProperty()
+            public static void WithProtectedPrivateSetProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -205,7 +205,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithOverridingProperties()
+            public static void WithOverridingProperties()
             {
                 var baseCode = @"
 namespace RoslynSandbox
@@ -273,7 +273,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithPublicVirtualMethod()
+            public static void WithPublicVirtualMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -324,7 +324,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithProtectedVirtualMethod()
+            public static void WithProtectedVirtualMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox

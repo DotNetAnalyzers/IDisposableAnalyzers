@@ -4,13 +4,13 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [TestCase("stream.Dispose()")]
         [TestCase("stream?.Dispose()")]
         [TestCase("((IDisposable)stream)?.Dispose()")]
         [TestCase("(stream as IDisposable)?.Dispose()")]
-        public void DisposedLocal(string expression)
+        public static void DisposedLocal(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 
         [TestCase("using (var stream = File.OpenRead(string.Empty))")]
         [TestCase("using (File.OpenRead(string.Empty))")]
-        public void UsedLocal(string expression)
+        public static void UsedLocal(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox

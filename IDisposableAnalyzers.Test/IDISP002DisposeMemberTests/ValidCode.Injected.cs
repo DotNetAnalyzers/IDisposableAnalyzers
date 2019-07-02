@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Injected
+        public static class Injected
         {
             [Test]
-            public void IgnoreAssignedWithCtorArgument()
+            public static void IgnoreAssignedWithCtorArgument()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreAssignedWithCtorArgumentIndexer()
+            public static void IgnoreAssignedWithCtorArgumentIndexer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
+            public static void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoreDictionaryPassedInViaCtor()
+            public static void IgnoreDictionaryPassedInViaCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -99,7 +99,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnorePassedInViaCtorUnderscore()
+            public static void IgnorePassedInViaCtorUnderscore()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -120,7 +120,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
+            public static void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -145,7 +145,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssignedWithCreatedAndInjected()
+            public static void AssignedWithCreatedAndInjected()
             {
                 var testCode = @"
 #pragma warning disable IDISP008

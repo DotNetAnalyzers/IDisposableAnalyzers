@@ -5,11 +5,11 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public class DisposeMethodTests
+    public static class DisposeMethodTests
     {
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public void TryFindIDisposableDispose(Search search)
+        public static void TryFindIDisposableDispose(Search search)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         [Explicit("Not sure if we want to find explicit.")]
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public void TryFindIDisposableDisposeWhenExplicit(Search search)
+        public static void TryFindIDisposableDisposeWhenExplicit(Search search)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
 
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public void TryFindVirtualDispose(Search search)
+        public static void TryFindVirtualDispose(Search search)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -138,7 +138,7 @@ namespace RoslynSandbox
 
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public void TryFindFirst(Search search)
+        public static void TryFindFirst(Search search)
         {
             var testCode = @"
 namespace RoslynSandbox

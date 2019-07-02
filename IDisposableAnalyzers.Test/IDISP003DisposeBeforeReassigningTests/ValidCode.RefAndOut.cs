@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void OutParameter()
+        public static void OutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void DictionaryTryGetValue(string expression)
+        public static void DictionaryTryGetValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void CallWithOutParameter(string expression)
+        public static void CallWithOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void CallWithOutParameterExpressionBody(string expression)
+        public static void CallWithOutParameterExpressionBody(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         [TestCase("out var _")]
         [TestCase("out FileStream temp")]
         [TestCase("out FileStream _")]
-        public void DiscardedCachedOutParameter(string expression)
+        public static void DiscardedCachedOutParameter(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -147,7 +147,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CachedOutParameter()
+        public static void CachedOutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -183,7 +183,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningVariableViaOutParameter()
+        public static void AssigningVariableViaOutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -215,7 +215,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningOutParameterExpressionBody()
+        public static void AssigningOutParameterExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
+        public static void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -261,7 +261,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldViaConcurrentDictionaryTryGetValue()
+        public static void AssigningFieldViaConcurrentDictionaryTryGetValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -285,7 +285,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
+        public static void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -310,7 +310,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldWithCachedViaOutParameter()
+        public static void AssigningFieldWithCachedViaOutParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -339,7 +339,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningVariableViaRefParameter()
+        public static void AssigningVariableViaRefParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -365,7 +365,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
+        public static void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -394,7 +394,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedOut()
+        public static void ChainedOut()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -419,7 +419,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SeparateDeclarationAndCreation()
+        public static void SeparateDeclarationAndCreation()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -441,7 +441,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TryGetOutVar()
+        public static void TryGetOutVar()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -469,7 +469,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningReturnOut()
+        public static void AssigningReturnOut()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -495,7 +495,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningReturnOutTwice()
+        public static void AssigningReturnOutTwice()
         {
             var testCode = @"
 namespace RoslynSandbox

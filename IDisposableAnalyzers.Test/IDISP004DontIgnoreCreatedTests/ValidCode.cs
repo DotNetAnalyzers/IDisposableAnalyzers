@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
         [TestCase("new List<Disposable> { new Disposable() }")]
         [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
-        public void AssigningLocal(string expression)
+        public static void AssigningLocal(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
         [TestCase("new List<Disposable> { new Disposable() }")]
         [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
-        public void AssigningField(string expression)
+        public static void AssigningField(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void RealisticExtensionMethodClass()
+        public static void RealisticExtensionMethodClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -209,7 +209,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IfTry()
+        public static void IfTry()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReadAsyncCall()
+        public static void ReadAsyncCall()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -277,7 +277,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReadAsyncConfigureAwait()
+        public static void ReadAsyncConfigureAwait()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -318,7 +318,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenGettingPropertyOfDisposable()
+        public static void WhenGettingPropertyOfDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -377,7 +377,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenGettingPropertyOfProperty()
+        public static void WhenGettingPropertyOfProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -439,7 +439,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddingFileOpenReadToList()
+        public static void AddingFileOpenReadToList()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -461,7 +461,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddingNewDisposableToList()
+        public static void AddingNewDisposableToList()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -483,7 +483,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddingNewDisposableToListThatIsDisposed()
+        public static void AddingNewDisposableToListThatIsDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -513,7 +513,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
+        public static void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -544,7 +544,7 @@ namespace RoslynSandbox
 
         [TestCase("File.Create(fileName).Dispose()")]
         [TestCase("File.Create(fileName)?.Dispose()")]
-        public void DisposingInSameStatement(string statement)
+        public static void DisposingInSameStatement(string statement)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -567,7 +567,7 @@ namespace RoslynSandbox
         [TestCase("Stream()?.Dispose()")]
         [TestCase("this.Stream().Dispose()")]
         [TestCase("this.Stream()?.Dispose()")]
-        public void DisposingMethodReturnValue(string expression)
+        public static void DisposingMethodReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -590,7 +590,7 @@ namespace RoslynSandbox
 
         [TestCase("Stream().Dispose()")]
         [TestCase("Stream()?.Dispose()")]
-        public void DisposingStaticMethodReturnValue(string expression)
+        public static void DisposingStaticMethodReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -614,7 +614,7 @@ namespace RoslynSandbox
         [TestCase("Stream?.Dispose()")]
         [TestCase("this.Stream.Dispose()")]
         [TestCase("this.Stream?.Dispose()")]
-        public void DisposingPropertyReturnValue(string expression)
+        public static void DisposingPropertyReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -637,7 +637,7 @@ namespace RoslynSandbox
 
         [TestCase("Stream.Dispose()")]
         [TestCase("Stream?.Dispose()")]
-        public void DisposingStaticPropertyReturnValue(string expression)
+        public static void DisposingStaticPropertyReturnValue(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -658,7 +658,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AddFileOpenReadToListOfObjectField()
+        public static void AddFileOpenReadToListOfObjectField()
         {
             var testCode = @"
 namespace RoslynSandbox

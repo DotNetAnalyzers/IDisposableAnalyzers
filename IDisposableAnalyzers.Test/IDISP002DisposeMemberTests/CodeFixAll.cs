@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFixAll
+    public static class CodeFixAll
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
         private static readonly CodeFixProvider Fix = new DisposeMemberFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
         [Test]
-        public void NotDisposingFieldAssignedInCtor()
+        public static void NotDisposingFieldAssignedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -62,7 +62,7 @@ namespace RoslynSandbox
 
         [Test]
         [Explicit("Order is random due to async.")]
-        public void NotDisposingFieldsAssignedInCtor()
+        public static void NotDisposingFieldsAssignedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox

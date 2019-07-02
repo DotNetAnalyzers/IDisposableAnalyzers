@@ -5,12 +5,12 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
 
         [Test]
-        public void AwaitWebClientDownloadStringTaskAsyncInUsing()
+        public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingAwaited()
+        public static void UsingAwaited()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -72,7 +72,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TaskFromResult()
+        public static void TaskFromResult()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TaskCompletedTask()
+        public static void TaskCompletedTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewMTaskRun()
+        public static void UsingNewMTaskRun()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewMLocalTaskRun()
+        public static void UsingNewMLocalTaskRun()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -190,7 +190,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingNewMLocalFuncTask()
+        public static void UsingNewMLocalFuncTask()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -227,7 +227,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnNullAfterAwaitIssue89()
+        public static void ReturnNullAfterAwaitIssue89()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -251,7 +251,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnNullIssue89()
+        public static void ReturnNullIssue89()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -274,7 +274,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void EarlyReturnNullIssue89()
+        public static void EarlyReturnNullIssue89()
         {
             var testCode = @"
 namespace RoslynSandbox

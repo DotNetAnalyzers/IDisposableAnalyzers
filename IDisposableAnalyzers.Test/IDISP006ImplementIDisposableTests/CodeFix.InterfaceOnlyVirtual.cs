@@ -4,16 +4,16 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class InterfaceOnlyVirtual
+        public static class InterfaceOnlyVirtual
         {
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             //// ReSharper disable once InconsistentNaming
             private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
             [Test]
-            public void AbstractClass()
+            public static void AbstractClass()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -67,7 +67,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AbstractClassWithFields()
+            public static void AbstractClassWithFields()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -153,7 +153,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AbstractClassWithMethods()
+            public static void AbstractClassWithMethods()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -238,7 +238,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void VirtualDispose()
+            public static void VirtualDispose()
             {
                 var testCode = @"
 namespace RoslynSandbox

@@ -3,12 +3,12 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public static partial class ValidCode
     {
-        public class Ignore
+        public static class Ignore
         {
             [Test]
-            public void NUnitAssertThrowsAsync()
+            public static void NUnitAssertThrowsAsync()
             {
                 var testCode = @"
 namespace RoslynSandbox

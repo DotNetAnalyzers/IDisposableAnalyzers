@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class OutParameter
+        public static class OutParameter
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
@@ -29,7 +29,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out Disposable temp")]
             [TestCase("out Disposable _")]
-            public void DiscardedNewDisposableStatementBody(string expression)
+            public static void DiscardedNewDisposableStatementBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out Disposable temp")]
             [TestCase("out Disposable _")]
-            public void DiscardedNewDisposableExpressionBody(string expression)
+            public static void DiscardedNewDisposableExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -82,7 +82,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out FileStream temp")]
             [TestCase("out FileStream _")]
-            public void DiscardedFileOpenReadStatementBody(string expression)
+            public static void DiscardedFileOpenReadStatementBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -118,7 +118,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out FileStream temp")]
             [TestCase("out FileStream _")]
-            public void DiscardedFileOpenReadExpressionBody(string expression)
+            public static void DiscardedFileOpenReadExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -151,7 +151,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out FileStream temp")]
             [TestCase("out FileStream _")]
-            public void DiscardedOutAssignedWithArgumentStatementBody(string expression)
+            public static void DiscardedOutAssignedWithArgumentStatementBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -181,7 +181,7 @@ namespace RoslynSandbox
             [TestCase("out var _")]
             [TestCase("out FileStream temp")]
             [TestCase("out FileStream _")]
-            public void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
+            public static void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox

@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Local
+        public static class Local
         {
             private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
@@ -33,7 +33,7 @@ namespace RoslynSandbox
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null")]
-            public void LanguageConstructs(string code)
+            public static void LanguageConstructs(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -54,7 +54,7 @@ namespace RoslynSandbox
 
             [TestCase("new BinaryReader(System.IO.File.OpenRead(string.Empty))")]
             [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
-            public void KnownArguments(string code)
+            public static void KnownArguments(string code)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -74,7 +74,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyInitializedPasswordBoxSecurePassword()
+            public static void PropertyInitializedPasswordBoxSecurePassword()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -97,7 +97,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void StaticPropertyInitializedPasswordBoxSecurePassword()
+            public static void StaticPropertyInitializedPasswordBoxSecurePassword()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -120,7 +120,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FileOpenRead()
+            public static void FileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -141,7 +141,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NewDisposable()
+            public static void NewDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -159,7 +159,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MethodCreatingDisposable1()
+            public static void MethodCreatingDisposable1()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -184,7 +184,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MethodCreatingDisposable2()
+            public static void MethodCreatingDisposable2()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -210,7 +210,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MethodCreatingDisposableExpressionBody()
+            public static void MethodCreatingDisposableExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -232,7 +232,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyCreatingDisposableSimple()
+            public static void PropertyCreatingDisposableSimple()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -257,7 +257,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyCreatingDisposableGetBody()
+            public static void PropertyCreatingDisposableGetBody()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -286,7 +286,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyCreatingDisposableExpressionBody()
+            public static void PropertyCreatingDisposableExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox

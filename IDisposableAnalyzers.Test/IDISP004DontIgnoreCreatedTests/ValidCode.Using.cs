@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         [Test]
-        public void FileOpenRead()
+        public static void FileOpenRead()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -27,7 +27,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NewStreamReader()
+        public static void NewStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SampleWithAwait()
+        public static void SampleWithAwait()
         {
             var testCode = @"
 namespace RoslynSandbox

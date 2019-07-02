@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void SimpleStatementBody()
+        public static void SimpleStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SimpleExpressionBody()
+        public static void SimpleExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnedTernary()
+        public static void ReturnedTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnedNullConditional()
+        public static void ReturnedNullConditional()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFileOpenRead()
+        public static void LocalFileOpenRead()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -94,7 +94,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFileOpenReadDisposable()
+        public static void LocalFileOpenReadDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -115,7 +115,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFileOpenReadAsDisposable()
+        public static void LocalFileOpenReadAsDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFileOpenReadCastDisposable()
+        public static void LocalFileOpenReadCastDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFileOpenReadAfterAccessingLength()
+        public static void LocalFileOpenReadAfterAccessingLength()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -178,7 +178,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInIfAndEnd()
+        public static void LocalInIfAndEnd()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -203,7 +203,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInIf()
+        public static void LocalInIf()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -229,7 +229,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInStreamReaderMethodBody()
+        public static void LocalInStreamReaderMethodBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -249,7 +249,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInLocalStreamReader()
+        public static void LocalInLocalStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -270,7 +270,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInStreamReaderMethodBodyAsDisposable()
+        public static void LocalInStreamReaderMethodBodyAsDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -290,7 +290,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
+        public static void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -311,7 +311,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDisposableIsReturnedPropertySimple()
+        public static void WhenDisposableIsReturnedPropertySimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -333,7 +333,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDisposableIsReturnedPropertyBody()
+        public static void WhenDisposableIsReturnedPropertyBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -356,7 +356,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenDisposableIsReturnedPropertyExpressionBody()
+        public static void WhenDisposableIsReturnedPropertyExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -372,7 +372,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInLazy()
+        public static void LocalInLazy()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -405,7 +405,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFunctionStatementBody()
+        public static void LocalFunctionStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -430,7 +430,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalFunctionExpressionBody()
+        public static void LocalFunctionExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -452,7 +452,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalInLocalFunction()
+        public static void LocalInLocalFunction()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -4,10 +4,10 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
     {
         [Test]
-        public void DontUseUsingWhenAssigningAField()
+        public static void DontUseUsingWhenAssigningAField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningAFieldTernary()
+        public static void DontUseUsingWhenAssigningAFieldTernary()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningAFieldInAMethod()
+        public static void DontUseUsingWhenAssigningAFieldInAMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
+        public static void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAddingLocalVariableToFieldList()
+        public static void DontUseUsingWhenAddingLocalVariableToFieldList()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
+        public static void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -148,7 +148,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningACallThatReturnsAField()
+        public static void DontUseUsingWhenAssigningACallThatReturnsAField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -175,7 +175,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
+        public static void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -213,7 +213,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BuildCollectionThenAssignFieldIndexer()
+        public static void BuildCollectionThenAssignFieldIndexer()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -237,7 +237,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void BuildCollectionThenAssignField()
+        public static void BuildCollectionThenAssignField()
         {
             var testCode = @"
 namespace RoslynSandbox

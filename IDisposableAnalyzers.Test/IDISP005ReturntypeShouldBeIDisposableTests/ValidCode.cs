@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = IDISP005ReturntypeShouldBeIDisposable.Descriptor;
@@ -26,7 +26,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void RealisticExtensionMethodClass()
+        public static void RealisticExtensionMethodClass()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -148,7 +148,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void VoidMethodReturn()
+        public static void VoidMethodReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -170,7 +170,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningObject()
+        public static void MethodReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -192,7 +192,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningDynamic()
+        public static void MethodReturningDynamic()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -214,7 +214,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericClassMethodReturningDynamicSubtract()
+        public static void GenericClassMethodReturningDynamicSubtract()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -231,7 +231,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericClassPropertyReturningDynamicSubtract()
+        public static void GenericClassPropertyReturningDynamicSubtract()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -248,7 +248,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningThis()
+        public static void MethodReturningThis()
         {
             var chunkCode = @"
 namespace RoslynSandbox
@@ -288,7 +288,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningFieldAsObject()
+        public static void MethodReturningFieldAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -309,7 +309,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningFieldIndexerAsObject()
+        public static void MethodReturningFieldIndexerAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -330,7 +330,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningFieldDisposableListIndexerAsObject()
+        public static void MethodReturningFieldDisposableListIndexerAsObject()
         {
             var disposableListCode = @"
 namespace RoslynSandbox
@@ -379,7 +379,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningFieldDisposableListIndexerAsObjectId()
+        public static void MethodReturningFieldDisposableListIndexerAsObjectId()
         {
             var disposableListCode = @"
 namespace RoslynSandbox
@@ -433,7 +433,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningFuncObject()
+        public static void MethodReturningFuncObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -457,7 +457,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningObjectExpressionBody()
+        public static void MethodReturningObjectExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -476,7 +476,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningObject()
+        public static void PropertyReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -501,7 +501,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IndexerReturningObject()
+        public static void IndexerReturningObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -526,7 +526,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningTaskFromResultOfDisposable()
+        public static void MethodReturningTaskFromResultOfDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -551,7 +551,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningTaskRunOfDisposable()
+        public static void MethodReturningTaskRunOfDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -571,7 +571,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void GenericMethod()
+        public static void GenericMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -593,7 +593,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PropertyReturningObjectExpressionBody()
+        public static void PropertyReturningObjectExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -612,7 +612,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningFileOpenReadAsStream()
+        public static void ReturningFileOpenReadAsStream()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -631,7 +631,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningFileOpenReadExtensionMethod()
+        public static void ReturningFileOpenReadExtensionMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -655,7 +655,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningNewDisposableExtensionMethodId()
+        public static void ReturningNewDisposableExtensionMethodId()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -679,7 +679,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnDisposableFieldAsObject()
+        public static void ReturnDisposableFieldAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -701,7 +701,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturnDisposableStaticFieldAsObject()
+        public static void ReturnDisposableStaticFieldAsObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -723,7 +723,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IfTry()
+        public static void IfTry()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -750,7 +750,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IEnumerableOfInt()
+        public static void IEnumerableOfInt()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -778,7 +778,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IEnumerableOfIntSimple()
+        public static void IEnumerableOfIntSimple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -801,7 +801,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void IEnumerableOfIntExpressionBodies()
+        public static void IEnumerableOfIntExpressionBodies()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -823,7 +823,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningAsyncTaskOfStream()
+        public static void ReturningAsyncTaskOfStream()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -853,7 +853,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void Lambda()
+        public static void Lambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -878,7 +878,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PassingFuncToMethod()
+        public static void PassingFuncToMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -903,7 +903,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void CallingOverload()
+        public static void CallingOverload()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -929,7 +929,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssertThrows()
+        public static void AssertThrows()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -954,7 +954,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningDisposedFromUsing()
+        public static void ReturningDisposedFromUsing()
         {
             var testCode = @"
 namespace RoslynSandbox

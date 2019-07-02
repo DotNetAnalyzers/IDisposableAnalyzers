@@ -4,12 +4,12 @@ namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
 
         [Test]
-        public void SealedWithFinalizer()
+        public static void SealedWithFinalizer()
         {
             var testCode = @"
 namespace RoslynSandbox

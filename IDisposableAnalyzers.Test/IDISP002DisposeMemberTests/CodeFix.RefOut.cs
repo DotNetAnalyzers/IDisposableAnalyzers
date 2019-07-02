@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class RefAndOut
+        public static class RefAndOut
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP002DisposeMember.Descriptor);
 
             [Test]
-            public void AssigningFieldViaOutParameterInCtor()
+            public static void AssigningFieldViaOutParameterInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -81,7 +81,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningFieldViaRefParameterInCtor()
+            public static void AssigningFieldViaRefParameterInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox

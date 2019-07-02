@@ -4,9 +4,9 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Invocation
+        public static class Invocation
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP004DontIgnoreCreated.Descriptor);
@@ -25,7 +25,7 @@ namespace RoslynSandbox
 }";
 
             [Test]
-            public void FileOpenRead()
+            public static void FileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FileOpenReadPassedIntoCtorOfNotDisposing()
+            public static void FileOpenReadPassedIntoCtorOfNotDisposing()
             {
                 var barCode = @"
 namespace RoslynSandbox
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void Generic()
+            public static void Generic()
             {
                 var interfaceCode = @"
 namespace RoslynSandbox
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void MethodCreatingDisposableExpressionBodyToString()
+            public static void MethodCreatingDisposableExpressionBodyToString()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -153,7 +153,7 @@ namespace RoslynSandbox
             [TestCase("this.Stream()?.ReadAsync(null, 0, 0)")]
             [TestCase("Stream().ReadAsync(null, 0, 0)")]
             [TestCase("Stream()?.ReadAsync(null, 0, 0)")]
-            public void MethodCreatingDisposableExpressionBodyAsync(string expression)
+            public static void MethodCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -176,7 +176,7 @@ namespace RoslynSandbox
             [TestCase("Stream?.Length")]
             [TestCase("this.Stream.Length")]
             [TestCase("this.Stream?.Length")]
-            public void PropertyCreatingDisposableExpressionBody(string expression)
+            public static void PropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -198,7 +198,7 @@ namespace RoslynSandbox
             [TestCase("this.Stream?.ReadAsync(null, 0, 0)")]
             [TestCase("Stream.ReadAsync(null, 0, 0)")]
             [TestCase("Stream?.ReadAsync(null, 0, 0)")]
-            public void PropertyCreatingDisposableExpressionBodyAsync(string expression)
+            public static void PropertyCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -218,7 +218,7 @@ namespace RoslynSandbox
 
             [TestCase("Stream.Length")]
             [TestCase("Stream?.Length")]
-            public void StaticPropertyCreatingDisposableExpressionBody(string expression)
+            public static void StaticPropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -236,7 +236,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void NoFixForArgument()
+            public static void NoFixForArgument()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -258,7 +258,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FactoryMethodNewDisposable()
+            public static void FactoryMethodNewDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -280,7 +280,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FactoryConstrainedGeneric()
+            public static void FactoryConstrainedGeneric()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -308,7 +308,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void WithOptionalParameter()
+            public static void WithOptionalParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -344,7 +344,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void DiscardFileOpenRead()
+            public static void DiscardFileOpenRead()
             {
                 var testCode = @"
 namespace RoslynSandbox

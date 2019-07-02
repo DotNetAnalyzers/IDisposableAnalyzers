@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
         private const string DisposableCode = @"
 namespace RoslynSandbox
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
 
         [Test]
-        public void NotDisposingVariable()
+        public static void NotDisposingVariable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SettingToNull()
+        public static void SettingToNull()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenNullCheckAndAssignedTwice()
+        public static void WhenNullCheckAndAssignedTwice()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -158,7 +158,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingVariableOfTypeObject()
+        public static void NotDisposingVariableOfTypeObject()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -195,7 +195,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningParameterTwice()
+        public static void AssigningParameterTwice()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -234,7 +234,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningInIfElse()
+        public static void AssigningInIfElse()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -287,7 +287,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingInitializedFieldInCtor()
+        public static void NotDisposingInitializedFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -328,7 +328,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingInitializedPropertyInCtor()
+        public static void NotDisposingInitializedPropertyInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -369,7 +369,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingInitializedBackingFieldInCtor()
+        public static void NotDisposingInitializedBackingFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -422,7 +422,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingBackingFieldInCtor()
+        public static void NotDisposingBackingFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -477,7 +477,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldInMethod()
+        public static void NotDisposingFieldInMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -518,7 +518,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldInLambda()
+        public static void NotDisposingFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -566,7 +566,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnStatementMethodBody()
+        public static void NotDisposingFieldAssignedInReturnStatementMethodBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -607,7 +607,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInExpressionBody()
+        public static void NotDisposingFieldAssignedInExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -645,7 +645,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnStatementInPropertyStatementBody()
+        public static void NotDisposingFieldAssignedInReturnStatementInPropertyStatementBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -692,7 +692,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
+        public static void NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -733,7 +733,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldInLambdaBlock()
+        public static void AssigningFieldInLambdaBlock()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -792,7 +792,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldInLambdaExpression()
+        public static void AssigningFieldInLambdaExpression()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -848,7 +848,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningBackingFieldInLambda()
+        public static void AssigningBackingFieldInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -918,7 +918,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningVariableViaOutParameterBefore()
+        public static void AssigningVariableViaOutParameterBefore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -975,7 +975,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WhenAssigningLocalInLambda()
+        public static void WhenAssigningLocalInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1018,7 +1018,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedBeforeWhileLoop()
+        public static void AssignedBeforeWhileLoop()
         {
             var code = @"
 namespace RoslynSandbox
@@ -1066,7 +1066,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignedWithNullBeforeWhileLoop()
+        public static void AssignedWithNullBeforeWhileLoop()
         {
             var code = @"
 namespace RoslynSandbox

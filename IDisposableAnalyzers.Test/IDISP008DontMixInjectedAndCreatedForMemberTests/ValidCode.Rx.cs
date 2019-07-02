@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
     {
-        public class Rx
+        public static class Rx
         {
             [Test]
-            public void SingleAssignmentDisposable()
+            public static void SingleAssignmentDisposable()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -37,7 +37,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void SingleAssignmentDisposableAssignedWithObservableSubscribe()
+            public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
             {
                 var testCode = @"
 namespace Gu.Reactive
@@ -65,7 +65,7 @@ namespace Gu.Reactive
             }
 
             [Test]
-            public void SingleAssignmentDisposableAssignedInAction()
+            public static void SingleAssignmentDisposableAssignedInAction()
             {
                 var testCode = @"
 namespace Gu.Reactive

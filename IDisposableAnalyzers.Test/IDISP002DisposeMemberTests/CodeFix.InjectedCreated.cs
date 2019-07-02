@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class InjectedCreated
+        public static class InjectedCreated
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP002DisposeMember.Descriptor);
 
             [Test]
-            public void CtorPassingCreatedIntoPrivateCtor()
+            public static void CtorPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -71,7 +71,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
+            public static void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -128,7 +128,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
+            public static void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -189,7 +189,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
+            public static void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
 namespace RoslynSandbox
@@ -250,7 +250,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
+            public static void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox

@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
+namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    internal partial class ValidCode<T>
+    public partial class ValidCode<T>
     {
-        public class Recursion
+        public static class Recursion
         {
             [Test]
-            public void IgnoresWhenDisposingRecursiveProperty()
+            public static void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -30,7 +30,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenNotDisposingRecursiveProperty()
+            public static void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -50,7 +50,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -78,7 +78,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+            public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -105,7 +105,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void IgnoresWhenDisposingRecursiveMethod()
+            public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox

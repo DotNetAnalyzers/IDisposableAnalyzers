@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class HandlesRecursion
+    public static class HandlesRecursion
     {
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(AnalyzerCategory)
                                                                                  .Assembly
@@ -17,13 +17,13 @@ namespace IDisposableAnalyzers.Test
                                                                                  .ToArray();
 
         [Test]
-        public void NotEmpty()
+        public static void NotEmpty()
         {
             CollectionAssert.IsNotEmpty(AllAnalyzers);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
+        public static void ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
-        public void ConstructorCycle(DiagnosticAnalyzer analyzer)
+        public static void ConstructorCycle(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -3,10 +3,10 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    internal partial class ValidCode
+    public static partial class ValidCode
     {
         [Test]
-        public void ChainedCtor()
+        public static void ChainedCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedCtorCoalesce()
+        public static void ChainedCtorCoalesce()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedCtors()
+        public static void ChainedCtors()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -107,7 +107,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedCtorCallsBaseCtorDisposedInThis()
+        public static void ChainedCtorCallsBaseCtorDisposedInThis()
         {
             var baseCode = @"
 namespace RoslynSandbox
@@ -183,7 +183,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedBaseCtorDisposedInThis()
+        public static void ChainedBaseCtorDisposedInThis()
         {
             var baseCode = @"
 namespace RoslynSandbox
@@ -260,7 +260,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void UsingStreamInStreamReader()
+        public static void UsingStreamInStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -282,7 +282,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposableCreate()
+        public static void DisposableCreate()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -303,7 +303,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningStreamReader()
+        public static void MethodReturningStreamReader()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -331,7 +331,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodReturningStreamReaderExpressionBody()
+        public static void MethodReturningStreamReaderExpressionBody()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -356,7 +356,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodWithFuncTaskAsParameter()
+        public static void MethodWithFuncTaskAsParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -379,7 +379,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void MethodWithFuncStreamAsParameter()
+        public static void MethodWithFuncStreamAsParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -404,7 +404,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SubclassedNinjectKernel()
+        public static void SubclassedNinjectKernel()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -439,7 +439,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ValueTupleOfLocals()
+        public static void ValueTupleOfLocals()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -470,7 +470,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ValueTuple()
+        public static void ValueTuple()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -499,7 +499,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TupleOfLocals()
+        public static void TupleOfLocals()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -530,7 +530,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalObjectThatIsDisposed()
+        public static void LocalObjectThatIsDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -552,7 +552,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldObjectThatIsDisposed()
+        public static void FieldObjectThatIsDisposed()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -583,7 +583,7 @@ namespace RoslynSandbox
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
         [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-        public void LocalTupleThatIsDisposed(string expression)
+        public static void LocalTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -607,7 +607,7 @@ namespace RoslynSandbox
 
         [TestCase("(File.OpenRead(file), new object())")]
         [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
-        public void LocalValueTupleThatIsDisposed(string expression)
+        public static void LocalValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -631,7 +631,7 @@ namespace RoslynSandbox
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void LocalPairThatIsDisposed(string expression)
+        public static void LocalPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
 namespace RoslynSandbox
@@ -681,7 +681,7 @@ namespace RoslynSandbox
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldTupleThatIsDisposed(string expression)
+        public static void FieldTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -710,7 +710,7 @@ namespace RoslynSandbox
         }
 
         [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldValueTupleThatIsDisposed(string expression)
+        public static void FieldValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -740,7 +740,7 @@ namespace RoslynSandbox
 
         [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public void FieldPairThatIsDisposed(string expression)
+        public static void FieldPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
 namespace RoslynSandbox

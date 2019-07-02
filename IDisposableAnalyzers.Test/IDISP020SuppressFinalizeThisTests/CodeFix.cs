@@ -5,14 +5,14 @@ namespace IDisposableAnalyzers.Test.IDISP020SuppressFinalizeThisTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class CodeFix
+    public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP020SuppressFinalizeThis.Descriptor);
         private static readonly CodeFixProvider Fix = new ArgumentFix();
 
         [TestCase("null")]
-        public void WhenStatementBody(string expression)
+        public static void WhenStatementBody(string expression)
         {
             var testCode = @"
 namespace RoslynSandbox

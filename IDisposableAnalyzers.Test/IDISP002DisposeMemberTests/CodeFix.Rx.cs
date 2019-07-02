@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class Rx
+        public static class Rx
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new DisposeMemberFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
             [Test]
-            public void SerialDisposable()
+            public static void SerialDisposable()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void ObservableSubscribe()
+            public static void ObservableSubscribe()
             {
                 var testCode = @"
 namespace RoslynSandbox

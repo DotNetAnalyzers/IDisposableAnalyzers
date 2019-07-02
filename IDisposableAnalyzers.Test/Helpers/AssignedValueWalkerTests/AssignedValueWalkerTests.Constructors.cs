@@ -6,14 +6,14 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
-        public class Constructors
+        public static class Constructors
         {
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "arg")]
             [TestCase("var temp3 = this.value;", "arg")]
-            public void FieldCtorArgSimple(string code, string expected)
+            public static void FieldCtorArgSimple(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "Id(arg)")]
             [TestCase("var temp3 = this.value;", "Id(arg)")]
-            public void FieldCtorArgThenIdMethod(string code, string expected)
+            public static void FieldCtorArgThenIdMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -90,7 +90,7 @@ namespace RoslynSandbox
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
-            public void FieldChainedCtor(string code, string expected)
+            public static void FieldChainedCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -144,7 +144,7 @@ namespace RoslynSandbox
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
-            public void FieldChainedPrivateCtor(string code, string expected)
+            public static void FieldChainedPrivateCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -198,7 +198,7 @@ namespace RoslynSandbox
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, ctorArg, 5, arg")]
-            public void FieldChainedInternalCtor(string code, string expected)
+            public static void FieldChainedInternalCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -246,7 +246,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "1")]
             [TestCase("var temp2 = this.value;", "1, 2")]
-            public void FieldPrivateCtorFactory(string code, string expected)
+            public static void FieldPrivateCtorFactory(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -280,7 +280,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "1")]
             [TestCase("var temp2 = this.value;", "1, ctorArg, 2")]
-            public void FieldPublicCtorFactory(string code, string expected)
+            public static void FieldPublicCtorFactory(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -320,7 +320,7 @@ namespace RoslynSandbox
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
-            public void FieldChainedCtorGenericClass(string code, string expected)
+            public static void FieldChainedCtorGenericClass(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -375,7 +375,7 @@ namespace RoslynSandbox
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp9 = this.value;", "1, 2, 3, 4, 5, arg")]
-            public void FieldCtorCallingPrivateInitializeMethod(string code, string expected)
+            public static void FieldCtorCallingPrivateInitializeMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -431,7 +431,7 @@ namespace RoslynSandbox
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
             [TestCase("var temp8 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
             [TestCase("var temp9 = this.value;", "1, 2, 3, 4, 5, arg, initArg")]
-            public void FieldCtorCallingProtectedInitializeMethod(string code, string expected)
+            public static void FieldCtorCallingProtectedInitializeMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -489,7 +489,7 @@ namespace RoslynSandbox
             [TestCase("var temp9 = this.Value;", "1, 2, 8, 3, 4, 5, 6, 7, arg")]
             [TestCase("var temp10 = this.Value;", "1, 2, 8, 3, 4, 5, 6, 7, arg")]
             [TestCase("var temp11 = this.Value;", "1, 2, 8, 3, 4, 5, 6, 7, arg")]
-            public void AutoPropertyChainedCtor(string code, string expected)
+            public static void AutoPropertyChainedCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -547,7 +547,7 @@ namespace RoslynSandbox
             [TestCase("var temp4 = this.temp1;", "this.value")]
             [TestCase("var temp5 = this.value;", "1, 2")]
             [TestCase("var temp6 = this.temp1;", "this.value")]
-            public void FieldInitializedlWithLiteralAndAssignedInCtor(string code, string expected)
+            public static void FieldInitializedlWithLiteralAndAssignedInCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -586,7 +586,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.Value;", "1, 2, 3")]
             [TestCase("var temp2 = this.Value;", "1, 2, 3, 4")]
-            public void InitializedInChainedWithLiteralGeneric(string code, string expected)
+            public static void InitializedInChainedWithLiteralGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -628,7 +628,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1, 2")]
             [TestCase("var temp3 = this.value;", "1, 2, 3, arg")]
             [TestCase("var temp4 = this.value;", "1, 2, 3, arg")]
-            public void FieldImplicitBase(string code, object expected)
+            public static void FieldImplicitBase(string code, object expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -674,7 +674,7 @@ namespace RoslynSandbox
             [TestCase("var temp5 = this.value;", "1, 2, 3, 4")]
             [TestCase("var temp6 = this.value;", "1, 2, 3, 4, 5, arg")]
             [TestCase("var temp7 = this.value;", "1, 2, 3, 4, 5, arg")]
-            public void FieldImplicitBaseWhenSubclassHasCtor(string code, object expected)
+            public static void FieldImplicitBaseWhenSubclassHasCtor(string code, object expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -724,7 +724,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "1, 2, 3")]
             [TestCase("var temp2 = this.value;", "1, 2, 3, 4")]
-            public void InitializedInBaseCtorWithLiteral(string code, string expected)
+            public static void InitializedInBaseCtorWithLiteral(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -771,7 +771,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "1, 2, 3")]
             [TestCase("var temp2 = this.value;", "1, 2, 3, 4")]
-            public void InitializedInExplicitBaseCtorWithLiteral(string code, string expected)
+            public static void InitializedInExplicitBaseCtorWithLiteral(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -818,7 +818,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void InitializedInBaseCtorWithDefaultGenericSimple()
+            public static void InitializedInBaseCtorWithDefaultGenericSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -852,7 +852,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AbstractGenericInitializedInBaseCtorSimple()
+            public static void AbstractGenericInitializedInBaseCtorSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -889,7 +889,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "default(T)")]
             [TestCase("var temp2 = this.value;", "default(T)")]
-            public void InitializedInBaseCtorWithDefaultGeneric(string code, string expected)
+            public static void InitializedInBaseCtorWithDefaultGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -934,7 +934,7 @@ namespace RoslynSandbox
 
             [TestCase("var temp1 = this.value;", "default(T)")]
             [TestCase("var temp2 = this.value;", "default(T)")]
-            public void InitializedInBaseCtorWithDefaultGenericGeneric(string code, string expected)
+            public static void InitializedInBaseCtorWithDefaultGenericGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -978,7 +978,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedInLambdaCtor()
+            public static void FieldAssignedInLambdaCtor()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

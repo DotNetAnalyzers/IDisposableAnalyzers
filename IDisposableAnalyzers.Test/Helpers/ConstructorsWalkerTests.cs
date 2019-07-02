@@ -8,10 +8,10 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    internal class ConstructorsWalkerTests
+    internal static class ConstructorsWalkerTests
     {
         [Test]
-        public void TwoInternalChained()
+        public static void TwoInternalChained()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void InternalPrivateChained()
+        public static void InternalPrivateChained()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void PrivatePrivateFactory()
+        public static void PrivatePrivateFactory()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

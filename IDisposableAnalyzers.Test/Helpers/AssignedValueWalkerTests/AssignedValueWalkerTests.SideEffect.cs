@@ -6,15 +6,15 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 
     using NUnit.Framework;
 
-    public partial class AssignedValueWalkerTests
+    public static partial class AssignedValueWalkerTests
     {
-        public class SideEffect
+        public static class SideEffect
         {
             [TestCase("var temp1 = this.value;", "")]
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
             [TestCase("var temp4 = this.value;", "1, 2, arg")]
-            public void MethodInjected(string code, string expected)
+            public static void MethodInjected(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
             [TestCase("var temp4 = this.value;", "1, 2, arg")]
-            public void MethodInjectedWithOptional(string code, string expected)
+            public static void MethodInjectedWithOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox
@@ -100,7 +100,7 @@ namespace RoslynSandbox
             [TestCase("var temp2 = this.text;", "null")]
             [TestCase("var temp3 = this.text;", "null, \"abc\"")]
             [TestCase("var temp4 = this.text;", "null, \"abc\", textArg")]
-            public void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
+            public static void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace RoslynSandbox

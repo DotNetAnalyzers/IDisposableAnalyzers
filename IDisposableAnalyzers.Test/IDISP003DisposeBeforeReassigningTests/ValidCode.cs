@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    public partial class ValidCode<T>
+    public static partial class ValidCode<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
         [Test]
-        public void LocalDeclaration()
+        public static void LocalDeclaration()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalAssignedInSwitch()
+        public static void LocalAssignedInSwitch()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -84,7 +84,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalAssignedInIfElseSwitch()
+        public static void LocalAssignedInIfElseSwitch()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +126,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignVariableInitializedWithNull()
+        public static void AssignVariableInitializedWithNull()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -151,7 +151,7 @@ namespace RoslynSandbox
         [TestCase("(stream as IDisposable).Dispose()")]
         [TestCase("((IDisposable)stream).Dispose()")]
         [TestCase("((IDisposable)stream)?.Dispose()")]
-        public void NotDisposingVariableOfTypeObject(string disposeCode)
+        public static void NotDisposingVariableOfTypeObject(string disposeCode)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -174,7 +174,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningPropertyInCtor()
+        public static void AssigningPropertyInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -196,7 +196,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningPropertyInCtorInDisposableType()
+        public static void AssigningPropertyInCtorInDisposableType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -222,7 +222,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningIndexerInCtor()
+        public static void AssigningIndexerInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -250,7 +250,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningIndexerInCtorInDisposableType()
+        public static void AssigningIndexerInCtorInDisposableType()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -282,7 +282,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningPropertyWithBackingFieldInCtor()
+        public static void AssigningPropertyWithBackingFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -310,7 +310,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningFieldInCtor()
+        public static void AssigningFieldInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -332,7 +332,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldSwapCached()
+        public static void FieldSwapCached()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -357,7 +357,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalSwapCached()
+        public static void LocalSwapCached()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -381,7 +381,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalSwapCachedDisposableDictionary()
+        public static void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
 namespace RoslynSandbox
@@ -418,7 +418,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalSwapCachedTryGetValue()
+        public static void LocalSwapCachedTryGetValue()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -446,7 +446,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningInIfElse()
+        public static void AssigningInIfElse()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -476,7 +476,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssignFieldViaOutParameterInCtor()
+        public static void AssignFieldViaOutParameterInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -507,7 +507,7 @@ namespace RoslynSandbox
         [TestCase("Stream stream;")]
         [TestCase("Stream stream = null;")]
         [TestCase("var stream = (Stream)null;")]
-        public void VariableSplitDeclarationAndAssignment(string declaration)
+        public static void VariableSplitDeclarationAndAssignment(string declaration)
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -529,7 +529,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void WithOptionalParameter()
+        public static void WithOptionalParameter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -561,7 +561,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedCalls()
+        public static void ChainedCalls()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -598,7 +598,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedCallsWithHelper()
+        public static void ChainedCallsWithHelper()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -644,7 +644,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReproIssue71()
+        public static void ReproIssue71()
         {
             var code = @"
 using System;
@@ -763,7 +763,7 @@ namespace TaxonomyWpf
         }
 
         [Test]
-        public void DisposingBackingFieldInSetter()
+        public static void DisposingBackingFieldInSetter()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -796,7 +796,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LazyProperty()
+        public static void LazyProperty()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -826,7 +826,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LazyAssigningSingleAssignmentDisposable()
+        public static void LazyAssigningSingleAssignmentDisposable()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -859,7 +859,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SeparateDeclarationAndAssignment()
+        public static void SeparateDeclarationAndAssignment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -880,7 +880,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SeparateDeclarationAndAssignmentInLambda()
+        public static void SeparateDeclarationAndAssignmentInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -904,7 +904,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SeparateDeclarationAndAssignmentInUsing()
+        public static void SeparateDeclarationAndAssignmentInUsing()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -926,7 +926,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void SingleSimpleAssignment()
+        public static void SingleSimpleAssignment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -952,7 +952,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void AssigningWithAssignment()
+        public static void AssigningWithAssignment()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -980,7 +980,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void TryWithEarlyReturn()
+        public static void TryWithEarlyReturn()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1006,7 +1006,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingListContent()
+        public static void DisposingListContent()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1031,7 +1031,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingListContentUnderscore()
+        public static void DisposingListContentUnderscore()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1056,7 +1056,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningOutParameterInForeach()
+        public static void ReturningOutParameterInForeach()
         {
             var code = @"
 namespace RoslynSandbox
@@ -1085,7 +1085,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningOutParameterInFor()
+        public static void ReturningOutParameterInFor()
         {
             var code = @"
 namespace RoslynSandbox
@@ -1115,7 +1115,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReturningOutParameterInWhile()
+        public static void ReturningOutParameterInWhile()
         {
             var code = @"
 namespace RoslynSandbox
@@ -1148,7 +1148,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposedAfterInForeach()
+        public static void DisposedAfterInForeach()
         {
             var code = @"
 namespace RoslynSandbox
@@ -1172,7 +1172,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void LocalAssignedTwoStepInLoop()
+        public static void LocalAssignedTwoStepInLoop()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1199,7 +1199,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ChainedConstructorSettingToNullThenInjected()
+        public static void ChainedConstructorSettingToNullThenInjected()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1227,7 +1227,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposeAssignDisposeAssignNull()
+        public static void DisposeAssignDisposeAssignNull()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -1258,7 +1258,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void FieldTryFinally()
+        public static void FieldTryFinally()
         {
             var testCode = @"
 namespace RoslynSandbox

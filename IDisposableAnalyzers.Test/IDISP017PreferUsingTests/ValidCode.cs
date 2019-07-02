@@ -4,12 +4,12 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public class ValidCode
+    public static class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
         [Test]
-        public void DisposingField()
+        public static void DisposingField()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingArrayItem()
+        public static void DisposingArrayItem()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void DisposingDictionaryItem()
+        public static void DisposingDictionaryItem()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -92,7 +92,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReassignAfterDispose()
+        public static void ReassignAfterDispose()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public void ReassignViaOutAfterDispose()
+        public static void ReassignViaOutAfterDispose()
         {
             var testCode = @"
 namespace RoslynSandbox

@@ -4,15 +4,15 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class Diagnostics
+    public static partial class Diagnostics
     {
-        public class Using
+        public static class Using
         {
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
 
             [Test]
-            public void UsingField1()
+            public static void UsingField1()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void UsingField2()
+            public static void UsingField2()
             {
                 var testCode = @"
 namespace RoslynSandbox

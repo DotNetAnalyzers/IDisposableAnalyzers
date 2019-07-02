@@ -5,16 +5,16 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public partial class CodeFix
+    public static partial class CodeFix
     {
-        public class AddUsingOutParameter
+        public static class AddUsingOutParameter
         {
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
             private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             [Test]
-            public void OutParameter()
+            public static void OutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -69,7 +69,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void OutVarParameter()
+            public static void OutVarParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox

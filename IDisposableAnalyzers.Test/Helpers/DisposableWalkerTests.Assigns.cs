@@ -6,12 +6,12 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public partial class DisposableWalkerTests
+    public static partial class DisposableWalkerTests
     {
-        public class Assigns
+        public static class Assigns
         {
             [Test]
-            public void WhenNotUsed()
+            public static void WhenNotUsed()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -35,7 +35,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void AssigningLocal()
+            public static void AssigningLocal()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -60,7 +60,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedInCtor()
+            public static void FieldAssignedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -88,7 +88,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedViaCalledMethodParameter()
+            public static void FieldAssignedViaCalledMethodParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -121,7 +121,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void FieldAssignedInCtorViaLocal()
+            public static void FieldAssignedInCtorViaLocal()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -150,7 +150,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyAssignedInCtor()
+            public static void PropertyAssignedInCtor()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -178,7 +178,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public void PropertyAssignedInCalledMethod()
+            public static void PropertyAssignedInCalledMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
