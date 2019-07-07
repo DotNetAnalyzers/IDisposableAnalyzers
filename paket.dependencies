@@ -13,7 +13,7 @@ group Test
   nuget Microsoft.NET.Test.Sdk
   nuget NUnit
   nuget NUnit3TestAdapter
-  nuget Microsoft.CodeAnalysis.CSharp.Workspaces 2.10
+  nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   nuget Gu.Roslyn.Asserts
   nuget Moq
   nuget Ninject
@@ -27,7 +27,7 @@ group NetCoreTest
   nuget Microsoft.NET.Test.Sdk
   nuget NUnit
   nuget NUnit3TestAdapter
-  nuget Microsoft.CodeAnalysis.CSharp.Workspaces 2.10
+  nuget Microsoft.CodeAnalysis.CSharp.Workspaces
   nuget Gu.Roslyn.Asserts
   nuget Microsoft.ApplicationInsights.AspNetCore
 
