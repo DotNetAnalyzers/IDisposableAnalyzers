@@ -4,7 +4,7 @@ Roslyn analyzers for IDisposable
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Gitter](https://badges.gitter.im/DotNetAnalyzers/IDisposableAnalyzers.svg)](https://gitter.im/DotNetAnalyzers/IDisposableAnalyzers?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 [![Build status](https://ci.appveyor.com/api/projects/status/nt35pbd1r08vj2m8/branch/master?svg=true)](https://ci.appveyor.com/project/JohanLarsson/idisposableanalyzers/branch/master)
-[![Build Status](https://dev.azure.com/johan-larsson/IDisposableAnalyzers/_apis/build/status/IDisposableAnalyzers-CI?branchName=master)](https://dev.azure.com/johan-larsson/IDisposableAnalyzers/_build/latest?definitionId=14&branchName=master)
+[![Build Status](https://dev.azure.com/DotNetAnalyzers/IDisposableAnalyzers/_apis/build/status/IDisposableAnalyzers-CI?branchName=master)](https://dev.azure.com/DotNetAnalyzers/IDisposableAnalyzers/_build/latest?definitionId=1&branchName=master)
 [![NuGet](https://img.shields.io/nuget/v/IDisposableAnalyzers.svg)](https://www.nuget.org/packages/IDisposableAnalyzers/)
 
 ![animation](https://user-images.githubusercontent.com/1640096/51797806-5efa7380-220a-11e9-918d-c1b39da79c38.gif)
