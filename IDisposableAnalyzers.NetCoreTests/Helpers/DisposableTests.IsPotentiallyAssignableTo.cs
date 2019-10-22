@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal static partial class DisposableTests
+    public static partial class DisposableTests
     {
         internal static class IsPotentiallyAssignableTo
         {

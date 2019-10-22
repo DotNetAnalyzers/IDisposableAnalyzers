@@ -19,13 +19,13 @@ namespace IDisposableAnalyzers
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)this.inner).GetEnumerator();
 
-        public void RemoveAll(Predicate<T> match) => this.inner.RemoveAll(match);
+        internal void RemoveAll(Predicate<T> match) => this.inner.RemoveAll(match);
 
-        public void Clear() => this.inner.Clear();
+        internal void Clear() => this.inner.Clear();
 
-        public bool Contains(T item) => this.inner.Contains(item);
+        internal bool Contains(T item) => this.inner.Contains(item);
 
-        public bool Add(T item)
+        internal bool Add(T item)
         {
             if (!this.inner.Contains(item))
             {

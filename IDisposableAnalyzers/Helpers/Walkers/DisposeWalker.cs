@@ -17,14 +17,6 @@ namespace IDisposableAnalyzers
             this.Scope = Scope.Instance;
         }
 
-        public IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
-
-        public IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
-
-        public void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
-
-        public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
-
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             base.VisitInvocationExpression(node);
@@ -40,6 +32,14 @@ namespace IDisposableAnalyzers
             this.identifiers.Add(node);
             base.VisitIdentifierName(node);
         }
+
+        internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
+
+        internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
+
+        internal void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
+
+        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
 
         internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
         {

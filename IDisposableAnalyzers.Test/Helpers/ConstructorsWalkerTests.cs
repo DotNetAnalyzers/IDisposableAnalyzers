@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     using NUnit.Framework;
 
-    internal static class ConstructorsWalkerTests
+    public static class ConstructorsWalkerTests
     {
         [Test]
         public static void TwoInternalChained()

@@ -5,9 +5,9 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    internal static partial class DisposableTests
+    public static partial class DisposableTests
     {
-        internal static class IsCreation
+        public static class IsCreation
         {
             [TestCase("Microsoft.Extensions.Logging.ApplicationInsightsLoggerFactoryExtensions.AddApplicationInsights(((Microsoft.Extensions.Logging.ILoggerFactory)o), null)")]
             public static void WhiteList(string code)

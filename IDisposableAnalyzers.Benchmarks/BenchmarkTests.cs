@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    internal class BenchmarkTests
+    public class BenchmarkTests
     {
         private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbol).Assembly
                                                                                                     .GetTypes()

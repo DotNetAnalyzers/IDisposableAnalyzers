@@ -22,13 +22,13 @@ namespace IDisposableAnalyzers
         {
         }
 
-        public IReadOnlyList<ConstructorDeclarationSyntax> NonPrivateCtors => this.nonPrivateCtors;
+        internal IReadOnlyList<ConstructorDeclarationSyntax> NonPrivateCtors => this.nonPrivateCtors;
 
-        public IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
+        internal IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
 
-        public IReadOnlyList<ConstructorInitializerSyntax> Initializers => this.initializers;
+        internal IReadOnlyList<ConstructorInitializerSyntax> Initializers => this.initializers;
 
-        public ConstructorDeclarationSyntax Default { get; private set; }
+        internal ConstructorDeclarationSyntax Default { get; private set; }
 
         private INamedTypeSymbol Type => this.type ?? (this.type = this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken) as INamedTypeSymbol);
 
