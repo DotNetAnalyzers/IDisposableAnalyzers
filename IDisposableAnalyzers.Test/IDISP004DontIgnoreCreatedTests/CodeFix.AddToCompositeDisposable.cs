@@ -1,6 +1,7 @@
 namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -10,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP004DontIgnoreCreated.Descriptor);
-            private static readonly AddToCompositeDisposableFix Fix = new AddToCompositeDisposableFix();
+            private static readonly CodeFixProvider Fix = new AddToCompositeDisposableFix();
 
             [Test]
             public static void CreateNewCompositeDisposable()

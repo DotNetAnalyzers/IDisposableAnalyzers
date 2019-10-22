@@ -37,7 +37,7 @@ namespace IDisposableAnalyzers
                                             SyntaxFactory.SeparatedList<ExpressionSyntax>(updatedExpressions))
                                         .WithOpenBraceToken(
                                             SyntaxFactory.Token(SyntaxKind.OpenBraceToken)
-                                                         .WithTrailingTrivia(SyntaxFactory.ElasticCarriageReturnLineFeed)))
+                                                         .WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed)))
                                         .WithAdditionalAnnotations(Formatter.Annotation);
                     }
                     else
