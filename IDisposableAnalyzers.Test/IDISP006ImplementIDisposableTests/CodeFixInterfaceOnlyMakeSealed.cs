@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
     }
 }";
@@ -122,7 +122,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
         private void ThrowIfDisposed()
         {
@@ -165,7 +165,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
         protected int Value { get; private set; }
     }
@@ -280,7 +280,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
         public virtual void M()
         {
@@ -331,7 +331,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
         protected virtual void M()
         {

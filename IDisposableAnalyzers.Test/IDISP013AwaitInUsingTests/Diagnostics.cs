@@ -101,7 +101,7 @@ namespace RoslynSandbox
             var tcs = new TaskCompletionSource<bool>();
             using (var client = new WebClient())
             {
-                return tcs.Task;
+                return ↓tcs.Task;
             }
         }
     }

@@ -59,7 +59,7 @@ namespace RoslynSandbox
     {
         public Stream Meh
         {
-            get => File.OpenRead(string.Empty);
+            get => ↓File.OpenRead(string.Empty);
         }
     }
 }";

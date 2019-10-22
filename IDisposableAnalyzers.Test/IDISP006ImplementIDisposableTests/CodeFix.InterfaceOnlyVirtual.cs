@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class C : IDisposable
+    public abstract class C : ↓IDisposable
     {
     }
 }";
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class C : IDisposable
+    public abstract class C : ↓IDisposable
     {
         public const int Value1 = 1;
         private const int Value2 = 2;
@@ -160,7 +160,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class C : IDisposable
+    public abstract class C : ↓IDisposable
     {
         public void M1()
         {
@@ -245,7 +245,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : IDisposable
+    public class C : ↓IDisposable
     {
     }
 }";

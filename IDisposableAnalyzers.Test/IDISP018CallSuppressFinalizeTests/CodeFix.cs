@@ -28,7 +28,7 @@ namespace RoslynSandbox
             this.Dispose(false);
         }
 
-        public void Dispose()
+        public void ↓Dispose()
         {
             this.Dispose(true);
         }
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             this.Dispose(false);
         }
 
-        public void Dispose()
+        public void ↓Dispose()
         {
             // 1
             this.Dispose(true);
@@ -160,7 +160,7 @@ namespace RoslynSandbox
             this.Dispose(false);
         }
 
-        public void Dispose() => this.Dispose(true);
+        public void ↓Dispose() => this.Dispose(true);
 
         private void Dispose(bool disposing)
         {

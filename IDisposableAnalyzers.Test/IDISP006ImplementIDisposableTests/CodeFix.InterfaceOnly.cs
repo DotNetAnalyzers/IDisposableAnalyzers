@@ -20,7 +20,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public struct C : IDisposable
+    public struct C : ↓IDisposable
     {
     }
 }";
@@ -51,7 +51,7 @@ namespace RoslynSandbox
 
     internal static class Cache<TKey, TValue>
     {
-        internal struct Transaction : IDisposable
+        internal struct Transaction : ↓IDisposable
         {
         }
     }

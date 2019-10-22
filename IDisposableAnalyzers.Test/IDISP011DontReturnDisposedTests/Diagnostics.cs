@@ -97,7 +97,7 @@ namespace RoslynSandbox
         public IEnumerable<string> F()
         {
             using (var reader = File.OpenText(string.Empty))
-                return Use(reader);
+                return Use(↓reader);
         }
 
         private IEnumerable<string> Use(TextReader reader)
