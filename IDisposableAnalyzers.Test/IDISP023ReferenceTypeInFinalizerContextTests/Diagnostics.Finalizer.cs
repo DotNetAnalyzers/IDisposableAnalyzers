@@ -14,8 +14,8 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 
             private static readonly StringBuilder Builder = new StringBuilder();
 
-            [TestCase("Builder.Append(1)")]
-            [TestCase("_ = Builder.Length")]
+            [TestCase("↓Builder.Append(1)")]
+            [TestCase("_ = ↓Builder.Length")]
             public static void Static(string expression)
             {
                 var testCode = @"
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             ↓Builder.Append(1);
         }
     }
-}".AssertReplace("Builder.Append(1)", expression);
+}".AssertReplace("↓Builder.Append(1)", expression);
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
             }
