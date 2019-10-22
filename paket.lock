@@ -716,7 +716,9 @@ NUGET
   remote: http://www.nuget.org/api/v2
     AsyncUsageAnalyzers (1.0.0-alpha003)
     Gu.Analyzers (1.5.5-dev)
-    StyleCop.Analyzers (1.1.118)
+    StyleCop.Analyzers (1.2.0-beta.66)
+      StyleCop.Analyzers.Unstable (>= 1.2.0.66)
+    StyleCop.Analyzers.Unstable (1.2.0.66)
 
 GROUP Benchmarks
 STORAGE: NONE
