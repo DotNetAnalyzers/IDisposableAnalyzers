@@ -21,36 +21,6 @@ namespace IDisposableAnalyzers
         /// </summary>
         internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
-        /// <summary>
-        /// Get a walker that has visited <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A walker that has visited <paramref name="node"/>.</returns>
-        internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var walker = BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
-            if (node is MethodDeclarationSyntax)
-            {
-                walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
-                walker.recursive.RemoveAll(x => IsInIfDisposing(x.Node));
-            }
-
-            foreach (var item in walker.recursive)
-            {
-                using (var recursiveWalker = RecursiveWalker.Borrow(item.Symbol, semanticModel, cancellationToken))
-                {
-                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
-                    {
-                        walker.usedReferenceTypes.Add(item.Node);
-                    }
-                }
-            }
-
-            return walker;
-        }
-
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (!IsDisposeBool(node))
@@ -79,6 +49,36 @@ namespace IDisposableAnalyzers
             }
 
             base.VisitIdentifierName(node);
+        }
+
+        /// <summary>
+        /// Get a walker that has visited <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">The node.</param>
+        /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
+        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
+        /// <returns>A walker that has visited <paramref name="node"/>.</returns>
+        internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var walker = BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            if (node is MethodDeclarationSyntax)
+            {
+                walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
+                walker.recursive.RemoveAll(x => IsInIfDisposing(x.Node));
+            }
+
+            foreach (var item in walker.recursive)
+            {
+                using (var recursiveWalker = RecursiveWalker.Borrow(item.Symbol, semanticModel, cancellationToken))
+                {
+                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
+                    {
+                        walker.usedReferenceTypes.Add(item.Node);
+                    }
+                }
+            }
+
+            return walker;
         }
 
         /// <inheritdoc />

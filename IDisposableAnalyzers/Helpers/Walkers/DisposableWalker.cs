@@ -11,12 +11,12 @@ namespace IDisposableAnalyzers
     {
         private readonly List<IdentifierNameSyntax> usages = new List<IdentifierNameSyntax>();
 
-        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
-
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             this.usages.Add(node);
         }
+
+        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
 
         protected override void Clear()
         {

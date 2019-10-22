@@ -17,6 +17,10 @@ namespace IDisposableAnalyzers
             this.Scope = Scope.Instance;
         }
 
+        internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
+
+        internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             base.VisitInvocationExpression(node);
@@ -32,14 +36,6 @@ namespace IDisposableAnalyzers
             this.identifiers.Add(node);
             base.VisitIdentifierName(node);
         }
-
-        internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
-
-        internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
-
-        internal void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
-
-        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
 
         internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -81,6 +77,10 @@ namespace IDisposableAnalyzers
 
             return Borrow(() => new DisposeWalker());
         }
+
+        internal void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
+
+        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
 
         internal Result IsMemberDisposed(ISymbol member)
         {

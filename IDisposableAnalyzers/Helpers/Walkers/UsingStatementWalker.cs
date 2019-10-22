@@ -13,13 +13,13 @@ namespace IDisposableAnalyzers
         {
         }
 
+        internal IReadOnlyList<UsingStatementSyntax> UsingStatements => this.usingStatements;
+
         public override void VisitUsingStatement(UsingStatementSyntax node)
         {
             this.usingStatements.Add(node);
             base.VisitUsingStatement(node);
         }
-
-        internal IReadOnlyList<UsingStatementSyntax> UsingStatements => this.usingStatements;
 
         internal static UsingStatementWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new UsingStatementWalker());
 
