@@ -180,10 +180,10 @@ namespace RoslynSandbox
         [TestCase("Missing()", ReturnValueSearch.TopLevel, "")]
         [TestCase("this.ThisExpressionBody()", ReturnValueSearch.Recursive, "this")]
         [TestCase("this.ThisExpressionBody()", ReturnValueSearch.TopLevel, "this")]
-        [TestCase("this.ReturningFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningFileOpenRead()", ReturnValueSearch.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
-        [TestCase("this.ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
+        [TestCase("ReturningFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("ReturningFileOpenRead()", ReturnValueSearch.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("ReturningLocalFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
+        [TestCase("ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
         public static void Call(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
