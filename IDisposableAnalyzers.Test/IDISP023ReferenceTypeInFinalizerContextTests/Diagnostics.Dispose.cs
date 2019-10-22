@@ -15,12 +15,13 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             private static readonly StringBuilder Builder = new StringBuilder();
 
             [TestCase("Builder.Append(1)")]
-            [TestCase("Builder.Length")]
+            [TestCase("_ = Builder.Length")]
             public static void Static(string expression)
             {
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.Text;
 
     public class C : IDisposable
@@ -60,7 +61,7 @@ namespace RoslynSandbox
 
             [TestCase("this.↓builder.Append(1)")]
             [TestCase("↓builder.Append(1)")]
-            [TestCase("↓builder.Length")]
+            [TestCase("_ = ↓builder.Length")]
             [TestCase("↓disposable.Dispose()")]
             [TestCase("↓disposable?.Dispose()")]
             [TestCase("this.↓disposable.Dispose()")]
@@ -85,7 +86,7 @@ namespace RoslynSandbox
 
         private bool isDisposed = false;
 
-        private readonly IDisposable Disposable { get; } = OpenRead(string.Empty);
+        private IDisposable Disposable { get; } = File.OpenRead(string.Empty);
 
         ~C()
         {
@@ -118,7 +119,7 @@ namespace RoslynSandbox
 
             [TestCase("this.↓builder.Append(1)")]
             [TestCase("↓builder.Append(1)")]
-            [TestCase("↓builder.Length")]
+            [TestCase("_ = ↓builder.Length")]
             [TestCase("↓disposable.Dispose()")]
             [TestCase("↓disposable?.Dispose()")]
             [TestCase("this.↓disposable.Dispose()")]
@@ -141,7 +142,7 @@ namespace RoslynSandbox
         private readonly StringBuilder builder = new StringBuilder();
         private readonly IDisposable disposable = File.OpenRead(string.Empty);
 
-        private readonly IDisposable Disposable { get; } = OpenRead(string.Empty);
+        private IDisposable Disposable { get; } = File.OpenRead(string.Empty);
 
         ~C()
         {
@@ -170,6 +171,7 @@ namespace RoslynSandbox
                 var testCode = @"
 namespace RoslynSandbox
 {
+    using System;
     using System.Text;
 
     public class C : IDisposable

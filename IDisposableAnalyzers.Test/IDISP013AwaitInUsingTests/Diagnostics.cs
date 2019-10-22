@@ -91,6 +91,7 @@ namespace RoslynSandbox
             var testCode = @"
 namespace RoslynSandbox
 {
+    using System.Net;
     using System.Threading.Tasks;
 
     public class C
@@ -98,7 +99,7 @@ namespace RoslynSandbox
         static Task M()
         {
             var tcs = new TaskCompletionSource<bool>();
-            using (var disposable = new Disposable())
+            using (var client = new WebClient())
             {
                 return tcs.Task;
             }

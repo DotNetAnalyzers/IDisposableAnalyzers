@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             private static readonly StringBuilder Builder = new StringBuilder();
 
             [TestCase("Builder.Append(1)")]
-            [TestCase("Builder.Length")]
+            [TestCase("_ = Builder.Length")]
             public static void Static(string expression)
             {
                 var testCode = @"
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 
             [TestCase("this.↓Builder.Append(1)")]
             [TestCase("↓Builder.Append(1)")]
-            [TestCase("↓Builder.Length")]
+            [TestCase("_ = ↓Builder.Length")]
             public static void Instance(string expression)
             {
                 var testCode = @"
