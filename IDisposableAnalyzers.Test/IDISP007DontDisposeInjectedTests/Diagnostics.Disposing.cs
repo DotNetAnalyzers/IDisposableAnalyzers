@@ -736,8 +736,8 @@ namespace RoslynSandbox
 
             [TestCase("((IDisposable)o).Dispose()")]
             [TestCase("((IDisposable)o)?.Dispose()")]
-            [TestCase("(o as IDisposable).Dispose().Dispose()")]
-            [TestCase("(o as IDisposable).Dispose()?.Dispose()")]
+            [TestCase("(o as IDisposable).Dispose()")]
+            [TestCase("(o as IDisposable)?.Dispose()")]
             public static void Cast(string cast)
             {
                 var testCode = @"

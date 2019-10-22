@@ -98,7 +98,7 @@ namespace RoslynSandbox
 
         private static bool TryM(string fileName, out FileStream stream)
         {
-            if (File.Exists(fileName)
+            if (File.Exists(fileName))
             {
                 stream = File.OpenRead(string.Empty);
                 return true;
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 
         private static bool TryM(string fileName, out FileStream stream)
         {
-            if (File.Exists(fileName)
+            if (File.Exists(fileName))
             {
                 stream = File.OpenRead(string.Empty);
                 return true;
