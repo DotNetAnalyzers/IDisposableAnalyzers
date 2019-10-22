@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers
 
     internal static class IDISP009IsIDisposable
     {
-        public const string DiagnosticId = "IDISP009";
+        internal const string DiagnosticId = "IDISP009";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

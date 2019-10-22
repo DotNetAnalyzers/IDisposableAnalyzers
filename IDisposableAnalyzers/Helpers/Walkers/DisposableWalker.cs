@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers
     {
         private readonly List<IdentifierNameSyntax> usages = new List<IdentifierNameSyntax>();
 
-        public void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
+        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.usages.RemoveAll(match);
 
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {

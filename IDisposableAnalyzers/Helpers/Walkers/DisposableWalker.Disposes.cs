@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal sealed partial class DisposableWalker
     {
-        public static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (localOrParameter.Symbol is IParameterSymbol parameter &&
                 parameter.RefKind != RefKind.None)
@@ -50,7 +50,7 @@ namespace IDisposableAnalyzers
             return true;
         }
 
-        public static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        internal static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
@@ -74,7 +74,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        internal static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
             {
@@ -91,7 +91,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        public static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                declaration.Parent is VariableDeclarationSyntax variableDeclaration &&

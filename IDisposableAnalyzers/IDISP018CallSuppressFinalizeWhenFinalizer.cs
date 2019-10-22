@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers
 
     internal static class IDISP018CallSuppressFinalizeWhenFinalizer
     {
-        public const string DiagnosticId = "IDISP018";
+        internal const string DiagnosticId = "IDISP018";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

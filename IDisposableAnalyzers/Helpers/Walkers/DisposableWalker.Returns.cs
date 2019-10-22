@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal sealed partial class DisposableWalker
     {
-        public static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        internal static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {

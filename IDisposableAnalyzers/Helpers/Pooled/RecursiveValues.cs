@@ -25,20 +25,11 @@ namespace IDisposableAnalyzers
         {
         }
 
-        public bool IsEmpty => this.rawValues.Count == 0;
-
         object IEnumerator.Current => this.Current;
 
         public ExpressionSyntax Current => this.values[this.recursiveIndex];
 
-        public static RecursiveValues Borrow(IReadOnlyList<ExpressionSyntax> rawValues, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            var item = Cache.GetOrCreate(() => new RecursiveValues());
-            item.rawValues = rawValues;
-            item.semanticModel = semanticModel;
-            item.cancellationToken = cancellationToken;
-            return item;
-        }
+        internal bool IsEmpty => this.rawValues.Count == 0;
 
         public bool MoveNext()
         {
@@ -78,6 +69,15 @@ namespace IDisposableAnalyzers
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
             Cache.Enqueue(this);
+        }
+
+        internal static RecursiveValues Borrow(IReadOnlyList<ExpressionSyntax> rawValues, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var item = Cache.GetOrCreate(() => new RecursiveValues());
+            item.rawValues = rawValues;
+            item.semanticModel = semanticModel;
+            item.cancellationToken = cancellationToken;
+            return item;
         }
 
         private bool AddRecursiveValues(ExpressionSyntax assignedValue)

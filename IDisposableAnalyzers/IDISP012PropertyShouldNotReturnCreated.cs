@@ -1,10 +1,10 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
     internal static class IDISP012PropertyShouldNotReturnCreated
     {
-        public const string DiagnosticId = "IDISP012";
+        internal const string DiagnosticId = "IDISP012";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

@@ -8,12 +8,12 @@ namespace IDisposableAnalyzers
     {
         private readonly SmallSet<T> set;
 
-        public SmallSetDebugView(SmallSet<T> set)
+        internal SmallSetDebugView(SmallSet<T> set)
         {
             this.set = set ?? throw new ArgumentNullException(nameof(set));
         }
 
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        public T[] Items => this.set.ToArray();
+        internal T[] Items => this.set.ToArray();
     }
 }

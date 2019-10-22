@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
 
     public static partial class DisposableTests
     {
-        internal static class IsPotentiallyAssignableTo
+        public static class IsPotentiallyAssignableTo
         {
             [TestCase("new string(' ', 1)", false)]
             [TestCase("new System.Text.StringBuilder()", false)]

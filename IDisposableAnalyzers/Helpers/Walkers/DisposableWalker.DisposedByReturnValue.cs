@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal sealed partial class DisposableWalker
     {
-        public static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
+        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
             if (candidate.Parent is ArgumentListSyntax argumentList &&
                 semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))

@@ -1,10 +1,10 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
     internal static class IDISP023ReferenceTypeInFinalizerContext
     {
-        public const string DiagnosticId = "IDISP023";
+        internal const string DiagnosticId = "IDISP023";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

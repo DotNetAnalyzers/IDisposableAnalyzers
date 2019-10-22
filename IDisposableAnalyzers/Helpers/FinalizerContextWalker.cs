@@ -19,7 +19,7 @@ namespace IDisposableAnalyzers
         /// <summary>
         /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
         /// </summary>
-        public IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
+        internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
         /// <summary>
         /// Get a walker that has visited <paramref name="node"/>.
@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
         /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
         /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
         /// <returns>A walker that has visited <paramref name="node"/>.</returns>
-        public static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
             if (node is MethodDeclarationSyntax)
@@ -140,7 +140,7 @@ namespace IDisposableAnalyzers
             internal readonly SyntaxNode Node;
             internal readonly ISymbol Symbol;
 
-            public Recursive(SyntaxNode node, ISymbol symbol)
+            internal Recursive(SyntaxNode node, ISymbol symbol)
             {
                 this.Node = node;
                 this.Symbol = symbol;
@@ -158,14 +158,7 @@ namespace IDisposableAnalyzers
             /// <summary>
             /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
             /// </summary>
-            public IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
-
-            public static RecursiveWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
-            {
-                return symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode node)
-                    ? BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
-                    : Borrow(() => new RecursiveWalker());
-            }
+            internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
             /// <inheritdoc />
             public override void VisitIdentifierName(IdentifierNameSyntax node)
@@ -179,6 +172,13 @@ namespace IDisposableAnalyzers
                 }
 
                 base.VisitIdentifierName(node);
+            }
+
+            internal static RecursiveWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                return symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode node)
+                    ? BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
+                    : Borrow(() => new RecursiveWalker());
             }
 
             /// <inheritdoc />

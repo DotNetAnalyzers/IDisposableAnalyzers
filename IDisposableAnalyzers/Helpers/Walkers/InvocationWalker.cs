@@ -14,9 +14,7 @@ namespace IDisposableAnalyzers
         {
         }
 
-        public IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
-
-        public void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
+        internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
@@ -25,6 +23,8 @@ namespace IDisposableAnalyzers
         }
 
         internal static InvocationWalker Borrow(SyntaxNode node) => BorrowAndVisit(node, () => new InvocationWalker());
+
+        internal void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
 
         protected override void Clear()
         {

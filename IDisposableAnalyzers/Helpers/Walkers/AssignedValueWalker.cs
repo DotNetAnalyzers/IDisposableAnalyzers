@@ -774,7 +774,7 @@ namespace IDisposableAnalyzers
         {
             private readonly AssignedValueWalker inner;
 
-            public PublicMemberWalker(AssignedValueWalker inner)
+            internal PublicMemberWalker(AssignedValueWalker inner)
             {
                 this.inner = inner;
             }
@@ -818,7 +818,7 @@ namespace IDisposableAnalyzers
         {
             private readonly AssignedValueWalker inner;
 
-            public CtorArgWalker(AssignedValueWalker inner)
+            internal CtorArgWalker(AssignedValueWalker inner)
             {
                 this.inner = inner;
             }
@@ -847,22 +847,22 @@ namespace IDisposableAnalyzers
         {
             private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new Dictionary<SyntaxNode, AssignedValueWalker>();
 
-            public MemberWalkers Parent { get; set; }
+            internal MemberWalkers Parent { get; set; }
 
             private Dictionary<SyntaxNode, AssignedValueWalker> Map => this.Parent?.Map ??
                                                                        this.map;
 
-            public void Add(SyntaxNode location, AssignedValueWalker walker)
+            internal void Add(SyntaxNode location, AssignedValueWalker walker)
             {
                 this.Map.Add(location, walker);
             }
 
-            public bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
+            internal bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
             {
                 return this.Map.TryGetValue(location, out walker);
             }
 
-            public void Clear()
+            internal void Clear()
             {
                 foreach (var walker in this.map.Values)
                 {

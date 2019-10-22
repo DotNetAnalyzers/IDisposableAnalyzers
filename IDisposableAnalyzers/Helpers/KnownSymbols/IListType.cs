@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
         internal readonly QualifiedMethod Add;
         internal readonly QualifiedMethod Remove;
 
-        public IListType()
+        internal IListType()
             : base("System.Collections.IList")
         {
             this.Add = new QualifiedMethod(this, nameof(this.Add));

@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers
     {
         internal readonly QualifiedMethod GetEnumerator;
 
-        public IEnumerableOfTType()
+        internal IEnumerableOfTType()
             : base("System.Collections.Generic.IEnumerable`1")
         {
             this.GetEnumerator = new QualifiedMethod(this, nameof(this.GetEnumerator));

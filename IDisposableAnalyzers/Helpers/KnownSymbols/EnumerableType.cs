@@ -57,7 +57,7 @@ namespace IDisposableAnalyzers
         internal readonly QualifiedMethod Where;
         internal readonly QualifiedMethod Zip;
 
-        public EnumerableType()
+        internal EnumerableType()
             : base("System.Linq.Enumerable")
         {
             this.Aggregate = new QualifiedMethod(this, nameof(this.Aggregate));

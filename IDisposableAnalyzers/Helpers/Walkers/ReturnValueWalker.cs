@@ -388,22 +388,22 @@ namespace IDisposableAnalyzers
         {
             private readonly Dictionary<SyntaxNode, ReturnValueWalker> map = new Dictionary<SyntaxNode, ReturnValueWalker>();
 
-            public RecursiveWalkers Parent { get; set; }
+            internal RecursiveWalkers Parent { get; set; }
 
             private Dictionary<SyntaxNode, ReturnValueWalker> Map => this.Parent?.Map ??
                                                                      this.map;
 
-            public void Add(SyntaxNode member, ReturnValueWalker walker)
+            internal void Add(SyntaxNode member, ReturnValueWalker walker)
             {
                 this.Map.Add(member, walker);
             }
 
-            public bool TryGetValue(SyntaxNode member, out ReturnValueWalker walker)
+            internal bool TryGetValue(SyntaxNode member, out ReturnValueWalker walker)
             {
                 return this.Map.TryGetValue(member, out walker);
             }
 
-            public void Clear()
+            internal void Clear()
             {
                 foreach (var walker in this.map.Values)
                 {
@@ -419,17 +419,17 @@ namespace IDisposableAnalyzers
         {
             private readonly Dictionary<IdentifierNameSyntax, AssignedValueWalker> map = new Dictionary<IdentifierNameSyntax, AssignedValueWalker>();
 
-            public void Add(IdentifierNameSyntax location, AssignedValueWalker walker)
+            internal void Add(IdentifierNameSyntax location, AssignedValueWalker walker)
             {
                 this.map.Add(location, walker);
             }
 
-            public bool TryGetValue(IdentifierNameSyntax location, out AssignedValueWalker walker)
+            internal bool TryGetValue(IdentifierNameSyntax location, out AssignedValueWalker walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }
 
-            public void Clear()
+            internal void Clear()
             {
                 foreach (var walker in this.map.Values)
                 {

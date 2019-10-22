@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers
     {
         internal readonly QualifiedMethod Create;
 
-        public TupleType()
+        internal TupleType()
             : base("System.Tuple")
         {
             this.Create = new QualifiedMethod(this, nameof(this.Create));

@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers
 
     internal static class IDISP014UseSingleInstanceOfHttpClient
     {
-        public const string DiagnosticId = "IDISP014";
+        internal const string DiagnosticId = "IDISP014";
 
         internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
             id: DiagnosticId,

@@ -459,11 +459,11 @@ namespace IDisposableAnalyzers
 
         private class MakeSealedRewriter : CSharpSyntaxRewriter
         {
-            public static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
+            internal static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
 
             private static readonly ThreadLocal<ClassDeclarationSyntax> CurrentClass = new ThreadLocal<ClassDeclarationSyntax>();
 
-            public SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
+            internal SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
             {
                 CurrentClass.Value = classDeclaration;
                 var updated = this.Visit(node);

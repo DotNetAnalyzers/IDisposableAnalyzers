@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers
         /// <summary>
         /// Gets a list with all <see cref="AssignmentExpressionSyntax"/> in the scope.
         /// </summary>
-        public IReadOnlyList<YieldStatementSyntax> YieldStatements => this.yieldStatements;
+        internal IReadOnlyList<YieldStatementSyntax> YieldStatements => this.yieldStatements;
 
         public override void VisitYieldStatement(YieldStatementSyntax node)
         {
