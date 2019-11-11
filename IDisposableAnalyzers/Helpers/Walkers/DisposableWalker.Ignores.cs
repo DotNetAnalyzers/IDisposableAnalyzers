@@ -22,12 +22,9 @@ namespace IDisposableAnalyzers
 
             switch (node.Parent)
             {
-                case EqualsValueClauseSyntax equalsValueClause:
-                    return equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                           variableDeclarator.Identifier.Text == "_";
-                case AssignmentExpressionSyntax assignmentExpression:
-                    return assignmentExpression.Left is IdentifierNameSyntax identifierName &&
-                           identifierName.Identifier.Text == "_";
+                case AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } }:
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier: { ValueText: "_" } } }:
+                    return true;
                 case AnonymousFunctionExpressionSyntax _:
                 case UsingStatementSyntax _:
                 case ReturnStatementSyntax _:
@@ -56,7 +53,6 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        [Obsolete("Use DisposableWalker")]
         private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (argument is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
