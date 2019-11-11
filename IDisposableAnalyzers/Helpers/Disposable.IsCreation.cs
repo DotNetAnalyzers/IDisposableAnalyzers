@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers
             }
 
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
-            if (symbol is IPropertySymbol property &&
+            if (symbol is IPropertySymbol { SetMethod: { } } property &&
                 IsAssignableFrom(property.Type, semanticModel.Compilation) &&
                 property.TryGetSetter(cancellationToken, out var setter) &&
                 (setter.ExpressionBody != null || setter.Body != null))
@@ -29,10 +29,9 @@ namespace IDisposableAnalyzers
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {
-                            if (assigned.Right is IdentifierNameSyntax identifierName &&
-                                identifierName.Identifier.ValueText == "value" &&
-                                IsPotentiallyAssignableFrom(assigned.Left, semanticModel, cancellationToken) &&
-                                semanticModel.GetSymbolSafe(assigned.Left, cancellationToken) is ISymbol candidate &&
+                            if (assigned is { Left: { } left, Right: IdentifierNameSyntax { Identifier: { ValueText: "value" } } } &&
+                                IsPotentiallyAssignableFrom(left, semanticModel, cancellationToken) &&
+                                semanticModel.GetSymbolSafe(left, cancellationToken) is { } candidate &&
                                 candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                             {
                                 assignedSymbols.Add(candidate);
@@ -169,9 +168,8 @@ namespace IDisposableAnalyzers
                 return Result.No;
             }
 
-            if (candidate is IdentifierNameSyntax identifierName &&
-                identifierName.Identifier.ValueText == "value" &&
-                candidate.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+            if (candidate is IdentifierNameSyntax { Identifier: { ValueText: "value" } } &&
+                candidate.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
                 return Result.No;
