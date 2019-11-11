@@ -77,10 +77,9 @@ namespace IDisposableAnalyzers
 
         internal static bool IsIDisposableDispose(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return candidate.TryGetMethodName(out var name) &&
+            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
+                   candidate.TryGetMethodName(out var name) &&
                    name == "Dispose" &&
-                   candidate.ArgumentList is ArgumentListSyntax argumentList &&
-                   argumentList.Arguments.Count == 0 &&
                    semanticModel.TryGetSymbol(candidate, cancellationToken, out var method) &&
                    method.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation);
         }

@@ -10,7 +10,6 @@ namespace IDisposableAnalyzers
     {
         internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
-            invocationOrObjectCreation = null;
             switch (candidate)
             {
                 case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } }:
@@ -72,17 +71,20 @@ namespace IDisposableAnalyzers
 
                     break;
                 case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
-                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
-                        Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                        method.TryFindParameter(candidate, out var parameterSymbol))
+                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method))
                     {
-                        invocationOrObjectCreation = invocation;
-                        return DisposedByReturnValue(parameterSymbol, semanticModel, cancellationToken, visited);
+                        if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
+                            method.TryFindParameter(candidate, out var parameterSymbol))
+                        {
+                            invocationOrObjectCreation = invocation;
+                            return DisposedByReturnValue(parameterSymbol, semanticModel, cancellationToken, visited);
+                        }
                     }
 
                     break;
             }
 
+            invocationOrObjectCreation = null;
             return false;
         }
 

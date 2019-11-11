@@ -40,7 +40,7 @@ namespace IDisposableAnalyzers
                 case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
                     when right.Contains(candidate):
                     return semanticModel.TryGetSymbol(element, cancellationToken, out container);
-                case ArgumentSyntax { Parent: ObjectCreationExpressionSyntax _ } argument:
+                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument:
                     if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var objectCreation) ||
                         AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out objectCreation))
                     {
