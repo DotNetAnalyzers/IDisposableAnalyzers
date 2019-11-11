@@ -10,7 +10,7 @@ namespace ValidCode
         public async Task Calls()
         {
             var text = await Bar1Async();
-            using (await  CreateDisposableAsync())
+            using (await CreateDisposableAsync())
             {
             }
 
@@ -26,11 +26,27 @@ namespace ValidCode
             {
             }
 
+            using (await Task.Run(() => new Disposable()))
+            {
+            }
+
+            using (await Task.Run(() => new Disposable()).ConfigureAwait(false))
+            {
+            }
+
             using (var disposable = await Task.FromResult(new Disposable()))
             {
             }
 
             using (var disposable = await Task.FromResult(new Disposable()).ConfigureAwait(false))
+            {
+            }
+
+            using (var disposable = await Task.Run(() => new Disposable()))
+            {
+            }
+
+            using (var disposable = await Task.Run(() => new Disposable()).ConfigureAwait(false))
             {
             }
         }

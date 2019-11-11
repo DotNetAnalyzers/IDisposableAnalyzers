@@ -688,6 +688,8 @@ namespace RoslynSandbox
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
         [TestCase("using (await Task.FromResult(File.OpenRead(fileName)))")]
         [TestCase("using (await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
         [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)))")]
@@ -713,6 +715,8 @@ namespace RoslynSandbox
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
         [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
@@ -731,6 +735,40 @@ namespace N
         {
             var stream = await Task.FromResult(File.OpenRead(fileName));
             stream.Dispose();
+        }
+    }
+}".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
+            RoslynAssert.Valid(Analyzer, testCode);
+        }
+
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
+        [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+        public static void AssigningAwaitedToField(string statement)
+        {
+            var testCode = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    sealed class C : IDisposable
+    {
+        private Stream stream;
+
+        async Task M(string fileName)
+        {
+            stream?.Dispose();
+            this.stream = await Task.FromResult(File.OpenRead(fileName));
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
         }
     }
 }".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
