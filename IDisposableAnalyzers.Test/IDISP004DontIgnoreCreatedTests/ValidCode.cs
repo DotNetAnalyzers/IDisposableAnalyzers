@@ -688,6 +688,31 @@ namespace RoslynSandbox
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
+        [TestCase("using (await Task.FromResult(File.OpenRead(fileName)))")]
+        [TestCase("using (await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
+        [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)))")]
+        [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
+        public static void UsingAwaited(string statement)
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    class C
+    {
+        static async Task M(string fileName)
+        {
+            using (await Task.FromResult(File.OpenRead(fileName)))
+            {
+            }
+        }
+    }
+}".AssertReplace("using (await Task.FromResult(File.OpenRead(fileName)))", statement);
+            RoslynAssert.Valid(Analyzer, testCode);
+        }
+
         [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
         [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
