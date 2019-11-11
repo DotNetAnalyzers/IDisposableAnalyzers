@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using Gu.Roslyn.AnalyzerExtensions;
     using IDisposableAnalyzers.Benchmarks.Benchmarks;
 
-    public class Program
+    public static class Program
     {
         public static void Main()
         {
@@ -55,12 +55,8 @@ namespace IDisposableAnalyzers.Benchmarks
             }
         }
 
-        private static IEnumerable<Summary> RunAll()
-        {
-            var switcher = new BenchmarkSwitcher(typeof(Program).Assembly);
-            var summaries = switcher.Run(new[] { "*" });
-            return summaries;
-        }
+        private static IEnumerable<Summary> RunAll() => new BenchmarkSwitcher(typeof(Program).Assembly).RunAll();
+
 
         private static IEnumerable<Summary> RunSingle<T>()
         {
@@ -69,18 +65,37 @@ namespace IDisposableAnalyzers.Benchmarks
 
         private static void CopyResult(Summary summary)
         {
-            var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, $"*{summary.Title}-report-github.md")
-                                          .Single();
+            var name = summary.Title.Split('.').LastOrDefault()?.Split('-').FirstOrDefault();
+            if (name == null)
+            {
+                Console.WriteLine("Did not find name in: " + summary.Title);
+                Console.WriteLine("Press any key to exit.");
+                _ = Console.ReadKey();
+                return;
+            }
+
+            var pattern = $"{summary.Title.Split('-').First()}-report-github.md";
+            var sourceFileName = Directory.EnumerateFiles(summary.ResultsDirectoryPath, pattern)
+                                          .SingleOrDefault();
+            if (sourceFileName == null)
+            {
+                Console.WriteLine("Did not find a file matching the pattern: " + pattern);
+                Console.WriteLine("Press any key to exit.");
+                _ = Console.ReadKey();
+                return;
+            }
+
             var destinationFileName = Path.ChangeExtension(FindCsFile(), ".md");
-            Console.WriteLine($"Copy: {sourceFileName}");
-            Console.WriteLine($"   -> {destinationFileName}");
+            Console.WriteLine($"Copy:");
+            Console.WriteLine($"Source: {sourceFileName}");
+            Console.WriteLine($"Target: {destinationFileName}");
             File.Copy(sourceFileName, destinationFileName, overwrite: true);
 
             string FindCsFile()
             {
                 return Directory.EnumerateFiles(
                                     AppDomain.CurrentDomain.BaseDirectory.Split(new[] { "\\bin\\" }, StringSplitOptions.RemoveEmptyEntries).First(),
-                                    $"{summary.Title.Split('.').Last()}.cs",
+                                    $"{name}.cs",
                                     SearchOption.AllDirectories)
                                 .Single();
             }
