@@ -16,8 +16,8 @@
   </Prerequisites>
 
   <Assets>
-    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="Gu.Roslyn.Asserts.Analyzers" Path="|Gu.Roslyn.Asserts.Analyzers|"/>
-    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="Gu.Roslyn.Asserts.Analyzers" Path="|Gu.Roslyn.Asserts.Analyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.MefComponent" d:Source="Project" d:ProjectName="IDisposableAnalyzers" Path="|IDisposableAnalyzers|"/>
+    <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="Project" d:ProjectName="IDisposableAnalyzers" Path="|IDisposableAnalyzers|"/>
     <Asset Type="Microsoft.VisualStudio.Analyzer" d:Source="File" Path="Gu.Roslyn.Extensions.dll" />
     <Asset Type="Microsoft.VisualStudio.Assembly" d:Source="File" Path="Gu.Roslyn.Extensions.dll" />
   </Assets>
