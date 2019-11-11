@@ -687,5 +687,29 @@ namespace RoslynSandbox
 }";
             RoslynAssert.Valid(Analyzer, testCode);
         }
+
+        [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+        public static void AssigningAwaitedToLocal(string statement)
+        {
+            var testCode = @"
+namespace N
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    class C
+    {
+        static async Task M(string fileName)
+        {
+            var stream = await Task.FromResult(File.OpenRead(fileName));
+            stream.Dispose();
+        }
+    }
+}".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
+            RoslynAssert.Valid(Analyzer, testCode);
+        }
     }
 }
