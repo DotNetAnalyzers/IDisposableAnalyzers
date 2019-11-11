@@ -29,10 +29,6 @@ namespace IDisposableAnalyzers
         {
             switch (candidate.Parent.Kind())
             {
-                case SyntaxKind.ArrayInitializerExpression:
-                case SyntaxKind.CollectionInitializerExpression:
-                    return StoresOrAssigns((ExpressionSyntax)candidate.Parent.Parent, out container);
-                case SyntaxKind.CastExpression:
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
@@ -41,18 +37,25 @@ namespace IDisposableAnalyzers
 
             switch (candidate.Parent)
             {
-                case AssignmentExpressionSyntax assignment when assignment.Right.Contains(candidate) &&
-                                                                assignment.Left is ElementAccessExpressionSyntax elementAccess:
-                    return semanticModel.TryGetSymbol(elementAccess.Expression, cancellationToken, out container);
+                case CastExpressionSyntax cast:
+                    return StoresOrAssigns(cast, out container);
+                case InitializerExpressionSyntax { Parent: ImplicitArrayCreationExpressionSyntax arrayCreation }:
+                    return StoresOrAssigns(arrayCreation, out container);
+                case InitializerExpressionSyntax { Parent: ArrayCreationExpressionSyntax arrayCreation }:
+                    return StoresOrAssigns(arrayCreation, out container);
+                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }:
+                    return StoresOrAssigns(objectCreation, out container);
+                case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
+                    when right.Contains(candidate):
+                    return semanticModel.TryGetSymbol(element, cancellationToken, out container);
                 case ArgumentSyntax argument when DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
                                                   AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation):
                     return StoresOrAssigns(invocationOrObjectCreation, out container);
-                case ArgumentSyntax argument when argument.Parent is TupleExpressionSyntax tupleExpression:
+                case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
-                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
-                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
+                    when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
                     {
                         if (method.DeclaringSyntaxReferences.IsEmpty)
                         {
@@ -97,9 +100,9 @@ namespace IDisposableAnalyzers
                         return false;
                     }
 
-                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
-                                                                    LocalOrParameter.TryCreate(container, out var local):
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
+                         LocalOrParameter.TryCreate(container, out var local):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
@@ -135,80 +138,71 @@ namespace IDisposableAnalyzers
 
         private static bool AccessibleInReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
-            if (candidate.Parent is ArgumentListSyntax argumentList)
+            switch (candidate)
             {
-                invocationOrObjectCreation = argumentList.Parent as ExpressionSyntax;
-                if (invocationOrObjectCreation == null)
-                {
-                    return false;
-                }
+                case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
+                    when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                    invocationOrObjectCreation = invocation;
+                    if (method.DeclaringSyntaxReferences.IsEmpty)
+                    {
+                        return method == KnownSymbol.Tuple.Create;
+                    }
 
-                switch (argumentList.Parent)
-                {
-                    case InvocationExpressionSyntax invocation when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                    if (method.ReturnsVoid ||
+                        invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
+                    {
+                        return false;
+                    }
+
+                    if (method.TryFindParameter(candidate, out var parameter) &&
+                        visited.CanVisit(candidate, out visited))
+                    {
+                        using (visited)
                         {
-                            if (method.DeclaringSyntaxReferences.IsEmpty)
+                            using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
                             {
-                                return method == KnownSymbol.Tuple.Create;
-                            }
-
-                            if (method.ReturnsVoid ||
-                                invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
-                            {
-                                return false;
-                            }
-
-                            if (method.TryFindParameter(candidate, out var parameter) &&
-                                visited.CanVisit(candidate, out visited))
-                            {
-                                using (visited)
+                                foreach (var usage in walker.usages)
                                 {
-                                    using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
+                                    if (usage.Parent is ArgumentSyntax parentArgument &&
+                                        AccessibleInReturnValue(parentArgument, semanticModel, cancellationToken, visited, out var parentInvocationOrObjectCreation) &&
+                                        Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
                                     {
-                                        foreach (var usage in walker.usages)
-                                        {
-                                            if (usage.Parent is ArgumentSyntax parentArgument &&
-                                                AccessibleInReturnValue(parentArgument, semanticModel, cancellationToken, visited, out var parentInvocationOrObjectCreation) &&
-                                                Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
-                                            {
-                                                return true;
-                                            }
-                                        }
+                                        return true;
                                     }
                                 }
                             }
-
-                            return false;
                         }
+                    }
 
-                    case ObjectCreationExpressionSyntax objectCreation when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var method):
+                    return false;
+
+                case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
+                    when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor):
+                    invocationOrObjectCreation = objectCreation;
+                    if (constructor.DeclaringSyntaxReferences.IsEmpty)
+                    {
+                        return constructor.ContainingType.FullName().StartsWith("System.Tuple`");
+                    }
+
+                    if (constructor.TryFindParameter(candidate, out parameter))
+                    {
+                        if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container))
                         {
-                            if (method.DeclaringSyntaxReferences.IsEmpty)
-                            {
-                                return method.ContainingType.FullName().StartsWith("System.Tuple`");
-                            }
-
-                            if (method.TryFindParameter(candidate, out var parameter))
-                            {
-                                if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container))
-                                {
-                                    return FieldOrProperty.TryCreate(container, out var containerMember) &&
-                                           semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
-                                }
-
-                                if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty))
-                                {
-                                    return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
-                                }
-                            }
-
-                            return false;
+                            return FieldOrProperty.TryCreate(container, out var containerMember) &&
+                                   semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
                         }
-                }
-            }
 
-            invocationOrObjectCreation = null;
-            return false;
+                        if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty))
+                        {
+                            return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
+                        }
+                    }
+
+                    return false;
+                default:
+                    invocationOrObjectCreation = null;
+                    return false;
+            }
         }
     }
 }

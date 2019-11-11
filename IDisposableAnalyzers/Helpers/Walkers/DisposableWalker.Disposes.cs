@@ -53,8 +53,7 @@ namespace IDisposableAnalyzers
         internal static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
-                declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
-                variableDeclaration.Parent is UsingStatementSyntax)
+                declaration is { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } })
             {
                 return true;
             }
@@ -94,8 +93,7 @@ namespace IDisposableAnalyzers
         internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
-               declaration.Parent is VariableDeclarationSyntax variableDeclaration &&
-               variableDeclaration.Parent is UsingStatementSyntax)
+               declaration is { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } })
             {
                 return true;
             }
@@ -128,14 +126,15 @@ namespace IDisposableAnalyzers
 
             switch (candidate.Parent)
             {
-                case ConditionalAccessExpressionSyntax conditionalAccess when conditionalAccess.WhenNotNull is InvocationExpressionSyntax invocation:
+                case ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation }:
                     return IsDispose(invocation);
-                case MemberAccessExpressionSyntax memberAccess when memberAccess.Parent is InvocationExpressionSyntax invocation:
+                case MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation }:
                     return IsDispose(invocation);
-                case AssignmentExpressionSyntax assignment when assignment.Left == candidate:
+                case AssignmentExpressionSyntax { Left: { } left } assignment
+                    when left == candidate:
                     return Disposes(assignment, semanticModel, cancellationToken, visited);
-                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
@@ -151,8 +150,7 @@ namespace IDisposableAnalyzers
 
             bool IsDispose(InvocationExpressionSyntax invocation)
             {
-                return invocation.ArgumentList is ArgumentListSyntax argumentList &&
-                        argumentList.Arguments.Count == 0 &&
+                return invocation is { ArgumentList: { Arguments: { Count: 0 } } } &&
                         invocation.TryGetMethodName(out var name) &&
                         name == "Dispose";
             }

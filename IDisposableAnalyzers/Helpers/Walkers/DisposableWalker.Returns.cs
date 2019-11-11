@@ -40,9 +40,9 @@ namespace IDisposableAnalyzers
 
             switch (candidate.Parent)
             {
-                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
-                                                                    LocalOrParameter.TryCreate(symbol, out var localOrParameter):
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
+                         LocalOrParameter.TryCreate(symbol, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
