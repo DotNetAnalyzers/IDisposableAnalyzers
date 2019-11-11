@@ -29,8 +29,8 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (expression is AssignmentExpressionSyntax assignmentExpression &&
-                semanticModel.GetSymbolSafe(assignmentExpression.Left, cancellationToken) is IPropertySymbol property &&
+            if (expression is AssignmentExpressionSyntax { Left: { } left } &&
+                semanticModel.GetSymbolSafe(left, cancellationToken) is IPropertySymbol property &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
                 using (var pooled = InvocationWalker.Borrow(setter))
@@ -51,21 +51,24 @@ namespace IDisposableAnalyzers
 
             bool TryGetScope(SyntaxNode node, out BlockSyntax result)
             {
-                result = null;
-                if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is AnonymousFunctionExpressionSyntax lambda)
+                if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is { Body: BlockSyntax lambdaBody })
                 {
-                    result = lambda.Body as BlockSyntax;
+                    result = lambdaBody;
+                    return true;
                 }
-                else if (node.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor)
+                else if (node.FirstAncestor<AccessorDeclarationSyntax>() is { Body: BlockSyntax accessorBody })
                 {
-                    result = accessor.Body;
+                    result = accessorBody;
+                    return true;
                 }
-                else if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is BaseMethodDeclarationSyntax method)
+                else if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is { Body: BlockSyntax methodBody })
                 {
-                    result = method.Body;
+                    result = methodBody;
+                    return true;
                 }
 
-                return result != null;
+                result = null;
+                return false;
             }
 
             bool IsReassignedAfter(SyntaxNode scope, InvocationExpressionSyntax disposeCall)
