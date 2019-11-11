@@ -47,10 +47,7 @@ namespace IDisposableAnalyzers
 
             bool IsIDisposableDispose(IMethodSymbol candidate)
             {
-                return candidate.Name == "Dispose" &&
-                       candidate.ReturnsVoid &&
-                       candidate.Parameters.Length == 0 &&
-                       candidate.DeclaredAccessibility == Accessibility.Public;
+                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } };
             }
         }
 
@@ -83,25 +80,22 @@ namespace IDisposableAnalyzers
 
         internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)
         {
-            if (virtualDispose.ParameterList is ParameterListSyntax parameterList &&
-                parameterList.Parameters.TrySingle(out var parameter))
+            if (virtualDispose.ParameterList is { Parameters: { Count: 1 } parameters } &&
+                parameters.TrySingle(out var parameter))
             {
                 using (var walker = InvocationWalker.Borrow(virtualDispose))
                 {
                     foreach (var invocation in walker.Invocations)
                     {
-                        if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                            memberAccess.Expression is BaseExpressionSyntax &&
+                        if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
                             invocation.TryGetMethodName(out var name) &&
                             name == virtualDispose.Identifier.ValueText &&
-                            invocation.ArgumentList is ArgumentListSyntax argumentList &&
-                            argumentList.Arguments.TrySingle(out var argument) &&
-                            argument.Expression is IdentifierNameSyntax identifierName &&
-                            identifierName.Identifier.ValueText == parameter.Identifier.ValueText &&
+                            invocation.ArgumentList is { Arguments: { Count: 1 } arguments } &&
+                            arguments[0] is { Expression: IdentifierNameSyntax { Identifier: { ValueText: { } argument } } } &&
+                            argument == parameter.Identifier.ValueText &&
                             semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
                             semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
-                            method.IsOverride &&
-                            method.OverriddenMethod is IMethodSymbol overridden &&
+                            method is { IsOverride: true, OverriddenMethod: { } overridden } &&
                             target.Equals(overridden))
                         {
                             baseCall = invocation;
@@ -121,8 +115,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in walker.Invocations)
                 {
-                    if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
-                        argumentList.Arguments.Count == 1 &&
+                    if (candidate.ArgumentList is { Arguments: { Count: 1 } } &&
                         candidate.TryGetMethodName(out var name) &&
                         name == "SuppressFinalize" &&
                         semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out _))
@@ -143,9 +136,8 @@ namespace IDisposableAnalyzers
             {
                 foreach (var candidate in walker.Invocations)
                 {
-                    if (candidate.ArgumentList is ArgumentListSyntax argumentList &&
-                        argumentList.Arguments.TrySingle(out argument) &&
-                        argument.Expression is ExpressionSyntax expression &&
+                    if (candidate.ArgumentList is { Arguments: { Count: 1 } arguments } &&
+                        (argument = arguments[0]) is { Expression: { } expression } &&
                         expression.IsEither(SyntaxKind.TrueLiteralExpression, SyntaxKind.FalseLiteralExpression) &&
                         candidate.TryGetMethodName(out var name) &&
                         name == "Dispose")
@@ -163,28 +155,20 @@ namespace IDisposableAnalyzers
 
         internal static bool IsOverrideDispose(IMethodSymbol candidate)
         {
-            return candidate.IsOverride &&
-                   candidate.ReturnsVoid &&
-                   candidate.Parameters.TrySingle(out var parameter) &&
-                   parameter.Type == KnownSymbol.Boolean;
+            return candidate is { IsOverride: true, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 1 } parameters } &&
+                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
 
         internal static bool IsVirtualDispose(IMethodSymbol candidate)
         {
-            return candidate.IsVirtual &&
-                   candidate.ReturnsVoid &&
-                   candidate.Parameters.TrySingle(out var parameter) &&
-                   parameter.Type == KnownSymbol.Boolean;
+            return candidate is { IsVirtual: true, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 1 } parameters } &&
+                   parameters[0].Type.SpecialType == SpecialType.System_Boolean;
         }
 
         internal static bool IsIDisposableDispose(IMethodSymbol candidate, Compilation compilation)
         {
-            return candidate != null &&
-                   candidate.Name == "Dispose" &&
-                   candidate.ReturnsVoid &&
-                   candidate.Parameters.Length == 0 &&
-                   candidate.DeclaredAccessibility == Accessibility.Public &&
-                   candidate.ContainingType.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+            return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } } &&
+                   Disposable.IsAssignableFrom(candidate.ContainingType, compilation);
         }
     }
 }
