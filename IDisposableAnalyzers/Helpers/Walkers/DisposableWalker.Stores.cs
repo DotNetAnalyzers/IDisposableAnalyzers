@@ -74,13 +74,9 @@ namespace IDisposableAnalyzers
                                         return true;
                                 }
                             }
-
-                            container = null;
-                            return false;
                         }
-
-                        if (method.TryFindParameter(argument, out var parameter) &&
-                            visited.CanVisit(candidate, out visited))
+                        else if (method.TryFindParameter(argument, out var parameter) &&
+                                 visited.CanVisit(candidate, out visited))
                         {
                             using (visited)
                             {
@@ -89,9 +85,6 @@ namespace IDisposableAnalyzers
                                     return true;
                                 }
                             }
-
-                            container = null;
-                            return false;
                         }
 
                         if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
