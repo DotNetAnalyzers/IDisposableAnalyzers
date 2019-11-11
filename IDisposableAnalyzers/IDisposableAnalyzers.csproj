@@ -1,8 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.3</TargetFrameworks>
-    <PackageTargetFallback>portable-net45+win8</PackageTargetFallback>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
@@ -37,12 +36,10 @@ BUGFIX IDISP023: when disposing members.</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <PackageReference Include="Gu.Analyzers" Version="1.6.3-dev" PrivateAssets="all" />
+    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.5.1-dev" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.3.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.113" PrivateAssets="all" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Exec Command=".paket\paket.exe pack publish" WorkingDirectory="$(SolutionDir)" />
-  </Target>
-
-  <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

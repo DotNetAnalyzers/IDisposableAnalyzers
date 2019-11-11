@@ -3,15 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29009.5
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".paket", ".paket", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".sln", ".sln", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
 		appveyor.yml = appveyor.yml
 		azure-pipelines.yml = azure-pipelines.yml
-		paket.dependencies = paket.dependencies
-		paket.lock = paket.lock
-		.paket\paket.targets = .paket\paket.targets
-		.paket\Readme.paket.md = .paket\Readme.paket.md
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6739-4830-BC74-2F8CF785A572}"
@@ -43,12 +41,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6
 		.paket\Readme.paket.md = .paket\Readme.paket.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 		documentation\SemanticModelCacheAnalyzer.md = documentation\SemanticModelCacheAnalyzer.md
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{AB970A83-4723-44EA-95EC-D591AF6EC75D}"
-	ProjectSection(SolutionItems) = preProject
-		.paket\tools\install.ps1 = .paket\tools\install.ps1
-		.paket\tools\uninstall.ps1 = .paket\tools\uninstall.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"
@@ -96,9 +88,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{AB970A83-4723-44EA-95EC-D591AF6EC75D} = {A1A96555-15B1-4A0C-ADC1-059CEAA3F788}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {74906569-DBB4-4A2A-B83B-D200EB4BEF68}
