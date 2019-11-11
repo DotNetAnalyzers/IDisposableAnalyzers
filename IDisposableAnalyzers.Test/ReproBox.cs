@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers.Test
         private static readonly Solution Solution = CodeFactory.CreateSolution(
             new FileInfo("C:\\Git\\_GuOrg\\Gu.Reactive\\Gu.Reactive.sln"),
             AllAnalyzers,
-            RoslynAssert.MetadataReferences);
+            MetadataReferences.FromAttributes());
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void SolutionRepro(DiagnosticAnalyzer analyzer)

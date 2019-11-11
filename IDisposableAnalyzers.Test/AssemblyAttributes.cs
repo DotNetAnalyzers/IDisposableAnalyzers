@@ -15,7 +15,7 @@ using Gu.Roslyn.Asserts;
     typeof(System.Windows.Media.Matrix),
     typeof(System.Xaml.XamlLanguage),
     typeof(Moq.Mock<>),
-    typeof(Ninject.StandardKernel),
+    typeof(Ninject.KernelConfiguration),
     typeof(Gu.Roslyn.AnalyzerExtensions.SyntaxTokenExt),
     typeof(Gu.Roslyn.CodeFixExtensions.Parse),
     typeof(NUnit.Framework.Assert))]

@@ -116,8 +116,8 @@ namespace ProjectX.Commands
 
                 var solution = CodeFactory.CreateSolution(
                     new[] { viewModelBaseCode, popupViewModelCode, closePopupCommandCode },
-                    CodeFactory.DefaultCompilationOptions(Analyzer, RoslynAssert.SuppressedDiagnostics),
-                    RoslynAssert.MetadataReferences);
+                    CodeFactory.DefaultCompilationOptions(Analyzer),
+                    MetadataReferences.FromAttributes());
                 RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
             }
 

@@ -57,7 +57,6 @@ namespace IDisposableAnalyzers.Benchmarks
 
         private static IEnumerable<Summary> RunAll() => new BenchmarkSwitcher(typeof(Program).Assembly).RunAll();
 
-
         private static IEnumerable<Summary> RunSingle<T>()
         {
             yield return BenchmarkRunner.Run<T>();

@@ -1,6 +1,5 @@
 namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 {
-    using System.Text;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
@@ -11,8 +10,6 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
         {
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor);
-
-            private static readonly StringBuilder Builder = new StringBuilder();
 
             [TestCase("↓Builder.Append(1)")]
             [TestCase("_ = ↓Builder.Length")]

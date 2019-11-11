@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
             }
 
             [Test]
