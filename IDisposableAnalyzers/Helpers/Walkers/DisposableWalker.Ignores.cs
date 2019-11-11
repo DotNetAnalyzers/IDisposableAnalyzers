@@ -56,11 +56,10 @@ namespace IDisposableAnalyzers
             return false;
         }
 
+        [Obsolete("Use DisposableWalker")]
         private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            if (argument != null &&
-                argument.Parent is ArgumentListSyntax argumentList &&
-                argumentList.Parent is ExpressionSyntax parentExpression &&
+            if (argument is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
                 semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol method))
             {
                 if (method.DeclaringSyntaxReferences.IsEmpty)
@@ -98,9 +97,10 @@ namespace IDisposableAnalyzers
 
                             switch (candidate.Parent)
                             {
-                                case AssignmentExpressionSyntax assignment when assignment.Right == candidate &&
-                                                                                semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol) &&
-                                                                                FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
+                                case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
+                                    when right == candidate &&
+                                            semanticModel.TryGetSymbol(left, cancellationToken, out ISymbol assignedSymbol) &&
+                                            FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
@@ -113,7 +113,7 @@ namespace IDisposableAnalyzers
                                     }
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
-                                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator:
+                                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }:
                                     return DisposableWalker.Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 

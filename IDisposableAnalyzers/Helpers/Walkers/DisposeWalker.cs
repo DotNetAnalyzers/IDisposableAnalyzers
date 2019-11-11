@@ -92,8 +92,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
-            if (member is IPropertySymbol property &&
-                property.OverriddenProperty is IPropertySymbol overridden)
+            if (member is IPropertySymbol { OverriddenProperty: { } overridden })
             {
                 return this.IsMemberDisposed(overridden);
             }
