@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
+        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
             switch (candidate)
             {
@@ -96,7 +96,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        private static bool DisposedByReturnValue(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
+        private static bool DisposedByReturnValue(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
             switch (candidate.Parent.Kind())
             {
@@ -122,7 +122,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
+        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
         {
             if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
                 candidate.ContainingSymbol is IMethodSymbol method)
