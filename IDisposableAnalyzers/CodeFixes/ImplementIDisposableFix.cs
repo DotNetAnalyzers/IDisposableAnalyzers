@@ -135,8 +135,8 @@ namespace IDisposableAnalyzers
                                 cancellationToken =>
                                     ImplementIDisposableSealedAsync(
                                         context,
-                                        cancellationToken,
-                                        classDeclaration),
+                                        classDeclaration,
+                                        cancellationToken),
                                 nameof(ImplementIDisposableFix) + "Sealed"),
                             diagnostic);
                         continue;
@@ -150,8 +150,8 @@ namespace IDisposableAnalyzers
                                 cancellationToken =>
                                     ImplementIDisposableVirtualAsync(
                                         context,
-                                        cancellationToken,
-                                        classDeclaration),
+                                        classDeclaration,
+                                        cancellationToken),
                                 nameof(ImplementIDisposableFix) + "Virtual"),
                             diagnostic);
                         continue;
@@ -163,8 +163,8 @@ namespace IDisposableAnalyzers
                             cancellationToken =>
                                 ImplementIDisposableSealedAsync(
                                     context,
-                                    cancellationToken,
-                                    classDeclaration),
+                                    classDeclaration,
+                                    cancellationToken),
                             nameof(ImplementIDisposableFix) + "Sealed"),
                         diagnostic);
 
@@ -174,8 +174,8 @@ namespace IDisposableAnalyzers
                             cancellationToken =>
                                 ImplementIDisposableVirtualAsync(
                                     context,
-                                    cancellationToken,
-                                    classDeclaration),
+                                    classDeclaration,
+                                    cancellationToken),
                             nameof(ImplementIDisposableFix) + "Virtual"),
                         diagnostic);
                 }
@@ -286,7 +286,7 @@ namespace IDisposableAnalyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ImplementIDisposableVirtualAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> ImplementIDisposableVirtualAsync(CodeFixContext context, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
@@ -355,7 +355,7 @@ namespace IDisposableAnalyzers
             return editor.GetChangedDocument();
         }
 
-        private static async Task<Document> ImplementIDisposableSealedAsync(CodeFixContext context, CancellationToken cancellationToken, ClassDeclarationSyntax classDeclaration)
+        private static async Task<Document> ImplementIDisposableSealedAsync(CodeFixContext context, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
