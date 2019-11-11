@@ -118,10 +118,6 @@ namespace IDisposableAnalyzers
             {
                 case SyntaxKind.UsingStatement:
                     return true;
-                case SyntaxKind.CastExpression:
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.ParenthesizedExpression:
-                    return Disposes((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
             }
 
             switch (candidate.Parent)
@@ -135,15 +131,16 @@ namespace IDisposableAnalyzers
                     return Disposes(assignment, semanticModel, cancellationToken, visited);
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
                     when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
-                    if (visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
-                        }
-                    }
-
-                    return false;
+                    return Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
+                case ExpressionSyntax parent
+                    when parent.IsKind(SyntaxKind.CastExpression) ||
+                         parent.IsKind(SyntaxKind.AsExpression) ||
+                         parent.IsKind(SyntaxKind.AsExpression) ||
+                         parent.IsKind(SyntaxKind.ParenthesizedExpression):
+                    return Disposes(parent, semanticModel, cancellationToken, visited);
+                case ArgumentSyntax argument
+                    when DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation):
+                    return Disposes(invocationOrObjectCreation, semanticModel, cancellationToken, visited);
             }
 
             return false;
