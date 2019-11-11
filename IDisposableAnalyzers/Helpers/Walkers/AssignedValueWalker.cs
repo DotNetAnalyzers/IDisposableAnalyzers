@@ -379,7 +379,7 @@ namespace IDisposableAnalyzers
             this.refParameters.Clear();
             this.outParameters.Clear();
             this.CurrentSymbol = null;
-            this.context = default(Context);
+            this.context = default;
             this.semanticModel = null;
             this.cancellationToken = CancellationToken.None;
             this.memberWalkers.Clear();
@@ -757,7 +757,7 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                StatementSyntax Next(StatementSyntax current)
+                static StatementSyntax Next(StatementSyntax current)
                 {
                     if (current.Parent is BlockSyntax block &&
                         block.Statements.TryElementAt(block.Statements.IndexOf(current) + 1, out var next))

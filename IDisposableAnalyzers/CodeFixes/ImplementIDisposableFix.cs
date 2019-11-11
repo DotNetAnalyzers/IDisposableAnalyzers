@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Globalization;
@@ -192,7 +193,7 @@ namespace IDisposableAnalyzers
             if (diagnostic.Id == "CS0535")
             {
                 return diagnostic.GetMessage(CultureInfo.InvariantCulture)
-                                 .EndsWith("does not implement interface member 'IDisposable.Dispose()'");
+                                 .EndsWith("does not implement interface member 'IDisposable.Dispose()'", StringComparison.Ordinal);
             }
 
             return false;

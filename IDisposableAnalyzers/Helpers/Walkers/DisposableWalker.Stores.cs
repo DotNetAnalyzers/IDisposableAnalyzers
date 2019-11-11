@@ -1,5 +1,6 @@
 namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -183,7 +184,7 @@ namespace IDisposableAnalyzers
                     invocationOrObjectCreation = objectCreation;
                     if (constructor.DeclaringSyntaxReferences.IsEmpty)
                     {
-                        return constructor.ContainingType.FullName().StartsWith("System.Tuple`");
+                        return constructor.ContainingType.FullName().StartsWith("System.Tuple`", StringComparison.Ordinal);
                     }
 
                     if (constructor.TryFindParameter(candidate, out parameter))

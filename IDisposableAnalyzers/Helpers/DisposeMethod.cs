@@ -45,7 +45,7 @@ namespace IDisposableAnalyzers
 
             return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
 
-            bool IsIDisposableDispose(IMethodSymbol candidate)
+            static bool IsIDisposableDispose(IMethodSymbol candidate)
             {
                 return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } };
             }
@@ -66,7 +66,7 @@ namespace IDisposableAnalyzers
 
             return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
 
-            bool IsIDisposableDispose(IMethodSymbol candidate)
+            static bool IsIDisposableDispose(IMethodSymbol candidate)
             {
                 return IsOverrideDispose(candidate) ||
                        IsVirtualDispose(candidate);
@@ -130,7 +130,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
+        internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
         {
             using (var walker = InvocationWalker.Borrow(disposeMethod))
             {

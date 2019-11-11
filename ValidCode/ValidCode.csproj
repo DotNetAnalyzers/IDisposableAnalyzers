@@ -4,6 +4,7 @@
     <TargetFramework>net472</TargetFramework>
     <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
     <Description>A project only used by the HasppyPathTests. It contains all kinds of weird variations that is still valid code. We use it to test all analyzers. If a bug is found we extract it to a minimal repro and use it in a test for the analyzer but we leave this project as is.</Description>
+    <NoWarn>$(NoWarn);IDE0051</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

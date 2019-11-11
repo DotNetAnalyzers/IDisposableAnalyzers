@@ -100,7 +100,7 @@ namespace IDisposableAnalyzers
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
-                                        return DisposableWalker.Ignores(parentExpression, semanticModel, cancellationToken, visited);
+                                        return Ignores(parentExpression, semanticModel, cancellationToken, visited);
                                     }
 
                                     if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
@@ -110,10 +110,10 @@ namespace IDisposableAnalyzers
 
                                     return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
                                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }:
-                                    return DisposableWalker.Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
+                                    return Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
                             }
 
-                            if (DisposableWalker.Ignores(candidate, semanticModel, cancellationToken, visited))
+                            if (Ignores(candidate, semanticModel, cancellationToken, visited))
                             {
                                 return true;
                             }

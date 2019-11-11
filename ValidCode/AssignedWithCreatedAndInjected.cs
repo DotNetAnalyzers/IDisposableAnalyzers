@@ -1,3 +1,4 @@
+// ReSharper disable All
 #pragma warning disable IDISP008
 namespace ValidCode
 {

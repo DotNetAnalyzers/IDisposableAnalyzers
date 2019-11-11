@@ -90,17 +90,14 @@ namespace IDisposableAnalyzers
             locations = null;
             return false;
 
-            bool IsAssigned(IdentifierNameSyntax identifier)
+            static bool IsAssigned(IdentifierNameSyntax identifier)
             {
-                switch (identifier.Parent)
+                return identifier.Parent switch
                 {
-                    case AssignmentExpressionSyntax assignment:
-                        return assignment.Left == identifier;
-                    case ArgumentSyntax argument when argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword):
-                        return true;
-                }
-
-                return false;
+                    AssignmentExpressionSyntax { Left: { } left } => left == identifier,
+                    ArgumentSyntax { RefOrOutKeyword: { } keyword } => keyword.IsKind(SyntaxKind.OutKeyword),
+                    _ => false,
+                };
             }
 
             bool IsReassigned(ExpressionSyntax location)

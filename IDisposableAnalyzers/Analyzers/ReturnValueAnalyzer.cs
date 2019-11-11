@@ -141,10 +141,11 @@ namespace IDisposableAnalyzers
 
             switch (returnValue)
             {
-                case InvocationExpressionSyntax invocation when invocation.TryGetMethodName(out var name) &&
-                                                                name == KnownSymbol.Task.FromResult.Name:
+                case InvocationExpressionSyntax invocation
+                    when invocation.TryGetMethodName(out var name) &&
+                         name == KnownSymbol.Task.FromResult.Name:
                     return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
-                case MemberAccessExpressionSyntax memberAccess when memberAccess.Name.Identifier.ValueText == "CompletedTask":
+                case MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } }:
                     return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
             }
 
@@ -153,7 +154,7 @@ namespace IDisposableAnalyzers
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited)
         {
-            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is IMethodSymbol method &&
+            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is { } method &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
                 method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
             {

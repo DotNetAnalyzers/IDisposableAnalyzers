@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
 
             return false;
 
-            bool TryGetScope(SyntaxNode node, out BlockSyntax result)
+            static bool TryGetScope(SyntaxNode node, out BlockSyntax result)
             {
                 if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is { Body: BlockSyntax lambdaBody })
                 {

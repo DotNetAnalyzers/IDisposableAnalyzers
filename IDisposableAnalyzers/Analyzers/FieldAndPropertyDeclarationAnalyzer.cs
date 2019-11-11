@@ -112,47 +112,35 @@ namespace IDisposableAnalyzers
                     return false;
                 }
 
-                switch (field.DeclaredAccessibility)
-                {
-                    case Accessibility.Private:
-                        return false;
-                    case Accessibility.Protected:
-                        return !field.ContainingType.IsSealed;
-                    case Accessibility.Internal:
-                    case Accessibility.ProtectedOrInternal:
-                    case Accessibility.ProtectedAndInternal:
-                    case Accessibility.Public:
-                        return true;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                return IsAccessible(field.DeclaredAccessibility, field.ContainingType);
             }
 
             if (fieldOrProperty.Symbol is IPropertySymbol property)
             {
-                if (property.SetMethod == null ||
-                    property.DeclaredAccessibility == Accessibility.Private)
-                {
-                    return false;
-                }
+                return IsAccessible(property.DeclaredAccessibility, property.ContainingType) &&
+                       property.SetMethod is { } set &&
+                       IsAccessible(set.DeclaredAccessibility, property.ContainingType);
+            }
 
-                switch (property.SetMethod.DeclaredAccessibility)
+            throw new InvalidOperationException("Should not get here.");
+
+            bool IsAccessible(Accessibility accessibility, INamedTypeSymbol containingType)
+            {
+                switch (accessibility)
                 {
                     case Accessibility.Private:
                         return false;
                     case Accessibility.Protected:
-                        return !property.ContainingType.IsSealed;
+                        return !containingType.IsSealed;
                     case Accessibility.Internal:
                     case Accessibility.ProtectedOrInternal:
                     case Accessibility.ProtectedAndInternal:
                     case Accessibility.Public:
                         return true;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, "Unhandled accessibility");
                 }
             }
-
-            throw new InvalidOperationException("Should not get here.");
         }
     }
 }

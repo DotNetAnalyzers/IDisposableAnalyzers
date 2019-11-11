@@ -68,7 +68,7 @@ namespace IDisposableAnalyzers
                         context.ReportDiagnostic(Diagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor, methodDeclaration.Identifier.GetLocation()));
                     }
 
-                    if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _, out var isDisposing) &&
+                    if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, out _, out var isDisposing) &&
                         isDisposing.Expression?.IsKind(SyntaxKind.TrueLiteralExpression) != true)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(IDISP021DisposeTrue.Descriptor, isDisposing.GetLocation()));

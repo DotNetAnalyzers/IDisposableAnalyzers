@@ -145,7 +145,7 @@ namespace IDisposableAnalyzers
 
             return false;
 
-            bool IsDispose(InvocationExpressionSyntax invocation)
+            static bool IsDispose(InvocationExpressionSyntax invocation)
             {
                 return invocation is { ArgumentList: { Arguments: { Count: 0 } } } &&
                         invocation.TryGetMethodName(out var name) &&

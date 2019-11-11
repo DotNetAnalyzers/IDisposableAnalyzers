@@ -57,7 +57,9 @@ namespace IDisposableAnalyzers.Benchmarks
 
         private static IEnumerable<Summary> RunAll() => new BenchmarkSwitcher(typeof(Program).Assembly).RunAll();
 
+#pragma warning disable IDE0051 // Remove unused private members
         private static IEnumerable<Summary> RunSingle<T>()
+#pragma warning restore IDE0051 // Remove unused private members
         {
             yield return BenchmarkRunner.Run<T>();
         }

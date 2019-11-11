@@ -28,7 +28,7 @@ namespace IDisposableAnalyzers
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is DestructorDeclarationSyntax methodDeclaration)
             {
-                if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _, out var isDisposing) &&
+                if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, out _, out var isDisposing) &&
                     isDisposing.Expression?.IsKind(SyntaxKind.FalseLiteralExpression) != true)
                 {
                     context.ReportDiagnostic(Diagnostic.Create(IDISP022DisposeFalse.Descriptor, isDisposing.GetLocation()));

@@ -28,11 +28,11 @@ namespace IDisposableAnalyzers
                 base.VisitInvocationExpression(node);
             }
 
-            bool IsDisposeBool(InvocationExpressionSyntax candidate)
+            static bool IsDisposeBool(InvocationExpressionSyntax candidate)
             {
                 return candidate.TryGetMethodName(out var name) &&
                         name == "Dispose" &&
-                        candidate.ArgumentList is ArgumentListSyntax argumentList &&
+                        candidate.ArgumentList is { } argumentList &&
                         argumentList.Arguments.TrySingle(out _);
             }
         }
