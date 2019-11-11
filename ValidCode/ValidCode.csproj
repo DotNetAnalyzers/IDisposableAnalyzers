@@ -1,10 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
     <Description>A project only used by the HasppyPathTests. It contains all kinds of weird variations that is still valid code. We use it to test all analyzers. If a bug is found we extract it to a minimal repro and use it in a test for the analyzer but we leave this project as is.</Description>
   </PropertyGroup>
 
-  <Import Project="..\.paket\Paket.Restore.targets" />
+  <ItemGroup>
+    <PackageReference Include="IDisposableAnalyzers" Version="2.1.2" PrivateAssets="all" />
+    <PackageReference Include="Moq" Version="4.13.1" />
+    <PackageReference Include="Ninject" Version="4.0.0-beta-0134" />
+    <PackageReference Include="System.Reactive.Linq" Version="4.2.0" />
+  </ItemGroup>
 </Project>
