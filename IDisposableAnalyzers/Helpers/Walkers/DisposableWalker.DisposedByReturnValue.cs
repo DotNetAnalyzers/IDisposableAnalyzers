@@ -10,75 +10,79 @@ namespace IDisposableAnalyzers
     {
         internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ExpressionSyntax invocationOrObjectCreation)
         {
-            if (candidate.Parent is ArgumentListSyntax argumentList &&
-                semanticModel.TryGetSymbol(argumentList.Parent, cancellationToken, out IMethodSymbol method))
+            invocationOrObjectCreation = null;
+            switch (candidate)
             {
-                invocationOrObjectCreation = argumentList.Parent as ExpressionSyntax;
-                if (invocationOrObjectCreation == null)
-                {
-                    return false;
-                }
-
-                if (method.MethodKind == MethodKind.Constructor)
-                {
-                    if (method.ContainingType == KnownSymbol.SingleAssignmentDisposable ||
-                        method.ContainingType == KnownSymbol.RxDisposable ||
-                        method.ContainingType == KnownSymbol.CompositeDisposable)
+                case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } }:
+                    if (type == KnownSymbol.SingleAssignmentDisposable ||
+                        type == KnownSymbol.RxDisposable ||
+                        type == KnownSymbol.CompositeDisposable)
                     {
+                        invocationOrObjectCreation = objectCreation;
                         return true;
                     }
 
-                    if (Disposable.IsAssignableFrom(method.ContainingType, semanticModel.Compilation))
+                    if (semanticModel.TryGetSymbol(objectCreation, cancellationToken, out IMethodSymbol constructor))
                     {
-                        if (method.ContainingType == KnownSymbol.BinaryReader ||
-                            method.ContainingType == KnownSymbol.BinaryWriter ||
-                            method.ContainingType == KnownSymbol.StreamReader ||
-                            method.ContainingType == KnownSymbol.StreamWriter ||
-                            method.ContainingType == KnownSymbol.CryptoStream ||
-                            method.ContainingType == KnownSymbol.DeflateStream ||
-                            method.ContainingType == KnownSymbol.GZipStream ||
-                            method.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                        if (Disposable.IsAssignableFrom(constructor.ContainingType, semanticModel.Compilation))
                         {
-                            if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                                argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
-                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                            if (constructor.ContainingType == KnownSymbol.BinaryReader ||
+                                constructor.ContainingType == KnownSymbol.BinaryWriter ||
+                                constructor.ContainingType == KnownSymbol.StreamReader ||
+                                constructor.ContainingType == KnownSymbol.StreamWriter ||
+                                constructor.ContainingType == KnownSymbol.CryptoStream ||
+                                constructor.ContainingType == KnownSymbol.DeflateStream ||
+                                constructor.ContainingType == KnownSymbol.GZipStream ||
+                                constructor.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
                             {
-                                return false;
-                            }
-
-                            return true;
-                        }
-
-                        if (method.TryFindParameter(candidate, out var parameter))
-                        {
-                            if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
-                                method.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
-                            {
-                                if (method.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
-                                    argumentList.TryFind(leaveOpenParameter, out var leaveOpenArgument) &&
+                                if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                                    objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
                                     leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                    literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                                    literal.IsKind(SyntaxKind.TrueLiteralExpression))
                                 {
                                     return false;
                                 }
 
+                                invocationOrObjectCreation = objectCreation;
                                 return true;
                             }
 
-                            return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                            if (constructor.TryFindParameter(candidate, out var parameter))
+                            {
+                                if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
+                                    constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
+                                {
+                                    if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
+                                        objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
+                                        leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                        literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                                    {
+                                        return false;
+                                    }
+
+                                    invocationOrObjectCreation = objectCreation;
+                                    return true;
+                                }
+
+                                invocationOrObjectCreation = objectCreation;
+                                return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                            }
                         }
                     }
-                }
-                else if (method.MethodKind == MethodKind.Ordinary &&
-                         Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                         method.TryFindParameter(candidate, out var parameter))
-                {
-                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
-                }
+
+                    break;
+                case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
+                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
+                        Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
+                        method.TryFindParameter(candidate, out var parameterSymbol))
+                    {
+                        invocationOrObjectCreation = invocation;
+                        return DisposedByReturnValue(parameterSymbol, semanticModel, cancellationToken, visited);
+                    }
+
+                    break;
             }
 
-            invocationOrObjectCreation = null;
             return false;
         }
 
@@ -97,9 +101,9 @@ namespace IDisposableAnalyzers
             {
                 case ArgumentSyntax argument:
                     return DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation);
-                case InitializerExpressionSyntax initializer when initializer.Parent is ObjectCreationExpressionSyntax objectCreation &&
-                                                                  semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
-                                                                  type == KnownSymbol.CompositeDisposable:
+                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }
+                    when semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+                         type == KnownSymbol.CompositeDisposable:
                     invocationOrObjectCreation = objectCreation;
                     return true;
                 default:

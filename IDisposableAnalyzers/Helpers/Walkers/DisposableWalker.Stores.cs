@@ -27,14 +27,6 @@ namespace IDisposableAnalyzers
 
         private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string, SyntaxNode)> visited, out ISymbol container)
         {
-            switch (candidate.Parent.Kind())
-            {
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.CoalesceExpression:
-                    return Stores((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out container);
-            }
-
             switch (candidate.Parent)
             {
                 case CastExpressionSyntax cast:
@@ -43,14 +35,20 @@ namespace IDisposableAnalyzers
                     return StoresOrAssigns(arrayCreation, out container);
                 case InitializerExpressionSyntax { Parent: ArrayCreationExpressionSyntax arrayCreation }:
                     return StoresOrAssigns(arrayCreation, out container);
-                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }:
-                    return StoresOrAssigns(objectCreation, out container);
+                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectInitializer }:
+                    return StoresOrAssigns(objectInitializer, out container);
                 case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
                     when right.Contains(candidate):
                     return semanticModel.TryGetSymbol(element, cancellationToken, out container);
-                case ArgumentSyntax argument when DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
-                                                  AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation):
-                    return StoresOrAssigns(invocationOrObjectCreation, out container);
+                case ArgumentSyntax { Parent: ObjectCreationExpressionSyntax _ } argument:
+                    if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var objectCreation) ||
+                        AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out objectCreation))
+                    {
+                        return StoresOrAssigns(objectCreation, out container);
+                    }
+
+                    container = null;
+                    return false;
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
                     return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
                            Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
@@ -96,6 +94,12 @@ namespace IDisposableAnalyzers
                             return false;
                         }
 
+                        if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
+                            AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation))
+                        {
+                            return StoresOrAssigns(invocationOrObjectCreation, out container);
+                        }
+
                         container = null;
                         return false;
                     }
@@ -113,6 +117,11 @@ namespace IDisposableAnalyzers
 
                     container = null;
                     return false;
+                case ExpressionSyntax parent
+                    when parent.IsKind(SyntaxKind.AsExpression) ||
+                         parent.IsKind(SyntaxKind.ConditionalExpression) ||
+                         parent.IsKind(SyntaxKind.CoalesceExpression):
+                    return Stores(parent, semanticModel, cancellationToken, visited, out container);
                 default:
                     container = null;
                     return false;
