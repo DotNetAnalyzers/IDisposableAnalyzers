@@ -476,8 +476,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
             }
 
             [Test]
@@ -526,7 +526,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
             }
         }
     }

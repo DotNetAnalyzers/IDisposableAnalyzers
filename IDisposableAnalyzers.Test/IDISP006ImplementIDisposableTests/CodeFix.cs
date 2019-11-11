@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     [TestFixture]
     public static partial class CodeFix
     {
-        private static readonly string DisposableCode = @"
+        private const string Disposable = @"
 namespace RoslynSandbox
 {
     using System;

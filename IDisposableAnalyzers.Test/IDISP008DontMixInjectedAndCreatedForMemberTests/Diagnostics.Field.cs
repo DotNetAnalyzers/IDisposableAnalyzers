@@ -200,7 +200,7 @@ namespace RoslynSandbox
         public static C Create() => new C(new Disposable());
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
             }
         }
     }

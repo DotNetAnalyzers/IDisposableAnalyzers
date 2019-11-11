@@ -22,13 +22,13 @@ namespace IDisposableAnalyzers.Test
         private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("IDisposableAnalyzers.csproj"),
             AllAnalyzers,
-            RoslynAssert.MetadataReferences);
+            MetadataReferences.FromAttributes());
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.csproj"),
             AllAnalyzers,
-            RoslynAssert.MetadataReferences);
+            MetadataReferences.FromAttributes());
 
         [SetUp]
         public void Setup()

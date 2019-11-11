@@ -5,7 +5,10 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
 
     public static partial class Diagnostics
     {
-        private static readonly string DisposableCode = @"
+        private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
+
+        private const string Disposable = @"
 namespace RoslynSandbox
 {
     using System;
@@ -17,8 +20,6 @@ namespace RoslynSandbox
         }
     }
 }";
-
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
         [Test]
         public static void PublicMethodRefParameter()
@@ -39,7 +40,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Diagnostics<AssignmentAnalyzer>(ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
         }
     }
 }

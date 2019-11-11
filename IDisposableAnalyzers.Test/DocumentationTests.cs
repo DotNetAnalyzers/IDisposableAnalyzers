@@ -151,7 +151,7 @@ namespace IDisposableAnalyzers.Test
 
         private static string GetTable(string doc, string headerRow)
         {
-            var startIndex = doc.IndexOf(headerRow);
+            var startIndex = doc.IndexOf(headerRow, StringComparison.Ordinal);
             if (startIndex < 0)
             {
                 return string.Empty;

@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             private static readonly DiagnosticAnalyzer Analyzer = new LocalDeclarationAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
 
-            private static readonly string DisposableCode = @"
+            private const string Disposable = @"
 namespace RoslynSandbox
 {
     using System;
@@ -41,7 +41,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
             }
 
             [Test]
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
             }
 
             [Test]
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
             }
 
             [Test]
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
             }
 
             [Test]
