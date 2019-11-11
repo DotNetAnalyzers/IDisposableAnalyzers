@@ -39,6 +39,7 @@ namespace IDisposableAnalyzers
                                     leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
                                     literal.IsKind(SyntaxKind.TrueLiteralExpression))
                                 {
+                                    invocationOrObjectCreation = null;
                                     return false;
                                 }
 
@@ -56,6 +57,7 @@ namespace IDisposableAnalyzers
                                         leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
                                         literal.IsKind(SyntaxKind.FalseLiteralExpression))
                                     {
+                                        invocationOrObjectCreation = null;
                                         return false;
                                     }
 
@@ -73,6 +75,12 @@ namespace IDisposableAnalyzers
                 case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
                     if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method))
                     {
+                        if (method == KnownSymbol.Task.FromResult)
+                        {
+                            invocationOrObjectCreation = invocation;
+                            return true;
+                        }
+
                         if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
                             method.TryFindParameter(candidate, out var parameterSymbol))
                         {

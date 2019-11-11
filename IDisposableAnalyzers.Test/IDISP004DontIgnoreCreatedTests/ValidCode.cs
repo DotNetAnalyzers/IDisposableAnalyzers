@@ -689,7 +689,9 @@ namespace RoslynSandbox
         }
 
         [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
+        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
+        [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)))")]
+        [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
         [TestCase("using (await Task.FromResult(File.OpenRead(fileName)))")]
         [TestCase("using (await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
         [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)))")]
@@ -715,12 +717,10 @@ namespace RoslynSandbox
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
-        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
-        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
         public static void AssigningAwaitedToLocal(string statement)
         {
             var testCode = @"
@@ -741,12 +741,10 @@ namespace N
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName))).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
         [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
-        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName))")]
-        [TestCase("var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
         public static void AssigningAwaitedToField(string statement)
         {
             var testCode = @"
