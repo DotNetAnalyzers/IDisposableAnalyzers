@@ -7,6 +7,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Editing;
 
+    [Obsolete("Use DocumentEditorCodeFixProvider")]
     internal static class CodeFixContextExt
     {
         internal static void RegisterDocumentEditorFix(

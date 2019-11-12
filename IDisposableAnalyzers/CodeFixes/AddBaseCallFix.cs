@@ -29,13 +29,12 @@ namespace IDisposableAnalyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax disposeMethod &&
-                    disposeMethod.Body is BlockSyntax body &&
-                    disposeMethod.ParameterList is ParameterListSyntax parameterList &&
-                    parameterList.Parameters.TrySingle(out var parameter))
+                    disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: BlockSyntax body } &&
+                    parameters.TrySingle(out var parameter))
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
-                            $"Call base.Dispose({parameter.Identifier.ValueText})",
+                            $"base.Dispose({parameter.Identifier.ValueText})",
                             _ => Task.FromResult(
                                 context.Document.WithSyntaxRoot(
                                     syntaxRoot.ReplaceNode(
@@ -43,7 +42,7 @@ namespace IDisposableAnalyzers
                                         body.AddStatements(SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
                                                                         .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
                                                                         .WithTrailingTrivia(SyntaxFactory.ElasticMarker))))),
-                            "Call base.Dispose()"),
+                            "base.Dispose()"),
                         diagnostic);
                 }
             }

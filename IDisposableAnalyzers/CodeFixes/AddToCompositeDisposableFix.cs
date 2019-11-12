@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddToCompositeDisposableFix))]
     [Shared]
-    internal class AddToCompositeDisposableFix : CodeFixProvider
+    internal class AddToCompositeDisposableFix : DocumentEditorCodeFixProvider
     {
         private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("System.Reactive.Disposables.CompositeDisposable")
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
@@ -26,35 +26,35 @@ namespace IDisposableAnalyzers
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP004DontIgnoreCreated.DiagnosticId);
 
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
         /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
+                                                   .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                             .ConfigureAwait(false);
-            foreach (var diagnostic in context.Diagnostics)
+                                                      .ConfigureAwait(false);
+            if (semanticModel.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Contains("System.Reactive")))
             {
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
-                              .TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement))
+                foreach (var diagnostic in context.Diagnostics)
                 {
-                    if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Add to CompositeDisposable.",
-                            (editor, cancellationToken) => AddToExisting(editor, statement, field),
-                            diagnostic);
-                    }
-                    else
-                    {
-                        if (semanticModel.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Contains("System.Reactive")))
+                        if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
                         {
-                            context.RegisterDocumentEditorFix(
+                            context.RegisterCodeFix(
+                                $"Add to {field.Identifier.ValueText}.",
+                                (editor, _) => AddToExisting(editor, statement, field),
+                                (string)null,
+                                diagnostic);
+                        }
+                        else
+                        {
+                            context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
-                                (editor, cancellationToken) =>
-                                    CreateAndInitialize(editor, statement, cancellationToken),
+                                (editor, cancellationToken) => CreateAndInitialize(editor, statement, cancellationToken),
+                                (string)null,
                                 diagnostic);
                         }
                     }
@@ -62,7 +62,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, IFieldSymbol field)
+        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, VariableDeclaratorSyntax field)
         {
             if (TryGetPreviousStatement(out var previous) &&
                 TryGetCreateCompositeDisposable(out var compositeDisposableCreation))
@@ -76,12 +76,13 @@ namespace IDisposableAnalyzers
             else
             {
                 var code = editor.SemanticModel.UnderscoreFields()
-                    ? $"{field.Name}.Add({statement.Expression});"
-                    : $"this.{field.Name}.Add({statement.Expression});";
+                    ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
+                    : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
 
-                editor.ReplaceNode(
-                    statement,
-                    SyntaxNodeExtensions.WithTriviaFrom(SyntaxFactory.ParseStatement(code), statement));
+                _ = editor.ReplaceNode(
+                    statement.Expression,
+                    x => SyntaxFactory.ParseExpression(code)
+                                      .WithTriviaFrom(x));
             }
 
             bool TryGetPreviousStatement(out StatementSyntax result)
@@ -97,18 +98,16 @@ namespace IDisposableAnalyzers
 
             bool TryGetCreateCompositeDisposable(out ObjectCreationExpressionSyntax result)
             {
-                if (previous is ExpressionStatementSyntax expressionStatement &&
-                    expressionStatement.Expression is AssignmentExpressionSyntax assignment &&
-                    assignment.Right is ObjectCreationExpressionSyntax objectCreation)
+                if (previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } })
                 {
-                    if ((assignment.Left is IdentifierNameSyntax identifierName &&
-                         identifierName.Identifier.ValueText == field.Name) ||
-                        (assignment.Left is MemberAccessExpressionSyntax memberAccess &&
-                         memberAccess.Expression is ThisExpressionSyntax &&
-                         memberAccess.Name.Identifier.ValueText == field.Name))
+                    switch (left)
                     {
-                        result = objectCreation;
-                        return true;
+                        case IdentifierNameSyntax identifierName
+                            when identifierName.Identifier.ValueText == field.Identifier.ValueText:
+                        case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
+                                when name.Identifier.ValueText == field.Identifier.ValueText:
+                            result = objectCreation;
+                            return true;
                     }
                 }
 
@@ -161,31 +160,23 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out IFieldSymbol field)
+        private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out VariableDeclaratorSyntax field)
         {
-            field = null;
-            var typeDeclaration = node.FirstAncestor<TypeDeclarationSyntax>();
-            if (typeDeclaration == null)
+            if (node.TryFirstAncestor(out TypeDeclarationSyntax containingType))
             {
-                return false;
-            }
-
-            var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, cancellationToken);
-            if (type == null)
-            {
-                return false;
-            }
-
-            foreach (var member in type.GetMembers())
-            {
-                if (member is IFieldSymbol candidateField &&
-                    candidateField.Type == KnownSymbol.CompositeDisposable)
+                foreach (var member in containingType.Members)
                 {
-                    field = candidateField;
-                    return true;
+                    if (member is FieldDeclarationSyntax { Declaration: { Type: { } type, Variables: { Count: 1 } variables } } &&
+                        semanticModel.TryGetType(type, cancellationToken, out var typeSymbol) &&
+                        typeSymbol == KnownSymbol.CompositeDisposable)
+                    {
+                        field = variables[0];
+                        return true;
+                    }
                 }
             }
 
+            field = null;
             return false;
         }
     }

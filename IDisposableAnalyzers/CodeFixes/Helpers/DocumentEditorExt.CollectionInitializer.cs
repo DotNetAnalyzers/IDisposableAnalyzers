@@ -74,10 +74,9 @@ namespace IDisposableAnalyzers
 
         private static ObjectCreationExpressionSyntax RemoveEmptyArgumentList(this ObjectCreationExpressionSyntax objectCreation)
         {
-            if (objectCreation.ArgumentList != null &&
-                objectCreation.ArgumentList.Arguments.Count == 0)
+            if (objectCreation is { ArgumentList: { Arguments: { Count: 0 } } argumentList })
             {
-                objectCreation = objectCreation.RemoveNode(objectCreation.ArgumentList, SyntaxRemoveOptions.KeepTrailingTrivia);
+                return objectCreation.RemoveNode(argumentList, SyntaxRemoveOptions.KeepTrailingTrivia);
             }
 
             return objectCreation;
