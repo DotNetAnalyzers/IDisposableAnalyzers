@@ -64,7 +64,7 @@ namespace IDisposableAnalyzers
                             case Result.AssumeNo:
                                 break;
                             default:
-                                throw new ArgumentOutOfRangeException();
+                                throw new ArgumentOutOfRangeException(nameof(disposable), disposable, "Unknown result type");
                         }
                     }
 
@@ -83,15 +83,11 @@ namespace IDisposableAnalyzers
             {
                 assignedSymbol = assignedValues.CurrentSymbol;
                 if (assignedValues.Count == 1 &&
-                    disposable.Parent is AssignmentExpressionSyntax assignment)
+                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } assignment &&
+                    binary.IsKind(SyntaxKind.CoalesceExpression))
                 {
-                    if (assignment.Parent is ParenthesizedExpressionSyntax parenthesizedExpression &&
-                        parenthesizedExpression.Parent is BinaryExpressionSyntax binary &&
-                        binary.IsKind(SyntaxKind.CoalesceExpression))
-                    {
-                        // lazy
-                        return Result.No;
-                    }
+                    // lazy
+                    return Result.No;
                 }
 
                 if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
@@ -221,7 +217,7 @@ namespace IDisposableAnalyzers
 
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException();
+                        throw new ArgumentOutOfRangeException(nameof(values), values, "Unhandled result type.");
                 }
             }
 
