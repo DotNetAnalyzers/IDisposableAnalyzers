@@ -30,6 +30,17 @@ namespace IDisposableAnalyzers
             return false;
         }
 
+        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
+        {
+            if (type.TypeKind == TypeKind.Interface)
+            {
+                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+            }
+
+            return TryFindIDisposableDispose(type, compilation, Search.Recursive, out var disposeMethod) &&
+                   disposeMethod.ExplicitInterfaceImplementations.IsEmpty;
+        }
+
         internal static bool TryFindIDisposableDispose(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
         {
             disposeMethod = null;

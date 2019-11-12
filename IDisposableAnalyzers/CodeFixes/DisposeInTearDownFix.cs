@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
                                     $"Dispose member in {tearDown.Identifier.ValueText}.",
                                     (editor, cancellationToken) => editor.ReplaceNode(
                                         body,
-                                        x => x.AddStatements(IDisposableFactory.ConditionalDisposeStatement(left, editor.SemanticModel, cancellationToken))),
+                                        x => x.AddStatements(IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
                                     $"Dispose member in {tearDown.Identifier.ValueText}.",
                                     diagnostic);
                                 break;
@@ -60,7 +60,7 @@ namespace IDisposableAnalyzers
                                         tearDown,
                                         x => x.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
-                                            IDisposableFactory.ConditionalDisposeStatement(left, editor.SemanticModel, cancellationToken))),
+                                            IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
                                     $"Dispose member in {tearDown.Identifier.ValueText}.",
                                     diagnostic);
                                 break;
@@ -81,7 +81,7 @@ namespace IDisposableAnalyzers
                             $"Create {tearDown.Identifier.ValueText} method and dispose member.",
                             (editor, cancellationToken) => editor.InsertAfter(
                                 setupMethod,
-                                tearDown.AddBodyStatements(IDisposableFactory.ConditionalDisposeStatement(left, editor.SemanticModel, cancellationToken))),
+                                tearDown.AddBodyStatements(IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
                             $"Create",
                             diagnostic);
                     }

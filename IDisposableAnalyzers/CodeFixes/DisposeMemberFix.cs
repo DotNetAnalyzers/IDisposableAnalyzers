@@ -29,52 +29,52 @@ namespace IDisposableAnalyzers
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode<MemberDeclarationSyntax>(diagnostic, out var member) &&
-                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol))
+                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol symbol) &&
+                    FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
-                    if (DisposeMethod.TryFindVirtualDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
-                        disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
+                    if (DisposeMethod.TryFindVirtualDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
+                        disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeDeclaration))
                     {
                         context.RegisterCodeFix(
-                            $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
-                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                            $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, disposable, disposeDeclaration, cancellationToken),
                             "Dispose member.",
                             diagnostic);
                     }
-                    else if (DisposeMethod.TryFindIDisposableDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeMethod) &&
-                             disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                    else if (DisposeMethod.TryFindIDisposableDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
+                             disposeSymbol.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
                     {
-                        switch (disposeMethodDeclaration)
+                        switch (disposeDeclaration)
                         {
                             case { ExpressionBody: { Expression: { } expression } }:
                                 context.RegisterCodeFix(
-                                    $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
+                                    $"{symbol.Name}.Dispose() in {disposeSymbol}",
                                     (editor, cancellationToken) => editor.ReplaceNode(
-                                        disposeMethodDeclaration,
+                                        disposeDeclaration,
                                         x => x.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
-                                            Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken))),
+                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
                                     "Dispose member.",
                                     diagnostic);
                                 break;
                             case { Body: { } body }:
                                 context.RegisterCodeFix(
-                                    $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
+                                    $"{symbol.Name}.Dispose() in {disposeSymbol}",
                                     (editor, cancellationToken) => editor.ReplaceNode(
                                         body,
-                                        x => x.AddStatements(Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken))),
+                                        x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
                                     "Dispose member.",
                                     diagnostic);
                                 break;
                         }
-
                     }
                 }
             }
         }
 
-        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax disposeMethodDeclaration, CancellationToken cancellationToken)
+        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, FieldOrProperty memberSymbol, MethodDeclarationSyntax disposeMethodDeclaration, CancellationToken cancellationToken)
         {
-            var disposeStatement = Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
+            var disposeStatement = IDisposableFactory.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
             if (TryFindIfDisposing(disposeMethodDeclaration, out var ifDisposing))
             {
                 if (ifDisposing.Statement is BlockSyntax block)
@@ -116,16 +116,6 @@ namespace IDisposableAnalyzers
                         block.AddStatements(ifDisposing));
                 }
             }
-        }
-
-        private static SyntaxList<StatementSyntax> CreateStatements(MethodDeclarationSyntax method, StatementSyntax newStatement)
-        {
-            if (method.ExpressionBody != null)
-            {
-                return SyntaxFactory.List(new[] { SyntaxFactory.ExpressionStatement(method.ExpressionBody.Expression), newStatement });
-            }
-
-            return method.Body.Statements.Add(newStatement);
         }
 
         private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)

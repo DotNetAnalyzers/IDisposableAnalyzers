@@ -60,15 +60,15 @@ namespace IDisposableAnalyzers
                     DisposeBefore(editor, disposable, location.Parent, cancellationToken);
                     break;
                 case StatementSyntax { Parent: BlockSyntax _ } statement:
-                    editor.InsertBefore(statement, IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                    editor.InsertBefore(statement, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
                     break;
                 case AnonymousFunctionExpressionSyntax lambda:
                     editor.ReplaceNode(
                         lambda,
-                        x => x.PrependStatements(IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                        x => x.PrependStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
                     break;
                 case ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: ExpressionStatementSyntax { Parent: BlockSyntax _ } invocationStatement } }:
-                    editor.InsertBefore(invocationStatement, IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                    editor.InsertBefore(invocationStatement, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
                     break;
                 case ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: ArrowExpressionClauseSyntax _ } invocation }:
                     DisposeBefore(editor, disposable, invocation, cancellationToken);
@@ -80,7 +80,7 @@ namespace IDisposableAnalyzers
                               .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                               .WithBody(
                                   SyntaxFactory.Block(
-                                      IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken),
+                                      IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                       SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax method }:
@@ -90,7 +90,7 @@ namespace IDisposableAnalyzers
                               .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                               .WithBody(
                                   SyntaxFactory.Block(
-                                      IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken),
+                                      IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                       SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
@@ -101,7 +101,7 @@ namespace IDisposableAnalyzers
                               .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                               .WithBody(
                                   SyntaxFactory.Block(
-                                      IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken),
+                                      IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                       SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
@@ -112,7 +112,7 @@ namespace IDisposableAnalyzers
                               .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
                               .WithBody(
                                   SyntaxFactory.Block(
-                                      IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken),
+                                      IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                       SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: PropertyDeclarationSyntax property }:
@@ -126,7 +126,7 @@ namespace IDisposableAnalyzers
                                           SyntaxFactory.AccessorDeclaration(
                                               SyntaxKind.GetAccessorDeclaration,
                                               SyntaxFactory.Block(
-                                                  IDisposableFactory.ConditionalDisposeStatement(disposable, editor.SemanticModel, cancellationToken),
+                                                  IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                                   SyntaxFactory.ReturnStatement(
                                                       x.ExpressionBody.Expression)))))));
                     break;

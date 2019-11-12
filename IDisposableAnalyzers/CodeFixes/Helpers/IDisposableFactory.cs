@@ -8,6 +8,7 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Formatting;
 
     internal static class IDisposableFactory
@@ -27,7 +28,16 @@ namespace IDisposableAnalyzers
                         Dispose)));
         }
 
-        internal static ExpressionStatementSyntax ConditionalDisposeStatement(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionStatementSyntax ConditionalDisposeStatement(ExpressionSyntax disposable)
+        {
+            return SyntaxFactory.ExpressionStatement(
+                SyntaxFactory.ConditionalAccessExpression(
+                    disposable,
+                    SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberBindingExpression(SyntaxFactory.Token(SyntaxKind.DotToken), Dispose))));
+        }
+
+        internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return SyntaxFactory.ExpressionStatement(
                 SyntaxFactory.ConditionalAccessExpression(
@@ -79,7 +89,127 @@ namespace IDisposableAnalyzers
                 }
 
                 return AsIDisposable(e.WithoutTrivia())
-                    .WithLeadingElasticLineFeed();
+                                      .WithLeadingElasticLineFeed();
+            }
+        }
+
+        internal static ExpressionStatementSyntax DisposeStatement(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using (var walker = MutationWalker.For(disposable, semanticModel, cancellationToken))
+            {
+                if (IsNeverNull(out var neverNull))
+                {
+                    if (disposable.Type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
+                        DisposeMethod.TryFindIDisposableDispose(disposable.Type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                        disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
+                    {
+                        return DisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();
+                    }
+
+                    return DisposeStatement(
+                        SyntaxFactory.CastExpression(
+                            IDisposable,
+                            neverNull.WithoutTrivia()))
+                        .WithLeadingElasticLineFeed();
+                }
+
+                bool IsNeverNull(out ExpressionSyntax memberAccess)
+                {
+                    if (walker.TrySingle(out var mutation) &&
+                        mutation is AssignmentExpressionSyntax { Left: { } single, Right: ObjectCreationExpressionSyntax _, Parent: ExpressionStatementSyntax { Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } } &&
+                        disposable.Symbol.ContainingType.Constructors.Length == 1)
+                    {
+                        memberAccess = single;
+                        return true;
+                    }
+
+                    if (walker.IsEmpty &&
+                        disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ } initializer &&
+                        initializer.TryFirstAncestor(out TypeDeclarationSyntax containingType))
+                    {
+                        if (TryGetMemberAccessFromUsage(containingType, out memberAccess))
+                        {
+                            return true;
+                        }
+
+                        switch (initializer.Parent)
+                        {
+                            case PropertyDeclarationSyntax { Identifier: { } identifier }:
+                                memberAccess = Create(identifier);
+                                return true;
+                            case VariableDeclaratorSyntax { Identifier: { } identifier }:
+                                memberAccess = Create(identifier);
+                                return true;
+                        }
+                    }
+
+                    memberAccess = null;
+                    return false;
+                }
+            }
+
+            if (DisposeMethod.IsAccessibleOn(disposable.Type, semanticModel.Compilation))
+            {
+                return ConditionalDisposeStatement(MemberAccess()).WithLeadingElasticLineFeed();
+            }
+
+            return ConditionalDisposeStatement(
+                    SyntaxFactory.BinaryExpression(
+                        SyntaxKind.AsExpression,
+                        MemberAccess(),
+                        IDisposable))
+                .WithLeadingElasticLineFeed();
+
+            ExpressionSyntax Create(SyntaxToken identifier)
+            {
+                return semanticModel.UnderscoreFields()
+                    ? (ExpressionSyntax)SyntaxFactory.IdentifierName(identifier)
+                    : SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        SyntaxFactory.ThisExpression(),
+                        SyntaxFactory.IdentifierName(identifier));
+            }
+
+            bool TryGetMemberAccessFromUsage(SyntaxNode containingNode, out ExpressionSyntax expression)
+            {
+                using (var identifierNameWalker = IdentifierNameWalker.Borrow(containingNode))
+                {
+                    foreach (var name in identifierNameWalker.IdentifierNames)
+                    {
+                        if (name.Identifier.ValueText == disposable.Name &&
+                            semanticModel.TryGetSymbol(name, cancellationToken, out var symbol) &&
+                            symbol.Equals(disposable.Symbol))
+                        {
+                            switch (name)
+                            {
+                                case { Parent: MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _ } memberAccess }:
+                                    expression = memberAccess;
+                                    return true;
+                                case { Parent: ArgumentSyntax _ }:
+                                case { Parent: ExpressionSyntax _ }:
+                                    expression = name;
+                                    return true;
+                            }
+                        }
+                    }
+                }
+
+                expression = null;
+                return false;
+            }
+
+            ExpressionSyntax MemberAccess()
+            {
+                if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&
+                    TryGetMemberAccessFromUsage(root, out var member))
+                {
+                    return member;
+                }
+
+                return Create(
+                    SyntaxFacts.GetKeywordKind(disposable.Name) != SyntaxKind.None
+                        ? SyntaxFactory.VerbatimIdentifier(default, $"@{disposable.Name}", disposable.Name, default)
+                        : SyntaxFactory.Identifier(disposable.Name));
             }
         }
 
