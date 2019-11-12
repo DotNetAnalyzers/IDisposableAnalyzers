@@ -15,17 +15,17 @@ namespace IDisposableAnalyzers
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(CreateAndAssignFieldFix))]
     [Shared]
-    internal class CreateAndAssignFieldFix : CodeFixProvider
+    internal class CreateAndAssignFieldFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP001DisposeCreated.DiagnosticId,
             IDISP004DontIgnoreCreated.DiagnosticId);
 
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
         /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -36,23 +36,25 @@ namespace IDisposableAnalyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId &&
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
+                    localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables } } &&
+                    variables[0].Initializer is { } &&
                     localDeclaration.TryFirstAncestor<ConstructorDeclarationSyntax>(out _) &&
-                    localDeclaration.Declaration.Variables.TrySingle(out var variable) &&
-                    variable.Initializer != null &&
-                    semanticModel.TryGetType(localDeclaration.Declaration.Type, context.CancellationToken, out var type))
+                    semanticModel.TryGetType(type, context.CancellationToken, out var local))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, type),
+                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, local),
+                        "Create and assign field.",
                         diagnostic);
                 }
                 else if (diagnostic.Id == IDISP004DontIgnoreCreated.DiagnosticId &&
                          node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
                          statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Create and assign field.",
                         (editor, cancellationToken) => CreateAndAssignField(editor, statement),
+                        "Create and assign field.",
                         diagnostic);
                 }
             }
@@ -63,12 +65,11 @@ namespace IDisposableAnalyzers
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
             var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var variableDeclarator = statement.Declaration.Variables[0];
-            var identifier = variableDeclarator.Identifier;
             var field = editor.AddField(
                 containingType,
                 usesUnderscoreNames
-                    ? "_" + identifier.ValueText
-                    : identifier.ValueText,
+                    ? "_" + variableDeclarator.Identifier.ValueText
+                    : variableDeclarator.Identifier.ValueText,
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
                 type,
@@ -77,14 +78,12 @@ namespace IDisposableAnalyzers
             var fieldAccess = usesUnderscoreNames
                 ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
                 : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
+
             editor.ReplaceNode(
                 statement,
-                SyntaxFactory.ExpressionStatement(
-                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
-                                     fieldAccess,
-                                     variableDeclarator.Initializer.Value))
-                             .WithLeadingTrivia(statement.GetLeadingTrivia())
-                             .WithTrailingTrivia(statement.GetTrailingTrivia()));
+                (x, g) => g.ExpressionStatement(
+                               g.AssignmentStatement(fieldAccess, variableDeclarator.Initializer.Value))
+                           .WithTriviaFrom(x));
         }
 
         private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement)
@@ -106,13 +105,8 @@ namespace IDisposableAnalyzers
                 ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
                 : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
             editor.ReplaceNode(
-                statement,
-                SyntaxFactory.ExpressionStatement(
-                                 (ExpressionSyntax)editor.Generator.AssignmentStatement(
-                                     fieldAccess,
-                                     statement.Expression))
-                             .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                             .WithTrailingTrivia(SyntaxFactory.ElasticMarker));
+                statement.Expression,
+                (x, g) => g.AssignmentStatement(fieldAccess, x).WithTriviaFrom(x));
         }
     }
 }
