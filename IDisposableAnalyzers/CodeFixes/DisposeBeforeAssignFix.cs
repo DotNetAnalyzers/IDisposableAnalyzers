@@ -34,14 +34,20 @@ namespace IDisposableAnalyzers
                     case AssignmentExpressionSyntax { Left: { } left } assignment:
                         context.RegisterCodeFix(
                             "Dispose before re-assigning.",
-                            (editor, cancellationToken) => DisposeBefore(editor, Disposable(BackingField(left)), assignment),
+                            (editor, cancellationToken) => DisposeBefore(
+                                editor,
+                                BackingField(left).Normalize(editor.SemanticModel, cancellationToken),
+                                assignment),
                             "Dispose before re-assigning.",
                             diagnostic);
                         break;
                     case ArgumentSyntax { Expression: { } expression } argument:
                         context.RegisterCodeFix(
                             "Dispose before re-assigning.",
-                            (editor, cancellationToken) => DisposeBefore(editor, Disposable(expression), argument),
+                            (editor, cancellationToken) => DisposeBefore(
+                                editor,
+                                expression.Normalize(editor.SemanticModel, cancellationToken),
+                                argument),
                             "Dispose before re-assigning.",
                             diagnostic);
                         break;
@@ -65,18 +71,6 @@ namespace IDisposableAnalyzers
 
                     return e;
                 }
-
-                ExpressionSyntax Disposable(ExpressionSyntax e)
-                {
-                    if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
-                    {
-                        return e.WithoutTrivia()
-                                .WithLeadingElasticLineFeed();
-                    }
-
-                    return IDisposableFactory.AsIDisposable(e.WithoutTrivia())
-                                             .WithLeadingElasticLineFeed();
-                }
             }
         }
 
@@ -87,6 +81,8 @@ namespace IDisposableAnalyzers
                 case AssignmentExpressionSyntax { Parent: { } }:
                 case ArgumentSyntax { Parent: { } }:
                 case InvocationExpressionSyntax { Parent: { } }:
+                case CastExpressionSyntax { Parent: { } }:
+                case ParenthesizedExpressionSyntax { Parent: { } }:
                     DisposeBefore(editor, disposable, location.Parent);
                     break;
                 case StatementSyntax { Parent: BlockSyntax _ } statement:

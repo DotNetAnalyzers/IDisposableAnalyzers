@@ -2,6 +2,8 @@ namespace IDisposableAnalyzers
 {
     using System;
     using System.Linq;
+    using System.Threading;
+    using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -14,6 +16,25 @@ namespace IDisposableAnalyzers
                                                                       .WithSimplifiedNames();
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
+
+        internal static ExpressionSyntax Normalize(this ExpressionSyntax e, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
+            {
+                if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
+                    DisposeMethod.TryFindIDisposableDispose(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                    disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
+                {
+                    return e.WithoutTrivia()
+                            .WithLeadingElasticLineFeed();
+                }
+
+                return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.CastExpression(IDisposable, e));
+            }
+
+            return AsIDisposable(e.WithoutTrivia())
+                                  .WithLeadingElasticLineFeed();
+        }
 
         internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable)
         {
@@ -47,6 +68,13 @@ namespace IDisposableAnalyzers
                 _ => throw new NotSupportedException(
                     $"No support for adding statements to lambda with the shape: {lambda?.ToString() ?? "null"}"),
             };
+        }
+
+        internal static MethodDeclarationSyntax AsBlockBody(this MethodDeclarationSyntax method, params StatementSyntax[] statements)
+        {
+            return method.WithExpressionBody(null)
+                         .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                         .WithBody(SyntaxFactory.Block(statements));
         }
 
         internal static ParenthesizedExpressionSyntax AsIDisposable(ExpressionSyntax e)

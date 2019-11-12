@@ -35,10 +35,10 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AttributeSyntax attribute)
+        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, out AttributeSyntax attribute)
         {
-            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
-                assignment.FirstAncestor<MethodDeclarationSyntax>() is MethodDeclarationSyntax methodDeclaration)
+            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out assignment) &&
+                assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
                        Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute);

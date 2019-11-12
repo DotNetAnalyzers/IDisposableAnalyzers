@@ -110,7 +110,7 @@ namespace RoslynSandbox
         [TearDown]
         public void TearDown()
         {
-            (this.disposable as System.IDisposable)?.Dispose();
+            ((System.IDisposable)this.disposable)?.Dispose();
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         [TearDown]
         public void TearDown()
         {
-            (this.disposable as System.IDisposable)?.Dispose();
+            ((System.IDisposable)this.disposable)?.Dispose();
         }
 
         [Test]
@@ -293,6 +293,62 @@ namespace RoslynSandbox
 
         [Test]
         public void Test()
+        {
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            }
+
+            [Test]
+            public static void CreateStaticTeardown()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public static class Tests
+    {
+        private static Disposable disposable;
+
+        [OneTimeSetUp]
+        public static void SetUp()
+        {
+            ↓disposable = new Disposable();
+        }
+
+        [Test]
+        public static void Test()
+        {
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using NUnit.Framework;
+
+    public static class Tests
+    {
+        private static Disposable disposable;
+
+        [OneTimeSetUp]
+        public static void SetUp()
+        {
+            disposable = new Disposable();
+        }
+
+        [OneTimeTearDown]
+        public static void OneTimeTearDown()
+        {
+            disposable?.Dispose();
+        }
+
+        [Test]
+        public static void Test()
         {
         }
     }
