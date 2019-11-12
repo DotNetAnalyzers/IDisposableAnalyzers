@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Linq;
     using System.Threading;
@@ -26,7 +26,7 @@ namespace IDisposableAnalyzers
                 name,
                 accessibility,
                 modifiers,
-                SyntaxFactory.ParseTypeName(type.ToDisplayString(SymbolDisplayFormat.MinimallyQualifiedFormat)),
+                (TypeSyntax)editor.Generator.TypeExpression(type),
                 cancellationToken);
         }
 

@@ -1,27 +1,24 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddBaseCallFix))]
     [Shared]
-    internal class AddBaseCallFix : CodeFixProvider
+    internal class AddBaseCallFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.DiagnosticId);
 
-        /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                                    .ConfigureAwait(false);
@@ -33,16 +30,20 @@ namespace IDisposableAnalyzers
                     parameters.TrySingle(out var parameter))
                 {
                     context.RegisterCodeFix(
-                        CodeAction.Create(
-                            $"base.Dispose({parameter.Identifier.ValueText})",
-                            _ => Task.FromResult(
-                                context.Document.WithSyntaxRoot(
-                                    syntaxRoot.ReplaceNode(
-                                        body,
-                                        body.AddStatements(SyntaxFactory.ParseStatement($"base.{disposeMethod.Identifier.ValueText}({parameter.Identifier.ValueText});")
-                                                                        .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                                                                        .WithTrailingTrivia(SyntaxFactory.ElasticMarker))))),
-                            "base.Dispose()"),
+                        $"base.Dispose({parameter.Identifier.ValueText})",
+                        (e, _) => e.ReplaceNode(
+                            body,
+                            x => x.AddStatements(
+                                SyntaxFactory.ExpressionStatement(
+                                    SyntaxFactory.InvocationExpression(
+                                        SyntaxFactory.MemberAccessExpression(
+                                            SyntaxKind.SimpleMemberAccessExpression,
+                                            SyntaxFactory.BaseExpression(),
+                                            SyntaxFactory.IdentifierName(disposeMethod.Identifier)),
+                                        SyntaxFactory.ArgumentList(
+                                            SyntaxFactory.SingletonSeparatedList(
+                                                SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))))),
+                        "base.Dispose()",
                         diagnostic);
                 }
             }
