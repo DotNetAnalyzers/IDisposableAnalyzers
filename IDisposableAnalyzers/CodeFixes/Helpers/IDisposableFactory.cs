@@ -10,6 +10,27 @@ namespace IDisposableAnalyzers
 
     internal static class IDisposableFactory
     {
+        private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
+
+        internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable)
+        {
+            return SyntaxFactory.ExpressionStatement(
+                SyntaxFactory.InvocationExpression(
+                    SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        disposable,
+                        Dispose)));
+        }
+
+        internal static ExpressionStatementSyntax ConditionalDisposeStatement(ExpressionSyntax disposable)
+        {
+            return SyntaxFactory.ExpressionStatement(
+                SyntaxFactory.ConditionalAccessExpression(
+                    disposable,
+                    SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberBindingExpression(SyntaxFactory.Token(SyntaxKind.DotToken), Dispose))));
+        }
+
         internal static AnonymousFunctionExpressionSyntax PrependStatements(this AnonymousFunctionExpressionSyntax lambda, params StatementSyntax[] statements)
         {
             return lambda switch
@@ -24,6 +45,5 @@ namespace IDisposableAnalyzers
                     $"No support for adding statements to lambda with the shape: {lambda?.ToString() ?? "null"}"),
             };
         }
-
     }
 }

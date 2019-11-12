@@ -22,13 +22,11 @@ namespace IDisposableAnalyzers
         private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("System.Reactive.Disposables.CompositeDisposable")
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
 
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP004DontIgnoreCreated.DiagnosticId);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)

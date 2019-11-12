@@ -5,26 +5,22 @@ namespace IDisposableAnalyzers
     using System.Threading.Tasks;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeActions;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ArgumentFix))]
     [Shared]
-    internal class ArgumentFix : CodeFixProvider
+    internal class ArgumentFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP020SuppressFinalizeThis.DiagnosticId,
             IDISP021DisposeTrue.DiagnosticId,
             IDISP022DisposeFalse.DiagnosticId);
 
-        /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                                    .ConfigureAwait(false);
@@ -36,40 +32,31 @@ namespace IDisposableAnalyzers
                     if (diagnostic.Id == IDISP020SuppressFinalizeThis.DiagnosticId)
                     {
                         context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Call GC.SuppressFinalize(this)",
-                                _ => Task.FromResult(
-                                    context.Document.WithSyntaxRoot(
-                                        syntaxRoot.ReplaceNode(
-                                            argument.Expression,
-                                            SyntaxFactory.ThisExpression()))),
-                                equivalenceKey: nameof(SuppressFinalizeFix)),
+                            "GC.SuppressFinalize(this)",
+                            (e, _) => e.ReplaceNode(
+                                argument.Expression,
+                                SyntaxFactory.ThisExpression()),
+                            equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
                     else if (diagnostic.Id == IDISP021DisposeTrue.DiagnosticId)
                     {
                         context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Call this.Dispose(true)",
-                                _ => Task.FromResult(
-                                    context.Document.WithSyntaxRoot(
-                                        syntaxRoot.ReplaceNode(
-                                            argument.Expression,
-                                            SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)))),
-                                equivalenceKey: nameof(SuppressFinalizeFix)),
+                            "this.Dispose(true)",
+                            (e, _) => e.ReplaceNode(
+                                argument.Expression,
+                                SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)),
+                            equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
                     else if (diagnostic.Id == IDISP022DisposeFalse.DiagnosticId)
                     {
                         context.RegisterCodeFix(
-                            CodeAction.Create(
-                                "Call this.Dispose(false)",
-                                _ => Task.FromResult(
-                                    context.Document.WithSyntaxRoot(
-                                        syntaxRoot.ReplaceNode(
-                                            argument.Expression,
-                                            SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))),
-                                equivalenceKey: nameof(SuppressFinalizeFix)),
+                            "this.Dispose(false)",
+                            (e, _) => e.ReplaceNode(
+                                argument.Expression,
+                                SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)),
+                            equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
                 }
