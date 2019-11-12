@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -17,14 +17,12 @@ namespace IDisposableAnalyzers
     [Shared]
     internal class CreateAndAssignFieldFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             IDISP001DisposeCreated.DiagnosticId,
             IDISP004DontIgnoreCreated.DiagnosticId);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
-        /// <inheritdoc/>
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
@@ -36,9 +34,8 @@ namespace IDisposableAnalyzers
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId &&
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
-                    localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables } } &&
+                    localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
                     variables[0].Initializer is { } &&
-                    localDeclaration.TryFirstAncestor<ConstructorDeclarationSyntax>(out _) &&
                     semanticModel.TryGetType(type, context.CancellationToken, out var local))
                 {
                     context.RegisterCodeFix(

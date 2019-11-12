@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
+﻿namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -8,8 +8,8 @@ namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
     public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor);
         private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor);
 
         [Test]
         public static void SealedWithFinalizerWhenStatementBody()
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void SealedWithFinalizerWhenStatementBodyWIthTrivia()
+        public static void SealedWithFinalizerWhenStatementBodyWithTrivia()
         {
             var testCode = @"
 namespace RoslynSandbox
