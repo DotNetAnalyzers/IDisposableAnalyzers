@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
             private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
 
             [Test]
-            public static void AssigningLocalVariableViaObjectCreationThenOutParameter()
+            public static void LocalViaObjectCreationThenOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -56,12 +56,12 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
             }
 
             [Test]
-            public static void AssigningLocalVariableViaInvocationThenOutParameter()
+            public static void LocalInvocationThenOutParameter()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -112,7 +112,60 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void AssigningFieldViaOutParameterInPublicMethod()
+            public static void LocalViaOutTwice()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            Stream stream;
+            TryGetStream(out stream);
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            Stream stream;
+            TryGetStream(out stream);
+            stream?.Dispose();
+            TryGetStream(out stream);
+        }
+
+        public bool TryGetStream(out Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public static void FieldViaOutInPublicMethod()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -126,7 +179,7 @@ namespace RoslynSandbox
 
         public void Update()
         {
-            TryGetStream(↓out stream);
+            TryGetStream(↓out this.stream);
         }
 
         public bool TryGetStream(out Stream outValue)
@@ -150,6 +203,59 @@ namespace RoslynSandbox
         public void Update()
         {
             this.stream?.Dispose();
+            TryGetStream(out this.stream);
+        }
+
+        public bool TryGetStream(out Stream outValue)
+        {
+            outValue = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public static void FieldViaOutInPublicMethodNoThis()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public void Update()
+        {
+            TryGetStream(↓out stream);
+        }
+
+        public bool TryGetStream(out Stream outValue)
+        {
+            outValue = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public void Update()
+        {
+            stream?.Dispose();
             TryGetStream(out stream);
         }
 
@@ -165,7 +271,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void AssigningVariableViaOutParameterTwice()
+            public static void FieldOfTypeObjectViaOutParameterInPublicMethodNoThis()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -175,16 +281,16 @@ namespace RoslynSandbox
 
     public class C
     {
-        public void M()
+        private object stream;
+
+        public void Update()
         {
-            Stream stream;
-            TryGetStream(out stream);
             TryGetStream(↓out stream);
         }
 
-        public bool TryGetStream(out Stream stream)
+        public bool TryGetStream(out object outValue)
         {
-            stream = File.OpenRead(string.Empty);
+            outValue = File.OpenRead(string.Empty);
             return true;
         }
     }
@@ -198,17 +304,17 @@ namespace RoslynSandbox
 
     public class C
     {
-        public void M()
+        private object stream;
+
+        public void Update()
         {
-            Stream stream;
-            TryGetStream(out stream);
-            stream?.Dispose();
+            (stream as IDisposable)?.Dispose();
             TryGetStream(out stream);
         }
 
-        public bool TryGetStream(out Stream stream)
+        public bool TryGetStream(out object outValue)
         {
-            stream = File.OpenRead(string.Empty);
+            outValue = File.OpenRead(string.Empty);
             return true;
         }
     }
@@ -218,7 +324,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void CallPrivateMethodRefParameter()
+            public static void FieldPrivateMethodRef()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -279,7 +385,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void CallPrivateMethodRefParameterTwice()
+            public static void FieldPrivateMethodRefTwice()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -342,7 +448,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void CallPrivateMethodRefParameterTwiceDifferentMethods()
+            public static void FieldPrivateMethodRefTwiceDifferentMethods()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -415,7 +521,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void CallPublicMethodRefParameter()
+            public static void FieldPublicMethodRef()
             {
                 var testCode = @"
 namespace RoslynSandbox
@@ -476,7 +582,7 @@ namespace RoslynSandbox
             }
 
             [Test]
-            public static void CallPublicMethodRefParameterExpressionBody()
+            public static void FieldPublicMethodRefExpressionBody()
             {
                 var testCode = @"
 namespace RoslynSandbox

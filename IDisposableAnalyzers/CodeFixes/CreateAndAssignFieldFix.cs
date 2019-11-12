@@ -30,7 +30,7 @@ namespace IDisposableAnalyzers
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                             .ConfigureAwait(false);
+                                                      .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);

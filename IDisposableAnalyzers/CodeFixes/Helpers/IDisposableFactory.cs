@@ -10,6 +10,9 @@ namespace IDisposableAnalyzers
 
     internal static class IDisposableFactory
     {
+        private static readonly TypeSyntax IDisposable = SyntaxFactory.ParseTypeName("System.IDisposable")
+                                                                      .WithSimplifiedNames();
+
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
         internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable)
@@ -44,6 +47,11 @@ namespace IDisposableAnalyzers
                 _ => throw new NotSupportedException(
                     $"No support for adding statements to lambda with the shape: {lambda?.ToString() ?? "null"}"),
             };
+        }
+
+        internal static ParenthesizedExpressionSyntax AsIDisposable(ExpressionSyntax e)
+        {
+            return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.BinaryExpression(SyntaxKind.AsExpression, e, IDisposable));
         }
     }
 }

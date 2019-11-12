@@ -6,7 +6,11 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     public static partial class CodeFix
     {
-        private const string DisposableCode = @"
+        private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
+        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor);
+
+        private const string Disposable = @"
 namespace RoslynSandbox
 {
     using System;
@@ -19,7 +23,7 @@ namespace RoslynSandbox
     }
 }";
 
-        private const string ExplicitDisposableCode = @"
+        private const string ExplicitDisposable = @"
 namespace RoslynSandbox
 {
     using System;
@@ -32,12 +36,8 @@ namespace RoslynSandbox
     }
 }";
 
-        private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor);
-        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
-
         [Test]
-        public static void NotDisposingVariable()
+        public static void LocalAssignedTwice()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -76,89 +76,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void SettingToNull()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public void Meh()
-        {
-            var stream = File.OpenRead(string.Empty);
-            ↓stream = null;
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public void Meh()
-        {
-            var stream = File.OpenRead(string.Empty);
-            stream?.Dispose();
-            stream = null;
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void WhenNullCheckAndAssignedTwice()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public void Meh()
-        {
-            Stream stream = null;
-            if (stream == null)
-            {
-                stream = File.OpenRead(string.Empty);
-                ↓stream = File.OpenRead(string.Empty);
-            }
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public void Meh()
-        {
-            Stream stream = null;
-            if (stream == null)
-            {
-                stream = File.OpenRead(string.Empty);
-                stream?.Dispose();
-                stream = File.OpenRead(string.Empty);
-            }
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void NotDisposingVariableOfTypeObject()
+        public static void LocalOfTypeObjectAssignedTwice()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -195,20 +113,19 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void AssigningParameterTwice()
+        public static void LocalAssignedAndThenAssignedWithNull()
         {
             var testCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        public void M(Stream stream)
+        public void Meh()
         {
-            stream = File.OpenRead(string.Empty);
-            ↓stream = File.OpenRead(string.Empty);
+            var stream = File.OpenRead(string.Empty);
+            ↓stream = null;
         }
     }
 }";
@@ -216,16 +133,15 @@ namespace RoslynSandbox
             var fixedCode = @"
 namespace RoslynSandbox
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        public void M(Stream stream)
+        public void Meh()
         {
-            stream = File.OpenRead(string.Empty);
+            var stream = File.OpenRead(string.Empty);
             stream?.Dispose();
-            stream = File.OpenRead(string.Empty);
+            stream = null;
         }
     }
 }";
@@ -234,7 +150,52 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void AssigningInIfElse()
+        public static void LocalAssignedTwiceInsideIf()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public void Meh()
+        {
+            Stream stream = null;
+            if (stream == null)
+            {
+                stream = File.OpenRead(string.Empty);
+                ↓stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public void Meh()
+        {
+            Stream stream = null;
+            if (stream == null)
+            {
+                stream = File.OpenRead(string.Empty);
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void LocalAssignedInElse()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -287,7 +248,242 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingInitializedFieldInCtor()
+        public static void LocalAssignedWithOutThenSimple()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                ↓stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            Stream stream;
+            if (this.TryGetStream(out stream))
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+            }
+        }
+
+        public bool TryGetStream(out Stream result)
+        {
+            result = File.OpenRead(string.Empty);
+            return true;
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void LocalInLambdaClosure()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        public C()
+        {
+            Disposable disposable = null;
+            Console.CancelKeyPress += (_, __) =>
+            {
+                ↓disposable = new Disposable();
+            };
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C
+    {
+        public C()
+        {
+            Disposable disposable = null;
+            Console.CancelKeyPress += (_, __) =>
+            {
+                disposable?.Dispose();
+                disposable = new Disposable();
+            };
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+        }
+
+        [Test]
+        public static void LocalInitializedBeforeWhileLoop()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                ↓stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
+        }
+
+        [Test]
+        public static void LocalInitializedWithNullBeforeWhileLoop()
+        {
+            var code = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(int i)
+        {
+            Stream stream = null;
+            while (i > 0)
+            {
+                ↓stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System.IO;
+
+    public class C
+    {
+        public C(int i)
+        {
+            Stream stream = null;
+            while (i > 0)
+            {
+                stream?.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
+        }
+
+        [Test]
+        public static void ParameterAssignedTwice()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M(Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            ↓stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M(Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+            stream?.Dispose();
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void FieldInitializedThenAssignedInCtor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -328,7 +524,48 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingInitializedPropertyInCtor()
+        public static void FieldOfTypeObjectInitializedThenAssignedInConstructor()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly object stream = File.OpenRead(string.Empty);
+
+        public C()
+        {
+            ↓this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly object stream = File.OpenRead(string.Empty);
+
+        public C()
+        {
+            (this.stream as IDisposable)?.Dispose();
+            this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void PropertyInitializedAndAssignedInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -369,7 +606,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingInitializedBackingFieldInCtor()
+        public static void PropertyWithBackingFieldInitializedThenAssignedInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -422,7 +659,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingBackingFieldInCtor()
+        public static void PropertyWithBackingFieldAssignedTwiceInConstructor()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -477,7 +714,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingFieldInMethod()
+        public static void FieldAssignedInPublicMethod()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -518,7 +755,86 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingFieldInLambda()
+        public static void FieldAssignedInPublicMethodReturnExpression()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh()
+        {
+            return ↓this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh()
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void FieldAssignedInPublicMethodExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh() => ↓this.stream = File.OpenRead(string.Empty);
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh()
+        {
+            this.stream?.Dispose();
+            return this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void FieldAssignedInLambda()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -566,174 +882,7 @@ namespace RoslynSandbox
         }
 
         [Test]
-        public static void NotDisposingFieldAssignedInReturnStatementMethodBody()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh()
-        {
-            return ↓this.stream = File.OpenRead(string.Empty);
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh()
-        {
-            this.stream?.Dispose();
-            return this.stream = File.OpenRead(string.Empty);
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void NotDisposingFieldAssignedInExpressionBody()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh() => ↓this.stream = File.OpenRead(string.Empty);
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh()
-        {
-            this.stream?.Dispose();
-            return this.stream = File.OpenRead(string.Empty);
-        }
-    }
-}";
-
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void NotDisposingFieldAssignedInReturnStatementInPropertyStatementBody()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh
-        {
-            get
-            {
-                return ↓this.stream = File.OpenRead(string.Empty);
-            }
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh
-        {
-            get
-            {
-                this.stream?.Dispose();
-                return this.stream = File.OpenRead(string.Empty);
-            }
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void NotDisposingFieldAssignedInReturnStatementInPropertyExpressionBody()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh => ↓this.stream = File.OpenRead(string.Empty);
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        private Stream stream;
-
-        public IDisposable Meh
-        {
-            get
-            {
-                this.stream?.Dispose();
-                return this.stream = File.OpenRead(string.Empty);
-            }
-        }
-    }
-}";
-
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void AssigningFieldInLambdaBlock()
+        public static void FieldAssignedInLambdaBlock()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -787,12 +936,100 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
         }
 
         [Test]
-        public static void AssigningFieldInLambdaExpression()
+        public static void FieldAssignedInGetterReturnExpression()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh
+        {
+            get
+            {
+                return ↓this.stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh
+        {
+            get
+            {
+                this.stream?.Dispose();
+                return this.stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void FieldAssignedInPropertyExpressionBody()
+        {
+            var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh => ↓this.stream = File.OpenRead(string.Empty);
+    }
+}";
+
+            var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private Stream stream;
+
+        public IDisposable Meh
+        {
+            get
+            {
+                this.stream?.Dispose();
+                return this.stream = File.OpenRead(string.Empty);
+            }
+        }
+    }
+}";
+
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+        }
+
+        [Test]
+        public static void FieldAssignedInLambdaArgument()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -843,12 +1080,12 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
         }
 
         [Test]
-        public static void AssigningBackingFieldInLambda()
+        public static void FieldAssignedInLambdaArgumentBlock()
         {
             var testCode = @"
 namespace RoslynSandbox
@@ -913,204 +1150,8 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-        }
-
-        [Test]
-        public static void AssigningVariableViaOutParameterBefore()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public void M()
-        {
-            Stream stream;
-            if (this.TryGetStream(out stream))
-            {
-                ↓stream = File.OpenRead(string.Empty);
-            }
-        }
-
-        public bool TryGetStream(out Stream result)
-        {
-            result = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public void M()
-        {
-            Stream stream;
-            if (this.TryGetStream(out stream))
-            {
-                stream?.Dispose();
-                stream = File.OpenRead(string.Empty);
-            }
-        }
-
-        public bool TryGetStream(out Stream result)
-        {
-            result = File.OpenRead(string.Empty);
-            return true;
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
-        }
-
-        [Test]
-        public static void WhenAssigningLocalInLambda()
-        {
-            var testCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class C
-    {
-        public C()
-        {
-            Disposable disposable = null;
-            Console.CancelKeyPress += (_, __) =>
-            {
-                ↓disposable = new Disposable();
-            };
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System;
-
-    public class C
-    {
-        public C()
-        {
-            Disposable disposable = null;
-            Console.CancelKeyPress += (_, __) =>
-            {
-                disposable?.Dispose();
-                disposable = new Disposable();
-            };
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, testCode }, fixedCode);
-        }
-
-        [Test]
-        public static void AssignedBeforeWhileLoop()
-        {
-            var code = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public C(int i)
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            while (i > 0)
-            {
-                ↓stream = File.OpenRead(string.Empty);
-                i--;
-            }
-
-            stream.Dispose();
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public C(int i)
-        {
-            Stream stream = File.OpenRead(string.Empty);
-            while (i > 0)
-            {
-                stream?.Dispose();
-                stream = File.OpenRead(string.Empty);
-                i--;
-            }
-
-            stream.Dispose();
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
-        }
-
-        [Test]
-        public static void AssignedWithNullBeforeWhileLoop()
-        {
-            var code = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public C(int i)
-        {
-            Stream stream = null;
-            while (i > 0)
-            {
-                ↓stream = File.OpenRead(string.Empty);
-                i--;
-            }
-
-            stream.Dispose();
-        }
-    }
-}";
-
-            var fixedCode = @"
-namespace RoslynSandbox
-{
-    using System.IO;
-
-    public class C
-    {
-        public C(int i)
-        {
-            Stream stream = null;
-            while (i > 0)
-            {
-                stream?.Dispose();
-                stream = File.OpenRead(string.Empty);
-                i--;
-            }
-
-            stream.Dispose();
-        }
-    }
-}";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, code, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
         }
     }
 }
