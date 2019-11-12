@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -17,7 +17,7 @@
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(AddUsingFix))]
     [Shared]
-    internal class AddUsingFix : CodeFixProvider
+    internal class AddUsingFix : DocumentEditorCodeFixProvider
     {
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -25,10 +25,10 @@
             IDISP004DontIgnoreCreated.DiagnosticId,
             IDISP017PreferUsing.DiagnosticId);
 
-        public override FixAllProvider GetFixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
         /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -42,15 +42,17 @@
                         switch (statement.Parent)
                         {
                             case BlockSyntax block:
-                                context.RegisterDocumentEditorFix(
+                                context.RegisterCodeFix(
                                     "Add using to end of block.",
                                     (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
+                                    "Add using to end of block.",
                                     diagnostic);
                                 break;
                             case SwitchSectionSyntax switchSection:
-                                context.RegisterDocumentEditorFix(
+                                context.RegisterCodeFix(
                                     "Add using to end of block.",
                                     (editor, _) => AddUsingToEndOfBlock(editor, switchSection, statement),
+                                    "Add using to end of block.",
                                     diagnostic);
                                 break;
                         }
@@ -58,20 +60,19 @@
                     else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax expressionStatement) &&
                              expressionStatement.Parent is BlockSyntax expressionStatementBlock)
                     {
-                        context.RegisterDocumentEditorFix(
+                        context.RegisterCodeFix(
                             "Add using to end of block.",
                             (editor, _) => AddUsingToEndOfBlock(editor, expressionStatementBlock, expressionStatement),
+                            "Add using to end of block.",
                             diagnostic);
                     }
                     else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
-                            argument.Parent is ArgumentListSyntax argumentList &&
-                            argumentList.Parent is InvocationExpressionSyntax invocation &&
-                            invocation.Parent is IfStatementSyntax ifStatement &&
-                            ifStatement.Statement is BlockSyntax ifBlock)
+                            argument.Parent is ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } })
                     {
-                        context.RegisterDocumentEditorFix(
+                        context.RegisterCodeFix(
                             "Add using to end of block.",
                             (editor, _) => AddUsingToEndOfBlock(editor, ifBlock, argument.Expression),
+                            "Add using to end of block.",
                             diagnostic);
                     }
                 }
@@ -79,17 +80,19 @@
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
                          statement.Parent is BlockSyntax block)
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Add using to end of block.",
                         (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
+                        "Add using to end of block.",
                         diagnostic);
                 }
                 else if (diagnostic.Id == IDISP017PreferUsing.DiagnosticId &&
                          syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax invocation))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Replace with using.",
                         (editor, cancellationToken) => ReplaceWithUsing(editor, invocation, cancellationToken),
+                        "Replace with using.",
                         diagnostic);
                 }
             }
@@ -191,16 +194,13 @@
                 invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
                 declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
-                if (expressionStatement.Parent is BlockSyntax finallyBlock &&
-                    finallyBlock.Parent is FinallyClauseSyntax finallyClause &&
-                    finallyClause.Parent is TryStatementSyntax tryStatement &&
+                if (expressionStatement.Parent is BlockSyntax { Parent: FinallyClauseSyntax { Parent: TryStatementSyntax tryStatement } } &&
                     !tryStatement.Catches.Any())
                 {
                     if (declaration.Variables.TrySingle(out var declarator) &&
                         declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
                         tryStatement.Block.Statements.TryFirst(out var statement) &&
-                        statement is ExpressionStatementSyntax assignExpressionStatement &&
-                        assignExpressionStatement.Expression is AssignmentExpressionSyntax assignment)
+                        statement is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax assignment })
                     {
                         editor.ReplaceNode(
                             tryStatement,
