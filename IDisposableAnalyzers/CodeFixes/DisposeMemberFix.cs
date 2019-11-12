@@ -35,11 +35,18 @@ namespace IDisposableAnalyzers
                     if (DisposeMethod.TryFindVirtualDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
                         disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeDeclaration))
                     {
-                        context.RegisterCodeFix(
-                            $"{symbol.Name}.Dispose() in {disposeSymbol}",
-                            (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, disposable, disposeDeclaration, cancellationToken),
-                            "Dispose member.",
-                            diagnostic);
+                        if (TryFindIfDisposing(disposeDeclaration, out var ifDisposing))
+                        {
+                            context.RegisterCodeFix(
+                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                (editor, cancellationToken) => editor.ReplaceNode(
+                                    ifDisposing.Statement,
+                                    x => x is BlockSyntax block
+                                        ? block.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
+                                        : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                "Dispose member.",
+                                diagnostic);
+                        }
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
                              disposeSymbol.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
@@ -99,7 +106,8 @@ namespace IDisposableAnalyzers
             else if (disposeMethodDeclaration.Body is BlockSyntax block)
             {
                 ifDisposing = SyntaxFactory.IfStatement(
-                    SyntaxFactory.IdentifierName(disposeMethodDeclaration.ParameterList.Parameters[0].Identifier),
+                    SyntaxFactory.IdentifierName(disposeMethodDeclaration.ParameterList.Parameters[0]
+                                                                         .Identifier),
                     SyntaxFactory.Block(disposeStatement));
 
                 if (DisposeMethod.TryFindBaseCall(disposeMethodDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
@@ -120,15 +128,14 @@ namespace IDisposableAnalyzers
 
         private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
         {
-            if (disposeMethod.ParameterList is ParameterListSyntax parameterList &&
-                parameterList.Parameters.TrySingle(out var parameter) &&
-                parameter.Type == KnownSymbol.Boolean)
+            if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
+                parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
+                type == KnownSymbol.Boolean)
             {
                 foreach (var statement in disposeMethod.Body.Statements)
                 {
-                    if (statement is IfStatementSyntax ifStatement &&
-                        ifStatement.Condition is IdentifierNameSyntax identifierName &&
-                        identifierName.Identifier.ValueText == parameter.Identifier.ValueText)
+                    if (statement is IfStatementSyntax { Condition: IdentifierNameSyntax condition } ifStatement &&
+                        condition.Identifier.ValueText == valueText)
                     {
                         result = ifStatement;
                         return true;
@@ -138,6 +145,39 @@ namespace IDisposableAnalyzers
 
             result = null;
             return false;
+        }
+
+        private static bool TryFindIfNotDisposingReturn(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
+        {
+            if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
+                parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
+                type == KnownSymbol.Boolean)
+            {
+                foreach (var statement in disposeMethod.Body.Statements)
+                {
+                    if (statement is IfStatementSyntax { Condition: PrefixUnaryExpressionSyntax { Operand: IdentifierNameSyntax operand } condition } ifStatement &&
+                        condition.IsKind(SyntaxKind.LogicalNotExpression) &&
+                        operand.Identifier.ValueText == valueText &&
+                        IsReturn(ifStatement.Statement))
+                    {
+                        result = ifStatement;
+                        return true;
+                    }
+                }
+            }
+
+            result = null;
+            return false;
+
+            bool IsReturn(StatementSyntax statement)
+            {
+                return statement switch
+                {
+                    ReturnStatementSyntax _ => true,
+                    BlockSyntax { Statements: { } statements } => statements.LastOrDefault() is ReturnStatementSyntax,
+                    _ => false,
+                };
+            }
         }
     }
 }
