@@ -41,33 +41,34 @@ namespace IDisposableAnalyzers
                             diagnostic);
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeMethod) &&
-                        disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
+                             disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
                     {
-                        context.RegisterCodeFix(
-                            $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
-                            (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
-                            "Dispose member.",
-                            diagnostic);
+                        switch (disposeMethodDeclaration)
+                        {
+                            case { ExpressionBody: { Expression: { } expression } }:
+                                context.RegisterCodeFix(
+                                    $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
+                                    (editor, cancellationToken) => editor.ReplaceNode(
+                                        disposeMethodDeclaration,
+                                        x => x.AsBlockBody(
+                                            SyntaxFactory.ExpressionStatement(expression),
+                                            Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken))),
+                                    "Dispose member.",
+                                    diagnostic);
+                                break;
+                            case { Body: { } body }:
+                                context.RegisterCodeFix(
+                                    $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
+                                    (editor, cancellationToken) => editor.ReplaceNode(
+                                        body,
+                                        x => x.AddStatements(Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken))),
+                                    "Dispose member.",
+                                    diagnostic);
+                                break;
+                        }
+
                     }
                 }
-            }
-        }
-
-        private static void DisposeInDisposeMethod(DocumentEditor editor, ISymbol memberSymbol, MethodDeclarationSyntax disposeMethod, CancellationToken cancellationToken)
-        {
-            var disposeStatement = Snippet.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
-            var statements = CreateStatements(disposeMethod, disposeStatement);
-            if (disposeMethod.Body != null)
-            {
-                var updatedBody = disposeMethod.Body.WithStatements(statements);
-                editor.ReplaceNode(disposeMethod.Body, updatedBody);
-            }
-            else if (disposeMethod.ExpressionBody != null)
-            {
-                var newMethod = disposeMethod.WithBody(SyntaxFactory.Block(statements))
-                                             .WithExpressionBody(null)
-                                             .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None));
-                editor.ReplaceNode(disposeMethod, newMethod);
             }
         }
 
