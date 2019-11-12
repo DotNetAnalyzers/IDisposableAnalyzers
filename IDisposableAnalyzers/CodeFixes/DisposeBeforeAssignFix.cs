@@ -11,30 +11,21 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeBeforeAssignFix))]
     [Shared]
-    internal class DisposeBeforeAssignFix : CodeFixProvider
+    internal class DisposeBeforeAssignFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP003DisposeBeforeReassigning.DiagnosticId);
 
-        /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Document;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                          .ConfigureAwait(false);
-            if (syntaxRoot == null)
-            {
-                return;
-            }
-
+                                                   .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                             .ConfigureAwait(false);
+                                                      .ConfigureAwait(false);
 
             foreach (var diagnostic in context.Diagnostics)
             {
@@ -42,17 +33,19 @@ namespace IDisposableAnalyzers
                 if (node is AssignmentExpressionSyntax assignment &&
                     TryCreateDisposeStatement(assignment, semanticModel, context.CancellationToken, out var disposeStatement))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Dispose before re-assigning.",
                         (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, assignment, disposeStatement),
+                        "Dispose before re-assigning.",
                         diagnostic);
                 }
                 else if (node.TryFirstAncestorOrSelf<ArgumentSyntax>(out var argument) &&
                          TryCreateDisposeStatement(argument, semanticModel, context.CancellationToken, out disposeStatement))
                 {
-                    context.RegisterDocumentEditorFix(
+                    context.RegisterCodeFix(
                         "Dispose before re-assigning.",
                         (editor, cancellationToken) => ApplyDisposeBeforeAssign(editor, argument, disposeStatement),
+                        "Dispose before re-assigning.",
                         diagnostic);
                 }
             }
@@ -65,31 +58,22 @@ namespace IDisposableAnalyzers
                 case StatementSyntax statement when statement.Parent is BlockSyntax:
                     editor.InsertBefore(statement, new[] { disposeStatement });
                     break;
-                case AnonymousFunctionExpressionSyntax anonymousFunction:
+                case AnonymousFunctionExpressionSyntax lambda:
                     editor.ReplaceNode(
-                        anonymousFunction,
-                        (x, _) =>
-                        {
-                            var old = (AnonymousFunctionExpressionSyntax)x;
-                            return old.ReplaceNode(
-                                           old.Body,
-                                           SyntaxFactory.Block(
-                                               disposeStatement.WithTrailingTrivia(SyntaxFactory.ElasticLineFeed),
-                                               SyntaxFactory.ExpressionStatement((ExpressionSyntax)old.Body)))
-                                       .WithAdditionalAnnotations(Formatter.Annotation);
-                        });
+                        lambda,
+                        x => x.PrependStatements(disposeStatement));
                     break;
                 case ArgumentListSyntax argumentList:
+                {
+                    if (argumentList.Parent is InvocationExpressionSyntax invocation &&
+                        invocation.Parent is StatementSyntax invocationStatement &&
+                        invocationStatement.Parent is BlockSyntax)
                     {
-                        if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                            invocation.Parent is StatementSyntax invocationStatement &&
-                            invocationStatement.Parent is BlockSyntax)
-                        {
-                            editor.InsertBefore(invocationStatement, new[] { disposeStatement });
-                        }
-
-                        break;
+                        editor.InsertBefore(invocationStatement, new[] { disposeStatement });
                     }
+
+                    break;
+                }
 
                 case ArrowExpressionClauseSyntax arrow:
                     {

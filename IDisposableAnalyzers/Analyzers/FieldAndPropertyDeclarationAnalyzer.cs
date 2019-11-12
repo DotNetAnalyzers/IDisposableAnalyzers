@@ -124,7 +124,7 @@ namespace IDisposableAnalyzers
 
             throw new InvalidOperationException("Should not get here.");
 
-            bool IsAccessible(Accessibility accessibility, INamedTypeSymbol containingType)
+            static bool IsAccessible(Accessibility accessibility, INamedTypeSymbol containingType)
             {
                 switch (accessibility)
                 {
