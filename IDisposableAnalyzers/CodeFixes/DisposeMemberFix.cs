@@ -14,16 +14,11 @@ namespace IDisposableAnalyzers
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeMemberFix))]
     [Shared]
-    internal class DisposeMemberFix : CodeFixProvider
+    internal class DisposeMemberFix : DocumentEditorCodeFixProvider
     {
-        /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP002DisposeMember.DiagnosticId);
 
-        /// <inheritdoc/>
-        public override FixAllProvider GetFixAllProvider() => DocumentEditorFixAllProvider.Document;
-
-        /// <inheritdoc/>
-        public override async Task RegisterCodeFixesAsync(CodeFixContext context)
+        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
@@ -39,17 +34,19 @@ namespace IDisposableAnalyzers
                     if (DisposeMethod.TryFindVirtualDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                         disposeMethod.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeMethodDeclaration))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose member.",
+                        context.RegisterCodeFix(
+                            $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
                             (editor, cancellationToken) => DisposeInVirtualDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                            "Dispose member.",
                             diagnostic);
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(memberSymbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeMethod) &&
                         disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeMethodDeclaration))
                     {
-                        context.RegisterDocumentEditorFix(
-                            "Dispose member.",
+                        context.RegisterCodeFix(
+                            $"{memberSymbol.Name}.Dispose() in {disposeMethod}",
                             (editor, cancellationToken) => DisposeInDisposeMethod(editor, memberSymbol, disposeMethodDeclaration, cancellationToken),
+                            "Dispose member.",
                             diagnostic);
                     }
                 }
