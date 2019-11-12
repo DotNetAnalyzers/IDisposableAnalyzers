@@ -17,25 +17,6 @@ namespace IDisposableAnalyzers
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
-        internal static ExpressionSyntax Normalize(this ExpressionSyntax e, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
-            {
-                if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
-                    DisposeMethod.TryFindIDisposableDispose(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
-                    disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
-                {
-                    return e.WithoutTrivia()
-                            .WithLeadingElasticLineFeed();
-                }
-
-                return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.CastExpression(IDisposable, e));
-            }
-
-            return AsIDisposable(e.WithoutTrivia())
-                                  .WithLeadingElasticLineFeed();
-        }
-
         internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable)
         {
             return SyntaxFactory.ExpressionStatement(
@@ -46,13 +27,60 @@ namespace IDisposableAnalyzers
                         Dispose)));
         }
 
-        internal static ExpressionStatementSyntax ConditionalDisposeStatement(ExpressionSyntax disposable)
+        internal static ExpressionStatementSyntax ConditionalDisposeStatement(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return SyntaxFactory.ExpressionStatement(
                 SyntaxFactory.ConditionalAccessExpression(
-                    disposable,
+                    Normalize(MemberAccess(disposable)),
                     SyntaxFactory.InvocationExpression(
                         SyntaxFactory.MemberBindingExpression(SyntaxFactory.Token(SyntaxKind.DotToken), Dispose))));
+
+            ExpressionSyntax MemberAccess(ExpressionSyntax e)
+            {
+                switch (e)
+                {
+                    case { Parent: ArgumentSyntax { RefOrOutKeyword: { } refOrOut } }
+                        when !refOrOut.IsKind(SyntaxKind.None):
+                        return e;
+                    case IdentifierNameSyntax _:
+                    case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } } _:
+                        if (semanticModel.GetSymbolInfo(e, cancellationToken).Symbol is IPropertySymbol { GetMethod: { } get } &&
+                            get.TrySingleAccessorDeclaration(cancellationToken, out var getter))
+                        {
+                            switch (getter)
+                            {
+                                case { ExpressionBody: { Expression: { } expression } }:
+                                    return expression;
+                                case { Body: { Statements: { Count: 1 } statements } }
+                                    when statements[0] is ReturnStatementSyntax { Expression: { } expression }:
+                                    return expression;
+                            }
+                        }
+
+                        return e;
+                    default:
+                        return e;
+                }
+            }
+
+            ExpressionSyntax Normalize(ExpressionSyntax e)
+            {
+                if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
+                {
+                    if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
+                        DisposeMethod.TryFindIDisposableDispose(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                        disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
+                    {
+                        return e.WithoutTrivia()
+                                .WithLeadingElasticLineFeed();
+                    }
+
+                    return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.CastExpression(IDisposable, e));
+                }
+
+                return AsIDisposable(e.WithoutTrivia())
+                    .WithLeadingElasticLineFeed();
+            }
         }
 
         internal static AnonymousFunctionExpressionSyntax PrependStatements(this AnonymousFunctionExpressionSyntax lambda, params StatementSyntax[] statements)
