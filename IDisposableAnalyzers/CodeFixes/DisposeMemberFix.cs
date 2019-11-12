@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -47,6 +47,54 @@ namespace IDisposableAnalyzers
                                 "Dispose member.",
                                 diagnostic);
                         }
+                        else if (TryFindIfNotDisposingReturn(disposeDeclaration, out var ifNotDisposing) &&
+                                 ifNotDisposing.Parent is BlockSyntax)
+                        {
+                            context.RegisterCodeFix(
+                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                (editor, cancellationToken) =>
+                                {
+                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    {
+                                        editor.InsertBefore(
+                                            baseCall,
+                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                    }
+                                    else
+                                    {
+                                        editor.InsertAfter(
+                                            ifNotDisposing,
+                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                    }
+                                },
+                                "Dispose member.",
+                                diagnostic);
+                        }
+                        else if (disposeDeclaration.Body is BlockSyntax block)
+                        {
+                            context.RegisterCodeFix(
+                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                (editor, cancellationToken) =>
+                                {
+                                    ifDisposing = SyntaxFactory.IfStatement(
+                                        SyntaxFactory.IdentifierName(disposeDeclaration.ParameterList.Parameters[0].Identifier),
+                                        SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    {
+                                        editor.InsertBefore(
+                                            baseCall.Parent,
+                                            ifDisposing);
+                                    }
+                                    else
+                                    {
+                                        _ = editor.ReplaceNode(
+                                            block,
+                                            x => x.AddStatements(ifDisposing));
+                                    }
+                                },
+                                "Dispose member.",
+                                diagnostic);
+                        }
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
                              disposeSymbol.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
@@ -75,53 +123,6 @@ namespace IDisposableAnalyzers
                                 break;
                         }
                     }
-                }
-            }
-        }
-
-        private static void DisposeInVirtualDisposeMethod(DocumentEditor editor, FieldOrProperty memberSymbol, MethodDeclarationSyntax disposeMethodDeclaration, CancellationToken cancellationToken)
-        {
-            var disposeStatement = IDisposableFactory.DisposeStatement(memberSymbol, editor.SemanticModel, cancellationToken);
-            if (TryFindIfDisposing(disposeMethodDeclaration, out var ifDisposing))
-            {
-                if (ifDisposing.Statement is BlockSyntax block)
-                {
-                    var statements = block.Statements.Add(disposeStatement);
-                    var newBlock = block.WithStatements(statements);
-                    editor.ReplaceNode(block, newBlock);
-                }
-                else if (ifDisposing.Statement is StatementSyntax statement)
-                {
-                    editor.ReplaceNode(
-                        ifDisposing,
-                        ifDisposing.WithStatement(SyntaxFactory.Block(statement, disposeStatement)));
-                }
-                else
-                {
-                    editor.ReplaceNode(
-                        ifDisposing,
-                        ifDisposing.WithStatement(SyntaxFactory.Block(disposeStatement)));
-                }
-            }
-            else if (disposeMethodDeclaration.Body is BlockSyntax block)
-            {
-                ifDisposing = SyntaxFactory.IfStatement(
-                    SyntaxFactory.IdentifierName(disposeMethodDeclaration.ParameterList.Parameters[0]
-                                                                         .Identifier),
-                    SyntaxFactory.Block(disposeStatement));
-
-                if (DisposeMethod.TryFindBaseCall(disposeMethodDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
-                {
-                    if (baseCall.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement))
-                    {
-                        editor.InsertBefore(expressionStatement, ifDisposing);
-                    }
-                }
-                else
-                {
-                    editor.ReplaceNode(
-                        block,
-                        block.AddStatements(ifDisposing));
                 }
             }
         }

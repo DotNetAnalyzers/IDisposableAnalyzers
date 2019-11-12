@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -1296,6 +1296,96 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public static void DisposeAfterIfNotDisposingReturn()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (!disposing)
+            {
+                return;
+            }
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (!disposing)
+            {
+                return;
+            }
+
+            this.stream?.Dispose();
+        }
+
+        protected void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
             public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
             {
                 var baseCode = @"
@@ -1490,6 +1580,56 @@ namespace RoslynSandbox
             }
 
             [Test]
+            public static void CreateIfDisposingWhenEmpty()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C : IDisposable
+    {
+        ↓private readonly IDisposable disposable = new Disposable();
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+
+    public class C : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode }, fixedCode);
+            }
+
+            [Test]
             public static void WhenCallingBaseDispose()
             {
                 var baseCode = @"
@@ -1497,7 +1637,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -1528,7 +1668,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         ↓private readonly IDisposable disposable = new Disposable();
 
@@ -1544,7 +1684,7 @@ namespace RoslynSandbox
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         private readonly IDisposable disposable = new Disposable();
 
