@@ -55,7 +55,7 @@ namespace IDisposableAnalyzers
         {
             switch (assignment.Parent)
             {
-                case StatementSyntax statement when statement.Parent is BlockSyntax:
+                case StatementSyntax { Parent: BlockSyntax _ } statement:
                     editor.InsertBefore(statement, new[] { disposeStatement });
                     break;
                 case AnonymousFunctionExpressionSyntax lambda:
@@ -63,59 +63,70 @@ namespace IDisposableAnalyzers
                         lambda,
                         x => x.PrependStatements(disposeStatement));
                     break;
-                case ArgumentListSyntax argumentList:
-                {
-                    if (argumentList.Parent is InvocationExpressionSyntax invocation &&
-                        invocation.Parent is StatementSyntax invocationStatement &&
-                        invocationStatement.Parent is BlockSyntax)
-                    {
-                        editor.InsertBefore(invocationStatement, new[] { disposeStatement });
-                    }
-
+                case ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: ExpressionStatementSyntax { Parent: BlockSyntax _ } invocationStatement } }:
+                    editor.InsertBefore(invocationStatement, new[] { disposeStatement });
                     break;
-                }
+                case ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: ArrowExpressionClauseSyntax _} invocation }:
+                    ApplyDisposeBeforeAssign(editor, invocation, disposeStatement);
+                    break;
+                case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } method }:
+                    editor.ReplaceNode(
+                        method,
+                        x => x.WithExpressionBody(null)
+                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                              .WithBody(
+                                  SyntaxFactory.Block(
+                                      disposeStatement,
+                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
+                    break;
+                case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax method }:
+                    editor.ReplaceNode(
+                        method,
+                        x => x.WithExpressionBody(null)
+                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                              .WithBody(
+                                  SyntaxFactory.Block(
+                                      disposeStatement,
+                                      SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
+                    break;
+                case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
+                    when accessor.IsKind(SyntaxKind.GetAccessorDeclaration):
+                    editor.ReplaceNode(
+                        accessor,
+                        x => x.WithExpressionBody(null)
+                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                              .WithBody(
+                                  SyntaxFactory.Block(
+                                      disposeStatement,
+                                      SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
+                    break;
+                case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
+                    when accessor.IsKind(SyntaxKind.SetAccessorDeclaration):
+                    editor.ReplaceNode(
+                        accessor,
+                        x => x.WithExpressionBody(null)
+                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                              .WithBody(
+                                  SyntaxFactory.Block(
+                                      disposeStatement,
+                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
+                    break;
+                case ArrowExpressionClauseSyntax { Parent: PropertyDeclarationSyntax property }:
+                    editor.ReplaceNode(
+                        property,
+                        x => x.WithExpressionBody(null)
+                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
+                              .WithAccessorList(
+                                  SyntaxFactory.AccessorList(
+                                      SyntaxFactory.SingletonList(
+                                          SyntaxFactory.AccessorDeclaration(
+                                              SyntaxKind.GetAccessorDeclaration,
+                                              SyntaxFactory.Block(
+                                                  disposeStatement,
+                                                  SyntaxFactory.ReturnStatement(
+                                                      x.ExpressionBody.Expression)))))));
+                    break;
 
-                case ArrowExpressionClauseSyntax arrow:
-                    {
-                        if (arrow.Parent is MethodDeclarationSyntax method)
-                        {
-                            editor.ReplaceNode(
-                                method,
-                                (x, _) =>
-                                {
-                                    var old = (MethodDeclarationSyntax)x;
-                                    return old.WithExpressionBody(null)
-                                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
-                                              .WithBody(
-                                                  SyntaxFactory.Block(
-                                                      disposeStatement,
-                                                      SyntaxFactory.ReturnStatement(old.ExpressionBody.Expression)));
-                                });
-                        }
-
-                        if (arrow.Parent is PropertyDeclarationSyntax property)
-                        {
-                            editor.ReplaceNode(
-                                property,
-                                (x, _) =>
-                                {
-                                    var old = (PropertyDeclarationSyntax)x;
-                                    return old.WithExpressionBody(null)
-                                              .WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.None))
-                                              .WithAccessorList(
-                                                  SyntaxFactory.AccessorList(
-                                                      SyntaxFactory.SingletonList(
-                                                          SyntaxFactory.AccessorDeclaration(
-                                                              SyntaxKind.GetAccessorDeclaration,
-                                                              SyntaxFactory.Block(
-                                                                  disposeStatement,
-                                                                  SyntaxFactory.ReturnStatement(
-                                                                      old.ExpressionBody.Expression))))));
-                                });
-                        }
-
-                        break;
-                    }
             }
         }
 

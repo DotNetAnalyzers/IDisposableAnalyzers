@@ -425,11 +425,11 @@ namespace RoslynSandbox
 
     public sealed class C : IDisposable
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
+        private Stream stream = File.OpenRead(string.Empty);
 
-        private C()
+        public void M1()
         {
-            this.Assign(↓ref this.stream);
+            this.M2(↓ref this.stream);
         }
 
         public void Dispose()
@@ -437,7 +437,7 @@ namespace RoslynSandbox
             this.stream?.Dispose();
         }
 
-        public void Assign(ref Stream stream)
+        public void M2(ref Stream stream)
         {
             stream = File.OpenRead(string.Empty);
         }
@@ -452,12 +452,12 @@ namespace RoslynSandbox
 
     public sealed class C : IDisposable
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
+        private Stream stream = File.OpenRead(string.Empty);
 
-        private C()
+        public void M1()
         {
             this.stream?.Dispose();
-            this.Assign(ref this.stream);
+            this.M2(ref this.stream);
         }
 
         public void Dispose()
@@ -465,7 +465,65 @@ namespace RoslynSandbox
             this.stream?.Dispose();
         }
 
-        public void Assign(ref Stream stream)
+        public void M2(ref Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            }
+
+            [Test]
+            public static void CallPublicMethodRefParameterExpressionBody()
+            {
+                var testCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private Stream stream = File.OpenRead(string.Empty);
+
+        public void M1() => this.M2(↓ref this.stream);
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+
+        public void M2(ref Stream stream)
+        {
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var fixedCode = @"
+namespace RoslynSandbox
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private Stream stream = File.OpenRead(string.Empty);
+
+        public void M1()
+        {
+            this.stream?.Dispose();
+            this.M2(ref this.stream);
+        }
+
+        public void Dispose()
+        {
+            this.stream?.Dispose();
+        }
+
+        public void M2(ref Stream stream)
         {
             stream = File.OpenRead(string.Empty);
         }
