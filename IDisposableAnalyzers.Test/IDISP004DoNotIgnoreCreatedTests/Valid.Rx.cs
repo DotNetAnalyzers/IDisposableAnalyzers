@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
         [Test]
         public static void SerialDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -31,13 +31,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SingleAssignmentDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -60,13 +60,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -93,13 +93,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableCtor()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -124,13 +124,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableAddIObservableSubscribe()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -151,13 +151,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableAddNewSingleAssignmentDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -178,13 +178,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableAddThrottleSubscribe()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -207,7 +207,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -254,7 +254,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, code);
         }
 
         [Test]
@@ -280,7 +280,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -301,7 +301,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, code);
         }
     }
 }

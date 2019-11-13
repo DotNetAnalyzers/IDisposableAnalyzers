@@ -34,7 +34,7 @@ namespace N
         [Test]
         public static void Ternary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -52,13 +52,13 @@ namespace N
         public IDisposable ↓M(bool b) => b ? new Disposable() : this.disposable;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
         }
 
         [Test]
         public static void NullCoalesce()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -76,13 +76,13 @@ namespace N
         public IDisposable ↓P() => this.disposable ?? new Disposable();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadFromUsing()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -108,7 +108,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

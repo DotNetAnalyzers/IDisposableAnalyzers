@@ -24,7 +24,7 @@ namespace N
         [Test]
         public static void PropertyReturning1()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -39,13 +39,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyReturningBoxed1()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -60,13 +60,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyReturning1ExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -81,13 +81,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyReturningNewTimeSpan()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -104,13 +104,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyReturningNewTimeSpanExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -121,13 +121,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyReturningBackingFieldExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -148,13 +148,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void PropertyReturningBackingField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -172,13 +172,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void PropertyReturningBackingFieldFunc()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -196,7 +196,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             [Test]
             public static void IgnoreAssignedWithCtorArgument()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -25,13 +25,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreAssignedWithCtorArgumentIndexer()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -73,13 +73,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
 
             [Test]
             public static void IgnoreDictionaryPassedInViaCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -95,13 +95,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnorePassedInViaCtorUnderscore()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -116,13 +116,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -141,13 +141,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void AssignedWithCreatedAndInjected()
             {
-                var testCode = @"
+                var code = @"
 #pragma warning disable IDISP008
 namespace N
 {
@@ -169,7 +169,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

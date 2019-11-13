@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             [Test]
             public static void SerialDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -33,7 +33,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

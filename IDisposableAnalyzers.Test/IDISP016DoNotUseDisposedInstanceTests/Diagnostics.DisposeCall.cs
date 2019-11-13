@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP016DoNotUseDisposedInstanceTests
             [Test]
             public static void CreateTouchDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingTwice()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -50,13 +50,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingTwiceInUsing()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -73,13 +73,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void AssignedViaOut()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -101,13 +101,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void AssignedViaOutVar()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -128,13 +128,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void ReassignAfterDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -153,13 +153,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void ReassignViaOutVarAfterDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -183,13 +183,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void ReassignViaOutAfterDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -214,7 +214,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

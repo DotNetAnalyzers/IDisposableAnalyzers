@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [TestCase("(stream as IDisposable)?.Dispose()")]
         public static void DisposedLocal(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -28,14 +28,14 @@ namespace N
     }
 }".AssertReplace("stream.Dispose()", expression);
 
-            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
 
         [TestCase("using (var stream = File.OpenRead(string.Empty))")]
         [TestCase("using (File.OpenRead(string.Empty))")]
         public static void UsedLocal(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -52,7 +52,7 @@ namespace N
     }
 }".AssertReplace("using (var stream = File.OpenRead(string.Empty))", expression);
 
-            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
     }
 }

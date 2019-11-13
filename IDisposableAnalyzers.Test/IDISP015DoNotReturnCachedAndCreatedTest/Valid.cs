@@ -35,7 +35,7 @@ namespace N
         [Test]
         public static void WhenRetuningCreated()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
 
         [Test]
         public static void WhenRetuningInjected()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -75,13 +75,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
 
         [Test]
         public static void ReturningCachedInDictionary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -103,13 +103,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
 
         [Test]
         public static void CreatedAndDisposableEmpty()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -119,13 +119,13 @@ namespace N
         public IDisposable M(bool b) => b ? new Disposable() : System.Reactive.Disposables.Disposable.Empty;
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void CreatedAndNopDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -144,7 +144,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
     }
 }

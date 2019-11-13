@@ -17,7 +17,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -28,7 +28,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, factoryCode, testCode);
+            RoslynAssert.Valid(Analyzer, factoryCode, code);
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -56,7 +56,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, testCode);
+            RoslynAssert.Valid(Analyzer, mehCode, code);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -89,7 +89,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, testCode);
+            RoslynAssert.Valid(Analyzer, mehCode, code);
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -116,13 +116,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, testCode);
+            RoslynAssert.Valid(Analyzer, mehCode, code);
         }
 
         [Test]
         public static void MethodReturningObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -135,13 +135,13 @@ namespace N
         private static object Meh() => new object();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MethodWithArgReturningObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -154,13 +154,13 @@ namespace N
         private static object Meh(string arg) => new object();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MethodWithObjArgReturningObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -173,13 +173,13 @@ namespace N
         private static object Id(object arg) => arg;
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturningStatementBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -192,13 +192,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturningLocalStatementBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -212,13 +212,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturningExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -228,7 +228,7 @@ namespace N
         public Stream M() => File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -254,7 +254,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class Meh
@@ -265,7 +265,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
         }
 
         [TestCase("new C()")]
@@ -296,7 +296,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class Meh
@@ -308,7 +308,7 @@ namespace N
     }
 }".AssertReplace("new C(new Disposable(), new Disposable())", objectCreation);
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
         }
 
         [Test]
@@ -334,7 +334,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -349,13 +349,13 @@ namespace N
         private static C Create(IDisposable disposable) => new C(disposable);
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
         }
 
         [Test]
         public static void ReturningCreateNewStreamReader()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -370,7 +370,7 @@ namespace N
         private static StreamReader Create(Stream stream) => new StreamReader(stream);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -401,7 +401,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class Meh
@@ -412,13 +412,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
         }
 
         [Test]
         public static void StreamInStreamReader()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -431,13 +431,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StreamInStreamReaderLocal()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -451,7 +451,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]

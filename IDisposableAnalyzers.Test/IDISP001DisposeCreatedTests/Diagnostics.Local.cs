@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -33,9 +33,9 @@ namespace N
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null")]
-            public static void LanguageConstructs(string code)
+            public static void LanguageConstructs(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -48,15 +48,15 @@ namespace N
             ↓var value = new Disposable();
         }
     }
-}".AssertReplace("new Disposable()", code);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
+}".AssertReplace("new Disposable()", expression);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [TestCase("new BinaryReader(System.IO.File.OpenRead(string.Empty))")]
             [TestCase("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))")]
-            public static void KnownArguments(string code)
+            public static void KnownArguments(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -69,14 +69,14 @@ namespace N
             ↓var value = new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty));
         }
     }
-}".AssertReplace("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))", code);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
+}".AssertReplace("new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty))", expression);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
             public static void PropertyInitializedPasswordBoxSecurePassword()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -93,13 +93,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void StaticPropertyInitializedPasswordBoxSecurePassword()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -116,13 +116,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void FileOpenRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -137,13 +137,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void NewDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public static class C
@@ -155,13 +155,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
             public static void MethodCreatingDisposable1()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -180,13 +180,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void MethodCreatingDisposable2()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -206,13 +206,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void MethodCreatingDisposableExpressionBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -228,13 +228,13 @@ namespace N
         public static Stream GetStream() => File.OpenRead(string.Empty);
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void PropertyCreatingDisposableSimple()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -253,13 +253,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void PropertyCreatingDisposableGetBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -282,13 +282,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void PropertyCreatingDisposableExpressionBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -304,7 +304,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

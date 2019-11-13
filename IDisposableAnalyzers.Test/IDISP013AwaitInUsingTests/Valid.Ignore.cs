@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
             [Test]
             public static void NUnitAssertThrowsAsync()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -29,7 +29,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

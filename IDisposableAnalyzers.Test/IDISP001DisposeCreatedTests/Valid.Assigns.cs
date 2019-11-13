@@ -9,7 +9,7 @@
         [Test]
         public static void DontUseUsingWhenAssigningAField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -25,13 +25,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningAFieldTernary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningAFieldInAMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -71,13 +71,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -94,13 +94,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAddingLocalVariableToFieldList()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -117,13 +117,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -144,13 +144,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningACallThatReturnsAField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -171,13 +171,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -209,13 +209,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void BuildCollectionThenAssignFieldIndexer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -233,13 +233,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void BuildCollectionThenAssignField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -259,7 +259,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
     }
 }

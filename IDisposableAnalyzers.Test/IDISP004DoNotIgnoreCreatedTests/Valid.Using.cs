@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
         [Test]
         public static void FileOpenRead()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -23,13 +23,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void NewStreamReader()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SampleWithAwait()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -74,7 +74,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

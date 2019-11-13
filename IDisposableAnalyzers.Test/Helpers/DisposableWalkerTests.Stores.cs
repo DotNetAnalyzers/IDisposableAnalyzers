@@ -325,7 +325,7 @@ namespace N
             [TestCase("private ConcurrentQueue<IDisposable> disposables = new ConcurrentQueue<IDisposable>()")]
             public static void InQueueOfT(string declaration)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -342,7 +342,7 @@ namespace N
         }
     }
 }".AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", declaration);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -355,9 +355,9 @@ namespace N
             [TestCase("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
             [TestCase("private IDictionary disposables = new Dictionary<int, IDisposable>()")]
-            public static void InDictionaryAdd(string code)
+            public static void InDictionaryAdd(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -373,8 +373,8 @@ namespace N
             this.disposables.Add(1, disposable);
         }
     }
-}".AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -386,9 +386,9 @@ namespace N
 
             [TestCase("TryAdd(1, disposable)")]
             [TestCase("TryUpdate(1, disposable, disposable)")]
-            public static void InConcurrentDictionary(string code)
+            public static void InConcurrentDictionary(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -403,8 +403,8 @@ namespace N
             this.disposables.TryAdd(1, disposable);
         }
     }
-}".AssertReplace("TryAdd(1, disposable)", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("TryAdd(1, disposable)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -417,7 +417,7 @@ namespace N
             [Test]
             public static void ArrayFieldAssignedInCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -432,7 +432,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -444,9 +444,9 @@ namespace N
 
             [TestCase("Tuple.Create(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            public static void InTuple(string code)
+            public static void InTuple(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -461,8 +461,8 @@ namespace N
             this.tuple = Tuple.Create(disposable, 1);
         }
     }
-}".AssertReplace("Tuple.Create(disposable, 1)", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("Tuple.Create(disposable, 1)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -475,9 +475,9 @@ namespace N
             [TestCase("_ = Tuple.Create(disposable, 1)")]
             [TestCase("Tuple.Create(disposable, 1)")]
             [TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            public static void InDiscardedTuple(string code)
+            public static void InDiscardedTuple(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -490,8 +490,8 @@ namespace N
             _ = Tuple.Create(disposable, 1);
         }
     }
-}".AssertReplace("Tuple.Create(disposable, 1)", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("Tuple.Create(disposable, 1)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -504,7 +504,7 @@ namespace N
             [TestCase("disposable2")]
             public static void InPairWhenNew(string parameter)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -533,7 +533,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
@@ -547,7 +547,7 @@ namespace N
             [TestCase("disposable2")]
             public static void InPairWhenFactoryMethod(string parameter)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -577,7 +577,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
@@ -591,7 +591,7 @@ namespace N
             [TestCase("disposable2")]
             public static void InDisposingPairWhenNew(string parameter)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -625,7 +625,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
@@ -639,7 +639,7 @@ namespace N
             [TestCase("disposable2")]
             public static void InDisposingPairWhenFactoryMethod(string parameter)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -675,7 +675,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
@@ -708,7 +708,7 @@ namespace N
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest, leaveOpen: false)", true)]
             public static void InLeaveOpen(string expression, bool stores)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -727,7 +727,7 @@ namespace N
         }
     }
 }".AssertReplace("new BinaryReader(stream)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("stream");
@@ -746,7 +746,7 @@ namespace N
             [TestCase("new HttpClient(handler, disposeHandler: false)", false)]
             public static void InHttpClient(string expression, bool stores)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -761,7 +761,7 @@ namespace N
         }
     }
 }".AssertReplace("new HttpClient(handler)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("handler");
@@ -778,7 +778,7 @@ namespace N
             [Test]
             public static void CallWrappingStreamInReader()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -798,7 +798,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");
@@ -811,7 +811,7 @@ namespace N
             [Test]
             public static void DisposedByReturnValueCallWrappingStreamInReader()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -832,7 +832,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
@@ -842,7 +842,7 @@ namespace N
             [Test]
             public static void Recursive()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -860,7 +860,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");

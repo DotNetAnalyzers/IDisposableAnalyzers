@@ -24,7 +24,7 @@ namespace N
         [Test]
         public static void DisposingArrayItem()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingDictionaryItem()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -71,7 +71,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -362,7 +362,7 @@ namespace N
         [Test]
         public static void InjectedInClassThatIsNotIDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -377,13 +377,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedInClassThatIsIDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -402,13 +402,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedInClassThatIsIDisposableManyCtors()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -442,13 +442,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -468,13 +468,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void NotDisposingFieldInVirtualDispose()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -517,7 +517,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -536,7 +536,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -561,13 +561,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, code);
         }
 
         [Test]
         public static void BoolProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -608,13 +608,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedInMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -636,13 +636,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreLambdaCreation()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -655,14 +655,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("action(stream)")]
         [TestCase("action.Invoke(stream)")]
         public static void IgnoreLambdaUsageOnLocal(string invokeCode)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -678,13 +678,13 @@ namespace N
         }
     }
 }".AssertReplace("action(stream)", invokeCode);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoreInLambdaMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -702,13 +702,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReassignedParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -723,13 +723,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReassignedParameterViaOut()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -752,7 +752,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

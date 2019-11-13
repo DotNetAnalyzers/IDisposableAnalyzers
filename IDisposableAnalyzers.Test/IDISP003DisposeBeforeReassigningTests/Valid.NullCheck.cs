@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         [TestCase("object.Equals(this.stream, null)")]
         public static void WhenNullCheckBefore(string nullCheck)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -34,7 +34,7 @@ namespace N
         }
     }
 }".AssertReplace("this.stream == null", nullCheck);
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
     }
 }

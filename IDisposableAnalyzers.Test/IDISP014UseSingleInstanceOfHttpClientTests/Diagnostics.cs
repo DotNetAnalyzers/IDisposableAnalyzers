@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
         [Test]
         public static void Using()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void UsingFullyQualified()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -52,13 +52,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void Field()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -68,13 +68,13 @@ namespace N
        private readonly HttpClient client = ↓new HttpClient();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void Property()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -84,7 +84,7 @@ namespace N
        public HttpClient Client { get; } = ↓new HttpClient();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

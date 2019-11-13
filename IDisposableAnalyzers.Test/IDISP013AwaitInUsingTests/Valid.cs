@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         [Test]
         public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingAwaited()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TaskFromResult()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -91,13 +91,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TaskCompletedTask()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -114,13 +114,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingNewMTaskRun()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -150,13 +150,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingNewMLocalTaskRun()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -186,13 +186,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingNewMLocalFuncTask()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -223,13 +223,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturnNullAfterAwaitIssue89()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -247,13 +247,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturnNullIssue89()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -270,13 +270,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void EarlyReturnNullIssue89()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -300,7 +300,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

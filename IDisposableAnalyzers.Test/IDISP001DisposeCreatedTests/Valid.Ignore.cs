@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [TestCase("Enumerable.Empty<IDisposable>();")]
         public static void Linq(string linq)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }".AssertReplace("disposables.First();", linq);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MockOf()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void Ninject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -69,7 +69,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

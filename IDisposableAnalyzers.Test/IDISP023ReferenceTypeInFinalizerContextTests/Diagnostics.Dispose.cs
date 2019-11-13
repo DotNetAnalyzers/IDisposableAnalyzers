@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             [TestCase("_ = ↓Builder.Length")]
             public static void Static(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -53,7 +53,7 @@ namespace N
     }
 }".AssertReplace("↓Builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.↓builder.Append(1)")]
@@ -69,7 +69,7 @@ namespace N
             [TestCase("this.↓Disposable?.Dispose()")]
             public static void InstanceOutsideIfDispose(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -111,7 +111,7 @@ namespace N
     }
 }".AssertReplace("this.↓builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.↓builder.Append(1)")]
@@ -127,7 +127,7 @@ namespace N
             [TestCase("this.↓Disposable?.Dispose()")]
             public static void InstanceNoIfDispose(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -159,13 +159,13 @@ namespace N
     }
 }".AssertReplace("this.↓builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void CallingStatic()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -205,7 +205,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

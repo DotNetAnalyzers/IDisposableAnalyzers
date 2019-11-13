@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             [TestCase("_ = ↓Builder.Length")]
             public static void Static(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Text;
@@ -31,7 +31,7 @@ namespace N
     }
 }".AssertReplace("↓Builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.↓Builder.Append(1)")]
@@ -39,7 +39,7 @@ namespace N
             [TestCase("_ = ↓Builder.Length")]
             public static void Instance(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Text;
@@ -55,13 +55,13 @@ namespace N
     }
 }".AssertReplace("this.↓Builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void CallingStatic()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Text;
@@ -79,7 +79,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [TestCase("out FileStream _")]
         public static void DictionaryTryGetValue(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -26,7 +26,7 @@ namespace N
         public static bool M(int i) => Map.TryGetValue(i, out _);
     }
 }".AssertReplace("out _", expression);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("out _")]
@@ -36,7 +36,7 @@ namespace N
         [TestCase("out FileStream _")]
         public static void DiscardCachedOutParameter(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -61,13 +61,13 @@ namespace N
         }
     }
 }".AssertReplace("out _", expression);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StaticConcurrentDictionaryGetOrAdd()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -84,13 +84,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConcurrentDictionaryGetOrAdd()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -107,13 +107,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConcurrentDictionaryTryGetValue()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -135,13 +135,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConcurrentDictionaryTryGetValueVarOut()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -162,13 +162,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConditionalWeakTableTryGetValue()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -190,13 +190,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConditionalWeakTableTryGetValueVarOut()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -217,13 +217,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CustomCacheWrappingDictionary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -273,13 +273,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PooledConcurrentQueueTryDequeue()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -331,13 +331,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PooledConcurrentQueueTryDequeue2()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -395,13 +395,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void TryGetRecursive()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -452,7 +452,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

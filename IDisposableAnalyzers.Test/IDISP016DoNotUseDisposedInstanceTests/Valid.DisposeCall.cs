@@ -15,7 +15,7 @@
             [Test]
             public static void CreateTouchDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -30,13 +30,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void UsingFileOpenRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -52,14 +52,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void DisposeInUsing()
             {
                 // this is weird but should not warn I think
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -75,13 +75,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void IfDisposeReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -102,13 +102,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void IfDisposeThrow()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -130,13 +130,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void ReassignAfterDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -154,13 +154,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [Test]
             public static void ReassignViaOutAfterDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -184,14 +184,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Descriptor, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, code);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
             public static void Tuple(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -214,14 +214,14 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
             public static void LocalTuple(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -238,14 +238,14 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
             [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
             public static void ListOfTuple(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -272,13 +272,13 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file), File.OpenRead(file))", expression);
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void ListOfValueTuple()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -305,13 +305,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void LeaveOpenLocals()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -334,13 +334,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void LeaveOpenFields()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -370,7 +370,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

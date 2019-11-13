@@ -14,7 +14,7 @@
             [Test]
             public static void FileOpenRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void FileOpenReadVariable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -50,13 +50,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void AwaitedStream()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -85,13 +85,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void AwaitedStreamVariable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -121,13 +121,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void InjectedIEnumerableOfTGetEnumerator()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -146,7 +146,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
@@ -178,7 +178,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -191,13 +191,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryCode, disposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, factoryCode, disposableCode, code);
             }
 
             [Test]
             public static void InjectedPasswordBoxSecurePassword()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -215,7 +215,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
@@ -257,7 +257,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -270,7 +270,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, iFactoryCode, factoryCode, disposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, iFactoryCode, factoryCode, disposableCode, code);
             }
 
             [Test]
@@ -312,7 +312,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -325,7 +325,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, disposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, disposableCode, code);
             }
 
             [Test]
@@ -355,7 +355,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -368,7 +368,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, DisposableCode, code);
             }
 
             [Test]
@@ -398,7 +398,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -411,7 +411,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, code);
             }
 
             [Test]
@@ -441,7 +441,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -454,7 +454,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, code);
             }
 
             [Test]
@@ -496,7 +496,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -509,13 +509,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, new[] { abstractFactoryCode, factoryCode, disposableCode, testCode });
+                RoslynAssert.Valid(Analyzer, new[] { abstractFactoryCode, factoryCode, disposableCode, code });
             }
 
             [Test]
             public static void IgnoresRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -538,13 +538,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresRecursiveMethod()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -567,13 +567,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void ReassignedParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -589,13 +589,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void ReassignedParameterViaOut()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -620,13 +620,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void ReassignedParameterViaOutAnd()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -652,7 +652,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

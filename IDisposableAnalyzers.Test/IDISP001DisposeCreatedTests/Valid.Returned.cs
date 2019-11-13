@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [Test]
         public static void SimpleStatementBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -22,13 +22,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SimpleExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -38,13 +38,13 @@ namespace N
         public static Stream M() => File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturnedTernary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -54,13 +54,13 @@ namespace N
         public static Stream M(string fileName) => fileName == null ? File.OpenRead(string.Empty) : File.OpenRead(fileName);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturnedNullConditional()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -70,13 +70,13 @@ namespace N
         public static Stream M(string fileName) => File.OpenRead(string.Empty) ?? File.OpenRead(fileName);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFileOpenRead()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -90,13 +90,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFileOpenReadDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -111,13 +111,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFileOpenReadAsDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -132,13 +132,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFileOpenReadCastDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -153,13 +153,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFileOpenReadAfterAccessingLength()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -174,13 +174,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInIfAndEnd()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -199,13 +199,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInIf()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -225,13 +225,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInStreamReaderMethodBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -245,13 +245,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInLocalStreamReader()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -266,13 +266,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInStreamReaderMethodBodyAsDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -286,13 +286,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -307,13 +307,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenDisposableIsReturnedPropertySimple()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -329,13 +329,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenDisposableIsReturnedPropertyBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -352,13 +352,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WhenDisposableIsReturnedPropertyExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -368,13 +368,13 @@ namespace N
         public static Stream M => File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInLazy()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -401,13 +401,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void LocalFunctionStatementBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -426,13 +426,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalFunctionExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -448,13 +448,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalInLocalFunction()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -474,7 +474,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

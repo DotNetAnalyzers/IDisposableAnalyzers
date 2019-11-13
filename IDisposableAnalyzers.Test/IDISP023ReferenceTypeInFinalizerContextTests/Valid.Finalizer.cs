@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             [Test]
             public static void SealedWithFinalizerStatementBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -42,13 +42,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SealedWithFinalizerExpressionBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -74,14 +74,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("isDisposed.Equals(false)")]
             [TestCase("isDisposed.Equals(this)")]
             public static void TouchingStruct(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -111,13 +111,13 @@ namespace N
         }
     }
 }".AssertReplace("isDisposed.Equals(false)", expression);
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SettingStaticToNull()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Text;
@@ -133,13 +133,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SettingInstanceToNull()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Text;
@@ -155,7 +155,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

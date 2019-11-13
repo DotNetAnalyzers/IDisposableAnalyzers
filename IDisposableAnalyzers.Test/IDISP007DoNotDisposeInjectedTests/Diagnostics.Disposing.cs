@@ -15,9 +15,9 @@
             [TestCase("(object) Stream")]
             [TestCase("stream as object")]
             [TestCase("Stream as object")]
-            public static void InjectedAndCreatedField(string code)
+            public static void InjectedAndCreatedField(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -39,8 +39,8 @@ namespace N
             ↓(this.stream as IDisposable)?.Dispose();
         }
     }
-}".AssertReplace("stream ?? File.OpenRead(string.Empty)", code);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+}".AssertReplace("stream ?? File.OpenRead(string.Empty)", expression);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.disposable.Dispose();")]
@@ -49,7 +49,7 @@ namespace N
             [TestCase("disposable?.Dispose();")]
             public static void DisposingFieldAssignedWithInjected(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -69,7 +69,7 @@ namespace N
         }
     }
 }".AssertReplace("this.disposable.Dispose();", disposeCall);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.disposable.Dispose();")]
@@ -78,7 +78,7 @@ namespace N
             [TestCase("disposable?.Dispose();")]
             public static void DisposingPublicField(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -98,14 +98,14 @@ namespace N
         }
     }
 }".AssertReplace("this.disposable.Dispose();", disposeCall);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("Disposable.Dispose();")]
             [TestCase("Disposable?.Dispose();")]
             public static void DisposingStaticField(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -120,13 +120,13 @@ namespace N
         }
     }
 }".AssertReplace("Disposable.Dispose();", disposeCall);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingPublicFieldOutsideOfLock()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -163,7 +163,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.Disposable.Dispose();")]
@@ -172,7 +172,7 @@ namespace N
             [TestCase("Disposable?.Dispose();")]
             public static void DisposingPropertyAssignedWithInjected(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -192,7 +192,7 @@ namespace N
         }
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("public abstract Stream Stream { get; }")]
@@ -201,7 +201,7 @@ namespace N
             [TestCase("public virtual Stream Stream { get; set; }")]
             public static void DisposingAbstractOrVirtualProperty(string property)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -234,7 +234,7 @@ namespace N
         }
     }
 }".AssertReplace("public abstract Stream Stream { get; }", property);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.Disposable.Dispose();")]
@@ -259,7 +259,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -288,7 +288,7 @@ namespace N
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
             }
 
             [TestCase("this.Disposable.Dispose();")]
@@ -313,7 +313,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -336,7 +336,7 @@ namespace N
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
             }
 
             [TestCase("this.foo.Disposable.Dispose()")]
@@ -361,7 +361,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -382,7 +382,7 @@ namespace N
     }
 }".AssertReplace("this.foo.Disposable.Dispose()", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
             }
 
             [TestCase("this.Disposable.Dispose();")]
@@ -391,7 +391,7 @@ namespace N
             [TestCase("Disposable?.Dispose();")]
             public static void DisposingMutableProperty(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -407,13 +407,13 @@ namespace N
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingCtorParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -427,13 +427,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -447,7 +447,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
@@ -521,7 +521,7 @@ namespace N
             [Test]
             public static void InjectedViaMethod()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -541,13 +541,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingFieldInVirtualDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -591,7 +591,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.disposable.Dispose();")]
@@ -606,7 +606,7 @@ namespace N
             [TestCase("disposable?.Disposable?.Dispose();")]
             public static void InjectedSingleAssignmentDisposable(string dispose)
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -629,13 +629,13 @@ namespace Gu.Reactive
      }
 }".AssertReplace("this.disposable.Dispose();", dispose);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingArrayItemAssignedWithInjected()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -656,13 +656,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingStaticArrayItem()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -678,13 +678,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingDictionaryItem()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -707,13 +707,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void DisposingStaticDictionaryItem()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -731,7 +731,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("((IDisposable)o).Dispose()")]
@@ -740,7 +740,7 @@ namespace N
             [TestCase("(o as IDisposable)?.Dispose()")]
             public static void Cast(string cast)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -754,13 +754,13 @@ namespace N
     }
 }".AssertReplace("((IDisposable)o).Dispose()", cast);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void IfPatternMatchedInjected()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -776,13 +776,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void SwitchPatternMatchedInjected()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -800,7 +800,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

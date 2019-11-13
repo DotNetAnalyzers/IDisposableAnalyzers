@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
         [Test]
         public static void Simple()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -56,13 +56,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
         }
 
         [Test]
         public static void SimpleWithArg()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -110,13 +110,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
         }
 
         [Test]
         public static void SimpleWhenArg()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -164,13 +164,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
         }
 
         [Test]
         public static void Chained()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -220,7 +220,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode, extCode, DisposableCode, wrappingDisposableCode);
+            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
         }
     }
 }

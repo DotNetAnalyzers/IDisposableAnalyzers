@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         [TestCase(Search.Recursive)]
         public static void TryFindIDisposableDispose(Search search)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -39,7 +39,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
@@ -52,7 +52,7 @@ namespace N
         [TestCase(Search.Recursive)]
         public static void TryFindIDisposableDisposeWhenExplicit(Search search)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -80,7 +80,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
@@ -92,7 +92,7 @@ namespace N
         [TestCase(Search.Recursive)]
         public static void TryFindVirtualDispose(Search search)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -128,7 +128,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
@@ -140,7 +140,7 @@ namespace N
         [TestCase(Search.Recursive)]
         public static void TryFindFirst(Search search)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -176,7 +176,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));

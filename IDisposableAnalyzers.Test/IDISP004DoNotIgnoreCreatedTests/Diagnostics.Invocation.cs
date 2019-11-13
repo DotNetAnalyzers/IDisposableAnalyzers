@@ -27,7 +27,7 @@ namespace N
             [Test]
             public static void FileOpenRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -41,7 +41,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
@@ -63,7 +63,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -76,7 +76,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, barCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, barCode, code);
             }
 
             [Test]
@@ -112,7 +112,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -125,13 +125,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, interfaceCode, disposableCode, factoryCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, interfaceCode, disposableCode, factoryCode, code);
             }
 
             [Test]
             public static void MethodCreatingDisposableExpressionBodyToString()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -146,7 +146,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.Stream().ReadAsync(null, 0, 0)")]
@@ -155,7 +155,7 @@ namespace N
             [TestCase("Stream()?.ReadAsync(null, 0, 0)")]
             public static void MethodCreatingDisposableExpressionBodyAsync(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -169,7 +169,7 @@ namespace N
     }
 }".AssertReplace("Stream().ReadAsync(null, 0, 0)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("Stream.Length")]
@@ -178,7 +178,7 @@ namespace N
             [TestCase("this.Stream?.Length")]
             public static void PropertyCreatingDisposableExpressionBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -191,7 +191,7 @@ namespace N
     }
 }".AssertReplace("this.Stream.Length", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("this.Stream.ReadAsync(null, 0, 0)")]
@@ -200,7 +200,7 @@ namespace N
             [TestCase("Stream?.ReadAsync(null, 0, 0)")]
             public static void PropertyCreatingDisposableExpressionBodyAsync(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -214,14 +214,14 @@ namespace N
     }
 }".AssertReplace("Stream.ReadAsync(null, 0, 0)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("Stream.Length")]
             [TestCase("Stream?.Length")]
             public static void StaticPropertyCreatingDisposableExpressionBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -233,13 +233,13 @@ namespace N
         public static long? M() => ↓Stream.Length;
     }
 }".AssertReplace("Stream.Length", expression);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void NoFixForArgument()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -255,13 +255,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void FactoryMethodNewDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public sealed class C
@@ -277,7 +277,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
@@ -294,7 +294,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -305,13 +305,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, factoryCode, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, factoryCode, DisposableCode, code);
             }
 
             [Test]
             public static void WithOptionalParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -341,13 +341,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
             public static void DiscardFileOpenRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -361,7 +361,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

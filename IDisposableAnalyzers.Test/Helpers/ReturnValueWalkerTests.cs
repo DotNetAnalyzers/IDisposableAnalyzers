@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         [TestCase(ReturnValueSearch.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 using System.Threading.Tasks;
 
 internal class C
@@ -29,7 +29,7 @@ internal class C
         return await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false);
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
@@ -52,7 +52,7 @@ internal class C
         [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.TopLevel, "this.value")]
         public static void Property(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     internal class C
@@ -87,7 +87,7 @@ namespace N
         }
     }
 }".AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {expression}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -112,7 +112,7 @@ namespace N
         [TestCase("RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
         public static void PropertyRecursive(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     internal class C
@@ -143,7 +143,7 @@ namespace N
         }
     }
 }".AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {expression}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -187,7 +187,7 @@ namespace N
         [TestCase("ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
         public static void Call(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -285,7 +285,7 @@ namespace N
         }
     }
 }".AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {expression}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -316,7 +316,7 @@ namespace N
         [TestCase("Flatten(null, null)", ReturnValueSearch.Recursive, "null, new List<IDisposable>()")]
         public static void CallRecursive(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -377,7 +377,7 @@ namespace N
         }
     }
 }".AssertReplace("var temp = Recursive()", $"var temp = {expression}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -391,7 +391,7 @@ namespace N
         [Test]
         public static void RecursiveWithOptionalParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -416,7 +416,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindInvocation("WithOptionalParameter(local)");
@@ -445,7 +445,7 @@ namespace N
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.TopLevel, "1, 2")]
         public static void Lambda(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -463,7 +463,7 @@ namespace N
         }
     }
 }".AssertReplace("Func<int> temp = () => 1", expression);
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -526,7 +526,7 @@ namespace N
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "CreateInt()")]
         public static void AsyncAwait(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -589,7 +589,7 @@ namespace N
     }
 }".AssertReplace("var value = await CreateStringAsync()", $"var value = {expression}");
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -609,7 +609,7 @@ namespace N
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.TopLevel, "RecursiveAsync4(value)")]
         public static void AsyncAwaitRecursive(string expression, ReturnValueSearch search, string expected)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -655,7 +655,7 @@ namespace N
     }
 }".AssertReplace("var value = await RecursiveAsync()", $"var value = {expression}");
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -668,7 +668,7 @@ namespace N
         [Test]
         public static void ChainedExtensionMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -703,7 +703,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
@@ -716,7 +716,7 @@ namespace N
         [Test]
         public static void ReturnTernary()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -732,7 +732,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnTernary(true)").Value;
@@ -745,7 +745,7 @@ namespace N
         [Test]
         public static void ReturnNullCoalesce()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -761,7 +761,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnNullCoalesce(null)").Value;
@@ -774,7 +774,7 @@ namespace N
         [Test]
         public static void ValidationErrorToStringConverter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
      using System;
@@ -815,7 +815,7 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");

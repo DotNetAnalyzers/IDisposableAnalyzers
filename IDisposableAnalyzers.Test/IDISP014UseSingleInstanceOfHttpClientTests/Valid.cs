@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
         [Test]
         public static void StaticFieldAssignedInInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -22,13 +22,13 @@ namespace N
         public static readonly HttpClient Client = new HttpClient();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StaticFieldAssignedInStaticCtor()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StaticPropertyAssignedInInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -66,13 +66,13 @@ namespace N
         public static HttpClient Client { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void StaticPropertyAssignedInStaticCtor()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -82,7 +82,7 @@ namespace N
         public static HttpClient Client { get; } = new HttpClient();
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace N
         }
     }
 }";
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -113,7 +113,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, httpClientCode, testCode);
+            RoslynAssert.Valid(Analyzer, httpClientCode, code);
         }
     }
 }

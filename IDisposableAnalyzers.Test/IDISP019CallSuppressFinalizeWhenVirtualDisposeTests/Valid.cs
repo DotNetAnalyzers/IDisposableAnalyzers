@@ -11,7 +11,7 @@
         [Test]
         public static void SealedWithFinalizer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -35,7 +35,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

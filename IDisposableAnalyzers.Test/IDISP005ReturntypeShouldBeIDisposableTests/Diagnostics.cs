@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
         [Test]
         public static void ReturnFileOpenReadAsObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -26,13 +26,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadAsDynamic()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -67,13 +67,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFieldPasswordBoxSecurePasswordAsObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -88,13 +88,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void IndexerReturningObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -115,13 +115,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadAsObjectExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -132,13 +132,13 @@ namespace N
         public object Meh() => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void PropertyReturnFileOpenReadAsObjectExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -149,13 +149,13 @@ namespace N
         public object Meh => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void StatementLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -172,13 +172,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ParenthesizedLambdaExpression()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -192,13 +192,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void SimpleLambdaExpression()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -212,7 +212,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

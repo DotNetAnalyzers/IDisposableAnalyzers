@@ -400,7 +400,7 @@ namespace N
             [Test]
             public static void WhenInterfaceIsMissing()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -415,7 +415,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, testCode);
+                RoslynAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, code);
             }
 
             [Test]

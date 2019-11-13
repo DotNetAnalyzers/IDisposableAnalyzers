@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [Test]
         public static void CompositeDisposableInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -32,13 +32,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void CompositeDisposableAdd()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -61,13 +61,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SerialDisposable()
         {
-            var testCode = @"
+            var code = @"
 using System;
 using System.IO;
 using System.Reactive.Disposables;
@@ -87,13 +87,13 @@ public sealed class C : IDisposable
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SerialDisposableObjectInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -116,13 +116,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void SingleAssignmentDisposable()
         {
-            var testCode = @"
+            var code = @"
 using System;
 using System.IO;
 using System.Reactive.Disposables;
@@ -142,13 +142,13 @@ public sealed class C : IDisposable
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposableCreateClosure()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -170,13 +170,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposableCreateClosureElvis()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -198,13 +198,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposableCreateClosureStatementBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -229,13 +229,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReturnsCompositeDisposableInitializer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -251,13 +251,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void ReturnsCompositeDisposableLazy()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -288,7 +288,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
     }
 }

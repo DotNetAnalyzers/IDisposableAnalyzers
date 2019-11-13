@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
             [Test]
             public static void UsingField1()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [Test]
             public static void UsingField2()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -56,7 +56,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

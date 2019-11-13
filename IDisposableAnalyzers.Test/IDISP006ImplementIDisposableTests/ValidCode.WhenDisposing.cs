@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [TestCase("stream?.Dispose();")]
             public static void DisposingField(string disposeCall)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }".AssertReplace("this.stream.Dispose();", disposeCall);
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingFieldInVirtualDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -75,13 +75,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingFieldInVirtualDispose2()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -119,13 +119,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
 
             [Test]
             public static void DisposingFieldInExpressionBodyDispose()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -136,13 +136,13 @@ namespace N
         public void Dispose() => _disposable.Dispose();
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
 
             [Test]
             public static void DisposingFieldAsCast()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -159,13 +159,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingFieldInlineAsCast()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -181,13 +181,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingFieldExplicitCast()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -204,13 +204,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingFieldInlineExplicitCast()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -226,13 +226,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingPropertyWhenInitializedInProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -254,13 +254,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void DisposingPropertyWhenInitializedInline()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -277,13 +277,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnorePassedInViaCtor1()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -298,13 +298,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnorePassedInViaCtor2()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -319,13 +319,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnorePassedInViaCtor3()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -344,14 +344,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [TestCase("disposables.First();")]
             [TestCase("disposables.Single();")]
             public static void IgnoreLinq(string linq)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -367,13 +367,13 @@ namespace N
         }
     }
 }".AssertReplace("disposables.First();", linq);
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoredWhenNotAssigned()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -384,13 +384,13 @@ namespace N
         private readonly IDisposable bar;
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoredWhenBackingField()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -406,13 +406,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreFieldThatIsNotDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -420,13 +420,13 @@ namespace N
         private readonly object bar = new object();
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -436,13 +436,13 @@ namespace N
         private static object Meh() => new object();
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -450,13 +450,13 @@ namespace N
         private readonly object bar = string.Copy(string.Empty);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoredStaticField()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -466,13 +466,13 @@ namespace N
         private static Stream stream = File.OpenRead(string.Empty);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreTask()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -482,13 +482,13 @@ namespace N
         private readonly Task stream = Task.Delay(0);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoreTaskOfInt()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -498,13 +498,13 @@ namespace N
         private readonly Task<int> stream = Task.FromResult(0);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void FieldOfTypeArrayOfInt()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public sealed class C
@@ -512,13 +512,13 @@ namespace N
         private readonly int[] ints = new[] { 1, 2, 3 };
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void PropertyWithBackingFieldOfTypeArrayOfInt()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public sealed class C
@@ -541,7 +541,7 @@ namespace N
         public bool HasInts => (this.ints != null) && (this.ints.Length > 0);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

@@ -27,7 +27,7 @@ namespace N
             [Test]
             public static void NewDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public sealed class C
@@ -38,7 +38,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
@@ -60,7 +60,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public sealed class C
@@ -71,7 +71,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, barCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, barCode, code);
             }
 
             [Test]
@@ -96,7 +96,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class Meh
@@ -107,7 +107,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, code);
             }
 
             [Test]
@@ -129,7 +129,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class Meh
@@ -140,13 +140,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, code);
             }
 
             [Test]
             public static void StringFormatArgument()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public static class C
@@ -154,13 +154,13 @@ namespace N
         public static string M() => string.Format(""{0}"", ↓new Disposable());
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
             public static void NewDisposableToString()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -171,13 +171,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
             public static void ReturnNewDisposableToString()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -188,7 +188,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [Test]
@@ -209,7 +209,7 @@ namespace N
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using Ninject;
@@ -224,7 +224,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, moduleCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, moduleCode, code);
             }
         }
     }

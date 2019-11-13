@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
         [Test]
         public static void ReturnFileOpenReadFromUsing()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -28,13 +28,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadDisposed()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnLazyFromUsing()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -79,13 +79,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnLazyFromUsingNested()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -120,7 +120,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

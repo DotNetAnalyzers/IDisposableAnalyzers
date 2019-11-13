@@ -41,7 +41,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -57,7 +57,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, code);
             }
 
             [Test]
@@ -94,7 +94,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, code);
             }
 
             [Test]
@@ -154,7 +154,7 @@ namespace N
         }
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -171,7 +171,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, testCode);
+                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseCode, code);
             }
         }
     }

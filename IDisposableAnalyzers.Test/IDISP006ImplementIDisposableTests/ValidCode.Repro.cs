@@ -123,7 +123,7 @@ namespace ProjectX.Commands
 
             public static void Issue150()
             {
-                var testCode = @"
+                var code = @"
 namespace ValidCode
 {
     using System.Collections.Generic;
@@ -150,7 +150,7 @@ namespace ValidCode
         public IReadOnlyList<string> AllLines { get; }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

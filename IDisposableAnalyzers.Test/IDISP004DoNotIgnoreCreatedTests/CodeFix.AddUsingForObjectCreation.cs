@@ -151,7 +151,7 @@ namespace N
             [Test]
             public static void NoFixForArgument()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -167,7 +167,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, testCode });
+                RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, code });
             }
         }
     }

@@ -24,7 +24,7 @@ namespace N
         [Test]
         public static void PublicMethodRefParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -40,7 +40,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

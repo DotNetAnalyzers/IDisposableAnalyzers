@@ -31,7 +31,7 @@ namespace N
             [TestCase("out Disposable _")]
             public static void DiscardedNewDisposableStatementBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public static class C
@@ -49,7 +49,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [TestCase("out _")]
@@ -59,7 +59,7 @@ namespace N
             [TestCase("out Disposable _")]
             public static void DiscardedNewDisposableExpressionBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public static class C
@@ -74,7 +74,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
             }
 
             [TestCase("out _")]
@@ -84,7 +84,7 @@ namespace N
             [TestCase("out FileStream _")]
             public static void DiscardedFileOpenReadStatementBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -110,7 +110,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("out _")]
@@ -120,7 +120,7 @@ namespace N
             [TestCase("out FileStream _")]
             public static void DiscardedFileOpenReadExpressionBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -143,7 +143,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("out _")]
@@ -153,7 +153,7 @@ namespace N
             [TestCase("out FileStream _")]
             public static void DiscardedOutAssignedWithArgumentStatementBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -173,7 +173,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
             [TestCase("out _")]
@@ -183,7 +183,7 @@ namespace N
             [TestCase("out FileStream _")]
             public static void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -200,7 +200,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }

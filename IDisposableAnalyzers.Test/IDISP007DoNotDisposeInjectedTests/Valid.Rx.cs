@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
             [Test]
             public static void InjectedSubscribe()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -32,13 +32,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void ChainedCtorInjectedSubscribe()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -71,13 +71,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void InjectedConditionalSubscribe()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -99,13 +99,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SingleAssignmentDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -127,13 +127,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -155,13 +155,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void SingleAssignmentDisposableAssignedInAction()
             {
-                var testCode = @"
+                var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -191,7 +191,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

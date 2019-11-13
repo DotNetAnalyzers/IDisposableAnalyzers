@@ -27,7 +27,7 @@ namespace N
             [Test]
             public static void AwaitTaskRun()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -41,13 +41,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
             public static void AwaitTaskFromResult()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -61,13 +61,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
             }
 
             [Test]
             public static void AwaitCreate()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -86,13 +86,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
             }
 
             [Test]
             public static void AwaitCreateAsyncTaskFromResult()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -111,13 +111,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, testCode);
+                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
             }
 
             [Test]
             public static void AwaitRead()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -144,7 +144,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, testCode);
+                RoslynAssert.Diagnostics(Analyzer, code);
             }
         }
     }

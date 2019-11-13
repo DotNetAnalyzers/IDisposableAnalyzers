@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [Test]
             public static void FactoryMethodCallingPrivateCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -25,13 +25,13 @@ namespace N
         public static C Create() => new C(true);
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void FactoryMethodCallingPrivateCtorWithCachedDisposable()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         public static C Create() => new C(Cached);
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
 
             [Test]
             public static void AssignedWithCreatedAndInjected()
             {
-                var testCode = @"
+                var code = @"
 #pragma warning disable IDISP008
 namespace N
 {
@@ -77,7 +77,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

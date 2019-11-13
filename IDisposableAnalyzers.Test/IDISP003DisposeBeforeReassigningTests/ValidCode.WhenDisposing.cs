@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         [Test]
         public static void DisposingVariable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -27,14 +27,14 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
         public static void DisposeBeforeAssigningInIfElse(string dispose)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -59,14 +59,14 @@ namespace N
         }
     }
 }".AssertReplace("stream.Dispose();", dispose);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
         public static void DisposeBeforeAssigningBeforeIfElse(string dispose)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -90,14 +90,14 @@ namespace N
         }
     }
 }".AssertReplace("stream.Dispose();", dispose);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("stream.Dispose();")]
         [TestCase("stream?.Dispose();")]
         public static void DisposeFieldBeforeIfElseReassigning(string dispose)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -120,13 +120,13 @@ namespace N
         }
     }
 }".AssertReplace("stream.Dispose();", dispose);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -143,13 +143,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingFieldInCtor()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -165,13 +165,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingFieldInMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -188,13 +188,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConditionallyDisposingFieldInMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -211,13 +211,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ConditionallyDisposingUnderscoreFieldInMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -234,13 +234,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingUnderscoreFieldInMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -257,13 +257,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void AssigningFieldInLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -289,13 +289,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void AssigningBackingFieldInLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -327,13 +327,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void AssigningSerialDisposableBackingFieldInLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -365,13 +365,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void AssigningSerialDisposableFieldInLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -397,13 +397,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void DisposingPreviousAssignedToLocal()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -425,7 +425,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [TestCase("stream.Dispose();")]

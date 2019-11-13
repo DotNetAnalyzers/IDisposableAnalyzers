@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [Test]
             public static void DisposingFieldInTearDown()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
 
             [Test]
             public static void DisposingFieldInOneTimeTearDown()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -60,7 +60,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
         }
     }

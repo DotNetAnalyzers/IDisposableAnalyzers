@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         [Test]
         public static void WebClientDownloadStringTaskAsync()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -30,13 +30,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ValueTask()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -58,13 +58,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void LocalTask()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -82,13 +82,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void TaskCompletionSourceTask()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Net;
@@ -106,7 +106,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

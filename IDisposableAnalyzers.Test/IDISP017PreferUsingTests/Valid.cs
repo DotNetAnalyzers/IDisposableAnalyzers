@@ -11,7 +11,7 @@
         [Test]
         public static void DisposingField()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -35,13 +35,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingArrayItem()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -61,13 +61,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingDictionaryItem()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -88,13 +88,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReassignAfterDispose()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -112,13 +112,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void ReassignViaOutAfterDispose()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -142,7 +142,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

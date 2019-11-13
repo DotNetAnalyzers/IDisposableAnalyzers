@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
         [Test]
         public static void ReturnFileOpenReadGetBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -28,13 +28,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -44,13 +44,13 @@ namespace N
         public Stream Meh => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
 
         [Test]
         public static void ReturnFileOpenReadGetExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -63,7 +63,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, testCode);
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

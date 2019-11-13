@@ -15,7 +15,7 @@
         [TestCase("protected Stream Stream")]
         public static void MutableFieldInSealed(string property)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -31,7 +31,7 @@ namespace N
         }
     }
 }".AssertReplace("private Stream Stream", property);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("public Stream Stream { get; protected set; }")]
@@ -39,7 +39,7 @@ namespace N
         [TestCase("protected Stream Stream { get; set; }")]
         public static void MutablePropertyInSealed(string property)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -55,7 +55,7 @@ namespace N
         }
     }
 }".AssertReplace("public Stream Stream { get; set; }", property);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("this.stream.Dispose();")]
@@ -64,7 +64,7 @@ namespace N
         [TestCase("stream?.Dispose();")]
         public static void DisposingCreatedField(string disposeCall)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -80,13 +80,13 @@ namespace N
         }
     }
 }".AssertReplace("this.stream.Dispose();", disposeCall);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposingCreatedFieldInVirtualDispose()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -126,13 +126,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void HandlesRecursion()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -147,14 +147,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("public Stream Stream { get; }")]
         [TestCase("public Stream Stream { get; private set; }")]
         public static void PropertyWithCreatedValue(string property)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -176,13 +176,13 @@ namespace N
         }
     }
 }".AssertReplace("public Stream Stream { get; }", property);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PropertyWithBackingFieldCreatedValue()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -210,7 +210,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("public Stream Stream { get; }")]
@@ -219,7 +219,7 @@ namespace N
         [TestCase("public Stream Stream { get; set; }")]
         public static void PropertyWithInjectedValue(string property)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -234,13 +234,13 @@ namespace N
         public Stream Stream { get; }
     }
 }".AssertReplace("public Stream Stream { get; }", property);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedListOfInt()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -256,13 +256,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedListOfT()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -278,13 +278,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedInClassThatIsNotIDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -299,13 +299,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedInClassThatIsIDisposable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -324,7 +324,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -343,7 +343,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -368,7 +368,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableCode, code);
         }
 
         [TestCase("private set")]
@@ -376,7 +376,7 @@ namespace N
         [TestCase("set")]
         public static void PropertyWithBackingFieldInjectedValue(string setter)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -401,13 +401,13 @@ namespace N
         }
     }
 }".AssertReplace("private set", setter);
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void GenericTypeWithPropertyAndIndexer()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -438,7 +438,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -458,7 +458,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -478,13 +478,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, disposableDictionaryCode, testCode);
+            RoslynAssert.Valid(Analyzer, disposableDictionaryCode, code);
         }
 
         [Test]
         public static void PublicMethodRefIntParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -497,13 +497,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PublicMethodRefStringParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -516,7 +516,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

@@ -66,7 +66,7 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -94,7 +94,7 @@ namespace N
         }
     }
 }";
-            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
+            var solution = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
             RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
         }
     }
