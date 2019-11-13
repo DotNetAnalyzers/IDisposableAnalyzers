@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();

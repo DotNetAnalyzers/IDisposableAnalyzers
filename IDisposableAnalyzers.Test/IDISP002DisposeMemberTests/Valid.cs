@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class ValidCode
+    public static partial class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 

@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
     {
         [TestCase("this.stream == null")]
         [TestCase("this.stream == null && file != null")]
