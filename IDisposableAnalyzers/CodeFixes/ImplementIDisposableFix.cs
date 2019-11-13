@@ -21,12 +21,10 @@
     [Shared]
     internal class ImplementIDisposableFix : CodeFixProvider
     {
-        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System"));
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
 
-        // ReSharper disable once InconsistentNaming
-        private static readonly TypeSyntax IDisposableInterface = SyntaxFactory.ParseTypeName("System.IDisposable")
-                                                                               .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                                                                               .WithAdditionalAnnotations(Simplifier.Annotation, SyntaxAnnotation.ElasticAnnotation);
+        private static readonly TypeSyntax SystemIDisposable = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"),SyntaxFactory.IdentifierName("IDisposable"))
+                                                                            .WithAdditionalAnnotations(Simplifier.Annotation);
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -203,7 +201,7 @@
         {
             var editor = await DocumentEditor.CreateAsync(context.Document, cancellationToken)
                                              .ConfigureAwait(false);
-            editor.AddInterfaceType(typeDeclaration, IDisposableInterface);
+            editor.AddInterfaceType(typeDeclaration, SystemIDisposable);
             return editor.GetChangedDocument();
         }
 
@@ -348,7 +346,7 @@
 
             if (classDeclaration.BaseList?.Types.TrySingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
             {
-                editor.AddInterfaceType(classDeclaration, IDisposableInterface);
+                editor.AddInterfaceType(classDeclaration, SystemIDisposable);
             }
 
             _ = editor.AddUsing(UsingSystem);
@@ -404,7 +402,7 @@
 
             if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
             {
-                editor.AddInterfaceType(classDeclaration, IDisposableInterface);
+                editor.AddInterfaceType(classDeclaration, SystemIDisposable);
             }
 
             var updated = editor.GetChangedDocument();
