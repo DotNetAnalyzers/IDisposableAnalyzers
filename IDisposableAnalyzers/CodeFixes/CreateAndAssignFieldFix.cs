@@ -27,20 +27,18 @@
         {
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                           .ConfigureAwait(false);
-            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                                      .ConfigureAwait(false);
+
             foreach (var diagnostic in context.Diagnostics)
             {
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id &&
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
-                    localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
-                    variables[0].Initializer is { } &&
-                    semanticModel.TryGetType(type, context.CancellationToken, out var local))
+                    localDeclaration is { Declaration: { Type: { }, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
+                    variables[0].Initializer is { })
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, local),
+                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, cancellationToken),
                         "Create and assign field.",
                         diagnostic);
                 }
@@ -57,29 +55,22 @@
             }
         }
 
-        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, ITypeSymbol type)
+        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, CancellationToken cancellationToken)
         {
-            var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            var variableDeclarator = statement.Declaration.Variables[0];
-            var field = editor.AddField(
-                containingType,
-                usesUnderscoreNames
-                    ? "_" + variableDeclarator.Identifier.ValueText
-                    : variableDeclarator.Identifier.ValueText,
+            var local = statement.Declaration.Variables[0];
+            var fieldAccess = AddField(
+                editor,
+                statement.FirstAncestor<TypeDeclarationSyntax>(),
+                local.Identifier.ValueText,
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
-                type,
-                CancellationToken.None);
-
-            var fieldAccess = usesUnderscoreNames
-                ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
-                : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
+                editor.SemanticModel.GetTypeInfoSafe(statement.Declaration.Type, cancellationToken).Type,
+                cancellationToken);
 
             editor.ReplaceNode(
                 statement,
                 (x, g) => g.ExpressionStatement(
-                               g.AssignmentStatement(fieldAccess, variableDeclarator.Initializer.Value))
+                               g.AssignmentStatement(fieldAccess, local.Initializer.Value))
                            .WithTriviaFrom(x));
         }
 
@@ -104,6 +95,30 @@
             editor.ReplaceNode(
                 statement.Expression,
                 (x, g) => g.AssignmentStatement(fieldAccess, x).WithTriviaFrom(x));
+        }
+
+        private static ExpressionSyntax AddField(DocumentEditor editor, TypeDeclarationSyntax containingType, string name, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
+        {
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
+            if (usesUnderscoreNames)
+            {
+                name = $"_{name}";
+            }
+
+            var field = editor.AddField(
+                containingType,
+                name,
+                accessibility,
+                modifiers,
+                (TypeSyntax)editor.Generator.TypeExpression(type),
+                cancellationToken);
+            var identifierNameSyntax = SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier);
+            return usesUnderscoreNames
+                ? (ExpressionSyntax)identifierNameSyntax
+                : SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.ThisExpression(),
+                    identifierNameSyntax);
         }
     }
 }

@@ -16,25 +16,6 @@
             string name,
             Accessibility accessibility,
             DeclarationModifiers modifiers,
-            ITypeSymbol type,
-            CancellationToken cancellationToken)
-        {
-            return AddField(
-                editor,
-                containingType,
-                name,
-                accessibility,
-                modifiers,
-                (TypeSyntax)editor.Generator.TypeExpression(type),
-                cancellationToken);
-        }
-
-        internal static FieldDeclarationSyntax AddField(
-            this DocumentEditor editor,
-            TypeDeclarationSyntax containingType,
-            string name,
-            Accessibility accessibility,
-            DeclarationModifiers modifiers,
             TypeSyntax type,
             CancellationToken cancellationToken)
         {
