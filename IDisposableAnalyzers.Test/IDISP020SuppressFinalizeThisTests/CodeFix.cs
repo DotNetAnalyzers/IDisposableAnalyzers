@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP020SuppressFinalizeThisTests
+﻿namespace IDisposableAnalyzers.Test.IDISP020SuppressFinalizeThisTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP020SuppressFinalizeThisTests
         [TestCase("null")]
         public static void WhenStatementBody(string expression)
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -39,7 +39,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("null", expression);
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

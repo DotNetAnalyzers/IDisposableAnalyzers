@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
     {
         [Test]
         public static void AssignLocalWithInt()
@@ -21,7 +21,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Descriptor, Disposable, testCode);
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -150,7 +150,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -174,7 +174,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -200,7 +200,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]

@@ -8,6 +8,19 @@
     <Rule Id="AvoidAsyncSuffix" Action="None" />
     <Rule Id="UseAsyncSuffix" Action="None" />
   </Rules>
+  <Rules AnalyzerId="Gu.Roslyn.Asserts.Analyzers" RuleNamespace="Gu.Roslyn.Asserts.Analyzers">
+    <Rule Id="GURA01" Action="Info" />
+    <Rule Id="GURA02" Action="Info" />
+    <Rule Id="GURA03" Action="Info" />
+    <Rule Id="GURA04" Action="Info" />
+    <Rule Id="GURA05" Action="Info" />
+    <Rule Id="GURA06" Action="Info" />
+    <Rule Id="GURA07" Action="Info" />
+    <Rule Id="GURA08a" Action="Warning" />
+    <Rule Id="GURA09" Action="Info" />
+    <Rule Id="GURA10" Action="Hidden" />
+    <Rule Id="GURA11" Action="Info" />
+  </Rules>
   <Rules AnalyzerId="Microsoft.Analyzers.ManagedCodeAnalysis" RuleNamespace="Microsoft.Rules.Managed">
     <Rule Id="CA1001" Action="Warning" />
     <Rule Id="CA1009" Action="Warning" />

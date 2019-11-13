@@ -1,9 +1,9 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
     {
         [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
         [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
@@ -188,7 +188,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace RoslynSandbox
 {
     public class Pair<T>
@@ -222,7 +222,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, testCode);
         }
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -297,7 +297,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace RoslynSandbox
 {
     public class Pair<T>
@@ -337,7 +337,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, testCode);
         }
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -406,13 +406,13 @@ namespace RoslynSandbox
             var staticPairCode = @"
 namespace RoslynSandbox
 {
-    public static class Pair
+    public static class StaticPair
     {
         public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace RoslynSandbox
 {
     public class Pair<T>
@@ -441,7 +441,7 @@ namespace RoslynSandbox
 
         public C(string file1, string file2)
         {
-            this.pair = Pair.Create(File.OpenRead(file1), File.OpenRead(file2));
+            this.pair = StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2));
         }
 
         public void Dispose()
@@ -452,7 +452,7 @@ namespace RoslynSandbox
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, testCode);
         }
 
         [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]

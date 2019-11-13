@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
     {
         [Test]
         public static void SimpleStatementBody()
@@ -401,7 +401,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]

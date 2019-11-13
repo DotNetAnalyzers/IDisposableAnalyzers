@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public partial class ValidCode<T>
+    public partial class Valid<T>
     {
         [Test]
         public static void IgnoresRecursiveCalculatedProperty()
@@ -64,7 +64,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]

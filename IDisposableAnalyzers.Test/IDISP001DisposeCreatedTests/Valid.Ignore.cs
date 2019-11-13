@@ -4,7 +4,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     using NUnit.Framework;
 
     // ReSharper disable once UnusedTypeParameter
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
     {
         [TestCase("disposables.First();")]
         [TestCase("disposables.First(x => x != null);")]

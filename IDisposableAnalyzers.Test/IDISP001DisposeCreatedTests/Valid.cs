@@ -1,4 +1,4 @@
-#pragma warning disable SA1203 // Constants must appear before fields
+﻿#pragma warning disable SA1203 // Constants must appear before fields
 namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
@@ -9,13 +9,13 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
     [TestFixture(typeof(LocalDeclarationAnalyzer))]
     [TestFixture(typeof(ArgumentAnalyzer))]
     [TestFixture(typeof(AssignmentAnalyzer))]
-    public static partial class ValidCode<T>
+    public static partial class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP001DisposeCreated;
 
-        private const string DisposableCode = @"
+        private const string Disposable = @"
 namespace RoslynSandbox
 {
     using System;
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         }
     }
 }".AssertReplace("new string(' ', 1)", code);
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 {
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var item = new Disposable();
             item.Dispose();
@@ -82,7 +82,7 @@ namespace RoslynSandbox
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
@@ -207,7 +207,7 @@ namespace RoslynSandbox
         [Test]
         public static void AwaitDownloadDataTask()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System.Net;
@@ -224,13 +224,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void FactoryMethod()
         {
-            var testCode = @"
+            var code = @"
 namespace RoslynSandbox
 {
     using System;
@@ -262,7 +262,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -465,7 +465,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, testCode);
         }
 
         [Test]
