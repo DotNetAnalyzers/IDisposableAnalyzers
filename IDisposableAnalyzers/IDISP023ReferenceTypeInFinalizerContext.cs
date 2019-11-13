@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP023";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Don't use reference types in finalizer context.",
             messageFormat: "Don't use reference types in finalizer context.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Don't use reference types in finalizer context.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Don't use reference types in finalizer context.");
     }
 }

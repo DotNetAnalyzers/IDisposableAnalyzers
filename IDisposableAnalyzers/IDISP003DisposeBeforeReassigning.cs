@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP003";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Dispose previous before re-assigning.",
             messageFormat: "Dispose previous before re-assigning.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Dispose previous before re-assigning.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Dispose previous before re-assigning.");
     }
 }

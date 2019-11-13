@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP018";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Call SuppressFinalize.",
             messageFormat: "Call SuppressFinalize(this).",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Call SuppressFinalize(this) as the type has a finalizer.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Call SuppressFinalize(this) as the type has a finalizer.");
     }
 }

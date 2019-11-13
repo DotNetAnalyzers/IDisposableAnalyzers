@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP005";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Return type should indicate that the value should be disposed.",
             messageFormat: "Return type should indicate that the value should be disposed.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Return type should indicate that the value should be disposed.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Return type should indicate that the value should be disposed.");
     }
 }

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP006";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Implement IDisposable.",
             messageFormat: "Implement IDisposable.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "The member is assigned with a created IDisposables within the type. Implement IDisposable and dispose it.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "The member is assigned with a created IDisposables within the type. Implement IDisposable and dispose it.");
     }
 }

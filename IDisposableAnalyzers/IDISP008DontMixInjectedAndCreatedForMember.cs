@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Microsoft.CodeAnalysis;
 
@@ -6,14 +6,13 @@ namespace IDisposableAnalyzers
     {
         internal const string DiagnosticId = "IDISP008";
 
-        internal static readonly DiagnosticDescriptor Descriptor = new DiagnosticDescriptor(
+        internal static readonly DiagnosticDescriptor Descriptor = Descriptors.Create(
             id: DiagnosticId,
             title: "Don't assign member with injected and created disposables.",
             messageFormat: "Don't assign member with injected and created disposables.",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Don't assign member with injected and created disposables. It creates a confusing ownership situation.",
-            helpLinkUri: HelpLink.ForId(DiagnosticId));
+            description: "Don't assign member with injected and created disposables. It creates a confusing ownership situation.");
     }
 }
