@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             [Test]
             public static void FieldAssignedInCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -34,7 +34,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
@@ -44,7 +44,7 @@ namespace N
             [Test]
             public static void FieldAssignedInLambdaCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -69,7 +69,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
@@ -79,7 +79,7 @@ namespace N
             [Test]
             public static void LocalSeparateDeclarationAndAssignment()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -100,7 +100,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
@@ -110,7 +110,7 @@ namespace N
             [Test]
             public static void LocalSeparateDeclarationAndAssignmentInLambda()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -134,7 +134,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
@@ -144,7 +144,7 @@ namespace N
             [Test]
             public static void LocalAssignmentInLambda()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -168,7 +168,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
@@ -178,7 +178,7 @@ namespace N
             [Test]
             public static void FieldAfterEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -200,7 +200,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.stream = null").Left;
@@ -210,7 +210,7 @@ namespace N
             [Test]
             public static void PropertyAfterEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -232,7 +232,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.Stream = null").Left;
@@ -242,7 +242,7 @@ namespace N
             [Test]
             public static void ParameterAfterEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -262,7 +262,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
@@ -272,7 +272,7 @@ namespace N
             [Test]
             public static void ParameterBeforeEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -293,7 +293,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
@@ -303,7 +303,7 @@ namespace N
             [Test]
             public static void LocalAfterEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -324,7 +324,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
@@ -334,7 +334,7 @@ namespace N
             [Test]
             public static void LocalBeforeEarlyReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System.IO;
@@ -356,7 +356,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
@@ -366,7 +366,7 @@ namespace N
             [Test]
             public static void OutParameterInExpressionBody()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -377,7 +377,7 @@ namespace N
         public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = File.OpenRead(string.Empty)").Left;
@@ -387,7 +387,7 @@ namespace N
             [Test]
             public static void Repro()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     public class C
@@ -465,7 +465,7 @@ namespace N
         public bool Selected { get; set; }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.P1 = null;").Left;

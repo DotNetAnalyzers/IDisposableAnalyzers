@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -12,9 +12,9 @@ namespace IDisposableAnalyzers.Test.Helpers
         [TestCase("Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", false, null)]
         [TestCase("Task.FromResult(new string(' ', 1))", true, "new string(' ', 1)")]
         [TestCase("Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", true, "new string(' ', 1)")]
-        public static void TryAwaitTaskFromResult(string code, bool expected, string expectedCode)
+        public static void TryAwaitTaskFromResult(string expression, bool expected, string expectedCode)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -26,11 +26,11 @@ namespace N
             var value = // Meh();
         }
     }
-}".AssertReplace("// Meh()", code);
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("// Meh()", expression);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value as InvocationExpressionSyntax;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
             Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskFromResult(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }
@@ -43,9 +43,9 @@ namespace N
         [TestCase("Task.Run(() => CreateString()).ConfigureAwait(false)", true, "() => CreateString()")]
         [TestCase("Task.FromResult(new string(' ', 1))", false, null)]
         [TestCase("Task.FromResult(new string(' ', 1)).ConfigureAwait(false)", false, null)]
-        public static void TryAwaitTaskRun(string code, bool expected, string expectedCode)
+        public static void TryAwaitTaskRun(string expression, bool expected, string expectedCode)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -59,11 +59,11 @@ namespace N
 
         internal static string CreateString() => new string(' ', 1);
     }
-}".AssertReplace("// Meh()", code);
-            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("// Meh()", expression);
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value as InvocationExpressionSyntax;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
             Assert.AreEqual(expected, AsyncAwait.TryAwaitTaskRun(value, semanticModel, CancellationToken.None, out ExpressionSyntax result));
             Assert.AreEqual(expectedCode, result?.ToFullString());
         }

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             [Test]
             public static void WhenNotUsed()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -26,7 +26,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -44,7 +44,7 @@ namespace N
             [TestCase("bool", "object.Equals(disposable, null)")]
             public static void WhenNotUsed(string type, string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -60,7 +60,7 @@ namespace N
     }
 }".AssertReplace("bool", type)
   .AssertReplace("Equals(disposable, null)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -71,9 +71,9 @@ namespace N
 
             [TestCase("Add(disposable)")]
             [TestCase("Insert(1, disposable)")]
-            public static void InListOfTAdd(string code)
+            public static void InListOfTAdd(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -88,8 +88,8 @@ namespace N
             this.disposables.Add(disposable);
         }
     }
-}".AssertReplace("Add(disposable)", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("Add(disposable)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -103,7 +103,7 @@ namespace N
             [TestCase("this.Initialize(disposable)")]
             public static void ListOfTAddInInitialize(string call)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -124,7 +124,7 @@ namespace N
         }
     }
 }".AssertReplace("this.Initialize(disposable)", call);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -138,7 +138,7 @@ namespace N
             [TestCase("this.Initialize(this.disposables, disposable)")]
             public static void ListOfTAddInInitializePassField(string call)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -159,7 +159,7 @@ namespace N
         }
     }
 }".AssertReplace("this.Initialize(this.disposables, disposable)", call);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -174,7 +174,7 @@ namespace N
             [TestCase("this.Initialize(disposables, disposable)")]
             public static void ListOfTAddInInitializeParameter(string call)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -193,7 +193,7 @@ namespace N
         }
     }
 }".AssertReplace("this.Initialize(disposables, disposable)", call);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -207,7 +207,7 @@ namespace N
             [Test]
             public static void ListOfTAssignIndexer()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -223,7 +223,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -236,7 +236,7 @@ namespace N
             [Test]
             public static void ListOfTInitializer()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -252,7 +252,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -266,7 +266,7 @@ namespace N
             [TestCase("new[] { disposable }")]
             public static void ArrayOfTInitializer(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -282,7 +282,7 @@ namespace N
         }
     }
 }".AssertReplace("new Disposable[] { disposable }", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -295,7 +295,7 @@ namespace N
             [Test]
             public static void InStackOfT()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -311,7 +311,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -323,7 +323,7 @@ namespace N
 
             [TestCase("private Queue<IDisposable> disposables = new Queue<IDisposable>()")]
             [TestCase("private ConcurrentQueue<IDisposable> disposables = new ConcurrentQueue<IDisposable>()")]
-            public static void InQueueOfT(string code)
+            public static void InQueueOfT(string declaration)
             {
                 var testCode = @"
 namespace N
@@ -341,7 +341,7 @@ namespace N
             this.disposables.Enqueue(disposable);
         }
     }
-}".AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", code);
+}".AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", declaration);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);

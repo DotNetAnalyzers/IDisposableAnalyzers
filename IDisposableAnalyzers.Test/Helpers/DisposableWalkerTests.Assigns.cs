@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             [Test]
             public static void WhenNotUsed()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -25,7 +25,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -37,7 +37,7 @@ namespace N
             [Test]
             public static void AssigningLocal()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -50,7 +50,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -62,7 +62,7 @@ namespace N
             [Test]
             public static void FieldAssignedInCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -77,7 +77,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -90,7 +90,7 @@ namespace N
             [Test]
             public static void FieldAssignedViaCalledMethodParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -110,7 +110,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -123,7 +123,7 @@ namespace N
             [Test]
             public static void FieldAssignedInCtorViaLocal()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -139,7 +139,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -152,7 +152,7 @@ namespace N
             [Test]
             public static void PropertyAssignedInCtor()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -167,7 +167,7 @@ namespace N
         public IDisposable Disposable { get; }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
@@ -180,7 +180,7 @@ namespace N
             [Test]
             public static void PropertyAssignedInCalledMethod()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -200,7 +200,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");

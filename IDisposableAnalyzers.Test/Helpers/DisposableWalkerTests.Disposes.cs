@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             [Test]
             public static void WhenNotUsed()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -28,7 +28,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
@@ -42,7 +42,7 @@ namespace N
             [TestCase("((IDisposable)disposable)?.Dispose()")]
             public static void WhenDisposed(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -57,7 +57,7 @@ namespace N
         }
     }
 }".AssertReplace("disposable.Dispose()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
@@ -68,7 +68,7 @@ namespace N
             [Test]
             public static void WhenUsing()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -84,7 +84,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
@@ -95,7 +95,7 @@ namespace N
             [Test]
             public static void WhenUsingAfterDeclaration()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -112,7 +112,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
             [Test]
             public static void IgnoresWhenDisposingRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -25,13 +25,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenNotDisposingRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -45,13 +45,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -73,13 +73,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -100,13 +100,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
 
             [Test]
             public static void IgnoresWhenDisposingRecursiveMethod()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -121,7 +121,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, testCode);
+                RoslynAssert.Valid(Analyzer, code);
             }
         }
     }

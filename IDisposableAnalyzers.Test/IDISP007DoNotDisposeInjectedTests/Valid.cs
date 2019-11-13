@@ -83,7 +83,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed = false;
@@ -116,7 +116,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class CImpl : CBase
+    public class CImpl : Base
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -149,16 +149,16 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private bool disposed = false;
 
-        public CBase()
+        public Base()
             : this(null)
         {
         }
 
-        public CBase(object bar)
+        public Base(object bar)
         {
             this.M = bar;
         }
@@ -188,7 +188,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : CBase
+    public class C : Base
     {
         public C(int no)
             : this(no.ToString())
@@ -222,17 +222,17 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private readonly object bar;
         private bool disposed = false;
 
-        public CBase()
+        public Base()
             : this(null)
         {
         }
 
-        public CBase(object bar)
+        public Base(object bar)
         {
             this.bar = bar;
         }
@@ -262,7 +262,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : CBase
+    public class C : Base
     {
         public C(int no)
             : this(no.ToString())
@@ -296,19 +296,19 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private static IDisposable Empty = new Disposable();
 
         private readonly object bar;
         private bool disposed = false;
 
-        public CBase(string text)
+        public Base(string text)
         {
             this.bar = Empty;
         }
 
-        public CBase(object bar)
+        public Base(object bar)
         {
             this.bar = bar;
         }
@@ -338,7 +338,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : CBase
+    public class C : Base
     {
         public C(string fileName)
             : base(File.OpenRead(fileName))

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -15,7 +15,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -46,7 +46,7 @@ namespace N
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -68,7 +68,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -99,7 +99,7 @@ namespace N
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -128,7 +128,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -159,7 +159,7 @@ namespace N
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;

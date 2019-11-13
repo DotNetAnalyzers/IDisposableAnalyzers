@@ -240,7 +240,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -270,7 +270,7 @@ namespace N
                 var testCode = @"
 namespace N
 {
-    public class C : CBase
+    public class C : Base
     {
         protected override void Dispose(bool disposing)
         {
@@ -290,7 +290,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -320,7 +320,7 @@ namespace N
                 var testCode = @"
 namespace N
 {
-    public class C : CBase
+    public class C : Base
     {
         private bool disposed;
 
@@ -348,7 +348,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -380,7 +380,7 @@ namespace N
 {
     using System;
 
-    public class C : CBase
+    public class C : Base
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;

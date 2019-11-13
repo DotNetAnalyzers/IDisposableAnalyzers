@@ -27,7 +27,7 @@ namespace N
         [Test]
         public static void RealisticExtensionMethodClass()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -143,79 +143,79 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void VoidMethodReturn()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
     {
         public void M()
         {
-            Meh();
+            M1();
         }
 
-        private static void Meh()
+        private static void M1()
         {
             return;
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MethodReturningObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
     {
         public void M()
         {
-            Meh();
+            M1();
         }
 
-        private static object Meh()
+        private static object M1()
         {
             return new object();
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MethodReturningDynamic()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
     {
         public void M()
         {
-            Meh();
+            M1();
         }
 
-        private static dynamic Meh()
+        private static dynamic M1()
         {
             return new object();
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void GenericClassMethodReturningDynamicSubtract()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C<T>
@@ -226,13 +226,13 @@ namespace N
         private dynamic Meh() => (dynamic)item1 - (dynamic)item2; //Supersnyggt
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void GenericClassPropertyReturningDynamicSubtract()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C<T>
@@ -243,7 +243,7 @@ namespace N
         private dynamic Meh => (dynamic)item1 - (dynamic)item2; //Supersnyggt
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -271,7 +271,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -283,13 +283,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, chunkCode, testCode);
+            RoslynAssert.Valid(Analyzer, chunkCode, code);
         }
 
         [Test]
         public static void MethodReturningFieldAsObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -304,13 +304,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]
         public static void MethodReturningFieldIndexerAsObject()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -325,7 +325,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
 
         [Test]

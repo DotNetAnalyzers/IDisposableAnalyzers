@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -12,9 +12,9 @@ namespace IDisposableAnalyzers.Test.Helpers
             [TestCase("1", false)]
             [TestCase("null", false)]
             [TestCase("\"abc\"", false)]
-            public static void ShortCircuit(string code, bool expected)
+            public static void ShortCircuit(string expression, bool expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     internal class C
@@ -24,18 +24,18 @@ namespace N
             var value = PLACEHOLDER;
         }
     }
-}".AssertReplace("PLACEHOLDER", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+}".AssertReplace("PLACEHOLDER", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, null, CancellationToken.None));
             }
 
             [TestCase("new string(' ', 1)", false)]
             [TestCase("new System.Text.StringBuilder()", false)]
             [TestCase("new System.IO.MemoryStream()", true)]
-            public static void ObjectCreation(string code, bool expected)
+            public static void ObjectCreation(string expression, bool expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     internal class C
@@ -45,11 +45,11 @@ namespace N
             var value = PLACEHOLDER;
         }
     }
-}".AssertReplace("PLACEHOLDER", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("PLACEHOLDER", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, semanticModel, CancellationToken.None));
             }
         }

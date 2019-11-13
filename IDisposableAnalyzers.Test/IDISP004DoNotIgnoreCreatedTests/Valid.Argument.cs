@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -114,12 +114,12 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private readonly IDisposable disposable;
         private bool disposed;
 
-        protected CBase(IDisposable disposable)
+        protected Base(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -148,7 +148,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : CBase
+    public sealed class C : Base
     {
         private bool disposed;
 
@@ -190,12 +190,12 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private readonly object disposable;
         private bool disposed;
 
-        protected CBase(IDisposable disposable)
+        protected Base(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -230,7 +230,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : CBase
+    public sealed class C : Base
     {
         private bool disposed;
 

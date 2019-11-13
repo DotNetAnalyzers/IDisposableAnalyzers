@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Linq;
     using System.Threading;
@@ -633,11 +633,11 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase
+    internal class Base
     {
         protected int value = 1;
 
-        internal CBase()
+        internal Base()
         {
             var temp1 = this.value;
             this.value = 2;
@@ -645,7 +645,7 @@ namespace N
         }
     }
 
-    internal class C : CBase
+    internal class C : Base
     {
         internal void M(int arg)
         {
@@ -679,11 +679,11 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase
+    internal class Base
     {
         protected int value = 1;
 
-        internal CBase()
+        internal Base()
         {
             var temp1 = this.value;
             this.value = 2;
@@ -691,7 +691,7 @@ namespace N
         }
     }
 
-    internal class C : CBase
+    internal class C : Base
     {
         internal C()
         {
@@ -729,22 +729,22 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase
+    internal class Base
     {
         protected int value = 1;
 
-        internal CBase()
+        internal Base()
         {
             this.value = 2;
         }
 
-        internal CBase(int value)
+        internal Base(int value)
         {
             this.value = value;
         }
     }
 
-    internal class C : CBase
+    internal class C : Base
     {
         internal C()
         {
@@ -776,22 +776,22 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase
+    internal class Base
     {
         protected int value = 1;
 
-        public CBase()
+        public Base()
         {
             this.value = -1;
         }
 
-        public CBase(int value)
+        public Base(int value)
         {
             this.value = value;
         }
     }
 
-    internal class C : CBase
+    internal class C : Base
     {
         internal C()
             : base(2)
@@ -823,17 +823,17 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase<T>
+    internal class Base<T>
     {
         protected readonly T value;
 
-        internal CBase()
+        internal Base()
         {
             this.value = default(T);
         }
     }
 
-    internal class C : CBase<int>
+    internal class C : Base<int>
     {
         internal C()
         {
@@ -857,9 +857,9 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    public abstract class CBase<T>
+    public abstract class Base<T>
     {
-        protected CBase()
+        protected Base()
         {
             this.Value = default(T);
         }
@@ -867,7 +867,7 @@ namespace N
         public abstract T Value { get; set; }
     }
 
-    public class C : CBase<int>
+    public class C : Base<int>
     {
         public C()
         {
@@ -894,22 +894,22 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase<T>
+    internal class Base<T>
     {
         protected readonly T value;
 
-        internal CBase()
+        internal Base()
         {
             this.value = default(T);
         }
 
-        internal CBase(T value)
+        internal Base(T value)
         {
             this.value = value;
         }
     }
 
-    internal class C : CBase<int>
+    internal class C : Base<int>
     {
         internal C()
         {
@@ -939,22 +939,22 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
-    internal class CBase<T>
+    internal class Base<T>
     {
         protected readonly T value;
 
-        internal CBase()
+        internal Base()
         {
             this.value = default(T);
         }
 
-        internal CBase(T value)
+        internal Base(T value)
         {
             this.value = value;
         }
     }
 
-    internal class C<T> : CBase<T>
+    internal class C<T> : Base<T>
     {
         internal C()
         {

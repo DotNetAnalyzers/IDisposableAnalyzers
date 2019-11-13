@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -210,7 +210,7 @@ namespace N
                 var baseCode = @"
 namespace N
 {
-    public abstract class CBase
+    public abstract class Base
     {
         public virtual int Value1 { get; protected set; }
 
@@ -225,7 +225,7 @@ namespace N
 {
     using System;
 
-    public class C : CBase, ↓IDisposable
+    public class C : Base, ↓IDisposable
     {
         public override int Value1 { get; protected set; }
 
@@ -240,7 +240,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : CBase, IDisposable
+    public sealed class C : Base, IDisposable
     {
         private bool disposed;
 

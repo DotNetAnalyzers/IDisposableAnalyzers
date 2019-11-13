@@ -339,7 +339,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         public abstract Stream Stream { get; }
         
@@ -356,7 +356,7 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class C : CBase
+    public sealed class C : Base
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
     }
@@ -374,7 +374,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private bool disposed;
 
@@ -407,7 +407,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C : CBase
+    public sealed class C : Base
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
 
@@ -780,7 +780,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -809,7 +809,7 @@ namespace N
             var testCode = @"
 namespace N
 {
-    public class C : CBase
+    public class C : Base
     {
         protected override void Dispose(bool disposing)
         {

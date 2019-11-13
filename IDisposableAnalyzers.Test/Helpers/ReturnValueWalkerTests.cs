@@ -1,4 +1,4 @@
-#pragma warning disable GU0073 // Member of non-public type should be internal.
+﻿#pragma warning disable GU0073 // Member of non-public type should be internal.
 namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Linq;
@@ -50,7 +50,7 @@ internal class C
         [TestCase("this.CalculatedReturningFieldExpressionBody", ReturnValueSearch.TopLevel, "this.value")]
         [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.Recursive, "this.value")]
         [TestCase("this.CalculatedReturningFieldStatementBody", ReturnValueSearch.TopLevel, "this.value")]
-        public static void Property(string code, ReturnValueSearch search, string expected)
+        public static void Property(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -86,11 +86,11 @@ namespace N
             }
         }
     }
-}".AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {code}");
+}".AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
@@ -110,7 +110,7 @@ namespace N
         [TestCase("this.RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
         [TestCase("RecursiveStatementBody", ReturnValueSearch.Recursive, "")]
         [TestCase("RecursiveStatementBody", ReturnValueSearch.TopLevel, "this.RecursiveStatementBody")]
-        public static void PropertyRecursive(string code, ReturnValueSearch search, string expected)
+        public static void PropertyRecursive(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -142,11 +142,11 @@ namespace N
             }
         }
     }
-}".AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {code}");
+}".AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
@@ -185,7 +185,7 @@ namespace N
         [TestCase("ReturningFileOpenRead()", ReturnValueSearch.TopLevel, "System.IO.File.OpenRead(string.Empty)")]
         [TestCase("ReturningLocalFileOpenRead()", ReturnValueSearch.Recursive, "System.IO.File.OpenRead(string.Empty)")]
         [TestCase("ReturningLocalFileOpenRead()", ReturnValueSearch.TopLevel, "stream")]
-        public static void Call(string code, ReturnValueSearch search, string expected)
+        public static void Call(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -284,11 +284,11 @@ namespace N
             return stream;
         }
     }
-}".AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {code}");
+}".AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
@@ -314,7 +314,7 @@ namespace N
         [TestCase("RecursiveWithOptional(1, new[] { 1, 2 })", ReturnValueSearch.TopLevel, "RecursiveWithOptional(arg, new[] { arg }), 1")]
         [TestCase("Flatten(null, null)", ReturnValueSearch.TopLevel, "null")]
         [TestCase("Flatten(null, null)", ReturnValueSearch.Recursive, "null, new List<IDisposable>()")]
-        public static void CallRecursive(string code, ReturnValueSearch search, string expected)
+        public static void CallRecursive(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -376,11 +376,11 @@ namespace N
             return result;
         }
     }
-}".AssertReplace("var temp = Recursive()", $"var temp = {code}");
+}".AssertReplace("var temp = Recursive()", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
@@ -443,7 +443,7 @@ namespace N
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return x; }", ReturnValueSearch.TopLevel, "1, x")]
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.Recursive, "1, 2")]
         [TestCase("Func<int,int> temp = x => { if (true) return 1; return 2; }", ReturnValueSearch.TopLevel, "1, 2")]
-        public static void Lambda(string code, ReturnValueSearch search, string expected)
+        public static void Lambda(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -462,11 +462,11 @@ namespace N
             return 1;
         }
     }
-}".AssertReplace("Func<int> temp = () => 1", code);
+}".AssertReplace("Func<int> temp = () => 1", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", returnValues);
@@ -524,7 +524,7 @@ namespace N
         [TestCase("await Task.FromResult(CreateInt())", ReturnValueSearch.TopLevel, "CreateInt()")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.Recursive, "1")]
         [TestCase("await Task.FromResult(CreateInt()).ConfigureAwait(false)", ReturnValueSearch.TopLevel, "CreateInt()")]
-        public static void AsyncAwait(string code, ReturnValueSearch search, string expected)
+        public static void AsyncAwait(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -587,12 +587,12 @@ namespace N
             }
         }
     }
-}".AssertReplace("var value = await CreateStringAsync()", $"var value = {code}");
+}".AssertReplace("var value = await CreateStringAsync()", $"var value = {expression}");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual(expected, string.Join(", ", returnValues));
@@ -607,7 +607,7 @@ namespace N
         [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.TopLevel, "await RecursiveAsync2(value)")]
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Recursive, "")]
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.TopLevel, "RecursiveAsync4(value)")]
-        public static void AsyncAwaitRecursive(string code, ReturnValueSearch search, string expected)
+        public static void AsyncAwaitRecursive(string expression, ReturnValueSearch search, string expected)
         {
             var testCode = @"
 namespace N
@@ -653,12 +653,12 @@ namespace N
             return await RecursiveAsync3(value);
         }
     }
-}".AssertReplace("var value = await RecursiveAsync()", $"var value = {code}");
+}".AssertReplace("var value = await RecursiveAsync()", $"var value = {expression}");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
             {
                 Assert.AreEqual(expected, string.Join(", ", returnValues));

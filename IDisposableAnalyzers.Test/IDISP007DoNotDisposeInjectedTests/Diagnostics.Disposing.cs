@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -207,7 +207,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private bool disposed;
 
@@ -458,16 +458,16 @@ namespace N
 {
     using System;
 
-    public class CBase : IDisposable
+    public class Base : IDisposable
     {
         private bool disposed = false;
 
-        public CBase()
+        public Base()
             : this(null)
         {
         }
 
-        public CBase(object bar)
+        public Base(object bar)
         {
             this.M = bar;
         }
@@ -497,7 +497,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : CBase
+    public class C : Base
     {
         public C(Stream stream)
             : base(stream)

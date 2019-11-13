@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
+﻿namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -32,7 +32,7 @@ namespace N
 {
     using System;
 
-    public abstract class CBase : IDisposable
+    public abstract class Base : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -61,7 +61,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class C : CBase
+    public class C : Base
     {
         protected override void ↓Dispose(bool disposing)
         {
@@ -72,7 +72,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class C : CBase
+    public class C : Base
     {
         protected override void Dispose(bool disposing)
         {

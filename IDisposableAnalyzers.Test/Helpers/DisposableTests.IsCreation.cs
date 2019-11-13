@@ -1,4 +1,4 @@
-#pragma warning disable GU0073 // Member of non-public type should be internal.
+﻿#pragma warning disable GU0073 // Member of non-public type should be internal.
 namespace IDisposableAnalyzers.Test.Helpers
 {
     using System.Linq;
@@ -24,9 +24,9 @@ namespace IDisposableAnalyzers.Test.Helpers
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.Yes)]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.Yes)]
-            public static void LanguageConstructs(string code, Result expected)
+            public static void LanguageConstructs(string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -45,12 +45,12 @@ namespace N
             var value = new Disposable();
         }
     }
-}".AssertReplace("new Disposable()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("new Disposable()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
                 Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -63,9 +63,9 @@ namespace N
             [TestCase("new List<IDisposable>()[0]",                       Result.No)]
             [TestCase("Moq.Mock.Of<IDisposable>()",                       Result.AssumeNo)]
             [TestCase("ImmutableList<IDisposable>.Empty[0]",              Result.No)]
-            public static void Ignored(string code, Result expected)
+            public static void Ignored(string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -89,12 +89,12 @@ namespace N
             var value = new Disposable();
         }
     }
-}".AssertReplace("new Disposable()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("new Disposable()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(expression)
                                       .Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
@@ -110,9 +110,9 @@ namespace N
             [TestCase("CreateIntId()")]
             [TestCase("CreateIntSquare()")]
             [TestCase("Id<int>()")]
-            public static void MethodReturningNotDisposable(string code)
+            public static void MethodReturningNotDisposable(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -160,12 +160,12 @@ namespace N
 
         internal T Id<T>(T arg) => arg;
     }
-}".AssertReplace("// Meh()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("// Meh()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation(code);
+                var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -181,9 +181,9 @@ namespace N
             [TestCase("CreateDisposableInIf(true)",                       Result.Yes)]
             [TestCase("CreateDisposableInElse(true)",                     Result.Yes)]
             [TestCase("ReturningLocal()",                                 Result.Yes)]
-            public static void Call(string code, Result expected)
+            public static void Call(string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -254,12 +254,12 @@ namespace N
             return stream;
         }
     }
-}".AssertReplace("// Meh()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("// Meh()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation(code);
+                var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -269,9 +269,9 @@ namespace N
             [TestCase("RecursiveTernary(true)",          Result.Yes)]
             [TestCase("this.RecursiveExpressionBody()",  Result.No)]
             [TestCase("this.RecursiveStatementBody()",   Result.No)]
-            public static void CallRecursiveMethod(string code, Result expected)
+            public static void CallRecursiveMethod(string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -309,19 +309,19 @@ namespace N
 
         private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
     }
-}".AssertReplace("// Meh()", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("// Meh()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation(code);
+                var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
             [Test]
             public static void RecursiveWithOptionalParameter()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -346,7 +346,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -363,9 +363,9 @@ namespace N
             [TestCase("await Task.Run(() => new Disposable())",    Result.Yes)]
             [TestCase("await Task.FromResult(new Disposable())",   Result.Yes)]
             [TestCase("await CreateDisposableAsync()",             Result.Yes)]
-            public static void AsyncAwait(string code, Result expected)
+            public static void AsyncAwait(string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -398,13 +398,13 @@ namespace N
             return new Disposable();
         }
     }
-}".AssertReplace("// Meh()", code);
+}".AssertReplace("// Meh()", expression);
 
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
+                var value = syntaxTree.FindEqualsValueClause(expression)
                                       .Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
@@ -412,7 +412,7 @@ namespace N
             [Test]
             public static void CompositeDisposableExtAddAndReturn()
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -448,7 +448,7 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -475,7 +475,7 @@ namespace BinaryReference
     {
     }
 }";
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -489,7 +489,7 @@ namespace N
         }
     }
 }".AssertReplace("disposable.AsCustom()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var references = MetadataReferences.FromAttributes()
                                                    .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
@@ -514,7 +514,7 @@ namespace BinaryReference
     }
 }";
 
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -528,7 +528,7 @@ namespace N
         }
     }
 }".AssertReplace("disposable.Fluent()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var references = MetadataReferences.FromAttributes()
                                                    .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
@@ -553,9 +553,9 @@ namespace N
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null, null)",                  Result.No)]
             [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetResourceSet(null, true, true)",       Result.No)]
             [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",              Result.No)]
-            public static void ThirdParty(string parameter, string code, Result expected)
+            public static void ThirdParty(string parameter, string expression, Result expected)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     using System;
@@ -569,12 +569,12 @@ namespace N
         }
     }
 }".AssertReplace("int value", parameter)
-  .AssertReplace("value", code);
+  .AssertReplace("value", expression);
 
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(code);
+                var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
                 Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
