@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
+namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;

@@ -1,11 +1,11 @@
-#pragma warning disable SA1203 // Constants must appear before fields
-namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
+﻿#pragma warning disable SA1203 // Constants must appear before fields
+namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class ValidCode
+    public static partial class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 

@@ -1,9 +1,9 @@
-namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
+namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class ValidCode
+    public partial class Valid
     {
         public static class Rx
         {
