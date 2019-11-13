@@ -32,15 +32,11 @@ namespace IDisposableAnalyzers
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is IMethodSymbol method &&
-                context.Node is MethodDeclarationSyntax methodDeclaration &&
-                method.Name == "Dispose" &&
-                method.ReturnsVoid)
+                context.ContainingSymbol is IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method &&
+                context.Node is MethodDeclarationSyntax methodDeclaration)
             {
                 if (method.Parameters.Length == 0 &&
-                    !method.IsStatic &&
                     method.DeclaredAccessibility == Accessibility.Public &&
-                    method.ReturnsVoid &&
                     method.OverriddenMethod == null &&
                     method.GetAttributes().Length == 0)
                 {

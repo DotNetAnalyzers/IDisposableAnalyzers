@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -57,10 +57,9 @@ namespace IDisposableAnalyzers
 
         private static bool IsReassignedWithCreated(AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
         {
-            if (assignment.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
-                accessor.IsKind(SyntaxKind.SetAccessorDeclaration) &&
-                assignment.Right is IdentifierNameSyntax assignedIdentifier &&
-                assignedIdentifier.Identifier.ValueText == "value")
+            if (assignment.Right is IdentifierNameSyntax { Identifier: { ValueText: "value" } } &&
+                assignment.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
+                accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
                 return false;
             }
