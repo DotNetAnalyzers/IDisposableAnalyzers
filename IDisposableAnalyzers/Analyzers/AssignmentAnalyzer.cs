@@ -28,12 +28,12 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is AssignmentExpressionSyntax assignment &&
-                !assignment.Left.IsKind(SyntaxKind.ElementAccessExpression) &&
-                context.SemanticModel.TryGetSymbol(assignment.Left, context.CancellationToken, out ISymbol assignedSymbol))
+                context.Node is AssignmentExpressionSyntax { Left: { } left, Right: { } right } assignment &&
+                !left.IsKind(SyntaxKind.ElementAccessExpression) &&
+                context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out var assignedSymbol))
             {
                 if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&
-                    Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    Disposable.IsCreation(right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, assignment.GetLocation()));
@@ -44,10 +44,9 @@
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning, assignment.GetLocation()));
                 }
 
-                if (assignedSymbol is IParameterSymbol assignedParameter &&
-                    assignedParameter.ContainingSymbol.DeclaredAccessibility != Accessibility.Private &&
-                    assignedParameter.RefKind == RefKind.Ref &&
-                    context.SemanticModel.TryGetType(assignment.Right, context.CancellationToken, out var type) &&
+                if (assignedSymbol is IParameterSymbol { RefKind: RefKind.Ref } refParameter &&
+                    refParameter.ContainingSymbol.DeclaredAccessibility != Accessibility.Private &&
+                    context.SemanticModel.TryGetType(right, context.CancellationToken, out var type) &&
                     Disposable.IsAssignableFrom(type, context.Compilation))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
@@ -108,8 +107,7 @@
                     using (var walker = VariableDeclaratorWalker.Borrow(memberDeclaration))
                     {
                         return walker.VariableDeclarators.TrySingle(
-                                   x => context.SemanticModel.TryGetSymbol(
-                                            x.Initializer?.Value, context.CancellationToken, out ISymbol symbol) &&
+                                   x => context.SemanticModel.TryGetSymbol(x.Initializer?.Value, context.CancellationToken, out var symbol) &&
                                         symbol.Equals(assignedSymbol),
                                    out var match) &&
                                match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
@@ -141,7 +139,8 @@
 
                         break;
 
-                    case BinaryExpressionSyntax binary when binary.IsKind(SyntaxKind.EqualsExpression):
+                    case BinaryExpressionSyntax binary
+                        when binary.IsKind(SyntaxKind.EqualsExpression):
                         if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
                             IsSymbol(binary.Right))
                         {

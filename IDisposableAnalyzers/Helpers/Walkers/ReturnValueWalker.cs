@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections;
@@ -111,20 +111,17 @@ namespace IDisposableAnalyzers
                 return;
             }
 
-            if (node is LocalFunctionStatementSyntax local)
+            switch (node)
             {
-                if (local.ExpressionBody is ArrowExpressionClauseSyntax arrowExpressionClause)
-                {
-                    this.AddReturnValue(arrowExpressionClause.Expression);
-                }
-                else
-                {
-                    this.Visit(local.Body);
-                }
-            }
-            else
-            {
-                this.Visit(node);
+                case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
+                    this.AddReturnValue(expression);
+                    break;
+                case LocalFunctionStatementSyntax { Body: { } body }:
+                    this.Visit(body);
+                    break;
+                default:
+                    this.Visit(node);
+                    break;
             }
         }
 
@@ -338,11 +335,13 @@ namespace IDisposableAnalyzers
                         this.AddReturnValue(ternary.WhenTrue);
                         this.AddReturnValue(ternary.WhenFalse);
                         break;
-                    case BinaryExpressionSyntax coalesce when coalesce.IsKind(SyntaxKind.CoalesceExpression):
+                    case BinaryExpressionSyntax coalesce
+                        when coalesce.IsKind(SyntaxKind.CoalesceExpression):
                         this.AddReturnValue(coalesce.Left);
                         this.AddReturnValue(coalesce.Right);
                         break;
-                    case IdentifierNameSyntax identifierName when this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken).IsEither<ILocalSymbol, IParameterSymbol>():
+                    case IdentifierNameSyntax identifierName
+                        when this.semanticModel.GetSymbolSafe(identifierName, this.cancellationToken).IsEither<ILocalSymbol, IParameterSymbol>():
                         if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
                         {
                             this.returnValues.Add(value);
@@ -364,7 +363,8 @@ namespace IDisposableAnalyzers
                         }
 
                         break;
-                    case ExpressionSyntax expression when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
+                    case { } expression
+                        when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
                         if (!this.TryHandlePropertyGet(value, out var property) &&
                             property != null &&
                             property.DeclaringSyntaxReferences.Length == 0)

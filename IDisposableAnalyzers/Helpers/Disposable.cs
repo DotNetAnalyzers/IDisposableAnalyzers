@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -9,22 +9,17 @@ namespace IDisposableAnalyzers
     {
         internal static bool IsPotentiallyAssignableFrom(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate == null ||
-                candidate.IsMissing ||
-                candidate is LiteralExpressionSyntax)
+            switch (candidate)
             {
-                return false;
-            }
-
-            if (candidate is ObjectCreationExpressionSyntax objectCreation)
-            {
-                return semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
-                       IsAssignableFrom(type, semanticModel.Compilation);
-            }
-            else
-            {
-                return semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
-                       IsPotentiallyAssignableFrom(type, semanticModel.Compilation);
+                case { IsMissing: true }:
+                case LiteralExpressionSyntax _:
+                    return false;
+                case ObjectCreationExpressionSyntax objectCreation:
+                    return semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+                           IsAssignableFrom(type, semanticModel.Compilation);
+                default:
+                    return semanticModel.TryGetType(candidate, cancellationToken, out type) &&
+                           IsPotentiallyAssignableFrom(type, semanticModel.Compilation);
             }
         }
 
@@ -70,7 +65,7 @@ namespace IDisposableAnalyzers
 
         internal static bool IsNop(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol) &&
+            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out var symbol) &&
                 FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
                 fieldOrProperty.IsStatic &&
                 IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
@@ -103,13 +98,11 @@ namespace IDisposableAnalyzers
 
             bool IsNop(ITypeSymbol type)
             {
-                return type.IsSealed &&
-                       type.BaseType == KnownSymbol.Object &&
+                return type is { IsSealed: true, BaseType: { SpecialType: SpecialType.System_Object } } &&
                        type.TryFindSingleMethod("Dispose", out var disposeMethod) &&
                        disposeMethod.Parameters.Length == 0 &&
                        disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration) &&
-                       declaration.Body is BlockSyntax body &&
-                       body.Statements.Count == 0;
+                       declaration is { Body: { Statements: { Count: 0 } }, ExpressionBody: null };
             }
         }
     }

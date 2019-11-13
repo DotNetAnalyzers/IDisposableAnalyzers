@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -24,35 +24,29 @@ namespace IDisposableAnalyzers
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
+            if (!context.IsExcludedFromAnalysis() &&
+                context.Node is UsingStatementSyntax usingStatement)
             {
-                return;
-            }
-
-            if (context.Node is UsingStatementSyntax usingStatement)
-            {
-                if (usingStatement.Declaration is VariableDeclarationSyntax variableDeclaration)
+                switch (usingStatement)
                 {
-                    foreach (var variableDeclarator in variableDeclaration.Variables)
-                    {
-                        if (variableDeclarator.Initializer == null)
+                    case { Declaration: { Variables: { } variables } }:
+                        foreach (var declarator in variables)
                         {
-                            continue;
+                            if (declarator is { Initializer: { Value: { } value } } &&
+                                Disposable.IsCachedOrInjectedOnly(value, value, context.SemanticModel, context.CancellationToken))
+                            {
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, value.GetLocation()));
+                            }
                         }
 
-                        var value = variableDeclarator.Initializer.Value;
-                        if (Disposable.IsCachedOrInjectedOnly(value, value, context.SemanticModel, context.CancellationToken))
+                        break;
+                    case { Expression: { } expression }:
+                        if (Disposable.IsCachedOrInjectedOnly(expression, expression, context.SemanticModel, context.CancellationToken))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, value.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, usingStatement.Expression.GetLocation()));
                         }
-                    }
-                }
-                else if (usingStatement.Expression is ExpressionSyntax expression)
-                {
-                    if (Disposable.IsCachedOrInjectedOnly(expression, expression, context.SemanticModel, context.CancellationToken))
-                    {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, usingStatement.Expression.GetLocation()));
-                    }
+
+                        break;
                 }
             }
         }

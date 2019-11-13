@@ -168,7 +168,7 @@
             result = null;
             return false;
 
-            bool IsReturn(StatementSyntax statement)
+            static bool IsReturn(StatementSyntax statement)
             {
                 return statement switch
                 {

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Linq;
@@ -95,7 +95,7 @@ namespace IDisposableAnalyzers
                             {
                                 case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
                                     when right == candidate &&
-                                            semanticModel.TryGetSymbol(left, cancellationToken, out ISymbol assignedSymbol) &&
+                                            semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
                                             FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
@@ -209,8 +209,7 @@ namespace IDisposableAnalyzers
                         : Result.AssumeYes;
                 }
 
-                if (method.IsExtensionMethod &&
-                    method.ReducedFrom is IMethodSymbol reducedFrom &&
+                if (method is { IsExtensionMethod: true, ReducedFrom: { } reducedFrom } &&
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
                     return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;

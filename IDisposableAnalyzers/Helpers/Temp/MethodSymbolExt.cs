@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers
         {
             if (method.IsExtensionMethod)
             {
-                if (method.ReducedFrom is IMethodSymbol reduced)
+                if (method.ReducedFrom is { } reduced)
                 {
                     return reduced.Parameters.TryFirst(out parameter);
                 }

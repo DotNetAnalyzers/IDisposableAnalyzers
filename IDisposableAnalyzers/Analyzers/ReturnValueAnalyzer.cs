@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -33,8 +33,7 @@ namespace IDisposableAnalyzers
         {
             if (!context.IsExcludedFromAnalysis() &&
                 !IsIgnored(context.ContainingSymbol) &&
-                context.Node is ReturnStatementSyntax returnStatement &&
-                returnStatement.Expression is ExpressionSyntax expression)
+                context.Node is ReturnStatementSyntax { Expression: { } expression })
             {
                 HandleReturnValue(context, expression);
             }
@@ -44,8 +43,7 @@ namespace IDisposableAnalyzers
         {
             if (!context.IsExcludedFromAnalysis() &&
                 !IsIgnored(context.ContainingSymbol) &&
-                context.Node is ArrowExpressionClauseSyntax arrowExpressionClause &&
-                arrowExpressionClause.Expression is ExpressionSyntax expression)
+                context.Node is ArrowExpressionClauseSyntax { Expression: { } expression })
             {
                 HandleReturnValue(context, expression);
             }
@@ -65,7 +63,7 @@ namespace IDisposableAnalyzers
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) == Result.Yes &&
-                context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out ISymbol returnedSymbol))
+                context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out var returnedSymbol))
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||
                     Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
@@ -74,14 +72,13 @@ namespace IDisposableAnalyzers
                 }
                 else
                 {
-                    if (returnValue.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
+                    if (returnValue.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
                         accessor.IsKind(SyntaxKind.GetAccessorDeclaration))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated, returnValue.GetLocation()));
                     }
 
-                    if (returnValue.FirstAncestor<ArrowExpressionClauseSyntax>() is ArrowExpressionClauseSyntax arrow &&
-                        arrow.Parent is PropertyDeclarationSyntax)
+                    if (returnValue.FirstAncestor<ArrowExpressionClauseSyntax>() is { Parent: PropertyDeclarationSyntax _ })
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated, returnValue.GetLocation()));
                     }
@@ -92,16 +89,16 @@ namespace IDisposableAnalyzers
                     }
                 }
             }
-            else if (returnValue is InvocationExpressionSyntax invocation &&
-                     invocation.ArgumentList is ArgumentListSyntax argumentList)
+            else if (returnValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } invocation)
             {
-                foreach (var argument in argumentList.Arguments)
+                foreach (var argument in arguments)
                 {
-                    if (Disposable.IsCreation(argument.Expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol argumentSymbol))
+                    if (argument is { Expression: { } expression } &&
+                        Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                        context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out var argumentSymbol))
                     {
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
-                            Disposable.IsDisposedBefore(argumentSymbol, argument.Expression, context.SemanticModel, context.CancellationToken))
+                            Disposable.IsDisposedBefore(argumentSymbol, expression, context.SemanticModel, context.CancellationToken))
                         {
                             if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken, null))
                             {

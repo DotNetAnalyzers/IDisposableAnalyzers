@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections;
@@ -62,13 +62,12 @@ namespace IDisposableAnalyzers
         {
             if (node.Initializer == null &&
                 this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                ctor.ContainingType is INamedTypeSymbol containingType &&
-                containingType.BaseType is INamedTypeSymbol baseType &&
+                ctor.ContainingType is { BaseType: { } baseType } &&
                 Constructor.TryFindDefault(baseType, Search.Recursive, out var baseCtor))
             {
                 this.HandleInvoke(baseCtor, null);
             }
-            else if (node.Initializer is ConstructorInitializerSyntax initializer &&
+            else if (node.Initializer is { } initializer &&
                      this.semanticModel.TryGetSymbol(initializer, this.cancellationToken, out var chained))
             {
                 this.HandleInvoke(chained, node.Initializer.ArgumentList);
@@ -111,7 +110,7 @@ namespace IDisposableAnalyzers
                 if (this.context.Node is ElementAccessExpressionSyntax &&
                     method.Name == "Add" &&
                     MemberPath.TrySingle(node, out var member) &&
-                    this.semanticModel.TryGetSymbol(member, this.cancellationToken, out ISymbol memberSymbol) &&
+                    this.semanticModel.TryGetSymbol(member, this.cancellationToken, out var memberSymbol) &&
                     memberSymbol.Equals(this.CurrentSymbol))
                 {
                     if (method.Parameters.TrySingle(out var parameter) &&
@@ -136,7 +135,7 @@ namespace IDisposableAnalyzers
         {
             if (node.Parent is AssignmentExpressionSyntax assignment &&
                 this.context.Node is ElementAccessExpressionSyntax &&
-                this.semanticModel.TryGetSymbol(node.Expression, this.cancellationToken, out ISymbol symbol) &&
+                this.semanticModel.TryGetSymbol(node.Expression, this.cancellationToken, out var symbol) &&
                 symbol.Equals(this.CurrentSymbol))
             {
                 this.values.Add(assignment.Right);
@@ -190,7 +189,7 @@ namespace IDisposableAnalyzers
                 return BorrowCore(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
             }
 
-            if (semanticModel.TryGetSymbol(value, cancellationToken, out ISymbol symbol))
+            if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
                 return BorrowCore(symbol, value, semanticModel, cancellationToken);
             }
@@ -320,7 +319,7 @@ namespace IDisposableAnalyzers
                 bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol parameter)
                 {
                     parameter = null;
-                    if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out ISymbol candidate))
+                    if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out var candidate))
                     {
                         if (candidate.Equals(this.CurrentSymbol) ||
                             this.refParameters.Contains(candidate as IParameterSymbol) ||
@@ -448,8 +447,8 @@ namespace IDisposableAnalyzers
                         if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                         {
                             this.Visit(contextCtor);
-                            if (contextCtor.ParameterList is ParameterListSyntax parameterList &&
-                                parameterList.Parameters.Any())
+                            if (contextCtor.ParameterList is { Parameters: { } parameters } parameterList &&
+                                parameters.Any())
                             {
                                 foreach (var creation in ctorWalker.ObjectCreations)
                                 {
@@ -708,7 +707,7 @@ namespace IDisposableAnalyzers
 
             internal bool ShouldVisit(SyntaxNode node)
             {
-                if (this.stopAt is StatementSyntax stopAtStatement &&
+                if (this.stopAt is { } stopAtStatement &&
                     node is StatementSyntax statement)
                 {
                     return statement.IsExecutedBefore(stopAtStatement) != ExecutedBefore.No;
@@ -825,7 +824,7 @@ namespace IDisposableAnalyzers
 
             public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
             {
-                if (node.Initializer is ConstructorInitializerSyntax initializer &&
+                if (node.Initializer is { } initializer &&
                     this.inner.semanticModel.TryGetSymbol(initializer, this.inner.cancellationToken, out var chained) &&
                     Equals(chained.ContainingType, this.inner.CurrentSymbol.ContainingType))
                 {

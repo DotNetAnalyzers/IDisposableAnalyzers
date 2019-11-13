@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Linq;
@@ -48,9 +48,9 @@ namespace IDisposableAnalyzers
 
                     if (DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out var suppressFinalize))
                     {
-                        if (suppressFinalize.ArgumentList is ArgumentListSyntax argumentList &&
-                            argumentList.Arguments.TrySingle(out var argument) &&
-                            !argument.Expression.IsKind(SyntaxKind.ThisExpression))
+                        if (suppressFinalize.ArgumentList is { Arguments: { Count: 1 } arguments } &&
+                            arguments[0] is { Expression: { } expression } argument &&
+                            !expression.IsKind(SyntaxKind.ThisExpression))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP020SuppressFinalizeThis, argument.GetLocation()));
                         }
