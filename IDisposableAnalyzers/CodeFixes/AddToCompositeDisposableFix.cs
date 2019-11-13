@@ -72,8 +72,9 @@
                                     cancellationToken);
 
                                 _ = editor.ReplaceNode(
-                                    statement.Expression,
-                                    x => SyntaxFactory.AssignmentExpression(
+                                    statement,
+                                    x => x.WithExpression(
+                                        SyntaxFactory.AssignmentExpression(
                                             SyntaxKind.SimpleAssignmentExpression,
                                             disposable,
                                             SyntaxFactory.ObjectCreationExpression(
@@ -82,8 +83,8 @@
                                                 SyntaxFactory.InitializerExpression(
                                                     SyntaxKind.CollectionInitializerExpression,
                                                     SyntaxFactory.SeparatedList(
-                                                        new[] { x.WithAdditionalAnnotations(Formatter.Annotation) },
-                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, SyntaxFactory.TriviaList(SyntaxFactory.ElasticLineFeed)) })))));
+                                                        new[] { x.Expression.WithAdditionalAnnotations(Formatter.Annotation) },
+                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) }))))));
                             }
                         }
                     }
