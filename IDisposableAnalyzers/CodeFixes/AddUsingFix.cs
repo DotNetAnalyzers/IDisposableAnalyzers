@@ -40,17 +40,11 @@
                     {
                         switch (statement.Parent)
                         {
-                            case BlockSyntax block:
+                            case BlockSyntax _:
+                            case SwitchSectionSyntax _:
                                 context.RegisterCodeFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
-                                    "Add using to end of block.",
-                                    diagnostic);
-                                break;
-                            case SwitchSectionSyntax switchSection:
-                                context.RegisterCodeFix(
-                                    "Add using to end of block.",
-                                    (editor, _) => AddUsingToEndOfBlock(editor, switchSection, statement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, statement),
                                     "Add using to end of block.",
                                     diagnostic);
                                 break;
@@ -145,32 +139,18 @@
             }
         }
 
-        private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax declarationStatement)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, LocalDeclarationStatementSyntax statement)
         {
-            var statements = StatementsAfter(declarationStatement);
+            var statements = StatementsAfter(statement);
             RemoveStatements(editor, statements);
             editor.ReplaceNode(
-                declarationStatement,
+                statement,
                 SyntaxFactory.UsingStatement(
-                                 declaration: declarationStatement.Declaration.WithoutLeadingTrivia(),
+                                 declaration: statement.Declaration.WithoutLeadingTrivia(),
                                  expression: null,
                                  statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
                                                          .WithAdditionalAnnotations(Formatter.Annotation))
-                             .WithLeadingTriviaFrom(declarationStatement.Declaration));
-        }
-
-        private static void AddUsingToEndOfBlock(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax declarationStatement)
-        {
-            var statements = StatementsAfter(declarationStatement);
-            RemoveStatements(editor, statements);
-
-            editor.ReplaceNode(
-                declarationStatement,
-                SyntaxFactory.UsingStatement(
-                    declaration: declarationStatement.Declaration,
-                    expression: null,
-                    statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
-                                            .WithAdditionalAnnotations(Formatter.Annotation)));
+                             .WithLeadingTriviaFrom(statement.Declaration));
         }
 
         private static void AddUsingToEndOfBlock(DocumentEditor editor, ExpressionStatementSyntax statement)
