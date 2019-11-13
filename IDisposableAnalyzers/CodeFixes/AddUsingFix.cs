@@ -36,15 +36,28 @@
             {
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out LocalDeclarationStatementSyntax statement))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax statement))
                     {
-                        switch (statement.Parent)
+                        switch (statement)
                         {
-                            case BlockSyntax _:
-                            case SwitchSectionSyntax _:
+                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: BlockSyntax _ } localDeclarationStatement:
                                 context.RegisterCodeFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsingToEndOfBlock(editor, statement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclarationStatement),
+                                    "Add using to end of block.",
+                                    diagnostic);
+                                break;
+                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: SwitchSectionSyntax _ } localDeclarationStatement:
+                                context.RegisterCodeFix(
+                                    "Add using to end of block.",
+                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclarationStatement),
+                                    "Add using to end of block.",
+                                    diagnostic);
+                                break;
+                            case ExpressionStatementSyntax { Parent: BlockSyntax _ } expressionStatement:
+                                context.RegisterCodeFix(
+                                    "Add using to end of block.",
+                                    (editor, _) => AddUsingToEndOfBlock(editor, expressionStatement),
                                     "Add using to end of block.",
                                     diagnostic);
                                 break;
