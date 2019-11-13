@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [Test]
             public static void Struct()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -37,14 +37,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, before, after);
+                RoslynAssert.FixAll(Fix, CS0535, before, after);
             }
 
             [Test]
             public static void NestedStruct()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -57,7 +57,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -72,8 +72,8 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, before, after);
+                RoslynAssert.FixAll(Fix, CS0535, before, after);
             }
         }
     }

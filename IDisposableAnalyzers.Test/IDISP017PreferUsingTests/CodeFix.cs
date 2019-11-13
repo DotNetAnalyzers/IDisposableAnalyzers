@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
         [Test]
         public static void Local()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -30,7 +30,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -46,13 +46,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void InitializedLocalDisposeInFinally()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -74,7 +74,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -90,13 +90,13 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
 
         [Test]
         public static void AssignedInTryDisposeInFinally()
         {
-            var testCode = @"
+            var before = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -119,7 +119,7 @@ namespace RoslynSandbox
     }
 }";
 
-            var fixedCode = @"
+            var after = @"
 namespace RoslynSandbox
 {
     using System.IO;
@@ -135,7 +135,7 @@ namespace RoslynSandbox
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, testCode, fixedCode);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [Test]
             public static void AbstractClass()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -62,14 +62,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, before, after);
+                RoslynAssert.FixAll(Fix, CS0535, before, after);
             }
 
             [Test]
             public static void AbstractClassWithFields()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -148,14 +148,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, before, after);
+                RoslynAssert.FixAll(Fix, CS0535, before, after);
             }
 
             [Test]
             public static void AbstractClassWithMethods()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -180,7 +180,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -233,14 +233,14 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode);
-                RoslynAssert.FixAll(Fix, CS0535, testCode, fixedCode);
+                RoslynAssert.CodeFix(Fix, CS0535, before, after);
+                RoslynAssert.FixAll(Fix, CS0535, before, after);
             }
 
             [Test]
             public static void VirtualDispose()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -250,7 +250,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -287,7 +287,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable with virtual dispose method.");
             }
         }
     }

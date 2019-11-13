@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             [Test]
             public static void EmptyClass()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -25,7 +25,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -73,7 +73,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -83,7 +83,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -111,13 +111,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, new[] { barCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { barCode, before }, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
             public static void WithThrowIfDisposed()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -130,7 +130,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -154,13 +154,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
             public static void WithProtectedPrivateSetProperty()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -171,7 +171,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -201,7 +201,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -220,7 +220,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -235,7 +235,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -269,13 +269,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, new[] { baseCode, testCode }, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { baseCode, before }, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
             public static void WithPublicVirtualMethod()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -288,7 +288,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -320,13 +320,13 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
             public static void WithProtectedVirtualMethod()
             {
-                var testCode = @"
+                var before = @"
 namespace RoslynSandbox
 {
     using System;
@@ -339,7 +339,7 @@ namespace RoslynSandbox
     }
 }";
 
-                var fixedCode = @"
+                var after = @"
 namespace RoslynSandbox
 {
     using System;
@@ -371,7 +371,7 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, testCode, fixedCode, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable and make class sealed.");
             }
         }
     }

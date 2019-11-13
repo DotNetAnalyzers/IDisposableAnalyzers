@@ -399,11 +399,11 @@ namespace RoslynSandbox
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
-        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        [TestCase("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
         public static void Pair(string expression)
         {
-            var staticPairCode = @"
+            var staticPair = @"
 namespace RoslynSandbox
 {
     public static class StaticPair
@@ -450,9 +450,9 @@ namespace RoslynSandbox
             this.pair.Item2.Dispose();
         }
     }
-}".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
+}".AssertReplace("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, testCode);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPair, testCode);
         }
 
         [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]
