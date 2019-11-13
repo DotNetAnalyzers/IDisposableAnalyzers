@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
             [TestCase("var temp4 = this.value;", "1, 2, arg")]
-            public static void MethodInjected(string code, string expected)
+            public static void MethodInjected(string statement, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -45,7 +45,7 @@ namespace N
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);
@@ -57,7 +57,7 @@ namespace N
             [TestCase("var temp2 = this.value;", "1")]
             [TestCase("var temp3 = this.value;", "1, 2")]
             [TestCase("var temp4 = this.value;", "1, 2, arg")]
-            public static void MethodInjectedWithOptional(string code, string expected)
+            public static void MethodInjectedWithOptional(string statement, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -88,7 +88,7 @@ namespace N
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);
@@ -100,7 +100,7 @@ namespace N
             [TestCase("var temp2 = this.text;", "null")]
             [TestCase("var temp3 = this.text;", "null, \"abc\"")]
             [TestCase("var temp4 = this.text;", "null, \"abc\", textArg")]
-            public static void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
+            public static void MethodInjectedWithOptionalAssigningOptional(string statement, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -131,7 +131,7 @@ namespace N
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);

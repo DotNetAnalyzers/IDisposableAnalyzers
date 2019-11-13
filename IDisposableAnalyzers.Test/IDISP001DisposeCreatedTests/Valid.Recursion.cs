@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [Test]
         public static void IgnoresRecursiveCalculatedProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -18,11 +18,11 @@ namespace N
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
-        public void Meh()
+        public void M()
         {
             var item = RecursiveProperty;
 
-            using(var meh = RecursiveProperty)
+            using(var m = RecursiveProperty)
             {
             }
 
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void IgnoresRecursiveGetSetProperty()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -47,30 +47,30 @@ namespace N
     {
         public C()
         {
-            var temp1 = this.M;
-            this.M = new Disposable();
-            var temp2 = this.M;
+            var temp1 = this.P;
+            this.P = new Disposable();
+            var temp2 = this.P;
         }
 
-        public IDisposable M
+        public IDisposable P
         {
-            get { return this.M; }
-            set { this.M = value; }
+            get { return this.P; }
+            set { this.P = value; }
         }
 
-        public void Meh()
+        public void M()
         {
-            var temp3 = this.M;
+            var temp3 = this.P;
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void MethodStatementBody()
         {
-            var testCode = @"
+            var code = @"
     using System;
 
     public static class C
@@ -93,13 +93,13 @@ namespace N
             return Forever();
         }
     }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void MethodExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -108,9 +108,9 @@ namespace N
     {
         public IDisposable Forever() => Forever();
 
-        public void Meh()
+        public void M()
         {
-            var meh = Forever();
+            var m = Forever();
             Forever();
 
             using(var item = Forever())
@@ -123,13 +123,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void WithOptionalParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -154,7 +154,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

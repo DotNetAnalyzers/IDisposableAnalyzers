@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -46,7 +46,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             ↓stream = File.OpenRead(string.Empty);
@@ -63,7 +63,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             stream?.Dispose();
@@ -85,7 +85,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             object stream = File.OpenRead(string.Empty);
             ↓stream = File.OpenRead(string.Empty);
@@ -100,7 +100,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             object stream = File.OpenRead(string.Empty);
             (stream as System.IDisposable)?.Dispose();
@@ -122,7 +122,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             ↓stream = null;
@@ -137,7 +137,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             stream?.Dispose();
@@ -159,7 +159,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream = null;
             if (stream == null)
@@ -178,7 +178,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream = null;
             if (stream == null)
@@ -204,7 +204,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream = File.OpenRead(string.Empty);
             if (true)
@@ -227,7 +227,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream = File.OpenRead(string.Empty);
             if (true)
@@ -726,7 +726,7 @@ namespace N
     {
         private Stream stream;
 
-        public void Meh()
+        public void M()
         {
             ↓this.stream = File.OpenRead(string.Empty);
         }
@@ -743,7 +743,7 @@ namespace N
     {
         private Stream stream;
 
-        public void Meh()
+        public void M()
         {
             this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
@@ -767,7 +767,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh()
+        public IDisposable M()
         {
             return ↓this.stream = File.OpenRead(string.Empty);
         }
@@ -784,7 +784,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh()
+        public IDisposable M()
         {
             this.stream?.Dispose();
             return this.stream = File.OpenRead(string.Empty);
@@ -808,7 +808,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh() => ↓this.stream = File.OpenRead(string.Empty);
+        public IDisposable M() => ↓this.stream = File.OpenRead(string.Empty);
     }
 }";
 
@@ -822,7 +822,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh()
+        public IDisposable M()
         {
             this.stream?.Dispose();
             return this.stream = File.OpenRead(string.Empty);
@@ -953,7 +953,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh
+        public IDisposable P
         {
             get
             {
@@ -973,7 +973,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh
+        public IDisposable P
         {
             get
             {
@@ -1000,7 +1000,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh => ↓this.stream = File.OpenRead(string.Empty);
+        public IDisposable P => ↓this.stream = File.OpenRead(string.Empty);
     }
 }";
 
@@ -1014,7 +1014,7 @@ namespace N
     {
         private Stream stream;
 
-        public IDisposable Meh
+        public IDisposable P
         {
             get
             {

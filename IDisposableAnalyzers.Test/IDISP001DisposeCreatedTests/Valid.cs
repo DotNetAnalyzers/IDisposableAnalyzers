@@ -21,7 +21,7 @@ namespace N
 
     public class Disposable : IDisposable
     {
-        public Disposable(string meh)
+        public Disposable(string _)
             : this()
         {
         }
@@ -45,9 +45,9 @@ namespace N
         [TestCase("await Task.Run(() => new object())")]
         [TestCase("await Task.Run(() => Type.GetType(string.Empty))")]
         [TestCase("await Task.Run(() => this.GetType())")]
-        public static void LanguageConstructs(string code)
+        public static void LanguageConstructs(string expression)
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -61,14 +61,14 @@ namespace N
             var value = new string(' ', 1);
         }
     }
-}".AssertReplace("new string(' ', 1)", code);
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+}".AssertReplace("new string(' ', 1)", expression);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void WhenDisposingVariable()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -81,13 +81,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void UsingFileStream()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -103,7 +103,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace N
     }
 }";
 
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -138,13 +138,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode, disposableCode);
+            RoslynAssert.Valid(Analyzer, code, disposableCode);
         }
 
         [Test]
         public static void Awaiting()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -174,13 +174,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void AwaitingMethodReturningString()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -200,7 +200,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
@@ -267,7 +267,7 @@ namespace N
         [Test]
         public static void FactoryMethodExpressionBody()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -295,13 +295,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedDbConnectionCreateCommand()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Data.Common;
@@ -316,13 +316,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void InjectedMemberDbConnectionCreateCommand()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Data.Common;
@@ -344,13 +344,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void DisposedInEventLambda()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.Diagnostics;
@@ -381,13 +381,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingOutParameter()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -412,13 +412,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void UsingOutVar()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -442,13 +442,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void NewDisposableSplitDeclarationAndAssignment()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -464,13 +464,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, testCode);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [Test]
         public static void DisposeInFinally()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -492,13 +492,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void LocalAssignedToLocalThatIsDisposed()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -515,13 +515,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [Test]
         public static void PairOfFileStreams()
         {
-            var testCode = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -564,7 +564,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, testCode);
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Linq;
     using System.Threading;
@@ -19,9 +19,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             [TestCase("nameof(int)")]
             [TestCase("new int[] { 1 , 2 , 3 }")]
             [TestCase("new int[2]")]
-            public static void InitializedWithConstant(string code)
+            public static void InitializedWithConstant(string expression)
             {
-                var testCode = @"
+                var code = @"
 namespace N
 {
     internal class C
@@ -34,14 +34,14 @@ namespace N
             var temp = value;
         }
     }
-}".AssertReplace("1", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+}".AssertReplace("1", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
-                    Assert.AreEqual(code, assignedValues.Single().ToString());
+                    Assert.AreEqual(expression, assignedValues.Single().ToString());
                 }
             }
 
@@ -72,7 +72,7 @@ namespace N
 
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
-            public static void NotInitialized(string code, string expected)
+            public static void NotInitialized(string statement, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -90,7 +90,7 @@ namespace N
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);
@@ -100,7 +100,7 @@ namespace N
 
             [TestCase("var temp1 = value;", "")]
             [TestCase("var temp2 = value;", "1")]
-            public static void NotInitializedInLambda(string code, string expected)
+            public static void NotInitializedInLambda(string statement, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -123,7 +123,7 @@ namespace N
 }");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
+                var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
                 {
                     var actual = string.Join(", ", assignedValues);
