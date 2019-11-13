@@ -12,8 +12,8 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP004DontIgnoreCreated.Descriptor,
-            IDISP014UseSingleInstanceOfHttpClient.Descriptor);
+            Descriptors.IDISP004DoNotIgnoreCreated,
+            Descriptors.IDISP014UseSingleInstanceOfHttpClient);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -35,13 +35,13 @@ namespace IDisposableAnalyzers
                     !IsStaticPropertyInitializer(objectCreation) &&
                     !IsStaticCtor(context.ContainingSymbol))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP014UseSingleInstanceOfHttpClient.Descriptor, objectCreation.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP014UseSingleInstanceOfHttpClient, objectCreation.GetLocation()));
                 }
 
                 if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     DisposableWalker.Ignores(expression, context.SemanticModel, context.CancellationToken, null))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP004DontIgnoreCreated.Descriptor, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated, context.Node.GetLocation()));
                 }
             }
         }

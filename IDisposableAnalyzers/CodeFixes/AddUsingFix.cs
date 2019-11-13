@@ -21,9 +21,9 @@
     internal class AddUsingFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP001DisposeCreated.Descriptor.Id,
-            IDISP004DontIgnoreCreated.Descriptor.Id,
-            IDISP017PreferUsing.Descriptor.Id);
+            Descriptors.IDISP001DisposeCreated.Id,
+            Descriptors.IDISP004DoNotIgnoreCreated.Id,
+            Descriptors.IDISP017PreferUsing.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
@@ -34,7 +34,7 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (diagnostic.Id == IDISP001DisposeCreated.Descriptor.Id)
+                if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id)
                 {
                     if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
                              argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
@@ -96,7 +96,7 @@
                         }
                     }
                 }
-                else if (diagnostic.Id == IDISP004DontIgnoreCreated.Descriptor.Id &&
+                else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
                          statement.Parent is BlockSyntax)
                 {
@@ -106,7 +106,7 @@
                         "Add using to end of block.",
                         diagnostic);
                 }
-                else if (diagnostic.Id == IDISP017PreferUsing.Descriptor.Id &&
+                else if (diagnostic.Id == Descriptors.IDISP017PreferUsing.Id &&
                          syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax invocation))
                 {
                     context.RegisterCodeFix(

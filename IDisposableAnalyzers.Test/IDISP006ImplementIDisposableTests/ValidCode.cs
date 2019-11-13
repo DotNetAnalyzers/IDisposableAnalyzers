@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-        private static readonly DiagnosticDescriptor Descriptor = IDISP006ImplementIDisposable.Descriptor;
+        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP006ImplementIDisposable;
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

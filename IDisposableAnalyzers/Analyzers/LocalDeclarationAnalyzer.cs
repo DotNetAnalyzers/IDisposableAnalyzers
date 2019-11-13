@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP001DisposeCreated.Descriptor);
+            Descriptors.IDISP001DisposeCreated);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -40,7 +40,7 @@ namespace IDisposableAnalyzers
                         context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol local) &&
                         DisposableWalker.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, localDeclaration.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, localDeclaration.GetLocation()));
                     }
                 }
             }

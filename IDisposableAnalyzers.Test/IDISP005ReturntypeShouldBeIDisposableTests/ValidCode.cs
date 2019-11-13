@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
     public static partial class ValidCode
     {
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
-        private static readonly DiagnosticDescriptor Descriptor = IDISP005ReturntypeShouldBeIDisposable.Descriptor;
+        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP005ReturnTypeShouldBeIDisposable;
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

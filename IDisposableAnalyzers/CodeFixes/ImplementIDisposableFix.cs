@@ -30,8 +30,8 @@
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP006ImplementIDisposable.Descriptor.Id,
-            IDISP009IsIDisposable.Descriptor.Id,
+            Descriptors.IDISP006ImplementIDisposable.Id,
+            Descriptors.IDISP009IsIDisposable.Id,
             "CS0535");
 
         public override FixAllProvider GetFixAllProvider() => null;
@@ -65,7 +65,7 @@
 
                 var typeDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
                                                 .FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                if (diagnostic.Id == IDISP009IsIDisposable.Descriptor.Id)
+                if (diagnostic.Id == Descriptors.IDISP009IsIDisposable.Id)
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
@@ -184,8 +184,8 @@
 
         private static bool IsSupportedDiagnostic(Diagnostic diagnostic)
         {
-            if (diagnostic.Id == IDISP006ImplementIDisposable.Descriptor.Id ||
-                diagnostic.Id == IDISP009IsIDisposable.Descriptor.Id)
+            if (diagnostic.Id == Descriptors.IDISP006ImplementIDisposable.Id ||
+                diagnostic.Id == Descriptors.IDISP009IsIDisposable.Id)
             {
                 return true;
             }

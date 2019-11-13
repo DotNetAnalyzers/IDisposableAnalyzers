@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP019CallSuppressFinalizeWhenVirtualDispo
     public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP019CallSuppressFinalizeVirtual);
         private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
 
         [Test]

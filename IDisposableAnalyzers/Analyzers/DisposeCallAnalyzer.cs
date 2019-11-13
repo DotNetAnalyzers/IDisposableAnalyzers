@@ -14,9 +14,9 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP007DontDisposeInjected.Descriptor,
-            IDISP016DontUseDisposedInstance.Descriptor,
-            IDISP017PreferUsing.Descriptor);
+            Descriptors.IDISP007DoNotDisposeInjected,
+            Descriptors.IDISP016DoNotUseDisposedInstance,
+            Descriptors.IDISP017PreferUsing);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -36,7 +36,7 @@ namespace IDisposableAnalyzers
             {
                 if (Disposable.IsCachedOrInjectedOnly(root, invocation, context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
 
                 if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
@@ -45,12 +45,12 @@ namespace IDisposableAnalyzers
                 {
                     if (IsUsedAfter(local, invocation, context, out var locations))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP016DontUseDisposedInstance.Descriptor, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation(), additionalLocations: locations));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP016DoNotUseDisposedInstance, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation(), additionalLocations: locations));
                     }
 
                     if (IsPreferUsing(local, invocation, context))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP017PreferUsing.Descriptor, invocation.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP017PreferUsing, invocation.GetLocation()));
                     }
                 }
             }

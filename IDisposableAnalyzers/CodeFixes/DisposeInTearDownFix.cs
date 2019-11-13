@@ -19,8 +19,8 @@
         private static readonly MethodDeclarationSyntax OneTimeTearDownMethod = CreateTearDownMethod(KnownSymbol.NUnitOneTimeTearDownAttribute);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP002DisposeMember.Descriptor.Id,
-            IDISP003DisposeBeforeReassigning.Descriptor.Id);
+            Descriptors.IDISP002DisposeMember.Id,
+            Descriptors.IDISP003DisposeBeforeReassigning.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

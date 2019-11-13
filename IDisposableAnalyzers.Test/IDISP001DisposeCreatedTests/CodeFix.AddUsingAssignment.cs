@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static class AddUsingAssignment
         {
             private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP001DisposeCreated.Descriptor);
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
             private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             private const string Disposable = @"

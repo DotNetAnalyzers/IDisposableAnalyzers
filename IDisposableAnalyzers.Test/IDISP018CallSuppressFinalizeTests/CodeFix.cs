@@ -9,7 +9,7 @@
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
         private static readonly CodeFixProvider Fix = new SuppressFinalizeFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP018CallSuppressFinalizeSealed);
 
         [Test]
         public static void SealedWithFinalizerWhenStatementBody()

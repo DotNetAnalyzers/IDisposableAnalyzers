@@ -17,7 +17,7 @@
     [Shared]
     internal class DisposeBeforeAssignFix : DocumentEditorCodeFixProvider
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP003DisposeBeforeReassigning.Descriptor.Id);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(Descriptors.IDISP003DisposeBeforeReassigning.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

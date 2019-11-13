@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
     {
         private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning);
 
         private const string Disposable = @"
 namespace RoslynSandbox

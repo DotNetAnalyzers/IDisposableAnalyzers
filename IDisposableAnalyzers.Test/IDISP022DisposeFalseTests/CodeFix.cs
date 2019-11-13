@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
     public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP022DisposeFalse.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP022DisposeFalse);
         private static readonly CodeFixProvider Fix = new ArgumentFix();
 
         [Test]

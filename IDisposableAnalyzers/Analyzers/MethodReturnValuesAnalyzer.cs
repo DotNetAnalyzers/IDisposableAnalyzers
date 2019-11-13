@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP015DontReturnCachedAndCreated.Descriptor);
+            Descriptors.IDISP015DoNotReturnCachedAndCreated);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -32,7 +32,7 @@ namespace IDisposableAnalyzers
                     if (walker.TryFirst(x => IsCreated(x), out _) &&
                         walker.TryFirst(x => IsCachedOrInjected(x) && !IsNop(x), out _))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated, methodDeclaration.Identifier.GetLocation()));
                     }
                 }
             }

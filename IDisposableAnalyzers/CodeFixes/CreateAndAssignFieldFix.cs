@@ -18,8 +18,8 @@
     internal class CreateAndAssignFieldFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP001DisposeCreated.Descriptor.Id,
-            IDISP004DontIgnoreCreated.Descriptor.Id);
+            Descriptors.IDISP001DisposeCreated.Id,
+            Descriptors.IDISP004DoNotIgnoreCreated.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
@@ -32,7 +32,7 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                if (diagnostic.Id == IDISP001DisposeCreated.Descriptor.Id &&
+                if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id &&
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
                     localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
                     variables[0].Initializer is { } &&
@@ -44,7 +44,7 @@
                         "Create and assign field.",
                         diagnostic);
                 }
-                else if (diagnostic.Id == IDISP004DontIgnoreCreated.Descriptor.Id &&
+                else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
                          node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
                          statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
                 {

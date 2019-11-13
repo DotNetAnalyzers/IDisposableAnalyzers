@@ -13,10 +13,10 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP005ReturntypeShouldBeIDisposable.Descriptor,
-            IDISP011DontReturnDisposed.Descriptor,
-            IDISP012PropertyShouldNotReturnCreated.Descriptor,
-            IDISP013AwaitInUsing.Descriptor);
+            Descriptors.IDISP005ReturnTypeShouldBeIDisposable,
+            Descriptors.IDISP011DontReturnDisposed,
+            Descriptors.IDISP012PropertyShouldNotReturnCreated,
+            Descriptors.IDISP013AwaitInUsing);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -70,25 +70,25 @@ namespace IDisposableAnalyzers
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||
                     Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, returnValue.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP011DontReturnDisposed, returnValue.GetLocation()));
                 }
                 else
                 {
                     if (returnValue.FirstAncestor<AccessorDeclarationSyntax>() is AccessorDeclarationSyntax accessor &&
                         accessor.IsKind(SyntaxKind.GetAccessorDeclaration))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated, returnValue.GetLocation()));
                     }
 
                     if (returnValue.FirstAncestor<ArrowExpressionClauseSyntax>() is ArrowExpressionClauseSyntax arrow &&
                         arrow.Parent is PropertyDeclarationSyntax)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP012PropertyShouldNotReturnCreated.Descriptor, returnValue.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated, returnValue.GetLocation()));
                     }
 
                     if (!IsDisposableReturnTypeOrIgnored(ReturnType(context), context.Compilation))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP005ReturntypeShouldBeIDisposable.Descriptor, returnValue.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP005ReturnTypeShouldBeIDisposable, returnValue.GetLocation()));
                     }
                 }
             }
@@ -105,7 +105,7 @@ namespace IDisposableAnalyzers
                         {
                             if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken, null))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(IDISP011DontReturnDisposed.Descriptor, argument.GetLocation()));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP011DontReturnDisposed, argument.GetLocation()));
                             }
                         }
                     }
@@ -120,7 +120,7 @@ namespace IDisposableAnalyzers
                 returnValueType.IsAwaitable() &&
                 ShouldAwait(context, returnValue))
             {
-                context.ReportDiagnostic(Diagnostic.Create(IDISP013AwaitInUsing.Descriptor, returnValue.GetLocation()));
+                context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP013AwaitInUsing, returnValue.GetLocation()));
             }
         }
 

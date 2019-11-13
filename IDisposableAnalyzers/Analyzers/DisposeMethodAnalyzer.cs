@@ -13,13 +13,13 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP009IsIDisposable.Descriptor,
-            IDISP010CallBaseDispose.Descriptor,
-            IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor,
-            IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor,
-            IDISP020SuppressFinalizeThis.Descriptor,
-            IDISP021DisposeTrue.Descriptor,
-            IDISP023ReferenceTypeInFinalizerContext.Descriptor);
+            Descriptors.IDISP009IsIDisposable,
+            Descriptors.IDISP010CallBaseDispose,
+            Descriptors.IDISP018CallSuppressFinalizeSealed,
+            Descriptors.IDISP019CallSuppressFinalizeVirtual,
+            Descriptors.IDISP020SuppressFinalizeThis,
+            Descriptors.IDISP021DisposeTrue,
+            Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -47,7 +47,7 @@ namespace IDisposableAnalyzers
                     if (!method.ExplicitInterfaceImplementations.Any() &&
                         !IsInterfaceImplementation(method))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP009IsIDisposable.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP009IsIDisposable, methodDeclaration.Identifier.GetLocation()));
                     }
 
                     if (DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out var suppressFinalize))
@@ -56,22 +56,22 @@ namespace IDisposableAnalyzers
                             argumentList.Arguments.TrySingle(out var argument) &&
                             !argument.Expression.IsKind(SyntaxKind.ThisExpression))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP020SuppressFinalizeThis.Descriptor, argument.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP020SuppressFinalizeThis, argument.GetLocation()));
                         }
                     }
                     else if (method.ContainingType.TryFindFirstMethod(x => x.MethodKind == MethodKind.Destructor, out _))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP018CallSuppressFinalizeSealed, methodDeclaration.Identifier.GetLocation()));
                     }
                     else if (method.ContainingType.TryFindFirstMethod(x => DisposeMethod.IsVirtualDispose(x), out _))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor, methodDeclaration.Identifier.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP019CallSuppressFinalizeVirtual, methodDeclaration.Identifier.GetLocation()));
                     }
 
                     if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, out _, out var isDisposing) &&
                         isDisposing.Expression?.IsKind(SyntaxKind.TrueLiteralExpression) != true)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP021DisposeTrue.Descriptor, isDisposing.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP021DisposeTrue, isDisposing.GetLocation()));
                     }
                 }
 
@@ -80,14 +80,14 @@ namespace IDisposableAnalyzers
                 {
                     if (ShouldCallBase(method, methodDeclaration, context))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP010CallBaseDispose.Descriptor, methodDeclaration.Identifier.GetLocation(), parameter.Name));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP010CallBaseDispose, methodDeclaration.Identifier.GetLocation(), parameter.Name));
                     }
 
                     using (var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken))
                     {
                         foreach (var node in walker.UsedReferenceTypes)
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor, node.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext, node.GetLocation()));
                         }
                     }
                 }

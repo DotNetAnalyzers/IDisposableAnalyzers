@@ -14,9 +14,9 @@
     internal class ArgumentFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP020SuppressFinalizeThis.Descriptor.Id,
-            IDISP021DisposeTrue.Descriptor.Id,
-            IDISP022DisposeFalse.Descriptor.Id);
+            Descriptors.IDISP020SuppressFinalizeThis.Id,
+            Descriptors.IDISP021DisposeTrue.Id,
+            Descriptors.IDISP022DisposeFalse.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
@@ -29,7 +29,7 @@
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument))
                 {
-                    if (diagnostic.Id == IDISP020SuppressFinalizeThis.Descriptor.Id)
+                    if (diagnostic.Id == Descriptors.IDISP020SuppressFinalizeThis.Id)
                     {
                         context.RegisterCodeFix(
                             "GC.SuppressFinalize(this)",
@@ -39,7 +39,7 @@
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
-                    else if (diagnostic.Id == IDISP021DisposeTrue.Descriptor.Id)
+                    else if (diagnostic.Id == Descriptors.IDISP021DisposeTrue.Id)
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(true)",
@@ -49,7 +49,7 @@
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
-                    else if (diagnostic.Id == IDISP022DisposeFalse.Descriptor.Id)
+                    else if (diagnostic.Id == Descriptors.IDISP022DisposeFalse.Id)
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(false)",

@@ -13,9 +13,9 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP002DisposeMember.Descriptor,
-            IDISP006ImplementIDisposable.Descriptor,
-            IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
+            Descriptors.IDISP002DisposeMember,
+            Descriptors.IDISP006ImplementIDisposable,
+            Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -84,18 +84,18 @@ namespace IDisposableAnalyzers
                         if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
                             IsMutableFromOutside(fieldOrProperty))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                         }
                         else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
                                  DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
                                  !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP002DisposeMember.Descriptor, context.Node.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
                             if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
                                 !TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
                             {
-                                context.ReportDiagnostic(Diagnostic.Create(IDISP006ImplementIDisposable.Descriptor, context.Node.GetLocation()));
+                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
                             }
                         }
                     }

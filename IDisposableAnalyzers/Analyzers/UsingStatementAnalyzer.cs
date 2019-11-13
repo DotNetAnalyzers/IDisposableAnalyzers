@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP007DontDisposeInjected.Descriptor);
+            Descriptors.IDISP007DoNotDisposeInjected);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -43,7 +43,7 @@ namespace IDisposableAnalyzers
                         var value = variableDeclarator.Initializer.Value;
                         if (Disposable.IsCachedOrInjectedOnly(value, value, context.SemanticModel, context.CancellationToken))
                         {
-                            context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, value.GetLocation()));
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, value.GetLocation()));
                         }
                     }
                 }
@@ -51,7 +51,7 @@ namespace IDisposableAnalyzers
                 {
                     if (Disposable.IsCachedOrInjectedOnly(expression, expression, context.SemanticModel, context.CancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(IDISP007DontDisposeInjected.Descriptor, usingStatement.Expression.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, usingStatement.Expression.GetLocation()));
                     }
                 }
             }

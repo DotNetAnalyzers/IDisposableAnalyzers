@@ -7,7 +7,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
     public static class Diagnostics
     {
         private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP015DontReturnCachedAndCreated.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated);
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

@@ -13,9 +13,9 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP001DisposeCreated.Descriptor,
-            IDISP003DisposeBeforeReassigning.Descriptor,
-            IDISP008DontMixInjectedAndCreatedForMember.Descriptor);
+            Descriptors.IDISP001DisposeCreated,
+            Descriptors.IDISP003DisposeBeforeReassigning,
+            Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -36,12 +36,12 @@ namespace IDisposableAnalyzers
                     Disposable.IsCreation(assignment.Right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, assignment.GetLocation()));
                 }
 
                 if (IsReassignedWithCreated(assignment, context))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, assignment.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning, assignment.GetLocation()));
                 }
 
                 if (assignedSymbol is IParameterSymbol assignedParameter &&
@@ -50,7 +50,7 @@ namespace IDisposableAnalyzers
                     context.SemanticModel.TryGetType(assignment.Right, context.CancellationToken, out var type) &&
                     Disposable.IsAssignableFrom(type, context.Compilation))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP008DontMixInjectedAndCreatedForMember.Descriptor, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
             }
         }

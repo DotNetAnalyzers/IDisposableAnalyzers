@@ -23,7 +23,7 @@
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP004DontIgnoreCreated.Descriptor.Id);
+            Descriptors.IDISP004DoNotIgnoreCreated.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

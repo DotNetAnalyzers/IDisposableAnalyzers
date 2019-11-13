@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();
-        private static readonly DiagnosticDescriptor Descriptor = IDISP001DisposeCreated.Descriptor;
+        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP001DisposeCreated;
 
         private const string DisposableCode = @"
 namespace RoslynSandbox

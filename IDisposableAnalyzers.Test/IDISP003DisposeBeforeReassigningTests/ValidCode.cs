@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
-        private static readonly DiagnosticDescriptor Descriptor = IDISP003DisposeBeforeReassigning.Descriptor;
+        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP003DisposeBeforeReassigning;
 
 #pragma warning disable SA1203 // Constants must appear before fields
         private const string DisposableCode = @"

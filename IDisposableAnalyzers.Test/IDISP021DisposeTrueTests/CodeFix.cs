@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP021DisposeTrueTests
     public static class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP021DisposeTrue.Descriptor);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP021DisposeTrue);
         private static readonly CodeFixProvider Fix = new ArgumentFix();
 
         [Test]

@@ -13,8 +13,8 @@ namespace IDisposableAnalyzers
     {
         /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            IDISP001DisposeCreated.Descriptor,
-            IDISP003DisposeBeforeReassigning.Descriptor);
+            Descriptors.IDISP001DisposeCreated,
+            Descriptors.IDISP003DisposeBeforeReassigning);
 
         /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
@@ -38,13 +38,13 @@ namespace IDisposableAnalyzers
                     (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
                      DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken)))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP001DisposeCreated.Descriptor, argument.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, argument.GetLocation()));
                 }
 
                 if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                     !Disposable.IsDisposedBefore(symbol, invocation, context.SemanticModel, context.CancellationToken))
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(IDISP003DisposeBeforeReassigning.Descriptor, argument.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning, argument.GetLocation()));
                 }
             }
         }

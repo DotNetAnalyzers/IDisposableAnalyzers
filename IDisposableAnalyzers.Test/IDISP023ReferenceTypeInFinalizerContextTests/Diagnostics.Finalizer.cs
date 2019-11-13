@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
         public static class Finalizer
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(IDISP023ReferenceTypeInFinalizerContext.Descriptor);
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
             [TestCase("↓Builder.Append(1)")]
             [TestCase("_ = ↓Builder.Length")]
