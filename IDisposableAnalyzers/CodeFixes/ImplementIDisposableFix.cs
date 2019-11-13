@@ -386,7 +386,7 @@
                     usesUnderscoreNames,
                     field));
 
-            if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out IMethodSymbol _))
+            if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
             {
                 _ = editor.AddMethod(
                     classDeclaration,
@@ -402,7 +402,7 @@
                         field));
             }
 
-            if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out BaseTypeSyntax _) != true)
+            if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
             {
                 editor.AddInterfaceType(classDeclaration, IDisposableInterface);
             }
@@ -478,7 +478,7 @@
 
             public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
             {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -493,7 +493,7 @@
 
             public override SyntaxNode VisitEventDeclaration(EventDeclarationSyntax node)
             {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -509,7 +509,7 @@
 
             public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
             {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -525,7 +525,7 @@
 
             public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
             {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
@@ -550,7 +550,7 @@
 
             public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
             {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out SyntaxToken modifier))
+                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
                 {
                     node = node.WithModifiers(node.Modifiers.Remove(modifier));
                 }
