@@ -2,7 +2,6 @@
 {
     using System.Collections.Immutable;
     using System.Composition;
-    using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
@@ -10,7 +9,6 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeMemberFix))]
     [Shared]
@@ -70,7 +68,7 @@
                                 "Dispose member.",
                                 diagnostic);
                         }
-                        else if (disposeDeclaration.Body is BlockSyntax block)
+                        else if (disposeDeclaration.Body is { } block)
                         {
                             context.RegisterCodeFix(
                                 $"{symbol.Name}.Dispose() in {disposeSymbol}",
@@ -133,7 +131,7 @@
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
                 type == KnownSymbol.Boolean)
             {
-                foreach (var statement in disposeMethod.Body.Statements)
+                foreach (var statement in body.Statements)
                 {
                     if (statement is IfStatementSyntax { Condition: IdentifierNameSyntax condition } ifStatement &&
                         condition.Identifier.ValueText == valueText)
@@ -154,7 +152,7 @@
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
                 type == KnownSymbol.Boolean)
             {
-                foreach (var statement in disposeMethod.Body.Statements)
+                foreach (var statement in body.Statements)
                 {
                     if (statement is IfStatementSyntax { Condition: PrefixUnaryExpressionSyntax { Operand: IdentifierNameSyntax operand } condition } ifStatement &&
                         condition.IsKind(SyntaxKind.LogicalNotExpression) &&
