@@ -117,27 +117,20 @@
         private static void CreateAndInitialize(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
         {
             var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            var field = editor.AddField(
+            var disposable = editor.AddField(
                 containingType,
-                usesUnderscoreNames
-                    ? "_disposable"
-                    : "disposable",
+                "disposable",
                 Accessibility.Private,
                 DeclarationModifiers.ReadOnly,
                 CompositeDisposableType,
                 cancellationToken);
-
-            var fieldAccess = usesUnderscoreNames
-                                  ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
-                                  : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
 
             var trailingTrivia = statement.GetTrailingTrivia();
             if (trailingTrivia.Any(SyntaxKind.SingleLineCommentTrivia))
             {
                 var padding = new string(' ', statement.GetLeadingTrivia().Span.Length);
                 var code = StringBuilderPool.Borrow()
-                                            .AppendLine($"{padding}{fieldAccess} = new System.Reactive.Disposables.CompositeDisposable")
+                                            .AppendLine($"{padding}{disposable} = new System.Reactive.Disposables.CompositeDisposable")
                                             .AppendLine($"{padding}{{")
                                             .AppendLine($"    {statement.GetLeadingTrivia()}{statement.Expression},{trailingTrivia.ToString().Trim('\r', '\n')}")
                                             .AppendLine($"{padding}}};")
@@ -152,7 +145,7 @@
             {
                 editor.ReplaceNode(
                     statement,
-                    SyntaxFactory.ParseStatement($"{fieldAccess} = new System.Reactive.Disposables.CompositeDisposable {{ {statement.Expression} }};")
+                    SyntaxFactory.ParseStatement($"{disposable} = new System.Reactive.Disposables.CompositeDisposable {{ {statement.Expression} }};")
                                  .WithAdditionalAnnotations(Formatter.Annotation)
                                  .WithSimplifiedNames());
             }

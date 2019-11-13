@@ -44,8 +44,7 @@
 
                     void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
                     {
-                        var fieldAccess = AddField(
-                            editor,
+                        var fieldAccess = editor.AddField(
                             containingType,
                             local.Identifier.ValueText,
                             Accessibility.Private,
@@ -72,13 +71,12 @@
 
                     void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
                     {
-                        var fieldAccess = AddField(
-                            editor,
+                        var fieldAccess = editor.AddField(
                             (TypeDeclarationSyntax)ctor.Parent,
                             "disposable",
                             Accessibility.Private,
                             DeclarationModifiers.ReadOnly,
-                            KnownSymbol.IDisposable.GetTypeSymbol(editor.SemanticModel.Compilation),
+                            IDisposableFactory.SystemIDisposable,
                             cancellationToken);
 
                         _ = editor.ReplaceNode(
@@ -89,30 +87,6 @@
                     }
                 }
             }
-        }
-
-        private static ExpressionSyntax AddField(DocumentEditor editor, TypeDeclarationSyntax containingType, string name, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
-        {
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            if (usesUnderscoreNames)
-            {
-                name = $"_{name}";
-            }
-
-            var field = editor.AddField(
-                containingType,
-                name,
-                accessibility,
-                modifiers,
-                (TypeSyntax)editor.Generator.TypeExpression(type),
-                cancellationToken);
-            var identifierNameSyntax = SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier);
-            return usesUnderscoreNames
-                ? (ExpressionSyntax)identifierNameSyntax
-                : SyntaxFactory.MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    SyntaxFactory.ThisExpression(),
-                    identifierNameSyntax);
         }
     }
 }

@@ -163,12 +163,9 @@
         private static void OverrideDispose(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            var field = editor.AddField(
+            var disposed = editor.AddField(
                 classDeclaration,
-                usesUnderscoreNames
-                    ? "_disposed"
-                    : "disposed",
+                "disposed",
                 Accessibility.Private,
                 DeclarationModifiers.None,
                 SyntaxFactory.ParseTypeName("bool"),
@@ -190,9 +187,10 @@
                                         .AppendLine("     base.Dispose(disposing);")
                                         .AppendLine("}")
                                         .Return();
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             _ = editor.AddMethod(
                 classDeclaration,
-                ParseMethod(code, usesUnderscoreNames, field));
+                ParseMethod(code, usesUnderscoreNames, disposed));
 
             if (!type.GetMembers().TryFirst(x => x.Name == "ThrowIfDisposed", out _))
             {
@@ -214,7 +212,7 @@
                                                 .Return();
                         _ = editor.AddMethod(
                             classDeclaration,
-                            ParseMethod(code, usesUnderscoreNames, field));
+                            ParseMethod(code, usesUnderscoreNames, disposed));
                     }
                 }
                 else
@@ -230,7 +228,7 @@
                                 }
                             }",
                             usesUnderscoreNames,
-                            field));
+                            disposed));
                 }
             }
         }
@@ -238,17 +236,15 @@
         private static void ImplementIDisposableVirtualAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            var field = editor.AddField(
+            var disposed = editor.AddField(
                 classDeclaration,
-                usesUnderscoreNames
-                    ? "_disposed"
-                    : "disposed",
+                "disposed",
                 Accessibility.Private,
                 DeclarationModifiers.None,
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             _ = editor.AddMethod(
                 classDeclaration,
                 ParseMethod(
@@ -257,9 +253,8 @@
                               this.Dispose(true);
                               GC.SuppressFinalize(this);
                           }",
-                    usesUnderscoreNames));
-
-            _ = editor.AddMethod(
+                    usesUnderscoreNames))
+                      .AddMethod(
                 classDeclaration,
                 ParseMethod(
                     @"protected virtual void Dispose(bool disposing)
@@ -275,7 +270,7 @@
                           }
                       }",
                     usesUnderscoreNames,
-                    field));
+                    disposed));
 
             if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
             {
@@ -290,7 +285,7 @@
                               }
                           }",
                         usesUnderscoreNames,
-                        field));
+                        disposed));
             }
 
             if (classDeclaration.BaseList?.Types.TrySingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
@@ -304,16 +299,15 @@
         private static void ImplementIDisposableSealedAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             var field = editor.AddField(
                 classDeclaration,
-                usesUnderscoreNames
-                    ? "_disposed"
-                    : "disposed",
+                "disposed",
                 Accessibility.Private,
                 DeclarationModifiers.None,
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
+
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
 
             _ = editor.AddMethod(
                 classDeclaration,
@@ -359,12 +353,11 @@
             }
         }
 
-        private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, FieldDeclarationSyntax field = null)
+        private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, ExpressionSyntax disposedFieldAccess = null)
         {
-            if (field.TryGetName(out var name) &&
-                name != "disposed")
+            if (disposedFieldAccess is { })
             {
-                code = code.Replace("disposed", name);
+                code = code.Replace("this.disposed", disposedFieldAccess.ToString());
             }
 
             if (usesUnderscoreNames)
