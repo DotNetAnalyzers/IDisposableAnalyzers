@@ -135,12 +135,12 @@ namespace N
 
     public sealed class C
     {
-        public C(IDisposable bar)
+        public C(IDisposable p)
         {
-            this.M = bar;
+            this.P = p;
         }
 
-        ↓public IDisposable M { get; }
+        ↓public IDisposable P { get; }
 
         public static C Create() => new C(new Disposable());
     }

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -290,11 +290,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            this.bar = bar;
+            this.disposable = disposable;
         }
     }
 }";
@@ -311,11 +311,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable _bar;
+        private readonly IDisposable _disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            _bar = bar;
+            _disposable = disposable;
         }
     }
 }";
@@ -332,11 +332,11 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable _bar;
+        private readonly IDisposable _disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            _bar = bar;
+            _disposable = disposable;
         }
 
         public void Dispose()
@@ -359,11 +359,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable _bar;
+        private readonly IDisposable _disposable;
         
         public C(IDisposable[] disposables)
         {
-            _bar = disposables.First();
+            _disposable = disposables.First();
         }
     }
 }".AssertReplace("disposables.First();", linq);
@@ -381,7 +381,7 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable disposable;
     }
 }";
                 RoslynAssert.Valid(Analyzer, code);
@@ -417,7 +417,7 @@ namespace N
 {
     public class C
     {
-        private readonly object bar = new object();
+        private readonly object f = new object();
     }
 }";
                 RoslynAssert.Valid(Analyzer, code);
@@ -431,7 +431,7 @@ namespace N
 {
     public class C
     {
-        private readonly object bar = Meh();
+        private readonly object f = Meh();
 
         private static object Meh() => new object();
     }
@@ -447,7 +447,7 @@ namespace N
 {
     public class C
     {
-        private readonly object bar = string.Copy(string.Empty);
+        private readonly object f = string.Copy(string.Empty);
     }
 }";
                 RoslynAssert.Valid(Analyzer, code);

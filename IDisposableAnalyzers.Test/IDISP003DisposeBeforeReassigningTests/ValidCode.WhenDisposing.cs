@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             stream.Dispose();
@@ -41,7 +41,7 @@ namespace N
 
     public class C
     {
-        public void Meh(bool b)
+        public void M(bool b)
         {
             Stream stream = File.OpenRead(string.Empty);
             if (b)
@@ -73,7 +73,7 @@ namespace N
 
     public class C
     {
-        public void Meh(bool b)
+        public void M(bool b)
         {
             Stream stream = File.OpenRead(string.Empty);
             stream.Dispose();
@@ -106,7 +106,7 @@ namespace N
     {
         private Stream stream = File.OpenRead(string.Empty);
 
-        public void Meh()
+        public void M()
         {
             this.stream.Dispose();
             if (true)
@@ -181,7 +181,7 @@ namespace N
     {
         private Stream stream;
 
-        public void Meh()
+        public void M()
         {
             this.stream.Dispose();
             this.stream = File.OpenRead(string.Empty);
@@ -204,7 +204,7 @@ namespace N
     {
         private Stream stream;
 
-        public void Meh()
+        public void M()
         {
             this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
@@ -227,7 +227,7 @@ namespace N
     {
         private Stream _stream;
 
-        public void Meh()
+        public void M()
         {
             _stream?.Dispose();
             _stream = File.OpenRead(string.Empty);
@@ -250,7 +250,7 @@ namespace N
     {
         private Stream _stream;
 
-        public void Meh()
+        public void M()
         {
             _stream.Dispose();
             _stream = File.OpenRead(string.Empty);

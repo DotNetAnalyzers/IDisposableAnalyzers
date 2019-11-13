@@ -37,7 +37,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
         }
@@ -134,7 +134,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream = null;
             stream = File.OpenRead(string.Empty);
@@ -160,7 +160,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             object stream = File.OpenRead(string.Empty);
             (stream as IDisposable)?.Dispose();
@@ -454,7 +454,7 @@ namespace N
 
     public class C
     {
-        public void Meh(bool b)
+        public void M(bool b)
         {
             Stream stream;
             if (b)
@@ -516,7 +516,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             Stream stream;
             stream = File.OpenRead(string.Empty);
@@ -1018,7 +1018,7 @@ namespace N
     {
         private List<Stream> streams = new List<Stream>();
 
-        public void Meh()
+        public void M()
         {
             this.streams[0].Dispose();
             this.streams[0] = File.OpenRead(string.Empty);
@@ -1043,7 +1043,7 @@ namespace N
     {
         private List<Stream> _streams = new List<Stream>();
 
-        public void Meh()
+        public void M()
         {
             _streams[0].Dispose();
             _streams[0] = File.OpenRead(string.Empty);

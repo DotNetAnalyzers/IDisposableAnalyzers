@@ -129,7 +129,7 @@ namespace N
     {
         internal C()
         {
-            // Meh();
+            // M();
         }
 
         internal static int StaticCreateIntStatementBody()
@@ -160,7 +160,7 @@ namespace N
 
         internal T Id<T>(T arg) => arg;
     }
-}".AssertReplace("// Meh()", expression);
+}".AssertReplace("// M()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -202,7 +202,7 @@ namespace N
 
         internal C()
         {
-            // Meh();
+            // M();
         }
 
         internal T Id<T>(T arg) => arg;
@@ -254,7 +254,7 @@ namespace N
             return stream;
         }
     }
-}".AssertReplace("// Meh()", expression);
+}".AssertReplace("// M()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -288,7 +288,7 @@ namespace N
     {
         internal C()
         {
-            // Meh();
+            // M();
         }
 
         private static IDisposable StaticRecursiveStatementBody()
@@ -309,7 +309,7 @@ namespace N
 
         private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
     }
-}".AssertReplace("// Meh()", expression);
+}".AssertReplace("// M()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -383,7 +383,7 @@ namespace N
     {
         internal async Task M()
         {
-            var value = // Meh();
+            var value = // M();
         }
 
         internal static async Task<string> CreateStringAsync()
@@ -398,7 +398,7 @@ namespace N
             return new Disposable();
         }
     }
-}".AssertReplace("// Meh()", expression);
+}".AssertReplace("// M()", expression);
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =

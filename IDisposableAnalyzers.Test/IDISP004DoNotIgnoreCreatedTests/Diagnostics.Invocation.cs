@@ -35,7 +35,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -246,12 +246,12 @@ namespace N
 
     public class C
     {
-        internal static string M()
+        internal static string M1()
         {
-            return Meh(↓File.OpenRead(string.Empty));
+            return M2(↓File.OpenRead(string.Empty));
         }
 
-        private static string Meh(Stream stream) => stream.ToString();
+        private static string M2(Stream stream) => stream.ToString();
     }
 }";
 
@@ -266,7 +266,7 @@ namespace N
 {
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓Create();
         }

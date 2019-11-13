@@ -23,7 +23,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓File.OpenRead(string.Empty);
             var i = 1;
@@ -39,7 +39,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (File.OpenRead(string.Empty))
             {
@@ -63,7 +63,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓File.OpenRead(string.Empty);
         }
@@ -78,7 +78,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (File.OpenRead(string.Empty))
             {
@@ -101,7 +101,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓File.OpenRead(string.Empty);
             var a = 1;
@@ -124,7 +124,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (File.OpenRead(string.Empty))
             {

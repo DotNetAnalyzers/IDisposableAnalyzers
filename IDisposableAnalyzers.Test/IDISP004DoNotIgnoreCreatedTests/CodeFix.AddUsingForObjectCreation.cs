@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -34,7 +34,7 @@ namespace N
 {
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓new Disposable();
             var i = 1;
@@ -47,7 +47,7 @@ namespace N
 {
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (new Disposable())
             {
@@ -70,7 +70,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓new Disposable();
         }
@@ -84,7 +84,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (new Disposable())
             {
@@ -106,7 +106,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓new Disposable();
             var a = 1;
@@ -128,7 +128,7 @@ namespace N
 
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             using (new Disposable())
             {
@@ -158,12 +158,12 @@ namespace N
 
     public class C
     {
-        internal static string M()
+        internal static string M1()
         {
-            return Meh(↓new Disposable());
+            return M2(↓new Disposable());
         }
 
-        private static string Meh(IDisposable stream) => stream.ToString();
+        private static string M2(IDisposable stream) => stream.ToString();
     }
 }";
 

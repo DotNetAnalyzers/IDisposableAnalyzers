@@ -32,7 +32,7 @@ namespace N
 {
     public sealed class C
     {
-        public void Meh()
+        public void M()
         {
             ↓new Disposable();
         }
@@ -82,11 +82,11 @@ namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -99,11 +99,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
-            return new C(↓new Disposable());
+            return new C1(↓new Disposable());
         }
     }
 }";

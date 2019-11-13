@@ -27,7 +27,7 @@ namespace N
 
         public int P { get; set; } = 1;
 
-        public void Meh()
+        public void M()
         {
             var temp3 = this.P;
         }
@@ -62,7 +62,7 @@ namespace N
 
         public int P { get; } = 1;
 
-        public void Meh()
+        public void M()
         {
             var temp3 = this.P;
         }
@@ -108,7 +108,7 @@ namespace N
             private set { this.p = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp5 = this.p;
             var temp6 = this.P;
@@ -155,7 +155,7 @@ namespace N
             set { this.p = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp5 = this.p;
             var temp6 = this.P;
@@ -188,7 +188,7 @@ namespace N
             set { this.p = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp = this.p;
         }
@@ -222,7 +222,7 @@ namespace N
             private set { this.p = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp = this.p;
         }
@@ -266,7 +266,7 @@ public sealed class C
         private set { this.p = value; }
     }
 
-    public void Meh()
+    public void M()
     {
         var temp5 = this.p;
         var temp6 = this.P;
@@ -310,7 +310,7 @@ public sealed class C
         set { this.p = value; }
     }
 
-    public void Meh()
+    public void M()
     {
         var temp5 = this.p;
         var temp6 = this.P;
@@ -369,7 +369,7 @@ namespace N
             }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp5 = this.p;
             var temp6 = this.P;
@@ -409,7 +409,7 @@ namespace N
             set { this.P = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp3 = this.P;
         }

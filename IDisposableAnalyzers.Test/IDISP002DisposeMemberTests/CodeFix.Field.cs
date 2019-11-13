@@ -143,7 +143,7 @@ namespace N
     {
         ↓private Stream stream = File.OpenRead(string.Empty);
 
-        public void Meh()
+        public void M()
         {
             this.stream.Dispose();
             this.stream = null;
@@ -165,7 +165,7 @@ namespace N
     {
         private Stream stream = File.OpenRead(string.Empty);
 
-        public void Meh()
+        public void M()
         {
             this.stream.Dispose();
             this.stream = null;

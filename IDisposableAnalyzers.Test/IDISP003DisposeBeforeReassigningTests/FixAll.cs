@@ -19,7 +19,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             ↓stream = File.OpenRead(string.Empty);
@@ -34,7 +34,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream = File.OpenRead(string.Empty);
             stream?.Dispose();
@@ -56,7 +56,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream1 = File.OpenRead(string.Empty);
             var stream2 = File.OpenRead(string.Empty);
@@ -73,7 +73,7 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M()
         {
             var stream1 = File.OpenRead(string.Empty);
             var stream2 = File.OpenRead(string.Empty);

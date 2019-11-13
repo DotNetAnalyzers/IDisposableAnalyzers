@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -139,7 +139,7 @@ namespace N
             return RecursiveOut(3.0, out value);
         }
 
-        public void Meh()
+        public void M()
         {
             IDisposable value;
             RecursiveOut(1.0, out value);
