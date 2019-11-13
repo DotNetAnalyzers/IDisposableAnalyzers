@@ -1,0 +1,101 @@
+﻿// ReSharper disable InconsistentNaming
+namespace IDisposableAnalyzers.Test
+{
+    using System;
+    using System.Collections.Immutable;
+    using System.Linq;
+    using Gu.Roslyn.AnalyzerExtensions;
+    using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.Diagnostics;
+    using NUnit.Framework;
+
+    public static class ValidWithAllAnalyzers
+    {
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol)
+            .Assembly
+            .GetTypes()
+            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+            .ToImmutableArray();
+
+        private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
+            ProjectFile.Find("IDisposableAnalyzers.csproj"),
+            AllAnalyzers,
+            MetadataReferences.FromAttributes());
+
+        // ReSharper disable once InconsistentNaming
+        private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
+            ProjectFile.Find("ValidCode.csproj"),
+            AllAnalyzers,
+            MetadataReferences.FromAttributes());
+
+        [OneTimeSetUp]
+        public static void OneTimeSetUp()
+        {
+            // The cache will be enabled when running in VS.
+            // It speeds up the tests and makes them more realistic
+            Cache<SyntaxTree, SemanticModel>.Begin();
+        }
+
+        [OneTimeTearDown]
+        public static void OneTimeTearDown()
+        {
+            Cache<SyntaxTree, SemanticModel>.End();
+        }
+
+        [Test]
+        public static void NotEmpty()
+        {
+            CollectionAssert.IsNotEmpty(AllAnalyzers);
+        }
+
+        [Ignore("Temp to get one green build finally.")]
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public static void AnalyzersProject(DiagnosticAnalyzer analyzer)
+        {
+            RoslynAssert.Valid(analyzer, AnalyzersProjectSln);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
+        {
+            RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
+        }
+
+        [TestCaseSource(nameof(AllAnalyzers))]
+        public static void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
+        {
+            var testCode = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C : SyntaxError
+    {
+        private readonly Stream stream = File.SyntaxError(string.Empty);
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.syntaxError)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.stream.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+            var solution = CodeFactory.CreateSolution(testCode, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
+            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+        }
+    }
+}

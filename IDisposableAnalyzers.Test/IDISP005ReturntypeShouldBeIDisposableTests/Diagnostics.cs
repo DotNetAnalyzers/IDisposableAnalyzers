@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;

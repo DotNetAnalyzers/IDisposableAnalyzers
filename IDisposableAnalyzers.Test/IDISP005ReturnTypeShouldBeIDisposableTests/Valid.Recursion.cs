@@ -1,9 +1,9 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class Valid
+    public static partial class Valid
     {
         public static class Recursion
         {

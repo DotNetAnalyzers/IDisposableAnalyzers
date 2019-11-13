@@ -1,3 +1,4 @@
+﻿#pragma warning disable GURA04 // Name of class should match asserts.
 namespace IDisposableAnalyzers.Test
 {
     using System;

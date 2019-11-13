@@ -1,6 +1,6 @@
 using Gu.Roslyn.Asserts;
 
-[assembly: TransitiveMetadataReferences(typeof(IDisposableAnalyzers.Test.ValidCodeWithAllAnalyzers))]
+[assembly: TransitiveMetadataReferences(typeof(IDisposableAnalyzers.Test.ValidWithAllAnalyzers))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),
     typeof(System.Net.WebClient),

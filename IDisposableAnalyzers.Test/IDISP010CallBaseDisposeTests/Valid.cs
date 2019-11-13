@@ -1,12 +1,12 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class Valid
+    public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         private const string DisposableCode = @"
 namespace N
@@ -21,19 +21,182 @@ namespace N
     }
 }";
 
-        [TestCase("stream.Dispose();")]
-        [TestCase("stream?.Dispose();")]
-        [TestCase("this.stream.Dispose();")]
-        [TestCase("this.stream?.Dispose();")]
-        [TestCase("Stream.Dispose();")]
-        [TestCase("Stream?.Dispose();")]
-        [TestCase("this.Stream.Dispose();")]
-        [TestCase("this.Stream?.Dispose();")]
-        [TestCase("Calculated.Dispose();")]
-        [TestCase("Calculated?.Dispose();")]
-        [TestCase("this.Calculated.Dispose();")]
-        [TestCase("this.Calculated?.Dispose();")]
-        public static void DisposingField(string disposeCall)
+        [Test]
+        public static void WhenCallingBaseDispose()
+        {
+            var fooBaseCode = @"
+namespace N
+{
+    using System;
+
+    public abstract class CBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace N
+{
+    public class C : CBase
+    {
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public static void WhenCallingBaseDisposeAfterCheckDispose()
+        {
+            var fooBaseCode = @"
+namespace N
+{
+    using System;
+
+    public abstract class CBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace N
+{
+    public class C : CBase
+    {
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
+        {
+            var fooBaseCode = @"
+namespace N
+{
+    using System;
+
+    public abstract class CBase : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            var testCode = @"
+namespace N
+{
+    using System;
+
+    public class C : CBase
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        protected override void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+
+            base.Dispose(disposing);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
+        }
+
+        [Test]
+        public static void WhenNoBaseClass()
         {
             var testCode = @"
 namespace N
@@ -58,7 +221,7 @@ namespace N
             this.stream.Dispose();
         }
     }
-}".AssertReplace("this.stream.Dispose();", disposeCall);
+}";
             RoslynAssert.Valid(Analyzer, testCode);
         }
 
@@ -142,6 +305,7 @@ namespace N
 
             _disposed = true;
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -295,7 +459,7 @@ namespace N
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream { get; private set; }
+        public Stream Stream { get; set; }
         
         public void Dispose()
         {
@@ -318,7 +482,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        public Stream Stream { get; private set; } = File.OpenRead(string.Empty);
+        public Stream Stream { get; set; } = File.OpenRead(string.Empty);
         
         public void Dispose()
         {
@@ -384,6 +548,7 @@ namespace N
         public void Dispose()
         {
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -725,7 +890,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class Base : IDisposable
+    public class C : IDisposable
     {
         public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
         private bool disposed;
@@ -739,6 +904,7 @@ namespace N
 
             this.disposed = true;
             this.Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -764,61 +930,12 @@ namespace N
 {
     using System.IO;
 
-    public class C : Base
+    public class M : C
     {
         public override Stream Stream { get; }
     }
 }";
             RoslynAssert.Valid(Analyzer, fooCode, barCode);
-        }
-
-        [Test]
-        public static void WhenCallingBaseDispose()
-        {
-            var fooBaseCode = @"
-namespace N
-{
-    using System;
-
-    public abstract class CBase : IDisposable
-    {
-        private readonly IDisposable disposable = new Disposable();
-        private bool disposed;
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            this.Dispose(true);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-                this.disposable.Dispose();
-            }
-        }
-    }
-}";
-            var testCode = @"
-namespace N
-{
-    public class C : CBase
-    {
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
-    }
-}";
-
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, testCode);
         }
 
         [Test]
@@ -875,154 +992,6 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, DisposableCode, testCode);
-        }
-
-        [Test]
-        public static void Issue150()
-        {
-            var testCode = @"
-namespace ValidCode
-{
-    using System.Collections.Generic;
-    using System.IO;
-
-    public class Issue150
-    {
-        public Issue150(string name)
-        {
-            this.Name = name;
-            if (File.Exists(name))
-            {
-                this.AllText = File.ReadAllText(name);
-                this.AllLines = File.ReadAllLines(name);
-            }
-        }
-
-        public string Name { get; }
-
-        public bool Exists => File.Exists(this.Name);
-
-        public string AllText { get; }
-
-        public IReadOnlyList<string> AllLines { get; }
-    }
-}";
-            RoslynAssert.Valid(Analyzer, testCode);
-        }
-
-        [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void Tuple(string expression)
-        {
-            var testCode = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public sealed class C : IDisposable
-    {
-        private readonly Tuple<FileStream, FileStream> tuple;
-
-        public C(string file1, string file2)
-        {
-            this.tuple = Tuple.Create(File.OpenRead(file1), File.OpenRead(file2));
-        }
-
-        public void Dispose()
-        {
-            this.tuple.Item1.Dispose();
-            this.tuple.Item2.Dispose();
-        }
-    }
-}".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
-
-            RoslynAssert.Valid(Analyzer, testCode);
-        }
-
-        [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void ValueTuple(string expression)
-        {
-            var testCode = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public sealed class C : IDisposable
-    {
-        private readonly (FileStream, FileStream) tuple;
-
-        public C(string file1, string file2)
-        {
-            this.tuple = (File.OpenRead(file1), File.OpenRead(file2));
-        }
-
-        public void Dispose()
-        {
-            this.tuple.Item1.Dispose();
-            this.tuple.Item2.Dispose();
-        }
-    }
-}".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
-
-            RoslynAssert.Valid(Analyzer, testCode);
-        }
-
-        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void Pair(string expression)
-        {
-            var staticPairCode = @"
-namespace N
-{
-    public static class Pair
-    {
-        public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
-    }
-}";
-
-            var genericPairCode = @"
-namespace N
-{
-    public class Pair<T>
-    {
-        public Pair(T item1, T item2)
-        {
-            this.Item1 = item1;
-            this.Item2 = item2;
-        }
-
-        public T Item1 { get; }
-
-        public T Item2 { get; }
-    }
-}";
-
-            var testCode = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public sealed class C : IDisposable
-    {
-        private readonly Pair<FileStream> pair;
-
-        public C(string file1, string file2)
-        {
-            this.pair = Pair.Create(File.OpenRead(file1), File.OpenRead(file2));
-        }
-
-        public void Dispose()
-        {
-            this.pair.Item1.Dispose();
-            this.pair.Item2.Dispose();
-        }
-    }
-}".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
-
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, testCode);
         }
     }
 }

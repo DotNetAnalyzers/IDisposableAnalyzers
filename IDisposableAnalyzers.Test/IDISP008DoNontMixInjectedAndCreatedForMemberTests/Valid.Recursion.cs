@@ -1,9 +1,10 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    public partial class Valid
+    // ReSharper disable once UnusedTypeParameter
+    public partial class Valid<T>
     {
         public static class Recursion
         {
