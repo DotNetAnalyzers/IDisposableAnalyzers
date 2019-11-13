@@ -444,7 +444,7 @@ namespace N
         [Test]
         public static void LocalSwapCachedDisposableDictionary()
         {
-            var disposableDictionaryCode = @"
+            var disposableDictionaryOfTKeyTValue = @"
 namespace N
 {
     using System;
@@ -478,7 +478,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, disposableDictionaryCode, code);
+            RoslynAssert.Valid(Analyzer, disposableDictionaryOfTKeyTValue, code);
         }
 
         [Test]

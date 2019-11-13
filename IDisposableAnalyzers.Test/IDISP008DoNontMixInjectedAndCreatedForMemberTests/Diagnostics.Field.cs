@@ -190,11 +190,11 @@ namespace N
 
     public sealed class C
     {
-        ↓private readonly IDisposable bar;
+        ↓private readonly IDisposable disposable;
 
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            this.bar = bar;
+            this.disposable = disposable;
         }
 
         public static C Create() => new C(new Disposable());

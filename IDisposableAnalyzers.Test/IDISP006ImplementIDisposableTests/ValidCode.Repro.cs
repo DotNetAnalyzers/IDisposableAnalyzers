@@ -1,3 +1,4 @@
+﻿#pragma warning disable GURA04, GURA06 // Name of class should match asserts.
 namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;

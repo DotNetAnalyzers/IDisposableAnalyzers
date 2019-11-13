@@ -77,13 +77,13 @@ namespace N
         [Test]
         public static void DisposingWithBaseClass()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed = false;
@@ -110,13 +110,13 @@ namespace N
     }
 }";
 
-            var fooImplCode = @"
+            var code = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public class CImpl : Base
+    public class C : BaseClass
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -138,32 +138,32 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, baseClass, code);
         }
 
         [Test]
         public static void DisposingInjectedPropertyInBaseClass()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         private bool disposed = false;
 
-        public Base()
+        public BaseClass()
             : this(null)
         {
         }
 
-        public Base(object bar)
+        public BaseClass(object p)
         {
-            this.M = bar;
+            this.P = p;
         }
 
-        public object M { get; }
+        public object P { get; }
 
         public void Dispose()
         {
@@ -188,7 +188,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : Base
+    public class C : BaseClass
     {
         public C(int no)
             : this(no.ToString())
@@ -204,40 +204,40 @@ namespace N
         {
             if (disposing)
             {
-                (this.M as IDisposable)?.Dispose();
+                (this.P as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, baseClass, fooImplCode);
         }
 
         [Test]
         public static void DisposingInjectedPropertyInBaseClassFieldExpressionBody()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
-        private readonly object bar;
+        private readonly object p;
         private bool disposed = false;
 
-        public Base()
+        public BaseClass()
             : this(null)
         {
         }
 
-        public Base(object bar)
+        public BaseClass(object p)
         {
-            this.bar = bar;
+            this.p = p;
         }
 
-        public object M => this.bar;
+        public object P => this.p;
 
         public void Dispose()
         {
@@ -262,7 +262,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : Base
+    public class C : BaseClass
     {
         public C(int no)
             : this(no.ToString())
@@ -278,42 +278,42 @@ namespace N
         {
             if (disposing)
             {
-                (this.M as IDisposable)?.Dispose();
+                (this.P as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, baseClass, fooImplCode);
         }
 
         [Test]
         public static void DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         private static IDisposable Empty = new Disposable();
 
-        private readonly object bar;
+        private readonly object p;
         private bool disposed = false;
 
-        public Base(string text)
+        public BaseClass(string text)
         {
-            this.bar = Empty;
+            this.p = Empty;
         }
 
-        public Base(object bar)
+        public BaseClass(object p)
         {
-            this.bar = bar;
+            this.p = p;
         }
 
-        public object M => this.bar;
+        public object P => this.p;
 
         public void Dispose()
         {
@@ -338,7 +338,7 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : Base
+    public class C : BaseClass
     {
         public C(string fileName)
             : base(File.OpenRead(fileName))
@@ -349,14 +349,14 @@ namespace N
         {
             if (disposing)
             {
-                (this.M as IDisposable)?.Dispose();
+                (this.P as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, fooImplCode);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, fooImplCode);
         }
 
         [Test]

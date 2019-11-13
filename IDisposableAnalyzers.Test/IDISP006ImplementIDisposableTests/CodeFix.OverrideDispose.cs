@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -78,7 +78,7 @@ namespace N
             [Test]
             public static void StyleCopCallingBaseThrowIfDisposed()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -161,14 +161,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
             public static void UnderscoreWhenThrowIsNotVirtual()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -241,14 +241,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
             public static void UnderscoreWhenThrowIsVirtual()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -331,8 +331,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]

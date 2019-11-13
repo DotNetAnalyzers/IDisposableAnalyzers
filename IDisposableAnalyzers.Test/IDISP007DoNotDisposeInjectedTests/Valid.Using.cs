@@ -276,7 +276,7 @@ namespace N
             [Test]
             public static void CreatedUsingInjectedAbstractFactoryWIthImplementation()
             {
-                var abstractFactoryCode = @"
+                var factoryBase = @"
 namespace N
 {
     using System;
@@ -325,13 +325,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, disposableCode, code);
+                RoslynAssert.Valid(Analyzer, factoryBase, factoryCode, disposableCode, code);
             }
 
             [Test]
             public static void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
             {
-                var abstractFactoryCode = @"
+                var factoryBaseOfT = @"
 namespace N
 {
     using System;
@@ -368,13 +368,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, factoryCode, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, factoryBaseOfT, factoryCode, DisposableCode, code);
             }
 
             [Test]
             public static void CreatedUsingInjectedAbstractFactoryNoImplementation()
             {
-                var abstractFactoryCode = @"
+                var factoryBase = @"
 namespace N
 {
     using System;
@@ -411,13 +411,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, code);
+                RoslynAssert.Valid(Analyzer, factoryBase, disposableCode, code);
             }
 
             [Test]
             public static void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
             {
-                var abstractFactoryCode = @"
+                var factoryBaseOfT = @"
 namespace N
 {
     using System;
@@ -454,13 +454,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, abstractFactoryCode, disposableCode, code);
+                RoslynAssert.Valid(Analyzer, factoryBaseOfT, disposableCode, code);
             }
 
             [Test]
             public static void CreatedUsingInjectedVirtualFactory()
             {
-                var abstractFactoryCode = @"
+                var factoryBase = @"
 namespace N
 {
     using System;
@@ -509,7 +509,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, new[] { abstractFactoryCode, factoryCode, disposableCode, code });
+                RoslynAssert.Valid(Analyzer, new[] { factoryBase, factoryCode, disposableCode, code });
             }
 
             [Test]

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -47,17 +47,17 @@ namespace N
             [Test]
             public static void FileOpenReadPassedIntoCtorOfNotDisposing()
             {
-                var barCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public class M
+    public class C1
     {
         private readonly Stream stream;
 
-        public M(Stream stream)
+        public C1(Stream stream)
         {
            this.stream = stream;
         }
@@ -70,19 +70,19 @@ namespace N
 
     public sealed class C
     {
-        public M Meh()
+        public C1 M()
         {
-            return new M(↓File.OpenRead(string.Empty));
+            return new C1(↓File.OpenRead(string.Empty));
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, barCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, c1, code);
             }
 
             [Test]
             public static void Generic()
             {
-                var interfaceCode = @"
+                var iDisposableOfT = @"
 namespace N
 {
     using System;
@@ -92,7 +92,7 @@ namespace N
     }
 }";
 
-                var disposableCode = @"
+                var disposableOfT = @"
 namespace N
 {
     public sealed class Disposable<T> : IDisposable<T>
@@ -125,7 +125,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, interfaceCode, disposableCode, factoryCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, iDisposableOfT, disposableOfT, factoryCode, code);
             }
 
             [Test]

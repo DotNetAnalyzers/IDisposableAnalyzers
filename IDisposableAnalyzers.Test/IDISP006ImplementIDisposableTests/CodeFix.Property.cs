@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
         public static class Property
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-            private static readonly CodeFixProvider CodeFix = new ImplementIDisposableFix();
+            private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
 
             [Test]
@@ -86,7 +86,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
@@ -187,7 +187,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, "Implement IDisposable with virtual dispose method.");
             }
 
             [Test]
@@ -234,8 +234,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -282,8 +282,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -335,8 +335,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -393,29 +393,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
-            public static void WhenInterfaceIsMissing()
-            {
-                var code = @"
-namespace N
-{
-    using System.IO;
-
-    public class C
-    {
-        ↓public Stream Stream { get; } = File.OpenRead(string.Empty);
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-
-                RoslynAssert.NoFix(Analyzer, CodeFix, ExpectedDiagnostic, code);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -476,8 +455,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
             }
 
             [Test]
@@ -526,7 +505,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, CodeFix, ExpectedDiagnostic, new[] { Disposable, before }, after, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, "Implement IDisposable and make class sealed.");
             }
         }
     }

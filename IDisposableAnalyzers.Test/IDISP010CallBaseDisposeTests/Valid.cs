@@ -24,12 +24,12 @@ namespace N
         [Test]
         public static void WhenCallingBaseDispose()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -59,7 +59,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         protected override void Dispose(bool disposing)
         {
@@ -68,18 +68,18 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
         public static void WhenCallingBaseDisposeAfterCheckDispose()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -109,7 +109,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         private bool disposed;
 
@@ -126,18 +126,18 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
         public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -169,7 +169,7 @@ namespace N
 {
     using System;
 
-    public class C : Base
+    public class C : BaseClass
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -192,7 +192,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
@@ -503,7 +503,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         public abstract Stream Stream { get; }
         
@@ -520,7 +520,7 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
     }
@@ -538,7 +538,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private bool disposed;
 
@@ -572,7 +572,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
 
@@ -884,15 +884,16 @@ namespace N
         [Test]
         public static void DisposingPropertyInBase()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
         public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
+
         private bool disposed;
 
         public void Dispose()
@@ -925,17 +926,17 @@ namespace N
     }
 }";
 
-            var barCode = @"
+            var code = @"
 namespace N
 {
     using System.IO;
 
-    public class M : C
+    public class C : C1
     {
         public override Stream Stream { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, c1, code);
         }
 
         [Test]

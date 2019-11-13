@@ -1,10 +1,10 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class CodeFix
+    public static partial class NoFix
     {
         public static class AddUsingForInvocation
         {
@@ -142,28 +142,6 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
-            public static void NoFixForArgument()
-            {
-                var code = @"
-namespace N
-{
-    using System.IO;
-
-    public class C
-    {
-        internal static string M()
-        {
-            return Meh(↓File.OpenRead(string.Empty));
-        }
-
-        private static string Meh(Stream stream) => stream.ToString();
-    }
-}";
-
-                RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
             }
         }
     }

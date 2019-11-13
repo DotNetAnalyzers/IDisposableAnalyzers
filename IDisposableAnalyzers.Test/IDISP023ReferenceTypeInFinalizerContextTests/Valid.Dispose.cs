@@ -235,12 +235,12 @@ namespace N
             [Test]
             public static void WhenCallingBaseDispose()
             {
-                var fooBaseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -270,7 +270,7 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         protected override void Dispose(bool disposing)
         {
@@ -279,18 +279,18 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+                RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
             }
 
             [Test]
             public static void WhenCallingBaseDisposeAfterCheckDispose()
             {
-                var fooBaseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -320,7 +320,7 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         private bool disposed;
 
@@ -337,18 +337,18 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+                RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
             }
 
             [Test]
             public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
             {
-                var fooBaseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -380,7 +380,7 @@ namespace N
 {
     using System;
 
-    public class C : Base
+    public class C : BaseClass
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -403,7 +403,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+                RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
             }
         }
     }

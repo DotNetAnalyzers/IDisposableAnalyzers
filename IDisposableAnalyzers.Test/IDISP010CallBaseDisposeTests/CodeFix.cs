@@ -27,12 +27,12 @@ namespace N
         [Test]
         public static void WhenNotCallingBaseDisposeWithBaseCode()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -61,7 +61,7 @@ namespace N
             var before = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         protected override void ↓Dispose(bool disposing)
         {
@@ -72,7 +72,7 @@ namespace N
             var after = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         protected override void Dispose(bool disposing)
         {
@@ -80,8 +80,8 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, before }, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, fooBaseCode, before }, after);
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
         }
 
         [Test]

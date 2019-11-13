@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -492,27 +492,6 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
-            public static void WhenInterfaceIsMissing()
-            {
-                var code = @"
-namespace N
-{
-    using System.IO;
-
-    public class C
-    {
-        ↓private readonly Stream stream = File.OpenRead(string.Empty);
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-
-                RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
             }
 
             [Test]

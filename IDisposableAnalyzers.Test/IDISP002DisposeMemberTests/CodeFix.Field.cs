@@ -742,7 +742,7 @@ namespace N
             [Test]
             public static void DisposeSecondMemberWhenOverriddenDisposeMethod()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -838,8 +838,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
@@ -946,12 +946,12 @@ namespace N
             [Test]
             public static void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
             {
-                var barCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
 
-    public sealed class M : Disposable
+    public sealed class C1 : Disposable
     {
     }
 }";
@@ -962,7 +962,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly M bar = new M();
+        ↓private readonly C1 c1 = new C1();
 
         public void Dispose()
         {
@@ -977,27 +977,27 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly M bar = new M();
+        private readonly C1 c1 = new C1();
 
         public void Dispose()
         {
-            this.bar.Dispose();
+            this.c1.Dispose();
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, barCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, barCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
             }
 
             [Test]
             public static void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
             {
-                var barCode = @"
+                var c1OfT = @"
 namespace N
 {
     using System;
 
-    public sealed class M<T> : Disposable
+    public sealed class C1<T> : Disposable
     {
     }
 }";
@@ -1008,7 +1008,7 @@ namespace N
 
     public sealed class C<T> : IDisposable
     {
-        ↓private readonly M<T> bar = new M<T>();
+        ↓private readonly C1<T> c1 = new C1<T>();
 
         public void Dispose()
         {
@@ -1023,16 +1023,16 @@ namespace N
 
     public sealed class C<T> : IDisposable
     {
-        private readonly M<T> bar = new M<T>();
+        private readonly C1<T> c1 = new C1<T>();
 
         public void Dispose()
         {
-            this.bar.Dispose();
+            this.c1.Dispose();
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, barCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, barCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
             }
 
             [Test]
@@ -1388,7 +1388,7 @@ namespace N
             [Test]
             public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -1478,14 +1478,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
             public static void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
@@ -1575,8 +1575,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
@@ -1632,12 +1632,12 @@ namespace N
             [Test]
             public static void WhenCallingBaseDispose()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -1668,7 +1668,7 @@ namespace N
 {
     using System;
 
-    public class C : Base
+    public class C : BaseClass
     {
         ↓private readonly IDisposable disposable = new Disposable();
 
@@ -1684,7 +1684,7 @@ namespace N
 {
     using System;
 
-    public class C : Base
+    public class C : BaseClass
     {
         private readonly IDisposable disposable = new Disposable();
 
@@ -1699,8 +1699,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
             }
         }
     }

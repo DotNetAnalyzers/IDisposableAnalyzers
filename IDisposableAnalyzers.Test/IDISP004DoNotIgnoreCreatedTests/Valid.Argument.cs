@@ -109,17 +109,17 @@ namespace N
         [Test]
         public static void ChainedCtorCallsBaseCtorDisposedInThis()
         {
-            var baseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         private readonly IDisposable disposable;
         private bool disposed;
 
-        protected Base(IDisposable disposable)
+        protected BaseClass(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -148,7 +148,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         private bool disposed;
 
@@ -179,28 +179,28 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, baseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
         public static void ChainedBaseCtorDisposedInThis()
         {
-            var baseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         private readonly object disposable;
         private bool disposed;
 
-        protected Base(IDisposable disposable)
+        protected BaseClass(IDisposable disposable)
         {
             this.disposable = disposable;
         }
 
-        public object M
+        public object P
         {
             get
             {
@@ -230,7 +230,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         private bool disposed;
 
@@ -249,14 +249,14 @@ namespace N
             this.disposed = true;
             if (disposing)
             {
-                (this.M as IDisposable)?.Dispose();
+                (this.P as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, baseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
@@ -642,7 +642,7 @@ namespace N
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -676,7 +676,7 @@ namespace N
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, code);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
         }
 
         [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
@@ -751,7 +751,7 @@ namespace N
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -791,7 +791,7 @@ namespace N
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, code);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
         }
     }
 }

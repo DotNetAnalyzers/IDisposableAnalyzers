@@ -1,11 +1,9 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using Gu.Roslyn.AnalyzerExtensions;
 
     internal class EnumerableType : QualifiedType
     {
-        internal static readonly EnumerableType Default = new EnumerableType();
-
         internal readonly QualifiedMethod Aggregate;
         internal readonly QualifiedMethod All;
         internal readonly QualifiedMethod Any;

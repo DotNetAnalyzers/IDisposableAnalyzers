@@ -59,14 +59,14 @@ namespace N
             [Test]
             public static void EmptyClassFigureOutUnderscoreFromOtherClass()
             {
-                var barCode = @"
+                var c1 = @"
 namespace N
 {
-    public class M
+    public class C1
     {
         private int _value;
 
-        public M(int value)
+        public C1(int value)
         {
             _value = value;
         }
@@ -111,7 +111,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, new[] { barCode, before }, after, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { c1, before }, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]

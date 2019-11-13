@@ -333,13 +333,13 @@ namespace N
         [Test]
         public static void DisposingPropertyInBaseClass()
         {
-            var baseClassCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         public abstract Stream Stream { get; }
         
@@ -356,13 +356,13 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, baseClassCode, code);
+            RoslynAssert.Valid(Analyzer, baseClass, code);
         }
 
         [Test]
@@ -374,7 +374,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private bool disposed;
 
@@ -407,7 +407,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C : Base
+    public sealed class C : BaseClass
     {
         public override Stream Stream { get; } = File.OpenRead(string.Empty);
 
@@ -719,13 +719,13 @@ namespace N
         [Test]
         public static void DisposingPropertyInBase()
         {
-            var fooCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
         private bool disposed;
@@ -764,23 +764,23 @@ namespace N
 {
     using System.IO;
 
-    public class C : Base
+    public class C : BaseClass
     {
         public override Stream Stream { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, fooCode, barCode);
+            RoslynAssert.Valid(Analyzer, baseClass, barCode);
         }
 
         [Test]
         public static void WhenCallingBaseDispose()
         {
-            var fooBaseCode = @"
+            var baseClass = @"
 namespace N
 {
     using System;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private readonly IDisposable disposable = new Disposable();
         private bool disposed;
@@ -809,7 +809,7 @@ namespace N
             var code = @"
 namespace N
 {
-    public class C : Base
+    public class C : BaseClass
     {
         protected override void Dispose(bool disposing)
         {
@@ -818,7 +818,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooBaseCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
         [Test]
@@ -969,20 +969,20 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+        [TestCase("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
         [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
         public static void Pair(string expression)
         {
             var staticPairCode = @"
 namespace N
 {
-    public static class Pair
+    public static class StaticPair
     {
         public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
     }
 }";
 
-            var genericPairCode = @"
+            var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -1011,7 +1011,7 @@ namespace N
 
         public C(string file1, string file2)
         {
-            this.pair = Pair.Create(File.OpenRead(file1), File.OpenRead(file2));
+            this.pair = StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2));
         }
 
         public void Dispose()
@@ -1020,9 +1020,9 @@ namespace N
             this.pair.Item2.Dispose();
         }
     }
-}".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
+}".AssertReplace("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, genericPairCode, staticPairCode, code);
+            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
         }
     }
 }

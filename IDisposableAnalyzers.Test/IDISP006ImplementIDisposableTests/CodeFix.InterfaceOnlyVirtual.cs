@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -9,8 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
         public static class InterfaceOnlyVirtual
         {
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
-            //// ReSharper disable once InconsistentNaming
-            private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS0535");
 
             [Test]
             public static void AbstractClass()
@@ -62,8 +61,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after);
-                RoslynAssert.FixAll(Fix, CS0535, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -148,8 +147,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after);
-                RoslynAssert.FixAll(Fix, CS0535, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -233,8 +232,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after);
-                RoslynAssert.FixAll(Fix, CS0535, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
             }
 
             [Test]
@@ -287,7 +286,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, "Implement IDisposable with virtual dispose method.");
             }
         }
     }

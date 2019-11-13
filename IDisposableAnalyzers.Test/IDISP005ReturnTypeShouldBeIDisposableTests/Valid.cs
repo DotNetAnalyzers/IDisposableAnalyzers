@@ -249,7 +249,7 @@ namespace N
         [Test]
         public static void MethodReturningThis()
         {
-            var chunkCode = @"
+            var chunkOfT = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -283,7 +283,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, chunkCode, code);
+            RoslynAssert.Valid(Analyzer, chunkOfT, code);
         }
 
         [Test]
@@ -331,7 +331,7 @@ namespace N
         [Test]
         public static void MethodReturningFieldDisposableListIndexerAsObject()
         {
-            var disposableListCode = @"
+            var disposableListOfT = @"
 namespace N
 {
     using System;
@@ -374,13 +374,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, disposableListCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, disposableListOfT, code);
         }
 
         [Test]
         public static void MethodReturningFieldDisposableListIndexerAsObjectId()
         {
-            var disposableListCode = @"
+            var disposableListOfT = @"
 namespace N
 {
     using System;
@@ -428,7 +428,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, disposableListCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, disposableListOfT, code);
         }
 
         [Test]

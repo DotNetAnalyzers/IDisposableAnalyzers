@@ -207,7 +207,7 @@ namespace N
     using System;
     using System.IO;
 
-    public abstract class Base : IDisposable
+    public abstract class BaseClass : IDisposable
     {
         private bool disposed;
 
@@ -243,14 +243,14 @@ namespace N
             [TestCase("Disposable?.Dispose();")]
             public static void DisposingCalculatedPropertyNestedStatementBody(string disposeCall)
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
 
-    public sealed class C
+    public sealed class C1
     {
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -264,20 +264,20 @@ namespace N
 {
     using System;
 
-    public sealed class M : IDisposable
+    public sealed class C : IDisposable
     {
-        private readonly C foo;
+        private readonly C1 c1;
 
-        public M(C foo)
+        public C(C1 c1)
         {
-            this.foo = foo;
+            this.c1 = c1;
         }
 
         public IDisposable Disposable
         {
             get
             {
-               return this.foo.Disposable;
+               return this.c1.Disposable;
             }
         }
 
@@ -288,7 +288,7 @@ namespace N
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, c1, code);
             }
 
             [TestCase("this.Disposable.Dispose();")]
@@ -297,14 +297,14 @@ namespace N
             [TestCase("Disposable?.Dispose();")]
             public static void DisposingCalculatedPropertyNestedExpressionBody(string disposeCall)
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
 
-    public sealed class C
+    public sealed class C1
     {
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
             this.Disposable = disposable;
         }
@@ -318,16 +318,16 @@ namespace N
 {
     using System;
 
-    public sealed class M : IDisposable
+    public sealed class C : IDisposable
     {
-        private readonly C foo;
+        private readonly C1 c1;
 
-        public M(C foo)
+        public C(C1 c1)
         {
-            this.foo = foo;
+            this.c1 = c1;
         }
 
-        public IDisposable Disposable => this.foo.Disposable;
+        public IDisposable Disposable => this.c1.Disposable;
 
         public void Dispose()
         {
@@ -336,7 +336,7 @@ namespace N
     }
 }".AssertReplace("this.Disposable.Dispose();", disposeCall);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, c1, code);
             }
 
             [TestCase("this.foo.Disposable.Dispose()")]
@@ -420,9 +420,9 @@ namespace N
 
     public class C
     {
-        public C(IDisposable meh)
+        public C(IDisposable disposable)
         {
-            ↓meh.Dispose();
+            ↓disposable.Dispose();
         }
     }
 }";
@@ -440,9 +440,9 @@ namespace N
 
     public class C
     {
-        public void M(IDisposable meh)
+        public void M(IDisposable disposable)
         {
-            ↓meh.Dispose();
+            ↓disposable.Dispose();
         }
     }
 }";
@@ -453,26 +453,26 @@ namespace N
             [Test]
             public static void DisposingInjectedPropertyInBaseClass()
             {
-                var fooBaseCode = @"
+                var baseClass = @"
 namespace N
 {
     using System;
 
-    public class Base : IDisposable
+    public class BaseClass : IDisposable
     {
         private bool disposed = false;
 
-        public Base()
+        public BaseClass()
             : this(null)
         {
         }
 
-        public Base(object bar)
+        public BaseClass(object o)
         {
-            this.M = bar;
+            this.P = o;
         }
 
-        public object M { get; }
+        public object P { get; }
 
         public void Dispose()
         {
@@ -491,13 +491,13 @@ namespace N
     }
 }";
 
-                var fooImplCode = @"
+                var code = @"
 namespace N
 {
     using System;
     using System.IO;
 
-    public class C : Base
+    public class C : BaseClass
     {
         public C(Stream stream)
             : base(stream)
@@ -508,14 +508,14 @@ namespace N
         {
             if (disposing)
             {
-                ↓(this.M as IDisposable)?.Dispose();
+                ↓(this.P as IDisposable)?.Dispose();
             }
 
             base.Dispose(disposing);
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, fooBaseCode, fooImplCode);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, baseClass, code);
             }
 
             [Test]
@@ -530,7 +530,7 @@ namespace N
     {
         private IDisposable disposable;
 
-        public void Meh(IDisposable disposable)
+        public void M(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -695,9 +695,9 @@ namespace N
     {
         private readonly Dictionary<int, IDisposable> map = new Dictionary<int, IDisposable>();
 
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            this.map[1] = bar;
+            this.map[1] = disposable;
         }
 
         public void M()

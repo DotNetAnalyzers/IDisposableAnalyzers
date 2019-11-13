@@ -9,7 +9,6 @@
     <Rule Id="UseAsyncSuffix" Action="None" />
   </Rules>
   <Rules AnalyzerId="Gu.Roslyn.Asserts.Analyzers" RuleNamespace="Gu.Roslyn.Asserts.Analyzers">
-    <Rule Id="GURA01" Action="Info" />
     <Rule Id="GURA02" Action="Info" />
     <Rule Id="GURA03" Action="Info" />
     <Rule Id="GURA04" Action="Info" />

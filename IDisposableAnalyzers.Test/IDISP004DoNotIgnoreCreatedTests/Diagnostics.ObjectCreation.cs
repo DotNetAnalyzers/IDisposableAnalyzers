@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -44,16 +44,16 @@ namespace N
             [Test]
             public static void NewDisposablePassedIntoCtor()
             {
-                var barCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
 
-    public class M
+    public class C1
     {
         private readonly IDisposable disposable;
 
-        public M(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
            this.disposable = disposable;
         }
@@ -65,13 +65,13 @@ namespace N
 {
     public sealed class C
     {
-        public M Meh()
+        public C1 M()
         {
-            return new M(↓new Disposable());
+            return new C1(↓new Disposable());
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, barCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
             }
 
             [Test]
@@ -194,13 +194,13 @@ namespace N
             [Test]
             public static void NewStandardKernelNewModuleArgument()
             {
-                var moduleCode = @"
+                var module = @"
 namespace N
 {
     using System;
     using Ninject.Modules;
 
-    public class CModule : NinjectModule
+    public class Module : NinjectModule
     {
         public override void Load()
         {
@@ -218,13 +218,13 @@ namespace N
     {
         public C()
         {
-            using (new StandardKernel(↓new CModule()))
+            using (new StandardKernel(↓new Module()))
             {
             }
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, moduleCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, module, code);
             }
         }
     }
