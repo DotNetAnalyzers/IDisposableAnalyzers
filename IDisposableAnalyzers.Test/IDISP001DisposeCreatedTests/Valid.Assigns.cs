@@ -10,7 +10,7 @@
         public static void DontUseUsingWhenAssigningAField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningAFieldTernary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningAFieldInAMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningAFieldInAMethodLocalVariable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -101,7 +101,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAddingLocalVariableToFieldList()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -124,7 +124,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningACallThatReturnsAStaticField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -151,7 +151,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningACallThatReturnsAField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -178,7 +178,7 @@ namespace RoslynSandbox
         public static void DontUseUsingWhenAssigningACallThatReturnsAFieldSwitch()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -216,7 +216,7 @@ namespace RoslynSandbox
         public static void BuildCollectionThenAssignFieldIndexer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -240,7 +240,7 @@ namespace RoslynSandbox
         public static void BuildCollectionThenAssignField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {

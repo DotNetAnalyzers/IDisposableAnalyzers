@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated);
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void Ternary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void NullCoalesce()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -83,7 +83,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadFromUsing()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

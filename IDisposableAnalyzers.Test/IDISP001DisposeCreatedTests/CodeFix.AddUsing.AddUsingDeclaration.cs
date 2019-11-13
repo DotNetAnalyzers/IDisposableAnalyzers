@@ -17,7 +17,7 @@
             public static void Local()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -55,7 +55,7 @@ namespace RoslynSandbox
             public static void LocalWithTrivia()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
             public static void LocalOneStatementAfter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -111,7 +111,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -135,7 +135,7 @@ namespace RoslynSandbox
             public static void LocalManyStatements()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -156,7 +156,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -185,7 +185,7 @@ namespace RoslynSandbox
             public static void LocalInLambda()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -203,7 +203,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -229,7 +229,7 @@ namespace RoslynSandbox
             public static void LocalInSwitchCase()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -261,7 +261,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -302,7 +302,7 @@ namespace RoslynSandbox
             public static void LocalFactoryMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -322,7 +322,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
             public static void CreateTouchDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             public static void DisposingTwice()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             public static void DisposingTwiceInUsing()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             public static void AssignedViaOut()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -108,7 +108,7 @@ namespace RoslynSandbox
             public static void AssignedViaOutVar()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -135,7 +135,7 @@ namespace RoslynSandbox
             public static void ReassignAfterDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -160,7 +160,7 @@ namespace RoslynSandbox
             public static void ReassignViaOutVarAfterDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -190,7 +190,7 @@ namespace RoslynSandbox
             public static void ReassignViaOutAfterDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

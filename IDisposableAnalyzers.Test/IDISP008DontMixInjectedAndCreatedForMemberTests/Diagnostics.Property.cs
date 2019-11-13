@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             public static void InjectedAndCreated(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedCtorAndInitializer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -61,7 +61,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedTwoCtors()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
             public static void Mutable(string property)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -107,7 +107,7 @@ namespace RoslynSandbox
             public static void MutablePropertyInSealed(string property)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedInFactory()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

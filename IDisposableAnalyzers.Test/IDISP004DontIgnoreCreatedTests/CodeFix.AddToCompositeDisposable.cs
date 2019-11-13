@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             public static void CreateNewCompositeDisposable()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             public static void CreateNewCompositeDisposableWithTrivia()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -73,7 +73,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -100,7 +100,7 @@ namespace RoslynSandbox
             public static void CreateNewCompositeDisposableWhenUsingsAndFields()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -123,7 +123,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -152,7 +152,7 @@ namespace RoslynSandbox
             public static void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -175,7 +175,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -204,7 +204,7 @@ namespace RoslynSandbox
             public static void AddToExistingCompositeDisposableInitializer()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -222,7 +222,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -245,7 +245,7 @@ namespace RoslynSandbox
             public static void AddToExistingCompositeDisposableInitializerWithCtorArg()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -263,7 +263,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -286,7 +286,7 @@ namespace RoslynSandbox
             public static void AddToExistingCompositeDisposableInitializerWithTrivia()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -304,7 +304,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -330,7 +330,7 @@ namespace RoslynSandbox
             public static void AddToExistingCompositeDisposableWithInitializerOneLine()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -348,7 +348,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -375,7 +375,7 @@ namespace RoslynSandbox
             public static void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -393,7 +393,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -420,7 +420,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -441,7 +441,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -468,7 +468,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithCtorArg()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -489,7 +489,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -516,7 +516,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -538,7 +538,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -567,7 +567,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -585,7 +585,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -609,7 +609,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -627,7 +627,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -651,7 +651,7 @@ namespace RoslynSandbox
             public static void AddIgnoredReturnValueToCompositeDisposableInitializer()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -669,7 +669,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -692,7 +692,7 @@ namespace RoslynSandbox
             public static void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -711,7 +711,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;

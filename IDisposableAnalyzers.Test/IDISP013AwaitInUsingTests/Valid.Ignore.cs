@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
             public static void NUnitAssertThrowsAsync()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

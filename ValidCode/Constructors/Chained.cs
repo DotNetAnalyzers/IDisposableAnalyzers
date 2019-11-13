@@ -1,5 +1,5 @@
 // ReSharper disable All
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

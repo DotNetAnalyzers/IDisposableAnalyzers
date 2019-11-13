@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void DictionaryTryGetValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static void DiscardCachedOutParameter(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         public static void StaticConcurrentDictionaryGetOrAdd()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -91,7 +91,7 @@ namespace RoslynSandbox
         public static void ConcurrentDictionaryGetOrAdd()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -114,7 +114,7 @@ namespace RoslynSandbox
         public static void ConcurrentDictionaryTryGetValue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -142,7 +142,7 @@ namespace RoslynSandbox
         public static void ConcurrentDictionaryTryGetValueVarOut()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -169,7 +169,7 @@ namespace RoslynSandbox
         public static void ConditionalWeakTableTryGetValue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Runtime.CompilerServices;
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         public static void ConditionalWeakTableTryGetValueVarOut()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Runtime.CompilerServices;
@@ -224,7 +224,7 @@ namespace RoslynSandbox
         public static void CustomCacheWrappingDictionary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -280,7 +280,7 @@ namespace RoslynSandbox
         public static void PooledConcurrentQueueTryDequeue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -338,7 +338,7 @@ namespace RoslynSandbox
         public static void PooledConcurrentQueueTryDequeue2()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -402,7 +402,7 @@ namespace RoslynSandbox
         public static void TryGetRecursive()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void IgnoreAssignedWithCtorArgument()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             public static void IgnoreAssignedWithCtorArgumentIndexer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -53,7 +53,7 @@ namespace RoslynSandbox
             public static void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             public static void IgnoreDictionaryPassedInViaCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -102,7 +102,7 @@ namespace RoslynSandbox
             public static void IgnorePassedInViaCtorUnderscore()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -123,7 +123,7 @@ namespace RoslynSandbox
             public static void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -149,7 +149,7 @@ namespace RoslynSandbox
             {
                 var testCode = @"
 #pragma warning disable IDISP008
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

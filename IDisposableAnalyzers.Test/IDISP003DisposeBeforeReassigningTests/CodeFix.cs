@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning);
 
         private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -24,7 +24,7 @@ namespace RoslynSandbox
 }";
 
         private const string ExplicitDisposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         public static void LocalAssignedTwice()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             // keeping it safe and doing ?.Dispose()
             // will require some work to figure out if it can be null
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         public static void LocalOfTypeObjectAssignedTwice()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -94,7 +94,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         public static void LocalAssignedAndThenAssignedWithNull()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -153,7 +153,7 @@ namespace RoslynSandbox
         public static void LocalAssignedTwiceInsideIf()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -172,7 +172,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -198,7 +198,7 @@ namespace RoslynSandbox
         public static void LocalAssignedInElse()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -221,7 +221,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -251,7 +251,7 @@ namespace RoslynSandbox
         public static void LocalAssignedWithOutThenSimple()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -276,7 +276,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -308,7 +308,7 @@ namespace RoslynSandbox
         public static void LocalInLambdaClosure()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -326,7 +326,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -351,7 +351,7 @@ namespace RoslynSandbox
         public static void LocalInitializedBeforeWhileLoop()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -372,7 +372,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -399,7 +399,7 @@ namespace RoslynSandbox
         public static void LocalInitializedWithNullBeforeWhileLoop()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -420,7 +420,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -447,7 +447,7 @@ namespace RoslynSandbox
         public static void ParameterAssignedTwice()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -463,7 +463,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -486,7 +486,7 @@ namespace RoslynSandbox
         public static void FieldInitializedThenAssignedInCtor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -503,7 +503,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -527,7 +527,7 @@ namespace RoslynSandbox
         public static void FieldOfTypeObjectInitializedThenAssignedInConstructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -544,7 +544,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -568,7 +568,7 @@ namespace RoslynSandbox
         public static void PropertyInitializedAndAssignedInConstructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -585,7 +585,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -609,7 +609,7 @@ namespace RoslynSandbox
         public static void PropertyWithBackingFieldInitializedThenAssignedInConstructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -632,7 +632,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -662,7 +662,7 @@ namespace RoslynSandbox
         public static void PropertyWithBackingFieldAssignedTwiceInConstructor()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -686,7 +686,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -717,7 +717,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInPublicMethod()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -734,7 +734,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -758,7 +758,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInPublicMethodReturnExpression()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -775,7 +775,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -799,7 +799,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInPublicMethodExpressionBody()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -813,7 +813,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -837,7 +837,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInLambda()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -856,7 +856,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -885,7 +885,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInLambdaBlock()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -911,7 +911,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -944,7 +944,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInGetterReturnExpression()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -964,7 +964,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -991,7 +991,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInPropertyExpressionBody()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1005,7 +1005,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1032,7 +1032,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInLambdaArgument()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1055,7 +1055,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1088,7 +1088,7 @@ namespace RoslynSandbox
         public static void FieldAssignedInLambdaArgumentBlock()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1119,7 +1119,7 @@ namespace RoslynSandbox
     }
 }";
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

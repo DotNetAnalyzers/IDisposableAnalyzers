@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
     public static partial class CodeFix
     {
         private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

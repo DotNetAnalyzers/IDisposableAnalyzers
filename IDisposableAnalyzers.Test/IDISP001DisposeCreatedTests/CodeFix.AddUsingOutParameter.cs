@@ -17,7 +17,7 @@
             public static void OutParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -72,7 +72,7 @@ namespace RoslynSandbox
             public static void OutVarParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -94,7 +94,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

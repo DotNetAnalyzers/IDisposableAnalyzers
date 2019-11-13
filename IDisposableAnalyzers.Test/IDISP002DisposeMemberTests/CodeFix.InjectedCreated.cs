@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void CtorPassingCreatedIntoPrivateCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -42,7 +42,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -99,7 +99,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -131,7 +131,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -145,7 +145,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -165,7 +165,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -192,7 +192,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
             {
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -206,7 +206,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -226,7 +226,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -253,7 +253,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -274,7 +274,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

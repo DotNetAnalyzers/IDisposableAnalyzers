@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
         public static void ReturnFileOpenReadFromUsing()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadDisposed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void ReturnLazyFromUsing()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -86,7 +86,7 @@ namespace RoslynSandbox
         public static void ReturnLazyFromUsingNested()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

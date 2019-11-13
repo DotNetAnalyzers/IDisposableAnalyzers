@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
         public static void DisposingCreatedFieldInVirtualDispose()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -58,7 +58,7 @@ namespace RoslynSandbox
         public static void HandlesRecursion()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -81,7 +81,7 @@ namespace RoslynSandbox
         public static void PropertyWithCreatedValue(string property)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -102,7 +102,7 @@ namespace RoslynSandbox
         public static void PropertyWithBackingFieldCreatedValue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -132,7 +132,7 @@ namespace RoslynSandbox
         public static void PropertyWithInjectedValue(string property)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -153,7 +153,7 @@ namespace RoslynSandbox
         public static void InjectedListOfInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -175,7 +175,7 @@ namespace RoslynSandbox
         public static void InjectedListOfT()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -197,7 +197,7 @@ namespace RoslynSandbox
         public static void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -218,7 +218,7 @@ namespace RoslynSandbox
         public static void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -243,7 +243,7 @@ namespace RoslynSandbox
         public static void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -256,7 +256,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -289,7 +289,7 @@ namespace RoslynSandbox
         public static void PropertyWithBackingFieldInjectedValue(string setter)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -320,7 +320,7 @@ namespace RoslynSandbox
         public static void GenericTypeWithPropertyAndIndexer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -357,7 +357,7 @@ namespace RoslynSandbox
         public static void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -371,7 +371,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -397,7 +397,7 @@ namespace RoslynSandbox
         public static void IgnoreTestMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -417,7 +417,7 @@ namespace RoslynSandbox
         public static void WhenImplementingInterface()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -481,7 +481,7 @@ namespace System.Web
         public static void WhenSubclassingAndImplementingTwoInterfaces()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Windows;

@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void WhenNotUsed()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -38,7 +38,7 @@ namespace RoslynSandbox
             public static void AssigningLocal()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -63,7 +63,7 @@ namespace RoslynSandbox
             public static void FieldAssignedInCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -84,14 +84,14 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
+                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
             [Test]
             public static void FieldAssignedViaCalledMethodParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -117,14 +117,14 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
+                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
             [Test]
             public static void FieldAssignedInCtorViaLocal()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -146,14 +146,14 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("RoslynSandbox.C.disposable", field.Symbol.ToString());
+                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
             [Test]
             public static void PropertyAssignedInCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -174,14 +174,14 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("RoslynSandbox.C.Disposable", field.Symbol.ToString());
+                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
 
             [Test]
             public static void PropertyAssignedInCalledMethod()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -207,7 +207,7 @@ namespace RoslynSandbox
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
-                Assert.AreEqual("RoslynSandbox.C.Disposable", field.Symbol.ToString());
+                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
         }
     }

@@ -18,7 +18,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             public static void InjectedAndCreatedField(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -50,7 +50,7 @@ namespace RoslynSandbox
             public static void DisposingFieldAssignedWithInjected(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -79,7 +79,7 @@ namespace RoslynSandbox
             public static void DisposingPublicField(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -106,7 +106,7 @@ namespace RoslynSandbox
             public static void DisposingStaticField(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -127,7 +127,7 @@ namespace RoslynSandbox
             public static void DisposingPublicFieldOutsideOfLock()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -173,7 +173,7 @@ namespace RoslynSandbox
             public static void DisposingPropertyAssignedWithInjected(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -202,7 +202,7 @@ namespace RoslynSandbox
             public static void DisposingAbstractOrVirtualProperty(string property)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -244,7 +244,7 @@ namespace RoslynSandbox
             public static void DisposingCalculatedPropertyNestedStatementBody(string disposeCall)
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -260,7 +260,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -298,7 +298,7 @@ namespace RoslynSandbox
             public static void DisposingCalculatedPropertyNestedExpressionBody(string disposeCall)
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -314,7 +314,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -346,7 +346,7 @@ namespace RoslynSandbox
             public static void DisposingNestedField(string disposeCall)
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -362,7 +362,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -392,7 +392,7 @@ namespace RoslynSandbox
             public static void DisposingMutableProperty(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -414,7 +414,7 @@ namespace RoslynSandbox
             public static void DisposingCtorParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -434,7 +434,7 @@ namespace RoslynSandbox
             public static void DisposingParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -454,7 +454,7 @@ namespace RoslynSandbox
             public static void DisposingInjectedPropertyInBaseClass()
             {
                 var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -492,7 +492,7 @@ namespace RoslynSandbox
 }";
 
                 var fooImplCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -522,7 +522,7 @@ namespace RoslynSandbox
             public static void InjectedViaMethod()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -548,7 +548,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInVirtualDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -636,7 +636,7 @@ namespace Gu.Reactive
             public static void DisposingArrayItemAssignedWithInjected()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -663,7 +663,7 @@ namespace RoslynSandbox
             public static void DisposingStaticArrayItem()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -685,7 +685,7 @@ namespace RoslynSandbox
             public static void DisposingDictionaryItem()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -714,7 +714,7 @@ namespace RoslynSandbox
             public static void DisposingStaticDictionaryItem()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -741,7 +741,7 @@ namespace RoslynSandbox
             public static void Cast(string cast)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -761,7 +761,7 @@ namespace RoslynSandbox
             public static void IfPatternMatchedInjected()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -783,7 +783,7 @@ namespace RoslynSandbox
             public static void SwitchPatternMatchedInjected()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

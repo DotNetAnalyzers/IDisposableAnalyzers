@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
             public static void WhiteList(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class Foo
     {

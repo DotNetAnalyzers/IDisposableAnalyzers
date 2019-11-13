@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             public static void SealedWithFinalizerStatementBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
             public static void SealedWithFinalizerExpressionBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -82,7 +82,7 @@ namespace RoslynSandbox
             public static void TouchingStruct(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -118,7 +118,7 @@ namespace RoslynSandbox
             public static void SettingStaticToNull()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 
@@ -140,7 +140,7 @@ namespace RoslynSandbox
             public static void SettingInstanceToNull()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Text;
 

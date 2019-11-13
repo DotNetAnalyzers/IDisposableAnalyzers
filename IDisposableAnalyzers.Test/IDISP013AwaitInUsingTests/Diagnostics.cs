@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         public static void WebClientDownloadStringTaskAsync()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -37,7 +37,7 @@ namespace RoslynSandbox
         public static void ValueTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -65,7 +65,7 @@ namespace RoslynSandbox
         public static void LocalTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         public static void TaskCompletionSourceTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;

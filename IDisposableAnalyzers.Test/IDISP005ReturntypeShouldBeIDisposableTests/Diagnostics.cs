@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP005ReturntypeShouldBeIDisposableTests
         public static void ReturnFileOpenReadAsObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadAsDynamic()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
         public static void ReturnFieldPasswordBoxSecurePasswordAsObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         public static void IndexerReturningObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -122,7 +122,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadAsObjectExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         public static void PropertyReturnFileOpenReadAsObjectExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -156,7 +156,7 @@ namespace RoslynSandbox
         public static void StatementLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -179,7 +179,7 @@ namespace RoslynSandbox
         public static void ParenthesizedLambdaExpression()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -199,7 +199,7 @@ namespace RoslynSandbox
         public static void SimpleLambdaExpression()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

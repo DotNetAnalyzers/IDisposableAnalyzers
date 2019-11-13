@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP019CallSuppressFinalizeWhenVirtualDispo
         public static void WhenStatementBody()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -69,7 +69,7 @@ namespace RoslynSandbox
         public static void WhenStatementBodyAndTrivia()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -95,7 +95,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -127,7 +127,7 @@ namespace RoslynSandbox
         public static void SealedWithFinalizerWhenExpressionBody()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -148,7 +148,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

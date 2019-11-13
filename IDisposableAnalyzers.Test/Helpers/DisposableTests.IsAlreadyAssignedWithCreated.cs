@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void FieldAssignedInCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             public static void FieldAssignedInLambdaCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             public static void LocalSeparateDeclarationAndAssignment()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -111,7 +111,7 @@ namespace RoslynSandbox
             public static void LocalSeparateDeclarationAndAssignmentInLambda()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -145,7 +145,7 @@ namespace RoslynSandbox
             public static void LocalAssignmentInLambda()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -179,7 +179,7 @@ namespace RoslynSandbox
             public static void FieldAfterEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -211,7 +211,7 @@ namespace RoslynSandbox
             public static void PropertyAfterEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -243,7 +243,7 @@ namespace RoslynSandbox
             public static void ParameterAfterEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -273,7 +273,7 @@ namespace RoslynSandbox
             public static void ParameterBeforeEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -304,7 +304,7 @@ namespace RoslynSandbox
             public static void LocalAfterEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -335,7 +335,7 @@ namespace RoslynSandbox
             public static void LocalBeforeEarlyReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -367,7 +367,7 @@ namespace RoslynSandbox
             public static void OutParameterInExpressionBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -388,7 +388,7 @@ namespace RoslynSandbox
             public static void Repro()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {

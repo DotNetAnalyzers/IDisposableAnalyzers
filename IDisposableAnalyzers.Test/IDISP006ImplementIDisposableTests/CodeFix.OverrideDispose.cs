@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void SubclassStreamReader()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -79,7 +79,7 @@ namespace RoslynSandbox
             public static void StyleCopCallingBaseThrowIfDisposed()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -115,7 +115,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -126,7 +126,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -169,7 +169,7 @@ namespace RoslynSandbox
             public static void UnderscoreWhenThrowIsNotVirtual()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -205,7 +205,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -216,7 +216,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -249,7 +249,7 @@ namespace RoslynSandbox
             public static void UnderscoreWhenThrowIsVirtual()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -285,7 +285,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -296,7 +296,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -339,7 +339,7 @@ namespace RoslynSandbox
             public static void SubclassingNinjectModule()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Ninject.Modules;
@@ -356,7 +356,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Ninject.Modules;

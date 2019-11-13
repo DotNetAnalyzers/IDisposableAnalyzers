@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void ImplementIDisposableAndMakeSealed()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -42,7 +42,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableWithVirtualDisposeMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -126,7 +126,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -194,7 +194,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableSealedClassUsingsInside()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -205,7 +205,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -244,7 +244,7 @@ namespace RoslynSandbox
                 var before = @"
 using System.IO;
 
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -255,7 +255,7 @@ namespace RoslynSandbox
                 var after = @"
 using System.IO;
 
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C : System.IDisposable
     {
@@ -290,7 +290,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableSealedClassUnderscoreWithConst()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -304,7 +304,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -343,7 +343,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableAbstractClass()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -354,7 +354,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -401,7 +401,7 @@ namespace RoslynSandbox
             public static void WhenInterfaceIsMissing()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -422,7 +422,7 @@ namespace RoslynSandbox
             public static void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -440,7 +440,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -484,7 +484,7 @@ namespace RoslynSandbox
             public static void Issue111PartialUserControl()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Windows.Controls;
@@ -496,7 +496,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Windows.Controls;

@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static void WhenNullCheckBefore(string nullCheck)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

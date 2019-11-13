@@ -12,7 +12,7 @@
         public static void LocalTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void LocalValueTupleThatDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void FieldTuple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public static void FieldTupleWithLocals()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         public static void FieldValueTuple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -148,7 +148,7 @@ namespace RoslynSandbox
         public static void FieldValueTupleWithLocals()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -180,7 +180,7 @@ namespace RoslynSandbox
         public static void LocalPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Pair
     {
@@ -189,7 +189,7 @@ namespace RoslynSandbox
 }";
 
             var pairOfT = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Pair<T>
     {
@@ -206,7 +206,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void FieldTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -259,7 +259,7 @@ namespace RoslynSandbox
         public static void FieldValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -289,7 +289,7 @@ namespace RoslynSandbox
         public static void FieldPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Pair
     {
@@ -298,7 +298,7 @@ namespace RoslynSandbox
 }";
 
             var pairOfT = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Pair<T>
     {
@@ -315,7 +315,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -345,7 +345,7 @@ namespace RoslynSandbox
         public static void FieldTuple(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -374,7 +374,7 @@ namespace RoslynSandbox
         public static void FieldValueTuple(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -404,7 +404,7 @@ namespace RoslynSandbox
         public static void Pair(string expression)
         {
             var staticPair = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class StaticPair
     {
@@ -413,7 +413,7 @@ namespace RoslynSandbox
 }";
 
             var pairOfT = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Pair<T>
     {
@@ -430,7 +430,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -460,7 +460,7 @@ namespace RoslynSandbox
         public static void DisposingPair(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
         private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -25,7 +25,7 @@ namespace RoslynSandbox
         public static void PublicMethodRefParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

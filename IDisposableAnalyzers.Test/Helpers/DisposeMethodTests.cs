@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         public static void TryFindIDisposableDispose(Search search)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -44,7 +44,7 @@ namespace RoslynSandbox
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
+            Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
 
         [Explicit("Not sure if we want to find explicit.")]
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static void TryFindIDisposableDisposeWhenExplicit(Search search)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -85,7 +85,7 @@ namespace RoslynSandbox
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
+            Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
 
         [TestCase(Search.TopLevel)]
@@ -93,7 +93,7 @@ namespace RoslynSandbox
         public static void TryFindVirtualDispose(Search search)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -133,7 +133,7 @@ namespace RoslynSandbox
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindVirtualDispose(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.C.Dispose(bool)", match.ToString());
+            Assert.AreEqual("N.C.Dispose(bool)", match.ToString());
         }
 
         [TestCase(Search.TopLevel)]
@@ -141,7 +141,7 @@ namespace RoslynSandbox
         public static void TryFindFirst(Search search)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -181,7 +181,7 @@ namespace RoslynSandbox
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual(true, DisposeMethod.TryFindFirst(method, compilation, search, out var match));
-            Assert.AreEqual("RoslynSandbox.C.Dispose()", match.ToString());
+            Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
     }
 }

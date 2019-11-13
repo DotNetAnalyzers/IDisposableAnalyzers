@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void AssignLocalWithInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         public static void AssignField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -47,7 +47,7 @@ namespace RoslynSandbox
         public static void AssignFieldLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         public static void AssignFieldViaLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         public static void AssignFieldViaParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -116,7 +116,7 @@ namespace RoslynSandbox
         public static void AssignProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -136,7 +136,7 @@ namespace RoslynSandbox
         public static void AssignPropertyLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         public static void AssignFieldIndexer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -181,7 +181,7 @@ namespace RoslynSandbox
         public static void AssignFieldListAdd()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -207,7 +207,7 @@ namespace RoslynSandbox
         public static void AssignAssemblyLoadToLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Reflection;
 
@@ -226,7 +226,7 @@ namespace RoslynSandbox
         public static void AssignedTernary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -250,7 +250,7 @@ namespace RoslynSandbox
         public static void AssignedCoalesce()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -272,7 +272,7 @@ namespace RoslynSandbox
         public static void WhenDisposedAndReassigned()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

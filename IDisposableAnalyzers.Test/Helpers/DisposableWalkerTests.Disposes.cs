@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void WhenNotUsed()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -43,7 +43,7 @@ namespace RoslynSandbox
             public static void WhenDisposed(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -69,7 +69,7 @@ namespace RoslynSandbox
             public static void WhenUsing()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -96,7 +96,7 @@ namespace RoslynSandbox
             public static void WhenUsingAfterDeclaration()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

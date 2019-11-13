@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
             public static void AddUsingForIgnoredFileOpenRead()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -43,7 +43,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -64,7 +64,7 @@ namespace RoslynSandbox
             public static void AddUsingForIgnoredReturnEmpty()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
             public static void AddUsingForIgnoredReturnManyStatements()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -122,7 +122,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -152,7 +152,7 @@ namespace RoslynSandbox
             public static void NoFixForArgument()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

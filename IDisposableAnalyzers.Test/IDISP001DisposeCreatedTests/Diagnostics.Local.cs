@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
 
             private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             public static void LanguageConstructs(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             public static void KnownArguments(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             public static void PropertyInitializedPasswordBoxSecurePassword()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
             public static void StaticPropertyInitializedPasswordBoxSecurePassword()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
@@ -123,7 +123,7 @@ namespace RoslynSandbox
             public static void FileOpenRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -144,7 +144,7 @@ namespace RoslynSandbox
             public static void NewDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -162,7 +162,7 @@ namespace RoslynSandbox
             public static void MethodCreatingDisposable1()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -187,7 +187,7 @@ namespace RoslynSandbox
             public static void MethodCreatingDisposable2()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -213,7 +213,7 @@ namespace RoslynSandbox
             public static void MethodCreatingDisposableExpressionBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -235,7 +235,7 @@ namespace RoslynSandbox
             public static void PropertyCreatingDisposableSimple()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -260,7 +260,7 @@ namespace RoslynSandbox
             public static void PropertyCreatingDisposableGetBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -289,7 +289,7 @@ namespace RoslynSandbox
             public static void PropertyCreatingDisposableExpressionBody()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

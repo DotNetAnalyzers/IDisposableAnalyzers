@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void FactoryMethodCallingPrivateCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             public static void FactoryMethodCallingPrivateCtorWithCachedDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             {
                 var testCode = @"
 #pragma warning disable IDISP008
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void Linq(string linq)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq;
@@ -34,7 +34,7 @@ namespace RoslynSandbox
         public static void MockOf()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Moq;
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void Ninject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Ninject;

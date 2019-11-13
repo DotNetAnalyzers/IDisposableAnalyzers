@@ -53,7 +53,7 @@ internal class C
         public static void Property(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -113,7 +113,7 @@ namespace RoslynSandbox
         public static void PropertyRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -188,7 +188,7 @@ namespace RoslynSandbox
         public static void Call(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -317,7 +317,7 @@ namespace RoslynSandbox
         public static void CallRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -392,7 +392,7 @@ namespace RoslynSandbox
         public static void RecursiveWithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -446,7 +446,7 @@ namespace RoslynSandbox
         public static void Lambda(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -527,7 +527,7 @@ namespace RoslynSandbox
         public static void AsyncAwait(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -610,7 +610,7 @@ namespace RoslynSandbox
         public static void AsyncAwaitRecursive(string code, ReturnValueSearch search, string expected)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -669,7 +669,7 @@ namespace RoslynSandbox
         public static void ChainedExtensionMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -717,7 +717,7 @@ namespace RoslynSandbox
         public static void ReturnTernary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -746,7 +746,7 @@ namespace RoslynSandbox
         public static void ReturnNullCoalesce()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -775,7 +775,7 @@ namespace RoslynSandbox
         public static void ValidationErrorToStringConverter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
      using System;
     using System.Globalization;

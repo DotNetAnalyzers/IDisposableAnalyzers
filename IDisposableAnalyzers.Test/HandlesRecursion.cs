@@ -26,7 +26,7 @@ namespace IDisposableAnalyzers.Test
         public static void ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -72,7 +72,7 @@ namespace RoslynSandbox
         public static void ConstructorCycle(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

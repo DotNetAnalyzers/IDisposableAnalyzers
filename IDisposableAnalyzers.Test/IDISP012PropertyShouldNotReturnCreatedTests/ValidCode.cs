@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
         private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -25,7 +25,7 @@ namespace RoslynSandbox
         public static void PropertyReturning1()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         public static void PropertyReturningBoxed1()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void PropertyReturning1ExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public static void PropertyReturningNewTimeSpan()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         public static void PropertyReturningNewTimeSpanExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -128,7 +128,7 @@ namespace RoslynSandbox
         public static void PropertyReturningBackingFieldExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -155,7 +155,7 @@ namespace RoslynSandbox
         public static void PropertyReturningBackingField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -179,7 +179,7 @@ namespace RoslynSandbox
         public static void PropertyReturningBackingFieldFunc()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

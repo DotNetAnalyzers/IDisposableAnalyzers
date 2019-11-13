@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP010");
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
         public static void WhenNotCallingBaseDisposeWithBaseCode()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -59,7 +59,7 @@ namespace RoslynSandbox
     }
 }";
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -70,7 +70,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -88,7 +88,7 @@ namespace RoslynSandbox
         public static void WhenNotCallingBaseDisposeWithoutBaseCode()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -106,7 +106,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

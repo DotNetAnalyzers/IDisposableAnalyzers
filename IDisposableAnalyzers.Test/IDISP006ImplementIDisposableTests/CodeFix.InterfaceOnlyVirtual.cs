@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void AbstractClass()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -26,7 +26,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -70,7 +70,7 @@ namespace RoslynSandbox
             public static void AbstractClassWithFields()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -96,7 +96,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
             public static void AbstractClassWithMethods()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -181,7 +181,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -241,7 +241,7 @@ namespace RoslynSandbox
             public static void VirtualDispose()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -251,7 +251,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

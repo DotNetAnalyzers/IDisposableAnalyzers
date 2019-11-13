@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             public static void LocalExplicitTypeToFieldInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -55,7 +55,7 @@ namespace RoslynSandbox
             public static void LocalVarToFieldInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -70,7 +70,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

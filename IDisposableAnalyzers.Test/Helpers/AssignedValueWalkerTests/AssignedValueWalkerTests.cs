@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
         public static void LambdaInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

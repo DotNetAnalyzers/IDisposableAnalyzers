@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             public static void AddUsingForIgnoredFileOpenRead()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -56,7 +56,7 @@ namespace RoslynSandbox
             public static void AddUsingForIgnoredReturnEmpty()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -94,7 +94,7 @@ namespace RoslynSandbox
             public static void AddUsingForIgnoredReturnManyStatements()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -117,7 +117,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -148,7 +148,7 @@ namespace RoslynSandbox
             public static void NoFixForArgument()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

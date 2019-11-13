@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
         public static void DisposingField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -42,7 +42,7 @@ namespace RoslynSandbox
         public static void DisposingArrayItem()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -68,7 +68,7 @@ namespace RoslynSandbox
         public static void DisposingDictionaryItem()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
         public static void ReassignAfterDispose()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -119,7 +119,7 @@ namespace RoslynSandbox
         public static void ReassignViaOutAfterDispose()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

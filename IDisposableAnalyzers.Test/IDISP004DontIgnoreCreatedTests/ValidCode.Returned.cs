@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         public static void Generic()
         {
             var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Factory
     {
@@ -18,7 +18,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void Operator()
         {
             var mehCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -44,7 +44,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         public static void OperatorNestedCall()
         {
             var mehCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -72,7 +72,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -96,7 +96,7 @@ namespace RoslynSandbox
         public static void OperatorEquals()
         {
             var mehCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -123,7 +123,7 @@ namespace RoslynSandbox
         public static void MethodReturningObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -142,7 +142,7 @@ namespace RoslynSandbox
         public static void MethodWithArgReturningObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -161,7 +161,7 @@ namespace RoslynSandbox
         public static void MethodWithObjArgReturningObject()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -180,7 +180,7 @@ namespace RoslynSandbox
         public static void ReturningStatementBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -199,7 +199,7 @@ namespace RoslynSandbox
         public static void ReturningLocalStatementBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -219,7 +219,7 @@ namespace RoslynSandbox
         public static void ReturningExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -235,7 +235,7 @@ namespace RoslynSandbox
         public static void ReturningNewAssigningAndDisposing()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -255,7 +255,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -274,7 +274,7 @@ namespace RoslynSandbox
         public static void ReturningNewAssigningAndDisposingParams(string objectCreation)
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -297,7 +297,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -315,7 +315,7 @@ namespace RoslynSandbox
         public static void ReturningCreateNewAssigningAndDisposing()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -335,7 +335,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -356,7 +356,7 @@ namespace RoslynSandbox
         public static void ReturningCreateNewStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -377,7 +377,7 @@ namespace RoslynSandbox
         public static void ReturningAssigningPrivateChained()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -402,7 +402,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -419,7 +419,7 @@ namespace RoslynSandbox
         public static void StreamInStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -438,7 +438,7 @@ namespace RoslynSandbox
         public static void StreamInStreamReaderLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -462,7 +462,7 @@ namespace RoslynSandbox
         public static void ReturnedInCompositeDisposable(string expression)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

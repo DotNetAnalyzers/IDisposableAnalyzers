@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
         public static void AutoPropertyGetSetAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         public static void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         public static void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -176,7 +176,7 @@ namespace RoslynSandbox
         public static void BackingFieldPublicSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -210,7 +210,7 @@ namespace RoslynSandbox
         public static void BackingFieldPrivateSetSimple()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -335,7 +335,7 @@ public sealed class C
         public static void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -392,7 +392,7 @@ namespace RoslynSandbox
         public static void RecursiveGetAndSet(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -429,7 +429,7 @@ namespace RoslynSandbox
         public static void Recursive()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {

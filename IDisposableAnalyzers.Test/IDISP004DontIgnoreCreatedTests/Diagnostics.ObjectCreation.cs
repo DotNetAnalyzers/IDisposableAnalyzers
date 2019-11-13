@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
 
             private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
             public static void NewDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             public static void NewDisposablePassedIntoCtor()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -61,7 +61,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -78,7 +78,7 @@ namespace RoslynSandbox
             public static void ReturningNewAssigningNotDisposing()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -97,7 +97,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -114,7 +114,7 @@ namespace RoslynSandbox
             public static void ReturningNewNotAssigning()
             {
                 var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -130,7 +130,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Meh
     {
@@ -147,7 +147,7 @@ namespace RoslynSandbox
             public static void StringFormatArgument()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -161,7 +161,7 @@ namespace RoslynSandbox
             public static void NewDisposableToString()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -178,7 +178,7 @@ namespace RoslynSandbox
             public static void ReturnNewDisposableToString()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -195,7 +195,7 @@ namespace RoslynSandbox
             public static void NewStandardKernelNewModuleArgument()
             {
                 var moduleCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using Ninject.Modules;
@@ -210,7 +210,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using Ninject;
 

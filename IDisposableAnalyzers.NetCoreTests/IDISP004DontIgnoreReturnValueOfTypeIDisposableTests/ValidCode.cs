@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeI
         public static void ILoggerFactoryAddApplicationInsights()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;

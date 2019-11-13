@@ -65,7 +65,7 @@ internal class C
             public static void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -96,7 +96,7 @@ namespace RoslynSandbox
             public static void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -127,7 +127,7 @@ namespace RoslynSandbox
             public static void InitializedElementStyleDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -162,7 +162,7 @@ namespace RoslynSandbox
             public static void InitializedDictionaryIndexer(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -197,7 +197,7 @@ namespace RoslynSandbox
             public static void InitializedDictionaryAfterAdd(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 

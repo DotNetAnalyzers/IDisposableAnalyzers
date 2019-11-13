@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public static void InitializedWithConstant(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -49,7 +49,7 @@ namespace RoslynSandbox
             public static void InitializedWithDefaultGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C<T>
     {
@@ -75,7 +75,7 @@ namespace RoslynSandbox
             public static void NotInitialized(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -103,7 +103,7 @@ namespace RoslynSandbox
             public static void NotInitializedInLambda(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -136,7 +136,7 @@ namespace RoslynSandbox
             public static void LambdaClosure(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -170,7 +170,7 @@ namespace RoslynSandbox
             public static void Loop(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -203,7 +203,7 @@ namespace RoslynSandbox
             public static void AssignedWithArg()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -228,7 +228,7 @@ namespace RoslynSandbox
             public static void VerbatimIdentifierAssignedWithArg()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -252,7 +252,7 @@ namespace RoslynSandbox
             public static void AssignedWithArgGenericMethod()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -277,7 +277,7 @@ namespace RoslynSandbox
             public static void AssignedWithArgGenericClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C<T>
     {
@@ -302,7 +302,7 @@ namespace RoslynSandbox
             public static void AssignedInLock()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

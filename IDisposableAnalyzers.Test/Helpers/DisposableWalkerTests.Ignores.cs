@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void AssignedToLocal(string statement)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -42,7 +42,7 @@ namespace RoslynSandbox
             public static void ArgumentPassedTo(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -71,7 +71,7 @@ namespace RoslynSandbox
             public static void ArgumentAssignedToTempLocal(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -102,7 +102,7 @@ namespace RoslynSandbox
             public static void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -134,7 +134,7 @@ namespace RoslynSandbox
             public static void ArgumentAssignedTempLocalInUsing(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -172,7 +172,7 @@ namespace RoslynSandbox
             public static void AssignedToField(string statement)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -202,7 +202,7 @@ namespace RoslynSandbox
             public static void Discarded(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -235,7 +235,7 @@ namespace RoslynSandbox
             public static void DiscardedWrapped(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -274,7 +274,7 @@ namespace RoslynSandbox
             public static void ReturnedExpressionBody()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -295,7 +295,7 @@ namespace RoslynSandbox
             public static void ReturnedStatementBody()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -319,7 +319,7 @@ namespace RoslynSandbox
             public static void ReturnedDisposableCtorArg()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -356,7 +356,7 @@ namespace RoslynSandbox
             public static void ReturnedInCompositeDisposable(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -378,7 +378,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedNotDisposable()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -412,7 +412,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedNotDisposableFactoryMethod()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -440,7 +440,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedNotDisposed()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -478,7 +478,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedNotDisposedFactoryMethod()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -510,7 +510,7 @@ namespace RoslynSandbox
             public static void CtorArgNotAssigned()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -542,7 +542,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedDisposed()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -578,7 +578,7 @@ namespace RoslynSandbox
             public static void CtorArgAssignedNotAssigned()
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -611,7 +611,7 @@ namespace RoslynSandbox
             public static void CompositeDisposableExtAddAndReturn(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

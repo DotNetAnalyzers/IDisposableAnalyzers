@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -107,7 +107,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -128,7 +128,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingRecursiveMethodChain()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -151,7 +151,7 @@ namespace RoslynSandbox
             public static void IgnoresRecursiveOutParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -181,7 +181,7 @@ namespace RoslynSandbox
             public static void IgnoresRecursiveOutParameterChain()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

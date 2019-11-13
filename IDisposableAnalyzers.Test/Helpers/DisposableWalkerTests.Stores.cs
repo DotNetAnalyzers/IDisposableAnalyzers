@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void WhenNotUsed()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
             public static void WhenNotUsed(string type, string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
             public static void InListOfTAdd(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("Initialize(disposable)")]
@@ -104,7 +104,7 @@ namespace RoslynSandbox
             public static void ListOfTAddInInitialize(string call)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -131,7 +131,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("Initialize(disposables, disposable)")]
@@ -139,7 +139,7 @@ namespace RoslynSandbox
             public static void ListOfTAddInInitializePassField(string call)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -175,7 +175,7 @@ namespace RoslynSandbox
             public static void ListOfTAddInInitializeParameter(string call)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -208,7 +208,7 @@ namespace RoslynSandbox
             public static void ListOfTAssignIndexer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -230,14 +230,14 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [Test]
             public static void ListOfTInitializer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -259,7 +259,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("new Disposable[] { disposable }")]
@@ -267,7 +267,7 @@ namespace RoslynSandbox
             public static void ArrayOfTInitializer(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -289,14 +289,14 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [Test]
             public static void InStackOfT()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -318,7 +318,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("private Queue<IDisposable> disposables = new Queue<IDisposable>()")]
@@ -326,7 +326,7 @@ namespace RoslynSandbox
             public static void InQueueOfT(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -349,7 +349,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()")]
@@ -358,7 +358,7 @@ namespace RoslynSandbox
             public static void InDictionaryAdd(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections;
@@ -381,7 +381,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("TryAdd(1, disposable)")]
@@ -389,7 +389,7 @@ namespace RoslynSandbox
             public static void InConcurrentDictionary(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Concurrent;
@@ -411,14 +411,14 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [Test]
             public static void ArrayFieldAssignedInCtor()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -439,7 +439,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposables", container.ToString());
+                Assert.AreEqual("N.C.disposables", container.ToString());
             }
 
             [TestCase("Tuple.Create(disposable, 1)")]
@@ -447,7 +447,7 @@ namespace RoslynSandbox
             public static void InTuple(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -469,7 +469,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.tuple", container.ToString());
+                Assert.AreEqual("N.C.tuple", container.ToString());
             }
 
             [TestCase("_ = Tuple.Create(disposable, 1)")]
@@ -478,7 +478,7 @@ namespace RoslynSandbox
             public static void InDiscardedTuple(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -505,7 +505,7 @@ namespace RoslynSandbox
             public static void InPairWhenNew(string parameter)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -540,7 +540,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+                Assert.AreEqual("N.C.pair", container.ToString());
             }
 
             [TestCase("disposable1")]
@@ -548,7 +548,7 @@ namespace RoslynSandbox
             public static void InPairWhenFactoryMethod(string parameter)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -584,7 +584,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+                Assert.AreEqual("N.C.pair", container.ToString());
             }
 
             [TestCase("disposable1")]
@@ -592,7 +592,7 @@ namespace RoslynSandbox
             public static void InDisposingPairWhenNew(string parameter)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -632,7 +632,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+                Assert.AreEqual("N.C.pair", container.ToString());
             }
 
             [TestCase("disposable1")]
@@ -640,7 +640,7 @@ namespace RoslynSandbox
             public static void InDisposingPairWhenFactoryMethod(string parameter)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -682,7 +682,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.pair", container.ToString());
+                Assert.AreEqual("N.C.pair", container.ToString());
             }
 
             [TestCase("new BinaryReader(stream)", true)]
@@ -709,7 +709,7 @@ namespace RoslynSandbox
             public static void InLeaveOpen(string expression, bool stores)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -737,7 +737,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("stream"), semanticModel, CancellationToken.None, null, out _));
                 if (stores)
                 {
-                    Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
+                    Assert.AreEqual("N.C.disposable", container.ToString());
                 }
             }
 
@@ -747,7 +747,7 @@ namespace RoslynSandbox
             public static void InHttpClient(string expression, bool stores)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
 
@@ -771,7 +771,7 @@ namespace RoslynSandbox
                 Assert.AreEqual(stores, DisposableWalker.DisposedByReturnValue(syntaxTree.FindArgument("handler"), semanticModel, CancellationToken.None, null, out _));
                 if (stores)
                 {
-                    Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
+                    Assert.AreEqual("N.C.disposable", container.ToString());
                 }
             }
 
@@ -779,7 +779,7 @@ namespace RoslynSandbox
             public static void CallWrappingStreamInReader()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -805,14 +805,14 @@ namespace RoslynSandbox
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
                 Assert.AreEqual(true, DisposableWalker.Stores(localOrParameter, semanticModel, CancellationToken.None, null, out var container));
-                Assert.AreEqual("RoslynSandbox.C.disposable", container.ToString());
+                Assert.AreEqual("N.C.disposable", container.ToString());
             }
 
             [Test]
             public static void DisposedByReturnValueCallWrappingStreamInReader()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -843,7 +843,7 @@ namespace RoslynSandbox
             public static void Recursive()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -874,7 +874,7 @@ namespace RoslynSandbox
             public static void CompositeDisposableExtAddAndReturn(string expression)
             {
                 var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

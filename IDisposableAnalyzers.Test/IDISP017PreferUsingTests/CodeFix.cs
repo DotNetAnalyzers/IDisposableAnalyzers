@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
         public static void Local()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -31,7 +31,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -53,7 +53,7 @@ namespace RoslynSandbox
         public static void InitializedLocalDisposeInFinally()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -75,7 +75,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         public static void AssignedInTryDisposeInFinally()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -120,7 +120,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

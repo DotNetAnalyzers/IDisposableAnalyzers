@@ -27,7 +27,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void LanguageConstructs(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -66,7 +66,7 @@ namespace RoslynSandbox
             public static void Ignored(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections;
@@ -113,7 +113,7 @@ namespace RoslynSandbox
             public static void MethodReturningNotDisposable(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -184,7 +184,7 @@ namespace RoslynSandbox
             public static void Call(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -272,7 +272,7 @@ namespace RoslynSandbox
             public static void CallRecursiveMethod(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -322,7 +322,7 @@ namespace RoslynSandbox
             public static void RecursiveWithOptionalParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -366,7 +366,7 @@ namespace RoslynSandbox
             public static void AsyncAwait(string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -413,7 +413,7 @@ namespace RoslynSandbox
             public static void CompositeDisposableExtAddAndReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -476,7 +476,7 @@ namespace BinaryReference
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using BinaryReference;
@@ -515,7 +515,7 @@ namespace BinaryReference
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using BinaryReference;
@@ -556,7 +556,7 @@ namespace RoslynSandbox
             public static void ThirdParty(string parameter, string code, Result expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq;

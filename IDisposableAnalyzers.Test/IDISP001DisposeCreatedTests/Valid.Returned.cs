@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void SimpleStatementBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         public static void SimpleExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -45,7 +45,7 @@ namespace RoslynSandbox
         public static void ReturnedTernary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -61,7 +61,7 @@ namespace RoslynSandbox
         public static void ReturnedNullConditional()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -77,7 +77,7 @@ namespace RoslynSandbox
         public static void LocalFileOpenRead()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -97,7 +97,7 @@ namespace RoslynSandbox
         public static void LocalFileOpenReadDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         public static void LocalFileOpenReadAsDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -139,7 +139,7 @@ namespace RoslynSandbox
         public static void LocalFileOpenReadCastDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -160,7 +160,7 @@ namespace RoslynSandbox
         public static void LocalFileOpenReadAfterAccessingLength()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -181,7 +181,7 @@ namespace RoslynSandbox
         public static void LocalInIfAndEnd()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -206,7 +206,7 @@ namespace RoslynSandbox
         public static void LocalInIf()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -232,7 +232,7 @@ namespace RoslynSandbox
         public static void LocalInStreamReaderMethodBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -252,7 +252,7 @@ namespace RoslynSandbox
         public static void LocalInLocalStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -273,7 +273,7 @@ namespace RoslynSandbox
         public static void LocalInStreamReaderMethodBodyAsDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -293,7 +293,7 @@ namespace RoslynSandbox
         public static void FileOpenReadIsReturnedInCompositeDisposableMethodBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Reactive.Disposables;
@@ -314,7 +314,7 @@ namespace RoslynSandbox
         public static void WhenDisposableIsReturnedPropertySimple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -336,7 +336,7 @@ namespace RoslynSandbox
         public static void WhenDisposableIsReturnedPropertyBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -359,7 +359,7 @@ namespace RoslynSandbox
         public static void WhenDisposableIsReturnedPropertyExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -375,7 +375,7 @@ namespace RoslynSandbox
         public static void LocalInLazy()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -408,7 +408,7 @@ namespace RoslynSandbox
         public static void LocalFunctionStatementBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -433,7 +433,7 @@ namespace RoslynSandbox
         public static void LocalFunctionExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -455,7 +455,7 @@ namespace RoslynSandbox
         public static void LocalInLocalFunction()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

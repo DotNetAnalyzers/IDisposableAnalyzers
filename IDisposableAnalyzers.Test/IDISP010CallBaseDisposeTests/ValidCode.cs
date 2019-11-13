@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         public static void WhenCallingBaseDispose()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -58,7 +58,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -76,7 +76,7 @@ namespace RoslynSandbox
         public static void WhenCallingBaseDisposeAfterCheckDispose()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -108,7 +108,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -134,7 +134,7 @@ namespace RoslynSandbox
         public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -166,7 +166,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -200,7 +200,7 @@ namespace RoslynSandbox
         public static void WhenNoBaseClass()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInVirtualDispose()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -276,7 +276,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInVirtualDispose2()
         {
             var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -288,7 +288,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -333,7 +333,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInExpressionBodyDispose()
         {
             var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     class Disposable : IDisposable {
@@ -342,7 +342,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     class Goof : IDisposable {
@@ -358,7 +358,7 @@ namespace RoslynSandbox
         public static void DisposingFieldAsCast()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -381,7 +381,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInlineAsCast()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -403,7 +403,7 @@ namespace RoslynSandbox
         public static void DisposingFieldExplicitCast()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -426,7 +426,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInlineExplicitCast()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -448,7 +448,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyWhenInitializedInProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -476,7 +476,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyWhenInitializedInline()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -499,7 +499,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyInBaseClass()
         {
             var baseClassCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -516,7 +516,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -534,7 +534,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyInVirtualDisposeInBaseClass()
         {
             var baseClassCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -569,7 +569,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -596,7 +596,7 @@ namespace RoslynSandbox
         public static void IgnoreLinq(string linq)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq;
@@ -618,7 +618,7 @@ namespace RoslynSandbox
         public static void IgnoredWhenNotAssigned()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -635,7 +635,7 @@ namespace RoslynSandbox
         public static void IgnoredWhenBackingField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -657,7 +657,7 @@ namespace RoslynSandbox
         public static void IgnoredWhenBackingFieldWithMethodSettingPropertyToNull()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -686,7 +686,7 @@ namespace RoslynSandbox
         public static void IgnoreFieldThatIsNotDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -700,7 +700,7 @@ namespace RoslynSandbox
         public static void IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -716,7 +716,7 @@ namespace RoslynSandbox
         public static void IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -730,7 +730,7 @@ namespace RoslynSandbox
         public static void IgnoredStaticField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -746,7 +746,7 @@ namespace RoslynSandbox
         public static void IgnoreTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -762,7 +762,7 @@ namespace RoslynSandbox
         public static void IgnoreTaskOfInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -778,7 +778,7 @@ namespace RoslynSandbox
         public static void FieldOfTypeArrayOfInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -792,7 +792,7 @@ namespace RoslynSandbox
         public static void PropertyWithBackingFieldOfTypeArrayOfInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -821,7 +821,7 @@ namespace RoslynSandbox
         public static void HandlesRecursion()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -842,7 +842,7 @@ namespace RoslynSandbox
         public static void InjectedListOfInt()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -864,7 +864,7 @@ namespace RoslynSandbox
         public static void InjectedListOfT()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -886,7 +886,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyInBase()
         {
             var fooCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -927,7 +927,7 @@ namespace RoslynSandbox
 }";
 
             var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -943,7 +943,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInTearDown()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -971,7 +971,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInOneTimeTearDown()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

@@ -18,7 +18,7 @@ Don't use disposed instance.
 Touching a disposed instance is often a bug as it should throw `ObjectDisposedException`.
 
 ```cs
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void PropertyWhenInitializedInline()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -56,7 +56,7 @@ namespace RoslynSandbox
             public static void GetOnlyPropertyWhenInitializedInline()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -72,7 +72,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -95,7 +95,7 @@ namespace RoslynSandbox
             public static void GetSetPropertyInSealedOfTypeObjectWhenInitializedInline()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -111,7 +111,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -134,7 +134,7 @@ namespace RoslynSandbox
             public static void GetOnlyPropertyOfTypeObjectWhenInitializedInline()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -150,7 +150,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -173,7 +173,7 @@ namespace RoslynSandbox
             public static void GetSetPropertyWhenInitializedInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -194,7 +194,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -222,7 +222,7 @@ namespace RoslynSandbox
             public static void GetOnlyPropertyWhenInitializedInCtorVirtualDisposeUnderscoreNames()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -267,7 +267,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -319,7 +319,7 @@ namespace RoslynSandbox
             public static void GetOnlyPropertyWhenInitializedInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -340,7 +340,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

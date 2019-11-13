@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void CompositeDisposableInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableAdd()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -94,7 +94,7 @@ public sealed class C : IDisposable
         public static void SerialDisposableObjectInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -149,7 +149,7 @@ public sealed class C : IDisposable
         public static void DisposableCreateClosure()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void DisposableCreateClosureElvis()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -205,7 +205,7 @@ namespace RoslynSandbox
         public static void DisposableCreateClosureStatementBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -236,7 +236,7 @@ namespace RoslynSandbox
         public static void ReturnsCompositeDisposableInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -258,7 +258,7 @@ namespace RoslynSandbox
         public static void ReturnsCompositeDisposableLazy()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;

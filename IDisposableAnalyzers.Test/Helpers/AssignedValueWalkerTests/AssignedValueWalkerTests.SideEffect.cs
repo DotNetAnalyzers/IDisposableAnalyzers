@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public static void MethodInjected(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -60,7 +60,7 @@ namespace RoslynSandbox
             public static void MethodInjectedWithOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -103,7 +103,7 @@ namespace RoslynSandbox
             public static void MethodInjectedWithOptionalAssigningOptional(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {

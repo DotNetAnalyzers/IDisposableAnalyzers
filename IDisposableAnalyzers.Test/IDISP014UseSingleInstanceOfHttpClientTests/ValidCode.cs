@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
         public static void StaticFieldAssignedInInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
 
@@ -29,7 +29,7 @@ namespace RoslynSandbox
         public static void StaticFieldAssignedInStaticCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Net.Http;
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         public static void StaticPropertyAssignedInInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Net.Http;
@@ -73,7 +73,7 @@ namespace RoslynSandbox
         public static void StaticPropertyAssignedInStaticCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         public static void CustomHttpClient()
         {
             var httpClientCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -101,7 +101,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {

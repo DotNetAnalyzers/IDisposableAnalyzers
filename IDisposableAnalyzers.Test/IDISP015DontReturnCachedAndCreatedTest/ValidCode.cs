@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP015DontReturnCachedAndCreatedTest
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP015DoNotReturnCachedAndCreated;
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void WhenRetuningCreated()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -56,7 +56,7 @@ namespace RoslynSandbox
         public static void WhenRetuningInjected()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -82,7 +82,7 @@ namespace RoslynSandbox
         public static void ReturningCachedInDictionary()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         public static void CreatedAndDisposableEmpty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -126,7 +126,7 @@ namespace RoslynSandbox
         public static void CreatedAndNopDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
         public static void Using()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void UsingFullyQualified()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void Field()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
 
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         public static void Property()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net.Http;
 

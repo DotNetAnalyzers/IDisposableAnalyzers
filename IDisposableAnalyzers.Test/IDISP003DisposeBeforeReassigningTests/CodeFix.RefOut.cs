@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
             public static void LocalViaObjectCreationThenOutParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -64,7 +64,7 @@ namespace RoslynSandbox
             public static void LocalInvocationThenOutParameter()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -86,7 +86,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -115,7 +115,7 @@ namespace RoslynSandbox
             public static void LocalViaOutTwice()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -138,7 +138,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -168,7 +168,7 @@ namespace RoslynSandbox
             public static void FieldViaOutInPublicMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -191,7 +191,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -221,7 +221,7 @@ namespace RoslynSandbox
             public static void FieldViaOutInPublicMethodNoThis()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -244,7 +244,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -274,7 +274,7 @@ namespace RoslynSandbox
             public static void FieldOfTypeObjectViaOutParameterInPublicMethodNoThis()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -297,7 +297,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -327,7 +327,7 @@ namespace RoslynSandbox
             public static void FieldPrivateMethodRef()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -354,7 +354,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -388,7 +388,7 @@ namespace RoslynSandbox
             public static void FieldPrivateMethodRefTwice()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -416,7 +416,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -451,7 +451,7 @@ namespace RoslynSandbox
             public static void FieldPrivateMethodRefTwiceDifferentMethods()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -484,7 +484,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -524,7 +524,7 @@ namespace RoslynSandbox
             public static void FieldPublicMethodRef()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -551,7 +551,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -585,7 +585,7 @@ namespace RoslynSandbox
             public static void FieldPublicMethodRefExpressionBody()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -609,7 +609,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

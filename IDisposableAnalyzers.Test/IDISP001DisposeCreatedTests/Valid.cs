@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP001DisposeCreated;
 
         private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -49,7 +49,7 @@ namespace RoslynSandbox
         public static void LanguageConstructs(string code)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -70,7 +70,7 @@ namespace RoslynSandbox
         public static void WhenDisposingVariable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -89,7 +89,7 @@ namespace RoslynSandbox
         public static void UsingFileStream()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -111,7 +111,7 @@ namespace RoslynSandbox
         public static void UsingNewDisposable()
         {
             var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -124,7 +124,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -146,7 +146,7 @@ namespace RoslynSandbox
         public static void Awaiting()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -182,7 +182,7 @@ namespace RoslynSandbox
         public static void AwaitingMethodReturningString()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -208,7 +208,7 @@ namespace RoslynSandbox
         public static void AwaitDownloadDataTask()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -231,7 +231,7 @@ namespace RoslynSandbox
         public static void FactoryMethod()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -269,7 +269,7 @@ namespace RoslynSandbox
         public static void FactoryMethodExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -303,7 +303,7 @@ namespace RoslynSandbox
         public static void InjectedDbConnectionCreateCommand()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Data.Common;
 
@@ -324,7 +324,7 @@ namespace RoslynSandbox
         public static void InjectedMemberDbConnectionCreateCommand()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Data.Common;
 
@@ -352,7 +352,7 @@ namespace RoslynSandbox
         public static void DisposedInEventLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Diagnostics;
     using System.Threading.Tasks;
@@ -389,7 +389,7 @@ namespace RoslynSandbox
         public static void UsingOutParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -420,7 +420,7 @@ namespace RoslynSandbox
         public static void UsingOutVar()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -450,7 +450,7 @@ namespace RoslynSandbox
         public static void NewDisposableSplitDeclarationAndAssignment()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -472,7 +472,7 @@ namespace RoslynSandbox
         public static void DisposeInFinally()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -500,7 +500,7 @@ namespace RoslynSandbox
         public static void LocalAssignedToLocalThatIsDisposed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -523,7 +523,7 @@ namespace RoslynSandbox
         public static void PairOfFileStreams()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

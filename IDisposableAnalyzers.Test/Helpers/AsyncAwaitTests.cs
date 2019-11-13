@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.Helpers
         public static void TryAwaitTaskFromResult(string code, bool expected, string expectedCode)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -46,7 +46,7 @@ namespace RoslynSandbox
         public static void TryAwaitTaskRun(string code, bool expected, string expectedCode)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 

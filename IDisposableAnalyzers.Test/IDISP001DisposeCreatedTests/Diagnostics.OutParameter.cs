@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
 
             private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             public static void DiscardedNewDisposableStatementBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -60,7 +60,7 @@ namespace RoslynSandbox
             public static void DiscardedNewDisposableExpressionBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -85,7 +85,7 @@ namespace RoslynSandbox
             public static void DiscardedFileOpenReadStatementBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -121,7 +121,7 @@ namespace RoslynSandbox
             public static void DiscardedFileOpenReadExpressionBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -154,7 +154,7 @@ namespace RoslynSandbox
             public static void DiscardedOutAssignedWithArgumentStatementBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -184,7 +184,7 @@ namespace RoslynSandbox
             public static void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

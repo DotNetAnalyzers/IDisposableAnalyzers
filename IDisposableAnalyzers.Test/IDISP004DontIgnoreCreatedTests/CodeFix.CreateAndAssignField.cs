@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             public static void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -32,7 +32,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -55,7 +55,7 @@ namespace RoslynSandbox
             public static void AssignIgnoredReturnValueToFieldInCtorWhenUsesThis()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
             public static void AssignIgnoredReturnValueToFieldInCtorWhenUnderscore()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -119,7 +119,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

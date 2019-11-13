@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static void NotDisposingVariable()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -50,7 +50,7 @@ namespace RoslynSandbox
         public static void NotDisposingVariables()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -67,7 +67,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

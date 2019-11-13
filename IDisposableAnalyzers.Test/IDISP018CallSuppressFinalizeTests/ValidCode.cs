@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP018CallSuppressFinalizeTests
         public static void SealedSimple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void SealedNoFinalizer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void SealedWithFinalizer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

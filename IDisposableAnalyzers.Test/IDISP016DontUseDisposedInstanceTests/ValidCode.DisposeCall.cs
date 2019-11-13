@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP016DontUseDisposedInstanceTests
             public static void CreateTouchDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -37,7 +37,7 @@ namespace RoslynSandbox
             public static void UsingFileOpenRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -60,7 +60,7 @@ namespace RoslynSandbox
             {
                 // this is weird but should not warn I think
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -82,7 +82,7 @@ namespace RoslynSandbox
             public static void IfDisposeReturn()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -109,7 +109,7 @@ namespace RoslynSandbox
             public static void IfDisposeThrow()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -137,7 +137,7 @@ namespace RoslynSandbox
             public static void ReassignAfterDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -161,7 +161,7 @@ namespace RoslynSandbox
             public static void ReassignViaOutAfterDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -192,7 +192,7 @@ namespace RoslynSandbox
             public static void Tuple(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -222,7 +222,7 @@ namespace RoslynSandbox
             public static void LocalTuple(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -246,7 +246,7 @@ namespace RoslynSandbox
             public static void ListOfTuple(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -279,7 +279,7 @@ namespace RoslynSandbox
             public static void ListOfValueTuple()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -312,7 +312,7 @@ namespace RoslynSandbox
             public static void LeaveOpenLocals()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Text;
@@ -341,7 +341,7 @@ namespace RoslynSandbox
             public static void LeaveOpenFields()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

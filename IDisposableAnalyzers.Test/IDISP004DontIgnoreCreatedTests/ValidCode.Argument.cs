@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         public static void ChainedCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
         public static void ChainedCtorCoalesce()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -71,7 +71,7 @@ namespace RoslynSandbox
         public static void ChainedCtors()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -110,7 +110,7 @@ namespace RoslynSandbox
         public static void ChainedCtorCallsBaseCtorDisposedInThis()
         {
             var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -144,7 +144,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -186,7 +186,7 @@ namespace RoslynSandbox
         public static void ChainedBaseCtorDisposedInThis()
         {
             var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -226,7 +226,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -263,7 +263,7 @@ namespace RoslynSandbox
         public static void UsingStreamInStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -285,7 +285,7 @@ namespace RoslynSandbox
         public static void DisposableCreate()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -306,7 +306,7 @@ namespace RoslynSandbox
         public static void MethodReturningStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -334,7 +334,7 @@ namespace RoslynSandbox
         public static void MethodReturningStreamReaderExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -359,7 +359,7 @@ namespace RoslynSandbox
         public static void MethodWithFuncTaskAsParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -382,7 +382,7 @@ namespace RoslynSandbox
         public static void MethodWithFuncStreamAsParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -407,7 +407,7 @@ namespace RoslynSandbox
         public static void SubclassedNinjectKernel()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using Ninject;
     using Ninject.Modules;
@@ -442,7 +442,7 @@ namespace RoslynSandbox
         public static void ValueTupleOfLocals()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -473,7 +473,7 @@ namespace RoslynSandbox
         public static void ValueTuple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -502,7 +502,7 @@ namespace RoslynSandbox
         public static void TupleOfLocals()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -533,7 +533,7 @@ namespace RoslynSandbox
         public static void LocalObjectThatIsDisposed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -555,7 +555,7 @@ namespace RoslynSandbox
         public static void FieldObjectThatIsDisposed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -586,7 +586,7 @@ namespace RoslynSandbox
         public static void LocalTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -610,7 +610,7 @@ namespace RoslynSandbox
         public static void LocalValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -634,7 +634,7 @@ namespace RoslynSandbox
         public static void LocalPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Pair
     {
@@ -643,7 +643,7 @@ namespace RoslynSandbox
 }";
 
             var genericPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Pair<T>
     {
@@ -660,7 +660,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -684,7 +684,7 @@ namespace RoslynSandbox
         public static void FieldTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -713,7 +713,7 @@ namespace RoslynSandbox
         public static void FieldValueTupleThatIsDisposed(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -743,7 +743,7 @@ namespace RoslynSandbox
         public static void FieldPairThatIsDisposed(string expression)
         {
             var staticPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public static class Pair
     {
@@ -752,7 +752,7 @@ namespace RoslynSandbox
 }";
 
             var genericPairCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Pair<T>
     {
@@ -769,7 +769,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

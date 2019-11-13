@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP019CallSuppressFinalizeWhenVirtualDispo
         public static void SealedWithFinalizer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

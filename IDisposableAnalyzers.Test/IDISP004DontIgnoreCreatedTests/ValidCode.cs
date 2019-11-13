@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void AssigningLocal(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void AssigningField(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         public static void RealisticExtensionMethodClass()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -212,7 +212,7 @@ namespace RoslynSandbox
         public static void IfTry()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -239,7 +239,7 @@ namespace RoslynSandbox
         public static void ReadAsyncCall()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -280,7 +280,7 @@ namespace RoslynSandbox
         public static void ReadAsyncConfigureAwait()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -321,7 +321,7 @@ namespace RoslynSandbox
         public static void WhenGettingPropertyOfDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -380,7 +380,7 @@ namespace RoslynSandbox
         public static void WhenGettingPropertyOfProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -442,7 +442,7 @@ namespace RoslynSandbox
         public static void AddingFileOpenReadToList()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -464,7 +464,7 @@ namespace RoslynSandbox
         public static void AddingNewDisposableToList()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -486,7 +486,7 @@ namespace RoslynSandbox
         public static void AddingNewDisposableToListThatIsDisposed()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -516,7 +516,7 @@ namespace RoslynSandbox
         public static void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -547,7 +547,7 @@ namespace RoslynSandbox
         public static void DisposingInSameStatement(string statement)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -570,7 +570,7 @@ namespace RoslynSandbox
         public static void DisposingMethodReturnValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -593,7 +593,7 @@ namespace RoslynSandbox
         public static void DisposingStaticMethodReturnValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -617,7 +617,7 @@ namespace RoslynSandbox
         public static void DisposingPropertyReturnValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -640,7 +640,7 @@ namespace RoslynSandbox
         public static void DisposingStaticPropertyReturnValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -661,7 +661,7 @@ namespace RoslynSandbox
         public static void AddFileOpenReadToListOfObjectField()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -699,7 +699,7 @@ namespace RoslynSandbox
         public static void UsingAwaited(string statement)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;

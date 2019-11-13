@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void DisposedLocal(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void UsedLocal(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

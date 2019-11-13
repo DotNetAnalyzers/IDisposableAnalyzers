@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
         public static void SealedWithFinalizer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

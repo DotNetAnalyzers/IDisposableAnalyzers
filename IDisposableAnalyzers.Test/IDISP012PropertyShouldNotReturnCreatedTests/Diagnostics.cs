@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
         public static void ReturnFileOpenReadGetBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         public static void ReturnFileOpenReadGetExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

@@ -15,7 +15,7 @@
         public static void WhenStatementBody(string expression)
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -40,7 +40,7 @@ namespace RoslynSandbox
 }".AssertReplace("null", expression);
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

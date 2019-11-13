@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void AssigningFieldInSetUp()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -39,7 +39,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -73,7 +73,7 @@ namespace RoslynSandbox
             public static void AssigningFieldInOneTimeSetUp()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -95,7 +95,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             public static void AssigningFieldInOneTimeSetUpWhenOneTimeTearDownExists()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

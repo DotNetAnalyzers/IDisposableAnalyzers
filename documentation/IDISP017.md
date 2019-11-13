@@ -16,7 +16,7 @@ Prefer using.
 ## Motivation
 
 ```cs
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -37,7 +37,7 @@ Prefer using in the code above. It is cleaner than adding try-finally. The code 
 ## How to fix violations
 
 ```cs
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

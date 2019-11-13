@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         public static void SerialDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -38,7 +38,7 @@ namespace RoslynSandbox
         public static void SingleAssignmentDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableInitializer()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -131,7 +131,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableAddIObservableSubscribe()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -158,7 +158,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableAddNewSingleAssignmentDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -185,7 +185,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableAddThrottleSubscribe()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -214,7 +214,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableExtAddAndReturn()
         {
             var compositeDisposableExtCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -234,7 +234,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -261,7 +261,7 @@ namespace RoslynSandbox
         public static void CompositeDisposableExtAddAndReturnToString()
         {
             var compositeDisposableExtCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -281,7 +281,7 @@ namespace RoslynSandbox
     }
 }";
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;

@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void SerialDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public static void FieldCtorArgSimple(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -51,7 +51,7 @@ namespace RoslynSandbox
             public static void FieldCtorArgThenIdMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             public static void FieldChainedCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -147,7 +147,7 @@ namespace RoslynSandbox
             public static void FieldChainedPrivateCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -201,7 +201,7 @@ namespace RoslynSandbox
             public static void FieldChainedInternalCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -249,7 +249,7 @@ namespace RoslynSandbox
             public static void FieldPrivateCtorFactory(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -283,7 +283,7 @@ namespace RoslynSandbox
             public static void FieldPublicCtorFactory(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -323,7 +323,7 @@ namespace RoslynSandbox
             public static void FieldChainedCtorGenericClass(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C<T>
     {
@@ -378,7 +378,7 @@ namespace RoslynSandbox
             public static void FieldCtorCallingPrivateInitializeMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -434,7 +434,7 @@ namespace RoslynSandbox
             public static void FieldCtorCallingProtectedInitializeMethod(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -492,7 +492,7 @@ namespace RoslynSandbox
             public static void AutoPropertyChainedCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -550,7 +550,7 @@ namespace RoslynSandbox
             public static void FieldInitializedlWithLiteralAndAssignedInCtor(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -589,7 +589,7 @@ namespace RoslynSandbox
             public static void InitializedInChainedWithLiteralGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C<T>
     {
@@ -631,7 +631,7 @@ namespace RoslynSandbox
             public static void FieldImplicitBase(string code, object expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase
     {
@@ -677,7 +677,7 @@ namespace RoslynSandbox
             public static void FieldImplicitBaseWhenSubclassHasCtor(string code, object expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase
     {
@@ -727,7 +727,7 @@ namespace RoslynSandbox
             public static void InitializedInBaseCtorWithLiteral(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase
     {
@@ -774,7 +774,7 @@ namespace RoslynSandbox
             public static void InitializedInExplicitBaseCtorWithLiteral(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase
     {
@@ -821,7 +821,7 @@ namespace RoslynSandbox
             public static void InitializedInBaseCtorWithDefaultGenericSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase<T>
     {
@@ -855,7 +855,7 @@ namespace RoslynSandbox
             public static void AbstractGenericInitializedInBaseCtorSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class CBase<T>
     {
@@ -892,7 +892,7 @@ namespace RoslynSandbox
             public static void InitializedInBaseCtorWithDefaultGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase<T>
     {
@@ -937,7 +937,7 @@ namespace RoslynSandbox
             public static void InitializedInBaseCtorWithDefaultGenericGeneric(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class CBase<T>
     {
@@ -981,7 +981,7 @@ namespace RoslynSandbox
             public static void FieldAssignedInLambdaCtor()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

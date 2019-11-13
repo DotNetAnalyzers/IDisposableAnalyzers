@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 
 #pragma warning disable SA1203 // Constants must appear before fields
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -31,7 +31,7 @@ namespace RoslynSandbox
         public static void LocalDeclaration()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public static void LocalAssignedInSwitch()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -87,7 +87,7 @@ namespace RoslynSandbox
         public static void LocalAssignedInIfElseSwitch()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -129,7 +129,7 @@ namespace RoslynSandbox
         public static void AssignVariableInitializedWithNull()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -154,7 +154,7 @@ namespace RoslynSandbox
         public static void NotDisposingVariableOfTypeObject(string disposeCode)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -177,7 +177,7 @@ namespace RoslynSandbox
         public static void AssigningPropertyInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -199,7 +199,7 @@ namespace RoslynSandbox
         public static void AssigningPropertyInCtorInDisposableType()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -225,7 +225,7 @@ namespace RoslynSandbox
         public static void AssigningIndexerInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -253,7 +253,7 @@ namespace RoslynSandbox
         public static void AssigningIndexerInCtorInDisposableType()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -285,7 +285,7 @@ namespace RoslynSandbox
         public static void AssigningPropertyWithBackingFieldInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -313,7 +313,7 @@ namespace RoslynSandbox
         public static void AssigningFieldInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -335,7 +335,7 @@ namespace RoslynSandbox
         public static void FieldSwapCached()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -360,7 +360,7 @@ namespace RoslynSandbox
         public static void LocalSwapCached()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -384,7 +384,7 @@ namespace RoslynSandbox
         public static void LocalSwapCachedDisposableDictionary()
         {
             var disposableDictionaryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -398,7 +398,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -421,7 +421,7 @@ namespace RoslynSandbox
         public static void LocalSwapCachedTryGetValue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -449,7 +449,7 @@ namespace RoslynSandbox
         public static void AssigningInIfElse()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -479,7 +479,7 @@ namespace RoslynSandbox
         public static void AssignFieldViaOutParameterInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -510,7 +510,7 @@ namespace RoslynSandbox
         public static void VariableSplitDeclarationAndAssignment(string declaration)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -532,7 +532,7 @@ namespace RoslynSandbox
         public static void WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -564,7 +564,7 @@ namespace RoslynSandbox
         public static void ChainedCalls()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -601,7 +601,7 @@ namespace RoslynSandbox
         public static void ChainedCallsWithHelper()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -617,7 +617,7 @@ namespace RoslynSandbox
 }";
 
             var helperCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -766,7 +766,7 @@ namespace TaxonomyWpf
         public static void DisposingBackingFieldInSetter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -799,7 +799,7 @@ namespace RoslynSandbox
         public static void LazyProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -829,7 +829,7 @@ namespace RoslynSandbox
         public static void LazyAssigningSingleAssignmentDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -862,7 +862,7 @@ namespace RoslynSandbox
         public static void SeparateDeclarationAndAssignment()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -883,7 +883,7 @@ namespace RoslynSandbox
         public static void SeparateDeclarationAndAssignmentInLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -907,7 +907,7 @@ namespace RoslynSandbox
         public static void SeparateDeclarationAndAssignmentInUsing()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -929,7 +929,7 @@ namespace RoslynSandbox
         public static void SingleSimpleAssignment()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -955,7 +955,7 @@ namespace RoslynSandbox
         public static void AssigningWithAssignment()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -983,7 +983,7 @@ namespace RoslynSandbox
         public static void TryWithEarlyReturn()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1009,7 +1009,7 @@ namespace RoslynSandbox
         public static void DisposingListContent()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -1034,7 +1034,7 @@ namespace RoslynSandbox
         public static void DisposingListContentUnderscore()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -1059,7 +1059,7 @@ namespace RoslynSandbox
         public static void ReturningOutParameterInForeach()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1088,7 +1088,7 @@ namespace RoslynSandbox
         public static void ReturningOutParameterInFor()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1118,7 +1118,7 @@ namespace RoslynSandbox
         public static void ReturningOutParameterInWhile()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1151,7 +1151,7 @@ namespace RoslynSandbox
         public static void DisposedAfterInForeach()
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1175,7 +1175,7 @@ namespace RoslynSandbox
         public static void LocalAssignedTwoStepInLoop()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1202,7 +1202,7 @@ namespace RoslynSandbox
         public static void ChainedConstructorSettingToNullThenInjected()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1230,7 +1230,7 @@ namespace RoslynSandbox
         public static void DisposeAssignDisposeAssignNull()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading;
@@ -1261,7 +1261,7 @@ namespace RoslynSandbox
         public static void FieldTryFinally()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading;

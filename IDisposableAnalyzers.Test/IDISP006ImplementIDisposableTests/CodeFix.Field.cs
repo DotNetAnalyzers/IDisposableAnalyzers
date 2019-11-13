@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void ImplementIDisposableAndMakeSealed()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -42,7 +42,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableWithVirtualDisposeMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -125,7 +125,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -192,7 +192,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableSealedClassUsingsInside()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -203,7 +203,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -241,7 +241,7 @@ namespace RoslynSandbox
                 var before = @"
 using System.IO;
 
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -252,7 +252,7 @@ namespace RoslynSandbox
                 var after = @"
 using System.IO;
 
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C : System.IDisposable
     {
@@ -286,7 +286,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableSealedClassUnderscore()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -297,7 +297,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -333,7 +333,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableSealedClassUnderscoreWithConst()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -346,7 +346,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -384,7 +384,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableAbstractClass()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -395,7 +395,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -441,7 +441,7 @@ namespace RoslynSandbox
             public static void ImplementIDisposableAbstractClassUnderscore()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -452,7 +452,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -498,7 +498,7 @@ namespace RoslynSandbox
             public static void WhenInterfaceIsMissing()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -519,7 +519,7 @@ namespace RoslynSandbox
             public static void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -537,7 +537,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -580,24 +580,24 @@ namespace RoslynSandbox
             public static void Issue111PartialUserControl()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
     public partial class CodeTabView : UserControl
     {
-        ↓private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
+        ↓private readonly N.Disposable disposable = new N.Disposable();
     }
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
     public partial sealed class CodeTabView : UserControl, System.IDisposable
     {
-        private readonly RoslynSandbox.Disposable disposable = new RoslynSandbox.Disposable();
+        private readonly N.Disposable disposable = new N.Disposable();
         private bool disposed;
 
         public void Dispose()

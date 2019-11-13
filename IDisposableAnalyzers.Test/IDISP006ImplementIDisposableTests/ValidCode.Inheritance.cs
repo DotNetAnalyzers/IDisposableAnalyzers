@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void WhenNotCallingBaseDispose()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -42,7 +42,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -64,7 +64,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDisposeAfterIfDisposedReturn()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -95,7 +95,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -124,7 +124,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDispose()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -155,7 +155,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

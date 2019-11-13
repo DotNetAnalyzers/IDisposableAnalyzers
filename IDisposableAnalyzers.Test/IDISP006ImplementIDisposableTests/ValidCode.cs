@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP006ImplementIDisposable;
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

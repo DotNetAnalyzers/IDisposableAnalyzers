@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void DisposingField(string disposeCall)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInVirtualDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -82,7 +82,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInVirtualDispose2()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -126,7 +126,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInExpressionBodyDispose()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -143,7 +143,7 @@ namespace RoslynSandbox
             public static void DisposingFieldAsCast()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -166,7 +166,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInlineAsCast()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -188,7 +188,7 @@ namespace RoslynSandbox
             public static void DisposingFieldExplicitCast()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -211,7 +211,7 @@ namespace RoslynSandbox
             public static void DisposingFieldInlineExplicitCast()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -233,7 +233,7 @@ namespace RoslynSandbox
             public static void DisposingPropertyWhenInitializedInProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -261,7 +261,7 @@ namespace RoslynSandbox
             public static void DisposingPropertyWhenInitializedInline()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -284,7 +284,7 @@ namespace RoslynSandbox
             public static void IgnorePassedInViaCtor1()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -305,7 +305,7 @@ namespace RoslynSandbox
             public static void IgnorePassedInViaCtor2()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -326,7 +326,7 @@ namespace RoslynSandbox
             public static void IgnorePassedInViaCtor3()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -352,7 +352,7 @@ namespace RoslynSandbox
             public static void IgnoreLinq(string linq)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Linq;
@@ -374,7 +374,7 @@ namespace RoslynSandbox
             public static void IgnoredWhenNotAssigned()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -391,7 +391,7 @@ namespace RoslynSandbox
             public static void IgnoredWhenBackingField()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -413,7 +413,7 @@ namespace RoslynSandbox
             public static void IgnoreFieldThatIsNotDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -427,7 +427,7 @@ namespace RoslynSandbox
             public static void IgnoreFieldThatIsNotDisposableAssignedWithMethod1()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -443,7 +443,7 @@ namespace RoslynSandbox
             public static void IgnoreFieldThatIsNotDisposableAssignedWIthMethod2()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -457,7 +457,7 @@ namespace RoslynSandbox
             public static void IgnoredStaticField()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -473,7 +473,7 @@ namespace RoslynSandbox
             public static void IgnoreTask()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -489,7 +489,7 @@ namespace RoslynSandbox
             public static void IgnoreTaskOfInt()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Threading.Tasks;
 
@@ -505,7 +505,7 @@ namespace RoslynSandbox
             public static void FieldOfTypeArrayOfInt()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -519,7 +519,7 @@ namespace RoslynSandbox
             public static void PropertyWithBackingFieldOfTypeArrayOfInt()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {

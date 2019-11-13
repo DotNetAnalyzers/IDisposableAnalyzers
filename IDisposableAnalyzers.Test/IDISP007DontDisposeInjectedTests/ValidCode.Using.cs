@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             public static void FileOpenRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             public static void FileOpenReadVariable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -57,7 +57,7 @@ namespace RoslynSandbox
             public static void AwaitedStream()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -92,7 +92,7 @@ namespace RoslynSandbox
             public static void AwaitedStreamVariable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -128,7 +128,7 @@ namespace RoslynSandbox
             public static void InjectedIEnumerableOfTGetEnumerator()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -153,7 +153,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedConcreteFactory()
             {
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -166,7 +166,7 @@ namespace RoslynSandbox
     }
 }";
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -179,7 +179,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -198,7 +198,7 @@ namespace RoslynSandbox
             public static void InjectedPasswordBoxSecurePassword()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Windows.Controls;
 
@@ -222,7 +222,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedInterfaceFactory()
             {
                 var iFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -232,7 +232,7 @@ namespace RoslynSandbox
     }
 }";
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -245,7 +245,7 @@ namespace RoslynSandbox
     }
 }";
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -258,7 +258,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -277,7 +277,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedAbstractFactoryWIthImplementation()
             {
                 var abstractFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -287,7 +287,7 @@ namespace RoslynSandbox
     }
 }";
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -300,7 +300,7 @@ namespace RoslynSandbox
     }
 }";
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -313,7 +313,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -332,7 +332,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
             {
                 var abstractFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -342,7 +342,7 @@ namespace RoslynSandbox
     }
 }";
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -356,7 +356,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -375,7 +375,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -386,7 +386,7 @@ namespace RoslynSandbox
 }";
 
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -399,7 +399,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -418,7 +418,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
             {
                 var abstractFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -429,7 +429,7 @@ namespace RoslynSandbox
 }";
 
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -442,7 +442,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -461,7 +461,7 @@ namespace RoslynSandbox
             public static void CreatedUsingInjectedVirtualFactory()
             {
                 var abstractFactoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -471,7 +471,7 @@ namespace RoslynSandbox
     }
 }";
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -484,7 +484,7 @@ namespace RoslynSandbox
     }
 }";
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -497,7 +497,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -516,7 +516,7 @@ namespace RoslynSandbox
             public static void IgnoresRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -545,7 +545,7 @@ namespace RoslynSandbox
             public static void IgnoresRecursiveMethod()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -574,7 +574,7 @@ namespace RoslynSandbox
             public static void ReassignedParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -596,7 +596,7 @@ namespace RoslynSandbox
             public static void ReassignedParameterViaOut()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -627,7 +627,7 @@ namespace RoslynSandbox
             public static void ReassignedParameterViaOutAnd()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

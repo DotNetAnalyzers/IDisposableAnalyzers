@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
 
             private const string Disposable = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
             public static void AwaitTaskRun()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             public static void AwaitTaskFromResult()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -68,7 +68,7 @@ namespace RoslynSandbox
             public static void AwaitCreate()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             public static void AwaitCreateAsyncTaskFromResult()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -118,7 +118,7 @@ namespace RoslynSandbox
             public static void AwaitRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;

@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.Helpers
             public static void ShortCircuit(string code, bool expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -36,7 +36,7 @@ namespace RoslynSandbox
             public static void ObjectCreation(string code, bool expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {

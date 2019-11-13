@@ -12,7 +12,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
             private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -28,7 +28,7 @@ namespace RoslynSandbox
             public static void FileOpenRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             public static void FileOpenReadPassedIntoCtorOfNotDisposing()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -64,7 +64,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -83,7 +83,7 @@ namespace RoslynSandbox
             public static void Generic()
             {
                 var interfaceCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
  
@@ -93,7 +93,7 @@ namespace RoslynSandbox
 }";
 
                 var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class Disposable<T> : IDisposable<T>
     {
@@ -104,7 +104,7 @@ namespace RoslynSandbox
 }";
 
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class Factory
     {
@@ -113,7 +113,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -132,7 +132,7 @@ namespace RoslynSandbox
             public static void MethodCreatingDisposableExpressionBodyToString()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
             public static void MethodCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -179,7 +179,7 @@ namespace RoslynSandbox
             public static void PropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -201,7 +201,7 @@ namespace RoslynSandbox
             public static void PropertyCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -222,7 +222,7 @@ namespace RoslynSandbox
             public static void StaticPropertyCreatingDisposableExpressionBody(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -240,7 +240,7 @@ namespace RoslynSandbox
             public static void NoFixForArgument()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -262,7 +262,7 @@ namespace RoslynSandbox
             public static void FactoryMethodNewDisposable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public sealed class C
     {
@@ -284,7 +284,7 @@ namespace RoslynSandbox
             public static void FactoryConstrainedGeneric()
             {
                 var factoryCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -295,7 +295,7 @@ namespace RoslynSandbox
 }";
 
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C
     {
@@ -312,7 +312,7 @@ namespace RoslynSandbox
             public static void WithOptionalParameter()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -348,7 +348,7 @@ namespace RoslynSandbox
             public static void DiscardFileOpenRead()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

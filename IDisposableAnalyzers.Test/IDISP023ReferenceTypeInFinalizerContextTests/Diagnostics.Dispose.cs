@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             public static void Static(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -70,7 +70,7 @@ namespace RoslynSandbox
             public static void InstanceOutsideIfDispose(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -128,7 +128,7 @@ namespace RoslynSandbox
             public static void InstanceNoIfDispose(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -166,7 +166,7 @@ namespace RoslynSandbox
             public static void CallingStatic()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;

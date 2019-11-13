@@ -20,7 +20,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DontMixInjectedAndCreatedForMemberTe
             public static void InjectedAndCreated(string code)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -44,7 +44,7 @@ namespace RoslynSandbox
             public static void MutableFieldInSealed(string property)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -66,7 +66,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedCtorAndInitializer()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -87,7 +87,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedTwoCtors()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -113,7 +113,7 @@ namespace RoslynSandbox
             public static void ProtectedMutable()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -129,7 +129,7 @@ namespace RoslynSandbox
             public static void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -156,7 +156,7 @@ namespace RoslynSandbox
             public static void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -184,7 +184,7 @@ namespace RoslynSandbox
             public static void InjectedAndCreatedViaFactory()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

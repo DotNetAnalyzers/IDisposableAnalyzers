@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static void OutParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void DictionaryTryGetValue(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -59,7 +59,7 @@ namespace RoslynSandbox
         public static void CallWithOutParameter(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -90,7 +90,7 @@ namespace RoslynSandbox
         public static void CallWithOutParameterExpressionBody(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -118,7 +118,7 @@ namespace RoslynSandbox
         public static void DiscardedCachedOutParameter(string expression)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         public static void CachedOutParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -186,7 +186,7 @@ namespace RoslynSandbox
         public static void AssigningVariableViaOutParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -218,7 +218,7 @@ namespace RoslynSandbox
         public static void AssigningOutParameterExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -235,7 +235,7 @@ namespace RoslynSandbox
         public static void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -264,7 +264,7 @@ namespace RoslynSandbox
         public static void AssigningFieldViaConcurrentDictionaryTryGetValue()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -288,7 +288,7 @@ namespace RoslynSandbox
         public static void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Concurrent;
     using System.IO;
@@ -313,7 +313,7 @@ namespace RoslynSandbox
         public static void AssigningFieldWithCachedViaOutParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -342,7 +342,7 @@ namespace RoslynSandbox
         public static void AssigningVariableViaRefParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -368,7 +368,7 @@ namespace RoslynSandbox
         public static void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -397,7 +397,7 @@ namespace RoslynSandbox
         public static void ChainedOut()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -422,7 +422,7 @@ namespace RoslynSandbox
         public static void SeparateDeclarationAndCreation()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -444,7 +444,7 @@ namespace RoslynSandbox
         public static void TryGetOutVar()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -472,7 +472,7 @@ namespace RoslynSandbox
         public static void AssigningReturnOut()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -498,7 +498,7 @@ namespace RoslynSandbox
         public static void AssigningReturnOutTwice()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

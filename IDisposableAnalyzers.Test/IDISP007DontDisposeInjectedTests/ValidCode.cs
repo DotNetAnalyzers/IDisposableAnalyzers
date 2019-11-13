@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
         private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
         private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -26,7 +26,7 @@ namespace RoslynSandbox
         public static void DisposingArrayItem()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
         public static void DisposingDictionaryItem()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;
@@ -79,7 +79,7 @@ namespace RoslynSandbox
         public static void DisposingWithBaseClass()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -112,7 +112,7 @@ namespace RoslynSandbox
 }";
 
             var fooImplCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -146,7 +146,7 @@ namespace RoslynSandbox
         public static void DisposingInjectedPropertyInBaseClass()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -184,7 +184,7 @@ namespace RoslynSandbox
 }";
 
             var fooImplCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -219,7 +219,7 @@ namespace RoslynSandbox
         public static void DisposingInjectedPropertyInBaseClassFieldExpressionBody()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -258,7 +258,7 @@ namespace RoslynSandbox
 }";
 
             var fooImplCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -293,7 +293,7 @@ namespace RoslynSandbox
         public static void DisposingInjectedPropertyInBaseClassFieldExpressionBodyNotAssignedByChained()
         {
             var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -334,7 +334,7 @@ namespace RoslynSandbox
 }";
 
             var fooImplCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -364,7 +364,7 @@ namespace RoslynSandbox
         public static void InjectedInClassThatIsNotIDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -385,7 +385,7 @@ namespace RoslynSandbox
         public static void InjectedInClassThatIsIDisposable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -410,7 +410,7 @@ namespace RoslynSandbox
         public static void InjectedInClassThatIsIDisposableManyCtors()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -450,7 +450,7 @@ namespace RoslynSandbox
         public static void InjectedObjectInClassThatIsIDisposableWhenTouchingInjectedInDisposeMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -476,7 +476,7 @@ namespace RoslynSandbox
         public static void NotDisposingFieldInVirtualDispose()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -525,7 +525,7 @@ namespace RoslynSandbox
         public static void InjectingIntoPrivateCtor()
         {
             var disposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -538,7 +538,7 @@ namespace RoslynSandbox
 }";
 
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -569,7 +569,7 @@ namespace RoslynSandbox
         public static void BoolProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.ComponentModel;
@@ -616,7 +616,7 @@ namespace RoslynSandbox
         public static void InjectedInMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -644,7 +644,7 @@ namespace RoslynSandbox
         public static void IgnoreLambdaCreation()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -664,7 +664,7 @@ namespace RoslynSandbox
         public static void IgnoreLambdaUsageOnLocal(string invokeCode)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -686,7 +686,7 @@ namespace RoslynSandbox
         public static void IgnoreInLambdaMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -710,7 +710,7 @@ namespace RoslynSandbox
         public static void ReassignedParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -731,7 +731,7 @@ namespace RoslynSandbox
         public static void ReassignedParameterViaOut()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.NetCoreTests.Helpers
             public static void Expression(string code, bool expected)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     internal class Foo
     {

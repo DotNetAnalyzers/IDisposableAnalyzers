@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
         public static void AddInterfaceSimple()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -38,7 +38,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void AddInterface()
         {
             var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -112,7 +112,7 @@ namespace RoslynSandbox
 }";
 
             var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

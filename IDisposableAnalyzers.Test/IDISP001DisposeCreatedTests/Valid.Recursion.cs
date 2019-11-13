@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void IgnoresRecursiveCalculatedProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -39,7 +39,7 @@ namespace RoslynSandbox
         public static void IgnoresRecursiveGetSetProperty()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -100,7 +100,7 @@ namespace RoslynSandbox
         public static void MethodExpressionBody()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -130,7 +130,7 @@ namespace RoslynSandbox
         public static void WithOptionalParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Collections.Generic;

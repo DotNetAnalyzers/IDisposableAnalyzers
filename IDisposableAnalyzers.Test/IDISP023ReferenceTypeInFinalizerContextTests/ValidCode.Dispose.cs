@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
             private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
             private const string DisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -27,7 +27,7 @@ namespace RoslynSandbox
             public static void TouchingReferenceTypeInIfBlock()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -69,7 +69,7 @@ namespace RoslynSandbox
             public static void TouchingReferenceTypeInIfExpression()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -110,7 +110,7 @@ namespace RoslynSandbox
             public static void TouchingStruct(string expression)
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -150,7 +150,7 @@ namespace RoslynSandbox
             public static void SettingStaticToNull()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -193,7 +193,7 @@ namespace RoslynSandbox
             public static void SettingInstanceToNull()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Text;
@@ -236,7 +236,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDispose()
             {
                 var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -268,7 +268,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -286,7 +286,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDisposeAfterCheckDispose()
             {
                 var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -318,7 +318,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class C : CBase
     {
@@ -344,7 +344,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDisposeAfterCheckDisposeAndIfDisposing()
             {
                 var fooBaseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -376,7 +376,7 @@ namespace RoslynSandbox
     }
 }";
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

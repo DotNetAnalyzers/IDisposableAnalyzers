@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static void DisposingFieldInTearDown()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 
@@ -38,7 +38,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInOneTimeTearDown()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using NUnit.Framework;
 

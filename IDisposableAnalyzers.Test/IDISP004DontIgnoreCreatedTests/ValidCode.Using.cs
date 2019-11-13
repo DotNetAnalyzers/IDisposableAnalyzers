@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         public static void FileOpenRead()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -30,7 +30,7 @@ namespace RoslynSandbox
         public static void NewStreamReader()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -51,7 +51,7 @@ namespace RoslynSandbox
         public static void SampleWithAwait()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading;

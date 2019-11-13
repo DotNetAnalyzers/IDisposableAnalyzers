@@ -16,7 +16,7 @@ namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
             public static void EmptyClass()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -26,7 +26,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -60,7 +60,7 @@ namespace RoslynSandbox
             public static void EmptyClassFigureOutUnderscoreFromOtherClass()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public class M
     {
@@ -74,7 +74,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -84,7 +84,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -118,7 +118,7 @@ namespace RoslynSandbox
             public static void WithThrowIfDisposed()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -131,7 +131,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -161,7 +161,7 @@ namespace RoslynSandbox
             public static void WithProtectedPrivateSetProperty()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -172,7 +172,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -208,7 +208,7 @@ namespace RoslynSandbox
             public static void WithOverridingProperties()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     public abstract class CBase
     {
@@ -221,7 +221,7 @@ namespace RoslynSandbox
 }";
 
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -236,7 +236,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -276,7 +276,7 @@ namespace RoslynSandbox
             public static void WithPublicVirtualMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -289,7 +289,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -327,7 +327,7 @@ namespace RoslynSandbox
             public static void WithProtectedVirtualMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -340,7 +340,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

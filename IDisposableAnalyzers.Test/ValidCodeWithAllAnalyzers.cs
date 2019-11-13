@@ -67,7 +67,7 @@ namespace IDisposableAnalyzers.Test
         public void WithSyntaxErrors(DiagnosticAnalyzer analyzer)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

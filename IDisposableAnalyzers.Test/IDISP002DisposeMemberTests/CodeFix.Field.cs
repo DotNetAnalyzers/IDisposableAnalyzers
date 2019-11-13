@@ -17,7 +17,7 @@
             public static void PrivateReadonlyInitializedWithFileOpenRead()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -33,7 +33,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -56,7 +56,7 @@ namespace RoslynSandbox
             public static void PrivateReadonlyFieldInitializedWithNewDisposable()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -71,7 +71,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -93,7 +93,7 @@ namespace RoslynSandbox
             public static void AssignedInExpressionBody()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -110,7 +110,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -134,7 +134,7 @@ namespace RoslynSandbox
             public static void InitializedAndSetToNullInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -156,7 +156,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -185,7 +185,7 @@ namespace RoslynSandbox
             public static void AssignedWithFileOpenReadInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -206,7 +206,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -234,7 +234,7 @@ namespace RoslynSandbox
             public static void AssignedWithNewDisposableInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -255,7 +255,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -283,7 +283,7 @@ namespace RoslynSandbox
             public static void ConditionallyAssignedInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -307,7 +307,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -338,7 +338,7 @@ namespace RoslynSandbox
             public static void AssignedInCtorNullCoalescing()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -359,7 +359,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -387,7 +387,7 @@ namespace RoslynSandbox
             public static void AssignedInCtorTernary()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -408,7 +408,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -436,7 +436,7 @@ namespace RoslynSandbox
             public static void ProtectedSealedInitialized()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -452,7 +452,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -475,7 +475,7 @@ namespace RoslynSandbox
             public static void WhenAlreadyDisposingOther()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -493,7 +493,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -518,7 +518,7 @@ namespace RoslynSandbox
             public static void DisposeMethodExpressionBody()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -533,7 +533,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -558,7 +558,7 @@ namespace RoslynSandbox
             public static void OfTypeObject()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -574,7 +574,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -597,7 +597,7 @@ namespace RoslynSandbox
             public static void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -624,7 +624,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -658,7 +658,7 @@ namespace RoslynSandbox
             public static void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -697,7 +697,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -743,7 +743,7 @@ namespace RoslynSandbox
             public static void DisposeSecondMemberWhenOverriddenDisposeMethod()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -779,7 +779,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -809,7 +809,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -845,8 +845,8 @@ namespace RoslynSandbox
             [Test]
             public static void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
             {
-                var baseCode = @"
-namespace RoslynSandbox
+                var baseClass = @"
+namespace N
 {
     using System;
 
@@ -882,7 +882,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -910,7 +910,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -939,15 +939,15 @@ namespace RoslynSandbox
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseCode, before }, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
             }
 
             [Test]
             public static void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -956,7 +956,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -971,7 +971,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -993,7 +993,7 @@ namespace RoslynSandbox
             public static void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
             {
                 var barCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1002,7 +1002,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1017,7 +1017,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1039,7 +1039,7 @@ namespace RoslynSandbox
             public static void LazyPropertyBackingField()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1063,7 +1063,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1094,7 +1094,7 @@ namespace RoslynSandbox
             public static void AssignedInCoalesce()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1123,7 +1123,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1159,7 +1159,7 @@ namespace RoslynSandbox
             public static void AssignedInTernary()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1183,7 +1183,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1214,7 +1214,7 @@ namespace RoslynSandbox
             public static void DisposeMemberWhenVirtualDisposeMethod()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1253,7 +1253,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1299,7 +1299,7 @@ namespace RoslynSandbox
             public static void DisposeAfterIfNotDisposingReturn()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1340,7 +1340,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -1389,7 +1389,7 @@ namespace RoslynSandbox
             public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1425,7 +1425,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1452,7 +1452,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1486,7 +1486,7 @@ namespace RoslynSandbox
             public static void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1522,7 +1522,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1549,7 +1549,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -1583,7 +1583,7 @@ namespace RoslynSandbox
             public static void CreateIfDisposingWhenEmpty()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1603,7 +1603,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1633,7 +1633,7 @@ namespace RoslynSandbox
             public static void WhenCallingBaseDispose()
             {
                 var baseCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1664,7 +1664,7 @@ namespace RoslynSandbox
     }
 }";
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -1680,7 +1680,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

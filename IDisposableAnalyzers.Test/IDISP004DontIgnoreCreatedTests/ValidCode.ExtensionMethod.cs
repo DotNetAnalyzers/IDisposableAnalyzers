@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DontIgnoreCreatedTests
         public static void Simple()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -24,7 +24,7 @@ namespace RoslynSandbox
     }
 }";
             var extCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -35,7 +35,7 @@ namespace RoslynSandbox
 }";
 
             var wrappingDisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -63,7 +63,7 @@ namespace RoslynSandbox
         public static void SimpleWithArg()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -78,7 +78,7 @@ namespace RoslynSandbox
     }
 }";
             var extCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -89,7 +89,7 @@ namespace RoslynSandbox
 }";
 
             var wrappingDisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -117,7 +117,7 @@ namespace RoslynSandbox
         public static void SimpleWhenArg()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -132,7 +132,7 @@ namespace RoslynSandbox
     }
 }";
             var extCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -143,7 +143,7 @@ namespace RoslynSandbox
 }";
 
             var wrappingDisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -171,7 +171,7 @@ namespace RoslynSandbox
         public static void Chained()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -186,7 +186,7 @@ namespace RoslynSandbox
     }
 }";
             var extCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -199,7 +199,7 @@ namespace RoslynSandbox
 }";
 
             var wrappingDisposableCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

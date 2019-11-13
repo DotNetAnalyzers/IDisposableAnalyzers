@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static void DisposingVariable()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -35,7 +35,7 @@ namespace RoslynSandbox
         public static void DisposeBeforeAssigningInIfElse(string dispose)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -67,7 +67,7 @@ namespace RoslynSandbox
         public static void DisposeBeforeAssigningBeforeIfElse(string dispose)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void DisposeFieldBeforeIfElseReassigning(string dispose)
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 
@@ -127,7 +127,7 @@ namespace RoslynSandbox
         public static void DisposingParameter()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -150,7 +150,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInCtor()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -172,7 +172,7 @@ namespace RoslynSandbox
         public static void DisposingFieldInMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -195,7 +195,7 @@ namespace RoslynSandbox
         public static void ConditionallyDisposingFieldInMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -218,7 +218,7 @@ namespace RoslynSandbox
         public static void ConditionallyDisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -241,7 +241,7 @@ namespace RoslynSandbox
         public static void DisposingUnderscoreFieldInMethod()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -264,7 +264,7 @@ namespace RoslynSandbox
         public static void AssigningFieldInLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -296,7 +296,7 @@ namespace RoslynSandbox
         public static void AssigningBackingFieldInLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -334,7 +334,7 @@ namespace RoslynSandbox
         public static void AssigningSerialDisposableBackingFieldInLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -372,7 +372,7 @@ namespace RoslynSandbox
         public static void AssigningSerialDisposableFieldInLambda()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Reactive.Disposables;
@@ -404,7 +404,7 @@ namespace RoslynSandbox
         public static void DisposingPreviousAssignedToLocal()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -433,7 +433,7 @@ namespace RoslynSandbox
         public static void WhileLoop(string call)
         {
             var code = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
 

@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             public static void UsingField1()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -39,7 +39,7 @@ namespace RoslynSandbox
             public static void UsingField2()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

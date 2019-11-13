@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
             public static void AssigningFieldViaOutParameterInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -47,7 +47,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -84,7 +84,7 @@ namespace RoslynSandbox
             public static void AssigningFieldViaRefParameterInCtor()
             {
                 var before = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;
@@ -114,7 +114,7 @@ namespace RoslynSandbox
 }";
 
                 var after = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.IO;

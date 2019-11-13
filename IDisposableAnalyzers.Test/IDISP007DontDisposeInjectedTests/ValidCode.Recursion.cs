@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DontDisposeInjectedTests
             public static void IgnoresWhenDisposingRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -32,7 +32,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenNotDisposingRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -52,7 +52,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -80,7 +80,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 
@@ -107,7 +107,7 @@ namespace RoslynSandbox
             public static void IgnoresWhenDisposingRecursiveMethod()
             {
                 var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
 

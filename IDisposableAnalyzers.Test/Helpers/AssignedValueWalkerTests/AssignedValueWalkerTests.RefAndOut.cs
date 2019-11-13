@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
             public static void LocalAssignedWithOutParameterSimple()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -48,7 +48,7 @@ namespace RoslynSandbox
             public static void DiscardedOut(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -77,7 +77,7 @@ namespace RoslynSandbox
             public static void DiscardedOutAssignedWithArgument(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     public static class C
     {
@@ -106,7 +106,7 @@ namespace RoslynSandbox
             public static void DiscardedOutCachedAndAssigned(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -142,7 +142,7 @@ namespace RoslynSandbox
             public static void OutParameterCachedAndAssigned()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     using System.Collections.Generic;
 
@@ -177,7 +177,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithOutParameterOtherClass()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     class C
     {
@@ -210,7 +210,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithOutParameterOtherClassElvis()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     class C
     {
@@ -246,7 +246,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -285,7 +285,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithOutParameterGeneric()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C<T>
     {
@@ -316,7 +316,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithChainedOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -354,7 +354,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithChainedRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -392,7 +392,7 @@ namespace RoslynSandbox
             public static void LocalAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -427,7 +427,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithOutParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -470,7 +470,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithRefParameter(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -512,7 +512,7 @@ namespace RoslynSandbox
             public static void FieldAssignedWithRefParameterArgument(string code, string expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -551,7 +551,7 @@ namespace RoslynSandbox
             public static void RefBeforeOut()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -582,7 +582,7 @@ namespace RoslynSandbox
             public static void RecursiveOutAssigned()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {
@@ -619,7 +619,7 @@ namespace RoslynSandbox
             public static void RecursiveOut()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace RoslynSandbox
+namespace N
 {
     internal class C
     {

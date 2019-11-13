@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -36,7 +36,7 @@ namespace RoslynSandbox
         public static void UsingAwaited()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -75,7 +75,7 @@ namespace RoslynSandbox
         public static void TaskFromResult()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -98,7 +98,7 @@ namespace RoslynSandbox
         public static void TaskCompletedTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.IO;
     using System.Threading.Tasks;
@@ -121,7 +121,7 @@ namespace RoslynSandbox
         public static void UsingNewMTaskRun()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -157,7 +157,7 @@ namespace RoslynSandbox
         public static void UsingNewMLocalTaskRun()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -193,7 +193,7 @@ namespace RoslynSandbox
         public static void UsingNewMLocalFuncTask()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Threading.Tasks;
@@ -230,7 +230,7 @@ namespace RoslynSandbox
         public static void ReturnNullAfterAwaitIssue89()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -254,7 +254,7 @@ namespace RoslynSandbox
         public static void ReturnNullIssue89()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System.Net;
     using System.Threading.Tasks;
@@ -277,7 +277,7 @@ namespace RoslynSandbox
         public static void EarlyReturnNullIssue89()
         {
             var testCode = @"
-namespace RoslynSandbox
+namespace N
 {
     using System;
     using System.Net;
