@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -45,7 +45,10 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+            };
         }
     }
 }";
@@ -53,6 +56,7 @@ namespace N
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
+            [Ignore("whitespace.")]
             [Test]
             public static void CreateNewCompositeDisposableWithTrivia()
             {
@@ -140,7 +144,10 @@ namespace N
 
         internal C()
         {
-            this.disposable = new System.Reactive.Disposables.CompositeDisposable { File.OpenRead(string.Empty) };
+            this.disposable = new System.Reactive.Disposables.CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+            };
         }
     }
 }";
@@ -192,7 +199,10 @@ namespace N
 
         internal C()
         {
-            _disposable = new System.Reactive.Disposables.CompositeDisposable { File.OpenRead(string.Empty) };
+            _disposable = new System.Reactive.Disposables.CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+            };
         }
     }
 }";

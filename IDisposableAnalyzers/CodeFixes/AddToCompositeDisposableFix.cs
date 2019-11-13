@@ -19,7 +19,13 @@
     [Shared]
     internal class AddToCompositeDisposableFix : DocumentEditorCodeFixProvider
     {
-        private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.ParseTypeName("System.Reactive.Disposables.CompositeDisposable")
+        private static readonly TypeSyntax CompositeDisposableType = SyntaxFactory.QualifiedName(
+                                                                                      SyntaxFactory.QualifiedName(
+                                                                                          SyntaxFactory.QualifiedName(
+                                                                                              SyntaxFactory.IdentifierName("System"),
+                                                                                              SyntaxFactory.IdentifierName("Reactive")),
+                                                                                          SyntaxFactory.IdentifierName("Disposables")),
+                                                                                      SyntaxFactory.IdentifierName("CompositeDisposable"))
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
@@ -51,9 +57,34 @@
                         {
                             context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
-                                (editor, cancellationToken) => CreateAndInitialize(editor, statement, cancellationToken),
+                                (editor, cancellationToken) => CreateAndInitialize(editor, cancellationToken),
                                 (string)null,
                                 diagnostic);
+
+                            void CreateAndInitialize(DocumentEditor editor, CancellationToken cancellationToken)
+                            {
+                                var disposable = editor.AddField(
+                                    statement.FirstAncestor<TypeDeclarationSyntax>(),
+                                    "disposable",
+                                    Accessibility.Private,
+                                    DeclarationModifiers.ReadOnly,
+                                    CompositeDisposableType,
+                                    cancellationToken);
+
+                                _ = editor.ReplaceNode(
+                                    statement.Expression,
+                                    x => SyntaxFactory.AssignmentExpression(
+                                            SyntaxKind.SimpleAssignmentExpression,
+                                            disposable,
+                                            SyntaxFactory.ObjectCreationExpression(
+                                                CompositeDisposableType,
+                                                null,
+                                                SyntaxFactory.InitializerExpression(
+                                                    SyntaxKind.CollectionInitializerExpression,
+                                                    SyntaxFactory.SeparatedList(
+                                                        new[] { x.WithAdditionalAnnotations(Formatter.Annotation) },
+                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, SyntaxFactory.TriviaList(SyntaxFactory.ElasticLineFeed)) })))));
+                            }
                         }
                     }
                 }
@@ -111,43 +142,6 @@
 
                 result = null;
                 return false;
-            }
-        }
-
-        private static void CreateAndInitialize(DocumentEditor editor, ExpressionStatementSyntax statement, CancellationToken cancellationToken)
-        {
-            var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-            var disposable = editor.AddField(
-                containingType,
-                "disposable",
-                Accessibility.Private,
-                DeclarationModifiers.ReadOnly,
-                CompositeDisposableType,
-                cancellationToken);
-
-            var trailingTrivia = statement.GetTrailingTrivia();
-            if (trailingTrivia.Any(SyntaxKind.SingleLineCommentTrivia))
-            {
-                var padding = new string(' ', statement.GetLeadingTrivia().Span.Length);
-                var code = StringBuilderPool.Borrow()
-                                            .AppendLine($"{padding}{disposable} = new System.Reactive.Disposables.CompositeDisposable")
-                                            .AppendLine($"{padding}{{")
-                                            .AppendLine($"    {statement.GetLeadingTrivia()}{statement.Expression},{trailingTrivia.ToString().Trim('\r', '\n')}")
-                                            .AppendLine($"{padding}}};")
-                                            .Return();
-
-                editor.ReplaceNode(
-                    statement,
-                    SyntaxFactory.ParseStatement(code)
-                                 .WithSimplifiedNames());
-            }
-            else
-            {
-                editor.ReplaceNode(
-                    statement,
-                    SyntaxFactory.ParseStatement($"{disposable} = new System.Reactive.Disposables.CompositeDisposable {{ {statement.Expression} }};")
-                                 .WithAdditionalAnnotations(Formatter.Annotation)
-                                 .WithSimplifiedNames());
             }
         }
 
