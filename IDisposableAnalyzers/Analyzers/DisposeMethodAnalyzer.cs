@@ -101,11 +101,7 @@ namespace IDisposableAnalyzers
             {
                 foreach (var member in @interface.GetMembers())
                 {
-                    if (member is IMethodSymbol candidate &&
-                        candidate.Name == "Dispose" &&
-                        candidate.ReturnsVoid &&
-                        candidate.DeclaredAccessibility == Accessibility.Public &&
-                        candidate.Parameters.Length == 0)
+                    if (member is IMethodSymbol { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } })
                     {
                         return true;
                     }
@@ -117,10 +113,8 @@ namespace IDisposableAnalyzers
 
         private static bool ShouldCallBase(IMethodSymbol method, MethodDeclarationSyntax methodDeclaration, SyntaxNodeAnalysisContext context)
         {
-            if (method.Parameters.TrySingle(out var parameter) &&
-                parameter.Type == KnownSymbol.Boolean &&
-                method.IsOverride &&
-                method.OverriddenMethod is IMethodSymbol overridden &&
+            if (method is { IsOverride: true, OverriddenMethod: { } overridden, Parameters: { Length: 1 } parameters } &&
+                parameters[0].Type.SpecialType == SpecialType.System_Boolean &&
                 !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
             {
                 if (overridden.DeclaringSyntaxReferences.Length == 0)
