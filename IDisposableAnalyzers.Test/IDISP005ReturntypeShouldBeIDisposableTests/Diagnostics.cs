@@ -82,7 +82,7 @@ namespace N
     {
         private readonly PasswordBox PasswordBox = new PasswordBox();
 
-        public object Meh()
+        public object M()
         {
             return ↓PasswordBox.SecurePassword;
         }

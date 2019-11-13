@@ -274,7 +274,7 @@ namespace N
 {
     public sealed class C
     {
-        public object Meh()
+        public object M()
         {
             var chunk = new Chunk<int>();
             return chunk.Add(1);
@@ -296,7 +296,7 @@ namespace N
     {
         private readonly IDisposable disposable = new Disposable();
 
-        private object Meh()
+        private object M()
         {
             return this.disposable;
         }
@@ -317,7 +317,7 @@ namespace N
     {
         private readonly IDisposable[] disposable = { new Disposable() };
 
-        private object Meh()
+        private object M()
         {
             return this.disposable[0];
         }
@@ -366,7 +366,7 @@ namespace N
     {
         private readonly DisposableList<IDisposable> disposable = new DisposableList<IDisposable> { new Disposable() };
 
-        private object Meh()
+        private object M()
         {
             return this.disposable[0];
         }
@@ -415,7 +415,7 @@ namespace N
     {
         private readonly DisposableList<IDisposable> disposable = new DisposableList<IDisposable> { new Disposable() };
 
-        private object Meh()
+        private object M()
         {
             return this.Id(this.disposable[0]);
         }
@@ -439,12 +439,12 @@ namespace N
 
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static Func<object> Meh()
+        private static Func<object> M2()
         {
             return () => new object();
         }
@@ -461,12 +461,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static object Meh() => new object();
+        private static object M2() => new object();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -482,10 +482,10 @@ namespace N
     {
         public void M()
         {
-            var meh = Meh;
+            var p = P;
         }
 
-        public object Meh
+        public object P
         {
             get
             {
@@ -558,7 +558,7 @@ namespace N
 
     public class C
     {
-        private static Task<IDisposable> Meh()
+        private static Task<IDisposable> M()
         {
             return Task.Run<IDisposable>(() => new Disposable());
         }
@@ -580,9 +580,9 @@ namespace N
             Id(1);
         }
 
-        private static T Id<T>(T meh)
+        private static T Id<T>(T t)
         {
-            return meh;
+            return t;
         }
     }
 }";
@@ -599,10 +599,10 @@ namespace N
     {
         public void M()
         {
-            var meh = Meh;
+            var p = P;
         }
 
-        public object Meh => new object();
+        public object P => new object();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -688,7 +688,7 @@ namespace N
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
 
-        public object Meh()
+        public object M()
         {
             return stream;
         }
@@ -710,7 +710,7 @@ namespace N
     {
         private readonly static Stream Stream = File.OpenRead(string.Empty);
 
-        public object Meh()
+        public object M()
         {
             return Stream;
         }
@@ -889,9 +889,9 @@ namespace N
             var text = Get(""abc"", 1, (s, i) => s.Substring(i));
         }
 
-        public T Get<T>(T text, int i, Func<T, int, T> meh)
+        public T Get<T>(T text, int i, Func<T, int, T> funk)
         {
-            return meh(text, i);
+            return funk(text, i);
         }
     }
 }";

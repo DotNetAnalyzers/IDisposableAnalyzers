@@ -83,7 +83,7 @@
             {
                 assignedSymbol = assignedValues.CurrentSymbol;
                 if (assignedValues.Count == 1 &&
-                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } }  &&
+                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } &&
                     binary.IsKind(SyntaxKind.CoalesceExpression))
                 {
                     // lazy
@@ -262,7 +262,7 @@
                 return Result.No;
             }
 
-            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol symbol))
+            if (semanticModel.TryGetSymbol(candidate, cancellationToken, out var symbol))
             {
                 switch (symbol)
                 {

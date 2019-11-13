@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -19,7 +19,7 @@ namespace N
 
     public sealed class C
     {
-        public Stream Meh
+        public Stream P
         {
             get
             {
@@ -41,7 +41,7 @@ namespace N
 
     public sealed class C
     {
-        public Stream Meh => ↓File.OpenRead(string.Empty);
+        public Stream P => ↓File.OpenRead(string.Empty);
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
@@ -57,7 +57,7 @@ namespace N
 
     public sealed class C
     {
-        public Stream Meh
+        public Stream P
         {
             get => ↓File.OpenRead(string.Empty);
         }

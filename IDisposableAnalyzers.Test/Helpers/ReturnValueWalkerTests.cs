@@ -7,7 +7,9 @@ namespace IDisposableAnalyzers.Test.Helpers
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
+#pragma warning disable GURA07 // Test class should be public static.
     internal static class ReturnValueWalkerTests
+#pragma warning restore GURA07 // Test class should be public static.
     {
         [TestCase(ReturnValueSearch.Recursive, "")]
         [TestCase(ReturnValueSearch.TopLevel, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]

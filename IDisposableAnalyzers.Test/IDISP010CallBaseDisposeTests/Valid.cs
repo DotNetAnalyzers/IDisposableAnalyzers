@@ -670,7 +670,7 @@ namespace N
             set { this.stream = value; }
         }
 
-        public void Meh()
+        public void M()
         {
             var temp = this.Stream;
             this.Stream = null;

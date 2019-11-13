@@ -17,7 +17,7 @@ namespace N
 
     public class Disposable : IDisposable
     {
-        public Disposable(string meh)
+        public Disposable(string _)
             : this()
         {
         }

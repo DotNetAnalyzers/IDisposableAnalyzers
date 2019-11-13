@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP015DoNotReturnCachedAndCreatedTest
+﻿namespace IDisposableAnalyzers.Test.IDISP015DoNotReturnCachedAndCreatedTest
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -16,7 +16,7 @@ namespace N
 
     public class Disposable : IDisposable
     {
-        public Disposable(string meh)
+        public Disposable(string _)
             : this()
         {
         }
