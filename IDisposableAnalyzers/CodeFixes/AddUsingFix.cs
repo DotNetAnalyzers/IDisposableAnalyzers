@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
@@ -56,11 +57,11 @@
                         }
                     }
                     else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax expressionStatement) &&
-                             expressionStatement.Parent is BlockSyntax expressionStatementBlock)
+                             expressionStatement.Parent is BlockSyntax)
                     {
                         context.RegisterCodeFix(
                             "Add using to end of block.",
-                            (editor, _) => AddUsingToEndOfBlock(editor, expressionStatementBlock, expressionStatement),
+                            (editor, _) => AddUsingToEndOfBlock(editor, expressionStatement),
                             "Add using to end of block.",
                             diagnostic);
                     }
@@ -99,11 +100,11 @@
                 }
                 else if (diagnostic.Id == IDISP004DontIgnoreCreated.DiagnosticId &&
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
-                         statement.Parent is BlockSyntax block)
+                         statement.Parent is BlockSyntax)
                 {
                     context.RegisterCodeFix(
                         "Add using to end of block.",
-                        (editor, _) => AddUsingToEndOfBlock(editor, block, statement),
+                        (editor, _) => AddUsingToEndOfBlock(editor, statement),
                         "Add using to end of block.",
                         diagnostic);
                 }
@@ -119,17 +120,35 @@
             }
         }
 
+        private static IReadOnlyList<StatementSyntax> StatementsAfter(StatementSyntax statement)
+        {
+            return statement switch
+            {
+                { Parent: BlockSyntax { Statements: { } statements } } => statements
+                                                                          .Where(s => s.SpanStart > statement.SpanStart)
+                                                                          .Where(x => !x.IsKind(SyntaxKind.LocalFunctionStatement))
+                                                                          .ToArray(),
+                { Parent: SwitchSectionSyntax { Statements: { } statements } } => statements
+                                                                                  .Where(s => s.SpanStart > statement.SpanStart)
+                                                                                  .Where(x => !x.IsKind(SyntaxKind.LocalFunctionStatement))
+                                                                                  .TakeWhile(x => !x.IsKind(SyntaxKind.BreakStatement))
+                                                                                  .ToArray(),
+                _ => throw new InvalidOperationException("Statement is not in a block."),
+            };
+        }
+
+        private static void RemoveStatements(DocumentEditor editor, IEnumerable<StatementSyntax> statements)
+        {
+            foreach (var statement in statements)
+            {
+                editor.RemoveNode(statement);
+            }
+        }
+
         private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, LocalDeclarationStatementSyntax declarationStatement)
         {
-            var statements = block.Statements
-                                  .Where(s => s.SpanStart > declarationStatement.SpanStart)
-                                  .TakeWhile(s => !(s is LocalFunctionStatementSyntax))
-                                  .ToArray();
-            foreach (var statementSyntax in statements)
-            {
-                editor.RemoveNode(statementSyntax);
-            }
-
+            var statements = StatementsAfter(declarationStatement);
+            RemoveStatements(editor, statements);
             editor.ReplaceNode(
                 declarationStatement,
                 SyntaxFactory.UsingStatement(
@@ -142,14 +161,8 @@
 
         private static void AddUsingToEndOfBlock(DocumentEditor editor, SwitchSectionSyntax switchSection, LocalDeclarationStatementSyntax declarationStatement)
         {
-            var statements = switchSection.Statements
-                                          .Where(s => s.SpanStart > declarationStatement.SpanStart)
-                                          .Where(s => !(s == switchSection.Statements.Last() && s is BreakStatementSyntax))
-                                          .ToArray();
-            foreach (var statement in statements)
-            {
-                editor.RemoveNode(statement);
-            }
+            var statements = StatementsAfter(declarationStatement);
+            RemoveStatements(editor, statements);
 
             editor.ReplaceNode(
                 declarationStatement,
@@ -160,15 +173,10 @@
                                             .WithAdditionalAnnotations(Formatter.Annotation)));
         }
 
-        private static void AddUsingToEndOfBlock(DocumentEditor editor, BlockSyntax block, ExpressionStatementSyntax statement)
+        private static void AddUsingToEndOfBlock(DocumentEditor editor, ExpressionStatementSyntax statement)
         {
-            var statements = block.Statements
-                                  .Where(s => s.SpanStart > statement.SpanStart)
-                                  .ToArray();
-            foreach (var statementSyntax in statements)
-            {
-                editor.RemoveNode(statementSyntax);
-            }
+            var statements = StatementsAfter(statement);
+            RemoveStatements(editor, statements);
 
             editor.ReplaceNode(
                 statement,
