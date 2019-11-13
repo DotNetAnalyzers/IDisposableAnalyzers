@@ -9,11 +9,25 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Formatting;
+    using Microsoft.CodeAnalysis.Simplification;
 
     internal static class IDisposableFactory
     {
-        private static readonly TypeSyntax IDisposable = SyntaxFactory.ParseTypeName("System.IDisposable")
-                                                                      .WithSimplifiedNames();
+        internal static readonly TypeSyntax SystemIDisposable = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
+                                                                             .WithAdditionalAnnotations(Simplifier.Annotation);
+
+        internal static readonly MethodDeclarationSyntax DisposeMethodDeclaration = SyntaxFactory.MethodDeclaration(
+            attributeLists: default,
+            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)),
+            returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+            explicitInterfaceSpecifier: default,
+            identifier: SyntaxFactory.Identifier("Dispose"),
+            typeParameterList: default,
+            parameterList: SyntaxFactory.ParameterList(),
+            constraintClauses: default,
+            body: SyntaxFactory.Block(),
+            expressionBody: default,
+            semicolonToken: default);
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
@@ -84,7 +98,7 @@
                                 .WithLeadingElasticLineFeed();
                     }
 
-                    return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.CastExpression(IDisposable, e));
+                    return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.CastExpression(SystemIDisposable, e));
                 }
 
                 return AsIDisposable(e.WithoutTrivia())
@@ -107,7 +121,7 @@
 
                     return DisposeStatement(
                         SyntaxFactory.CastExpression(
-                            IDisposable,
+                            SystemIDisposable,
                             neverNull.WithoutTrivia()))
                         .WithLeadingElasticLineFeed();
                 }
@@ -156,7 +170,7 @@
                     SyntaxFactory.BinaryExpression(
                         SyntaxKind.AsExpression,
                         MemberAccess(),
-                        IDisposable))
+                        SystemIDisposable))
                 .WithLeadingElasticLineFeed();
 
             ExpressionSyntax Create(SyntaxToken identifier)
@@ -236,7 +250,7 @@
 
         internal static ParenthesizedExpressionSyntax AsIDisposable(ExpressionSyntax e)
         {
-            return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.BinaryExpression(SyntaxKind.AsExpression, e, IDisposable));
+            return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.BinaryExpression(SyntaxKind.AsExpression, e, SystemIDisposable));
         }
     }
 }
