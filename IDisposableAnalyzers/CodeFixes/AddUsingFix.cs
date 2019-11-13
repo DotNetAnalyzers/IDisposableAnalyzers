@@ -162,9 +162,10 @@
                 statement,
                 SyntaxFactory.UsingStatement(
                     declaration: null,
-                    expression: statement.Expression,
+                    expression: statement.Expression.WithoutLeadingTrivia(),
                     statement: SyntaxFactory.Block(SyntaxFactory.List(statements))
-                                            .WithAdditionalAnnotations(Formatter.Annotation)));
+                                            .WithAdditionalAnnotations(Formatter.Annotation))
+                             .WithLeadingTriviaFrom(statement.Expression));
         }
 
         private static void ReplaceWithUsing(DocumentEditor editor, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
