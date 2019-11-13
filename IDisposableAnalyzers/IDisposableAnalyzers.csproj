@@ -40,7 +40,7 @@ BUGFIX IDISP023: when disposing members.</Description>
 
   <ItemGroup>
     <PackageReference Include="Gu.Analyzers" Version="1.6.3-dev" PrivateAssets="all" />
-    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.5.1-dev" />
+    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.5.5-dev" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.3.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="all" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.113" PrivateAssets="all" />
