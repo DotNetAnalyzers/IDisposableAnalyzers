@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -8,9 +8,9 @@ namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 
     public static partial class AssignedValueWalkerTests
     {
-        [TestCase("var temp1 = this.M;", "1")]
-        [TestCase("var temp2 = this.M;", "1, 2")]
-        [TestCase("var temp3 = this.M;", "1, 2")]
+        [TestCase("var temp1 = this.P;", "1")]
+        [TestCase("var temp2 = this.P;", "1, 2")]
+        [TestCase("var temp3 = this.P;", "1, 2")]
         public static void AutoPropertyGetSetAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -20,16 +20,16 @@ namespace N
     {
         public C()
         {
-            var temp1 = this.M;
-            this.M = 2;
-            var temp2 = this.M;
+            var temp1 = this.P;
+            this.P = 2;
+            var temp2 = this.P;
         }
 
-        public int M { get; set; } = 1;
+        public int P { get; set; } = 1;
 
         public void Meh()
         {
-            var temp3 = this.M;
+            var temp3 = this.P;
         }
     }
 }");
@@ -43,9 +43,9 @@ namespace N
             }
         }
 
-        [TestCase("var temp1 = this.M;", "1")]
-        [TestCase("var temp2 = this.M;", "1, 2")]
-        [TestCase("var temp3 = this.M;", "1, 2")]
+        [TestCase("var temp1 = this.P;", "1")]
+        [TestCase("var temp2 = this.P;", "1, 2")]
+        [TestCase("var temp3 = this.P;", "1, 2")]
         public static void AutoPropertyGetOnlyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -55,16 +55,16 @@ namespace N
     {
         public C()
         {
-            var temp1 = this.M;
-            this.M = 2;
-            var temp2 = this.M;
+            var temp1 = this.P;
+            this.P = 2;
+            var temp2 = this.P;
         }
 
-        public int M { get; } = 1;
+        public int P { get; } = 1;
 
         public void Meh()
         {
-            var temp3 = this.M;
+            var temp3 = this.P;
         }
     }
 }");
@@ -78,12 +78,12 @@ namespace N
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.M;", "")]
-        [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.M;", "")]
-        [TestCase("var temp5 = this.bar;", "1, 2")]
-        [TestCase("var temp6 = this.M;", "")]
+        [TestCase("var temp1 = this.p;", "1")]
+        [TestCase("var temp2 = this.P;", "")]
+        [TestCase("var temp3 = this.p;", "1, 2")]
+        [TestCase("var temp4 = this.P;", "")]
+        [TestCase("var temp5 = this.p;", "1, 2")]
+        [TestCase("var temp6 = this.P;", "")]
         public static void BackingFieldPrivateSetInitializedAndAssignedInCtor(string code1, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -91,27 +91,27 @@ namespace N
 {
     public sealed class C
     {
-        private int bar = 1;
+        private int p = 1;
 
         public C()
         {
-            var temp1 = this.bar;
-            var temp2 = this.M;
-            this.bar = 2;
-            var temp3 = this.bar;
-            var temp4 = this.M;
+            var temp1 = this.p;
+            var temp2 = this.P;
+            this.p = 2;
+            var temp3 = this.p;
+            var temp4 = this.P;
         }
 
-        public int M
+        public int P
         {
-            get { return this.bar; }
-            private set { this.bar = value; }
+            get { return this.p; }
+            private set { this.p = value; }
         }
 
         public void Meh()
         {
-            var temp5 = this.bar;
-            var temp6 = this.M;
+            var temp5 = this.p;
+            var temp6 = this.P;
         }
     }
 }");
@@ -125,12 +125,12 @@ namespace N
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.M;", "")]
-        [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.M;", "")]
-        [TestCase("var temp5 = this.bar;", "1, 2, value")]
-        [TestCase("var temp6 = this.M;", "")]
+        [TestCase("var temp1 = this.p;", "1")]
+        [TestCase("var temp2 = this.P;", "")]
+        [TestCase("var temp3 = this.p;", "1, 2")]
+        [TestCase("var temp4 = this.P;", "")]
+        [TestCase("var temp5 = this.p;", "1, 2, value")]
+        [TestCase("var temp6 = this.P;", "")]
         public static void BackingFieldPublicSetInitializedAndAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -138,27 +138,27 @@ namespace N
 {
     public sealed class C
     {
-        private int bar = 1;
+        private int p = 1;
 
         public C()
         {
-            var temp1 = this.bar;
-            var temp2 = this.M;
-            this.bar = 2;
-            var temp3 = this.bar;
-            var temp4 = this.M;
+            var temp1 = this.p;
+            var temp2 = this.P;
+            this.p = 2;
+            var temp3 = this.p;
+            var temp4 = this.P;
         }
 
-        public int M
+        public int P
         {
-            get { return this.bar; }
-            set { this.bar = value; }
+            get { return this.p; }
+            set { this.p = value; }
         }
 
         public void Meh()
         {
-            var temp5 = this.bar;
-            var temp6 = this.M;
+            var temp5 = this.p;
+            var temp6 = this.P;
         }
     }
 }");
@@ -180,23 +180,23 @@ namespace N
 {
     public sealed class C
     {
-        private int bar;
+        private int p;
 
-        public int M
+        public int P
         {
-            get { return this.bar; }
-            set { this.bar = value; }
+            get { return this.p; }
+            set { this.p = value; }
         }
 
         public void Meh()
         {
-            var temp = this.bar;
+            var temp = this.p;
         }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause("var temp = this.bar").Value;
+            var value = syntaxTree.FindEqualsValueClause("var temp = this.p").Value;
             using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", assignedValues);
@@ -214,23 +214,23 @@ namespace N
 {
     public sealed class C
     {
-        private int bar;
+        private int p;
 
-        public int M
+        public int P
         {
-            get { return this.bar; }
-            private set { this.bar = value; }
+            get { return this.p; }
+            private set { this.p = value; }
         }
 
         public void Meh()
         {
-            var temp = this.bar;
+            var temp = this.p;
         }
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause("var temp = this.bar").Value;
+            var value = syntaxTree.FindEqualsValueClause("var temp = this.p").Value;
             using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
             {
                 var actual = string.Join(", ", assignedValues);
@@ -238,38 +238,38 @@ namespace N
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.M;", "")]
-        [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.M;", "2")]
-        [TestCase("var temp5 = this.bar;", "1, 2")]
-        [TestCase("var temp6 = this.M;", "2")]
+        [TestCase("var temp1 = this.p;", "1")]
+        [TestCase("var temp2 = this.P;", "")]
+        [TestCase("var temp3 = this.p;", "1, 2")]
+        [TestCase("var temp4 = this.P;", "2")]
+        [TestCase("var temp5 = this.p;", "1, 2")]
+        [TestCase("var temp6 = this.P;", "2")]
         public static void BackingFieldPrivateSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 public sealed class C
 {
-    private int bar = 1;
+    private int p = 1;
 
     public C()
     {
-        var temp1 = this.bar;
-        var temp2 = this.M;
-        this.M = 2;
-        var temp3 = this.bar;
-        var temp4 = this.M;
+        var temp1 = this.p;
+        var temp2 = this.P;
+        this.P = 2;
+        var temp3 = this.p;
+        var temp4 = this.P;
     }
 
-    public int M
+    public int P
     {
-        get { return this.bar; }
-        private set { this.bar = value; }
+        get { return this.p; }
+        private set { this.p = value; }
     }
 
     public void Meh()
     {
-        var temp5 = this.bar;
-        var temp6 = this.M;
+        var temp5 = this.p;
+        var temp6 = this.P;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -282,38 +282,38 @@ public sealed class C
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.M;", "")]
-        [TestCase("var temp3 = this.bar;", "1, 2")]
-        [TestCase("var temp4 = this.M;", "2")]
-        [TestCase("var temp5 = this.bar;", "1, 2, value")]
-        [TestCase("var temp6 = this.M;", "2")]
+        [TestCase("var temp1 = this.p;", "1")]
+        [TestCase("var temp2 = this.P;", "")]
+        [TestCase("var temp3 = this.p;", "1, 2")]
+        [TestCase("var temp4 = this.P;", "2")]
+        [TestCase("var temp5 = this.p;", "1, 2, value")]
+        [TestCase("var temp6 = this.P;", "2")]
         public static void BackingFieldPublicSetInitializedAndPropertyAssignedInCtor(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 public sealed class C
 {
-    private int bar = 1;
+    private int p = 1;
 
     public C()
     {
-        var temp1 = this.bar;
-        var temp2 = this.M;
-        this.M = 2;
-        var temp3 = this.bar;
-        var temp4 = this.M;
+        var temp1 = this.p;
+        var temp2 = this.P;
+        this.P = 2;
+        var temp3 = this.p;
+        var temp4 = this.P;
     }
 
-    public int M
+    public int P
     {
-        get { return this.bar; }
-        set { this.bar = value; }
+        get { return this.p; }
+        set { this.p = value; }
     }
 
     public void Meh()
     {
-        var temp5 = this.bar;
-        var temp6 = this.M;
+        var temp5 = this.p;
+        var temp6 = this.P;
     }
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
@@ -326,12 +326,12 @@ public sealed class C
             }
         }
 
-        [TestCase("var temp1 = this.bar;", "1")]
-        [TestCase("var temp2 = this.M;", "")]
-        [TestCase("var temp3 = this.bar;", "1, 2, value / 2, 3")]
-        [TestCase("var temp4 = this.M;", "2")]
-        [TestCase("var temp5 = this.bar;", "1, 2, value / 2, 3, value, value")]
-        [TestCase("var temp6 = this.M;", "2")]
+        [TestCase("var temp1 = this.p;", "1")]
+        [TestCase("var temp2 = this.P;", "")]
+        [TestCase("var temp3 = this.p;", "1, 2, value / 2, 3")]
+        [TestCase("var temp4 = this.P;", "2")]
+        [TestCase("var temp5 = this.p;", "1, 2, value / 2, 3, value, value")]
+        [TestCase("var temp6 = this.P;", "2")]
         public static void BackingFieldPublicSetInitializedAndPropertyAssignedInCtorWeirdSetter(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -339,40 +339,40 @@ namespace N
 {
     public sealed class C
     {
-        private int bar = 1;
+        private int p = 1;
 
         public C()
         {
-            var temp1 = this.bar;
-            var temp2 = this.M;
-            this.M = 2;
-            var temp3 = this.bar;
-            var temp4 = this.M;
+            var temp1 = this.p;
+            var temp2 = this.P;
+            this.P = 2;
+            var temp3 = this.p;
+            var temp4 = this.P;
         }
 
-        public int M
+        public int P
         {
-            get { return this.bar; }
+            get { return this.p; }
             set
             {
                 if (true)
                 {
-                    this.bar = value;
+                    this.p = value;
                 }
                 else
                 {
-                    this.bar = value;
+                    this.p = value;
                 }
 
-                this.bar = value / 2;
-                this.bar = 3;
+                this.p = value / 2;
+                this.p = 3;
             }
         }
 
         public void Meh()
         {
-            var temp5 = this.bar;
-            var temp6 = this.M;
+            var temp5 = this.p;
+            var temp6 = this.P;
         }
     }
 }");
@@ -386,9 +386,9 @@ namespace N
             }
         }
 
-        [TestCase("var temp1 = this.M;", "")]
-        [TestCase("var temp2 = this.M;", "2")]
-        [TestCase("var temp3 = this.M;", "2, value")]
+        [TestCase("var temp1 = this.P;", "")]
+        [TestCase("var temp2 = this.P;", "2")]
+        [TestCase("var temp3 = this.P;", "2, value")]
         public static void RecursiveGetAndSet(string code, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -398,20 +398,20 @@ namespace N
     {
         public C()
         {
-            var temp1 = this.M;
-            this.M = 2;
-            var temp2 = this.M;
+            var temp1 = this.P;
+            this.P = 2;
+            var temp2 = this.P;
         }
 
-        public int M
+        public int P
         {
-            get { return this.M; }
-            set { this.M = value; }
+            get { return this.P; }
+            set { this.P = value; }
         }
 
         public void Meh()
         {
-            var temp3 = this.M;
+            var temp3 = this.P;
         }
     }
 }");
