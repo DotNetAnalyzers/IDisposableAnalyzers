@@ -314,16 +314,16 @@ namespace N
         [Test]
         public static void ReturningCreateNewAssigningAndDisposing()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     using System;
 
-    public sealed class C : IDisposable
+    public sealed class C1 : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -339,17 +339,17 @@ namespace N
 {
     using System;
 
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
             return Create(new Disposable());
         }
 
-        private static C Create(IDisposable disposable) => new C(disposable);
+        private static C1 Create(IDisposable disposable) => new C1(disposable);
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
         }
 
         [Test]

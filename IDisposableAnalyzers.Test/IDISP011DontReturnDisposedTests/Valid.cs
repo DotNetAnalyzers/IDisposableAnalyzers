@@ -152,12 +152,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static void Meh()
+        private static void M2()
         {
             return;
         }
@@ -174,12 +174,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static object Meh()
+        private static object M2()
         {
             return new object();
         }
@@ -196,12 +196,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static dynamic Meh()
+        private static dynamic M2()
         {
             return new object();
         }
@@ -221,7 +221,7 @@ namespace N
         private readonly T item1;
         private readonly T item2;
 
-        private dynamic Meh() => (dynamic)item1 - (dynamic)item2; //Supersnyggt
+        private dynamic M() => (dynamic)item1 - (dynamic)item2; //Supersnyggt
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -238,7 +238,7 @@ namespace N
         private readonly T item1;
         private readonly T item2;
 
-        private dynamic Meh => (dynamic)item1 - (dynamic)item2; //Supersnyggt
+        private dynamic P => (dynamic)item1 - (dynamic)item2; //Supersnyggt
     }
 }";
             RoslynAssert.Valid(Analyzer, code);

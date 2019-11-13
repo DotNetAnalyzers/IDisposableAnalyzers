@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP009IsIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -93,11 +93,11 @@ namespace N
             this.disposed = true;
         }
 
-        private void M()
+        private void M1()
         {
         }
 
-        private void Meh()
+        private void M2()
         {
         }
 
@@ -138,11 +138,11 @@ namespace N
             this.disposed = true;
         }
 
-        private void M()
+        private void M1()
         {
         }
 
-        private void Meh()
+        private void M2()
         {
         }
 

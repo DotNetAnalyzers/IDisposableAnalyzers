@@ -524,11 +524,11 @@ namespace N
     {
         public IDisposable RecursiveProperty => RecursiveProperty;
 
-        public void Meh()
+        public void M()
         {
             var item = RecursiveProperty;
 
-            using(var meh = RecursiveProperty)
+            using(var m = RecursiveProperty)
             {
             }
 
@@ -553,9 +553,9 @@ namespace N
     {
         public IDisposable RecursiveMethod() => RecursiveMethod();
 
-        public void Meh()
+        public void M()
         {
-            var meh = RecursiveMethod();
+            var m = RecursiveMethod();
 
             using(var item = RecursiveMethod())
             {

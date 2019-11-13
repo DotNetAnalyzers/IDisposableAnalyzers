@@ -118,7 +118,7 @@ namespace N
         {
         }
 
-        private void Meh()
+        private void M1()
         {
         }
     }
@@ -180,7 +180,7 @@ namespace N
             }
         }
 
-        private void Meh()
+        private void M1()
         {
         }
     }

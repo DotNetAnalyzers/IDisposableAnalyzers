@@ -418,21 +418,21 @@ namespace N
         private readonly IDisposable disposable;
 
         public C(IDisposable disposable)
-            : this(disposable, ""meh"")
+            : this(disposable, string.Empty)
         {
         }
 
-        public C(IDisposable disposable, IDisposable gah, int meh)
-            : this(disposable, meh)
+        public C(IDisposable disposable1, IDisposable disposable2, int n)
+            : this(disposable1, n)
         {
         }
 
-        private C(IDisposable disposable, int meh)
-            : this(disposable, meh.ToString())
+        private C(IDisposable disposable, int n)
+            : this(disposable, n.ToString())
         {
         }
 
-        private C(IDisposable disposable, string meh)
+        private C(IDisposable disposable, string n)
         {
             this.disposable = disposable;
         }
@@ -455,16 +455,16 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private object meh;
+        private object f;
 
-        public C(object meh)
+        public C(object f)
         {
-            this.meh = meh;
+            this.f = f;
         }
 
         public void Dispose()
         {
-            meh = null;
+            f = null;
         }
     }
 }";
@@ -627,7 +627,7 @@ namespace N
         {
         }
 
-        public void M(IDisposable meh)
+        public void M(IDisposable disposable)
         {
         }
 
@@ -693,10 +693,10 @@ namespace N
     {
         public C()
         {
-            Meh(x => x.Dispose());
+            M(x => x.Dispose());
         }
 
-        public static void Meh(Action<IDisposable> action)
+        public static void M(Action<IDisposable> action)
         {
             action(null);
         }

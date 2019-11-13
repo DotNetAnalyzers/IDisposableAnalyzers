@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -19,7 +19,7 @@ namespace N
 
     public sealed class C
     {
-        public object Meh()
+        public object M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -41,7 +41,7 @@ namespace N
 
     public sealed class C
     {
-        public object Meh()
+        public object M()
         {
             var stream = File.OpenRead(string.Empty);
             stream.Dispose();

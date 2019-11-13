@@ -276,7 +276,7 @@ namespace N
 {
     public sealed class C
     {
-        public object Meh()
+        public object M()
         {
             var chunk = new Chunk<int>();
             return chunk.Add(1);

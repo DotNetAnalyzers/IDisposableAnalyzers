@@ -703,9 +703,9 @@ namespace N
 {
     public class C
     {
-        private readonly object bar = Meh();
+        private readonly object bar = M();
 
-        private static object Meh() => new object();
+        private static object M() => new object();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);

@@ -212,11 +212,11 @@ namespace N
 {
     public abstract class Base
     {
-        public virtual int Value1 { get; protected set; }
+        public virtual int P1 { get; protected set; }
 
-        public abstract int Value2 { get; set; }
+        public abstract int P2 { get; set; }
 
-        protected virtual int Value3 { get; set; }
+        protected virtual int P3 { get; set; }
     }
 }";
 
@@ -227,11 +227,11 @@ namespace N
 
     public class C : Base, ↓IDisposable
     {
-        public override int Value1 { get; protected set; }
+        public override int P1 { get; protected set; }
 
-        public override int Value2 { get; set; }
+        public override int P2 { get; set; }
 
-        protected override int Value3 { get; set; }
+        protected override int P3 { get; set; }
     }
 }";
 
@@ -244,11 +244,11 @@ namespace N
     {
         private bool disposed;
 
-        public override int Value1 { get; protected set; }
+        public override int P1 { get; protected set; }
 
-        public override int Value2 { get; set; }
+        public override int P2 { get; set; }
 
-        protected override int Value3 { get; set; }
+        protected override int P3 { get; set; }
 
         public void Dispose()
         {
