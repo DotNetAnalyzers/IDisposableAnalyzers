@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers
     [Shared]
     internal class DisposeBeforeAssignFix : DocumentEditorCodeFixProvider
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP003DisposeBeforeReassigning.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP003DisposeBeforeReassigning.Descriptor.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

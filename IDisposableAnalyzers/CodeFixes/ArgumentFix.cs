@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -14,9 +14,9 @@ namespace IDisposableAnalyzers
     internal class ArgumentFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP020SuppressFinalizeThis.DiagnosticId,
-            IDISP021DisposeTrue.DiagnosticId,
-            IDISP022DisposeFalse.DiagnosticId);
+            IDISP020SuppressFinalizeThis.Descriptor.Id,
+            IDISP021DisposeTrue.Descriptor.Id,
+            IDISP022DisposeFalse.Descriptor.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
@@ -29,7 +29,7 @@ namespace IDisposableAnalyzers
             {
                 if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument))
                 {
-                    if (diagnostic.Id == IDISP020SuppressFinalizeThis.DiagnosticId)
+                    if (diagnostic.Id == IDISP020SuppressFinalizeThis.Descriptor.Id)
                     {
                         context.RegisterCodeFix(
                             "GC.SuppressFinalize(this)",
@@ -39,7 +39,7 @@ namespace IDisposableAnalyzers
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
-                    else if (diagnostic.Id == IDISP021DisposeTrue.DiagnosticId)
+                    else if (diagnostic.Id == IDISP021DisposeTrue.Descriptor.Id)
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(true)",
@@ -49,7 +49,7 @@ namespace IDisposableAnalyzers
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
                     }
-                    else if (diagnostic.Id == IDISP022DisposeFalse.DiagnosticId)
+                    else if (diagnostic.Id == IDISP022DisposeFalse.Descriptor.Id)
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(false)",

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Immutable;
@@ -30,8 +30,8 @@ namespace IDisposableAnalyzers
 
         /// <inheritdoc/>
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP006ImplementIDisposable.DiagnosticId,
-            IDISP009IsIDisposable.DiagnosticId,
+            IDISP006ImplementIDisposable.Descriptor.Id,
+            IDISP009IsIDisposable.Descriptor.Id,
             "CS0535");
 
         public override FixAllProvider GetFixAllProvider() => null;
@@ -65,7 +65,7 @@ namespace IDisposableAnalyzers
 
                 var typeDeclaration = syntaxRoot.FindNode(diagnostic.Location.SourceSpan)
                                                 .FirstAncestorOrSelf<TypeDeclarationSyntax>();
-                if (diagnostic.Id == IDISP009IsIDisposable.DiagnosticId)
+                if (diagnostic.Id == IDISP009IsIDisposable.Descriptor.Id)
                 {
                     context.RegisterCodeFix(
                         CodeAction.Create(
@@ -184,8 +184,8 @@ namespace IDisposableAnalyzers
 
         private static bool IsSupportedDiagnostic(Diagnostic diagnostic)
         {
-            if (diagnostic.Id == IDISP006ImplementIDisposable.DiagnosticId ||
-                diagnostic.Id == IDISP009IsIDisposable.DiagnosticId)
+            if (diagnostic.Id == IDISP006ImplementIDisposable.Descriptor.Id ||
+                diagnostic.Id == IDISP009IsIDisposable.Descriptor.Id)
             {
                 return true;
             }

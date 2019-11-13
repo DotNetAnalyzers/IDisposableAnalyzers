@@ -1,5 +1,8 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
+
+    [Obsolete("Remove")]
     internal static class HelpLink
     {
         internal static string ForId(string id)

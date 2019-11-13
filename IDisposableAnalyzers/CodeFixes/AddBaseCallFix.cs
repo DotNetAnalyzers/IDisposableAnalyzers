@@ -14,7 +14,7 @@
     [Shared]
     internal class AddBaseCallFix : DocumentEditorCodeFixProvider
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.DiagnosticId);
+        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(IDISP010CallBaseDispose.Descriptor.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

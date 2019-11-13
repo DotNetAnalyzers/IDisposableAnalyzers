@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Composition;
@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers
                                                                                   .WithAdditionalAnnotations(Simplifier.Annotation);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP004DontIgnoreCreated.DiagnosticId);
+            IDISP004DontIgnoreCreated.Descriptor.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 

@@ -19,8 +19,8 @@
                                                                                       .WithAdditionalAnnotations(Formatter.Annotation);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            IDISP018CallSuppressFinalizeWhenFinalizer.DiagnosticId,
-            IDISP019CallSuppressFinalizeWhenVirtualDispose.DiagnosticId);
+            IDISP018CallSuppressFinalizeWhenFinalizer.Descriptor.Id,
+            IDISP019CallSuppressFinalizeWhenVirtualDispose.Descriptor.Id);
 
         protected override DocumentEditorFixAllProvider FixAllProvider() => null;
 
