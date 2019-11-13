@@ -36,7 +36,39 @@
             {
                 if (diagnostic.Id == IDISP001DisposeCreated.DiagnosticId)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax statement))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
+                             argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
+                    {
+                        if (argument is { Expression: DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier: { } identifier } } })
+                        {
+                            context.RegisterCodeFix(
+                                "Add using to end of block.",
+                                (editor, _) => editor.ReplaceNode(
+                                    ifBlock,
+                                    x => SyntaxFactory.Block(
+                                        SyntaxFactory.UsingStatement(
+                                            null,
+                                            SyntaxFactory.IdentifierName(identifier),
+                                            x.WithAdditionalAnnotations(Formatter.Annotation)))),
+                                "Add using to end of block.",
+                                diagnostic);
+                        }
+                        else if (argument is { Expression: { } expression })
+                        {
+                            context.RegisterCodeFix(
+                                "Add using to end of block.",
+                                (editor, _) => editor.ReplaceNode(
+                                    ifBlock,
+                                    x => SyntaxFactory.Block(
+                                        SyntaxFactory.UsingStatement(
+                                            null,
+                                            expression,
+                                            x.WithAdditionalAnnotations(Formatter.Annotation)))),
+                                "Add using to end of block.",
+                                diagnostic);
+                        }
+                    }
+                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax statement))
                     {
                         switch (statement)
                         {
@@ -61,47 +93,6 @@
                                     "Add using to end of block.",
                                     diagnostic);
                                 break;
-                        }
-                    }
-                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax expressionStatement) &&
-                             expressionStatement.Parent is BlockSyntax)
-                    {
-                        context.RegisterCodeFix(
-                            "Add using to end of block.",
-                            (editor, _) => AddUsingToEndOfBlock(editor, expressionStatement),
-                            "Add using to end of block.",
-                            diagnostic);
-                    }
-                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
-                             argument is { Expression: { }, Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
-                    {
-                        if (argument is { Expression: DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier: { } identifier } } })
-                        {
-                            context.RegisterCodeFix(
-                                "Add using to end of block.",
-                                (editor, _) => editor.ReplaceNode(
-                                    ifBlock,
-                                    x => SyntaxFactory.Block(
-                                        SyntaxFactory.UsingStatement(
-                                            null,
-                                            SyntaxFactory.IdentifierName(identifier),
-                                            x.WithAdditionalAnnotations(Formatter.Annotation)))),
-                                "Add using to end of block.",
-                                diagnostic);
-                        }
-                        else
-                        {
-                            context.RegisterCodeFix(
-                                "Add using to end of block.",
-                                (editor, _) => editor.ReplaceNode(
-                                    ifBlock,
-                                    x => SyntaxFactory.Block(
-                                        SyntaxFactory.UsingStatement(
-                                            null,
-                                            argument.Expression,
-                                            x.WithAdditionalAnnotations(Formatter.Annotation)))),
-                                "Add using to end of block.",
-                                diagnostic);
                         }
                     }
                 }

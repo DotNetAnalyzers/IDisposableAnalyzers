@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
