@@ -33,68 +33,63 @@
                 var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
                 if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id &&
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
-                    localDeclaration is { Declaration: { Type: { }, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
-                    variables[0].Initializer is { })
+                    localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
+                    variables[0] is { Initializer: { } } local &&
+                    localDeclaration.TryFirstAncestor(out TypeDeclarationSyntax containingType))
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, localDeclaration, cancellationToken),
+                        (editor, cancellationToken) => CreateAndAssignField(editor, cancellationToken),
                         "Create and assign field.",
                         diagnostic);
+
+                    void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
+                    {
+                        var fieldAccess = AddField(
+                            editor,
+                            containingType,
+                            local.Identifier.ValueText,
+                            Accessibility.Private,
+                            DeclarationModifiers.ReadOnly,
+                            editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type,
+                            cancellationToken);
+
+                        editor.ReplaceNode(
+                            localDeclaration,
+                            (x, g) => g.ExpressionStatement(
+                                           g.AssignmentStatement(fieldAccess, local.Initializer.Value))
+                                       .WithTriviaFrom(x));
+                    }
                 }
                 else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
                          node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
-                         statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out _))
+                         statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out var ctor))
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, statement),
+                        (editor, cancellationToken) => CreateAndAssignField(editor, cancellationToken),
                         "Create and assign field.",
                         diagnostic);
+
+                    void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
+                    {
+                        var fieldAccess = AddField(
+                            editor,
+                            (TypeDeclarationSyntax)ctor.Parent,
+                            "disposable",
+                            Accessibility.Private,
+                            DeclarationModifiers.ReadOnly,
+                            KnownSymbol.IDisposable.GetTypeSymbol(editor.SemanticModel.Compilation),
+                            cancellationToken);
+
+                        _ = editor.ReplaceNode(
+                            statement,
+                            x => SyntaxFactory.ExpressionStatement(
+                                           SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldAccess, x.Expression))
+                                       .WithTriviaFrom(x));
+                    }
                 }
             }
-        }
-
-        private static void CreateAndAssignField(DocumentEditor editor, LocalDeclarationStatementSyntax statement, CancellationToken cancellationToken)
-        {
-            var local = statement.Declaration.Variables[0];
-            var fieldAccess = AddField(
-                editor,
-                statement.FirstAncestor<TypeDeclarationSyntax>(),
-                local.Identifier.ValueText,
-                Accessibility.Private,
-                DeclarationModifiers.ReadOnly,
-                editor.SemanticModel.GetTypeInfoSafe(statement.Declaration.Type, cancellationToken).Type,
-                cancellationToken);
-
-            editor.ReplaceNode(
-                statement,
-                (x, g) => g.ExpressionStatement(
-                               g.AssignmentStatement(fieldAccess, local.Initializer.Value))
-                           .WithTriviaFrom(x));
-        }
-
-        private static void CreateAndAssignField(DocumentEditor editor, ExpressionStatementSyntax statement)
-        {
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            var containingType = statement.FirstAncestor<TypeDeclarationSyntax>();
-
-            var field = editor.AddField(
-                containingType,
-                usesUnderscoreNames
-                    ? "_disposable"
-                    : "disposable",
-                Accessibility.Private,
-                DeclarationModifiers.ReadOnly,
-                SyntaxFactory.ParseTypeName("System.IDisposable").WithAdditionalAnnotations(Simplifier.Annotation),
-                CancellationToken.None);
-
-            var fieldAccess = usesUnderscoreNames
-                ? SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier.ValueText)
-                : SyntaxFactory.ParseExpression($"this.{field.Declaration.Variables[0].Identifier.ValueText}");
-            editor.ReplaceNode(
-                statement.Expression,
-                (x, g) => g.AssignmentStatement(fieldAccess, x).WithTriviaFrom(x));
         }
 
         private static ExpressionSyntax AddField(DocumentEditor editor, TypeDeclarationSyntax containingType, string name, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
