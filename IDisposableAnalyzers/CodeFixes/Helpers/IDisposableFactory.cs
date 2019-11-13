@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Linq;
@@ -8,7 +8,6 @@ namespace IDisposableAnalyzers
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Formatting;
 
     internal static class IDisposableFactory

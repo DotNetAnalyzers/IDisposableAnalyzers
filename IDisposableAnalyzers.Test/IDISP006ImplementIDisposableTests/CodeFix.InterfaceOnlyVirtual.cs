@@ -90,7 +90,7 @@ namespace N
             value6 = Value2;
         }
 
-        public int M => this.value5 + this.value6;
+        public int P => this.value5 + this.value6;
     }
 }";
 
@@ -117,7 +117,7 @@ namespace N
             value6 = Value2;
         }
 
-        public int M => this.value5 + this.value6;
+        public int P => this.value5 + this.value6;
 
         public void Dispose()
         {

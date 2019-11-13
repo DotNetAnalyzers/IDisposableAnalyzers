@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -365,7 +365,7 @@ namespace N
 
     public static class C
     {
-        public static Stream M => File.OpenRead(string.Empty);
+        public static Stream P => File.OpenRead(string.Empty);
     }
 }";
             RoslynAssert.Valid(Analyzer, code);

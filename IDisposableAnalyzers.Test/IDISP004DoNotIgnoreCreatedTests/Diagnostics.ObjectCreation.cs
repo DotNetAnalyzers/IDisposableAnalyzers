@@ -77,7 +77,7 @@ namespace N
             [Test]
             public static void ReturningNewAssigningNotDisposing()
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
@@ -107,20 +107,20 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
             }
 
             [Test]
             public static void ReturningNewNotAssigning()
             {
-                var fooCode = @"
+                var c1 = @"
 namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
         }
 
@@ -132,15 +132,15 @@ namespace N
                 var code = @"
 namespace N
 {
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
-            return new C(↓new Disposable());
+            return new C1(↓new Disposable());
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, fooCode, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
             }
 
             [Test]

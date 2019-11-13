@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Threading;
@@ -83,7 +83,7 @@ namespace IDisposableAnalyzers
             {
                 assignedSymbol = assignedValues.CurrentSymbol;
                 if (assignedValues.Count == 1 &&
-                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } assignment &&
+                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } }  &&
                     binary.IsKind(SyntaxKind.CoalesceExpression))
                 {
                     // lazy

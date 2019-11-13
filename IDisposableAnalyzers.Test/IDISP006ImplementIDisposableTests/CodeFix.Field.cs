@@ -31,11 +31,11 @@ namespace N
 
         public int Value { get; }
 
-        protected virtual void M()
+        protected virtual void M1()
         {
         }
 
-        private void Meh()
+        private void M2()
         {
         }
     }
@@ -67,11 +67,11 @@ namespace N
             this.disposed = true;
         }
 
-        private void M()
+        private void M1()
         {
         }
 
-        private void Meh()
+        private void M2()
         {
         }
 

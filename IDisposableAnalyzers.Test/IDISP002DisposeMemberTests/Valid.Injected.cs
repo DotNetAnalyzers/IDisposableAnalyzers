@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,11 +17,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            this.bar = bar;
+            this.disposable = disposable;
         }
     }
 }";
@@ -38,11 +38,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable disposable;
         
-        public C(IDisposable[] bars)
+        public C(IDisposable[] disposables)
         {
-            this.bar = bars[0];
+            this.disposable = disposables[0];
         }
     }
 }";
@@ -59,11 +59,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable disposable;
 
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            this.bar = bar;
+            this.disposable = disposable;
         }
 
         public static C Create()
@@ -108,11 +108,11 @@ namespace N
 
     public sealed class C
     {
-        private readonly IDisposable _bar;
+        private readonly IDisposable _disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            _bar = bar;
+            _disposable = disposable;
         }
     }
 }";
@@ -129,11 +129,11 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable _bar;
+        private readonly IDisposable _disposable;
         
-        public C(IDisposable bar)
+        public C(IDisposable disposable)
         {
-            _bar = bar;
+            _disposable = disposable;
         }
 
         public void Dispose()

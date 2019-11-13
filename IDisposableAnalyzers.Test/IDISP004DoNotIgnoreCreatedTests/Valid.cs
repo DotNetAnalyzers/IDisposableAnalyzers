@@ -365,9 +365,9 @@ namespace N
 
     class M
     {
-        public M(C foo)
+        public M(C c)
         {
-            var fooValue = foo.Value;
+            var fooValue = c.Value;
         }
     }
 }";
@@ -424,9 +424,9 @@ namespace N
 
     class M
     {
-        public M(C foo)
+        public M(C c)
         {
-            this.C = foo;
+            this.C = c;
             var fooValue = this.C.Value;
         }
 

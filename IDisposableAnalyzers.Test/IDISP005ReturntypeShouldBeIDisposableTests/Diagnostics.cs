@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -20,7 +20,7 @@ namespace N
 
     public sealed class C
     {
-        public object Meh()
+        public object M()
         {
             return ↓File.OpenRead(string.Empty);
         }
@@ -40,7 +40,7 @@ namespace N
 
     public sealed class C
     {
-        public dynamic Meh()
+        public dynamic M()
         {
             return ↓File.OpenRead(string.Empty);
         }
@@ -61,7 +61,7 @@ namespace N
     {
         private static readonly PasswordBox PasswordBox = new PasswordBox();
 
-        public object Meh()
+        public object M()
         {
             return ↓PasswordBox.SecurePassword;
         }
@@ -129,7 +129,7 @@ namespace N
 
     public sealed class C
     {
-        public object Meh() => ↓File.OpenRead(string.Empty);
+        public object M() => ↓File.OpenRead(string.Empty);
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
@@ -146,7 +146,7 @@ namespace N
 
     public sealed class C
     {
-        public object Meh => ↓File.OpenRead(string.Empty);
+        public object P => ↓File.OpenRead(string.Empty);
     }
 }";
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);

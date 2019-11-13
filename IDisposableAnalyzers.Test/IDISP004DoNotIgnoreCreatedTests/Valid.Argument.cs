@@ -77,7 +77,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly int meh;
+        private readonly int n;
 
         public C()
             : this(new Disposable())
@@ -89,9 +89,9 @@ namespace N
         {
         }
 
-        private C(IDisposable disposable, int meh)
+        private C(IDisposable disposable, int n)
         {
-            this.meh = meh;
+            this.n = n;
             this.Disposable = disposable;
         }
 
@@ -365,11 +365,11 @@ namespace N
     using System.Threading.Tasks;
     public class C
     {
-        public void Meh()
+        public void M1()
         {
-            this.M(() => Task.Delay(0));
+            this.M2(() => Task.Delay(0));
         }
-        public void M(Func<Task> func)
+        public void M2(Func<Task> func)
         {
         }
     }
@@ -389,12 +389,12 @@ namespace N
 
     public class C
     {
-        public void Meh()
+        public void M1()
         {
-            this.M(() => File.OpenRead(string.Empty));
+            this.M2(() => File.OpenRead(string.Empty));
         }
 
-        public void M(Func<Stream> func)
+        public void M2(Func<Stream> func)
         {
         }
     }
@@ -414,20 +414,20 @@ namespace N
 
     public static class C
     {
-        public static IKernel Kernel { get; } = new CKernel(
+        public static IKernel Kernel { get; } = new Kernel(
             new NinjectSettings(),
-            new CModule());
+            new Module());
     }
 
-    public class CKernel : StandardKernel
+    public class Kernel : StandardKernel
     {
-        public CKernel(INinjectSettings settings, params INinjectModule[] modules)
+        public Kernel(INinjectSettings settings, params INinjectModule[] modules)
             : base(settings, modules)
         {
         }
     }
 
-    public class CModule : NinjectModule
+    public class Module : NinjectModule
     {
         public override void Load()
         {

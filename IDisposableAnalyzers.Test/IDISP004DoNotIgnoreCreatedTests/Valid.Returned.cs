@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -8,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
         [Test]
         public static void Generic()
         {
-            var factoryCode = @"
+            var factory = @"
 namespace N
 {
     public class Factory
@@ -28,18 +28,18 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, factoryCode, code);
+            RoslynAssert.Valid(Analyzer, factory, code);
         }
 
         [Test]
         public static void Operator()
         {
-            var mehCode = @"
+            var c1 = @"
 namespace N
 {
-    public class Meh
+    public class C1
     {
-        public static Meh operator +(Meh left, Meh right) => new Meh();
+        public static C1 operator +(C1 left, C1 right) => new C1();
     }
 }";
 
@@ -50,24 +50,24 @@ namespace N
     {
         public object M()
         {
-            var meh1 = new Meh();
-            var meh2 = new Meh();
+            var meh1 = new C1();
+            var meh2 = new C1();
             return meh1 + meh2;
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, code);
+            RoslynAssert.Valid(Analyzer, c1, code);
         }
 
         [Test]
         public static void OperatorNestedCall()
         {
-            var mehCode = @"
+            var c1 = @"
 namespace N
 {
-    public class Meh
+    public class C1
     {
-        public static Meh operator +(Meh left, Meh right) => new Meh();
+        public static C1 operator +(C1 left, C1 right) => new C1();
     }
 }";
 
@@ -78,27 +78,27 @@ namespace N
     {
         public object M()
         {
-            var meh1 = new Meh();
-            var meh2 = new Meh();
-            return Add(new Meh(), new Meh());
+            var meh1 = new C1();
+            var meh2 = new C1();
+            return Add(new C1(), new C1());
         }
 
-        public object Add(Meh meh1, Meh meh2)
+        public object Add(C1 meh1, C1 meh2)
         {
             return meh1 + meh2;
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, code);
+            RoslynAssert.Valid(Analyzer, c1, code);
         }
 
         [Test]
         public static void OperatorEquals()
         {
-            var mehCode = @"
+            var c1 = @"
 namespace N
 {
-    public class Meh
+    public class C1
     {
     }
 }";
@@ -110,13 +110,13 @@ namespace N
     {
         public bool M()
         {
-            var meh1 = new Meh();
-            var meh2 = new Meh();
+            var meh1 = new C1();
+            var meh2 = new C1();
             return meh1 == meh2;
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, mehCode, code);
+            RoslynAssert.Valid(Analyzer, c1, code);
         }
 
         [Test]
@@ -127,12 +127,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh();
+            M2();
         }
 
-        private static object Meh() => new object();
+        private static object M2() => new object();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -146,12 +146,12 @@ namespace N
 {
     public class C
     {
-        public void M()
+        public void M1()
         {
-            Meh(""Meh"");
+            M2(""M2"");
         }
 
-        private static object Meh(string arg) => new object();
+        private static object M2(string arg) => new object();
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -234,16 +234,16 @@ namespace N
         [Test]
         public static void ReturningNewAssigningAndDisposing()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public C(IDisposable disposable)
+        public C1(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -257,32 +257,32 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
-            return new C(new Disposable());
+            return new C1(new Disposable());
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
         }
 
-        [TestCase("new C()")]
-        [TestCase("new C(new Disposable())")]
-        [TestCase("new C(new Disposable(), new Disposable())")]
+        [TestCase("new C1()")]
+        [TestCase("new C1(new Disposable())")]
+        [TestCase("new C1(new Disposable(), new Disposable())")]
         public static void ReturningNewAssigningAndDisposingParams(string objectCreation)
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
         private readonly IDisposable[] disposables;
 
-        public C(params IDisposable[] disposables)
+        public C1(params IDisposable[] disposables)
         {
             this.disposables = disposables;
         }
@@ -299,16 +299,16 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
-            return new C(new Disposable(), new Disposable());
+            return new C1(new Disposable(), new Disposable());
         }
     }
-}".AssertReplace("new C(new Disposable(), new Disposable())", objectCreation);
+}".AssertReplace("new C1(new Disposable(), new Disposable())", objectCreation);
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
         }
 
         [Test]
@@ -360,7 +360,7 @@ namespace N
 {
     using System.IO;
 
-    public class Meh
+    public class C
     {
         public StreamReader M()
         {
@@ -376,21 +376,21 @@ namespace N
         [Test]
         public static void ReturningAssigningPrivateChained()
         {
-            var fooCode = @"
+            var c1 = @"
 namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public class C1 : IDisposable
     {
         private readonly IDisposable disposable;
 
-        public C(int value, IDisposable disposable)
+        public C1(int value, IDisposable disposable)
             : this(disposable)
         {
         }
 
-        private C(IDisposable disposable)
+        private C1(IDisposable disposable)
         {
             this.disposable = disposable;
         }
@@ -404,15 +404,15 @@ namespace N
             var code = @"
 namespace N
 {
-    public class Meh
+    public class C
     {
-        public C M()
+        public C1 M()
         {
-            return new C(1, new Disposable());
+            return new C1(1, new Disposable());
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, fooCode, code);
+            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
         }
 
         [Test]
