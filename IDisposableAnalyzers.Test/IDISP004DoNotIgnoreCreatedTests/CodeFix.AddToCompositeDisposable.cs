@@ -5,12 +5,10 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class NoFix
+    public static partial class CodeFix
     {
         public static class AddToCompositeDisposable
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
             private static readonly CodeFixProvider Fix = new AddToCompositeDisposableFix();
 
             [Test]
@@ -56,7 +54,6 @@ namespace N
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
 
-            [Ignore("whitespace.")]
             [Test]
             public static void CreateNewCompositeDisposableWithTrivia()
             {

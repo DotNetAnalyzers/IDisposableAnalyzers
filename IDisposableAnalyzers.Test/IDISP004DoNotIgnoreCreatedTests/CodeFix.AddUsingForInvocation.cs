@@ -4,12 +4,10 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class NoFix
+    public static partial class CodeFix
     {
         public static class AddUsingForInvocation
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
             private static readonly AddUsingFix Fix = new AddUsingFix();
 
             [Test]

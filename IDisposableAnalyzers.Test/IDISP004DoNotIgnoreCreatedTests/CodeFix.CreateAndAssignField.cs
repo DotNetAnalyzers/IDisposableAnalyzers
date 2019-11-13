@@ -1,16 +1,13 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class NoFix
+    public static partial class CodeFix
     {
         public static class CreateAndAssignField
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
             private static readonly CodeFixProvider Fix = new CreateAndAssignFieldFix();
 
             [Test]

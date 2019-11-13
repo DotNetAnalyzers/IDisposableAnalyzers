@@ -49,9 +49,64 @@
                         {
                             context.RegisterCodeFix(
                                 $"Add to {field.Identifier.ValueText}.",
-                                (editor, _) => AddToExisting(editor, statement, field),
+                                (editor, _) => AddToExisting(editor),
                                 (string)null,
                                 diagnostic);
+
+                            void AddToExisting(DocumentEditor editor)
+                            {
+                                if (TryGetPreviousStatement(out var previous) &&
+                                    TryGetCreateCompositeDisposable(out var compositeDisposableCreation))
+                                {
+                                    editor.RemoveNode(statement);
+                                    editor.AddItemToCollectionInitializer(
+                                        compositeDisposableCreation,
+                                        statement.Expression,
+                                        statement.GetTrailingTrivia());
+                                }
+                                else
+                                {
+                                    var code = editor.SemanticModel.UnderscoreFields()
+                                        ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
+                                        : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
+
+                                    _ = editor.ReplaceNode(
+                                        statement.Expression,
+                                        x => SyntaxFactory.ParseExpression(code)
+                                                          .WithTriviaFrom(x));
+                                }
+
+                                bool TryGetPreviousStatement(out StatementSyntax result)
+                                {
+                                    result = null;
+                                    if (statement.Parent is BlockSyntax block)
+                                    {
+                                        return block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
+                                    }
+
+                                    return false;
+                                }
+
+                                bool TryGetCreateCompositeDisposable(out ObjectCreationExpressionSyntax result)
+                                {
+                                    if (previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } })
+                                    {
+                                        switch (left)
+                                        {
+                                            case IdentifierNameSyntax identifierName
+                                                when identifierName.Identifier.ValueText == field.Identifier.ValueText:
+                                            case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
+                                                    when name.Identifier.ValueText == field.Identifier.ValueText:
+                                                result = objectCreation;
+                                                return true;
+                                        }
+                                    }
+
+                                    result = null;
+                                    return false;
+                                }
+                            }
+
                         }
                         else
                         {
@@ -84,65 +139,13 @@
                                                     SyntaxKind.CollectionInitializerExpression,
                                                     SyntaxFactory.SeparatedList(
                                                         new[] { x.Expression.WithAdditionalAnnotations(Formatter.Annotation) },
-                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) }))))));
+                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) })))))
+                                          .WithoutTrailingTrivia()
+                                          .WithAdditionalAnnotations(Formatter.Annotation));
                             }
                         }
                     }
                 }
-            }
-        }
-
-        private static void AddToExisting(DocumentEditor editor, ExpressionStatementSyntax statement, VariableDeclaratorSyntax field)
-        {
-            if (TryGetPreviousStatement(out var previous) &&
-                TryGetCreateCompositeDisposable(out var compositeDisposableCreation))
-            {
-                editor.RemoveNode(statement);
-                editor.AddItemToCollectionInitializer(
-                    compositeDisposableCreation,
-                    statement.Expression,
-                    statement.GetTrailingTrivia());
-            }
-            else
-            {
-                var code = editor.SemanticModel.UnderscoreFields()
-                    ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
-                    : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
-
-                _ = editor.ReplaceNode(
-                    statement.Expression,
-                    x => SyntaxFactory.ParseExpression(code)
-                                      .WithTriviaFrom(x));
-            }
-
-            bool TryGetPreviousStatement(out StatementSyntax result)
-            {
-                result = null;
-                if (statement.Parent is BlockSyntax block)
-                {
-                    return block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
-                }
-
-                return false;
-            }
-
-            bool TryGetCreateCompositeDisposable(out ObjectCreationExpressionSyntax result)
-            {
-                if (previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } })
-                {
-                    switch (left)
-                    {
-                        case IdentifierNameSyntax identifierName
-                            when identifierName.Identifier.ValueText == field.Identifier.ValueText:
-                        case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
-                                when name.Identifier.ValueText == field.Identifier.ValueText:
-                            result = objectCreation;
-                            return true;
-                    }
-                }
-
-                result = null;
-                return false;
             }
         }
 

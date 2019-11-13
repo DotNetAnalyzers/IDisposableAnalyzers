@@ -1,14 +1,17 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class NoFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+        private static readonly CodeFixProvider AddUsingFix = new AddUsingFix();
+        private static readonly CodeFixProvider CreateAndAssignFieldFix = new CreateAndAssignFieldFix();
+        private static readonly CodeFixProvider AddToCompositeDisposableFix = new AddToCompositeDisposableFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
-        private static readonly AddUsingFix Fix = new AddUsingFix();
 
         [Test]
         public static void WhenArgument()
@@ -29,7 +32,9 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
+            RoslynAssert.NoFix(Analyzer, AddUsingFix, ExpectedDiagnostic, code);
+            RoslynAssert.NoFix(Analyzer, CreateAndAssignFieldFix, ExpectedDiagnostic, code);
+            RoslynAssert.NoFix(Analyzer, AddToCompositeDisposableFix, ExpectedDiagnostic, code);
         }
     }
 }
