@@ -33,6 +33,51 @@ namespace N
     {
         private bool disposed;
 
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
+            }
+
+            [Test]
+            public static void AbstractClassLegacyPattern()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    public abstract class C : ↓IDisposable
+    {
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    public abstract class C : IDisposable
+    {
+        private bool disposed;
+
         public void Dispose()
         {
             this.Dispose(true);
@@ -61,8 +106,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
@@ -147,8 +192,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
@@ -232,12 +277,56 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
             public static void VirtualDispose()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    public class C : ↓IDisposable
+    {
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    public class C : IDisposable
+    {
+        private bool disposed;
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
+            }
+
+            [Test]
+            public static void VirtualDisposeLegacy()
             {
                 var before = @"
 namespace N
@@ -286,7 +375,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, "Implement IDisposable with virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
         }
     }

@@ -24,6 +24,19 @@
             expressionBody: default,
             semicolonToken: default);
 
+        private static readonly MethodDeclarationSyntax DefaultVirtualDispose = SyntaxFactory.MethodDeclaration(
+            attributeLists: default,
+            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.VirtualKeyword)),
+            returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+            explicitInterfaceSpecifier: default,
+            identifier: SyntaxFactory.Identifier("Dispose"),
+            typeParameterList: default,
+            parameterList: SyntaxFactory.ParameterList(),
+            constraintClauses: default,
+            body: SyntaxFactory.Block(),
+            expressionBody: default,
+            semicolonToken: default);
+
         private static readonly MethodDeclarationSyntax DefaultPublicOverrideDispose = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
             modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
@@ -93,6 +106,25 @@
             }
 
             return EmptyDispose.AddBodyStatements(
+                SyntaxFactory.IfStatement(
+                    disposedField,
+                    SyntaxFactory.Block(SyntaxFactory.ReturnStatement())),
+                SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        disposedField,
+                        SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+        }
+
+        internal static MethodDeclarationSyntax VirtualDispose(ExpressionSyntax disposedField)
+        {
+            if (disposedField == null)
+            {
+                return DefaultVirtualDispose;
+            }
+
+            return DefaultVirtualDispose.InsertBodyStatements(
+                0,
                 SyntaxFactory.IfStatement(
                     disposedField,
                     SyntaxFactory.Block(SyntaxFactory.ReturnStatement())),
