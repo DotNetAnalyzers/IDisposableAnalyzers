@@ -16,6 +16,16 @@
         internal static readonly TypeSyntax SystemIDisposable = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
                                                                              .WithAdditionalAnnotations(Simplifier.Annotation);
 
+        internal static readonly StatementSyntax GcSuppressFinalizeThis = SyntaxFactory.ExpressionStatement(
+                                                                                           SyntaxFactory.InvocationExpression(
+                                                                                               SyntaxFactory.MemberAccessExpression(
+                                                                                                   SyntaxKind.SimpleMemberAccessExpression,
+                                                                                                   SyntaxFactory.IdentifierName("GC"),
+                                                                                                   SyntaxFactory.IdentifierName("SuppressFinalize")),
+                                                                                               Arguments(SyntaxFactory.ThisExpression())))
+                                                                                      .WithTrailingElasticLineFeed()
+                                                                                      .WithAdditionalAnnotations(Formatter.Annotation);
+
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
         internal static ExpressionStatementSyntax DisposeStatement(ExpressionSyntax disposable)
@@ -243,6 +253,11 @@
         internal static ParenthesizedExpressionSyntax AsIDisposable(ExpressionSyntax e)
         {
             return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.BinaryExpression(SyntaxKind.AsExpression, e, SystemIDisposable));
+        }
+
+        internal static ArgumentListSyntax Arguments(ExpressionSyntax expression)
+        {
+            return SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(expression)));
         }
     }
 }

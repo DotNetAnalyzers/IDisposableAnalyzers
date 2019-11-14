@@ -8,16 +8,11 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressFinalizeFix))]
     [Shared]
     internal class SuppressFinalizeFix : DocumentEditorCodeFixProvider
     {
-        private static readonly StatementSyntax GcSuppressFinalizeThis = SyntaxFactory.ParseStatement("GC.SuppressFinalize(this);")
-                                                                                      .WithTrailingElasticLineFeed()
-                                                                                      .WithAdditionalAnnotations(Formatter.Annotation);
-
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.IDISP018CallSuppressFinalizeSealed.Id,
             Descriptors.IDISP019CallSuppressFinalizeVirtual.Id);
@@ -40,7 +35,7 @@
                                 "GC.SuppressFinalize(this)",
                                 (e, _) => e.ReplaceNode(
                                     body,
-                                    x => x.AddStatements(GcSuppressFinalizeThis)),
+                                    x => x.AddStatements(IDisposableFactory.GcSuppressFinalizeThis)),
                                 equivalenceKey: nameof(SuppressFinalizeFix),
                                 diagnostic);
                             break;
@@ -51,7 +46,7 @@
                                     disposeMethod,
                                     x => x.AsBlockBody(
                                         SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression),
-                                        GcSuppressFinalizeThis)),
+                                        IDisposableFactory.GcSuppressFinalizeThis)),
                                 equivalenceKey: nameof(SuppressFinalizeFix),
                                 diagnostic);
                             break;
