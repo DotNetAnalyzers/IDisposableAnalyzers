@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Linq;
@@ -65,10 +66,59 @@
                                             editor.RemoveNode(statement);
                                             editor.ReplaceNode(
                                                 initializer,
-                                                x => x.AddExpressions(statement.Expression));
+                                                x => SyntaxFactory.InitializerExpression(
+                                                         SyntaxKind.CollectionInitializerExpression,
+                                                         SyntaxFactory.SeparatedList(Expressions(x), Separators(x)))
+                                                                  .WithAdditionalAnnotations(Formatter.Annotation));
+
+                                            IEnumerable<ExpressionSyntax> Expressions(InitializerExpressionSyntax old)
+                                            {
+                                                if (old.Expressions.Count == 0)
+                                                {
+                                                    yield return statement.Expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                }
+                                                else
+                                                {
+                                                    foreach (var e in old.Expressions.Take(old.Expressions.Count - 1))
+                                                    {
+                                                        yield return e;
+                                                    }
+
+                                                    yield return old.Expressions.Last().WithoutTrailingTrivia();
+                                                    yield return statement.Expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                }
+                                            }
+
+                                            IEnumerable<SyntaxToken> Separators(InitializerExpressionSyntax old)
+                                            {
+                                                var separators = old.Expressions.GetSeparators();
+                                                if (old.Expressions.SeparatorCount < old.Expressions.Count)
+                                                {
+                                                    var last = old.Expressions.Last();
+                                                    if (last.HasTrailingTrivia &&
+                                                        last.GetTrailingTrivia() is { } trivia)
+                                                    {
+                                                        if (trivia.Last().IsKind(SyntaxKind.EndOfLineTrivia))
+                                                        {
+                                                            separators = separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, trivia));
+                                                        }
+                                                        else
+                                                        {
+                                                            separators = separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, trivia.Add(SyntaxFactory.LineFeed)));
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        separators = separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, SyntaxFactory.TriviaList(SyntaxFactory.LineFeed)));
+                                                    }
+                                                }
+
+                                                return separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, statement.GetTrailingTrivia()));
+                                            }
+
                                             break;
                                         case { ArgumentList: { } argumentList }
-                                            when argumentList.Arguments.Any():
+                                            when argumentList.Arguments.TryFirst(x => !(x.Expression is LiteralExpressionSyntax), out _):
                                             editor.RemoveNode(statement);
                                             editor.ReplaceNode(
                                                 argumentList,
@@ -76,7 +126,7 @@
                                             break;
                                         default:
                                             editor.RemoveNode(statement);
-                                            if (objectCreation.ArgumentList is { } empty)
+                                            if (objectCreation.ArgumentList is { Arguments: { Count: 0 } } empty)
                                             {
                                                 editor.RemoveNode(empty);
                                             }

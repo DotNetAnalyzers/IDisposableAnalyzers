@@ -241,7 +241,7 @@ namespace N
         {
             this.disposable = new CompositeDisposable
             {
-                File.OpenRead(string.Empty)
+                File.OpenRead(string.Empty),
             };
         }
     }
@@ -464,7 +464,7 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable
+            this.disposable = new CompositeDisposable()
             {
                 File.OpenRead(string.Empty),
                 File.OpenRead(string.Empty),
@@ -562,7 +562,7 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable
+            this.disposable = new CompositeDisposable()
             {
                 File.OpenRead(string.Empty), // comment
                 File.OpenRead(string.Empty),
