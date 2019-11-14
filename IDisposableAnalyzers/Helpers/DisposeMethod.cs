@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -82,11 +82,6 @@ namespace IDisposableAnalyzers
                 return IsOverrideDispose(candidate) ||
                        IsVirtualDispose(candidate);
             }
-        }
-
-        internal static bool TryFindBaseVirtual(ITypeSymbol type, out IMethodSymbol result)
-        {
-            return type.TryFindFirstMethodRecursive("Dispose", x => IsVirtualDispose(x), out result);
         }
 
         internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)

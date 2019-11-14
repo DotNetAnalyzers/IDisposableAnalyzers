@@ -156,6 +156,74 @@ namespace N
             }
 
             [Test]
+            public static void WhenBaseHasPublicVirtualDisposeAndThrowIfDisposed()
+            {
+                var baseClass = @"
+namespace N
+{
+    using System;
+
+    public class BaseClass : IDisposable
+    {
+        private bool disposed;
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+                var before = @"
+namespace N
+{
+    using System.IO;
+
+    public class C : BaseClass
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System.IO;
+
+    public class C : BaseClass
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            base.Dispose();
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            }
+
+            [Test]
             public static void UnderscoreWhenThrowIsNotVirtual()
             {
                 var baseClass = @"

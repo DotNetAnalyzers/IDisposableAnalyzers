@@ -13,7 +13,6 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
-    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(ImplementIDisposableFix))]
     [Shared]
@@ -60,10 +59,10 @@
                                                                   .ConfigureAwait(false);
                         var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
                         if (Disposable.IsAssignableFrom(type, semanticModel.Compilation) &&
-                            DisposeMethod.TryFindBaseVirtual(type, out var baseDispose))
+                            type.TryFindFirstMethodRecursive("Dispose", x => x.IsVirtual, out var baseDispose))
                         {
                             context.RegisterCodeFix(
-                                "override Dispose(bool)",
+                                $"override {baseDispose}",
                                 (editor, cancellationToken) =>
                                     OverrideDispose(
                                         editor,

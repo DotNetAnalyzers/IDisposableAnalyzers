@@ -8,8 +8,8 @@
 
     internal static class MethodFactory
     {
-        internal static readonly TypeSyntax SystemObjectDisposedException = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("ObjectDisposedException"))
-                                                                             .WithAdditionalAnnotations(Simplifier.Annotation);
+        internal static readonly TypeSyntax SystemObjectDisposedException = SyntaxFactory.QualifiedName(
+            SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("ObjectDisposedException")).WithAdditionalAnnotations(Simplifier.Annotation);
 
         private static readonly MethodDeclarationSyntax EmptyDispose = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
@@ -26,7 +26,7 @@
 
         private static readonly MethodDeclarationSyntax DefaultPublicOverrideDispose = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
-            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
+            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
             returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
             explicitInterfaceSpecifier: default,
             identifier: SyntaxFactory.Identifier("Dispose"),
