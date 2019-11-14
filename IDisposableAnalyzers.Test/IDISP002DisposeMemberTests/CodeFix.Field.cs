@@ -1777,7 +1777,7 @@ namespace N
             }
 
             this.disposed = true;
-            this.stream.Dispose();
+            this.stream?.Dispose();
             base.Dispose();
         }
     }
