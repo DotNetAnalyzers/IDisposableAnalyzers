@@ -137,23 +137,10 @@
                     }
 
                     if (walker.IsEmpty &&
-                        disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ } initializer &&
-                        initializer.TryFirstAncestor(out TypeDeclarationSyntax containingType))
+                        disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ })
                     {
-                        if (TryGetMemberAccessFromUsage(containingType, out memberAccess))
-                        {
-                            return true;
-                        }
-
-                        switch (initializer.Parent)
-                        {
-                            case PropertyDeclarationSyntax { Identifier: { } identifier }:
-                                memberAccess = Create(identifier);
-                                return true;
-                            case VariableDeclaratorSyntax { Identifier: { } identifier }:
-                                memberAccess = Create(identifier);
-                                return true;
-                        }
+                        memberAccess = MemberAccess(disposable, semanticModel, cancellationToken);
+                        return true;
                     }
 
                     memberAccess = null;
@@ -163,15 +150,29 @@
 
             if (DisposeMethod.IsAccessibleOn(disposable.Type, semanticModel.Compilation))
             {
-                return ConditionalDisposeStatement(MemberAccess()).WithLeadingElasticLineFeed();
+                return ConditionalDisposeStatement(MemberAccess(disposable, semanticModel, cancellationToken)).WithLeadingElasticLineFeed();
             }
 
             return ConditionalDisposeStatement(
                     SyntaxFactory.BinaryExpression(
                         SyntaxKind.AsExpression,
-                        MemberAccess(),
+                        MemberAccess(disposable, semanticModel, cancellationToken),
                         SystemIDisposable))
                 .WithLeadingElasticLineFeed();
+        }
+
+        internal static ExpressionSyntax MemberAccess(FieldOrProperty member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&
+                TryGetMemberAccessFromUsage(root, member, semanticModel, cancellationToken, out var memberAccess))
+            {
+                return memberAccess;
+            }
+
+            return Create(
+                SyntaxFacts.GetKeywordKind(member.Name) != SyntaxKind.None
+                    ? SyntaxFactory.VerbatimIdentifier(default, $"@{member.Name}", member.Name, default)
+                    : SyntaxFactory.Identifier(member.Name));
 
             ExpressionSyntax Create(SyntaxToken identifier)
             {
@@ -182,48 +183,34 @@
                         SyntaxFactory.ThisExpression(),
                         SyntaxFactory.IdentifierName(identifier));
             }
+        }
 
-            bool TryGetMemberAccessFromUsage(SyntaxNode containingNode, out ExpressionSyntax expression)
+        internal static bool TryGetMemberAccessFromUsage(SyntaxNode containingNode, FieldOrProperty member, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax expression)
+        {
+            using (var identifierNameWalker = IdentifierNameWalker.Borrow(containingNode))
             {
-                using (var identifierNameWalker = IdentifierNameWalker.Borrow(containingNode))
+                foreach (var name in identifierNameWalker.IdentifierNames)
                 {
-                    foreach (var name in identifierNameWalker.IdentifierNames)
+                    if (name.Identifier.ValueText == member.Name &&
+                        semanticModel.TryGetSymbol(name, cancellationToken, out var symbol) &&
+                        symbol.Equals(member.Symbol))
                     {
-                        if (name.Identifier.ValueText == disposable.Name &&
-                            semanticModel.TryGetSymbol(name, cancellationToken, out var symbol) &&
-                            symbol.Equals(disposable.Symbol))
+                        switch (name)
                         {
-                            switch (name)
-                            {
-                                case { Parent: MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _ } memberAccess }:
-                                    expression = memberAccess;
-                                    return true;
-                                case { Parent: ArgumentSyntax _ }:
-                                case { Parent: ExpressionSyntax _ }:
-                                    expression = name;
-                                    return true;
-                            }
+                            case { Parent: MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _ } memberAccess }:
+                                expression = memberAccess;
+                                return true;
+                            case { Parent: ArgumentSyntax _ }:
+                            case { Parent: ExpressionSyntax _ }:
+                                expression = name;
+                                return true;
                         }
                     }
                 }
-
-                expression = null;
-                return false;
             }
 
-            ExpressionSyntax MemberAccess()
-            {
-                if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&
-                    TryGetMemberAccessFromUsage(root, out var member))
-                {
-                    return member;
-                }
-
-                return Create(
-                    SyntaxFacts.GetKeywordKind(disposable.Name) != SyntaxKind.None
-                        ? SyntaxFactory.VerbatimIdentifier(default, $"@{disposable.Name}", disposable.Name, default)
-                        : SyntaxFactory.Identifier(disposable.Name));
-            }
+            expression = null;
+            return false;
         }
 
         internal static AnonymousFunctionExpressionSyntax PrependStatements(this AnonymousFunctionExpressionSyntax lambda, params StatementSyntax[] statements)
