@@ -193,7 +193,6 @@
 
         private static void ImplementIDisposableVirtualAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
-            var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
             var disposed = editor.AddField(
                 classDeclaration,
                 "disposed",
