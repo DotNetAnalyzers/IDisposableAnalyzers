@@ -42,10 +42,8 @@
                             (editor, cancellationToken) => editor.AddInterfaceType(typeDeclaration, IDisposableFactory.SystemIDisposable),
                             "add interface",
                             diagnostic);
-                        continue;
                     }
-
-                    if (typeDeclaration is StructDeclarationSyntax structDeclaration)
+                    else if (typeDeclaration is StructDeclarationSyntax structDeclaration)
                     {
                         context.RegisterCodeFix(
                             "Implement IDisposable.",
@@ -63,78 +61,79 @@
                         {
                             context.RegisterCodeFix(
                                 $"override {baseDispose}",
-                                (editor, cancellationToken) =>
-                                    OverrideDispose(
-                                        editor,
-                                        classDeclaration,
-                                        baseDispose,
-                                        cancellationToken),
+                                (editor, cancellationToken) => OverrideDispose(editor, cancellationToken),
                                 "override",
                                 diagnostic);
-                            continue;
-                        }
 
-                        if (type.TryFindSingleMethodRecursive("Dispose", out var disposeMethod) &&
-                            !disposeMethod.IsStatic &&
-                            disposeMethod.ReturnsVoid &&
-                            disposeMethod.Parameters.Length == 0)
-                        {
-                            continue;
-                        }
-
-                        if (type.TryFindFieldRecursive("disposed", out _) ||
-                            type.TryFindFieldRecursive("_disposed", out _))
-                        {
-                            return;
-                        }
-
-                        if (type.IsSealed)
-                        {
-                            context.RegisterCodeFix(
-                                "Implement IDisposable.",
-                                (editor, cancellationToken) =>
-                                    ImplementIDisposableSealedAsync(
-                                        editor,
-                                        classDeclaration,
-                                        cancellationToken),
-                                "Sealed",
-                                diagnostic);
-                            continue;
-                        }
-
-                        if (type.IsAbstract)
-                        {
-                            context.RegisterCodeFix(
-                                "Implement IDisposable with virtual dispose method.",
-                                (editor, cancellationToken) =>
-                                    ImplementIDisposableVirtualAsync(
-                                        editor,
-                                        classDeclaration,
-                                        cancellationToken),
-                                nameof(ImplementIDisposableFix) + "Virtual",
-                                diagnostic);
-                            continue;
-                        }
-
-                        context.RegisterCodeFix(
-                            "Implement IDisposable and make class sealed.",
-                            (editor, cancellationToken) =>
-                                ImplementIDisposableSealedAsync(
-                                    editor,
+                            void OverrideDispose(DocumentEditor editor, CancellationToken cancellationToken)
+                            {
+                                var disposed = editor.AddField(
                                     classDeclaration,
-                                    cancellationToken),
-                            nameof(ImplementIDisposableFix) + "Sealed",
-                            diagnostic);
+                                    "disposed",
+                                    Accessibility.Private,
+                                    DeclarationModifiers.None,
+                                    SyntaxFactory.ParseTypeName("bool"),
+                                    cancellationToken);
 
-                        context.RegisterCodeFix(
-                            "Implement IDisposable with virtual dispose method.",
-                            (editor, cancellationToken) =>
-                                ImplementIDisposableVirtualAsync(
-                                    editor,
-                                    classDeclaration,
-                                    cancellationToken),
-                            nameof(ImplementIDisposableFix) + "Virtual",
-                            diagnostic);
+                                _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, baseDispose))
+                                          .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
+                            }
+                        }
+                        else if (CanImplement())
+                        {
+                            switch (type)
+                            {
+                                case { IsSealed: true }:
+                                    context.RegisterCodeFix(
+                                        "Implement IDisposable.",
+                                        (editor, cancellationToken) =>
+                                            ImplementIDisposableSealedAsync(
+                                                editor,
+                                                classDeclaration,
+                                                cancellationToken),
+                                        "Sealed",
+                                        diagnostic);
+                                    break;
+                                case { IsAbstract: true }:
+                                    context.RegisterCodeFix(
+                                        "Implement IDisposable with virtual dispose method.",
+                                        (editor, cancellationToken) =>
+                                            ImplementIDisposableVirtualAsync(
+                                                editor,
+                                                classDeclaration,
+                                                cancellationToken),
+                                        nameof(ImplementIDisposableFix) + "Virtual",
+                                        diagnostic);
+                                    break;
+                                default:
+                                    context.RegisterCodeFix(
+                                        "Implement IDisposable and make class sealed.",
+                                        (editor, cancellationToken) =>
+                                            ImplementIDisposableSealedAsync(
+                                                editor,
+                                                classDeclaration,
+                                                cancellationToken),
+                                        nameof(ImplementIDisposableFix) + "Sealed",
+                                        diagnostic);
+
+                                    context.RegisterCodeFix(
+                                        "Implement IDisposable with virtual dispose method.",
+                                        (editor, cancellationToken) =>
+                                            ImplementIDisposableVirtualAsync(
+                                                editor,
+                                                classDeclaration,
+                                                cancellationToken),
+                                        nameof(ImplementIDisposableFix) + "Virtual",
+                                        diagnostic);
+                                    break;
+                            }
+                        }
+
+                        bool CanImplement()
+                        {
+                            return !type.TryFindFirstMethodRecursive("Dispose", out var disposeMethod) ||
+                                   disposeMethod.Parameters.Length != 0;
+                        }
                     }
                 }
             }
@@ -155,20 +154,6 @@
             }
 
             return false;
-        }
-
-        private static void OverrideDispose(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, IMethodSymbol toOverride, CancellationToken cancellationToken)
-        {
-            var disposed = editor.AddField(
-                classDeclaration,
-                "disposed",
-                Accessibility.Private,
-                DeclarationModifiers.None,
-                SyntaxFactory.ParseTypeName("bool"),
-                cancellationToken);
-
-            _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, toOverride))
-                      .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
         }
 
         private static void ImplementIDisposableVirtualAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
