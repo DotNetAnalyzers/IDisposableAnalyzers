@@ -20,11 +20,10 @@
                                                                                            SyntaxFactory.InvocationExpression(
                                                                                                SyntaxFactory.MemberAccessExpression(
                                                                                                    SyntaxKind.SimpleMemberAccessExpression,
-                                                                                                   SyntaxFactory.IdentifierName("GC"),
+                                                                                                   SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("GC")),
                                                                                                    SyntaxFactory.IdentifierName("SuppressFinalize")),
                                                                                                Arguments(SyntaxFactory.ThisExpression())))
-                                                                                      .WithTrailingElasticLineFeed()
-                                                                                      .WithAdditionalAnnotations(Formatter.Annotation);
+                                                                                       .WithAdditionalAnnotations(Simplifier.Annotation);
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
