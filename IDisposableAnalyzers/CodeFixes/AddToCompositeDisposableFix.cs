@@ -56,57 +56,70 @@
                             void AddToExisting(DocumentEditor editor)
                             {
                                 if (TryGetPreviousStatement(out var previous) &&
-                                    TryGetCreateCompositeDisposable(out var compositeDisposableCreation))
+                                    previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } } &&
+                                    IsField(left))
                                 {
-                                    editor.RemoveNode(statement);
-                                    editor.AddItemToCollectionInitializer(
-                                        compositeDisposableCreation,
-                                        statement.Expression,
-                                        statement.GetTrailingTrivia());
-                                }
-                                else
-                                {
-                                    var code = editor.SemanticModel.UnderscoreFields()
-                                        ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
-                                        : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
+                                    switch (objectCreation)
+                                    {
+                                        case { Initializer: { } initializer }:
+                                            editor.RemoveNode(statement);
+                                            editor.ReplaceNode(
+                                                initializer,
+                                                x => x.AddExpressions(statement.Expression));
+                                            break;
+                                        case { ArgumentList: { } argumentList }
+                                            when argumentList.Arguments.Any():
+                                            editor.RemoveNode(statement);
+                                            editor.ReplaceNode(
+                                                argumentList,
+                                                x => x.AddArguments(SyntaxFactory.Argument(statement.Expression)));
+                                            break;
+                                        default:
+                                            editor.RemoveNode(statement);
+                                            if (objectCreation.ArgumentList is { } empty)
+                                            {
+                                                editor.RemoveNode(empty);
+                                            }
 
-                                    _ = editor.ReplaceNode(
-                                        statement.Expression,
-                                        x => SyntaxFactory.ParseExpression(code)
-                                                          .WithTriviaFrom(x));
+                                            editor.ReplaceNode(
+                                                objectCreation,
+                                                x => x.WithInitializer(CreateInitializer(statement)));
+                                            break;
+                                    }
+
+                                    return;
                                 }
+
+                                var code = editor.SemanticModel.UnderscoreFields()
+                                    ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
+                                    : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
+
+                                _ = editor.ReplaceNode(
+                                    statement.Expression,
+                                    x => SyntaxFactory.ParseExpression(code)
+                                                      .WithTriviaFrom(x));
 
                                 bool TryGetPreviousStatement(out StatementSyntax result)
                                 {
                                     result = null;
-                                    if (statement.Parent is BlockSyntax block)
-                                    {
-                                        return block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
-                                    }
-
-                                    return false;
+                                    return statement.Parent is BlockSyntax block &&
+                                           block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
                                 }
 
-                                bool TryGetCreateCompositeDisposable(out ObjectCreationExpressionSyntax result)
+                                bool IsField(ExpressionSyntax e)
                                 {
-                                    if (previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } })
+                                    switch (e)
                                     {
-                                        switch (left)
-                                        {
-                                            case IdentifierNameSyntax identifierName
-                                                when identifierName.Identifier.ValueText == field.Identifier.ValueText:
-                                            case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
-                                                    when name.Identifier.ValueText == field.Identifier.ValueText:
-                                                result = objectCreation;
-                                                return true;
-                                        }
+                                        case IdentifierNameSyntax identifierName
+                                            when identifierName.Identifier.ValueText == field.Identifier.ValueText:
+                                        case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
+                                            when name.Identifier.ValueText == field.Identifier.ValueText:
+                                            return true;
+                                        default:
+                                            return false;
                                     }
-
-                                    result = null;
-                                    return false;
                                 }
                             }
-
                         }
                         else
                         {
@@ -135,11 +148,7 @@
                                             SyntaxFactory.ObjectCreationExpression(
                                                 CompositeDisposableType,
                                                 null,
-                                                SyntaxFactory.InitializerExpression(
-                                                    SyntaxKind.CollectionInitializerExpression,
-                                                    SyntaxFactory.SeparatedList(
-                                                        new[] { x.Expression.WithAdditionalAnnotations(Formatter.Annotation) },
-                                                        new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) })))))
+                                                CreateInitializer(x))))
                                           .WithoutTrailingTrivia()
                                           .WithAdditionalAnnotations(Formatter.Annotation));
                             }
@@ -147,6 +156,15 @@
                     }
                 }
             }
+        }
+
+        private static InitializerExpressionSyntax CreateInitializer(ExpressionStatementSyntax x)
+        {
+            return SyntaxFactory.InitializerExpression(
+                SyntaxKind.CollectionInitializerExpression,
+                SyntaxFactory.SeparatedList(
+                    new[] { x.Expression.WithAdditionalAnnotations(Formatter.Annotation) },
+                    new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) }));
         }
 
         private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out VariableDeclaratorSyntax field)

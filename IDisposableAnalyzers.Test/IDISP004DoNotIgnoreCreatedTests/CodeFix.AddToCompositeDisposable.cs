@@ -2,7 +2,6 @@
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
@@ -240,7 +239,10 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty)
+            };
         }
     }
 }";
@@ -281,7 +283,10 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable(1) { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable(1)
+            {
+                File.OpenRead(string.Empty),
+            };
         }
     }
 }";
@@ -687,7 +692,10 @@ namespace N
 
         internal C()
         {
-            this.disposable = new CompositeDisposable { File.OpenRead(string.Empty) };
+            this.disposable = new CompositeDisposable
+            {
+                File.OpenRead(string.Empty),
+            };
         }
     }
 }";
