@@ -480,10 +480,11 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
     using System.Windows.Controls;
 
-    public partial sealed class CodeTabView : UserControl, System.IDisposable
+    public partial sealed class CodeTabView : UserControl, IDisposable
     {
         private bool disposed;
 
@@ -503,7 +504,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
