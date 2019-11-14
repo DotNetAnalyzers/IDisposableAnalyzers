@@ -47,6 +47,7 @@ BUGFIX IDISP023: when disposing members.</Description>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="tools\*" Pack="true" PackagePath="" />
     <None Include="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\Gu.Roslyn.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>
