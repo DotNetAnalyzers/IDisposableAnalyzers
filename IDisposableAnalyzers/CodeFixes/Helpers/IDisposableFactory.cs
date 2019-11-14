@@ -161,6 +161,24 @@
                 .WithLeadingElasticLineFeed();
         }
 
+        internal static ExpressionSyntax MemberAccess(SyntaxToken memberIdentifier, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&
+                semanticModel.GetSymbolSafe(memberIdentifier.Parent, cancellationToken) is { } member &&
+                FieldOrProperty.TryCreate(member, out var fieldOrProperty) &&
+                TryGetMemberAccessFromUsage(root, fieldOrProperty, semanticModel, cancellationToken, out var memberAccess))
+            {
+                return memberAccess;
+            }
+
+            return semanticModel.UnderscoreFields()
+                ? (ExpressionSyntax)SyntaxFactory.IdentifierName(memberIdentifier)
+                : SyntaxFactory.MemberAccessExpression(
+                    SyntaxKind.SimpleMemberAccessExpression,
+                    SyntaxFactory.ThisExpression(),
+                    SyntaxFactory.IdentifierName(memberIdentifier));
+        }
+
         internal static ExpressionSyntax MemberAccess(FieldOrProperty member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&

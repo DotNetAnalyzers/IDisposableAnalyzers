@@ -50,11 +50,11 @@
                         {
                             context.RegisterCodeFix(
                                 $"Add to {field.Identifier.ValueText}.",
-                                (editor, _) => AddToExisting(editor),
+                                (editor, cancellationToken) => AddToExisting(editor, cancellationToken),
                                 (string)null,
                                 diagnostic);
 
-                            void AddToExisting(DocumentEditor editor)
+                            void AddToExisting(DocumentEditor editor, CancellationToken cancellationToken)
                             {
                                 if (TryGetPreviousStatement(out var previous) &&
                                     previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } } &&
@@ -140,13 +140,14 @@
                                     return;
                                 }
 
-                                var code = editor.SemanticModel.UnderscoreFields()
-                                    ? $"{field.Identifier.ValueText}.Add({statement.Expression})"
-                                    : $"this.{field.Identifier.ValueText}.Add({statement.Expression})";
-
                                 _ = editor.ReplaceNode(
                                     statement.Expression,
-                                    x => SyntaxFactory.ParseExpression(code)
+                                    x => SyntaxFactory.InvocationExpression(
+                                                          SyntaxFactory.MemberAccessExpression(
+                                                              SyntaxKind.SimpleMemberAccessExpression,
+                                                              IDisposableFactory.MemberAccess(field.Identifier, semanticModel, cancellationToken),
+                                                              SyntaxFactory.IdentifierName("Add")),
+                                                          SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(statement.Expression))))
                                                       .WithTriviaFrom(x));
 
                                 bool TryGetPreviousStatement(out StatementSyntax result)
