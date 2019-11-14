@@ -44,9 +44,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -80,7 +81,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -207,9 +208,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -229,7 +231,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -252,12 +254,12 @@ namespace N
     }
 }";
 
-                var after = @"
+                var after = @"using System;
 using System.IO;
 
 namespace N
 {
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private bool disposed;
 
@@ -277,7 +279,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -306,9 +308,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         public const int Value = 2;
         private readonly int _value = 1;
@@ -330,7 +333,7 @@ namespace N
         {
             if (_disposed)
             {
-                throw new System.ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException(GetType().FullName);
             }
         }
     }

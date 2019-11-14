@@ -19,8 +19,6 @@
     [Shared]
     internal class ImplementIDisposableFix : DocumentEditorCodeFixProvider
     {
-        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
-
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.IDISP006ImplementIDisposable.Id,
             Descriptors.IDISP009IsIDisposable.Id,
@@ -202,7 +200,8 @@
                 cancellationToken);
 
             var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            _ = editor.AddMethod(
+            _ = editor.AddIDisposableInterface(classDeclaration)
+                      .AddMethod(
                 classDeclaration,
                 ParseMethod(
                     @"public void Dispose()
@@ -229,17 +228,10 @@
                     usesUnderscoreNames,
                     disposed))
                       .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
-
-            if (classDeclaration.BaseList?.Types.TrySingle(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
-            {
-                editor.AddInterfaceType(classDeclaration, IDisposableFactory.SystemIDisposable);
-                _ = editor.AddUsing(UsingSystem);
-            }
         }
 
         private static void ImplementIDisposableSealedAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
-            var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
             var disposed = editor.AddField(
                 classDeclaration,
                 "disposed",
@@ -248,15 +240,11 @@
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            _ = editor.AddMethod(classDeclaration, MethodFactory.Dispose(disposed))
+            _ = editor.AddIDisposableInterface(classDeclaration)
+                      .AddMethod(classDeclaration, MethodFactory.Dispose(disposed))
                       .AddPrivateThrowIfDisposed(classDeclaration, disposed, cancellationToken);
 
-            if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
-            {
-                editor.AddInterfaceType(classDeclaration, IDisposableFactory.SystemIDisposable);
-            }
-
-            if (!type.IsSealed)
+            if (!classDeclaration.Modifiers.Any(SyntaxKind.SealedKeyword))
             {
                 _ = editor.ReplaceNode(
                     classDeclaration,

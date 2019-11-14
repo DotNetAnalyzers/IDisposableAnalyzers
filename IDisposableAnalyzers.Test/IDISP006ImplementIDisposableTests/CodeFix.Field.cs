@@ -44,9 +44,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -79,7 +80,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -205,9 +206,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -226,7 +228,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -249,12 +251,12 @@ namespace N
     }
 }";
 
-                var after = @"
+                var after = @"using System;
 using System.IO;
 
 namespace N
 {
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
         private bool disposed;
@@ -273,7 +275,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }
@@ -299,9 +301,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         private readonly Stream _stream = File.OpenRead(string.Empty);
         private bool _disposed;
@@ -320,7 +323,7 @@ namespace N
         {
             if (_disposed)
             {
-                throw new System.ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException(GetType().FullName);
             }
         }
     }
@@ -348,9 +351,10 @@ namespace N
                 var after = @"
 namespace N
 {
+    using System;
     using System.IO;
 
-    public sealed class C : System.IDisposable
+    public sealed class C : IDisposable
     {
         public const int Value = 2;
 
@@ -371,7 +375,7 @@ namespace N
         {
             if (_disposed)
             {
-                throw new System.ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException(GetType().FullName);
             }
         }
     }
@@ -565,18 +569,19 @@ namespace N
 
     public partial class CodeTabView : UserControl
     {
-        ↓private readonly N.Disposable disposable = new N.Disposable();
+        ↓private readonly Disposable disposable = new Disposable();
     }
 }";
 
                 var after = @"
 namespace N
 {
+    using System;
     using System.Windows.Controls;
 
-    public partial sealed class CodeTabView : UserControl, System.IDisposable
+    public partial sealed class CodeTabView : UserControl, IDisposable
     {
-        private readonly N.Disposable disposable = new N.Disposable();
+        private readonly Disposable disposable = new Disposable();
         private bool disposed;
 
         public void Dispose()
@@ -593,7 +598,7 @@ namespace N
         {
             if (this.disposed)
             {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }

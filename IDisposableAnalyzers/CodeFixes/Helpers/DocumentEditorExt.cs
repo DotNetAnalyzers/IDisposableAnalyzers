@@ -11,6 +11,8 @@
 
     internal static partial class DocumentEditorExt
     {
+        private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
+
         internal static ExpressionSyntax AddField(
             this DocumentEditor editor,
             TypeDeclarationSyntax containingType,
@@ -64,6 +66,26 @@
                     SyntaxKind.SimpleMemberAccessExpression,
                     SyntaxFactory.ThisExpression(),
                     identifierNameSyntax);
+        }
+
+        internal static DocumentEditor AddIDisposableInterface(this DocumentEditor editor, TypeDeclarationSyntax type)
+        {
+            if (IsMissing())
+            {
+                editor.AddUsing(UsingSystem)
+                      .AddInterfaceType(type, IDisposableFactory.SystemIDisposable);
+            }
+
+            return editor;
+
+            bool IsMissing()
+            {
+                return type switch
+                {
+                    { BaseList: { Types: { } types } } => !types.TryFirst(x => x == KnownSymbol.IDisposable, out _),
+                    _ => true,
+                };
+            }
         }
 
         internal static DocumentEditor AddThrowIfDisposed(this DocumentEditor editor, TypeDeclarationSyntax containingType, ExpressionSyntax disposed, CancellationToken cancellationToken)
