@@ -16,7 +16,7 @@
         internal static readonly TypeSyntax SystemIDisposable = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
                                                                              .WithAdditionalAnnotations(Simplifier.Annotation);
 
-        internal static readonly MethodDeclarationSyntax DisposeMethodDeclaration = SyntaxFactory.MethodDeclaration(
+        internal static readonly MethodDeclarationSyntax EmptyDisposeMethodDeclaration = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
             modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword)),
             returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -28,6 +28,19 @@
             body: SyntaxFactory.Block(),
             expressionBody: default,
             semicolonToken: default);
+
+        internal static MethodDeclarationSyntax DisposeMethodDeclaration(ExpressionSyntax disposedField)
+        {
+            return EmptyDisposeMethodDeclaration.AddBodyStatements(
+                SyntaxFactory.IfStatement(
+                    disposedField,
+                    SyntaxFactory.Block(SyntaxFactory.ReturnStatement())),
+                SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        disposedField,
+                        SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+        }
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 

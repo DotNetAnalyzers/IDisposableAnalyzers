@@ -52,7 +52,7 @@
                     {
                         context.RegisterCodeFix(
                             "Implement IDisposable.",
-                            (editor, _) => editor.AddMethod(structDeclaration, IDisposableFactory.DisposeMethodDeclaration),
+                            (editor, _) => editor.AddMethod(structDeclaration, IDisposableFactory.EmptyDisposeMethodDeclaration),
                             "Struct",
                             diagnostic);
                     }
@@ -299,7 +299,7 @@
         private static void ImplementIDisposableSealedAsync(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, CancellationToken cancellationToken)
         {
             var type = (ITypeSymbol)editor.SemanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-            var field = editor.AddField(
+            var disposed = editor.AddField(
                 classDeclaration,
                 "disposed",
                 Accessibility.Private,
@@ -307,23 +307,11 @@
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-
             _ = editor.AddMethod(
                 classDeclaration,
-                ParseMethod(
-                    @"public void Dispose()
-                          {
-                              if (this.disposed)
-                              {
-                                  return;
-                              }
+                IDisposableFactory.DisposeMethodDeclaration(disposed));
 
-                              this.disposed = true;
-                          }",
-                    usesUnderscoreNames,
-                    field));
-
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
             {
                 _ = editor.AddMethod(
@@ -337,7 +325,7 @@
                               }
                           }",
                         usesUnderscoreNames,
-                        field));
+                        disposed));
             }
 
             if (classDeclaration.BaseList?.Types.TryFirst(x => (x.Type as IdentifierNameSyntax)?.Identifier.ValueText.Contains("IDisposable") == true, out _) != true)
