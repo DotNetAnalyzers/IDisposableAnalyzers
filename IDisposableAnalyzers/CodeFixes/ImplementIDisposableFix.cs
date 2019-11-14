@@ -52,14 +52,14 @@
                     {
                         context.RegisterCodeFix(
                             "Implement IDisposable.",
-                            (editor, _) => editor.AddMethod(structDeclaration, IDisposableFactory.EmptyDisposeMethodDeclaration),
+                            (editor, _) => editor.AddMethod(structDeclaration, MethodFactory.Dispose(null)),
                             "Struct",
                             diagnostic);
                     }
                     else if (typeDeclaration is ClassDeclarationSyntax classDeclaration)
                     {
                         var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                                         .ConfigureAwait(false);
+                                                                  .ConfigureAwait(false);
                         var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
                         if (Disposable.IsAssignableFrom(type, semanticModel.Compilation) &&
                             DisposeMethod.TryFindBaseVirtual(type, out var baseDispose))
@@ -309,7 +309,7 @@
 
             _ = editor.AddMethod(
                 classDeclaration,
-                IDisposableFactory.DisposeMethodDeclaration(disposed));
+                MethodFactory.Dispose(disposed));
 
             var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             if (!type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
