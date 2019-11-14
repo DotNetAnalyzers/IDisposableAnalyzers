@@ -1702,6 +1702,89 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
             }
+
+            [Test]
+            public static void WhenBaseHasPublicOverrideDisposeAndThrowIfDisposed()
+            {
+                var baseClass = @"
+namespace N
+{
+    using System;
+
+    public class BaseClass : IDisposable
+    {
+        private bool disposed;
+
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
+        }
+    }
+}";
+                var before = @"
+namespace N
+{
+    using System.IO;
+
+    public class C : BaseClass
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            base.Dispose();
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System.IO;
+
+    public class C : BaseClass
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        public override void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.stream.Dispose();
+            base.Dispose();
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            }
         }
     }
 }

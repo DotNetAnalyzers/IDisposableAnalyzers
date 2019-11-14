@@ -2,6 +2,7 @@
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
@@ -9,6 +10,7 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeMemberFix))]
     [Shared]
@@ -33,65 +35,46 @@
                     if (DisposeMethod.TryFindVirtualDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
                         disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeDeclaration))
                     {
-                        if (TryFindIfDisposing(disposeDeclaration, out var ifDisposing))
+                        if (disposeDeclaration is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } block })
                         {
                             context.RegisterCodeFix(
                                 $"{symbol.Name}.Dispose() in {disposeSymbol}",
-                                (editor, cancellationToken) => editor.ReplaceNode(
-                                    ifDisposing.Statement,
-                                    x => x is BlockSyntax block
-                                        ? block.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
-                                        : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                (editor, token) => Dispose(editor, token),
                                 "Dispose member.",
                                 diagnostic);
-                        }
-                        else if (TryFindIfNotDisposingReturn(disposeDeclaration, out var ifNotDisposing) &&
-                                 ifNotDisposing.Parent is BlockSyntax)
-                        {
-                            context.RegisterCodeFix(
-                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
-                                (editor, cancellationToken) =>
+
+                            void Dispose(DocumentEditor editor, CancellationToken cancellationToken)
+                            {
+                                if (TryFindIfNotDisposingReturn(disposeDeclaration, out var ifNotDisposingReturn) &&
+                                    ifNotDisposingReturn.Parent is BlockSyntax)
                                 {
-                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
-                                    {
-                                        editor.InsertBefore(
-                                            baseCall,
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
-                                    }
-                                    else
-                                    {
-                                        editor.InsertAfter(
-                                            ifNotDisposing,
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
-                                    }
-                                },
-                                "Dispose member.",
-                                diagnostic);
-                        }
-                        else if (disposeDeclaration.Body is { } block)
-                        {
-                            context.RegisterCodeFix(
-                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
-                                (editor, cancellationToken) =>
+                                    editor.InsertAfter(
+                                        ifNotDisposingReturn,
+                                        IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                }
+                                else if (TryFindIfDisposing(disposeDeclaration, out var ifDisposing))
+                                {
+                                    _ = editor.ReplaceNode(
+                                        ifDisposing.Statement,
+                                        x => x is BlockSyntax block
+                                            ? block.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
+                                            : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                }
+                                else
                                 {
                                     ifDisposing = SyntaxFactory.IfStatement(
-                                        SyntaxFactory.IdentifierName(disposeDeclaration.ParameterList.Parameters[0].Identifier),
+                                        SyntaxFactory.IdentifierName(parameters[0].Identifier),
                                         SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
                                     if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
                                     {
-                                        editor.InsertBefore(
-                                            baseCall.Parent,
-                                            ifDisposing);
+                                        editor.InsertBefore(baseCall.Parent, ifDisposing);
                                     }
                                     else
                                     {
-                                        _ = editor.ReplaceNode(
-                                            block,
-                                            x => x.AddStatements(ifDisposing));
+                                        _ = editor.ReplaceNode(block, x => x.AddStatements(ifDisposing));
                                     }
-                                },
-                                "Dispose member.",
-                                diagnostic);
+                                }
+                            }
                         }
                     }
                     else if (DisposeMethod.TryFindIDisposableDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
@@ -113,11 +96,26 @@
                             case { Body: { } body }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {disposeSymbol}",
-                                    (editor, cancellationToken) => editor.ReplaceNode(
-                                        body,
-                                        x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                    (editor, cancellationToken) => Dispose(editor, cancellationToken),
                                     "Dispose member.",
                                     diagnostic);
+
+                                void Dispose(DocumentEditor editor, CancellationToken cancellationToken)
+                                {
+                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    {
+                                        editor.InsertBefore(
+                                            baseCall.Parent,
+                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                    }
+                                    else
+                                    {
+                                        _ = editor.ReplaceNode(
+                                            body,
+                                            x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                    }
+                                }
+
                                 break;
                         }
                     }
