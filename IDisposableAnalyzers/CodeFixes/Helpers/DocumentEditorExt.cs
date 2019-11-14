@@ -68,6 +68,25 @@
                     identifierNameSyntax);
         }
 
+        internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor, CancellationToken cancellationToken)
+        {
+            if (editor.SemanticModel.UnderscoreFields())
+            {
+                return SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.IdentifierName("Dispose"),
+                        IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+            }
+
+            return SyntaxFactory.ExpressionStatement(
+                SyntaxFactory.InvocationExpression(
+                    SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        SyntaxFactory.ThisExpression(),
+                        SyntaxFactory.IdentifierName("Dispose")),
+                    IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+        }
+
         internal static DocumentEditor AddIDisposableInterface(this DocumentEditor editor, TypeDeclarationSyntax type)
         {
             if (IsMissing())

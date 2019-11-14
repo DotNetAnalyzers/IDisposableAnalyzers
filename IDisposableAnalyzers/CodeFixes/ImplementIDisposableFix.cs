@@ -50,7 +50,7 @@
                     {
                         context.RegisterCodeFix(
                             "Implement IDisposable.",
-                            (editor, _) => editor.AddMethod(structDeclaration, MethodFactory.Dispose(null)),
+                            (editor, _) => editor.AddMethod(structDeclaration, MethodFactory.Dispose()),
                             "Struct",
                             diagnostic);
                     }
@@ -201,15 +201,7 @@
 
             var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             _ = editor.AddIDisposableInterface(classDeclaration)
-                      .AddMethod(
-                classDeclaration,
-                ParseMethod(
-                    @"public void Dispose()
-                          {
-                              this.Dispose(true);
-                              GC.SuppressFinalize(this);
-                          }",
-                    usesUnderscoreNames))
+                      .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(cancellationToken), IDisposableFactory.GcSuppressFinalizeThis))
                       .AddMethod(
                 classDeclaration,
                 ParseMethod(

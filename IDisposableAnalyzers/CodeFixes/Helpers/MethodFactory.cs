@@ -67,6 +67,11 @@
                         SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
         }
 
+        internal static MethodDeclarationSyntax Dispose(params StatementSyntax[] statements)
+        {
+            return EmptyDispose.AddBodyStatements(statements);
+        }
+
         internal static MethodDeclarationSyntax PrivateThrowIfDisposed(ExpressionSyntax disposedField)
         {
             return EmptyPrivateThrowIfDisposed.AddBodyStatements(IfDisposedThrow(disposedField));
