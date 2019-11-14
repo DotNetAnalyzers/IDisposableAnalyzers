@@ -158,7 +158,7 @@
             return false;
         }
 
-        private static void OverrideDispose(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, IMethodSymbol baseDispose, CancellationToken cancellationToken)
+        private static void OverrideDispose(DocumentEditor editor, ClassDeclarationSyntax classDeclaration, IMethodSymbol toOverride, CancellationToken cancellationToken)
         {
             var disposed = editor.AddField(
                 classDeclaration,
@@ -168,24 +168,7 @@
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"{baseDispose.DeclaredAccessibility.ToCodeString()} override void Dispose(bool disposing)")
-                                        .AppendLine("{")
-                                        .AppendLine("    if (this.disposed)")
-                                        .AppendLine("    {")
-                                        .AppendLine("        return;")
-                                        .AppendLine("    }")
-                                        .AppendLine()
-                                        .AppendLine("     this.disposed = true;")
-                                        .AppendLine("     if (disposing)")
-                                        .AppendLine("     {")
-                                        .AppendLine("     }")
-                                        .AppendLine()
-                                        .AppendLine("     base.Dispose(disposing);")
-                                        .AppendLine("}")
-                                        .Return();
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
-            _ = editor.AddMethod(classDeclaration, ParseMethod(code, usesUnderscoreNames, disposed))
+            _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, toOverride))
                       .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
         }
 
@@ -225,25 +208,6 @@
                     classDeclaration,
                     x => MakeSealedRewriter.Default.Visit(x, x));
             }
-        }
-
-        private static MethodDeclarationSyntax ParseMethod(string code, bool usesUnderscoreNames, ExpressionSyntax disposedFieldAccess = null)
-        {
-            if (disposedFieldAccess is { })
-            {
-                code = code.Replace("this.disposed", disposedFieldAccess.ToString());
-            }
-
-            if (usesUnderscoreNames)
-            {
-                code = code.Replace("this.", string.Empty);
-            }
-
-            return Parse.MethodDeclaration(code)
-                        .WithSimplifiedNames()
-                        .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                        .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                        .WithAdditionalAnnotations(Formatter.Annotation);
         }
 
         private class MakeSealedRewriter : CSharpSyntaxRewriter

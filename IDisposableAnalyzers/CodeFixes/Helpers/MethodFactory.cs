@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -23,21 +24,33 @@
             expressionBody: default,
             semicolonToken: default);
 
-        private static readonly MethodDeclarationSyntax EmptyProtectedVirtualDispose = SyntaxFactory.MethodDeclaration(
+        private static readonly MethodDeclarationSyntax DefaultPublicOverrideDispose = SyntaxFactory.MethodDeclaration(
+            attributeLists: default,
+            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
+            returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+            explicitInterfaceSpecifier: default,
+            identifier: SyntaxFactory.Identifier("Dispose"),
+            typeParameterList: default,
+            parameterList: SyntaxFactory.ParameterList(),
+            constraintClauses: default,
+            body: SyntaxFactory.Block(
+                SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            SyntaxFactory.BaseExpression(),
+                            SyntaxFactory.IdentifierName("Dispose"))))),
+            expressionBody: default,
+            semicolonToken: default);
+
+        private static readonly MethodDeclarationSyntax DefaultProtectedVirtualDispose = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
             modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.VirtualKeyword)),
             returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
             explicitInterfaceSpecifier: default,
             identifier: SyntaxFactory.Identifier("Dispose"),
             typeParameterList: default,
-            parameterList: SyntaxFactory.ParameterList(
-                SyntaxFactory.SingletonSeparatedList(
-                    SyntaxFactory.Parameter(
-                        default,
-                        default,
-                        SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.BoolKeyword)),
-                        SyntaxFactory.Identifier("disposing"),
-                        default))),
+            parameterList: SingleBoolParameter("disposing"),
             constraintClauses: default,
             body: SyntaxFactory.Block(
                 SyntaxFactory.IfStatement(
@@ -90,14 +103,98 @@
                         SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
         }
 
+        internal static MethodDeclarationSyntax OverrideDispose(ExpressionSyntax disposedField, IMethodSymbol toOverride)
+        {
+            switch (toOverride)
+            {
+                case { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 0 } }:
+                    return DefaultPublicOverrideDispose.InsertBodyStatements(
+                        0,
+                        IfDisposedReturn(),
+                        DisposedTrue());
+                case { DeclaredAccessibility: Accessibility.Protected, IsVirtual: true, Parameters: { Length: 1 } parameters }
+                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter:
+                    return SyntaxFactory.MethodDeclaration(
+                        attributeLists: default,
+                        modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
+                        returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                        explicitInterfaceSpecifier: default,
+                        identifier: SyntaxFactory.Identifier(toOverride.Name),
+                        typeParameterList: default,
+                        parameterList: SingleBoolParameter(parameter.Name),
+                        constraintClauses: default,
+                        body: SyntaxFactory.Block(
+                            IfDisposedReturn(),
+                            DisposedTrue(),
+                            IfDisposing(parameter),
+                            BaseDispose(parameter)),
+                        expressionBody: default,
+                        semicolonToken: default);
+                case { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 1 } parameters }
+                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter:
+                    return SyntaxFactory.MethodDeclaration(
+                        attributeLists: default,
+                        modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
+                        returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                        explicitInterfaceSpecifier: default,
+                        identifier: SyntaxFactory.Identifier(toOverride.Name),
+                        typeParameterList: default,
+                        parameterList: SingleBoolParameter(parameter.Name),
+                        constraintClauses: default,
+                        body: SyntaxFactory.Block(
+                            IfDisposedReturn(),
+                            DisposedTrue(),
+                            IfDisposing(parameter),
+                            BaseDispose(parameter)),
+                        expressionBody: default,
+                        semicolonToken: default);
+                default:
+                    throw new NotSupportedException($"Could not generate code for overriding {toOverride}");
+            }
+
+            IfStatementSyntax IfDisposedReturn()
+            {
+                return SyntaxFactory.IfStatement(
+                    disposedField,
+                    SyntaxFactory.Block(SyntaxFactory.ReturnStatement()));
+            }
+
+            ExpressionStatementSyntax DisposedTrue()
+            {
+                return SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        disposedField,
+                        SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)));
+            }
+
+            IfStatementSyntax IfDisposing(IParameterSymbol parameter)
+            {
+                return SyntaxFactory.IfStatement(
+                    SyntaxFactory.IdentifierName(parameter.Name),
+                    SyntaxFactory.Block());
+            }
+
+            ExpressionStatementSyntax BaseDispose(IParameterSymbol parameter)
+            {
+                return SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.InvocationExpression(
+                        SyntaxFactory.MemberAccessExpression(
+                            SyntaxKind.SimpleMemberAccessExpression,
+                            SyntaxFactory.BaseExpression(),
+                            SyntaxFactory.IdentifierName(parameter.ContainingSymbol.Name)),
+                        IDisposableFactory.Arguments(SyntaxFactory.IdentifierName(parameter.Name))));
+            }
+        }
+
         internal static MethodDeclarationSyntax ProtectedVirtualDispose(ExpressionSyntax disposedField)
         {
             if (disposedField == null)
             {
-                return EmptyProtectedVirtualDispose;
+                return DefaultProtectedVirtualDispose;
             }
 
-            return EmptyProtectedVirtualDispose.InsertBodyStatements(
+            return DefaultProtectedVirtualDispose.InsertBodyStatements(
                 0,
                 SyntaxFactory.IfStatement(
                     disposedField,
@@ -169,6 +266,18 @@
                     return SyntaxFactory.IdentifierName("GetType");
                 }
             }
+        }
+
+        private static ParameterListSyntax SingleBoolParameter(string name)
+        {
+            return SyntaxFactory.ParameterList(
+                SyntaxFactory.SingletonSeparatedList(
+                    SyntaxFactory.Parameter(
+                        default,
+                        default,
+                        SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.BoolKeyword)),
+                        SyntaxFactory.Identifier(name),
+                        default)));
         }
     }
 }
