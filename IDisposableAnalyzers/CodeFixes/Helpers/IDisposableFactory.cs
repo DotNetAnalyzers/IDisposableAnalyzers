@@ -13,17 +13,19 @@
 
     internal static class IDisposableFactory
     {
-        internal static readonly TypeSyntax SystemIDisposable = SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
-                                                                             .WithAdditionalAnnotations(Simplifier.Annotation);
+        internal static readonly TypeSyntax SystemIDisposable =
+            SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
+                         .WithAdditionalAnnotations(Simplifier.Annotation);
 
-        internal static readonly StatementSyntax GcSuppressFinalizeThis = SyntaxFactory.ExpressionStatement(
-                                                                                           SyntaxFactory.InvocationExpression(
-                                                                                               SyntaxFactory.MemberAccessExpression(
-                                                                                                   SyntaxKind.SimpleMemberAccessExpression,
-                                                                                                   SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("GC")),
-                                                                                                   SyntaxFactory.IdentifierName("SuppressFinalize")),
-                                                                                               Arguments(SyntaxFactory.ThisExpression())))
-                                                                                       .WithAdditionalAnnotations(Simplifier.Annotation);
+        internal static readonly StatementSyntax GcSuppressFinalizeThis =
+            SyntaxFactory.ExpressionStatement(
+                             SyntaxFactory.InvocationExpression(
+                                 SyntaxFactory.MemberAccessExpression(
+                                     SyntaxKind.SimpleMemberAccessExpression,
+                                     SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("GC")),
+                                     SyntaxFactory.IdentifierName("SuppressFinalize")),
+                                 Arguments(SyntaxFactory.ThisExpression())))
+                         .WithAdditionalAnnotations(Simplifier.Annotation);
 
         private static readonly IdentifierNameSyntax Dispose = SyntaxFactory.IdentifierName("Dispose");
 
