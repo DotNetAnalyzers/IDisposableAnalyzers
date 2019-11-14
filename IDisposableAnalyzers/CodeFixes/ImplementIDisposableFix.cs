@@ -199,26 +199,9 @@
                 SyntaxFactory.ParseTypeName("bool"),
                 cancellationToken);
 
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
             _ = editor.AddIDisposableInterface(classDeclaration)
                       .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(cancellationToken), IDisposableFactory.GcSuppressFinalizeThis))
-                      .AddMethod(
-                classDeclaration,
-                ParseMethod(
-                    @"protected virtual void Dispose(bool disposing)
-                      {
-                          if (this.disposed)
-                          {
-                              return;
-                          }
-                     
-                          this.disposed = true;
-                          if (disposing)
-                          {
-                          }
-                      }",
-                    usesUnderscoreNames,
-                    disposed))
+                      .AddMethod(classDeclaration, MethodFactory.ProtectedVirtualDispose(disposed))
                       .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
         }
 

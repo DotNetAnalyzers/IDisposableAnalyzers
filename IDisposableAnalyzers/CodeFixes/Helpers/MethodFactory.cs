@@ -23,6 +23,29 @@
             expressionBody: default,
             semicolonToken: default);
 
+        private static readonly MethodDeclarationSyntax EmptyProtectedVirtualDispose = SyntaxFactory.MethodDeclaration(
+            attributeLists: default,
+            modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.VirtualKeyword)),
+            returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+            explicitInterfaceSpecifier: default,
+            identifier: SyntaxFactory.Identifier("Dispose"),
+            typeParameterList: default,
+            parameterList: SyntaxFactory.ParameterList(
+                SyntaxFactory.SingletonSeparatedList(
+                    SyntaxFactory.Parameter(
+                        default,
+                        default,
+                        SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.BoolKeyword)),
+                        SyntaxFactory.Identifier("disposing"),
+                        default))),
+            constraintClauses: default,
+            body: SyntaxFactory.Block(
+                SyntaxFactory.IfStatement(
+                    SyntaxFactory.IdentifierName("disposing"),
+                    SyntaxFactory.Block())),
+            expressionBody: default,
+            semicolonToken: default);
+
         private static readonly MethodDeclarationSyntax EmptyProtectedThrowIfDisposed = SyntaxFactory.MethodDeclaration(
             attributeLists: default,
             modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.VirtualKeyword)),
@@ -67,8 +90,32 @@
                         SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
         }
 
+        internal static MethodDeclarationSyntax ProtectedVirtualDispose(ExpressionSyntax disposedField)
+        {
+            if (disposedField == null)
+            {
+                return EmptyProtectedVirtualDispose;
+            }
+
+            return EmptyProtectedVirtualDispose.InsertBodyStatements(
+                0,
+                SyntaxFactory.IfStatement(
+                    disposedField,
+                    SyntaxFactory.Block(SyntaxFactory.ReturnStatement())),
+                SyntaxFactory.ExpressionStatement(
+                    SyntaxFactory.AssignmentExpression(
+                        SyntaxKind.SimpleAssignmentExpression,
+                        disposedField,
+                        SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+        }
+
         internal static MethodDeclarationSyntax Dispose(params StatementSyntax[] statements)
         {
+            if (statements is null || statements.Length == 0)
+            {
+                return EmptyDispose;
+            }
+
             return EmptyDispose.AddBodyStatements(statements);
         }
 
@@ -80,6 +127,11 @@
         internal static MethodDeclarationSyntax ProtectedThrowIfDisposed(ExpressionSyntax disposedField)
         {
             return EmptyProtectedThrowIfDisposed.AddBodyStatements(IfDisposedThrow(disposedField));
+        }
+
+        private static MethodDeclarationSyntax InsertBodyStatements(this MethodDeclarationSyntax method, int index, params StatementSyntax[] items)
+        {
+            return method.WithBody(method.Body.WithStatements(method.Body.Statements.InsertRange(index, items)));
         }
 
         private static IfStatementSyntax IfDisposedThrow(ExpressionSyntax disposedField)
