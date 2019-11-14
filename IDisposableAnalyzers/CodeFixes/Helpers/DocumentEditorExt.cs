@@ -65,5 +65,29 @@
                     SyntaxFactory.ThisExpression(),
                     identifierNameSyntax);
         }
+
+        internal static DocumentEditor AddThrowIfDisposed(this DocumentEditor editor, TypeDeclarationSyntax containingType, ExpressionSyntax disposed, CancellationToken cancellationToken)
+        {
+            if (editor.SemanticModel.TryGetSymbol(containingType, cancellationToken, out var type) &&
+                !type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
+            {
+                return type.IsSealed
+                    ? editor.AddMethod(containingType, MethodFactory.PrivateThrowIfDisposed(disposed))
+                    : editor.AddMethod(containingType, MethodFactory.ProtectedThrowIfDisposed(disposed));
+            }
+
+            return editor;
+        }
+
+        internal static DocumentEditor AddPrivateThrowIfDisposed(this DocumentEditor editor, TypeDeclarationSyntax containingType, ExpressionSyntax disposed, CancellationToken cancellationToken)
+        {
+            if (editor.SemanticModel.TryGetSymbol(containingType, cancellationToken, out var type) &&
+                !type.TryFindSingleMethodRecursive("ThrowIfDisposed", out _))
+            {
+                return editor.AddMethod(containingType, MethodFactory.PrivateThrowIfDisposed(disposed));
+            }
+
+            return editor;
+        }
     }
 }

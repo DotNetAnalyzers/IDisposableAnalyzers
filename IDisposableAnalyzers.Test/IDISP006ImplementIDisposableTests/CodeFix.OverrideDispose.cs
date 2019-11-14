@@ -76,7 +76,7 @@ namespace N
             }
 
             [Test]
-            public static void StyleCopCallingBaseThrowIfDisposed()
+            public static void WhenBaseHasThrowIfDisposed()
             {
                 var baseClass = @"
 namespace N
@@ -148,16 +148,6 @@ namespace N
             }
 
             base.Dispose(disposing);
-        }
-
-        protected override void ThrowIfDisposed()
-        {
-            if (this.disposed)
-            {
-                throw new System.ObjectDisposedException(this.GetType().FullName);
-            }
-
-            base.ThrowIfDisposed();
         }
     }
 }";
@@ -318,16 +308,6 @@ namespace N
             }
 
             base.Dispose(disposing);
-        }
-
-        protected override void ThrowIfDisposed()
-        {
-            if (_disposed)
-            {
-                throw new System.ObjectDisposedException(GetType().FullName);
-            }
-
-            base.ThrowIfDisposed();
         }
     }
 }";
