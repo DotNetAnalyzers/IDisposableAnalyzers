@@ -101,7 +101,7 @@
                 return type is { IsSealed: true, BaseType: { SpecialType: SpecialType.System_Object } } &&
                        type.TryFindSingleMethod("Dispose", out var disposeMethod) &&
                        disposeMethod.Parameters.Length == 0 &&
-                       disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration) &&
+                       disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration) &&
                        declaration is { Body: { Statements: { Count: 0 } }, ExpressionBody: null };
             }
         }

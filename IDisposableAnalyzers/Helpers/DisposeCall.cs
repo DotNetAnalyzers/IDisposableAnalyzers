@@ -18,8 +18,8 @@
 
         internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
         {
-            if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifer) &&
-               (disposedMember = rootIdentifer.Parent as IdentifierNameSyntax) is { })
+            if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifier) &&
+               (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { })
             {
                 var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
                 if (property == null ||
@@ -44,8 +44,8 @@
                         }
 
                         return pooled.TrySingle(out var expression) &&
-                               MemberPath.TryFindRoot(expression, out rootIdentifer) &&
-                               (disposedMember = rootIdentifer.Parent as IdentifierNameSyntax) is { };
+                               MemberPath.TryFindRoot(expression, out rootIdentifier) &&
+                               (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
                     }
                 }
             }
@@ -70,7 +70,7 @@
                     {
                         return walker.TrySingle(out var returnValue) &&
                                MemberPath.TrySingle(returnValue, out var expression) &&
-                               semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol nested) &&
+                               semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
                                nested.Equals(symbol);
                     }
                 }

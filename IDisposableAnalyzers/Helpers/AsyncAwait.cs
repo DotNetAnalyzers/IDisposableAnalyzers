@@ -109,7 +109,7 @@
                         case MemberAccessExpressionSyntax memberAccess:
                             return TryPeel(memberAccess.Expression, out peeled);
                         default:
-                            peeled = default;
+                            peeled = default!;
                             return false;
                     }
                 }

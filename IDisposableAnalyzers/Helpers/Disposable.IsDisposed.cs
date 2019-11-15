@@ -67,7 +67,7 @@
                     return true;
                 }
 
-                result = null;
+                result = null!;
                 return false;
             }
 
@@ -77,7 +77,7 @@
                 {
                     foreach (var mutation in walker.All())
                     {
-                        if (mutation.TryFirstAncestor(out StatementSyntax statement) &&
+                        if (mutation.TryFirstAncestor(out StatementSyntax? statement) &&
                             disposeCall.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
                             statement.IsExecutedBefore(expression) == ExecutedBefore.Yes)
                         {

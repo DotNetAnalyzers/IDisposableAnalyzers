@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -27,13 +27,17 @@ namespace IDisposableAnalyzers
 
         internal static bool IsCachedOrInjected(ExpressionSyntax value, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var symbol = semanticModel.GetSymbolSafe(value, cancellationToken);
-            if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
+            if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
-                return true;
+                if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
+                {
+                    return true;
+                }
+
+                return IsAssignedWithInjected(symbol, location, semanticModel, cancellationToken);
             }
 
-            return IsAssignedWithInjected(symbol, location, semanticModel, cancellationToken);
+            return false;
         }
 
         internal static Result IsAnyCachedOrInjected(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)

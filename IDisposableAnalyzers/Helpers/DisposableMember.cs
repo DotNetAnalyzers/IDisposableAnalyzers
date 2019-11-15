@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -9,7 +9,12 @@ namespace IDisposableAnalyzers
     {
         internal static Result IsDisposed(FieldOrProperty member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return IsDisposed(member, semanticModel.GetDeclaredSymbolSafe(context, cancellationToken), semanticModel, cancellationToken);
+            if (semanticModel.TryGetSymbol(context, cancellationToken, out var symbol))
+            {
+                return IsDisposed(member, symbol, semanticModel, cancellationToken);
+            }
+
+            return Result.Unknown;
         }
 
         internal static Result IsDisposed(FieldOrProperty member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -52,7 +57,7 @@ namespace IDisposableAnalyzers
                     foreach (var candidate in walker.Identifiers)
                     {
                         if (candidate.Identifier.Text == member.Name &&
-                            semanticModel.TryGetSymbol(candidate, cancellationToken, out ISymbol candidateSymbol) &&
+                            semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
                             candidateSymbol.OriginalDefinition.Equals(member.Symbol))
                         {
                             return true;
