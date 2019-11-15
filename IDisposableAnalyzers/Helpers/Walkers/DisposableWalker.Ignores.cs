@@ -10,7 +10,7 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
+        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (Disposes(node, semanticModel, cancellationToken, visited) ||
                 Assigns(node, semanticModel, cancellationToken, visited, out _) ||
@@ -53,7 +53,7 @@
             return false;
         }
 
-        private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
+        private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (argument is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
                 semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol method))
@@ -128,7 +128,7 @@
         }
 
         [Obsolete("Use DisposableWalker")]
-        private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
+        private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax block) &&
                 semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local))
@@ -174,7 +174,7 @@
         }
 
         [Obsolete("Use DisposableWalker")]
-        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
+        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (symbol is IMethodSymbol method)
             {
