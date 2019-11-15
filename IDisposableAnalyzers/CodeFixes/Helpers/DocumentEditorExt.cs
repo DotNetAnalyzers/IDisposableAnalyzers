@@ -19,8 +19,7 @@
             string name,
             Accessibility accessibility,
             DeclarationModifiers modifiers,
-            ITypeSymbol type,
-            CancellationToken cancellationToken)
+            ITypeSymbol type)
         {
             return AddField(
                 editor,
@@ -28,8 +27,7 @@
                 name,
                 accessibility,
                 modifiers,
-                (TypeSyntax)editor.Generator.TypeExpression(type),
-                cancellationToken);
+                (TypeSyntax)editor.Generator.TypeExpression(type));
         }
 
         internal static ExpressionSyntax AddField(
@@ -38,8 +36,7 @@
             string name,
             Accessibility accessibility,
             DeclarationModifiers modifiers,
-            TypeSyntax type,
-            CancellationToken cancellationToken)
+            TypeSyntax type)
         {
             var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
             if (usesUnderscoreNames &&

@@ -176,19 +176,18 @@
                         {
                             context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
-                                (editor, cancellationToken) => CreateAndInitialize(editor, cancellationToken),
+                                (editor, cancellationToken) => CreateAndInitialize(editor),
                                 (string?)null,
                                 diagnostic);
 
-                            void CreateAndInitialize(DocumentEditor editor, CancellationToken cancellationToken)
+                            void CreateAndInitialize(DocumentEditor editor)
                             {
                                 var disposable = editor.AddField(
                                     statement.FirstAncestor<TypeDeclarationSyntax>(),
                                     "disposable",
                                     Accessibility.Private,
                                     DeclarationModifiers.ReadOnly,
-                                    CompositeDisposableType,
-                                    cancellationToken);
+                                    CompositeDisposableType);
 
                                 _ = editor.ReplaceNode(
                                     statement,

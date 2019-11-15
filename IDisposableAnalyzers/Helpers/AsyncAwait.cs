@@ -13,7 +13,7 @@
             switch (awaitExpression)
             {
                 case { Expression: InvocationExpressionSyntax invocation }
-                    when TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out result):
+                    when TryPeelConfigureAwait(invocation, out result):
                     return true;
                 case { Expression: InvocationExpressionSyntax invocation }:
                     result = invocation;
@@ -40,7 +40,7 @@
 
         internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out var inner))
+            if (TryPeelConfigureAwait(invocation, out var inner))
             {
                 invocation = inner;
             }
@@ -73,7 +73,7 @@
 
         internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out var inner))
+            if (TryPeelConfigureAwait(invocation, out var inner))
             {
                 invocation = inner;
             }
@@ -91,7 +91,7 @@
             return false;
         }
 
-        internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
+        internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
         {
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
                 invocation.TryGetMethodName(out var name) &&

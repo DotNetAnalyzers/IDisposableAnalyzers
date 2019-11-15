@@ -49,8 +49,7 @@
                             local.Identifier.ValueText,
                             Accessibility.Private,
                             DeclarationModifiers.ReadOnly,
-                            editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type,
-                            cancellationToken);
+                            editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type);
 
                         editor.ReplaceNode(
                             localDeclaration,
@@ -65,19 +64,18 @@
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, cancellationToken),
+                        (editor, cancellationToken) => CreateAndAssignField(editor),
                         "Create and assign field.",
                         diagnostic);
 
-                    void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
+                    void CreateAndAssignField(DocumentEditor editor)
                     {
                         var fieldAccess = editor.AddField(
                             (TypeDeclarationSyntax)ctor.Parent,
                             "disposable",
                             Accessibility.Private,
                             DeclarationModifiers.ReadOnly,
-                            IDisposableFactory.SystemIDisposable,
-                            cancellationToken);
+                            IDisposableFactory.SystemIDisposable);
 
                         _ = editor.ReplaceNode(
                             statement,

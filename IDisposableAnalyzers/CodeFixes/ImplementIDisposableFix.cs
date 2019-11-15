@@ -72,8 +72,7 @@
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"),
-                                    cancellationToken);
+                                    SyntaxFactory.ParseTypeName("bool"));
 
                                 _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, baseDispose))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
@@ -132,8 +131,7 @@
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"),
-                                    cancellationToken);
+                                    SyntaxFactory.ParseTypeName("bool"));
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.VirtualDispose(disposed))
@@ -147,8 +145,7 @@
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"),
-                                    cancellationToken);
+                                    SyntaxFactory.ParseTypeName("bool"));
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.Dispose(disposed))
@@ -169,8 +166,7 @@
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"),
-                                    cancellationToken);
+                                    SyntaxFactory.ParseTypeName("bool"));
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(cancellationToken), IDisposableFactory.GcSuppressFinalizeThis))
