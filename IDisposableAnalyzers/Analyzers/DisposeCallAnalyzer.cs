@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -12,13 +12,11 @@ namespace IDisposableAnalyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class DisposeCallAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP007DoNotDisposeInjected,
             Descriptors.IDISP016DoNotUseDisposedInstance,
             Descriptors.IDISP017PreferUsing);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

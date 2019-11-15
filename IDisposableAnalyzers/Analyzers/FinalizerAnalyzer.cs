@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -10,12 +10,10 @@ namespace IDisposableAnalyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class FinalizerAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP022DisposeFalse,
             Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

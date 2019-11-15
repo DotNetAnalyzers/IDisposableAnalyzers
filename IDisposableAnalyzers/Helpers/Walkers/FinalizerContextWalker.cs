@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Threading;
@@ -60,7 +60,7 @@ namespace IDisposableAnalyzers
         /// <returns>A walker that has visited <paramref name="node"/>.</returns>
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
             if (node is MethodDeclarationSyntax)
             {
                 walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
@@ -177,7 +177,7 @@ namespace IDisposableAnalyzers
             internal static RecursiveWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 return symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode node)
-                    ? BorrowAndVisit(node, Scope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
+                    ? BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
                     : Borrow(() => new RecursiveWalker());
             }
 

@@ -11,14 +11,12 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ReturnValueAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP005ReturnTypeShouldBeIDisposable,
             Descriptors.IDISP011DontReturnDisposed,
             Descriptors.IDISP012PropertyShouldNotReturnCreated,
             Descriptors.IDISP013AwaitInUsing);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

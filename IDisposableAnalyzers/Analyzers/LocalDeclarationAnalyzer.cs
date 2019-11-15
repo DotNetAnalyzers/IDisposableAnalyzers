@@ -10,11 +10,9 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class LocalDeclarationAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP001DisposeCreated);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             if (context == null)

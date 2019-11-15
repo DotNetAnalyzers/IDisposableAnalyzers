@@ -109,7 +109,8 @@
                 base.VisitInvocationExpression(node);
                 if (this.context.Node is ElementAccessExpressionSyntax &&
                     method.Name == "Add" &&
-                    MemberPath.TrySingle(node, out var member) &&
+                    MemberPath.TrySingle(node, out var memberIdentifier) &&
+                    memberIdentifier.Parent is IdentifierNameSyntax { } member &&
                     this.semanticModel.TryGetSymbol(member, this.cancellationToken, out var memberSymbol) &&
                     memberSymbol.Equals(this.CurrentSymbol))
                 {
@@ -683,8 +684,8 @@
                     result = null;
                     return assigned is ExpressionSyntax assignedExpression &&
                            MemberPath.TrySingle(assignedExpression, out var assignedMember) &&
-                           assignedMember.Identifier.ValueText != this.CurrentSymbol.Name &&
-                           this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.Identifier.ValueText, out result);
+                           assignedMember.ValueText != this.CurrentSymbol.Name &&
+                           this.CurrentSymbol.ContainingType.TryFindPropertyRecursive(assignedMember.ValueText, out result);
                 }
             }
         }

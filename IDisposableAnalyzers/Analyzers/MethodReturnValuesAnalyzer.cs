@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -10,7 +10,6 @@ namespace IDisposableAnalyzers
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class MethodReturnValuesAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP015DoNotReturnCachedAndCreated);
 

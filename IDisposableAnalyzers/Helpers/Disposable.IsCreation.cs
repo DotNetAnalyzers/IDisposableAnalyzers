@@ -25,7 +25,7 @@
             {
                 using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
                 {
-                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, Scope.Recursive, semanticModel, cancellationToken))
+                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, SearchScope.Recursive, semanticModel, cancellationToken))
                     {
                         foreach (var assigned in pooledAssigned.Assignments)
                         {

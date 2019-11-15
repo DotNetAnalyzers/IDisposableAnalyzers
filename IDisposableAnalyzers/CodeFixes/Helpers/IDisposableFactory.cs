@@ -169,7 +169,7 @@
                 return memberAccess;
             }
 
-            return semanticModel.UnderscoreFields()
+            return semanticModel.UnderscoreFields() == CodeStyleResult.Yes
                 ? (ExpressionSyntax)SyntaxFactory.IdentifierName(memberIdentifier)
                 : SyntaxFactory.MemberAccessExpression(
                     SyntaxKind.SimpleMemberAccessExpression,
@@ -192,7 +192,7 @@
 
             ExpressionSyntax Create(SyntaxToken identifier)
             {
-                return semanticModel.UnderscoreFields()
+                return semanticModel.UnderscoreFields() == CodeStyleResult.Yes
                     ? (ExpressionSyntax)SyntaxFactory.IdentifierName(identifier)
                     : SyntaxFactory.MemberAccessExpression(
                         SyntaxKind.SimpleMemberAccessExpression,

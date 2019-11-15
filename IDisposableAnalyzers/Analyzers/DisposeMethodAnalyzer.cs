@@ -11,7 +11,6 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class DisposeMethodAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP009IsIDisposable,
             Descriptors.IDISP010CallBaseDispose,
@@ -21,7 +20,6 @@
             Descriptors.IDISP021DisposeTrue,
             Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

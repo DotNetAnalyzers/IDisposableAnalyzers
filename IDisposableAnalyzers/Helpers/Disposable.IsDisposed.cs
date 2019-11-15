@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -73,7 +73,7 @@ namespace IDisposableAnalyzers
 
             bool IsReassignedAfter(SyntaxNode scope, InvocationExpressionSyntax disposeCall)
             {
-                using (var walker = MutationWalker.Borrow(scope, Scope.Member, semanticModel, cancellationToken))
+                using (var walker = MutationWalker.Borrow(scope, SearchScope.Member, semanticModel, cancellationToken))
                 {
                     foreach (var mutation in walker.All())
                     {

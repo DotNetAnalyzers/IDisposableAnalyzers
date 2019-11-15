@@ -10,7 +10,7 @@
     {
         internal static bool IsAssignedAndDisposedInSetupAndTearDown(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out var assignment) &&
+            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
@@ -37,7 +37,7 @@
 
         internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, out AttributeSyntax attribute)
         {
-            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, Scope.Member, semanticModel, cancellationToken, out assignment) &&
+            if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||

@@ -209,7 +209,7 @@
 
             bool IsAssignedBefore(IfStatementSyntax nullCheck)
             {
-                using (var walker = AssignmentExecutionWalker.Borrow(nullCheck, Scope.Member, semanticModel, cancellationToken))
+                using (var walker = AssignmentExecutionWalker.Borrow(nullCheck, SearchScope.Member, semanticModel, cancellationToken))
                 {
                     foreach (var assignment in walker.Assignments)
                     {

@@ -31,18 +31,20 @@ namespace IDisposableAnalyzers.Test
             AllAnalyzers,
             MetadataReferences.FromAttributes());
 
+        private static IDisposable cacheTransaction;
+
         [OneTimeSetUp]
         public static void OneTimeSetUp()
         {
             // The cache will be enabled when running in VS.
             // It speeds up the tests and makes them more realistic
-            Cache<SyntaxTree, SemanticModel>.Begin();
+            cacheTransaction = SyntaxTreeCache<SemanticModel>.Begin(null);
         }
 
         [OneTimeTearDown]
         public static void OneTimeTearDown()
         {
-            Cache<SyntaxTree, SemanticModel>.End();
+            cacheTransaction.Dispose();
         }
 
         [Test]

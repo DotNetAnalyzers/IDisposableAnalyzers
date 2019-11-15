@@ -38,9 +38,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6
 		documentation\IDISP022.md = documentation\IDISP022.md
 		documentation\IDISP023.md = documentation\IDISP023.md
 		README.md = README.md
-		.paket\Readme.paket.md = .paket\Readme.paket.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
-		documentation\SemanticModelCacheAnalyzer.md = documentation\SemanticModelCacheAnalyzer.md
+		documentation\SyntaxTreeCacheAnalyzer.md = documentation\SyntaxTreeCacheAnalyzer.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Benchmarks", "IDisposableAnalyzers.Benchmarks\IDisposableAnalyzers.Benchmarks.csproj", "{DFBD789A-0F36-4691-8582-E3809E83A5EA}"

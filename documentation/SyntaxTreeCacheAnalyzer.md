@@ -1,13 +1,13 @@
-# SemanticModelCacheAnalyzer
-## Controls if Semantic models should be cached for syntax trees.
+# SyntaxTreeCacheAnalyzer
+## Controls caching of for example Semantic models for syntax trees.
 
 | Topic    | Value
 | :--      | :--
-| Id       | SemanticModelCacheAnalyzer
+| Id       | SyntaxTreeCacheAnalyzer
 | Severity | Hidden
 | Enabled  | True
-| Category | SemanticModelCacheAnalyzer
-| Code     | [SemanticModelCacheAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/SemanticModelCacheAnalyzer.cs)
+| Category | Caching
+| Code     | [SemanticModelCacheAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/SemanticModelCacheAnalyzer.cs)
 
 ## Description
 
@@ -30,21 +30,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable SemanticModelCacheAnalyzer // Controls if Semantic models should be cached for syntax trees.
+#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
 Code violating the rule here
-#pragma warning restore SemanticModelCacheAnalyzer // Controls if Semantic models should be cached for syntax trees.
+#pragma warning restore SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable SemanticModelCacheAnalyzer // Controls if Semantic models should be cached for syntax trees.
+#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
-[System.Diagnostics.CodeAnalysis.SuppressMessage("SemanticModelCacheAnalyzer", 
-    "SemanticModelCacheAnalyzer:Controls if Semantic models should be cached for syntax trees.", 
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Caching", 
+    "SyntaxTreeCacheAnalyzer:Controls caching of for example Semantic models for syntax trees.", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

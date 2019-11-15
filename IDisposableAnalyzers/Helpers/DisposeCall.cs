@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -17,7 +17,8 @@ namespace IDisposableAnalyzers
 
         internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out IdentifierNameSyntax disposedMember)
         {
-            if (MemberPath.TryFindRoot(disposeCall, out disposedMember))
+            if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifer) &&
+               (disposedMember = rootIdentifer.Parent as IdentifierNameSyntax) is { })
             {
                 var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
                 if (property == null ||
@@ -42,11 +43,13 @@ namespace IDisposableAnalyzers
                         }
 
                         return pooled.TrySingle(out var expression) &&
-                               MemberPath.TryFindRoot(expression, out disposedMember);
+                               MemberPath.TryFindRoot(expression, out rootIdentifer) &&
+                               (disposedMember = rootIdentifer.Parent as IdentifierNameSyntax) is { };
                     }
                 }
             }
 
+            disposedMember = null;
             return false;
         }
 

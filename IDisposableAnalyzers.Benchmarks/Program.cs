@@ -1,4 +1,4 @@
-// ReSharper disable HeuristicUnreachableCode
+﻿// ReSharper disable HeuristicUnreachableCode
 #pragma warning disable GU0011 // Don't ignore the return value.
 #pragma warning disable CS0162 // Unreachable code detected
 namespace IDisposableAnalyzers.Benchmarks
@@ -12,6 +12,7 @@ namespace IDisposableAnalyzers.Benchmarks
     using BenchmarkDotNet.Running;
     using Gu.Roslyn.AnalyzerExtensions;
     using IDisposableAnalyzers.Benchmarks.Benchmarks;
+    using Microsoft.CodeAnalysis;
 
     public static class Program
     {
@@ -25,9 +26,10 @@ namespace IDisposableAnalyzers.Benchmarks
                 benchmark.Run();
                 Console.WriteLine("Attach profiler and press any key to continue...");
                 Console.ReadKey();
-                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.Begin();
-                benchmark.Run();
-                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.End();
+                using (SyntaxTreeCache<SemanticModel>.Begin(null))
+                {
+                    benchmark.Run();
+                }
             }
             else if (false)
             {
@@ -45,13 +47,13 @@ namespace IDisposableAnalyzers.Benchmarks
             }
             else
             {
-                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.Begin();
-                foreach (var summary in RunAll())
+                using (SyntaxTreeCache<SemanticModel>.Begin(null))
                 {
-                    CopyResult(summary);
+                    foreach (var summary in RunAll())
+                    {
+                        CopyResult(summary);
+                    }
                 }
-
-                Cache<Microsoft.CodeAnalysis.SyntaxTree, Microsoft.CodeAnalysis.SemanticModel>.End();
             }
         }
 

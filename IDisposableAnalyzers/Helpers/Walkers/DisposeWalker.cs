@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace IDisposableAnalyzers
 
         private DisposeWalker()
         {
-            this.Scope = Scope.Instance;
+            this.SearchScope = SearchScope.Instance;
         }
 
         internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
@@ -52,7 +52,7 @@ namespace IDisposableAnalyzers
         {
             if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
             {
-                return BorrowAndVisit(declaration, Scope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+                return BorrowAndVisit(declaration, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
             }
 
             return Borrow(() => new DisposeWalker());
@@ -62,13 +62,13 @@ namespace IDisposableAnalyzers
         {
             if (disposeMethod != null)
             {
-                return BorrowAndVisit(disposeMethod, Scope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+                return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
             }
 
             return Borrow(() => new DisposeWalker());
         }
 
-        internal static DisposeWalker Borrow(SyntaxNode scope, Scope search, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static DisposeWalker Borrow(SyntaxNode scope, SearchScope search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (scope != null)
             {

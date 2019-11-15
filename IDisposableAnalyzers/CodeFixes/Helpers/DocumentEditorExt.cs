@@ -41,7 +41,7 @@
             TypeSyntax type,
             CancellationToken cancellationToken)
         {
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields();
+            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
             if (usesUnderscoreNames &&
                 !name.StartsWith("_", StringComparison.Ordinal))
             {
@@ -70,7 +70,7 @@
 
         internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor, CancellationToken cancellationToken)
         {
-            if (editor.SemanticModel.UnderscoreFields())
+            if (editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes)
             {
                 return SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.InvocationExpression(

@@ -1,4 +1,4 @@
-#pragma warning disable CA1055 // Uri return values should not be strings
+﻿#pragma warning disable CA1055 // Uri return values should not be strings
 #pragma warning disable CA1056 // Uri properties should not be strings
 #pragma warning disable CA1721 // Property names should not match get methods
 namespace IDisposableAnalyzers.Test
@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers.Test
         private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
                                                                               .Assembly
                                                                               .GetTypes()
-                                                                              .Where(t => typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                                                                              .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
                                                                               .OrderBy(x => x.Name)
                                                                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
                                                                               .ToArray();
