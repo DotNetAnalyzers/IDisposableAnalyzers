@@ -123,7 +123,7 @@
 
         internal static Result IsAssignedWithCreated(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (symbol?.Kind == SymbolKind.Discard)
+            if (symbol.Kind == SymbolKind.Discard)
             {
                 return Result.No;
             }

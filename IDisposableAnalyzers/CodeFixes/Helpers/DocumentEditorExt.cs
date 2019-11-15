@@ -65,7 +65,7 @@
                     identifierNameSyntax);
         }
 
-        internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor, CancellationToken cancellationToken)
+        internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor)
         {
             if (editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes)
             {

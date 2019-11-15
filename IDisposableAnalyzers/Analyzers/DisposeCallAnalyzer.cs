@@ -60,7 +60,7 @@
             if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                 declaration.TryFirstAncestor(out BlockSyntax block))
             {
-                List<Location> temp = null;
+                List<Location>? temp = null;
                 using (var walker = IdentifierNameWalker.Borrow(block))
                 {
                     foreach (var identifierName in walker.IdentifierNames)
@@ -130,7 +130,8 @@
             bool DeclarationIsAssignment()
             {
                 return localDeclarationStatement.Parent == expressionStatement.Parent &&
-                       Disposable.IsCreation(declarator.Initializer?.Value, context.SemanticModel, context.CancellationToken) == Result.Yes;
+                       declarator is { Initializer: { Value: { } value } } &&
+                       Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken) == Result.Yes;
             }
 
             bool IsTrivialTryFinally()

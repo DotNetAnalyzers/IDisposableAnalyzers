@@ -169,7 +169,7 @@
                                     SyntaxFactory.ParseTypeName("bool"));
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
-                                          .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(cancellationToken), IDisposableFactory.GcSuppressFinalizeThis))
+                                          .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(), IDisposableFactory.GcSuppressFinalizeThis))
                                           .AddMethod(classDeclaration, MethodFactory.ProtectedVirtualDispose(disposed))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
                             }

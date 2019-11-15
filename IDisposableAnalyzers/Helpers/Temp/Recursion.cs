@@ -34,6 +34,13 @@
         /// </summary>
         internal CancellationToken CancellationToken { get; private set; }
 
+        /// <inheritdoc/>
+        public void Dispose()
+        {
+            this.Clear();
+            Cache.Enqueue(this);
+        }
+
         /// <summary>
         /// Get and instance from cache, dispose returns it.
         /// </summary>
@@ -50,13 +57,6 @@
             recursion.SemanticModel = semanticModel ?? throw new ArgumentNullException(nameof(semanticModel));
             recursion.CancellationToken = cancellationToken;
             return recursion;
-        }
-
-        /// <inheritdoc/>
-        public void Dispose()
-        {
-            this.Clear();
-            Cache.Enqueue(this);
         }
 
         /// <summary>
@@ -133,7 +133,7 @@
                 node is { Parent: ArgumentListSyntax { Parent: { } parent } } &&
                 this.SemanticModel.TryGetSymbol(parent, this.CancellationToken, out IMethodSymbol? method) &&
                 method.TryFindParameter(node, out var symbol) &&
-                method.TrySingleDeclaration(this.CancellationToken, out BaseMethodDeclarationSyntax? declaration))
+                method.TrySingleDeclaration<BaseMethodDeclarationSyntax>(this.CancellationToken, out var declaration))
             {
                 return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(symbol, declaration);
             }
@@ -175,7 +175,7 @@
             if (this.visited.Add((caller, line, node)) &&
                 this.SemanticModel.TryGetSymbol(node, this.CancellationToken, out IPropertySymbol? property) &&
                 property is { GetMethod: { } get } &&
-                get.TrySingleDeclaration(this.CancellationToken, out CSharpSyntaxNode? declaration))
+                get.TrySingleDeclaration<CSharpSyntaxNode>(this.CancellationToken, out var declaration))
             {
                 return new SymbolAndDeclaration<IMethodSymbol, CSharpSyntaxNode>(get, declaration);
             }
@@ -194,7 +194,7 @@
         internal SymbolAndDeclaration<IMethodSymbol, MethodDeclarationSyntax>? MethodGroup(ExpressionSyntax node, [CallerMemberName] string? caller = null, [CallerLineNumber] int line = 0)
         {
             if (this.visited.Add((caller, line, node)) &&
-                this.SemanticModel.TryGetSymbol(node, this.CancellationToken, out IMethodSymbol? symbol) &&
+                this.SemanticModel.TryGetSymbol<IMethodSymbol>(node, this.CancellationToken, out var symbol) &&
                 symbol.TrySingleMethodDeclaration(this.CancellationToken, out var declaration))
             {
                 return new SymbolAndDeclaration<IMethodSymbol, MethodDeclarationSyntax>(symbol, declaration);
@@ -214,9 +214,9 @@
         internal SymbolAndDeclaration<INamedTypeSymbol, TypeDeclarationSyntax>? ContainingType(SyntaxNode node, [CallerMemberName] string? caller = null, [CallerLineNumber] int line = 0)
         {
             if (this.visited.Add((caller, line, node)) &&
-                this.SemanticModel.TryGetSymbol(node, this.CancellationToken, out ISymbol? symbol) &&
+                this.SemanticModel.TryGetSymbol<ISymbol>(node, this.CancellationToken, out var symbol) &&
                 symbol.ContainingSymbol is INamedTypeSymbol type &&
-                type.TrySingleDeclaration(this.CancellationToken, out TypeDeclarationSyntax? declaration))
+                type.TrySingleDeclaration<TypeDeclarationSyntax>(this.CancellationToken, out var declaration))
             {
                 return new SymbolAndDeclaration<INamedTypeSymbol, TypeDeclarationSyntax>(type, declaration);
             }
@@ -239,8 +239,8 @@
             where TDeclaration : CSharpSyntaxNode
         {
             if (this.visited.Add((caller, line, node)) &&
-                this.SemanticModel.TryGetSymbol(node, this.CancellationToken, out TSymbol? symbol) &&
-                symbol.TrySingleDeclaration(this.CancellationToken, out TDeclaration? declaration))
+                this.SemanticModel.TryGetSymbol<TSymbol>(node, this.CancellationToken, out var symbol) &&
+                symbol.TrySingleDeclaration<TDeclaration>(this.CancellationToken, out var declaration))
             {
                 return new SymbolAndDeclaration<TSymbol, TDeclaration>(symbol, declaration);
             }

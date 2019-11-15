@@ -269,9 +269,10 @@
                             this.AddReturnValue(argument.Expression);
                         }
                         else if (parameter.HasExplicitDefaultValue &&
-                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                                 parameterDeclaration is { Default: { Value: { } value } })
                         {
-                            this.returnValues.Add(parameterDeclaration.Default?.Value);
+                            this.returnValues.Add(value);
                         }
                     }
 

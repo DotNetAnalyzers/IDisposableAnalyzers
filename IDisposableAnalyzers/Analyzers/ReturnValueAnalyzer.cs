@@ -180,7 +180,7 @@
             return false;
         }
 
-        private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol type, Compilation compilation)
+        private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol? type, Compilation compilation)
         {
             if (type == null ||
                 type == KnownSymbol.Void)

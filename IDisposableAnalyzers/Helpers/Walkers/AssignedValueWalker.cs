@@ -32,7 +32,7 @@
 
         public int Count => this.values.Count;
 
-        internal ISymbol CurrentSymbol { get; private set; }
+        internal ISymbol CurrentSymbol { get; private set; } = null!;
 
         public ExpressionSyntax this[int index] => this.values[index];
 
@@ -699,9 +699,9 @@
         private struct Context
         {
             internal readonly SyntaxNode Node;
-            private readonly StatementSyntax stopAt;
+            private readonly StatementSyntax? stopAt;
 
-            internal Context(SyntaxNode node, StatementSyntax stopAt)
+            internal Context(SyntaxNode node, StatementSyntax? stopAt)
             {
                 this.Node = node;
                 this.stopAt = stopAt;
@@ -723,7 +723,7 @@
                 return true;
             }
 
-            private static StatementSyntax? GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
+            private static StatementSyntax? GetStopAt(SyntaxNode? location, ISymbol symbol, CancellationToken cancellationToken)
             {
                 if (location == null)
                 {
