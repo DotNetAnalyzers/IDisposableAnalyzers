@@ -1,7 +1,7 @@
 namespace IDisposableAnalyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -46,19 +46,16 @@ namespace IDisposableAnalyzers
                 invocation = inner;
             }
 
-            if (invocation?.ArgumentList == null ||
-                invocation.ArgumentList.Arguments.Count == 0)
+            if (invocation is { ArgumentList: { Arguments: { Count: 1 } arguments } } &&
+                arguments[0].Expression is { } expression &&
+                invocation.IsSymbol(KnownSymbol.Task.FromResult, semanticModel, cancellationToken))
             {
-                return false;
+                result = expression;
+                return true;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-            if (symbol == KnownSymbol.Task.FromResult)
-            {
-                result = invocation.ArgumentList.Arguments[0].Expression;
-            }
-
-            return result != null;
+            result = null;
+            return false;
         }
 
         internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
@@ -75,27 +72,24 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            result = null;
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out InvocationExpressionSyntax inner))
+            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out var inner))
             {
                 invocation = inner;
             }
 
-            if (invocation?.ArgumentList == null ||
-                invocation.ArgumentList.Arguments.Count == 0)
+            if (invocation is { ArgumentList: { Arguments: { } arguments } } &&
+                arguments.Count > 0 &&
+                arguments[0].Expression is { } expression &&
+                invocation.IsSymbol(KnownSymbol.Task.Run, semanticModel, cancellationToken))
             {
-                return false;
+                result = expression;
+                return true;
             }
 
-            var symbol = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-            if (symbol == KnownSymbol.Task.Run)
-            {
-                result = invocation.ArgumentList.Arguments[0].Expression;
-            }
-
-            return result != null;
+            result = null;
+            return false;
         }
 
         internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax result)
