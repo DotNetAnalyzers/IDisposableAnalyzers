@@ -225,7 +225,7 @@
             return false;
         }
 
-        private static ITypeSymbol ReturnType(SyntaxNodeAnalysisContext context)
+        private static ITypeSymbol? ReturnType(SyntaxNodeAnalysisContext context)
         {
             var anonymousFunction = context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
             if (anonymousFunction != null)

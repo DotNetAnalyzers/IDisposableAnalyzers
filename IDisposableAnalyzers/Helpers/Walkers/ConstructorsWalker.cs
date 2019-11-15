@@ -28,7 +28,7 @@
 
         internal IReadOnlyList<ConstructorInitializerSyntax> Initializers => this.initializers;
 
-        internal ConstructorDeclarationSyntax Default { get; private set; }
+        internal ConstructorDeclarationSyntax? Default { get; private set; }
 
         private INamedTypeSymbol Type => this.type ?? (this.type = this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken) as INamedTypeSymbol);
 

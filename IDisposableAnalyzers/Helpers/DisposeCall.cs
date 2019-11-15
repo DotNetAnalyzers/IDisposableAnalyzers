@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -7,7 +8,7 @@
 
     internal static class DisposeCall
     {
-        internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol disposed)
+        internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? disposed)
         {
             disposed = null;
             return IsIDisposableDispose(disposeCall, semanticModel, cancellationToken) &&
@@ -15,7 +16,7 @@
                    semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
         }
 
-        internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, out IdentifierNameSyntax disposedMember)
+        internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
         {
             if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifer) &&
                (disposedMember = rootIdentifer.Parent as IdentifierNameSyntax) is { })

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections;
     using System.Collections.Concurrent;
@@ -17,8 +17,8 @@ namespace IDisposableAnalyzers
 
         private int rawIndex = -1;
         private int recursiveIndex = -1;
-        private IReadOnlyList<ExpressionSyntax> rawValues;
-        private SemanticModel semanticModel;
+        private IReadOnlyList<ExpressionSyntax> rawValues = null!;
+        private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
 
         private RecursiveValues()

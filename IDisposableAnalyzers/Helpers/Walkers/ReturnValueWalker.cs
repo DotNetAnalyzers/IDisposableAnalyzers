@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -147,9 +148,10 @@
                                 this.AddReturnValue(argument.Expression);
                             }
                             else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                                     parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                this.returnValues.Add(parameterDeclaration.Default?.Value);
+                                this.returnValues.Add(defaultValue);
                             }
                         }
 
@@ -180,9 +182,10 @@
                                 this.AddReturnValue(argument.Expression);
                             }
                             else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                                     parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                this.returnValues.Add(parameterDeclaration.Default?.Value);
+                                this.returnValues.Add(defaultValue);
                             }
                         }
 
@@ -392,7 +395,7 @@
         {
             private readonly Dictionary<SyntaxNode, ReturnValueWalker> map = new Dictionary<SyntaxNode, ReturnValueWalker>();
 
-            internal RecursiveWalkers Parent { get; set; }
+            internal RecursiveWalkers? Parent { get; set; }
 
             private Dictionary<SyntaxNode, ReturnValueWalker> Map => this.Parent?.Map ??
                                                                      this.map;
@@ -402,7 +405,7 @@
                 this.Map.Add(member, walker);
             }
 
-            internal bool TryGetValue(SyntaxNode member, out ReturnValueWalker walker)
+            internal bool TryGetValue(SyntaxNode member, [NotNullWhen(true)] out ReturnValueWalker? walker)
             {
                 return this.Map.TryGetValue(member, out walker);
             }
@@ -428,7 +431,7 @@
                 this.map.Add(location, walker);
             }
 
-            internal bool TryGetValue(IdentifierNameSyntax location, out AssignedValueWalker walker)
+            internal bool TryGetValue(IdentifierNameSyntax location, [NotNullWhen(true)] out AssignedValueWalker? walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }

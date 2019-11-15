@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -54,7 +55,11 @@
 
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
-            this.HandleAssignedValue(node, node.Initializer?.Value);
+            if (node is { Initializer: { Value: { } value } })
+            {
+                this.HandleAssignedValue(node, value);
+            }
+
             base.VisitVariableDeclarator(node);
         }
 
@@ -718,7 +723,7 @@
                 return true;
             }
 
-            private static StatementSyntax GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
+            private static StatementSyntax? GetStopAt(SyntaxNode location, ISymbol symbol, CancellationToken cancellationToken)
             {
                 if (location == null)
                 {
@@ -758,7 +763,7 @@
                     return false;
                 }
 
-                static StatementSyntax Next(StatementSyntax current)
+                static StatementSyntax? Next(StatementSyntax current)
                 {
                     if (current.Parent is BlockSyntax block &&
                         block.Statements.TryElementAt(block.Statements.IndexOf(current) + 1, out var next))
@@ -848,7 +853,7 @@
         {
             private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new Dictionary<SyntaxNode, AssignedValueWalker>();
 
-            internal MemberWalkers Parent { get; set; }
+            internal MemberWalkers? Parent { get; set; }
 
             private Dictionary<SyntaxNode, AssignedValueWalker> Map => this.Parent?.Map ??
                                                                        this.map;
@@ -858,7 +863,7 @@
                 this.Map.Add(location, walker);
             }
 
-            internal bool TryGetValue(SyntaxNode location, out AssignedValueWalker walker)
+            internal bool TryGetValue(SyntaxNode location, [NotNullWhen(true)] out AssignedValueWalker? walker)
             {
                 return this.Map.TryGetValue(location, out walker);
             }

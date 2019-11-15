@@ -177,7 +177,7 @@
                             context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
                                 (editor, cancellationToken) => CreateAndInitialize(editor, cancellationToken),
-                                (string)null,
+                                (string?)null,
                                 diagnostic);
 
                             void CreateAndInitialize(DocumentEditor editor, CancellationToken cancellationToken)
