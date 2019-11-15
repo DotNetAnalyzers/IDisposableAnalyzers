@@ -24,7 +24,7 @@ namespace IDisposableAnalyzers
             return result != null;
         }
 
-        internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
             switch (expression)
             {
@@ -38,10 +38,9 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            result = null;
-            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out InvocationExpressionSyntax inner))
+            if (TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out var inner))
             {
                 invocation = inner;
             }
@@ -58,7 +57,7 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax result)
+        internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
             switch (expression)
             {
