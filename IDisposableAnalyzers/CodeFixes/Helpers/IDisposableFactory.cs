@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -201,7 +202,7 @@
             }
         }
 
-        internal static bool TryGetMemberAccessFromUsage(SyntaxNode containingNode, FieldOrProperty member, SemanticModel semanticModel, CancellationToken cancellationToken, out ExpressionSyntax expression)
+        internal static bool TryGetMemberAccessFromUsage(SyntaxNode containingNode, FieldOrProperty member, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? expression)
         {
             using (var identifierNameWalker = IdentifierNameWalker.Borrow(containingNode))
             {

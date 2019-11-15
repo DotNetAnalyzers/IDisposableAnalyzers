@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -8,7 +9,7 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out ExpressionSyntax invocationOrObjectCreation)
+        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
         {
             switch (candidate)
             {
@@ -21,7 +22,7 @@
                         return true;
                     }
 
-                    if (semanticModel.TryGetSymbol(objectCreation, cancellationToken, out IMethodSymbol constructor))
+                    if (semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor))
                     {
                         if (Disposable.IsAssignableFrom(constructor.ContainingType, semanticModel.Compilation))
                         {
@@ -96,7 +97,7 @@
             return false;
         }
 
-        private static bool DisposedByReturnValue(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out ExpressionSyntax invocationOrObjectCreation)
+        private static bool DisposedByReturnValue(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
         {
             switch (candidate.Parent.Kind())
             {

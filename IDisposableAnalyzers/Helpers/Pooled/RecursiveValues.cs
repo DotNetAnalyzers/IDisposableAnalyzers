@@ -63,10 +63,10 @@
         {
             this.values.Clear();
             this.checkedLocations.Clear();
-            this.rawValues = null;
+            this.rawValues = null!;
             this.rawIndex = -1;
             this.recursiveIndex = -1;
-            this.semanticModel = null;
+            this.semanticModel = null!;
             this.cancellationToken = CancellationToken.None;
             Cache.Enqueue(this);
         }

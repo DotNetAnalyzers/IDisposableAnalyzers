@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -8,7 +9,7 @@
 
     internal static class MethodSymbolExt
     {
-        internal static bool TryGetThisParameter(this IMethodSymbol method, out IParameterSymbol parameter)
+        internal static bool TryGetThisParameter(this IMethodSymbol method, [NotNullWhen(true)] out IParameterSymbol? parameter)
         {
             if (method.IsExtensionMethod)
             {

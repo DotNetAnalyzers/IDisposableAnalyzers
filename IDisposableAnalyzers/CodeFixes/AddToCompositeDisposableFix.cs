@@ -3,6 +3,7 @@
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
@@ -217,7 +218,7 @@
                     new[] { SyntaxFactory.Token(default, SyntaxKind.CommaToken, x.GetTrailingTrivia()) }));
         }
 
-        private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, out VariableDeclaratorSyntax field)
+        private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out VariableDeclaratorSyntax? field)
         {
             if (node.TryFirstAncestor(out TypeDeclarationSyntax containingType))
             {

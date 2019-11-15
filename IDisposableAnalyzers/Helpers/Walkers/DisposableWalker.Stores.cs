@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -9,7 +10,7 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out ISymbol container)
+        internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
         {
             using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
             {
@@ -26,7 +27,7 @@
             return false;
         }
 
-        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out ISymbol container)
+        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol container)
         {
             switch (candidate.Parent)
             {
@@ -139,7 +140,7 @@
             }
         }
 
-        private static bool AccessibleInReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out ExpressionSyntax invocationOrObjectCreation)
+        private static bool AccessibleInReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax invocationOrObjectCreation)
         {
             switch (candidate)
             {

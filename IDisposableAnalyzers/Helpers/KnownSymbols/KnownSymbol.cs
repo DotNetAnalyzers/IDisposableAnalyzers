@@ -1,4 +1,4 @@
-// ReSharper disable InconsistentNaming
+﻿// ReSharper disable InconsistentNaming
 namespace IDisposableAnalyzers
 {
     using Gu.Roslyn.AnalyzerExtensions;
@@ -71,7 +71,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
         internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
 
-        private static QualifiedType Create(string qualifiedName, string alias = null)
+        private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
             return new QualifiedType(qualifiedName, alias);
         }

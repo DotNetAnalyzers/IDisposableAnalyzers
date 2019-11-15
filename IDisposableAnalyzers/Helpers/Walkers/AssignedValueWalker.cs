@@ -230,7 +230,7 @@
             return BorrowCore(symbol, context, semanticModel, cancellationToken);
         }
 
-        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
+        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax? argumentList)
         {
             if (method != null &&
                 (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
