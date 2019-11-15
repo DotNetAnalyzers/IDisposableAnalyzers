@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -35,7 +36,7 @@
             return false;
         }
 
-        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, out AssignmentExpressionSyntax assignment, out AttributeSyntax attribute)
+        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
@@ -48,7 +49,7 @@
             return false;
         }
 
-        internal static bool TryGetTearDownMethod(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken, out MethodDeclarationSyntax result)
+        internal static bool TryGetTearDownMethod(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out MethodDeclarationSyntax? result)
         {
             result = null;
             var typeDeclarationSyntax = setupAttribute.FirstAncestor<TypeDeclarationSyntax>();
