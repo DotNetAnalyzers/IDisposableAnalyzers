@@ -97,22 +97,21 @@
                 invocation.TryGetMethodName(out var name) &&
                 name == KnownSymbol.Task.ConfigureAwait.Name)
             {
-                result = invocation.Expression as InvocationExpressionSyntax;
-                if (result != null)
-                {
-                    return true;
-                }
+                return TryPeel(invocation.Expression, out result);
 
-                var memberAccess = invocation?.Expression as MemberAccessExpressionSyntax;
-                while (memberAccess != null)
+                bool TryPeel(ExpressionSyntax e, out InvocationExpressionSyntax peeled)
                 {
-                    result = memberAccess.Expression as InvocationExpressionSyntax;
-                    if (result != null)
+                    switch (e)
                     {
-                        return true;
+                        case InvocationExpressionSyntax inner:
+                            peeled = inner;
+                            return true;
+                        case MemberAccessExpressionSyntax memberAccess:
+                            return TryPeel(memberAccess.Expression, out peeled);
+                        default:
+                            peeled = default;
+                            return false;
                     }
-
-                    memberAccess = memberAccess.Expression as MemberAccessExpressionSyntax;
                 }
             }
 

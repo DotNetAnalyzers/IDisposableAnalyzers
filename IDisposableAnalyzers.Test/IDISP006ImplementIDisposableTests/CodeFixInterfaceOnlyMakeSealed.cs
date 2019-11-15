@@ -210,7 +210,7 @@ namespace N
                 var baseCode = @"
 namespace N
 {
-    public abstract class Base
+    public abstract class BaseClass
     {
         public virtual int P1 { get; protected set; }
 
@@ -225,7 +225,7 @@ namespace N
 {
     using System;
 
-    public class C : Base, ↓IDisposable
+    public class C : BaseClass, ↓IDisposable
     {
         public override int P1 { get; protected set; }
 
@@ -240,7 +240,7 @@ namespace N
 {
     using System;
 
-    public sealed class C : Base, IDisposable
+    public sealed class C : BaseClass, IDisposable
     {
         private bool disposed;
 
