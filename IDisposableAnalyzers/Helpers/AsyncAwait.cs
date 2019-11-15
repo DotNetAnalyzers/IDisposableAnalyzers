@@ -8,7 +8,7 @@
 
     internal static class AsyncAwait
     {
-        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
+        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
         {
             switch (awaitExpression)
             {
