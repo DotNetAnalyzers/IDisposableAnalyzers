@@ -92,13 +92,13 @@ namespace IDisposableAnalyzers
             return false;
         }
 
-        internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax result)
+        internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
         {
-            result = null;
-            var method = semanticModel.GetSymbolSafe(invocation, cancellationToken);
-            if (method?.Name == "ConfigureAwait")
+            if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
+                invocation.TryGetMethodName(out var name) &&
+                name == KnownSymbol.Task.ConfigureAwait.Name)
             {
-                result = invocation?.Expression as InvocationExpressionSyntax;
+                result = invocation.Expression as InvocationExpressionSyntax;
                 if (result != null)
                 {
                     return true;
@@ -117,6 +117,7 @@ namespace IDisposableAnalyzers
                 }
             }
 
+            result = null;
             return false;
         }
     }
