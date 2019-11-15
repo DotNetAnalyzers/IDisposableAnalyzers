@@ -2,6 +2,7 @@
 {
     using System.Collections.Immutable;
     using System.Composition;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -123,7 +124,7 @@
             }
         }
 
-        private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
+        private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out IfStatementSyntax? result)
         {
             if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
@@ -144,7 +145,7 @@
             return false;
         }
 
-        private static bool TryFindIfNotDisposingReturn(MethodDeclarationSyntax disposeMethod, out IfStatementSyntax result)
+        private static bool TryFindIfNotDisposingReturn(MethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out IfStatementSyntax? result)
         {
             if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
