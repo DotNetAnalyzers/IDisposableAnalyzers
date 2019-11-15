@@ -26,7 +26,7 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax disposeMethod))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out MethodDeclarationSyntax? disposeMethod))
                 {
                     switch (disposeMethod)
                     {

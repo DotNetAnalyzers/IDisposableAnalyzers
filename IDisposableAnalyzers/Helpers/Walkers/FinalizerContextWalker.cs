@@ -69,7 +69,7 @@
 
             foreach (var item in walker.recursive)
             {
-                using (var recursiveWalker = RecursiveWalker.Borrow(item.Symbol, semanticModel, cancellationToken))
+                using (var recursiveWalker = RecursiveWalker.Borrow(item.SymbolAndDeclaration, semanticModel, cancellationToken))
                 {
                     if (recursiveWalker.UsedReferenceTypes.Count > 0)
                     {
@@ -89,11 +89,11 @@
             base.Clear();
         }
 
-        protected override bool TryGetTargetSymbol<TSymbol>(SyntaxNode node, out TSymbol symbol)
+        protected override bool TryGetTargetSymbol<TSymbol, TDeclaration>(SyntaxNode node, out SymbolAndDeclaration<TSymbol, TDeclaration> sad)
         {
-            if (base.TryGetTargetSymbol(node, out symbol))
+            if (base.TryGetTargetSymbol(node, out sad))
             {
-                this.recursive.Add(new Recursive(node, symbol));
+                this.recursive.Add(new Recursive(node, new SymbolAndDeclaration<ISymbol, SyntaxNode>(sad.Symbol, sad.Declaration)));
             }
 
             return false;
@@ -119,11 +119,11 @@
 
         private static bool IsInIfDisposing(SyntaxNode node)
         {
-            if (node.TryFirstAncestor(out IfStatementSyntax ifStatement))
+            if (node.TryFirstAncestor(out IfStatementSyntax? ifStatement))
             {
                 if (ifStatement.Statement.Contains(node) &&
                     ifStatement.Condition is IdentifierNameSyntax identifierName &&
-                    ifStatement.TryFirstAncestor(out MethodDeclarationSyntax methodDeclaration) &&
+                    ifStatement.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
                     methodDeclaration.TryFindParameter(identifierName.Identifier.Text, out _))
                 {
                     return true;
@@ -138,12 +138,12 @@
         private struct Recursive
         {
             internal readonly SyntaxNode Node;
-            internal readonly ISymbol Symbol;
+            internal readonly SymbolAndDeclaration<ISymbol, SyntaxNode> SymbolAndDeclaration;
 
-            internal Recursive(SyntaxNode node, ISymbol symbol)
+            internal Recursive(SyntaxNode node, SymbolAndDeclaration<ISymbol, SyntaxNode> symbolAndDeclaration)
             {
                 this.Node = node;
-                this.Symbol = symbol;
+                this.SymbolAndDeclaration = symbolAndDeclaration;
             }
         }
 
@@ -174,11 +174,9 @@
                 base.VisitIdentifierName(node);
             }
 
-            internal static RecursiveWalker Borrow(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static RecursiveWalker Borrow(SymbolAndDeclaration<ISymbol, SyntaxNode> symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                return symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode node)
-                    ? BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker())
-                    : Borrow(() => new RecursiveWalker());
+                return BorrowAndVisit(symbol.Declaration, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
             }
 
             /// <inheritdoc />

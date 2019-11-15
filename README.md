@@ -37,7 +37,7 @@ Roslyn analyzers for IDisposable
 | [IDISP021](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP021.md)| Call this.Dispose(true).
 | [IDISP022](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md)| Call this.Dispose(false).
 | [IDISP023](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP023.md)| Don't use reference types in finalizer context.
-| [SyntaxTreeCacheAnalyzer]()| Controls caching of for example Semantic models for syntax trees.
+| [SyntaxTreeCacheAnalyzer]()| Controls caching of for example semantic models for syntax trees.
 
 ## Using IDisposableAnalyzers
 

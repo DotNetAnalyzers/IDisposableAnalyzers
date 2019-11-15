@@ -1,5 +1,5 @@
 # SyntaxTreeCacheAnalyzer
-## Controls caching of for example Semantic models for syntax trees.
+## Controls caching of for example semantic models for syntax trees.
 
 | Topic    | Value
 | :--      | :--
@@ -30,21 +30,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
+#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example semantic models for syntax trees.
 Code violating the rule here
-#pragma warning restore SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
+#pragma warning restore SyntaxTreeCacheAnalyzer // Controls caching of for example semantic models for syntax trees.
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example Semantic models for syntax trees.
+#pragma warning disable SyntaxTreeCacheAnalyzer // Controls caching of for example semantic models for syntax trees.
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Caching", 
-    "SyntaxTreeCacheAnalyzer:Controls caching of for example Semantic models for syntax trees.", 
+    "SyntaxTreeCacheAnalyzer:Controls caching of for example semantic models for syntax trees.", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->
