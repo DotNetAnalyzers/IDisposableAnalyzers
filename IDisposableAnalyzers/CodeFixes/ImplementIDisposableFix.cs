@@ -23,7 +23,7 @@
             Descriptors.IDISP009IsIDisposable.Id,
             "CS0535");
 
-        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {

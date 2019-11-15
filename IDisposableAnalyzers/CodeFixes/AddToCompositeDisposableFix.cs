@@ -32,7 +32,7 @@
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.IDISP004DoNotIgnoreCreated.Id);
 
-        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -51,7 +51,7 @@
                             context.RegisterCodeFix(
                                 $"Add to {field.Identifier.ValueText}.",
                                 (editor, cancellationToken) => AddToExisting(editor, cancellationToken),
-                                (string)null,
+                                (string?)null,
                                 diagnostic);
 
                             void AddToExisting(DocumentEditor editor, CancellationToken cancellationToken)

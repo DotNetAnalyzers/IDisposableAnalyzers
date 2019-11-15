@@ -18,7 +18,7 @@
             Descriptors.IDISP021DisposeTrue.Id,
             Descriptors.IDISP022DisposeFalse.Id);
 
-        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {

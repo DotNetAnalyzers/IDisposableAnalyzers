@@ -17,7 +17,7 @@
             Descriptors.IDISP018CallSuppressFinalizeSealed.Id,
             Descriptors.IDISP019CallSuppressFinalizeVirtual.Id);
 
-        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {

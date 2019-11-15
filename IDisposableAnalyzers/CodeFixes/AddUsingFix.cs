@@ -25,7 +25,7 @@
             Descriptors.IDISP004DoNotIgnoreCreated.Id,
             Descriptors.IDISP017PreferUsing.Id);
 
-        protected override DocumentEditorFixAllProvider FixAllProvider() => null;
+        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
