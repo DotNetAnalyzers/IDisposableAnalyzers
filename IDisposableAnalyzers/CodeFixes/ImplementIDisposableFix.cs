@@ -30,10 +30,13 @@
             var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
                                                    .ConfigureAwait(false);
 
+            var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
+                                                      .ConfigureAwait(false);
+
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (IsSupportedDiagnostic(diagnostic) &&
-                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out TypeDeclarationSyntax typeDeclaration))
+                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out TypeDeclarationSyntax? typeDeclaration))
                 {
                     if (diagnostic.Id == Descriptors.IDISP009IsIDisposable.Id)
                     {
@@ -51,11 +54,9 @@
                             "Struct",
                             diagnostic);
                     }
-                    else if (typeDeclaration is ClassDeclarationSyntax classDeclaration)
+                    else if (typeDeclaration is ClassDeclarationSyntax classDeclaration &&
+                             semanticModel.TryGetNamedType(classDeclaration, context.CancellationToken, out var type))
                     {
-                        var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
-                                                                  .ConfigureAwait(false);
-                        var type = semanticModel.GetDeclaredSymbolSafe(typeDeclaration, context.CancellationToken);
                         if (Disposable.IsAssignableFrom(type, semanticModel.Compilation) &&
                             type.TryFindFirstMethodRecursive("Dispose", x => x.IsVirtual, out var baseDispose))
                         {
