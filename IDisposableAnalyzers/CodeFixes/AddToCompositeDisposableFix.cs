@@ -45,7 +45,7 @@
             {
                 foreach (var diagnostic in context.Diagnostics)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement))
                     {
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
                         {
@@ -220,7 +220,7 @@
 
         private static bool TryGetField(SyntaxNode node, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out VariableDeclaratorSyntax? field)
         {
-            if (node.TryFirstAncestor(out TypeDeclarationSyntax containingType))
+            if (node.TryFirstAncestor(out TypeDeclarationSyntax? containingType))
             {
                 foreach (var member in containingType.Members)
                 {

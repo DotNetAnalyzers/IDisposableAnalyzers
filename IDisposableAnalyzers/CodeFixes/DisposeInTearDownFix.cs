@@ -35,9 +35,10 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (TryGetMemberAccess(out var member) &&
-                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol memberSymbol) &&
+                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? memberSymbol) &&
                     FieldOrProperty.TryCreate(memberSymbol, out var fieldOrProperty) &&
-                    TestFixture.IsAssignedInSetUp(fieldOrProperty, member.FirstAncestor<ClassDeclarationSyntax>(), semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
+                    member.FirstAncestor<ClassDeclarationSyntax>() is { } classDeclaration &&
+                    TestFixture.IsAssignedInSetUp(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
                     assignment is { Left: { } left })
                 {
                     if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDown))
@@ -89,20 +90,20 @@
 
                 bool TryGetMemberAccess(out SyntaxNode node)
                 {
-                    if (syntaxRoot.TryFindNode(diagnostic, out AssignmentExpressionSyntax assignment) &&
+                    if (syntaxRoot.TryFindNode(diagnostic, out AssignmentExpressionSyntax? assignment) &&
                         assignment is { Left: { } left })
                     {
                         node = left;
                         return true;
                     }
 
-                    if (syntaxRoot.TryFindNode(diagnostic, out MemberDeclarationSyntax member))
+                    if (syntaxRoot.TryFindNode(diagnostic, out MemberDeclarationSyntax? member))
                     {
                         node = member;
                         return true;
                     }
 
-                    node = null;
+                    node = null!;
                     return false;
                 }
             }

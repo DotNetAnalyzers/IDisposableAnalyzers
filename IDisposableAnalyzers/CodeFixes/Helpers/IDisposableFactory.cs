@@ -12,6 +12,7 @@
     using Microsoft.CodeAnalysis.Formatting;
     using Microsoft.CodeAnalysis.Simplification;
 
+    // ReSharper disable once InconsistentNaming
     internal static class IDisposableFactory
     {
         internal static readonly TypeSyntax SystemIDisposable =
@@ -65,7 +66,7 @@
                         when !refOrOut.IsKind(SyntaxKind.None):
                         return e;
                     case IdentifierNameSyntax _:
-                    case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } } _:
+                    case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } }:
                         if (semanticModel.GetSymbolInfo(e, cancellationToken).Symbol is IPropertySymbol { GetMethod: { } get } &&
                             get.TrySingleAccessorDeclaration(cancellationToken, out var getter))
                         {
@@ -142,7 +143,7 @@
                         return true;
                     }
 
-                    memberAccess = null;
+                    memberAccess = null!;
                     return false;
                 }
             }

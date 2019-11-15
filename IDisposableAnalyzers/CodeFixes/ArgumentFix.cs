@@ -27,7 +27,7 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax argument))
+                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
                 {
                     if (diagnostic.Id == Descriptors.IDISP020SuppressFinalizeThis.Id)
                     {

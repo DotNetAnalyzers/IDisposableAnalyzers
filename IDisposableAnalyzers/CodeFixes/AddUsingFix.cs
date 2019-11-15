@@ -36,7 +36,7 @@
             {
                 if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax argument) &&
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax? argument) &&
                              argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
                     {
                         if (argument is { Expression: DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier: { } identifier } } })
@@ -68,7 +68,7 @@
                                 diagnostic);
                         }
                     }
-                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax statement))
+                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax? statement))
                     {
                         switch (statement)
                         {
@@ -97,7 +97,7 @@
                     }
                 }
                 else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
-                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax statement) &&
+                         syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement) &&
                          statement.Parent is BlockSyntax)
                 {
                     context.RegisterCodeFix(
@@ -107,7 +107,7 @@
                         diagnostic);
                 }
                 else if (diagnostic.Id == Descriptors.IDISP017PreferUsing.Id &&
-                         syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax invocation))
+                         syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax? invocation))
                 {
                     context.RegisterCodeFix(
                         "Replace with using.",
@@ -175,9 +175,9 @@
         private static void ReplaceWithUsing(DocumentEditor editor, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
             if (DisposeCall.TryGetDisposedRootMember(invocation, editor.SemanticModel, cancellationToken, out var root) &&
-                editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol local) &&
-                local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax declaration) &&
-                invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
+                editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol? local) &&
+                local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax? declaration) &&
+                invocation.TryFirstAncestor(out ExpressionStatementSyntax? expressionStatement) &&
                 declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement)
             {
                 if (expressionStatement.Parent is BlockSyntax { Parent: FinallyClauseSyntax { Parent: TryStatementSyntax { Block: { } tryBlock } tryStatement } } &&

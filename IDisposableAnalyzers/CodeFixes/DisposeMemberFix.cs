@@ -30,11 +30,11 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (syntaxRoot.TryFindNode<MemberDeclarationSyntax>(diagnostic, out var member) &&
-                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol symbol) &&
+                    semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? symbol) &&
                     FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
                     if (DisposeMethod.TryFindVirtualDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
-                        disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax disposeDeclaration))
+                        disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? disposeDeclaration))
                     {
                         if (disposeDeclaration is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } block })
                         {
@@ -57,8 +57,8 @@
                                 {
                                     _ = editor.ReplaceNode(
                                         ifDisposing.Statement,
-                                        x => x is BlockSyntax block
-                                            ? block.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
+                                        x => x is BlockSyntax ifBlock
+                                            ? ifBlock.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
                                             : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
                                 }
                                 else

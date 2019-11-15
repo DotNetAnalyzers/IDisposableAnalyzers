@@ -34,7 +34,7 @@
                     node.TryFirstAncestorOrSelf<LocalDeclarationStatementSyntax>(out var localDeclaration) &&
                     localDeclaration is { Declaration: { Type: { } type, Variables: { Count: 1 } variables }, Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } &&
                     variables[0] is { Initializer: { } } local &&
-                    localDeclaration.TryFirstAncestor(out TypeDeclarationSyntax containingType))
+                    localDeclaration.TryFirstAncestor(out TypeDeclarationSyntax? containingType))
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
