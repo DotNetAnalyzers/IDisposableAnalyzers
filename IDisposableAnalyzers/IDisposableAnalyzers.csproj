@@ -46,7 +46,7 @@ BUGFIX IDISP023: when disposing members.</Description>
 
   <ItemGroup>
     <PackageReference Include="Gu.Analyzers" Version="1.6.3-dev" PrivateAssets="all" />
-    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.7.3-dev" />
+    <PackageReference Include="Gu.Roslyn.Extensions" Version="0.8.1-dev" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.3.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="all" />
     <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />

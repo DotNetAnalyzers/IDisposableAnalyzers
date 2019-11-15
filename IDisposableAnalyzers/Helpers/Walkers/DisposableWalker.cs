@@ -23,6 +23,7 @@ namespace IDisposableAnalyzers
             this.usages.Clear();
         }
 
+        [Obsolete("Use recursion")]
         private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (localOrParameter.TryGetScope(cancellationToken, out var scope))

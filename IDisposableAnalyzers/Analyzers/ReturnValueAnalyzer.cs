@@ -127,7 +127,7 @@
 
         private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax ancestor) &&
+            if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax? ancestor) &&
                 ancestor.TryGetMethodName(out var ancestorName) &&
                 ancestorName == "ThrowsAsync")
             {
@@ -136,10 +136,8 @@
 
             switch (returnValue)
             {
-                case InvocationExpressionSyntax invocation
-                    when invocation.TryGetMethodName(out var name) &&
-                         name == KnownSymbol.Task.FromResult.Name:
-                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.FromResult;
+                case InvocationExpressionSyntax invocation:
+                    return !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken);
                 case MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } }:
                     return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
             }
@@ -151,7 +149,7 @@
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is { } method &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
-                method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax methodDeclaration))
+                method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
             {
                 if (YieldStatementWalker.Any(methodDeclaration))
                 {

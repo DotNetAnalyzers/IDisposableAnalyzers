@@ -102,12 +102,13 @@
             bool TryGetAssignedLocal(out ILocalSymbol result)
             {
                 result = null;
-                if (assignment.TryFirstAncestor(out MemberDeclarationSyntax memberDeclaration))
+                if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
                 {
                     using (var walker = VariableDeclaratorWalker.Borrow(memberDeclaration))
                     {
                         return walker.VariableDeclarators.TrySingle(
-                                   x => context.SemanticModel.TryGetSymbol(x.Initializer?.Value, context.CancellationToken, out var symbol) &&
+                                   x => x is { Initializer: { Value: { } value } } &&
+                                        context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
                                         symbol.Equals(assignedSymbol),
                                    out var match) &&
                                match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
@@ -121,7 +122,7 @@
 
         private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return context.TryFirstAncestor(out IfStatementSyntax ifStatement) &&
+            return context.TryFirstAncestor(out IfStatementSyntax? ifStatement) &&
                    ifStatement.Statement.Contains(context) &&
                    IsNullCheck(ifStatement.Condition);
 
