@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
@@ -8,21 +8,20 @@ namespace IDisposableAnalyzers
 
     internal static class AsyncAwait
     {
-        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax result)
+        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
         {
-            result = null;
-            if (awaitExpression?.Expression == null)
+            switch (awaitExpression)
             {
-                return false;
+                case { Expression: InvocationExpressionSyntax invocation }
+                    when TryPeelConfigureAwait(invocation, semanticModel, cancellationToken, out result):
+                    return true;
+                case { Expression: InvocationExpressionSyntax invocation }:
+                    result = invocation;
+                    return true;
+                default:
+                    result = default;
+                    return false;
             }
-
-            if (TryPeelConfigureAwait(awaitExpression.Expression as InvocationExpressionSyntax, semanticModel, cancellationToken, out result))
-            {
-                return result != null;
-            }
-
-            result = awaitExpression.Expression as InvocationExpressionSyntax;
-            return result != null;
         }
 
         internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
@@ -31,8 +30,8 @@ namespace IDisposableAnalyzers
             {
                 case InvocationExpressionSyntax invocation:
                     return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
-                case AwaitExpressionSyntax awaitExpression:
-                    return TryAwaitTaskFromResult(awaitExpression.Expression, semanticModel, cancellationToken, out result);
+                case AwaitExpressionSyntax { Expression: { } awaited }:
+                    return TryAwaitTaskFromResult(awaited, semanticModel, cancellationToken, out result);
             }
 
             result = null;
@@ -64,8 +63,8 @@ namespace IDisposableAnalyzers
             {
                 case InvocationExpressionSyntax invocation:
                     return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
-                case AwaitExpressionSyntax awaitExpression:
-                    return TryAwaitTaskRun(awaitExpression.Expression, semanticModel, cancellationToken, out result);
+                case AwaitExpressionSyntax { Expression: { } awaited }:
+                    return TryAwaitTaskRun(awaited, semanticModel, cancellationToken, out result);
             }
 
             result = null;

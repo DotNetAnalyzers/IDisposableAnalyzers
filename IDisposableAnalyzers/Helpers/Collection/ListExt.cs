@@ -1,10 +1,10 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
 
     internal static class ListExt
     {
-        internal static void PurgeDuplicates<T>(this List<T> list, IEqualityComparer<T> comparer = null)
+        internal static void PurgeDuplicates<T>(this List<T> list, IEqualityComparer<T>? comparer = null)
         {
             comparer ??= EqualityComparer<T>.Default;
             for (var i = 0; i < list.Count; i++)

@@ -1,6 +1,7 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
@@ -46,7 +47,7 @@ namespace IDisposableAnalyzers
             }
         }
 
-        private static bool ShouldCheck(SyntaxNodeAnalysisContext context, out ExpressionSyntax expression)
+        private static bool ShouldCheck(SyntaxNodeAnalysisContext context, [NotNullWhen(true)] out ExpressionSyntax? expression)
         {
             if (context.Node is ExpressionSyntax candidate)
             {

@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -8,7 +9,7 @@
 
     internal static class DisposeMethod
     {
-        internal static bool TryFindFirst(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
+        internal static bool TryFindFirst(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
         {
             if (search == Search.TopLevel)
             {
@@ -41,7 +42,7 @@
                    disposeMethod.ExplicitInterfaceImplementations.IsEmpty;
         }
 
-        internal static bool TryFindIDisposableDispose(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
+        internal static bool TryFindIDisposableDispose(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
         {
             disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
@@ -62,7 +63,7 @@
             }
         }
 
-        internal static bool TryFindVirtualDispose(ITypeSymbol type, Compilation compilation, Search search, out IMethodSymbol disposeMethod)
+        internal static bool TryFindVirtualDispose(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
         {
             disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
@@ -84,7 +85,7 @@
             }
         }
 
-        internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax baseCall)
+        internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? baseCall)
         {
             switch (virtualDispose)
             {
@@ -144,7 +145,7 @@
             return false;
         }
 
-        internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, out InvocationExpressionSyntax suppressCall)
+        internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall)
         {
             using (var walker = InvocationWalker.Borrow(disposeMethod))
             {
@@ -165,7 +166,7 @@
             return false;
         }
 
-        internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, out InvocationExpressionSyntax suppressCall, out ArgumentSyntax argument)
+        internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall, [NotNullWhen(true)] out ArgumentSyntax? argument)
         {
             using (var walker = InvocationWalker.Borrow(disposeMethod))
             {

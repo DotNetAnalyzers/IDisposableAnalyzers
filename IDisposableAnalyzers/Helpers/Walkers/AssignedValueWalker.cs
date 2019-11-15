@@ -20,7 +20,7 @@
         private readonly CtorArgWalker ctorArgWalker;
 
         private Context context;
-        private SemanticModel semanticModel;
+        private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
 
         private AssignedValueWalker()
@@ -357,9 +357,10 @@
                     }
 
                     if (parameter.HasExplicitDefaultValue &&
-                        parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration))
+                        parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                        parameterDeclaration is { Default: { Value: { } defaultValue } })
                     {
-                        return parameterDeclaration.Default?.Value;
+                        return defaultValue;
                     }
                 }
 
@@ -378,9 +379,9 @@
             this.outValues.Clear();
             this.refParameters.Clear();
             this.outParameters.Clear();
-            this.CurrentSymbol = null;
+            this.CurrentSymbol = null!;
             this.context = default;
-            this.semanticModel = null;
+            this.semanticModel = null!;
             this.cancellationToken = CancellationToken.None;
             this.memberWalkers.Clear();
         }

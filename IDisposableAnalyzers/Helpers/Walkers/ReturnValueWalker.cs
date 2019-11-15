@@ -15,7 +15,7 @@
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private ReturnValueSearch search;
-        private SemanticModel semanticModel;
+        private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
 
         private ReturnValueWalker()
@@ -80,7 +80,7 @@
             this.returnValues.Clear();
             this.recursiveWalkers.Clear();
             this.assignedValueWalkers.Clear();
-            this.semanticModel = null;
+            this.semanticModel = null!;
             this.cancellationToken = CancellationToken.None;
         }
 
@@ -103,22 +103,26 @@
 
         private void Run(SyntaxNode node)
         {
-            if (this.TryHandleInvocation(node as InvocationExpressionSyntax, out _) ||
-                this.TryHandleAwait(node as AwaitExpressionSyntax) ||
-                this.TryHandlePropertyGet(node as ExpressionSyntax, out _) ||
-                this.TryHandleLambda(node as LambdaExpressionSyntax))
-            {
-                return;
-            }
-
             switch (node)
             {
+                case InvocationExpressionSyntax invocation:
+                    _ = this.TryHandleInvocation(invocation, out _);
+                    return;
+                case AwaitExpressionSyntax awaitExpression:
+                    _ = this.TryHandleAwait(awaitExpression);
+                    return;
+                case LambdaExpressionSyntax lambda:
+                    _ = this.TryHandleLambda(lambda);
+                    return;
                 case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
                     this.AddReturnValue(expression);
                     break;
                 case LocalFunctionStatementSyntax { Body: { } body }:
                     this.Visit(body);
                     break;
+                case ExpressionSyntax expression:
+                    _ = this.TryHandlePropertyGet(expression, out _);
+                    return;
                 default:
                     this.Visit(node);
                     break;

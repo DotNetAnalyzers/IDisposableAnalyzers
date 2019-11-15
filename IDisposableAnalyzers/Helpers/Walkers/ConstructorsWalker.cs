@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Generic;
     using System.Threading;
@@ -13,10 +13,10 @@ namespace IDisposableAnalyzers
         private readonly List<ObjectCreationExpressionSyntax> objectCreations = new List<ObjectCreationExpressionSyntax>();
         private readonly List<ConstructorInitializerSyntax> initializers = new List<ConstructorInitializerSyntax>();
 
-        private SemanticModel semanticModel;
+        private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
-        private TypeDeclarationSyntax context;
-        private INamedTypeSymbol type;
+        private TypeDeclarationSyntax context = null!;
+        private INamedTypeSymbol? type;
 
         private ConstructorsWalker()
         {
@@ -142,11 +142,11 @@ namespace IDisposableAnalyzers
             this.nonPrivateCtors.Clear();
             this.objectCreations.Clear();
             this.initializers.Clear();
-            this.Default = null;
-            this.semanticModel = null;
+            this.Default = null!;
+            this.semanticModel = null!;
             this.cancellationToken = CancellationToken.None;
-            this.type = null;
-            this.context = null;
+            this.type = null!;
+            this.context = null!;
         }
     }
 }

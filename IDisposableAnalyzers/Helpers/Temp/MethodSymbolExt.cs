@@ -25,7 +25,7 @@
         }
 
         [Obsolete("Use Gu.Roslyn.Extensions")]
-        public static bool IsSymbol(this InvocationExpressionSyntax candidate, QualifiedMethod symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsSymbol(this InvocationExpressionSyntax candidate, QualifiedMethod symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (candidate is null)
             {
