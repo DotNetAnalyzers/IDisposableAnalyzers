@@ -213,8 +213,8 @@
                     return Borrow(property, semanticModel, cancellationToken);
                 case ILocalSymbol _:
                 case IParameterSymbol _:
-                    if (symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode declaration) &&
-                        declaration.TryFirstAncestor(out MemberDeclarationSyntax memberDeclaration))
+                    if (symbol.TrySingleDeclaration(cancellationToken, out SyntaxNode? declaration) &&
+                        declaration.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
                     {
                         return BorrowCore(symbol, memberDeclaration, semanticModel, cancellationToken);
                     }
@@ -234,7 +234,7 @@
         {
             if (method != null &&
                 (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
-                 this.CurrentSymbol.ContainingType.IsAssignableTo(method.ContainingType, this.semanticModel.Compilation)))
+                 this.CurrentSymbol.ContainingType?.IsAssignableTo(method.ContainingType, this.semanticModel.Compilation) == true))
             {
                 if (TryGetWalker(out var walker))
                 {
@@ -288,7 +288,7 @@
                         return false;
                     }
 
-                    if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax declaration))
+                    if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax? declaration))
                     {
                         result = Borrow(() => new AssignedValueWalker());
                         this.memberWalkers.Add(key, result);
@@ -432,16 +432,16 @@
                 this.Visit(scope);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
-                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax typeDeclaration) &&
+                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? typeDeclaration) &&
                      this.semanticModel.TryGetSymbol(typeDeclaration, this.cancellationToken, out var type))
             {
                 if (this.CurrentSymbol is IFieldSymbol &&
-                    this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax fieldDeclarationSyntax))
+                    this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax? fieldDeclarationSyntax))
                 {
                     this.Visit(fieldDeclarationSyntax);
                 }
                 else if (this.CurrentSymbol is IPropertySymbol &&
-                         this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax propertyDeclaration) &&
+                         this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out PropertyDeclarationSyntax? propertyDeclaration) &&
                          propertyDeclaration.Initializer != null)
                 {
                     this.values.Add(propertyDeclaration.Initializer.Value);

@@ -100,7 +100,7 @@
             foreach (var identifier in this.identifiers)
             {
                 if (member.Name == identifier.Identifier.ValueText &&
-                    this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out ISymbol candidate) &&
+                    this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out var candidate) &&
                      member.Equals(candidate))
                 {
                     return Result.AssumeYes;
