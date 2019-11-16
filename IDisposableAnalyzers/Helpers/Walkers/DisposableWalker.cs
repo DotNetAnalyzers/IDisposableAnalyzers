@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections.Generic;
@@ -39,6 +39,40 @@ namespace IDisposableAnalyzers
             {
                 if (identifierName.Identifier.Text == localOrParameter.Name &&
                     semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol))
+                {
+                    switch (symbol)
+                    {
+                        case ILocalSymbol local:
+                            return local.Equals(localOrParameter.Symbol);
+                        case IParameterSymbol _:
+                            return localOrParameter.Symbol.Kind == SymbolKind.Parameter;
+                    }
+                }
+
+                return false;
+            }
+        }
+
+        private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, Recursion recursion)
+        {
+            if (localOrParameter.TryGetScope(recursion.CancellationToken, out var scope))
+            {
+                return CreateUsagesWalker(localOrParameter, scope, recursion);
+            }
+
+            return Borrow(() => new DisposableWalker());
+        }
+
+        private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, SyntaxNode node, Recursion recursion)
+        {
+            var walker = BorrowAndVisit(node, () => new DisposableWalker());
+            walker.RemoveAll(x => !IsMatch(x));
+            return walker;
+
+            bool IsMatch(IdentifierNameSyntax identifierName)
+            {
+                if (identifierName.Identifier.Text == localOrParameter.Name &&
+                    recursion.SemanticModel.TryGetSymbol(identifierName, recursion.CancellationToken, out var symbol))
                 {
                     switch (symbol)
                     {
