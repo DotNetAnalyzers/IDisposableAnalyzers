@@ -102,7 +102,7 @@
 
             bool TryGetAssignedLocal(out ILocalSymbol result)
             {
-                result = null;
+                result = null!;
                 if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
                 {
                     using (var walker = VariableDeclaratorWalker.Borrow(memberDeclaration))

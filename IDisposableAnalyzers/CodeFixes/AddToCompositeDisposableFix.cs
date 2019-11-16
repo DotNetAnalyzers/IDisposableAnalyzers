@@ -153,7 +153,7 @@
 
                                 bool TryGetPreviousStatement(out StatementSyntax result)
                                 {
-                                    result = null;
+                                    result = null!;
                                     return statement.Parent is BlockSyntax block &&
                                            block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
                                 }

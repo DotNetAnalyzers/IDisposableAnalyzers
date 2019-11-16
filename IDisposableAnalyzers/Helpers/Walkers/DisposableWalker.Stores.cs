@@ -135,7 +135,7 @@
                     return true;
                 }
 
-                result = null;
+                result = null!;
                 return false;
             }
         }

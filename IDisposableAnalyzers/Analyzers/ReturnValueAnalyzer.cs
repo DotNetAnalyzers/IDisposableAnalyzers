@@ -107,7 +107,7 @@
                 }
             }
 
-            if (ReturnType(context).IsAwaitable() &&
+            if (ReturnType(context)?.IsAwaitable() == true &&
                 returnValue.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
                 usingStatement.Statement.Contains(returnValue) &&
                 !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
@@ -138,14 +138,14 @@
             {
                 case InvocationExpressionSyntax invocation:
                     return !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken);
-                case MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } }:
-                    return context.SemanticModel.GetSymbolSafe(returnValue, context.CancellationToken) != KnownSymbol.Task.CompletedTask;
+                case MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess:
+                    return !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken);
             }
 
             return true;
         }
 
-        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)> visited)
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is { } method &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
