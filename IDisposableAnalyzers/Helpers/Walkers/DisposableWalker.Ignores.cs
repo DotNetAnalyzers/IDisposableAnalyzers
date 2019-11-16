@@ -127,7 +127,6 @@
             return false;
         }
 
-        [Obsolete("Use DisposableWalker")]
         private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax? block) &&
@@ -138,36 +137,18 @@
                     return false;
                 }
 
-                using (var invocations = InvocationWalker.Borrow(block))
+                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
                 {
-                    // Just checking if there is a dispose call in the scope for now.
-                    if (invocations.Invocations.TryFirst(x => DisposeCall.IsIDisposableDispose(x, semanticModel, cancellationToken), out _))
+                    foreach (var usage in walker.usages)
                     {
-                        return false;
+                        if (!Ignores(usage, semanticModel, cancellationToken, visited))
+                        {
+                            return false;
+                        }
                     }
                 }
 
-                using (var walker = IdentifierNameWalker.Borrow(block))
-                {
-                    walker.RemoveAll(x => !IsMatch(x));
-                    if (walker.IdentifierNames.Count == 0)
-                    {
-                        return true;
-                    }
-
-                    return walker.IdentifierNames.All(x => Ignores(x, semanticModel, cancellationToken, visited));
-                }
-
-                bool IsMatch(IdentifierNameSyntax candidate)
-                {
-                    if (candidate.Identifier.Text != local.Name)
-                    {
-                        return false;
-                    }
-
-                    return semanticModel.TryGetSymbol(candidate, cancellationToken, out ILocalSymbol? other) &&
-                           other.Equals(local);
-                }
+                return true;
             }
 
             return false;

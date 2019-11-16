@@ -41,8 +41,7 @@
                     return assignment.Right.Contains(candidate) &&
                            semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assignedSymbol) &&
                            FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
-                case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
-                                                  argumentList.Parent is InvocationExpressionSyntax invocation &&
+                case ArgumentSyntax argument when argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } &&
                                                   invocation.IsPotentialThisOrBase() &&
                                                   semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                                                   method.TryFindParameter(argument, out var parameter) &&
