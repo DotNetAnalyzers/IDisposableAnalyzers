@@ -328,9 +328,14 @@
                     parameter = null;
                     if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out var candidate))
                     {
-                        if (candidate.Equals(this.CurrentSymbol) ||
-                            this.refParameters.Contains(candidate as IParameterSymbol) ||
-                            this.outParameters.Contains(candidate as IParameterSymbol))
+                        if (candidate.Equals(this.CurrentSymbol))
+                        {
+                            return method.TryFindParameter(argument, out parameter);
+                        }
+
+                        if (candidate is IParameterSymbol p &&
+                            (this.refParameters.Contains(p) ||
+                             this.outParameters.Contains(p)))
                         {
                             return method.TryFindParameter(argument, out parameter);
                         }

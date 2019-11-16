@@ -92,7 +92,7 @@
             if (assignedValue.Parent is ArgumentSyntax argument &&
                 argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword))
             {
-                if (assignedValue.TryFirstAncestor(out InvocationExpressionSyntax invocation) &&
+                if (assignedValue.TryFirstAncestor(out InvocationExpressionSyntax? invocation) &&
                     this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out var target) &&
                     target.TrySingleMethodDeclaration(this.cancellationToken, out var targetDeclaration))
                 {
@@ -152,7 +152,7 @@
                     }
             }
 
-            if (this.semanticModel.TryGetSymbol(assignedValue, this.cancellationToken, out ISymbol symbol))
+            if (this.semanticModel.TryGetSymbol(assignedValue, this.cancellationToken, out var symbol))
             {
                 switch (symbol)
                 {

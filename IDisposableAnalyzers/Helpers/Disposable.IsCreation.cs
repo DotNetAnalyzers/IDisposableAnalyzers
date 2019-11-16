@@ -103,7 +103,7 @@
 
             bool IsReturnedBefore(ExpressionSyntax expression)
             {
-                if (expression.TryFirstAncestor(out BlockSyntax block) &&
+                if (expression.TryFirstAncestor(out BlockSyntax? block) &&
                     block.Statements.TryFirstOfType(out ReturnStatementSyntax _))
                 {
                     if (expression.TryFirstAncestor<ForEachStatementSyntax>(out _) ||
