@@ -39,12 +39,12 @@
             {
                 case AssignmentExpressionSyntax assignment:
                     return assignment.Right.Contains(candidate) &&
-                           semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out ISymbol assignedSymbol) &&
+                           semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assignedSymbol) &&
                            FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
                 case ArgumentSyntax argument when argument.Parent is ArgumentListSyntax argumentList &&
                                                   argumentList.Parent is InvocationExpressionSyntax invocation &&
                                                   invocation.IsPotentialThisOrBase() &&
-                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method) &&
+                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                                                   method.TryFindParameter(argument, out var parameter) &&
                                                   LocalOrParameter.TryCreate(parameter, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
@@ -58,7 +58,7 @@
                     return false;
 
                 case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ISymbol symbol) &&
+                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
                                                                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
                     {

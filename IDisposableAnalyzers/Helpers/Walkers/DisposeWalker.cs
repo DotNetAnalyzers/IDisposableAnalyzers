@@ -50,7 +50,7 @@
 
         internal static DisposeWalker Borrow(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax declaration))
+            if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
             {
                 return BorrowAndVisit(declaration, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
             }

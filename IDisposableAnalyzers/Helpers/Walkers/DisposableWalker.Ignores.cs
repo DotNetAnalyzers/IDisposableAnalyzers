@@ -56,7 +56,7 @@
         private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (argument is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
-                semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol method))
+                semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol? method))
             {
                 if (method.DeclaringSyntaxReferences.IsEmpty)
                 {
@@ -130,8 +130,8 @@
         [Obsolete("Use DisposableWalker")]
         private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
-            if (declarator.TryFirstAncestor(out BlockSyntax block) &&
-                semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol local))
+            if (declarator.TryFirstAncestor(out BlockSyntax? block) &&
+                semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol? local))
             {
                 if (declarator.TryFirstAncestor<UsingStatementSyntax>(out _))
                 {
@@ -165,7 +165,7 @@
                         return false;
                     }
 
-                    return semanticModel.TryGetSymbol(candidate, cancellationToken, out ILocalSymbol other) &&
+                    return semanticModel.TryGetSymbol(candidate, cancellationToken, out ILocalSymbol? other) &&
                            other.Equals(local);
                 }
             }

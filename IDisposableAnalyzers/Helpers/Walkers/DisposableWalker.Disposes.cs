@@ -130,7 +130,7 @@
                     when left == candidate:
                     return Disposes(assignment, semanticModel, cancellationToken, visited);
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol assignedSymbol):
+                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol? assignedSymbol):
                     return Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
                 case ExpressionSyntax parent
                     when parent.IsKind(SyntaxKind.CastExpression) ||

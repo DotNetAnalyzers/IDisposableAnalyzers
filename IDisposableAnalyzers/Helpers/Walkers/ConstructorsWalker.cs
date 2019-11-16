@@ -122,7 +122,7 @@
                 walker.Default == null)
             {
                 if (Constructor.TryFindDefault(walker.Type, Search.Recursive, out var defaultCtor) &&
-                    defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax defaultCtorDeclaration))
+                    defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax? defaultCtorDeclaration))
                 {
                     walker.Default = defaultCtorDeclaration;
                     if (!defaultCtorDeclaration.Modifiers.Any(SyntaxKind.PrivateKeyword))

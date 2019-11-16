@@ -74,7 +74,7 @@
 
                     break;
                 case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
-                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol method))
+                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol? method))
                     {
                         if (method == KnownSymbol.Task.FromResult)
                         {

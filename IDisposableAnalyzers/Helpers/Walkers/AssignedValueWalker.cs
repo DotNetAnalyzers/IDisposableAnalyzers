@@ -190,12 +190,13 @@
 
         internal static AssignedValueWalker Borrow(ExpressionSyntax value, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (value is ElementAccessExpressionSyntax elementAccess)
+            if (value is ElementAccessExpressionSyntax { Expression: { } expression } elementAccess &&
+                semanticModel.TryGetSymbol(expression, cancellationToken, out var symbol))
             {
-                return BorrowCore(semanticModel.GetSymbolSafe(elementAccess.Expression, cancellationToken), elementAccess, semanticModel, cancellationToken);
+                return BorrowCore(symbol, elementAccess, semanticModel, cancellationToken);
             }
 
-            if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
+            if (semanticModel.TryGetSymbol(value, cancellationToken, out symbol))
             {
                 return BorrowCore(symbol, value, semanticModel, cancellationToken);
             }
@@ -230,7 +231,7 @@
             return BorrowCore(symbol, context, semanticModel, cancellationToken);
         }
 
-        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax? argumentList)
+        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
         {
             if (method != null &&
                 (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
@@ -640,7 +641,7 @@
                 return;
             }
 
-            if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol assignedSymbol))
+            if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol? assignedSymbol))
             {
                 if (assignedSymbol.IsEquivalentTo(this.CurrentSymbol) ||
                     this.refParameters.Contains(assignedSymbol as IParameterSymbol))
@@ -736,9 +737,9 @@
                     return null;
                 }
 
-                if (location.TryFirstAncestor(out AnonymousFunctionExpressionSyntax anonymous) &&
+                if (location.TryFirstAncestor(out AnonymousFunctionExpressionSyntax? anonymous) &&
                     !IsDeclaredIn(anonymous) &&
-                    anonymous.TryFirstAncestor(out StatementSyntax statement))
+                    anonymous.TryFirstAncestor(out StatementSyntax? statement))
                 {
                     return Next(statement);
                 }
