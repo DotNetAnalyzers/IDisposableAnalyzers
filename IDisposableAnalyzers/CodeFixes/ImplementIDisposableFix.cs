@@ -176,7 +176,11 @@
                                                            .ConfigureAwait(false);
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
-                                          .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(), IDisposableFactory.GcSuppressFinalizeThis))
+                                          .AddMethod(
+                                              classDeclaration,
+                                              MethodFactory.Dispose(
+                                                  await editor.ThisDisposedTrueAsync(cancellationToken).ConfigureAwait(false),
+                                                  IDisposableFactory.GcSuppressFinalizeThis))
                                           .AddMethod(classDeclaration, MethodFactory.ProtectedVirtualDispose(disposed))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
                             }

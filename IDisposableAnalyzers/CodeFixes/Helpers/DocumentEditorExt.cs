@@ -10,7 +10,7 @@
     using Microsoft.CodeAnalysis.CSharp.Syntax;
     using Microsoft.CodeAnalysis.Editing;
 
-    internal static partial class DocumentEditorExt
+    internal static class DocumentEditorExt
     {
         private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
 
@@ -65,9 +65,9 @@
             }
         }
 
-        internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor)
+        internal static async Task<ExpressionStatementSyntax> ThisDisposedTrueAsync(this DocumentEditor editor, CancellationToken cancellationToken)
         {
-            if (editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes)
+            if (await editor.OriginalDocument.QualifyMethodAccessAsync(cancellationToken).ConfigureAwait(false) == CodeStyleResult.Yes)
             {
                 return SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.InvocationExpression(
