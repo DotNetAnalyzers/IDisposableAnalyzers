@@ -235,24 +235,24 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class Disposal : IDisposable
+    public sealed class Disposer : IDisposable
     {
         private readonly Stream stream;
 
-        public Disposal()
+        public Disposer()
             : this(File.OpenRead(string.Empty))
         {
         }
 
-        private Disposal(Stream stream)
+        private Disposer(Stream stream)
         {
             this.stream = stream;
         }
 
-        public static Disposal Create()
+        public static Disposer Create()
         {
             Stream stream = File.OpenRead(string.Empty);
-            return new Disposal(stream);
+            return new Disposer(stream);
         }
 
         public void Dispose()
