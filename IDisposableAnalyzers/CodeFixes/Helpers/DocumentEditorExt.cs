@@ -48,6 +48,7 @@
             var identifierNameSyntax = SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier);
             switch (await editor.OriginalDocument.QualifyFieldAccessAsync(cancellationToken).ConfigureAwait(false))
             {
+                case CodeStyleResult.No:
                 case CodeStyleResult.NotFound
                     when name.StartsWith("_", StringComparison.Ordinal):
                     return identifierNameSyntax;
@@ -58,8 +59,6 @@
                         SyntaxKind.SimpleMemberAccessExpression,
                         SyntaxFactory.ThisExpression(),
                         identifierNameSyntax);
-                case CodeStyleResult.No:
-                    return identifierNameSyntax;
                 default:
                     throw new InvalidOperationException("Unhandled code style.");
             }
@@ -67,21 +66,28 @@
 
         internal static async Task<ExpressionStatementSyntax> ThisDisposedTrueAsync(this DocumentEditor editor, CancellationToken cancellationToken)
         {
-            if (await editor.OriginalDocument.QualifyMethodAccessAsync(cancellationToken).ConfigureAwait(false) == CodeStyleResult.Yes)
+            switch (await editor.OriginalDocument.QualifyMethodAccessAsync(cancellationToken).ConfigureAwait(false))
             {
-                return SyntaxFactory.ExpressionStatement(
-                    SyntaxFactory.InvocationExpression(
-                        SyntaxFactory.IdentifierName("Dispose"),
-                        IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+                case CodeStyleResult.NotFound
+                    when editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes:
+                case CodeStyleResult.No:
+                    return SyntaxFactory.ExpressionStatement(
+                        SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.IdentifierName("Dispose"),
+                            IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+                case CodeStyleResult.Yes:
+                case CodeStyleResult.Mixed:
+                case CodeStyleResult.NotFound:
+                    return SyntaxFactory.ExpressionStatement(
+                        SyntaxFactory.InvocationExpression(
+                            SyntaxFactory.MemberAccessExpression(
+                                SyntaxKind.SimpleMemberAccessExpression,
+                                SyntaxFactory.ThisExpression(),
+                                SyntaxFactory.IdentifierName("Dispose")),
+                            IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
+                default:
+                    throw new InvalidOperationException("Unhandled code style.");
             }
-
-            return SyntaxFactory.ExpressionStatement(
-                SyntaxFactory.InvocationExpression(
-                    SyntaxFactory.MemberAccessExpression(
-                        SyntaxKind.SimpleMemberAccessExpression,
-                        SyntaxFactory.ThisExpression(),
-                        SyntaxFactory.IdentifierName("Dispose")),
-                    IDisposableFactory.Arguments(SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression))));
         }
 
         internal static DocumentEditor AddIDisposableInterface(this DocumentEditor editor, TypeDeclarationSyntax type)
