@@ -182,26 +182,31 @@
 
                 case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                     when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor):
-                    invocationOrObjectCreation = objectCreation;
-                    if (constructor.DeclaringSyntaxReferences.IsEmpty)
+                    if(constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
                     {
-                        return constructor.ContainingType.FullName().StartsWith("System.Tuple`", StringComparison.Ordinal);
+                        invocationOrObjectCreation = objectCreation;
+                        return true;
                     }
 
                     if (constructor.TryFindParameter(candidate, out parameter))
                     {
-                        if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container))
+                        if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container) &&
+                            FieldOrProperty.TryCreate(container, out var containerMember) &&
+                            semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol))
                         {
-                            return FieldOrProperty.TryCreate(container, out var containerMember) &&
-                                   semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol);
+                            invocationOrObjectCreation = objectCreation;
+                            return true;
                         }
 
-                        if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty))
+                        if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                            semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
                         {
-                            return semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol);
+                            invocationOrObjectCreation = objectCreation;
+                            return true;
                         }
                     }
 
+                    invocationOrObjectCreation = default;
                     return false;
                 default:
                     invocationOrObjectCreation = null;
