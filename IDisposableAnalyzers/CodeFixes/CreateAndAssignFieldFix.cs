@@ -38,18 +38,20 @@
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor, cancellationToken),
+                        (editor, cancellationToken) => CreateAndAssignFieldAsync(editor, cancellationToken),
                         "Create and assign field.",
                         diagnostic);
 
-                    void CreateAndAssignField(DocumentEditor editor, CancellationToken cancellationToken)
+                    async Task CreateAndAssignFieldAsync(DocumentEditor editor, CancellationToken cancellationToken)
                     {
-                        var fieldAccess = editor.AddField(
-                            containingType,
-                            local.Identifier.ValueText,
-                            Accessibility.Private,
-                            DeclarationModifiers.ReadOnly,
-                            editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type);
+                        var fieldAccess = await editor.AddFieldAsync(
+                                                          containingType,
+                                                          local.Identifier.ValueText,
+                                                          Accessibility.Private,
+                                                          DeclarationModifiers.ReadOnly,
+                                                          editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type,
+                                                          cancellationToken)
+                                                      .ConfigureAwait(false);
 
                         editor.ReplaceNode(
                             localDeclaration,
@@ -64,18 +66,20 @@
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
-                        (editor, cancellationToken) => CreateAndAssignField(editor),
+                        (editor, cancellationToken) => CreateAndAssignFieldAsync(editor, cancellationToken),
                         "Create and assign field.",
                         diagnostic);
 
-                    void CreateAndAssignField(DocumentEditor editor)
+                    async Task CreateAndAssignFieldAsync(DocumentEditor editor, CancellationToken cancellationToken)
                     {
-                        var fieldAccess = editor.AddField(
-                            (TypeDeclarationSyntax)ctor.Parent,
-                            "disposable",
-                            Accessibility.Private,
-                            DeclarationModifiers.ReadOnly,
-                            IDisposableFactory.SystemIDisposable);
+                        var fieldAccess = await editor.AddFieldAsync(
+                                                          (TypeDeclarationSyntax)ctor.Parent,
+                                                          "disposable",
+                                                          Accessibility.Private,
+                                                          DeclarationModifiers.ReadOnly,
+                                                          IDisposableFactory.SystemIDisposable,
+                                                          cancellationToken)
+                                                      .ConfigureAwait(false);
 
                         _ = editor.ReplaceNode(
                             statement,

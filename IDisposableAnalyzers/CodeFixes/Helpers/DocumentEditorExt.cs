@@ -2,6 +2,7 @@
 {
     using System;
     using System.Threading;
+    using System.Threading.Tasks;
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
@@ -13,34 +14,22 @@
     {
         private static readonly UsingDirectiveSyntax UsingSystem = SyntaxFactory.UsingDirective(SyntaxFactory.IdentifierName("System"));
 
-        internal static ExpressionSyntax AddField(
-            this DocumentEditor editor,
-            TypeDeclarationSyntax containingType,
-            string name,
-            Accessibility accessibility,
-            DeclarationModifiers modifiers,
-            ITypeSymbol type)
+        internal static Task<ExpressionSyntax> AddFieldAsync(this DocumentEditor editor, TypeDeclarationSyntax containingType, string name, Accessibility accessibility, DeclarationModifiers modifiers, ITypeSymbol type, CancellationToken cancellationToken)
         {
-            return AddField(
+            return AddFieldAsync(
                 editor,
                 containingType,
                 name,
                 accessibility,
                 modifiers,
-                (TypeSyntax)editor.Generator.TypeExpression(type));
+                (TypeSyntax)editor.Generator.TypeExpression(type),
+                cancellationToken);
         }
 
-        internal static ExpressionSyntax AddField(
-            this DocumentEditor editor,
-            TypeDeclarationSyntax containingType,
-            string name,
-            Accessibility accessibility,
-            DeclarationModifiers modifiers,
-            TypeSyntax type)
+        internal static async Task<ExpressionSyntax> AddFieldAsync(this DocumentEditor editor, TypeDeclarationSyntax containingType, string name, Accessibility accessibility, DeclarationModifiers modifiers, TypeSyntax type, CancellationToken cancellationToken)
         {
-            var usesUnderscoreNames = editor.SemanticModel.UnderscoreFields() == CodeStyleResult.Yes;
-            if (usesUnderscoreNames &&
-                !name.StartsWith("_", StringComparison.Ordinal))
+            if (!name.StartsWith("_", StringComparison.Ordinal) &&
+                await editor.OriginalDocument.UnderscoreFieldsAsync(cancellationToken).ConfigureAwait(false) == CodeStyleResult.Yes)
             {
                 name = $"_{name}";
             }
@@ -57,12 +46,23 @@
                 type: type);
             _ = editor.AddField(containingType, field);
             var identifierNameSyntax = SyntaxFactory.IdentifierName(field.Declaration.Variables[0].Identifier);
-            return usesUnderscoreNames
-                ? (ExpressionSyntax)identifierNameSyntax
-                : SyntaxFactory.MemberAccessExpression(
-                    SyntaxKind.SimpleMemberAccessExpression,
-                    SyntaxFactory.ThisExpression(),
-                    identifierNameSyntax);
+            switch (await editor.OriginalDocument.QualifyFieldAccessAsync(cancellationToken).ConfigureAwait(false))
+            {
+                case CodeStyleResult.NotFound
+                    when name.StartsWith("_", StringComparison.Ordinal):
+                    return identifierNameSyntax;
+                case CodeStyleResult.Yes:
+                case CodeStyleResult.Mixed:
+                case CodeStyleResult.NotFound:
+                    return SyntaxFactory.MemberAccessExpression(
+                        SyntaxKind.SimpleMemberAccessExpression,
+                        SyntaxFactory.ThisExpression(),
+                        identifierNameSyntax);
+                case CodeStyleResult.No:
+                    return identifierNameSyntax;
+                default:
+                    throw new InvalidOperationException("Unhandled code style.");
+            }
         }
 
         internal static ExpressionStatementSyntax ThisDisposedTrue(this DocumentEditor editor)

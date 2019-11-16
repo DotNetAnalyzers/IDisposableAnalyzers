@@ -62,18 +62,19 @@
                         {
                             context.RegisterCodeFix(
                                 $"override {baseDispose}",
-                                (editor, cancellationToken) => OverrideDispose(editor, cancellationToken),
+                                (editor, cancellationToken) => OverrideDisposeAsync(editor, cancellationToken),
                                 "override",
                                 diagnostic);
 
-                            void OverrideDispose(DocumentEditor editor, CancellationToken cancellationToken)
+                            async Task OverrideDisposeAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                var disposed = editor.AddField(
+                                var disposed = await editor.AddFieldAsync(
                                     classDeclaration,
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"));
+                                    SyntaxFactory.ParseTypeName("bool"),
+                                    cancellationToken).ConfigureAwait(false);
 
                                 _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, baseDispose))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
@@ -87,66 +88,69 @@
                                     context.RegisterCodeFix(
                                         "Implement IDisposable.",
                                         (editor, cancellationToken) =>
-                                            Sealed(editor, cancellationToken),
-                                        nameof(Sealed),
+                                            SealedAsync(editor, cancellationToken),
+                                        nameof(SealedAsync),
                                         diagnostic);
                                     break;
                                 case { IsAbstract: true }:
                                     context.RegisterCodeFix(
                                         "Implement IDisposable.",
-                                        (editor, cancellationToken) => Vanilla(editor, cancellationToken),
-                                        nameof(Vanilla),
+                                        (editor, cancellationToken) => VanillaAsync(editor, cancellationToken),
+                                        nameof(VanillaAsync),
                                         diagnostic);
 
                                     context.RegisterCodeFix(
                                         "LEGACY Implement IDisposable with protected virtual dispose method.",
-                                        (editor, cancellationToken) => Legacy(editor, cancellationToken),
-                                        nameof(Legacy),
+                                        (editor, cancellationToken) => LegacyAsync(editor, cancellationToken),
+                                        nameof(LegacyAsync),
                                         diagnostic);
                                     break;
                                 default:
                                     context.RegisterCodeFix(
                                         "Implement IDisposable and make class sealed.",
-                                        (editor, cancellationToken) => Sealed(editor, cancellationToken),
-                                        nameof(Sealed),
+                                        (editor, cancellationToken) => SealedAsync(editor, cancellationToken),
+                                        nameof(SealedAsync),
                                         diagnostic);
 
                                     context.RegisterCodeFix(
                                         "Implement IDisposable.",
-                                        (editor, cancellationToken) => Vanilla(editor, cancellationToken),
-                                        nameof(Vanilla),
+                                        (editor, cancellationToken) => VanillaAsync(editor, cancellationToken),
+                                        nameof(VanillaAsync),
                                         diagnostic);
 
                                     context.RegisterCodeFix(
                                         "LEGACY Implement IDisposable with protected virtual dispose method.",
-                                        (editor, cancellationToken) => Legacy(editor, cancellationToken),
-                                        nameof(Legacy),
+                                        (editor, cancellationToken) => LegacyAsync(editor, cancellationToken),
+                                        nameof(LegacyAsync),
                                         diagnostic);
                                     break;
                             }
 
-                            void Vanilla(DocumentEditor editor, CancellationToken cancellationToken)
+                            async Task VanillaAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                var disposed = editor.AddField(
-                                    classDeclaration,
-                                    "disposed",
-                                    Accessibility.Private,
-                                    DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"));
+                                var disposed = await editor.AddFieldAsync(
+                                                               classDeclaration,
+                                                               "disposed",
+                                                               Accessibility.Private,
+                                                               DeclarationModifiers.None,
+                                                               SyntaxFactory.ParseTypeName("bool"),
+                                                               cancellationToken)
+                                                           .ConfigureAwait(false);
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.VirtualDispose(disposed))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
                             }
 
-                            void Sealed(DocumentEditor editor, CancellationToken cancellationToken)
+                            async Task SealedAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                var disposed = editor.AddField(
+                                var disposed = await editor.AddFieldAsync(
                                     classDeclaration,
                                     "disposed",
                                     Accessibility.Private,
                                     DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"));
+                                    SyntaxFactory.ParseTypeName("bool"),
+                                    cancellationToken).ConfigureAwait(false);
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.Dispose(disposed))
@@ -160,14 +164,16 @@
                                 }
                             }
 
-                            void Legacy(DocumentEditor editor, CancellationToken cancellationToken)
+                            async Task LegacyAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                var disposed = editor.AddField(
-                                    classDeclaration,
-                                    "disposed",
-                                    Accessibility.Private,
-                                    DeclarationModifiers.None,
-                                    SyntaxFactory.ParseTypeName("bool"));
+                                var disposed = await editor.AddFieldAsync(
+                                                               classDeclaration,
+                                                               "disposed",
+                                                               Accessibility.Private,
+                                                               DeclarationModifiers.None,
+                                                               SyntaxFactory.ParseTypeName("bool"),
+                                                               cancellationToken)
+                                                           .ConfigureAwait(false);
 
                                 _ = editor.AddIDisposableInterface(classDeclaration)
                                           .AddMethod(classDeclaration, MethodFactory.Dispose(editor.ThisDisposedTrue(), IDisposableFactory.GcSuppressFinalizeThis))

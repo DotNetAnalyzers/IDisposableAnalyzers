@@ -173,22 +173,23 @@
                                 }
                             }
                         }
-                        else
+                        else if (statement.FirstAncestor<TypeDeclarationSyntax>() is { } containingType)
                         {
                             context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
-                                (editor, cancellationToken) => CreateAndInitialize(editor),
+                                (editor, cancellationToken) => CreateAndInitializeAsync(editor, cancellationToken),
                                 (string?)null,
                                 diagnostic);
 
-                            void CreateAndInitialize(DocumentEditor editor)
+                            async Task CreateAndInitializeAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                var disposable = editor.AddField(
-                                    statement.FirstAncestor<TypeDeclarationSyntax>(),
+                                var disposable = await editor.AddFieldAsync(
+                                    containingType,
                                     "disposable",
                                     Accessibility.Private,
                                     DeclarationModifiers.ReadOnly,
-                                    CompositeDisposableType);
+                                    CompositeDisposableType, 
+                                    cancellationToken).ConfigureAwait(false);
 
                                 _ = editor.ReplaceNode(
                                     statement,
