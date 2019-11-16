@@ -40,7 +40,7 @@
 
                 if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
                     memberAccess.Expression is IdentifierNameSyntax &&
-                    context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol local))
+                    context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol? local))
                 {
                     if (IsUsedAfter(local, invocation, context, out var locations))
                     {
@@ -58,7 +58,7 @@
         private static bool IsUsedAfter(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context, [NotNullWhen(true)] out IReadOnlyList<Location>? locations)
         {
             if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
-                declaration.TryFirstAncestor(out BlockSyntax block))
+                declaration.TryFirstAncestor(out BlockSyntax? block))
             {
                 List<Location>? temp = null;
                 using (var walker = IdentifierNameWalker.Borrow(block))
@@ -67,7 +67,7 @@
                     {
                         if (identifierName.Identifier.ValueText == local.Name &&
                             invocation.IsExecutedBefore(identifierName) == ExecutedBefore.Yes &&
-                            context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol candidate) &&
+                            context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol? candidate) &&
                             local.Equals(candidate) &&
                             !IsAssigned(identifierName) &&
                             !IsReassigned(identifierName))
@@ -105,7 +105,7 @@
                 {
                     foreach (var mutation in walker.All())
                     {
-                        if (mutation.TryFirstAncestorOrSelf(out ExpressionSyntax expression) &&
+                        if (mutation.TryFirstAncestorOrSelf(out ExpressionSyntax? expression) &&
                             invocation.IsExecutedBefore(expression) != ExecutedBefore.No &&
                             expression.IsExecutedBefore(location) != ExecutedBefore.No)
                         {
@@ -122,8 +122,8 @@
         {
             return local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                    declaration is VariableDeclaratorSyntax declarator &&
-                   declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax localDeclarationStatement) &&
-                   invocation.TryFirstAncestor(out ExpressionStatementSyntax expressionStatement) &&
+                   declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax? localDeclarationStatement) &&
+                   invocation.TryFirstAncestor(out ExpressionStatementSyntax? expressionStatement) &&
                    (DeclarationIsAssignment() || IsTrivialTryFinally()) &&
                    !IsMutated();
 
@@ -149,7 +149,7 @@
                 {
                     if (declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
                         walker.TrySingle(out var mutation) &&
-                        mutation.TryFirstAncestor(out ExpressionStatementSyntax statement) &&
+                        mutation.TryFirstAncestor(out ExpressionStatementSyntax? statement) &&
                         statement.Parent is BlockSyntax block &&
                         block.Statements[0] == statement &&
                         block.Parent is TryStatementSyntax)

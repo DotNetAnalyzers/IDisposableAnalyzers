@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
     using System.Threading;
@@ -32,7 +32,7 @@ namespace IDisposableAnalyzers
                 argumentList.Parent is InvocationExpressionSyntax invocation &&
                 argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 IsCreation(argument, context.SemanticModel, context.CancellationToken) &&
-                context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out ISymbol symbol))
+                context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out var symbol))
             {
                 if (symbol.Kind == SymbolKind.Discard ||
                     (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&

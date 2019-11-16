@@ -34,7 +34,7 @@
                 {
                     if (declarator.Initializer is { Value: { } value } &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                        context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol local) &&
+                        context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
                         DisposableWalker.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, localDeclaration.GetLocation()));

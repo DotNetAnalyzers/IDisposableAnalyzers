@@ -81,7 +81,8 @@
             }
 
             if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty) &&
-                TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, context.Node.FirstAncestor<TypeDeclarationSyntax>(), context.SemanticModel, context.CancellationToken))
+                context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
+                TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
             {
                 return false;
             }
