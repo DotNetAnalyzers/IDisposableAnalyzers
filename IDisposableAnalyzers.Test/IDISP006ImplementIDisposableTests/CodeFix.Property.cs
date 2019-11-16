@@ -484,7 +484,7 @@ namespace N
     using System.IO;
     using System.Windows.Controls;
 
-    public partial sealed class CodeTabView : UserControl, IDisposable
+    public sealed partial class CodeTabView : UserControl, IDisposable
     {
         private bool disposed;
 

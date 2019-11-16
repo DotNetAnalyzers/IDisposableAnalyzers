@@ -627,7 +627,7 @@ namespace N
     using System;
     using System.Windows.Controls;
 
-    public partial sealed class CodeTabView : UserControl, IDisposable
+    public sealed partial class CodeTabView : UserControl, IDisposable
     {
         private readonly Disposable disposable = new Disposable();
         private bool disposed;

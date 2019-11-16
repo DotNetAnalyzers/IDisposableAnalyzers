@@ -156,7 +156,7 @@
                                 {
                                     _ = editor.ReplaceNode(
                                         classDeclaration,
-                                        x => MakeSealedRewriter.Default.Visit(x, x));
+                                        x => SealRewriter.Seal(x));
                                 }
                             }
 
@@ -201,121 +201,6 @@
             }
 
             return false;
-        }
-
-        private class MakeSealedRewriter : CSharpSyntaxRewriter
-        {
-            internal static readonly MakeSealedRewriter Default = new MakeSealedRewriter();
-
-            private static readonly ThreadLocal<ClassDeclarationSyntax> CurrentClass = new ThreadLocal<ClassDeclarationSyntax>();
-
-            public override SyntaxNode VisitClassDeclaration(ClassDeclarationSyntax node)
-            {
-                // We only want to make the top level class sealed.
-                if (ReferenceEquals(CurrentClass.Value, node))
-                {
-                    var updated = (ClassDeclarationSyntax)base.VisitClassDeclaration(node);
-                    return updated.WithModifiers(updated.Modifiers.Add(SyntaxFactory.Token(SyntaxKind.SealedKeyword)));
-                }
-
-                return node;
-            }
-
-            public override SyntaxNode VisitFieldDeclaration(FieldDeclarationSyntax node)
-            {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                }
-
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
-                }
-
-                return base.VisitFieldDeclaration(node);
-            }
-
-            public override SyntaxNode VisitEventDeclaration(EventDeclarationSyntax node)
-            {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                }
-
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
-                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
-                {
-                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
-                }
-
-                return base.VisitEventDeclaration(node);
-            }
-
-            public override SyntaxNode VisitPropertyDeclaration(PropertyDeclarationSyntax node)
-            {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                }
-
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
-                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
-                {
-                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
-                }
-
-                return base.VisitPropertyDeclaration(node);
-            }
-
-            public override SyntaxNode VisitAccessorDeclaration(AccessorDeclarationSyntax node)
-            {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                }
-
-                var parentModifiers = node.FirstAncestor<BasePropertyDeclarationSyntax>()?.Modifiers;
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
-                    parentModifiers?.Any(SyntaxKind.OverrideKeyword) == false)
-                {
-                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
-                }
-
-                if (parentModifiers?.TrySingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier) == true)
-                {
-                    if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.PrivateKeyword), out modifier))
-                    {
-                        node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                    }
-                }
-
-                return base.VisitAccessorDeclaration(node);
-            }
-
-            public override SyntaxNode VisitMethodDeclaration(MethodDeclarationSyntax node)
-            {
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.VirtualKeyword), out var modifier))
-                {
-                    node = node.WithModifiers(node.Modifiers.Remove(modifier));
-                }
-
-                if (node.Modifiers.TrySingle(x => x.IsKind(SyntaxKind.ProtectedKeyword), out modifier) &&
-                    !node.Modifiers.Any(SyntaxKind.OverrideKeyword))
-                {
-                    node = node.WithModifiers(node.Modifiers.Replace(modifier, SyntaxFactory.Token(SyntaxKind.PrivateKeyword)));
-                }
-
-                return base.VisitMethodDeclaration(node);
-            }
-
-            internal SyntaxNode Visit(SyntaxNode node, ClassDeclarationSyntax classDeclaration)
-            {
-                CurrentClass.Value = classDeclaration;
-                var updated = this.Visit(node);
-                CurrentClass.Value = null;
-                return updated;
-            }
         }
     }
 }
