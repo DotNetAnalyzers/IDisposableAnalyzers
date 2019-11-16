@@ -53,7 +53,7 @@ namespace IDisposableAnalyzers.Test
             CollectionAssert.IsNotEmpty(AllAnalyzers);
         }
 
-        [Ignore("Temp to get one green build finally.")]
+        [Ignore("Does not see nullable attributes from RAA")]
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void AnalyzersProject(DiagnosticAnalyzer analyzer)
         {

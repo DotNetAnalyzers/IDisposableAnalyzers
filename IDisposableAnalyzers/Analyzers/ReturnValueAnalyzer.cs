@@ -98,7 +98,7 @@
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, expression, context.SemanticModel, context.CancellationToken))
                         {
-                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken, null))
+                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP011DontReturnDisposed, argument.GetLocation()));
                             }
@@ -145,30 +145,33 @@
             return true;
         }
 
-        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (semanticModel.GetSymbolSafe(invocation, cancellationToken) is { } method &&
-                method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, semanticModel.Compilation) &&
-                method.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                if (YieldStatementWalker.Any(methodDeclaration))
+                return IsLazyEnumerable(invocation, recursion);
+            }
+        }
+
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, Recursion recursion)
+        {
+            if (recursion.Target(invocation) is { Symbol: { } method, Declaration: { } declaration } sad &&
+                method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, recursion.SemanticModel.Compilation))
+            {
+                if (YieldStatementWalker.Any(declaration))
                 {
                     return true;
                 }
 
-                using (var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
+                using (var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, recursion.SemanticModel, recursion.CancellationToken))
                 {
                     foreach (var returnValue in walker)
                     {
-                        if (returnValue is InvocationExpressionSyntax nestedInvocation &&
-                            visited.CanVisit(invocation, out visited))
+                        if (returnValue is InvocationExpressionSyntax nestedInvocation)
                         {
-                            using (visited)
+                            if (IsLazyEnumerable(nestedInvocation, recursion))
                             {
-                                if (IsLazyEnumerable(nestedInvocation, semanticModel, cancellationToken, visited))
-                                {
-                                    return true;
-                                }
+                                return true;
                             }
                         }
                     }
