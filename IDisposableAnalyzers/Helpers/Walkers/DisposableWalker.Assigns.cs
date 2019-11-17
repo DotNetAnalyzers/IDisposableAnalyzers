@@ -37,9 +37,9 @@
 
             switch (candidate.Parent)
             {
-                case AssignmentExpressionSyntax assignment:
-                    return assignment.Right.Contains(candidate) &&
-                           semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assignedSymbol) &&
+                case AssignmentExpressionSyntax { Left: { } left, Right: { } right }:
+                    return right.Contains(candidate) &&
+                           semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
                            FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
                 when invocation.IsPotentialThisOrBase() &&

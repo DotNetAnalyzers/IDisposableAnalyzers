@@ -63,6 +63,11 @@
             return Borrow(() => new DisposableWalker());
         }
 
+        private static DisposableWalker CreateUsagesWalker(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
+        {
+            return CreateUsagesWalker(new LocalOrParameter(target.Symbol), target.Declaration, recursion);
+        }
+
         private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, SyntaxNode node, Recursion recursion)
         {
             var walker = BorrowAndVisit(node, () => new DisposableWalker());

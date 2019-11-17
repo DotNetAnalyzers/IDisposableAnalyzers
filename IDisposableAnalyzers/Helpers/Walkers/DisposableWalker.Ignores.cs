@@ -45,8 +45,8 @@
                 case MemberAccessExpressionSyntax memberAccess
                     when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-                case ConditionalAccessExpressionSyntax conditionalAccess
-                    when semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out var symbol):
+                case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull } conditionalAccess
+                    when semanticModel.TryGetSymbol(whenNotNull, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
                 case InitializerExpressionSyntax initializer
                     when initializer.Parent is ExpressionSyntax creation:
