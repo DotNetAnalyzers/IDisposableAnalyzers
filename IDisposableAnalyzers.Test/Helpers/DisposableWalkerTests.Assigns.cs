@@ -31,7 +31,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -56,7 +56,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out _));
+                Assert.AreEqual(false, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -83,7 +83,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
@@ -116,7 +116,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
@@ -145,7 +145,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
             }
 
@@ -173,7 +173,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
 
@@ -206,7 +206,7 @@ namespace N
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
                 Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, null, out var field));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
         }

@@ -93,7 +93,7 @@
             }
 
             if (TryGetAssignedLocal(out var local) &&
-                DisposableWalker.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken, null))
+                DisposableWalker.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
             {
                 return false;
             }

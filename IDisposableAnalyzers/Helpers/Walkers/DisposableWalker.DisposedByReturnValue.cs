@@ -10,100 +10,21 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
-            switch (candidate)
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } }:
-                    if (type == KnownSymbol.SingleAssignmentDisposable ||
-                        type == KnownSymbol.RxDisposable ||
-                        type == KnownSymbol.CompositeDisposable)
-                    {
-                        invocationOrObjectCreation = objectCreation;
-                        return true;
-                    }
-
-                    if (semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor))
-                    {
-                        if (Disposable.IsAssignableFrom(constructor.ContainingType, semanticModel.Compilation))
-                        {
-                            if (constructor.ContainingType == KnownSymbol.BinaryReader ||
-                                constructor.ContainingType == KnownSymbol.BinaryWriter ||
-                                constructor.ContainingType == KnownSymbol.StreamReader ||
-                                constructor.ContainingType == KnownSymbol.StreamWriter ||
-                                constructor.ContainingType == KnownSymbol.CryptoStream ||
-                                constructor.ContainingType == KnownSymbol.DeflateStream ||
-                                constructor.ContainingType == KnownSymbol.GZipStream ||
-                                constructor.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
-                            {
-                                if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                                    objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                                    leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                    literal.IsKind(SyntaxKind.TrueLiteralExpression))
-                                {
-                                    invocationOrObjectCreation = null;
-                                    return false;
-                                }
-
-                                invocationOrObjectCreation = objectCreation;
-                                return true;
-                            }
-
-                            if (constructor.TryFindParameter(candidate, out var parameter))
-                            {
-                                if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
-                                    constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
-                                {
-                                    if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
-                                        objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                                        leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                        literal.IsKind(SyntaxKind.FalseLiteralExpression))
-                                    {
-                                        invocationOrObjectCreation = null;
-                                        return false;
-                                    }
-
-                                    invocationOrObjectCreation = objectCreation;
-                                    return true;
-                                }
-
-                                if (Target(candidate, semanticModel, cancellationToken, visited) is { } target &&
-                                    DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
-                                {
-                                    invocationOrObjectCreation = objectCreation;
-                                    return true;
-                                }
-                            }
-                        }
-                    }
-
-                    break;
-                case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
-                    if (semanticModel.TryGetSymbol(invocation, cancellationToken, out IMethodSymbol? method))
-                    {
-                        if (method == KnownSymbol.Task.FromResult)
-                        {
-                            invocationOrObjectCreation = invocation;
-                            return true;
-                        }
-
-                        if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                            Target(candidate, semanticModel, cancellationToken, visited) is { } ctorTarget &&
-                            DisposedByReturnValue(ctorTarget, semanticModel, cancellationToken, visited))
-                        {
-                            invocationOrObjectCreation = invocation;
-                            return true;
-                        }
-                    }
-
-                    break;
+                if (recursion.Target(candidate) is { } target)
+                {
+                    return DisposedByReturnValue(target, recursion, out creation);
+                }
             }
 
-            invocationOrObjectCreation = null;
+            creation = null;
             return false;
         }
 
-        private static bool DisposedByReturnValue(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        private static bool DisposedByReturnValue(ExpressionSyntax candidate, Recursion recursion, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
             switch (candidate.Parent.Kind())
             {
@@ -111,26 +32,26 @@
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                    return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited, out invocationOrObjectCreation);
+                    return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, recursion, out creation);
             }
 
             switch (candidate.Parent)
             {
                 case ArgumentSyntax argument
-                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
-                    return DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out invocationOrObjectCreation);
+                    when recursion.Target(argument) is { } target:
+                    return DisposedByReturnValue(target, recursion, out creation);
                 case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }
-                    when semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+                    when recursion.SemanticModel.TryGetType(objectCreation, recursion.CancellationToken, out var type) &&
                          type == KnownSymbol.CompositeDisposable:
-                    invocationOrObjectCreation = objectCreation;
+                    creation = objectCreation;
                     return true;
                 default:
-                    invocationOrObjectCreation = null;
+                    creation = null;
                     return false;
             }
         }
 
-        private static bool DisposedByReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        private static bool DisposedByReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
             switch (target)
             {
@@ -139,11 +60,11 @@
                         type == KnownSymbol.RxDisposable ||
                         type == KnownSymbol.CompositeDisposable)
                     {
-                        invocationOrObjectCreation = objectCreation;
+                        creation = objectCreation;
                         return true;
                     }
 
-                    if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, semanticModel.Compilation))
+                    if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation))
                     {
                         if (constructor.ContainingType == KnownSymbol.BinaryReader ||
                             constructor.ContainingType == KnownSymbol.BinaryWriter ||
@@ -159,33 +80,33 @@
                                 leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
                                 literal.IsKind(SyntaxKind.TrueLiteralExpression))
                             {
-                                invocationOrObjectCreation = null;
+                                creation = null;
                                 return false;
                             }
 
-                            invocationOrObjectCreation = objectCreation;
+                            creation = objectCreation;
                             return true;
                         }
 
-                        if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
-                            constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
+                        if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, recursion.SemanticModel.Compilation) &&
+                            constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, recursion.SemanticModel.Compilation))
                         {
                             if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
                                 objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
                                 leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
                                 literal.IsKind(SyntaxKind.FalseLiteralExpression))
                             {
-                                invocationOrObjectCreation = null;
+                                creation = null;
                                 return false;
                             }
 
-                            invocationOrObjectCreation = objectCreation;
+                            creation = objectCreation;
                             return true;
                         }
 
-                        if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
+                        if (DisposedByReturnValue(target, recursion))
                         {
-                            invocationOrObjectCreation = objectCreation;
+                            creation = objectCreation;
                             return true;
                         }
                     }
@@ -194,29 +115,29 @@
                 case { Symbol: { ContainingSymbol: IMethodSymbol method } parameter, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
                     if (method == KnownSymbol.Task.FromResult)
                     {
-                        invocationOrObjectCreation = invocation;
+                        creation = invocation;
                         return true;
                     }
 
-                    if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                        DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
+                    if (Disposable.IsAssignableFrom(method.ReturnType, recursion.SemanticModel.Compilation) &&
+                        DisposedByReturnValue(target, recursion))
                     {
-                        invocationOrObjectCreation = invocation;
+                        creation = invocation;
                         return true;
                     }
 
                     break;
             }
 
-            invocationOrObjectCreation = null;
+            creation = null;
             return false;
         }
 
         [Obsolete("Merge with above.")]
-        private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
             where TSource : SyntaxNode
         {
-            using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+            using (var walker = CreateUsagesWalker(target, recursion))
             {
                 foreach (var usage in walker.usages)
                 {
@@ -227,16 +148,16 @@
                             return true;
                     }
 
-                    if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                        DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                    if (Assigns(usage, recursion, out var fieldOrProperty) &&
+                        DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, recursion.SemanticModel, recursion.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
                         return true;
                     }
 
                     if (usage.Parent is ArgumentSyntax argument &&
-                        Target(argument, semanticModel, cancellationToken, visited) is { } argumentTarget && 
-                        DisposedByReturnValue(argumentTarget, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) &&
-                        Returns(invocationOrObjectCreation, semanticModel, cancellationToken, visited))
+                        recursion.Target(argument) is { } argumentTarget &&
+                        DisposedByReturnValue(argumentTarget, recursion, out var invocationOrObjectCreation) &&
+                        Returns(invocationOrObjectCreation, recursion))
                     {
                         return true;
                     }

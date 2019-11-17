@@ -16,33 +16,36 @@
                 return false;
             }
 
-            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                foreach (var usage in walker.usages)
+                using (var walker = CreateUsagesWalker(localOrParameter, recursion))
                 {
-                    if (Returns(usage, semanticModel, cancellationToken, null))
+                    foreach (var usage in walker.usages)
                     {
-                        return false;
-                    }
+                        if (Returns(usage, recursion))
+                        {
+                            return false;
+                        }
 
-                    if (Assigns(usage, semanticModel, cancellationToken, null, out _))
-                    {
-                        return false;
-                    }
+                        if (Assigns(usage, recursion, out _))
+                        {
+                            return false;
+                        }
 
-                    if (Stores(usage, semanticModel, cancellationToken, null, out _))
-                    {
-                        return false;
-                    }
+                        if (Stores(usage, recursion, out _))
+                        {
+                            return false;
+                        }
 
-                    if (Disposes(usage, semanticModel, cancellationToken, null))
-                    {
-                        return false;
-                    }
+                        if (Disposes(usage, recursion))
+                        {
+                            return false;
+                        }
 
-                    if (DisposedByReturnValue(usage, semanticModel, cancellationToken, null, out _))
-                    {
-                        return false;
+                        if (DisposedByReturnValue(usage, recursion, out _))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -50,7 +53,7 @@
             return true;
         }
 
-        internal static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        internal static bool DisposesAfter(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                 declaration is { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } })
@@ -58,14 +61,17 @@
                 return true;
             }
 
-            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                foreach (var usage in walker.usages)
+                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
                 {
-                    if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
-                        Disposes(usage, semanticModel, cancellationToken, visited))
+                    foreach (var usage in walker.usages)
                     {
-                        return true;
+                        if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                            Disposes(usage, recursion))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -73,16 +79,19 @@
             return false;
         }
 
-        internal static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        internal static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                foreach (var usage in walker.usages)
+                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
                 {
-                    if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
-                        Disposes(usage, semanticModel, cancellationToken, visited))
+                    foreach (var usage in walker.usages)
                     {
-                        return true;
+                        if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                            Disposes(usage, recursion))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -90,7 +99,7 @@
             return false;
         }
 
-        internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
                declaration is { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } })
@@ -98,11 +107,33 @@
                 return true;
             }
 
-            using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            {
+                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
+                {
+                    foreach (var usage in walker.usages)
+                    {
+                        if (Disposes(usage, recursion))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool Disposes<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion)
+            where TSource : SyntaxNode
+            where TSymbol : class, ISymbol
+            where TNode : SyntaxNode
+        {
+            using (var walker = CreateUsagesWalker(target, recursion))
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (Disposes(usage, semanticModel, cancellationToken, visited))
+                    if (Disposes(usage, recursion))
                     {
                         return true;
                     }
@@ -112,7 +143,7 @@
             return false;
         }
 
-        private static bool Disposes(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool Disposes(ExpressionSyntax candidate, Recursion recursion)
         {
             switch (candidate.Parent.Kind())
             {
@@ -128,19 +159,22 @@
                     return IsDispose(invocation);
                 case AssignmentExpressionSyntax { Left: { } left } assignment
                     when left == candidate:
-                    return Disposes(assignment, semanticModel, cancellationToken, visited);
+                    return Disposes(assignment, recursion);
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } }:
+                    return true;
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol? assignedSymbol):
-                    return Disposes(assignedSymbol, semanticModel, cancellationToken, visited);
+                    when recursion.Target(variableDeclarator) is { } target:
+                    return Disposes(target, recursion);
                 case ExpressionSyntax parent
                     when parent.IsKind(SyntaxKind.CastExpression) ||
                          parent.IsKind(SyntaxKind.AsExpression) ||
                          parent.IsKind(SyntaxKind.AsExpression) ||
                          parent.IsKind(SyntaxKind.ParenthesizedExpression):
-                    return Disposes(parent, semanticModel, cancellationToken, visited);
+                    return Disposes(parent, recursion);
                 case ArgumentSyntax argument
-                    when DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation):
-                    return Disposes(invocationOrObjectCreation, semanticModel, cancellationToken, visited);
+                    when recursion.Target(argument) is { } target:
+                    return DisposedByReturnValue(target, recursion, out var creation) &&
+                           Disposes(creation, recursion);
             }
 
             return false;

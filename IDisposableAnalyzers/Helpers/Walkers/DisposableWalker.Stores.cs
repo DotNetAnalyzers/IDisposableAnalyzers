@@ -10,35 +10,15 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
+        internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? container)
         {
-            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                foreach (var usage in walker.usages)
-                {
-                    if (Stores(usage, semanticModel, cancellationToken, visited.IncrementUsage(), out container))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            container = null;
-            return false;
-        }
-
-        private static bool Stores<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
-            where TSource : SyntaxNode
-            where TSymbol : ISymbol
-            where TNode : SyntaxNode
-        {
-            if (target.TargetNode is { })
-            {
-                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                using (var walker = CreateUsagesWalker(localOrParameter, recursion))
                 {
                     foreach (var usage in walker.usages)
                     {
-                        if (Stores(usage, semanticModel, cancellationToken, visited, out container))
+                        if (Stores(usage, recursion, out container))
                         {
                             return true;
                         }
@@ -50,7 +30,30 @@
             return false;
         }
 
-        private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
+        private static bool Stores<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion, [NotNullWhen(true)] out ISymbol? container)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
+        {
+            if (target.TargetNode is { })
+            {
+                using (var walker = CreateUsagesWalker(target, recursion))
+                {
+                    foreach (var usage in walker.usages)
+                    {
+                        if (Stores(usage, recursion, out container))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            container = null;
+            return false;
+        }
+
+        private static bool Stores(ExpressionSyntax candidate, Recursion recursion, [NotNullWhen(true)] out ISymbol? container)
         {
             switch (candidate.Parent)
             {
@@ -64,11 +67,11 @@
                     return StoresOrAssigns(objectInitializer, out container);
                 case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
                     when right.Contains(candidate):
-                    return semanticModel.TryGetSymbol(element, cancellationToken, out container);
+                    return recursion.SemanticModel.TryGetSymbol(element, recursion.CancellationToken, out container);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument
-                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
-                    if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out var objectCreation) ||
-                        AccessibleInReturnValue(target, semanticModel, cancellationToken, visited, out objectCreation))
+                    when recursion.Target(argument) is { } target:
+                    if (DisposedByReturnValue(target, recursion, out var objectCreation) ||
+                        AccessibleInReturnValue(target, recursion, out objectCreation))
                     {
                         return StoresOrAssigns(objectCreation, out container);
                     }
@@ -78,7 +81,7 @@
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
                     return StoresOrAssigns(tupleExpression, out container);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
-                    when Target(argument, semanticModel, cancellationToken, visited) is { Symbol: { } parameter } target:
+                    when recursion.Target(argument) is { Symbol: { } parameter } target:
                     if (target.TargetNode is null &&
                         parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
                         invocation.Expression is MemberAccessExpressionSyntax memberAccess)
@@ -93,18 +96,18 @@
                             case "AddOrUpdate":
                             case "TryAdd":
                             case "TryUpdate":
-                                _ = semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                                _ = recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
                                 return true;
                         }
                     }
 
-                    if (Stores(target, semanticModel, cancellationToken, visited, out container))
+                    if (Stores(target, recursion, out container))
                     {
                         return true;
                     }
 
-                    if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out var creation) ||
-                        AccessibleInReturnValue(target, semanticModel, cancellationToken, visited, out creation))
+                    if (DisposedByReturnValue(target, recursion, out var creation) ||
+                        AccessibleInReturnValue(target, recursion, out creation))
                     {
                         return StoresOrAssigns(creation, out container);
                     }
@@ -113,14 +116,14 @@
                     return false;
 
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when Target(variableDeclarator, semanticModel, cancellationToken, visited) is { } target:
-                    return Stores(target, semanticModel, cancellationToken, visited, out container);
+                    when recursion.Target(variableDeclarator) is { } target:
+                    return Stores(target, recursion, out container);
 
                 case ExpressionSyntax parent
                     when parent.IsKind(SyntaxKind.AsExpression) ||
                          parent.IsKind(SyntaxKind.ConditionalExpression) ||
                          parent.IsKind(SyntaxKind.CoalesceExpression):
-                    return Stores(parent, semanticModel, cancellationToken, visited, out container);
+                    return Stores(parent, recursion, out container);
                 default:
                     container = null;
                     return false;
@@ -128,12 +131,12 @@
 
             bool StoresOrAssigns(ExpressionSyntax expression, out ISymbol result)
             {
-                if (Stores(expression, semanticModel, cancellationToken, visited, out result))
+                if (Stores(expression, recursion, out result))
                 {
                     return true;
                 }
 
-                if (Assigns(expression, semanticModel, cancellationToken, visited, out var fieldOrProperty))
+                if (Assigns(expression, recursion, out var fieldOrProperty))
                 {
                     result = fieldOrProperty.Symbol;
                     return true;
@@ -144,87 +147,12 @@
             }
         }
 
-        [Obsolete("Use target")]
-        private static bool AccessibleInReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
-        {
-            switch (candidate)
-            {
-                case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
-                    when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
-                    invocationOrObjectCreation = invocation;
-                    if (method.DeclaringSyntaxReferences.IsEmpty)
-                    {
-                        return method == KnownSymbol.Tuple.Create;
-                    }
-
-                    if (method.ReturnsVoid ||
-                        invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
-                    {
-                        return false;
-                    }
-
-                    if (method.TryFindParameter(candidate, out var parameter) &&
-                        visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
-                            {
-                                foreach (var usage in walker.usages)
-                                {
-                                    if (usage.Parent is ArgumentSyntax parentArgument &&
-                                        AccessibleInReturnValue(parentArgument, semanticModel, cancellationToken, visited, out var parentInvocationOrObjectCreation) &&
-                                        Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    return false;
-
-                case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
-                    when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor):
-                    if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
-                    {
-                        invocationOrObjectCreation = objectCreation;
-                        return true;
-                    }
-
-                    if (constructor.TryFindParameter(candidate, out parameter))
-                    {
-                        if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var container) &&
-                            FieldOrProperty.TryCreate(container, out var containerMember) &&
-                            semanticModel.IsAccessible(candidate.SpanStart, containerMember.Symbol))
-                        {
-                            invocationOrObjectCreation = objectCreation;
-                            return true;
-                        }
-
-                        if (Assigns(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                            semanticModel.IsAccessible(candidate.SpanStart, fieldOrProperty.Symbol))
-                        {
-                            invocationOrObjectCreation = objectCreation;
-                            return true;
-                        }
-                    }
-
-                    invocationOrObjectCreation = default;
-                    return false;
-                default:
-                    invocationOrObjectCreation = null;
-                    return false;
-            }
-        }
-
-        private static bool AccessibleInReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        private static bool AccessibleInReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
             switch (target)
             {
                 case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
-                    invocationOrObjectCreation = invocation;
+                    creation = invocation;
                     if (method.DeclaringSyntaxReferences.IsEmpty)
                     {
                         return method == KnownSymbol.Tuple.Create;
@@ -236,13 +164,14 @@
                         return false;
                     }
 
-                    using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                    using (var walker = CreateUsagesWalker(target, recursion))
                     {
                         foreach (var usage in walker.usages)
                         {
-                            if (usage.Parent is ArgumentSyntax parentArgument &&
-                                AccessibleInReturnValue(parentArgument, semanticModel, cancellationToken, visited, out var parentInvocationOrObjectCreation) &&
-                                Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
+                            if (usage.Parent is ArgumentSyntax containingArgument &&
+                                recursion.Target(containingArgument) is { } argumentTarget &&
+                                AccessibleInReturnValue(argumentTarget, recursion, out var containingCreation) &&
+                                Returns(containingCreation, recursion))
                             {
                                 return true;
                             }
@@ -254,35 +183,35 @@
                 case { Symbol: { ContainingSymbol: { } constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } } }:
                     if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
                     {
-                        invocationOrObjectCreation = objectCreation;
+                        creation = objectCreation;
                         return true;
                     }
 
-                    using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                    using (var walker = CreateUsagesWalker(target, recursion))
                     {
                         foreach (var usage in walker.usages)
                         {
-                            if (Stores(usage, semanticModel, cancellationToken, visited, out var container) &&
+                            if (Stores(usage, recursion, out var container) &&
                                 FieldOrProperty.TryCreate(container, out var containerMember) &&
-                                semanticModel.IsAccessible(target.Source.SpanStart, containerMember.Symbol))
+                                recursion.SemanticModel.IsAccessible(target.Source.SpanStart, containerMember.Symbol))
                             {
-                                invocationOrObjectCreation = objectCreation;
+                                creation = objectCreation;
                                 return true;
                             }
 
-                            if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                semanticModel.IsAccessible(target.Source.SpanStart, fieldOrProperty.Symbol))
+                            if (Assigns(usage, recursion, out var fieldOrProperty) &&
+                                recursion.SemanticModel.IsAccessible(target.Source.SpanStart, fieldOrProperty.Symbol))
                             {
-                                invocationOrObjectCreation = objectCreation;
+                                creation = objectCreation;
                                 return true;
                             }
                         }
                     }
 
-                    invocationOrObjectCreation = default;
+                    creation = default;
                     return false;
                 default:
-                    invocationOrObjectCreation = null;
+                    creation = null;
                     return false;
             }
         }

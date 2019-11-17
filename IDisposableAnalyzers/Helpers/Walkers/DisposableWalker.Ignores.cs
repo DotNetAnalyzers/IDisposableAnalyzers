@@ -10,12 +10,20 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (Disposes(node, semanticModel, cancellationToken, visited) ||
-                Assigns(node, semanticModel, cancellationToken, visited, out _) ||
-                Stores(node, semanticModel, cancellationToken, visited, out _) ||
-                Returns(node, semanticModel, cancellationToken, visited))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            {
+                return Ignores(node, recursion);
+            }
+        }
+
+        private static bool Ignores(ExpressionSyntax node, Recursion recursion)
+        {
+            if (Disposes(node, recursion) ||
+                Assigns(node, recursion, out _) ||
+                Stores(node, recursion, out _) ||
+                Returns(node, recursion))
             {
                 return false;
             }
@@ -33,40 +41,40 @@
                 case StatementSyntax _:
                     return true;
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tuple }:
-                    return Ignores(tuple, semanticModel, cancellationToken, visited);
+                    return Ignores(tuple, recursion);
                 case ArgumentSyntax argument
-                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
-                    return Ignores(target, semanticModel, cancellationToken, visited);
+                    when recursion.Target(argument) is { } target:
+                    return Ignores(target, recursion);
                 case MemberAccessExpressionSyntax memberAccess
-                    when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
-                    return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                    when recursion.SemanticModel.TryGetSymbol(memberAccess, recursion.CancellationToken, out var symbol):
+                    return IsChainedDisposingInReturnValue(symbol, recursion).IsEither(Result.No, Result.AssumeNo);
                 case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull } conditionalAccess
-                    when semanticModel.TryGetSymbol(whenNotNull, cancellationToken, out var symbol):
-                    return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
+                    when recursion.SemanticModel.TryGetSymbol(whenNotNull, recursion.CancellationToken, out var symbol):
+                    return IsChainedDisposingInReturnValue(symbol, recursion).IsEither(Result.No, Result.AssumeNo);
                 case InitializerExpressionSyntax { Parent: ExpressionSyntax creation } initializer:
-                    return Ignores(creation, semanticModel, cancellationToken, visited);
+                    return Ignores(creation, recursion);
             }
 
             return false;
         }
 
-        private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
         {
             if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
-                semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol? method))
+                recursion.SemanticModel.TryGetSymbol(parentExpression, recursion.CancellationToken, out IMethodSymbol? method))
             {
                 if (method.DeclaringSyntaxReferences.IsEmpty)
                 {
-                    if (!Ignores(parentExpression, semanticModel, cancellationToken, visited))
+                    if (!Ignores(parentExpression, recursion))
                     {
-                        return !DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out _) &&
-                               !AccessibleInReturnValue(target.Source, semanticModel, cancellationToken, visited, out _);
+                        return !DisposedByReturnValue(target, recursion, out _) &&
+                               !AccessibleInReturnValue(target, recursion, out _);
                     }
 
                     return true;
                 }
 
-                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                using (var walker = CreateUsagesWalker(target, recursion))
                 {
                     if (walker.usages.Count == 0)
                     {
@@ -90,12 +98,12 @@
                         {
                             case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
                                 when right == candidate &&
-                                     semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
+                                     recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
                                      FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
-                                if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
-                                    DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
+                                if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, recursion.SemanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
+                                    DisposableMember.IsDisposed(assignedMember, disposeMethod, recursion.SemanticModel, recursion.CancellationToken))
                                 {
-                                    return Ignores(parentExpression, semanticModel, cancellationToken, visited);
+                                    return Ignores(parentExpression, recursion);
                                 }
 
                                 if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
@@ -103,12 +111,12 @@
                                     return true;
                                 }
 
-                                return !semanticModel.IsAccessible(target.Source.SpanStart, assignedMember.Symbol);
+                                return !recursion.SemanticModel.IsAccessible(target.Source.SpanStart, assignedMember.Symbol);
                             case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }:
-                                return Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
+                                return Ignores(variableDeclarator, recursion);
                         }
 
-                        if (Ignores(candidate, semanticModel, cancellationToken, visited))
+                        if (Ignores(candidate, recursion))
                         {
                             return true;
                         }
@@ -121,21 +129,21 @@
             return false;
         }
 
-        private static bool Ignores(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool Ignores(VariableDeclaratorSyntax declarator, Recursion recursion)
         {
             if (declarator.TryFirstAncestor(out BlockSyntax? block) &&
-                semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol? local))
+                recursion.SemanticModel.TryGetSymbol(declarator, recursion.CancellationToken, out ILocalSymbol? local))
             {
                 if (declarator.TryFirstAncestor<UsingStatementSyntax>(out _))
                 {
                     return false;
                 }
 
-                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), semanticModel, cancellationToken))
+                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
                 {
                     foreach (var usage in walker.usages)
                     {
-                        if (!Ignores(usage, semanticModel, cancellationToken, visited))
+                        if (!Ignores(usage, recursion))
                         {
                             return false;
                         }
@@ -149,7 +157,7 @@
         }
 
         [Obsolete("Use DisposableWalker")]
-        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, Recursion recursion)
         {
             if (symbol is IMethodSymbol method)
             {
@@ -174,12 +182,12 @@
                         method.ReturnType is INamedTypeSymbol namedType &&
                         namedType.TypeArguments.TrySingle(out var type))
                     {
-                        return !Disposable.IsAssignableFrom(type, semanticModel.Compilation)
+                        return !Disposable.IsAssignableFrom(type, recursion.SemanticModel.Compilation)
                             ? Result.No
                             : Result.AssumeYes;
                     }
 
-                    return !Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation)
+                    return !Disposable.IsAssignableFrom(method.ReturnType, recursion.SemanticModel.Compilation)
                         ? Result.No
                         : Result.AssumeYes;
                 }
@@ -187,8 +195,8 @@
                 if (method is { IsExtensionMethod: true, ReducedFrom: { } reducedFrom } &&
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
-                    _ = reducedFrom.TrySingleMethodDeclaration(cancellationToken, out var declaration);
-                    return DisposedByReturnValue(new Target<SyntaxNode, IParameterSymbol, BaseMethodDeclarationSyntax>(null!, parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
+                    _ = reducedFrom.TrySingleMethodDeclaration(recursion.CancellationToken, out var declaration);
+                    return DisposedByReturnValue(new Target<SyntaxNode, IParameterSymbol, BaseMethodDeclarationSyntax>(null!, parameter, declaration), recursion) ? Result.Yes : Result.No;
                 }
             }
 

@@ -8,34 +8,15 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        internal static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                foreach (var usage in walker.usages)
-                {
-                    if (Returns(usage, semanticModel, cancellationToken, visited))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        private static bool Returns<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
-            where TSource : SyntaxNode
-            where TSymbol : ISymbol
-            where TNode : SyntaxNode
-        {
-            if (target.TargetNode is { })
-            {
-                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                using (var walker = CreateUsagesWalker(localOrParameter, recursion))
                 {
                     foreach (var usage in walker.usages)
                     {
-                        if (Returns(usage, semanticModel, cancellationToken, visited))
+                        if (Returns(usage, recursion))
                         {
                             return true;
                         }
@@ -46,7 +27,29 @@
             return false;
         }
 
-        private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool Returns<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
+        {
+            if (target.TargetNode is { })
+            {
+                using (var walker = CreateUsagesWalker(target, recursion))
+                {
+                    foreach (var usage in walker.usages)
+                    {
+                        if (Returns(usage, recursion))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool Returns(ExpressionSyntax candidate, Recursion recursion)
         {
             switch (candidate.Parent.Kind())
             {
@@ -57,14 +60,14 @@
                 case SyntaxKind.AsExpression:
                 case SyntaxKind.ConditionalExpression:
                 case SyntaxKind.CoalesceExpression:
-                    return Returns((ExpressionSyntax)candidate.Parent, semanticModel, cancellationToken, visited);
+                    return Returns((ExpressionSyntax)candidate.Parent, recursion);
             }
 
             switch (candidate.Parent)
             {
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when Target(variableDeclarator, semanticModel, cancellationToken, visited) is { } target:
-                    return Returns(target, semanticModel, cancellationToken, visited);
+                    when recursion.Target(variableDeclarator) is { } target:
+                    return Returns(target, recursion);
 
                 default:
                     return false;

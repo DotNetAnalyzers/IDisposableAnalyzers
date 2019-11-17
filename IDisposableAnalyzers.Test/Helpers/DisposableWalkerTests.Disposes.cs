@@ -33,7 +33,7 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
-                Assert.AreEqual(false, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(false, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
 
             [TestCase("disposable.Dispose()")]
@@ -62,7 +62,7 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
-                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
 
             [Test]
@@ -89,7 +89,7 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
-                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
 
             [Test]
@@ -117,7 +117,7 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
-                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None, null));
+                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
         }
     }
