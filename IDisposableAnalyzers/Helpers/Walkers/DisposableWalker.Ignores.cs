@@ -34,8 +34,9 @@
                     return true;
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tuple }:
                     return Ignores(tuple, semanticModel, cancellationToken, visited);
-                case ArgumentSyntax argument:
-                    return Ignores(Target(argument, semanticModel, cancellationToken, visited).Value, semanticModel, cancellationToken, visited);
+                case ArgumentSyntax argument
+                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
+                    return Ignores(target, semanticModel, cancellationToken, visited);
                 case MemberAccessExpressionSyntax memberAccess
                     when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
@@ -58,7 +59,7 @@
                 {
                     if (!Ignores(parentExpression, semanticModel, cancellationToken, visited))
                     {
-                        return !DisposedByReturnValue(target.Source, semanticModel, cancellationToken, visited, out _) &&
+                        return !DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out _) &&
                                !AccessibleInReturnValue(target.Source, semanticModel, cancellationToken, visited, out _);
                     }
 

@@ -128,6 +128,88 @@
             }
         }
 
+        internal static bool DisposedByReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        {
+            switch (target)
+            {
+                case { Symbol: { ContainingSymbol: IMethodSymbol constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } } }:
+                    if (type == KnownSymbol.SingleAssignmentDisposable ||
+                        type == KnownSymbol.RxDisposable ||
+                        type == KnownSymbol.CompositeDisposable)
+                    {
+                        invocationOrObjectCreation = objectCreation;
+                        return true;
+                    }
+
+                    if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, semanticModel.Compilation))
+                    {
+                        if (constructor.ContainingType == KnownSymbol.BinaryReader ||
+                            constructor.ContainingType == KnownSymbol.BinaryWriter ||
+                            constructor.ContainingType == KnownSymbol.StreamReader ||
+                            constructor.ContainingType == KnownSymbol.StreamWriter ||
+                            constructor.ContainingType == KnownSymbol.CryptoStream ||
+                            constructor.ContainingType == KnownSymbol.DeflateStream ||
+                            constructor.ContainingType == KnownSymbol.GZipStream ||
+                            constructor.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                        {
+                            if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                                objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
+                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                literal.IsKind(SyntaxKind.TrueLiteralExpression))
+                            {
+                                invocationOrObjectCreation = null;
+                                return false;
+                            }
+
+                            invocationOrObjectCreation = objectCreation;
+                            return true;
+                        }
+
+                        if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, semanticModel.Compilation) &&
+                            constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, semanticModel.Compilation))
+                        {
+                            if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
+                                objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
+                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                                literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                            {
+                                invocationOrObjectCreation = null;
+                                return false;
+                            }
+
+                            invocationOrObjectCreation = objectCreation;
+                            return true;
+                        }
+
+                        if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
+                        {
+                            invocationOrObjectCreation = objectCreation;
+                            return true;
+                        }
+                    }
+
+                    break;
+                case { Symbol: { ContainingSymbol: IMethodSymbol method } parameter, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                    if (method == KnownSymbol.Task.FromResult)
+                    {
+                        invocationOrObjectCreation = invocation;
+                        return true;
+                    }
+
+                    if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
+                        DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
+                    {
+                        invocationOrObjectCreation = invocation;
+                        return true;
+                    }
+
+                    break;
+            }
+
+            invocationOrObjectCreation = null;
+            return false;
+        }
+
         private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
             where TSource : SyntaxNode
         {
