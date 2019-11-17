@@ -42,9 +42,10 @@
                 case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
                     when right.Contains(candidate):
                     return semanticModel.TryGetSymbol(element, cancellationToken, out container);
-                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument:
-                    if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var objectCreation) ||
-                        AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out objectCreation))
+                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument
+                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
+                    if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out var objectCreation) ||
+                        AccessibleInReturnValue(target, semanticModel, cancellationToken, visited, out objectCreation))
                     {
                         return StoresOrAssigns(objectCreation, out container);
                     }
@@ -52,8 +53,7 @@
                     container = null;
                     return false;
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
-                    return Stores(tupleExpression, semanticModel, cancellationToken, visited, out container) ||
-                           Assigns(tupleExpression, semanticModel, cancellationToken, visited, out _);
+                    return StoresOrAssigns(tupleExpression, out container);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
                     when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
                     {
