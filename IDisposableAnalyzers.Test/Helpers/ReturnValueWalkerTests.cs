@@ -35,11 +35,9 @@ internal class C
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
-            using (var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", pooled);
-                Assert.AreEqual(expected, actual);
-            }
+            using var pooled = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", pooled);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase("this.CalculatedExpressionBody", ReturnValueSearch.Recursive, "1")]
@@ -93,11 +91,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(expected, actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase("StaticRecursiveExpressionBody", ReturnValueSearch.Recursive, "")]
@@ -149,11 +145,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(expected, actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase("StaticCreateIntStatementBody()", ReturnValueSearch.Recursive, "1")]
@@ -291,11 +285,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(expected, actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase("Recursive()", ReturnValueSearch.Recursive, "")]
@@ -383,11 +375,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(expected, actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual(expected, actual);
         }
 
         [Test]
@@ -422,11 +412,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindInvocation("WithOptionalParameter(local)");
-            using (var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual("disposable", actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual("disposable", actual);
         }
 
         [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Recursive, "1")]
@@ -469,11 +457,9 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                var actual = string.Join(", ", returnValues);
-                Assert.AreEqual(expected, actual);
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", returnValues);
+            Assert.AreEqual(expected, actual);
         }
 
         [TestCase("await CreateAsync(0)", ReturnValueSearch.Recursive, "1, 0, 2, 3")]
@@ -595,10 +581,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual(expected, string.Join(", ", returnValues));
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", returnValues));
         }
 
         [TestCase("await RecursiveAsync()", ReturnValueSearch.Recursive, "")]
@@ -661,10 +645,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
-            using (var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual(expected, string.Join(", ", returnValues));
-            }
+            using var returnValues = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", returnValues));
         }
 
         [Test]
@@ -709,10 +691,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual("new WrappingDisposable(d)", returnValues.Single().ToString());
-            }
+            using var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("new WrappingDisposable(d)", returnValues.Single().ToString());
         }
 
         [Test]
@@ -738,10 +718,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnTernary(true)").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual("1, 2", string.Join(", ", returnValues));
-            }
+            using var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1, 2", string.Join(", ", returnValues));
         }
 
         [Test]
@@ -767,10 +745,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnNullCoalesce(null)").Value;
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual("null, string.Empty", string.Join(", ", returnValues));
-            }
+            using var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("null, string.Empty", string.Join(", ", returnValues));
         }
 
         [Test]
@@ -821,10 +797,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
-            using (var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None))
-            {
-                Assert.AreEqual("error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
-            }
+            using var returnValues = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("error.ErrorContent, result.ErrorContent, value", string.Join(", ", returnValues));
         }
     }
 }

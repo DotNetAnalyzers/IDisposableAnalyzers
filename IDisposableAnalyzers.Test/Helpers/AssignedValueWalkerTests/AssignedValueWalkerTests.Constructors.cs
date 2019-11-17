@@ -38,11 +38,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "")]
@@ -75,11 +73,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -129,11 +125,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1, 2")]
@@ -183,11 +177,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1, 2")]
@@ -237,11 +229,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -271,11 +261,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -305,11 +293,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -359,11 +345,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -415,11 +399,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -471,11 +453,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.Value;", "1")]
@@ -534,11 +514,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -577,11 +555,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.Value;", "1, 2, 3")]
@@ -617,11 +593,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -660,11 +634,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1")]
@@ -715,11 +687,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1, 2, 3")]
@@ -762,11 +732,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "1, 2, 3")]
@@ -810,11 +778,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [Test]
@@ -844,11 +810,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = this.value;").Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("default(T)", actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual("default(T)", actual);
             }
 
             [Test]
@@ -880,11 +844,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = this.Value;").Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual("default(T)", actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual("default(T)", actual);
             }
 
             [TestCase("var temp1 = this.value;", "default(T)")]
@@ -925,11 +887,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [TestCase("var temp1 = this.value;", "default(T)")]
@@ -970,11 +930,9 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    var actual = string.Join(", ", assignedValues);
-                    Assert.AreEqual(expected, actual);
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                var actual = string.Join(", ", assignedValues);
+                Assert.AreEqual(expected, actual);
             }
 
             [Test]
@@ -1001,10 +959,8 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.value = 1").Left;
-                using (var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None))
-                {
-                    Assert.AreEqual("1", assignedValues.Single().ToString());
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+                Assert.AreEqual("1", assignedValues.Single().ToString());
             }
         }
     }
