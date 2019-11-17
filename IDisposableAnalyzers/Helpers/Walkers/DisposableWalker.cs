@@ -37,7 +37,7 @@
 
             bool IsMatch(IdentifierNameSyntax identifierName)
             {
-                if (identifierName.Identifier.Text == localOrParameter.Name &&
+                if (identifierName.Identifier.ValueText == localOrParameter.Name &&
                     semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol))
                 {
                     switch (symbol)
@@ -76,7 +76,7 @@
 
             bool IsMatch(IdentifierNameSyntax identifierName)
             {
-                if (identifierName.Identifier.Text == localOrParameter.Name &&
+                if (identifierName.Identifier.ValueText == localOrParameter.Name &&
                     recursion.SemanticModel.TryGetSymbol(identifierName, recursion.CancellationToken, out var symbol))
                 {
                     switch (symbol)
