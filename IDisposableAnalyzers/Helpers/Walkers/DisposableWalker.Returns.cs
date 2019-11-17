@@ -24,6 +24,28 @@
             return false;
         }
 
+        private static bool Returns<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
+        {
+            if (target.TargetNode is { })
+            {
+                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                {
+                    foreach (var usage in walker.usages)
+                    {
+                        if (Returns(usage, semanticModel, cancellationToken, visited))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         private static bool Returns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             switch (candidate.Parent.Kind())
@@ -41,17 +63,9 @@
             switch (candidate.Parent)
             {
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
-                         LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-                    if (visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Returns(localOrParameter, semanticModel, cancellationToken, visited);
-                        }
-                    }
+                    when Target(variableDeclarator, semanticModel, cancellationToken, visited) is { } target:
+                    return Returns(target, semanticModel, cancellationToken, visited);
 
-                    return false;
                 default:
                     return false;
             }

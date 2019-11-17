@@ -854,10 +854,7 @@ namespace N
             this.disposable = GetReader(stream);
         }
 
-        private static StreamReader GetReader(Stream arg)
-        {
-            return GetReader(arg);
-        }
+        private static StreamReader GetReader(Stream arg) => GetReader(arg);
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);

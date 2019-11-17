@@ -44,10 +44,22 @@
             return null;
         }
 
+        [Obsolete("Use Recursion")]
+        private static Target<VariableDeclaratorSyntax, ILocalSymbol, SyntaxNode>? Target(VariableDeclaratorSyntax declarator, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        {
+            if(semanticModel.TryGetSymbol(declarator, cancellationToken, out ILocalSymbol? local) &&
+                local.TryGetScope(cancellationToken, out var scope))
+            {
+                return Gu.Roslyn.AnalyzerExtensions.Target.Create(declarator, local, scope);
+            }
+
+            return null;
+        }
+
         [Obsolete("Use recursion")]
         private static DisposableWalker CreateUsagesWalker<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
               where TSource : SyntaxNode
-              where TSymbol : class, ISymbol
+              where TSymbol : ISymbol
               where TNode : SyntaxNode
         {
             if (target.TargetNode is { } node)

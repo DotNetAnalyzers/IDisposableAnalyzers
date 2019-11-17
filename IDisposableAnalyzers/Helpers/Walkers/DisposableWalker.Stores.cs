@@ -16,7 +16,7 @@
             {
                 foreach (var usage in walker.usages)
                 {
-                    if (Stores(usage, semanticModel, cancellationToken, visited, out container))
+                    if (Stores(usage, semanticModel, cancellationToken, visited.IncrementUsage(), out container))
                     {
                         return true;
                     }
@@ -27,9 +27,12 @@
             return false;
         }
 
-        internal static bool Stores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
+        private static bool Stores<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
         {
-            if(target.TargetNode is { })
+            if (target.TargetNode is { })
             {
                 using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
                 {
@@ -110,18 +113,9 @@
                     return false;
 
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
-                         LocalOrParameter.TryCreate(container, out var local):
-                    if (visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Stores(local, semanticModel, cancellationToken, visited, out container);
-                        }
-                    }
+                    when Target(variableDeclarator, semanticModel, cancellationToken, visited) is { } target:
+                    return Stores(target, semanticModel, cancellationToken, visited, out container);
 
-                    container = null;
-                    return false;
                 case ExpressionSyntax parent
                     when parent.IsKind(SyntaxKind.AsExpression) ||
                          parent.IsKind(SyntaxKind.ConditionalExpression) ||
