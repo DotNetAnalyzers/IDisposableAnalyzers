@@ -41,11 +41,11 @@
                     return assignment.Right.Contains(candidate) &&
                            semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assignedSymbol) &&
                            FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
-                case ArgumentSyntax argument when argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } &&
-                                                  invocation.IsPotentialThisOrBase() &&
-                                                  semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
-                                                  method.TryFindParameter(argument, out var parameter) &&
-                                                  LocalOrParameter.TryCreate(parameter, out var localOrParameter):
+                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
+                when invocation.IsPotentialThisOrBase() &&
+                     semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                     method.TryFindParameter(argument, out var parameter) &&
+                     LocalOrParameter.TryCreate(parameter, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)
@@ -56,9 +56,9 @@
 
                     return false;
 
-                case EqualsValueClauseSyntax equalsValueClause when equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                                                                    semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
-                                                                    LocalOrParameter.TryCreate(symbol, out var localOrParameter):
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
+                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
                     if (visited.CanVisit(candidate, out visited))
                     {
                         using (visited)

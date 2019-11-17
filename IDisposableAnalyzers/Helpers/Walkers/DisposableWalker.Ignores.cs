@@ -42,11 +42,14 @@
                     }
 
                     break;
-                case MemberAccessExpressionSyntax memberAccess when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
+                case MemberAccessExpressionSyntax memberAccess
+                    when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-                case ConditionalAccessExpressionSyntax conditionalAccess when semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out var symbol):
+                case ConditionalAccessExpressionSyntax conditionalAccess
+                    when semanticModel.TryGetSymbol(conditionalAccess.WhenNotNull, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-                case InitializerExpressionSyntax initializer when initializer.Parent is ExpressionSyntax creation:
+                case InitializerExpressionSyntax initializer
+                    when initializer.Parent is ExpressionSyntax creation:
                     return Ignores(creation, semanticModel, cancellationToken, visited);
             }
 
@@ -95,8 +98,8 @@
                             {
                                 case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
                                     when right == candidate &&
-                                            semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
-                                            FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
+                                         semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
+                                         FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
                                     if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
                                         DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
                                     {
