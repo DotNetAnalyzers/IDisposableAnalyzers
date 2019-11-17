@@ -182,7 +182,7 @@
 
                 case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                     when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var constructor):
-                    if(constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
+                    if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
                     {
                         invocationOrObjectCreation = objectCreation;
                         return true;
