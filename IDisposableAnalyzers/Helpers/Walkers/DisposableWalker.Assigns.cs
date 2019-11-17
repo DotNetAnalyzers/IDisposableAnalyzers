@@ -11,21 +11,17 @@
     {
         internal static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty first)
         {
-            using (var walker = CreateUsagesWalker(localOrParameter, semanticModel, cancellationToken))
+            if (localOrParameter.TryGetScope(cancellationToken, out var scope))
             {
-                foreach (var usage in walker.usages)
-                {
-                    if (Assigns(usage, semanticModel, cancellationToken, visited, out first))
-                    {
-                        return true;
-                    }
-                }
+                return Assigns(new SymbolAndDeclaration<ISymbol, SyntaxNode>(localOrParameter.Symbol, scope), semanticModel, cancellationToken, visited, out first);
             }
 
             return false;
         }
 
-        private static bool Assigns(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty fieldOrProperty)
+        private static bool Assigns<TSymbol, TNode>(SymbolAndDeclaration<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty fieldOrProperty)
+              where TSymbol : class, ISymbol
+              where TNode : SyntaxNode
         {
             using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
             {
@@ -63,17 +59,9 @@
                          Target(argument, semanticModel, cancellationToken, visited) is { } target:
                     return Assigns(target, semanticModel, cancellationToken, visited, out fieldOrProperty);
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
-                     LocalOrParameter.TryCreate(symbol, out var localOrParameter):
-                    if (visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
-                        }
-                    }
-
-                    return false;
+                    when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol? local) &&
+                         local.TryGetScope(cancellationToken, out var scope):
+                    return Assigns(new SymbolAndDeclaration<ILocalSymbol, SyntaxNode>(local, scope), semanticModel, cancellationToken, visited, out fieldOrProperty);
 
                 default:
                     return false;

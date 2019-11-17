@@ -51,7 +51,9 @@
         }
 
         [Obsolete("Use recursion")]
-        private static DisposableWalker CreateUsagesWalker(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static DisposableWalker CreateUsagesWalker<TSymbol, TNode>(SymbolAndDeclaration<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+              where TSymbol : class, ISymbol
+              where TNode : SyntaxNode
         {
             var walker = BorrowAndVisit(target.Declaration, () => new DisposableWalker());
             walker.RemoveAll(x => !IsMatch(x));
