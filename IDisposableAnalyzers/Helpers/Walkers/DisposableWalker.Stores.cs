@@ -85,10 +85,10 @@
                         }
                     }
 
-                    if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
-                        AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation))
+                    if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out var creation) ||
+                        AccessibleInReturnValue(target, semanticModel, cancellationToken, visited, out creation))
                     {
-                        return StoresOrAssigns(invocationOrObjectCreation, out container);
+                        return StoresOrAssigns(creation, out container);
                     }
 
                     container = null;
