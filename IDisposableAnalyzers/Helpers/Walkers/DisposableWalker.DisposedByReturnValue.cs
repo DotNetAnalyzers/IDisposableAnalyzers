@@ -234,7 +234,8 @@
                     }
 
                     if (usage.Parent is ArgumentSyntax argument &&
-                        DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) &&
+                        Target(argument, semanticModel, cancellationToken, visited) is { } argumentTarget && 
+                        DisposedByReturnValue(argumentTarget, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) &&
                         Returns(invocationOrObjectCreation, semanticModel, cancellationToken, visited))
                     {
                         return true;
