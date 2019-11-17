@@ -151,7 +151,7 @@ namespace N
     {
         public static long M()
         {
-            using (var meh = new Disposable())
+            using (var disposable = new Disposable())
             {
                 return 1;
             }

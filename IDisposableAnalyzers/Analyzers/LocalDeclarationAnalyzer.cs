@@ -15,11 +15,6 @@
 
         public override void Initialize(AnalysisContext context)
         {
-            if (context == null)
-            {
-                throw new System.ArgumentNullException(nameof(context));
-            }
-
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.Analyze | GeneratedCodeAnalysisFlags.ReportDiagnostics);
             context.EnableConcurrentExecution();
             context.RegisterSyntaxNodeAction(c => Handle(c), SyntaxKind.LocalDeclarationStatement);
@@ -28,11 +23,12 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is LocalDeclarationStatementSyntax { Declaration: { Variables: { } variables } localDeclaration })
+                context.Node is LocalDeclarationStatementSyntax { Declaration: { Variables: { } variables } localDeclaration } statement)
             {
                 foreach (var declarator in variables)
                 {
                     if (declarator.Initializer is { Value: { } value } &&
+                        statement.UsingKeyword.IsKind(SyntaxKind.None) &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
                         DisposableWalker.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))

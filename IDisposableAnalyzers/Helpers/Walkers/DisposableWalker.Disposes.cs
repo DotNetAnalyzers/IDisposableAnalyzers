@@ -95,10 +95,15 @@
 
         internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (local.TrySingleDeclaration(cancellationToken, out var declaration) &&
-               declaration is { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } })
+            if (local.TrySingleDeclaration(cancellationToken, out var declaration))
             {
-                return true;
+                switch (declaration)
+                {
+                    case { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } }:
+                    case { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: var usingKeywod } } }
+                        when usingKeywod.IsKind(SyntaxKind.UsingKeyword):
+                        return true;
+                }
             }
 
             using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
