@@ -35,14 +35,14 @@
                         case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
                             when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                                  method.TryFindParameter(argument, out var parameter) &&
-                                 method.TrySingleMethodDeclaration(cancellationToken, out var declaration):
-                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration);
+                                 method.TrySingleMethodDeclaration(cancellationToken, out var methodDeclaration):
+                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, methodDeclaration);
 
                         case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                             when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var ctor) &&
                                  ctor.TryFindParameter(argument, out var parameter) &&
-                                 ctor.TrySingleMethodDeclaration(cancellationToken, out var declaration):
-                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration);
+                                 ctor.TrySingleDeclaration<ConstructorDeclarationSyntax>(cancellationToken, out var ctorDeclaration):
+                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, ctorDeclaration);
                     }
                 }
             }

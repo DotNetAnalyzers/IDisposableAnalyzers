@@ -194,9 +194,10 @@
                 }
 
                 if (method is { IsExtensionMethod: true, ReducedFrom: { } reducedFrom } &&
-                    reducedFrom.Parameters.TryFirst(out var parameter))
+                    reducedFrom.Parameters.TryFirst(out var parameter) &&
+                    reducedFrom.TrySingleMethodDeclaration(cancellationToken, out var declaration))
                 {
-                    return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
+                    return DisposedByReturnValue(new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
                 }
             }
 

@@ -66,8 +66,12 @@
                                     return true;
                                 }
 
-                                invocationOrObjectCreation = objectCreation;
-                                return DisposedByReturnValue(parameter, semanticModel, cancellationToken, visited);
+                                if (Target(candidate, semanticModel, cancellationToken, visited) is { } target &&
+                                    DisposedByReturnValue(target, semanticModel, cancellationToken, visited))
+                                {
+                                    invocationOrObjectCreation = objectCreation;
+                                    return true;
+                                }
                             }
                         }
                     }
@@ -83,10 +87,11 @@
                         }
 
                         if (Disposable.IsAssignableFrom(method.ReturnType, semanticModel.Compilation) &&
-                            method.TryFindParameter(candidate, out var parameterSymbol))
+                            Target(candidate, semanticModel, cancellationToken, visited) is { } ctorTarget &&
+                            DisposedByReturnValue(ctorTarget, semanticModel, cancellationToken, visited))
                         {
                             invocationOrObjectCreation = invocation;
-                            return DisposedByReturnValue(parameterSymbol, semanticModel, cancellationToken, visited);
+                            return true;
                         }
                     }
 
@@ -123,40 +128,30 @@
             }
         }
 
-        private static bool DisposedByReturnValue(IParameterSymbol candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool DisposedByReturnValue(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
-            if (candidate.TrySingleDeclaration(cancellationToken, out var parameterSyntax) &&
-                candidate.ContainingSymbol is IMethodSymbol method)
+            using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
             {
-                if (visited.CanVisit(parameterSyntax, out visited))
+                foreach (var usage in walker.usages)
                 {
-                    using (visited)
+                    switch (usage.Parent.Kind())
                     {
-                        using (var walker = CreateUsagesWalker(new LocalOrParameter(candidate), semanticModel, cancellationToken))
-                        {
-                            foreach (var usage in walker.usages)
-                            {
-                                switch (usage.Parent.Kind())
-                                {
-                                    case SyntaxKind.ReturnStatement:
-                                    case SyntaxKind.ArrowExpressionClause:
-                                        return true;
-                                }
+                        case SyntaxKind.ReturnStatement:
+                        case SyntaxKind.ArrowExpressionClause:
+                            return true;
+                    }
 
-                                if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
-                                    DisposableMember.IsDisposed(fieldOrProperty, method.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-                                {
-                                    return true;
-                                }
+                    if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                        DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                    {
+                        return true;
+                    }
 
-                                if (usage.Parent is ArgumentSyntax argument &&
-                                    DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) &&
-                                    Returns(invocationOrObjectCreation, semanticModel, cancellationToken, visited))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
+                    if (usage.Parent is ArgumentSyntax argument &&
+                        DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) &&
+                        Returns(invocationOrObjectCreation, semanticModel, cancellationToken, visited))
+                    {
+                        return true;
                     }
                 }
             }
