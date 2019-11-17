@@ -23,6 +23,58 @@
             this.usages.Clear();
         }
 
+        [Obsolete("Use Recursion")]
+        private static SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>? Target(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        {
+            if (visited.CanVisit(argument, out visited))
+            {
+                using (visited)
+                {
+                    switch (argument)
+                    {
+                        case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
+                            when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                                 method.TryFindParameter(argument, out var parameter) &&
+                                 method.TrySingleMethodDeclaration(cancellationToken, out var declaration):
+                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration);
+
+                        case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
+                            when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var ctor) &&
+                                 ctor.TryFindParameter(argument, out var parameter) &&
+                                 ctor.TrySingleMethodDeclaration(cancellationToken, out var declaration):
+                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration);
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        [Obsolete("Use recursion")]
+        private static DisposableWalker CreateUsagesWalker(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            var walker = BorrowAndVisit(target.Declaration, () => new DisposableWalker());
+            walker.RemoveAll(x => !IsMatch(x));
+            return walker;
+
+            bool IsMatch(IdentifierNameSyntax identifierName)
+            {
+                if (identifierName.Identifier.ValueText == target.Symbol.Name &&
+                    semanticModel.TryGetSymbol(identifierName, cancellationToken, out var symbol))
+                {
+                    switch (symbol)
+                    {
+                        case ILocalSymbol local:
+                            return local.Equals(target.Symbol);
+                        case IParameterSymbol _:
+                            return target.Symbol.Kind == SymbolKind.Parameter;
+                    }
+                }
+
+                return false;
+            }
+        }
+
         [Obsolete("Use recursion")]
         private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {

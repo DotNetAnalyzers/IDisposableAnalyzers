@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -15,6 +16,22 @@
                 foreach (var usage in walker.usages)
                 {
                     if (Assigns(usage, semanticModel, cancellationToken, visited, out first))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        private static bool Assigns(SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty fieldOrProperty)
+        {
+            using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+            {
+                foreach (var usage in walker.usages)
+                {
+                    if (Assigns(usage, semanticModel, cancellationToken, visited, out fieldOrProperty))
                     {
                         return true;
                     }
@@ -42,20 +59,9 @@
                            semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
                            FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
-                when invocation.IsPotentialThisOrBase() &&
-                     semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
-                     method.TryFindParameter(argument, out var parameter) &&
-                     LocalOrParameter.TryCreate(parameter, out var localOrParameter):
-                    if (visited.CanVisit(candidate, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Assigns(localOrParameter, semanticModel, cancellationToken, visited, out fieldOrProperty);
-                        }
-                    }
-
-                    return false;
-
+                    when invocation.IsPotentialThisOrBase() &&
+                         Target(argument, semanticModel, cancellationToken, visited) is { } target:
+                    return Assigns(target, semanticModel, cancellationToken, visited, out fieldOrProperty);
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
                 when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out var symbol) &&
                      LocalOrParameter.TryCreate(symbol, out var localOrParameter):
