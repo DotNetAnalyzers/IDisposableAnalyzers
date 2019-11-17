@@ -55,49 +55,44 @@
                 case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
                     return StoresOrAssigns(tupleExpression, out container);
                 case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
-                    when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method):
+                    when Target(argument, semanticModel, cancellationToken, visited) is { Symbol: { } parameter } target:
+                    if (target.TargetNode is null &&
+                        parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
+                        invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
-                        if (method.DeclaringSyntaxReferences.IsEmpty)
+                        switch (parameter.ContainingSymbol.Name)
                         {
-                            if (method.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
-                                invocation.Expression is MemberAccessExpressionSyntax memberAccess)
-                            {
-                                switch (method.Name)
-                                {
-                                    case "Add":
-                                    case "Insert":
-                                    case "Push":
-                                    case "Enqueue":
-                                    case "GetOrAdd":
-                                    case "AddOrUpdate":
-                                    case "TryAdd":
-                                    case "TryUpdate":
-                                        _ = semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
-                                        return true;
-                                }
-                            }
+                            case "Add":
+                            case "Insert":
+                            case "Push":
+                            case "Enqueue":
+                            case "GetOrAdd":
+                            case "AddOrUpdate":
+                            case "TryAdd":
+                            case "TryUpdate":
+                                _ = semanticModel.TryGetSymbol(memberAccess.Expression, cancellationToken, out container);
+                                return true;
                         }
-                        else if (method.TryFindParameter(argument, out var parameter) &&
-                                 visited.CanVisit(candidate, out visited))
-                        {
-                            using (visited)
-                            {
-                                if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
-                                {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
-                            AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation))
-                        {
-                            return StoresOrAssigns(invocationOrObjectCreation, out container);
-                        }
-
-                        container = null;
-                        return false;
                     }
+                    else if (visited.CanVisit(candidate, out visited))
+                    {
+                        using (visited)
+                        {
+                            if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    if (DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out var invocationOrObjectCreation) ||
+                        AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation))
+                    {
+                        return StoresOrAssigns(invocationOrObjectCreation, out container);
+                    }
+
+                    container = null;
+                    return false;
 
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
                     when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out container) &&
