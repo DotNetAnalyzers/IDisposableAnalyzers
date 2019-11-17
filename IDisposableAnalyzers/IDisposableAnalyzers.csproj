@@ -27,10 +27,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>2.1.3.0</Version>
+    <Version>2.1.3</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
-    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>BUGFIX IDISP011: when disposing before foreach.
 BUGFIX IDISP003 should not warn when reassigning after dispose.
 BUGFIX IDISP002 &amp; IDISP006 should not warn when assigned with created and injected.
