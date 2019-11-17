@@ -24,7 +24,7 @@
         }
 
         [Obsolete("Use Recursion")]
-        private static SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>? Target(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static Target<IParameterSymbol, BaseMethodDeclarationSyntax>? Target(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (visited.CanVisit(argument, out visited))
             {
@@ -34,15 +34,15 @@
                     {
                         case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
                             when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
-                                 method.TryFindParameter(argument, out var parameter) &&
-                                 method.TrySingleMethodDeclaration(cancellationToken, out var methodDeclaration):
-                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, methodDeclaration);
+                                 method.TryFindParameter(argument, out var parameter):
+                            _ = method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? methodDeclaration);
+                            return new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, methodDeclaration);
 
                         case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                             when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var ctor) &&
-                                 ctor.TryFindParameter(argument, out var parameter) &&
-                                 ctor.TrySingleDeclaration<ConstructorDeclarationSyntax>(cancellationToken, out var ctorDeclaration):
-                            return new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, ctorDeclaration);
+                                 ctor.TryFindParameter(argument, out var parameter):
+                            _ = ctor.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? ctorDeclaration);
+                            return new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, ctorDeclaration);
                     }
                 }
             }
@@ -51,14 +51,18 @@
         }
 
         [Obsolete("Use recursion")]
-        private static DisposableWalker CreateUsagesWalker<TSymbol, TNode>(SymbolAndDeclaration<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static DisposableWalker CreateUsagesWalker<TSymbol, TNode>(Target<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
               where TSymbol : class, ISymbol
               where TNode : SyntaxNode
         {
-            var walker = BorrowAndVisit(target.Declaration, () => new DisposableWalker());
-            walker.RemoveAll(x => !IsMatch(x));
-            return walker;
+            if (target.Node is { } node)
+            {
+                var walker = BorrowAndVisit(target.Node, () => new DisposableWalker());
+                walker.RemoveAll(x => !IsMatch(x));
+                return walker;
+            }
 
+            return Borrow(() => new DisposableWalker());
             bool IsMatch(IdentifierNameSyntax identifierName)
             {
                 if (identifierName.Identifier.ValueText == target.Symbol.Name &&

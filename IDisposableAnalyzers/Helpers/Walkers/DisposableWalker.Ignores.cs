@@ -48,8 +48,7 @@
                 case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull } conditionalAccess
                     when semanticModel.TryGetSymbol(whenNotNull, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
-                case InitializerExpressionSyntax initializer
-                    when initializer.Parent is ExpressionSyntax creation:
+                case InitializerExpressionSyntax { Parent: ExpressionSyntax creation } initializer:
                     return Ignores(creation, semanticModel, cancellationToken, visited);
             }
 
@@ -194,10 +193,10 @@
                 }
 
                 if (method is { IsExtensionMethod: true, ReducedFrom: { } reducedFrom } &&
-                    reducedFrom.Parameters.TryFirst(out var parameter) &&
-                    reducedFrom.TrySingleMethodDeclaration(cancellationToken, out var declaration))
+                    reducedFrom.Parameters.TryFirst(out var parameter))
                 {
-                    return DisposedByReturnValue(new SymbolAndDeclaration<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
+                    _ = reducedFrom.TrySingleMethodDeclaration(cancellationToken, out var declaration);
+                    return DisposedByReturnValue(new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
                 }
             }
 

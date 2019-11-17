@@ -69,7 +69,7 @@
 
             foreach (var item in walker.recursive)
             {
-                using (var recursiveWalker = RecursiveWalker.Borrow(item.SymbolAndDeclaration, semanticModel, cancellationToken))
+                using (var recursiveWalker = RecursiveWalker.Borrow(item.Target, semanticModel, cancellationToken))
                 {
                     if (recursiveWalker.UsedReferenceTypes.Count > 0)
                     {
@@ -89,11 +89,11 @@
             base.Clear();
         }
 
-        protected override bool TryGetTargetSymbol<TSymbol, TDeclaration>(SyntaxNode node, out SymbolAndDeclaration<TSymbol, TDeclaration> sad)
+        protected override bool TryGetTargetSymbol<TSymbol, TDeclaration>(SyntaxNode node, out Target<TSymbol, TDeclaration> sad)
         {
             if (base.TryGetTargetSymbol(node, out sad))
             {
-                this.recursive.Add(new Recursive(node, new SymbolAndDeclaration<ISymbol, SyntaxNode>(sad.Symbol, sad.Declaration)));
+                this.recursive.Add(new Recursive(node, new Target<ISymbol, SyntaxNode>(sad.Symbol, sad.Node)));
             }
 
             return false;
@@ -138,12 +138,12 @@
         private struct Recursive
         {
             internal readonly SyntaxNode Node;
-            internal readonly SymbolAndDeclaration<ISymbol, SyntaxNode> SymbolAndDeclaration;
+            internal readonly Target<ISymbol, SyntaxNode> Target;
 
-            internal Recursive(SyntaxNode node, SymbolAndDeclaration<ISymbol, SyntaxNode> symbolAndDeclaration)
+            internal Recursive(SyntaxNode node, Target<ISymbol, SyntaxNode> target)
             {
                 this.Node = node;
-                this.SymbolAndDeclaration = symbolAndDeclaration;
+                this.Target = target;
             }
         }
 
@@ -174,9 +174,9 @@
                 base.VisitIdentifierName(node);
             }
 
-            internal static RecursiveWalker Borrow(SymbolAndDeclaration<ISymbol, SyntaxNode> symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static RecursiveWalker Borrow(Target<ISymbol, SyntaxNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                return BorrowAndVisit(symbol.Declaration, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
+                return BorrowAndVisit(target.Node!, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
             }
 
             /// <inheritdoc />

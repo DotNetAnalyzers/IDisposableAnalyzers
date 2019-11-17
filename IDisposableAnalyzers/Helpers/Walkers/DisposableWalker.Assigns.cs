@@ -13,13 +13,13 @@
         {
             if (localOrParameter.TryGetScope(cancellationToken, out var scope))
             {
-                return Assigns(new SymbolAndDeclaration<ISymbol, SyntaxNode>(localOrParameter.Symbol, scope), semanticModel, cancellationToken, visited, out first);
+                return Assigns(new Target<ISymbol, SyntaxNode>(localOrParameter.Symbol, scope), semanticModel, cancellationToken, visited, out first);
             }
 
             return false;
         }
 
-        private static bool Assigns<TSymbol, TNode>(SymbolAndDeclaration<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty fieldOrProperty)
+        private static bool Assigns<TSymbol, TNode>(Target<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, out FieldOrProperty fieldOrProperty)
               where TSymbol : class, ISymbol
               where TNode : SyntaxNode
         {
@@ -61,7 +61,7 @@
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
                     when semanticModel.TryGetSymbol(variableDeclarator, cancellationToken, out ILocalSymbol? local) &&
                          local.TryGetScope(cancellationToken, out var scope):
-                    return Assigns(new SymbolAndDeclaration<ILocalSymbol, SyntaxNode>(local, scope), semanticModel, cancellationToken, visited, out fieldOrProperty);
+                    return Assigns(new Target<ILocalSymbol, SyntaxNode>(local, scope), semanticModel, cancellationToken, visited, out fieldOrProperty);
 
                 default:
                     return false;
