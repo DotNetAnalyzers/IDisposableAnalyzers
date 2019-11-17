@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -115,8 +116,9 @@
 
             switch (candidate.Parent)
             {
-                case ArgumentSyntax argument:
-                    return DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out invocationOrObjectCreation);
+                case ArgumentSyntax argument
+                    when Target(argument, semanticModel, cancellationToken, visited) is { } target:
+                    return DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out invocationOrObjectCreation);
                 case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }
                     when semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
                          type == KnownSymbol.CompositeDisposable:
@@ -128,7 +130,7 @@
             }
         }
 
-        internal static bool DisposedByReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        private static bool DisposedByReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
         {
             switch (target)
             {
@@ -210,6 +212,7 @@
             return false;
         }
 
+        [Obsolete("Merge with above.")]
         private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
             where TSource : SyntaxNode
         {
