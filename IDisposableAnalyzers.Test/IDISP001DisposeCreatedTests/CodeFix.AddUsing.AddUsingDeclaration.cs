@@ -14,6 +14,42 @@
             private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             [Test]
+            public static void LocalToUsingDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            ↓var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            using var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            }
+
+            [Test]
             public static void Local()
             {
                 var before = @"
@@ -47,8 +83,46 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            }
+
+            [Test]
+            public static void LocalWithTriviaToUsingDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            // Some comment
+            ↓var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            // Some comment
+            using var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
 
             [Test]
@@ -87,8 +161,46 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            }
+
+            [Test]
+            public static void LocalOneStatementAfterToUsingDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            ↓var stream = File.OpenRead(string.Empty);
+            var i = 1;
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            using var stream = File.OpenRead(string.Empty);
+            var i = 1;
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
 
             [Test]
@@ -127,12 +239,146 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
             }
 
             [Test]
             public static void LocalManyStatements()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            ↓var stream = File.OpenRead(string.Empty);
+            var a = 1;
+            var b = 1;
+            if (a == b)
+            {
+                var c = 2;
+            }
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C
+    {
+        public void M()
+        {
+            using var stream = File.OpenRead(string.Empty);
+            var a = 1;
+            var b = 1;
+            if (a == b)
+            {
+                var c = 2;
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            }
+
+            [Test]
+            public static void LocalInLambdaToUsingDeclaration()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public C()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                ↓var stream = File.OpenRead(string.Empty);
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public C()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                using var stream = File.OpenRead(string.Empty);
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            }
+
+            [Test]
+            public static void LocalInLambda()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public C()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                ↓var stream = File.OpenRead(string.Empty);
+            };
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public C()
+        {
+            Console.CancelKeyPress += (_, __) =>
+            {
+                using (var stream = File.OpenRead(string.Empty))
+                {
+                }
+            };
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            }
+
+            [Test]
+            public static void LocalManyStatementsToUsingDeclaration()
             {
                 var before = @"
 namespace N
@@ -177,52 +423,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
-            public static void LocalInLambda()
-            {
-                var before = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public C()
-        {
-            Console.CancelKeyPress += (_, __) =>
-            {
-                ↓var stream = File.OpenRead(string.Empty);
-            };
-        }
-    }
-}";
-
-                var after = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public class C
-    {
-        public C()
-        {
-            Console.CancelKeyPress += (_, __) =>
-            {
-                using (var stream = File.OpenRead(string.Empty))
-                {
-                }
-            };
-        }
-    }
-}";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
             }
 
             [Test]
@@ -294,8 +496,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
             }
 
             [Test]

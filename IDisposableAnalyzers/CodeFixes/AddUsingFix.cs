@@ -37,7 +37,7 @@
                 if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id)
                 {
                     if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax? argument) &&
-                             argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
+                        argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
                     {
                         if (argument is { Expression: DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier: { } identifier } } })
                         {
@@ -70,6 +70,19 @@
                     }
                     else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax? statement))
                     {
+                        if (statement is LocalDeclarationStatementSyntax lds)
+                        {
+                            context.RegisterCodeFix(
+                                "using",
+                                (editor, _) => editor.ReplaceNode(
+                                    lds,
+                                    x => x.WithUsingKeyword(SyntaxFactory.Token(SyntaxKind.UsingKeyword)
+                                                                         .WithLeadingTrivia(x.Declaration.GetLeadingTrivia()))
+                                          .WithDeclaration(x.Declaration.WithLeadingTrivia(SyntaxFactory.TriviaList()))),
+                                "using",
+                                diagnostic);
+                        }
+
                         switch (statement)
                         {
                             case LocalDeclarationStatementSyntax { Declaration: { }, Parent: BlockSyntax _ } localDeclarationStatement:
