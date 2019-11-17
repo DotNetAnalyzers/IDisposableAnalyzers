@@ -93,7 +93,7 @@
         {
             if (base.TryGetTargetSymbol(node, out sad))
             {
-                this.recursive.Add(new Recursive(node, Target.Create<SyntaxNode,ISymbol, SyntaxNode>(node, sad.Symbol, sad.TargetNode)));
+                this.recursive.Add(new Recursive(node, Target.Create<SyntaxNode, ISymbol, SyntaxNode>(node, sad.Symbol, sad.TargetNode)));
             }
 
             return false;

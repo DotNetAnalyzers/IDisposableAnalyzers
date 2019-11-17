@@ -131,8 +131,7 @@
 
         private static bool Ignores(VariableDeclaratorSyntax declarator, Recursion recursion)
         {
-            if (declarator.TryFirstAncestor(out BlockSyntax? block) &&
-                recursion.SemanticModel.TryGetSymbol(declarator, recursion.CancellationToken, out ILocalSymbol? local))
+            if (recursion.SemanticModel.TryGetSymbol(declarator, recursion.CancellationToken, out ILocalSymbol? local))
             {
                 if (declarator.TryFirstAncestor<UsingStatementSyntax>(out _))
                 {

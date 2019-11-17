@@ -188,7 +188,7 @@
                                     "disposable",
                                     Accessibility.Private,
                                     DeclarationModifiers.ReadOnly,
-                                    CompositeDisposableType, 
+                                    CompositeDisposableType,
                                     cancellationToken).ConfigureAwait(false);
 
                                 _ = editor.ReplaceNode(

@@ -648,15 +648,22 @@
 
             if (this.semanticModel.TryGetSymbol(assigned, this.cancellationToken, out ISymbol? assignedSymbol))
             {
-                if (assignedSymbol.IsEquivalentTo(this.CurrentSymbol) ||
-                    this.refParameters.Contains(assignedSymbol as IParameterSymbol))
+                if (assignedSymbol.IsEquivalentTo(this.CurrentSymbol))
                 {
                     this.values.Add(value);
                 }
 
-                if (this.outParameters.Contains(assignedSymbol as IParameterSymbol))
+                if (assignedSymbol is IParameterSymbol parameter)
                 {
-                    this.outValues.Add(value);
+                    if (this.outParameters.Contains(parameter))
+                    {
+                        this.outValues.Add(value);
+                    }
+
+                    if (this.refParameters.Contains(parameter))
+                    {
+                        this.values.Add(value);
+                    }
                 }
             }
 
