@@ -279,12 +279,12 @@
                 }
             }
 
-            bool TryGetWalker(out AssignedValueWalker result)
+            bool TryGetWalker(out AssignedValueWalker? result)
             {
                 result = null;
                 if (TryGetKey(out var key))
                 {
-                    if (this.memberWalkers.TryGetValue(key, out result))
+                    if (this.memberWalkers.TryGetValue(key!, out result))
                     {
                         return false;
                     }
@@ -292,7 +292,7 @@
                     if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax? declaration))
                     {
                         result = Borrow(() => new AssignedValueWalker());
-                        this.memberWalkers.Add(key, result);
+                        this.memberWalkers.Add(key!, result);
                         result.CurrentSymbol = this.CurrentSymbol;
                         result.semanticModel = this.semanticModel;
                         result.cancellationToken = this.cancellationToken;
@@ -307,12 +307,12 @@
                                 if (argument.RefOrOutKeyword.IsKind(SyntaxKind.RefKeyword) &&
                                     TryGetMatchingParameter(argument, out var parameter))
                                 {
-                                    result.refParameters.Add(parameter);
+                                    result.refParameters.Add(parameter!);
                                 }
                                 else if (argument.RefOrOutKeyword.IsKind(SyntaxKind.OutKeyword) &&
                                          TryGetMatchingParameter(argument, out parameter))
                                 {
-                                    result.outParameters.Add(parameter);
+                                    result.outParameters.Add(parameter!);
                                 }
                             }
                         }
@@ -323,7 +323,7 @@
 
                 return result != null;
 
-                bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol parameter)
+                bool TryGetMatchingParameter(ArgumentSyntax argument, out IParameterSymbol? parameter)
                 {
                     parameter = null;
                     if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out var candidate))
@@ -344,7 +344,7 @@
                     return false;
                 }
 
-                bool TryGetKey(out SyntaxNode node)
+                bool TryGetKey(out SyntaxNode? node)
                 {
                     if (argumentList != null)
                     {
@@ -630,7 +630,7 @@
 
             if (TryGetSetterWalker(out var setterWalker))
             {
-                foreach (var nested in setterWalker.values)
+                foreach (var nested in setterWalker!.values)
                 {
                     if (nested is IdentifierNameSyntax identifierName &&
                         identifierName.Identifier.ValueText == "value")
@@ -667,7 +667,7 @@
                 }
             }
 
-            bool TryGetSetterWalker(out AssignedValueWalker walker)
+            bool TryGetSetterWalker(out AssignedValueWalker? walker)
             {
                 walker = null;
                 if (!this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
@@ -682,7 +682,7 @@
                         return false;
                     }
 
-                    if (property.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
+                    if (property!.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                         declaration.TryGetSetter(out var setter))
                     {
                         walker = Borrow(() => new AssignedValueWalker());
@@ -698,7 +698,7 @@
 
                 return walker != null;
 
-                bool TryGetProperty(out IPropertySymbol result)
+                bool TryGetProperty(out IPropertySymbol? result)
                 {
                     result = null;
                     return assigned is ExpressionSyntax assignedExpression &&

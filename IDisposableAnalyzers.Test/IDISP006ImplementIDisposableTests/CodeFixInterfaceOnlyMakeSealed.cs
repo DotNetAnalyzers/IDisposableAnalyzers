@@ -207,7 +207,7 @@ namespace N
             [Test]
             public static void WithOverridingProperties()
             {
-                var baseCode = @"
+                var baseClass = @"
 namespace N
 {
     public abstract class BaseClass
@@ -269,7 +269,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, new[] { baseCode, before }, after, "Implement IDisposable and make class sealed.");
+                RoslynAssert.CodeFix(Fix, CS0535, new[] { baseClass, before }, after, "Implement IDisposable and make class sealed.");
             }
 
             [Test]
