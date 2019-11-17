@@ -38,7 +38,7 @@ BUGFIX IDISP023: when disposing members.</Description>
     <PackageReleaseNotes>
       BUGFIX: Handle extension methods in binary references better.
     </PackageReleaseNotes>
-    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</PackageProjectUrl>
     <RepositoryUrl>https://github.com/DotNetAnalyzers/IDisposableAnalyzers</RepositoryUrl>
   </PropertyGroup>
@@ -46,7 +46,7 @@ BUGFIX IDISP023: when disposing members.</Description>
   <ItemGroup>
     <PackageReference Include="Gu.Analyzers" Version="1.6.3-dev" PrivateAssets="all" />
     <PackageReference Include="Gu.Roslyn.Extensions" Version="0.10.2-dev" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="2.3.1" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <!--<PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.7" PrivateAssets="all" />-->
     <PackageDownload Include="Microsoft.NETCore.App.Ref" Version="[$(AnnotatedReferenceAssemblyVersion)]" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.113" PrivateAssets="all" />

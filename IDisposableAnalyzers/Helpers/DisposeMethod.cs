@@ -91,22 +91,20 @@
             {
                 case { ParameterList: { Parameters: { Count: 0 } } }:
                     {
-                        using (var walker = InvocationWalker.Borrow(virtualDispose))
+                        using var walker = InvocationWalker.Borrow(virtualDispose);
+                        foreach (var invocation in walker.Invocations)
                         {
-                            foreach (var invocation in walker.Invocations)
+                            if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
+                                invocation.TryGetMethodName(out var name) &&
+                                name == virtualDispose.Identifier.ValueText &&
+                                invocation.ArgumentList is { Arguments: { Count: 0 } } &&
+                                semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
+                                semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
+                                method is { IsOverride: true, OverriddenMethod: { } overridden } &&
+                                target.Equals(overridden))
                             {
-                                if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
-                                    invocation.TryGetMethodName(out var name) &&
-                                    name == virtualDispose.Identifier.ValueText &&
-                                    invocation.ArgumentList is { Arguments: { Count: 0 } } &&
-                                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
-                                    semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
-                                    method is { IsOverride: true, OverriddenMethod: { } overridden } &&
-                                    target.Equals(overridden))
-                                {
-                                    baseCall = invocation;
-                                    return true;
-                                }
+                                baseCall = invocation;
+                                return true;
                             }
                         }
 
@@ -116,24 +114,22 @@
                 case { ParameterList: { Parameters: { Count: 1 } parameters } }
                     when parameters.TrySingle(out var parameter):
                     {
-                        using (var walker = InvocationWalker.Borrow(virtualDispose))
+                        using var walker = InvocationWalker.Borrow(virtualDispose);
+                        foreach (var invocation in walker.Invocations)
                         {
-                            foreach (var invocation in walker.Invocations)
+                            if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
+                                invocation.TryGetMethodName(out var name) &&
+                                name == virtualDispose.Identifier.ValueText &&
+                                invocation.ArgumentList is { Arguments: { Count: 1 } arguments } &&
+                                arguments[0] is { Expression: IdentifierNameSyntax { Identifier: { ValueText: { } argument } } } &&
+                                argument == parameter.Identifier.ValueText &&
+                                semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
+                                semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
+                                method is { IsOverride: true, OverriddenMethod: { } overridden } &&
+                                target.Equals(overridden))
                             {
-                                if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
-                                    invocation.TryGetMethodName(out var name) &&
-                                    name == virtualDispose.Identifier.ValueText &&
-                                    invocation.ArgumentList is { Arguments: { Count: 1 } arguments } &&
-                                    arguments[0] is { Expression: IdentifierNameSyntax { Identifier: { ValueText: { } argument } } } &&
-                                    argument == parameter.Identifier.ValueText &&
-                                    semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
-                                    semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
-                                    method is { IsOverride: true, OverriddenMethod: { } overridden } &&
-                                    target.Equals(overridden))
-                                {
-                                    baseCall = invocation;
-                                    return true;
-                                }
+                                baseCall = invocation;
+                                return true;
                             }
                         }
 

@@ -14,14 +14,12 @@
         {
             using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                using (var walker = CreateUsagesWalker(localOrParameter, recursion))
+                using var walker = CreateUsagesWalker(localOrParameter, recursion);
+                foreach (var usage in walker.usages)
                 {
-                    foreach (var usage in walker.usages)
+                    if (Stores(usage, recursion, out container))
                     {
-                        if (Stores(usage, recursion, out container))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }

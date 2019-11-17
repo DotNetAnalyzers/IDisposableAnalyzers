@@ -77,12 +77,10 @@
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP010CallBaseDispose, methodDeclaration.Identifier.GetLocation(), parameter.Name));
                     }
 
-                    using (var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken))
+                    using var walker = FinalizerContextWalker.Borrow(methodDeclaration, context.SemanticModel, context.CancellationToken);
+                    foreach (var node in walker.UsedReferenceTypes)
                     {
-                        foreach (var node in walker.UsedReferenceTypes)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext, node.GetLocation()));
-                        }
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext, node.GetLocation()));
                     }
                 }
             }
@@ -121,16 +119,14 @@
                 }
                 else
                 {
-                    using (var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken))
+                    using var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken);
+                    foreach (var disposeCall in disposeWalker.Invocations)
                     {
-                        foreach (var disposeCall in disposeWalker.Invocations)
+                        if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                            FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                            !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
                         {
-                            if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                                FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
-                                !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }

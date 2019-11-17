@@ -23,53 +23,51 @@
                 property.TryGetSetter(cancellationToken, out var setter) &&
                 (setter.ExpressionBody != null || setter.Body != null))
             {
-                using (var assignedSymbols = PooledSet<ISymbol>.Borrow())
+                using var assignedSymbols = PooledSet<ISymbol>.Borrow();
+                using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, SearchScope.Recursive, semanticModel, cancellationToken))
                 {
-                    using (var pooledAssigned = AssignmentExecutionWalker.Borrow(setter, SearchScope.Recursive, semanticModel, cancellationToken))
+                    foreach (var assigned in pooledAssigned.Assignments)
                     {
-                        foreach (var assigned in pooledAssigned.Assignments)
+                        if (assigned is { Left: { } left, Right: IdentifierNameSyntax { Identifier: { ValueText: "value" } } } &&
+                            IsPotentiallyAssignableFrom(left, semanticModel, cancellationToken) &&
+                            semanticModel.GetSymbolSafe(left, cancellationToken) is { } candidate &&
+                            candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                         {
-                            if (assigned is { Left: { } left, Right: IdentifierNameSyntax { Identifier: { ValueText: "value" } } } &&
-                                IsPotentiallyAssignableFrom(left, semanticModel, cancellationToken) &&
-                                semanticModel.GetSymbolSafe(left, cancellationToken) is { } candidate &&
-                                candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
-                            {
-                                assignedSymbols.Add(candidate);
-                            }
+                            assignedSymbols.Add(candidate);
                         }
                     }
-
-                    assignedSymbol = null;
-                    var result = Result.No;
-                    foreach (var candidate in assignedSymbols)
-                    {
-                        switch (IsAssignedWithCreated(candidate, disposable, semanticModel, cancellationToken))
-                        {
-                            case Result.Unknown:
-                                if (result == Result.No)
-                                {
-                                    assignedSymbol = candidate;
-                                    result = Result.Unknown;
-                                }
-
-                                break;
-                            case Result.Yes:
-                                assignedSymbol = candidate;
-                                return Result.Yes;
-                            case Result.AssumeYes:
-                                assignedSymbol = candidate;
-                                result = Result.AssumeYes;
-                                break;
-                            case Result.No:
-                            case Result.AssumeNo:
-                                break;
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(disposable), disposable, "Unknown result type");
-                        }
-                    }
-
-                    return result;
                 }
+
+                assignedSymbol = null;
+                var result = Result.No;
+                foreach (var candidate in assignedSymbols)
+                {
+                    switch (IsAssignedWithCreated(candidate, disposable, semanticModel, cancellationToken))
+                    {
+                        case Result.Unknown:
+                            if (result == Result.No)
+                            {
+                                assignedSymbol = candidate;
+                                result = Result.Unknown;
+                            }
+
+                            break;
+                        case Result.Yes:
+                            assignedSymbol = candidate;
+                            return Result.Yes;
+                        case Result.AssumeYes:
+                            assignedSymbol = candidate;
+                            result = Result.AssumeYes;
+                            break;
+                        case Result.No:
+                        case Result.AssumeNo:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException(nameof(disposable), disposable, "Unknown result type");
+                    }
+                }
+
+                return result;
             }
 
             if (symbol is IParameterSymbol &&
@@ -95,10 +93,8 @@
                     assignedValues.RemoveAll(x => IsReturnedBefore(x));
                 }
 
-                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                }
+                using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                return IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
 
             bool IsReturnedBefore(ExpressionSyntax expression)
@@ -128,13 +124,9 @@
                 return Result.No;
             }
 
-            using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCreation(recursive, semanticModel, cancellationToken);
-                }
-            }
+            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            return IsAnyCreation(recursive, semanticModel, cancellationToken);
         }
 
         /// <summary>
@@ -176,10 +168,8 @@
                 return Result.Yes;
             }
 
-            using (var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken))
-            {
-                return IsAnyCreation(recursive, semanticModel, cancellationToken);
-            }
+            using var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken);
+            return IsAnyCreation(recursive, semanticModel, cancellationToken);
         }
 
         internal static Result IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)

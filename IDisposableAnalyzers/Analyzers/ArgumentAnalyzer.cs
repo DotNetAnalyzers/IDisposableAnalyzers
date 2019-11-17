@@ -57,14 +57,10 @@
                 method.TryFindParameter(candidate, out var parameter) &&
                 Disposable.IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
             {
-                using (var assignedValues = AssignedValueWalker.Borrow(candidate.Expression, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                    {
-                        return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                               !Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                    }
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(candidate.Expression, semanticModel, cancellationToken);
+                using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                      !Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
             }
 
             return false;

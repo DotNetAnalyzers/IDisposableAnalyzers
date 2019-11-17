@@ -105,16 +105,14 @@
                 result = null!;
                 if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
                 {
-                    using (var walker = VariableDeclaratorWalker.Borrow(memberDeclaration))
-                    {
-                        return walker.VariableDeclarators.TrySingle(
-                                   x => x is { Initializer: { Value: { } value } } &&
-                                        context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
-                                        symbol.Equals(assignedSymbol),
-                                   out var match) &&
-                               match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
-                               context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out result);
-                    }
+                    using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
+                    return walker.VariableDeclarators.TrySingle(
+                                x => x is { Initializer: { Value: { } value } } &&
+                                    context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
+                                    symbol.Equals(assignedSymbol),
+                                out var match) &&
+                            match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
+                            context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out result);
                 }
 
                 return false;

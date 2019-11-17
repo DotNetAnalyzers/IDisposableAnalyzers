@@ -24,10 +24,8 @@
                 return Result.Unknown;
             }
 
-            using (var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken))
-            {
-                return walker.IsMemberDisposed(member.Symbol);
-            }
+            using var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken);
+            return walker.IsMemberDisposed(member.Symbol);
         }
 
         internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -39,26 +37,12 @@
 
             if (disposeMethod.TrySingleMethodDeclaration(cancellationToken, out var disposeMethodDeclaration))
             {
-                using (var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken))
+                using var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken);
+                if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
                 {
-                    if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
+                    foreach (var candidate in walker.Invocations)
                     {
-                        foreach (var candidate in walker.Invocations)
-                        {
-                            if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
-                            {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    }
-
-                    foreach (var candidate in walker.Identifiers)
-                    {
-                        if (candidate.Identifier.Text == member.Name &&
-                            semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
-                            candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                        if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
                         {
                             return true;
                         }
@@ -66,6 +50,18 @@
 
                     return false;
                 }
+
+                foreach (var candidate in walker.Identifiers)
+                {
+                    if (candidate.Identifier.Text == member.Name &&
+                        semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
+                        candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
 
             return false;

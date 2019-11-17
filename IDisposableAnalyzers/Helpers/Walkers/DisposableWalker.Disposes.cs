@@ -16,37 +16,33 @@
                 return false;
             }
 
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var walker = CreateUsagesWalker(localOrParameter, recursion);
+            foreach (var usage in walker.usages)
             {
-                using (var walker = CreateUsagesWalker(localOrParameter, recursion))
+                if (Returns(usage, recursion))
                 {
-                    foreach (var usage in walker.usages)
-                    {
-                        if (Returns(usage, recursion))
-                        {
-                            return false;
-                        }
+                    return false;
+                }
 
-                        if (Assigns(usage, recursion, out _))
-                        {
-                            return false;
-                        }
+                if (Assigns(usage, recursion, out _))
+                {
+                    return false;
+                }
 
-                        if (Stores(usage, recursion, out _))
-                        {
-                            return false;
-                        }
+                if (Stores(usage, recursion, out _))
+                {
+                    return false;
+                }
 
-                        if (Disposes(usage, recursion))
-                        {
-                            return false;
-                        }
+                if (Disposes(usage, recursion))
+                {
+                    return false;
+                }
 
-                        if (DisposedByReturnValue(usage, recursion, out _))
-                        {
-                            return false;
-                        }
-                    }
+                if (DisposedByReturnValue(usage, recursion, out _))
+                {
+                    return false;
                 }
             }
 
@@ -83,15 +79,13 @@
         {
             using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
+                using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
+                foreach (var usage in walker.usages)
                 {
-                    foreach (var usage in walker.usages)
+                    if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                        Disposes(usage, recursion))
                     {
-                        if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
-                            Disposes(usage, recursion))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }
@@ -109,14 +103,12 @@
 
             using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
             {
-                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
+                using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
+                foreach (var usage in walker.usages)
                 {
-                    foreach (var usage in walker.usages)
+                    if (Disposes(usage, recursion))
                     {
-                        if (Disposes(usage, recursion))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }

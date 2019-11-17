@@ -99,11 +99,9 @@
                     if (targetDeclaration.TryFindParameter(argument, out var parameter) &&
                         this.semanticModel.TryGetSymbol(parameter, this.cancellationToken, out var parameterSymbol))
                     {
-                        using (var assignedValues = AssignedValueWalker.Borrow(parameterSymbol, this.semanticModel, this.cancellationToken))
-                        {
-                            assignedValues.HandleInvoke(target, invocation.ArgumentList);
-                            return this.AddManyRecursively(assignedValues);
-                        }
+                        using var assignedValues = AssignedValueWalker.Borrow(parameterSymbol, this.semanticModel, this.cancellationToken);
+                        assignedValues.HandleInvoke(target, invocation.ArgumentList);
+                        return this.AddManyRecursively(assignedValues);
                     }
 
                     return false;

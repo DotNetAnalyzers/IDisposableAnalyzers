@@ -11,20 +11,18 @@
         {
             if (TryGetScope(expression, out var block))
             {
-                using (var walker = InvocationWalker.Borrow(block))
+                using var walker = InvocationWalker.Borrow(block);
+                foreach (var invocation in walker.Invocations)
                 {
-                    foreach (var invocation in walker.Invocations)
+                    if (invocation.IsExecutedBefore(expression) == ExecutedBefore.No)
                     {
-                        if (invocation.IsExecutedBefore(expression) == ExecutedBefore.No)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) &&
-                            !IsReassignedAfter(block, invocation))
-                        {
-                            return true;
-                        }
+                    if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) &&
+                        !IsReassignedAfter(block, invocation))
+                    {
+                        return true;
                     }
                 }
             }
@@ -33,16 +31,14 @@
                 semanticModel.GetSymbolSafe(left, cancellationToken) is IPropertySymbol property &&
                 property.TryGetSetter(cancellationToken, out var setter))
             {
-                using (var pooled = InvocationWalker.Borrow(setter))
+                using var pooled = InvocationWalker.Borrow(setter);
+                foreach (var invocation in pooled.Invocations)
                 {
-                    foreach (var invocation in pooled.Invocations)
+                    if ((DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
+                         DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken)) &&
+                         !IsReassignedAfter(setter, invocation))
                     {
-                        if ((DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
-                             DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken)) &&
-                             !IsReassignedAfter(setter, invocation))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }

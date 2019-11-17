@@ -11,15 +11,11 @@
         {
             if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
-                using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
-                {
-                    using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                    {
-                        return (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                                IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)) &&
-                              !IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                    }
-                }
+                using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+                using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                return (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
+                        IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)) &&
+                       !IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
             }
 
             return false;
@@ -65,21 +61,17 @@
                         result = Result.AssumeYes;
                     }
 
-                    using (var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken))
+                    using var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken);
+                    using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                    isInjected = IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
+                    if (isInjected == Result.Yes)
                     {
-                        using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                        {
-                            isInjected = IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
-                            if (isInjected == Result.Yes)
-                            {
-                                return Result.Yes;
-                            }
+                        return Result.Yes;
+                    }
 
-                            if (isInjected == Result.AssumeYes)
-                            {
-                                result = Result.AssumeYes;
-                            }
-                        }
+                    if (isInjected == Result.AssumeYes)
+                    {
+                        result = Result.AssumeYes;
                     }
                 }
                 else if (semanticModel.TryGetSymbol(values.Current, cancellationToken, out symbol))
@@ -160,13 +152,9 @@
 
         private static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken))
-            {
-                using (var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken))
-                {
-                    return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
-                }
-            }
+            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
         }
     }
 }

@@ -34,14 +34,12 @@
         {
             if (target.TargetNode is { })
             {
-                using (var walker = CreateUsagesWalker(target, recursion))
+                using var walker = CreateUsagesWalker(target, recursion);
+                foreach (var usage in walker.usages)
                 {
-                    foreach (var usage in walker.usages)
+                    if (Returns(usage, recursion))
                     {
-                        if (Returns(usage, recursion))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }

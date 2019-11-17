@@ -61,29 +61,27 @@
                 declaration.TryFirstAncestor(out BlockSyntax? block))
             {
                 List<Location>? temp = null;
-                using (var walker = IdentifierNameWalker.Borrow(block))
+                using var walker = IdentifierNameWalker.Borrow(block);
+                foreach (var identifierName in walker.IdentifierNames)
                 {
-                    foreach (var identifierName in walker.IdentifierNames)
+                    if (identifierName.Identifier.ValueText == local.Name &&
+                        invocation.IsExecutedBefore(identifierName) == ExecutedBefore.Yes &&
+                        context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol? candidate) &&
+                        local.Equals(candidate) &&
+                        !IsAssigned(identifierName) &&
+                        !IsReassigned(identifierName))
                     {
-                        if (identifierName.Identifier.ValueText == local.Name &&
-                            invocation.IsExecutedBefore(identifierName) == ExecutedBefore.Yes &&
-                            context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol? candidate) &&
-                            local.Equals(candidate) &&
-                            !IsAssigned(identifierName) &&
-                            !IsReassigned(identifierName))
+                        if (temp == null)
                         {
-                            if (temp == null)
-                            {
-                                temp = new List<Location>();
-                            }
-
-                            temp.Add(identifierName.GetLocation());
+                            temp = new List<Location>();
                         }
-                    }
 
-                    locations = temp;
-                    return locations != null;
+                        temp.Add(identifierName.GetLocation());
+                    }
                 }
+
+                locations = temp;
+                return locations != null;
             }
 
             locations = null;
@@ -145,20 +143,18 @@
 
             bool IsMutated()
             {
-                using (var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken))
+                using var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken);
+                if (declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
+                    walker.TrySingle(out var mutation) &&
+                    mutation.TryFirstAncestor(out ExpressionStatementSyntax? statement) &&
+                    statement.Parent is BlockSyntax block &&
+                    block.Statements[0] == statement &&
+                    block.Parent is TryStatementSyntax)
                 {
-                    if (declarator.Initializer?.Value.IsKind(SyntaxKind.NullLiteralExpression) == true &&
-                        walker.TrySingle(out var mutation) &&
-                        mutation.TryFirstAncestor(out ExpressionStatementSyntax? statement) &&
-                        statement.Parent is BlockSyntax block &&
-                        block.Statements[0] == statement &&
-                        block.Parent is TryStatementSyntax)
-                    {
-                        return false;
-                    }
-
-                    return walker.All().Any();
+                    return false;
                 }
+
+                return walker.All().Any();
             }
         }
     }

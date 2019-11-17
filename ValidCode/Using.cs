@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -8,6 +8,8 @@ namespace ValidCode
     {
         public Using(IObservable<int> observable)
         {
+            using var file = File.OpenRead(string.Empty);
+
             IDisposable temp;
             using (temp = new Disposable())
             {

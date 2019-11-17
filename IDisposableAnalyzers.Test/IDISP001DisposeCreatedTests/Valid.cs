@@ -107,6 +107,26 @@ namespace N
         }
 
         [Test]
+        public static void UsingFileStreamCSharp8()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static long M()
+        {
+            using var stream = File.OpenRead(string.Empty);
+            return stream.Length;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public static void UsingNewDisposable()
         {
             var disposableCode = @"

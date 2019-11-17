@@ -147,10 +147,8 @@
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
-            {
-                return IsLazyEnumerable(invocation, recursion);
-            }
+            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            return IsLazyEnumerable(invocation, recursion);
         }
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, Recursion recursion)
@@ -163,16 +161,14 @@
                     return true;
                 }
 
-                using (var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, recursion.SemanticModel, recursion.CancellationToken))
+                using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var returnValue in walker)
                 {
-                    foreach (var returnValue in walker)
+                    if (returnValue is InvocationExpressionSyntax nestedInvocation)
                     {
-                        if (returnValue is InvocationExpressionSyntax nestedInvocation)
+                        if (IsLazyEnumerable(nestedInvocation, recursion))
                         {
-                            if (IsLazyEnumerable(nestedInvocation, recursion))
-                            {
-                                return true;
-                            }
+                            return true;
                         }
                     }
                 }

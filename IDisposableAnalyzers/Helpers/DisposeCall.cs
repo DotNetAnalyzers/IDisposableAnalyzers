@@ -36,17 +36,15 @@
                 foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
                 {
                     var node = reference.GetSyntax(cancellationToken);
-                    using (var pooled = ReturnValueWalker.Borrow(node, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
+                    using var pooled = ReturnValueWalker.Borrow(node, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                    if (pooled.Count == 0)
                     {
-                        if (pooled.Count == 0)
-                        {
-                            return true;
-                        }
-
-                        return pooled.TrySingle(out var expression) &&
-                               MemberPath.TryFindRoot(expression, out rootIdentifier) &&
-                               (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
+                        return true;
                     }
+
+                    return pooled.TrySingle(out var expression) &&
+                           MemberPath.TryFindRoot(expression, out rootIdentifier) &&
+                           (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
                 }
             }
 
@@ -66,13 +64,11 @@
                 if (disposed is IPropertySymbol property &&
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
-                    using (var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken))
-                    {
-                        return walker.TrySingle(out var returnValue) &&
-                               MemberPath.TrySingle(returnValue, out var expression) &&
-                               semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
-                               nested.Equals(symbol);
-                    }
+                    using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                    return walker.TrySingle(out var returnValue) &&
+                           MemberPath.TrySingle(returnValue, out var expression) &&
+                           semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
+                           nested.Equals(symbol);
                 }
             }
 

@@ -73,29 +73,25 @@
 
         private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, FieldOrProperty fieldOrProperty)
         {
-            using (var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken))
+            using var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
+            using var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken);
+            if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
             {
-                using (var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
+                    IsMutableFromOutside(fieldOrProperty))
                 {
-                    if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
-                    {
-                        if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                            IsMutableFromOutside(fieldOrProperty))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
-                        }
-                        else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                                 DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
-                                 !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
+                }
+                else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
+                         DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                         !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
-                            if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
-                                !TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
-                            {
-                                context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
-                            }
-                        }
+                    if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
+                        !TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
                     }
                 }
             }
