@@ -9,8 +9,9 @@ Roslyn analyzers for IDisposable
 
 ![animation](https://user-images.githubusercontent.com/1640096/51797806-5efa7380-220a-11e9-918d-c1b39da79c38.gif)
 
-* 1.x versions are for Visual Studio 2015.
+* 3.x versions are for Visual Studio 2019.
 * 2.x versions are for Visual Studio 2017.
+* 1.x versions are for Visual Studio 2015.
 
 | Id       | Title
 | :--      | :--
