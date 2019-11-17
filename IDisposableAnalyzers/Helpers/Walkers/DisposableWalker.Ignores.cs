@@ -196,7 +196,7 @@
                     reducedFrom.Parameters.TryFirst(out var parameter))
                 {
                     _ = reducedFrom.TrySingleMethodDeclaration(cancellationToken, out var declaration);
-                    return DisposedByReturnValue(new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
+                    return DisposedByReturnValue(new Target<SyntaxNode, IParameterSymbol, BaseMethodDeclarationSyntax>(null!, parameter, declaration), semanticModel, cancellationToken, visited) ? Result.Yes : Result.No;
                 }
             }
 

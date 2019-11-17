@@ -24,7 +24,7 @@
         }
 
         [Obsolete("Use Recursion")]
-        private static Target<IParameterSymbol, BaseMethodDeclarationSyntax>? Target(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax>? Target(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
             if (visited.CanVisit(argument, out visited))
             {
@@ -36,13 +36,13 @@
                             when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                                  method.TryFindParameter(argument, out var parameter):
                             _ = method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? methodDeclaration);
-                            return new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, methodDeclaration);
+                            return Gu.Roslyn.AnalyzerExtensions.Target.Create(argument, parameter, methodDeclaration);
 
                         case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                             when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var ctor) &&
                                  ctor.TryFindParameter(argument, out var parameter):
                             _ = ctor.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? ctorDeclaration);
-                            return new Target<IParameterSymbol, BaseMethodDeclarationSyntax>(parameter, ctorDeclaration);
+                            return Gu.Roslyn.AnalyzerExtensions.Target.Create(argument, parameter, ctorDeclaration);
                     }
                 }
             }
@@ -51,13 +51,14 @@
         }
 
         [Obsolete("Use recursion")]
-        private static DisposableWalker CreateUsagesWalker<TSymbol, TNode>(Target<TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static DisposableWalker CreateUsagesWalker<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+              where TSource : SyntaxNode
               where TSymbol : class, ISymbol
               where TNode : SyntaxNode
         {
-            if (target.Node is { } node)
+            if (target.TargetNode is { } node)
             {
-                var walker = BorrowAndVisit(target.Node, () => new DisposableWalker());
+                var walker = BorrowAndVisit(node, () => new DisposableWalker());
                 walker.RemoveAll(x => !IsMatch(x));
                 return walker;
             }

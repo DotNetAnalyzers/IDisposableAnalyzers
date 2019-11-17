@@ -89,11 +89,11 @@
             base.Clear();
         }
 
-        protected override bool TryGetTargetSymbol<TSymbol, TDeclaration>(SyntaxNode node, out Target<TSymbol, TDeclaration> sad)
+        protected override bool TryGetTargetSymbol<TSource, TSymbol, TDeclaration>(TSource node, out Target<TSource, TSymbol, TDeclaration> sad)
         {
             if (base.TryGetTargetSymbol(node, out sad))
             {
-                this.recursive.Add(new Recursive(node, new Target<ISymbol, SyntaxNode>(sad.Symbol, sad.Node)));
+                this.recursive.Add(new Recursive(node, Target.Create<SyntaxNode,ISymbol, SyntaxNode>(node, sad.Symbol, sad.TargetNode)));
             }
 
             return false;
@@ -138,9 +138,9 @@
         private struct Recursive
         {
             internal readonly SyntaxNode Node;
-            internal readonly Target<ISymbol, SyntaxNode> Target;
+            internal readonly Target<SyntaxNode, ISymbol, SyntaxNode> Target;
 
-            internal Recursive(SyntaxNode node, Target<ISymbol, SyntaxNode> target)
+            internal Recursive(SyntaxNode node, Target<SyntaxNode, ISymbol, SyntaxNode> target)
             {
                 this.Node = node;
                 this.Target = target;
@@ -174,9 +174,9 @@
                 base.VisitIdentifierName(node);
             }
 
-            internal static RecursiveWalker Borrow(Target<ISymbol, SyntaxNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static RecursiveWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                return BorrowAndVisit(target.Node!, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
+                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
             }
 
             /// <inheritdoc />

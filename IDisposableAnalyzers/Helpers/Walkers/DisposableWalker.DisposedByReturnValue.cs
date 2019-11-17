@@ -128,7 +128,8 @@
             }
         }
 
-        private static bool DisposedByReturnValue(Target<IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+            where TSource : SyntaxNode
         {
             using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
             {
