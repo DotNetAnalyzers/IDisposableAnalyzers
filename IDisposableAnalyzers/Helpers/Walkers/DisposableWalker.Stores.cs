@@ -140,6 +140,7 @@
             }
         }
 
+        [Obsolete("Use target")]
         private static bool AccessibleInReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
         {
             switch (candidate)
@@ -203,6 +204,74 @@
                         {
                             invocationOrObjectCreation = objectCreation;
                             return true;
+                        }
+                    }
+
+                    invocationOrObjectCreation = default;
+                    return false;
+                default:
+                    invocationOrObjectCreation = null;
+                    return false;
+            }
+        }
+
+        private static bool AccessibleInReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ExpressionSyntax? invocationOrObjectCreation)
+        {
+            switch (target)
+            {
+                case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                    invocationOrObjectCreation = invocation;
+                    if (method.DeclaringSyntaxReferences.IsEmpty)
+                    {
+                        return method == KnownSymbol.Tuple.Create;
+                    }
+
+                    if (method.ReturnsVoid ||
+                        invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
+                    {
+                        return false;
+                    }
+
+                    using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                    {
+                        foreach (var usage in walker.usages)
+                        {
+                            if (usage.Parent is ArgumentSyntax parentArgument &&
+                                AccessibleInReturnValue(parentArgument, semanticModel, cancellationToken, visited, out var parentInvocationOrObjectCreation) &&
+                                Returns(parentInvocationOrObjectCreation, semanticModel, cancellationToken, visited))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    return false;
+
+                case { Symbol: { ContainingSymbol: { } constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } } }:
+                    if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
+                    {
+                        invocationOrObjectCreation = objectCreation;
+                        return true;
+                    }
+
+                    using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                    {
+                        foreach (var usage in walker.usages)
+                        {
+                            if (Stores(usage, semanticModel, cancellationToken, visited, out var container) &&
+                                FieldOrProperty.TryCreate(container, out var containerMember) &&
+                                semanticModel.IsAccessible(target.Source.SpanStart, containerMember.Symbol))
+                            {
+                                invocationOrObjectCreation = objectCreation;
+                                return true;
+                            }
+
+                            if (Assigns(usage, semanticModel, cancellationToken, visited, out var fieldOrProperty) &&
+                                semanticModel.IsAccessible(target.Source.SpanStart, fieldOrProperty.Symbol))
+                            {
+                                invocationOrObjectCreation = objectCreation;
+                                return true;
+                            }
                         }
                     }
 
