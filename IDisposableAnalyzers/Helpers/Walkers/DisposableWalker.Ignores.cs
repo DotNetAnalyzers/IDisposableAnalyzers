@@ -32,16 +32,10 @@
                     return false;
                 case StatementSyntax _:
                     return true;
+                case ArgumentSyntax { Parent: TupleExpressionSyntax tuple }:
+                    return Ignores(tuple, semanticModel, cancellationToken, visited);
                 case ArgumentSyntax argument:
-                    if (visited.CanVisit(argument, out visited))
-                    {
-                        using (visited)
-                        {
-                            return Ignores(argument, semanticModel, cancellationToken, visited);
-                        }
-                    }
-
-                    break;
+                    return Ignores(Target(argument, semanticModel, cancellationToken, visited).Value, semanticModel, cancellationToken, visited);
                 case MemberAccessExpressionSyntax memberAccess
                     when semanticModel.TryGetSymbol(memberAccess, cancellationToken, out var symbol):
                     return IsChainedDisposingInReturnValue(symbol, semanticModel, cancellationToken, visited).IsEither(Result.No, Result.AssumeNo);
@@ -55,73 +49,70 @@
             return false;
         }
 
-        private static bool Ignores(ArgumentSyntax argument, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
+        private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited)
         {
-            if (argument is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
+            if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
                 semanticModel.TryGetSymbol(parentExpression, cancellationToken, out IMethodSymbol? method))
             {
                 if (method.DeclaringSyntaxReferences.IsEmpty)
                 {
                     if (!Ignores(parentExpression, semanticModel, cancellationToken, visited))
                     {
-                        return !DisposedByReturnValue(argument, semanticModel, cancellationToken, visited, out _) &&
-                               !AccessibleInReturnValue(argument, semanticModel, cancellationToken, visited, out _);
+                        return !DisposedByReturnValue(target.Source, semanticModel, cancellationToken, visited, out _) &&
+                               !AccessibleInReturnValue(target.Source, semanticModel, cancellationToken, visited, out _);
                     }
 
                     return true;
                 }
 
-                if (method.TryFindParameter(argument, out var parameter))
+                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
                 {
-                    using (var walker = CreateUsagesWalker(new LocalOrParameter(parameter), semanticModel, cancellationToken))
+                    if (walker.usages.Count == 0)
                     {
-                        if (walker.usages.Count == 0)
+                        return true;
+                    }
+
+                    return walker.usages.All(x => IsIgnored(x));
+
+                    bool IsIgnored(IdentifierNameSyntax candidate)
+                    {
+                        switch (candidate.Parent.Kind())
+                        {
+                            case SyntaxKind.NotEqualsExpression:
+                                return true;
+                            case SyntaxKind.Argument:
+                                // Stopping analysis here assuming it is handled
+                                return false;
+                        }
+
+                        switch (candidate.Parent)
+                        {
+                            case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
+                                when right == candidate &&
+                                     semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
+                                     FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
+                                if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
+                                    DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
+                                {
+                                    return Ignores(parentExpression, semanticModel, cancellationToken, visited);
+                                }
+
+                                if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
+                                {
+                                    return true;
+                                }
+
+                                return !semanticModel.IsAccessible(target.Source.SpanStart, assignedMember.Symbol);
+                            case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }:
+                                return Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
+                        }
+
+                        if (Ignores(candidate, semanticModel, cancellationToken, visited))
                         {
                             return true;
                         }
 
-                        return walker.usages.All(x => IsIgnored(x));
-
-                        bool IsIgnored(IdentifierNameSyntax candidate)
-                        {
-                            switch (candidate.Parent.Kind())
-                            {
-                                case SyntaxKind.NotEqualsExpression:
-                                    return true;
-                                case SyntaxKind.Argument:
-                                    // Stopping analysis here assuming it is handled
-                                    return false;
-                            }
-
-                            switch (candidate.Parent)
-                            {
-                                case AssignmentExpressionSyntax { Right: { } right, Left: { } left }
-                                    when right == candidate &&
-                                         semanticModel.TryGetSymbol(left, cancellationToken, out var assignedSymbol) &&
-                                         FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
-                                    if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
-                                        DisposableMember.IsDisposed(assignedMember, disposeMethod, semanticModel, cancellationToken))
-                                    {
-                                        return Ignores(parentExpression, semanticModel, cancellationToken, visited);
-                                    }
-
-                                    if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
-                                    {
-                                        return true;
-                                    }
-
-                                    return !semanticModel.IsAccessible(argument.SpanStart, assignedMember.Symbol);
-                                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }:
-                                    return Ignores(variableDeclarator, semanticModel, cancellationToken, visited);
-                            }
-
-                            if (Ignores(candidate, semanticModel, cancellationToken, visited))
-                            {
-                                return true;
-                            }
-
-                            return false;
-                        }
+                        return false;
                     }
                 }
             }

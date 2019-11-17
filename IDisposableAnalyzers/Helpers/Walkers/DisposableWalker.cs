@@ -32,17 +32,11 @@
                 {
                     switch (argument)
                     {
-                        case { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }
-                            when semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                        case { Parent: ArgumentListSyntax { Parent: { } parent } }
+                            when semanticModel.TryGetSymbol(parent, cancellationToken, out IMethodSymbol? method) &&
                                  method.TryFindParameter(argument, out var parameter):
                             _ = method.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? methodDeclaration);
                             return Gu.Roslyn.AnalyzerExtensions.Target.Create(argument, parameter, methodDeclaration);
-
-                        case { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
-                            when semanticModel.TryGetSymbol(objectCreation, cancellationToken, out var ctor) &&
-                                 ctor.TryFindParameter(argument, out var parameter):
-                            _ = ctor.TrySingleDeclaration(cancellationToken, out BaseMethodDeclarationSyntax? ctorDeclaration);
-                            return Gu.Roslyn.AnalyzerExtensions.Target.Create(argument, parameter, ctorDeclaration);
                     }
                 }
             }
