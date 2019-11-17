@@ -27,6 +27,26 @@
             return false;
         }
 
+        internal static bool Stores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
+        {
+            if(target.TargetNode is { })
+            {
+                using (var walker = CreateUsagesWalker(target, semanticModel, cancellationToken))
+                {
+                    foreach (var usage in walker.usages)
+                    {
+                        if (Stores(usage, semanticModel, cancellationToken, visited, out container))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            container = null;
+            return false;
+        }
+
         private static bool Stores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, PooledSet<(string Caller, SyntaxNode Node)>? visited, [NotNullWhen(true)] out ISymbol? container)
         {
             switch (candidate.Parent)
@@ -74,15 +94,10 @@
                                 return true;
                         }
                     }
-                    else if (visited.CanVisit(candidate, out visited))
+
+                    if (Stores(target, semanticModel, cancellationToken, visited, out container))
                     {
-                        using (visited)
-                        {
-                            if (Stores(new LocalOrParameter(parameter), semanticModel, cancellationToken, visited, out container))
-                            {
-                                return true;
-                            }
-                        }
+                        return true;
                     }
 
                     if (DisposedByReturnValue(target, semanticModel, cancellationToken, visited, out var creation) ||
