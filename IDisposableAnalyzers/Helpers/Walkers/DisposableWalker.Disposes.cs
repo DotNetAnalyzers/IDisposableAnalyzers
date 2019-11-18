@@ -57,18 +57,14 @@
                 return true;
             }
 
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
+            foreach (var usage in walker.usages)
             {
-                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
+                if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
+                    Disposes(usage, recursion))
                 {
-                    foreach (var usage in walker.usages)
-                    {
-                        if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
-                            Disposes(usage, recursion))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
             }
 
@@ -126,14 +122,12 @@
             where TSymbol : class, ISymbol
             where TNode : SyntaxNode
         {
-            using (var walker = CreateUsagesWalker(target, recursion))
+            using var walker = CreateUsagesWalker(target, recursion);
+            foreach (var usage in walker.usages)
             {
-                foreach (var usage in walker.usages)
+                if (Disposes(usage, recursion))
                 {
-                    if (Disposes(usage, recursion))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 

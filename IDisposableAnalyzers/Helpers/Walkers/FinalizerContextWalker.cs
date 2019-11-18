@@ -69,12 +69,10 @@
 
             foreach (var item in walker.recursive)
             {
-                using (var recursiveWalker = RecursiveWalker.Borrow(item.Target, semanticModel, cancellationToken))
+                using var recursiveWalker = RecursiveWalker.Borrow(item.Target, semanticModel, cancellationToken);
+                if (recursiveWalker.UsedReferenceTypes.Count > 0)
                 {
-                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
-                    {
-                        walker.usedReferenceTypes.Add(item.Node);
-                    }
+                    walker.usedReferenceTypes.Add(item.Node);
                 }
             }
 
