@@ -43,12 +43,15 @@
                 case ArgumentSyntax argument
                     when recursion.Target(argument) is { } target:
                     return Ignores(target, recursion);
-                case MemberAccessExpressionSyntax memberAccess
-                    when recursion.SemanticModel.TryGetSymbol(memberAccess, recursion.CancellationToken, out var symbol):
-                    return IsChainedDisposingInReturnValue(symbol, recursion).IsEither(Result.No, Result.AssumeNo);
-                case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull } conditionalAccess
-                    when recursion.SemanticModel.TryGetSymbol(whenNotNull, recursion.CancellationToken, out var symbol):
-                    return IsChainedDisposingInReturnValue(symbol, recursion).IsEither(Result.No, Result.AssumeNo);
+                case MemberAccessExpressionSyntax _:
+                case ConditionalAccessExpressionSyntax _:
+                    if (DisposedByReturnValue(node, recursion, out var returnValue) &&
+                       !Ignores(returnValue, recursion))
+                    {
+                        return false;
+                    }
+
+                    return true;
                 case InitializerExpressionSyntax { Parent: ExpressionSyntax creation } initializer:
                     return Ignores(creation, recursion);
             }
@@ -149,53 +152,6 @@
             }
 
             return false;
-        }
-
-        [Obsolete("Use DisposableWalker")]
-        private static Result IsChainedDisposingInReturnValue(ISymbol symbol, Recursion recursion)
-        {
-            if (symbol is IMethodSymbol method)
-            {
-                if (method.ReturnsVoid)
-                {
-                    return Result.No;
-                }
-
-                if (method.ReturnType.Name == "ConfiguredTaskAwaitable")
-                {
-                    return Result.Yes;
-                }
-
-                if (method.ContainingType.DeclaringSyntaxReferences.Length == 0)
-                {
-                    if (method.ReturnType == KnownSymbol.Task)
-                    {
-                        return Result.No;
-                    }
-
-                    if (method.ReturnType == KnownSymbol.TaskOfT &&
-                        method.ReturnType is INamedTypeSymbol namedType &&
-                        namedType.TypeArguments.TrySingle(out var type))
-                    {
-                        return !Disposable.IsAssignableFrom(type, recursion.SemanticModel.Compilation)
-                            ? Result.No
-                            : Result.AssumeYes;
-                    }
-
-                    return !Disposable.IsAssignableFrom(method.ReturnType, recursion.SemanticModel.Compilation)
-                        ? Result.No
-                        : Result.AssumeYes;
-                }
-
-                if (method is { IsExtensionMethod: true, ReducedFrom: { } reducedFrom } &&
-                    reducedFrom.Parameters.TryFirst(out var parameter))
-                {
-                    _ = reducedFrom.TrySingleMethodDeclaration(recursion.CancellationToken, out var declaration);
-                    return DisposedByReturnValue(new Target<SyntaxNode, IParameterSymbol, BaseMethodDeclarationSyntax>(null!, parameter, declaration), recursion) ? Result.Yes : Result.No;
-                }
-            }
-
-            return Result.AssumeNo;
         }
     }
 }

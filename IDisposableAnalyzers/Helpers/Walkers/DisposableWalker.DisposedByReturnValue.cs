@@ -43,6 +43,16 @@
                          type == KnownSymbol.CompositeDisposable:
                     creation = objectCreation;
                     return true;
+                case MemberAccessExpressionSyntax memberAccess
+                    when recursion.Target<MemberAccessExpressionSyntax, ISymbol, CSharpSyntaxNode>(memberAccess) is { } target &&
+                         DisposedByReturnValue(target, recursion):
+                    creation = memberAccess;
+                    return true;
+                case ConditionalAccessExpressionSyntax conditionalAccess
+                    when recursion.Target<ConditionalAccessExpressionSyntax, ISymbol, CSharpSyntaxNode>(conditionalAccess) is { } target &&
+                         DisposedByReturnValue(target, recursion):
+                    creation = conditionalAccess;
+                    return true;
                 default:
                     creation = null;
                     return false;
@@ -131,12 +141,37 @@
             return false;
         }
 
-        [Obsolete("Merge with above.")]
-        private static bool DisposedByReturnValue<TSource>(Target<TSource, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
+        private static bool DisposedByReturnValue<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion)
             where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
         {
-            using (var walker = CreateUsagesWalker(target, recursion))
+            switch (target.Symbol)
             {
+                case IPropertySymbol { ContainingType: { MetadataName: "Task`1" }, Name: "Result" }:
+                    return true;
+                case IMethodSymbol { ReturnsVoid: true }:
+                case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
+                    return false;
+                case IMethodSymbol { ReturnType: { MetadataName: "ConfiguredTaskAwaitable`1" } }:
+                    return true;
+                case IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "Task`1" } taskOfT }
+                    when taskOfT.TypeArguments.TrySingle(out var type):
+                    return Disposable.IsAssignableFrom(type, recursion.SemanticModel.Compilation);
+                case IMethodSymbol { ReturnType: { } returnType, DeclaringSyntaxReferences: { Length: 0 } }:
+                    // we assume here not sure it is the best assumption.
+                    return Disposable.IsAssignableFrom(returnType, recursion.SemanticModel.Compilation);
+                case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
+                     when reducedFrom.Parameters.TryFirst(out var parameter):
+                    return DisposedByReturnValue(Target.Create(target.Source, parameter, target.TargetNode), recursion);
+                case IFieldSymbol _:
+                case IPropertySymbol _:
+                    return false;
+            }
+
+            if (target.TargetNode is { })
+            {
+                using var walker = CreateUsagesWalker(target, recursion);
                 foreach (var usage in walker.usages)
                 {
                     switch (usage.Parent.Kind())

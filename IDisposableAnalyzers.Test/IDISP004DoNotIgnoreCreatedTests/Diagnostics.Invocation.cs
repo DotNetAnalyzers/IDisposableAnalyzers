@@ -24,13 +24,13 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void FileOpenRead()
+            [TestCase("")]
+            [TestCase("_ = ")]
+            public static void DiscardFileOpenRead(string discard)
             {
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -39,6 +39,22 @@ namespace N
         {
             ↓File.OpenRead(string.Empty);
         }
+    }
+}".AssertReplace("↓", discard + "↓");
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+            }
+
+            [Test]
+            public static void ReturnFileOpenReadLength()
+            {
+                var code = @"
+namespace N
+{
+    using System.IO;
+
+    public sealed class C
+    {
+        public long M(string name) => ↓File.OpenRead(name).Length;
     }
 }";
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
