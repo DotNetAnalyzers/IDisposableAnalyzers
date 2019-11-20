@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test
 
     using NUnit.Framework;
 
-    [Explicit("For harvesting test cases only.")]
+    [Ignore("For harvesting test cases only.")]
     public static class ReproBox
     {
         // ReSharper disable once UnusedMember.Local

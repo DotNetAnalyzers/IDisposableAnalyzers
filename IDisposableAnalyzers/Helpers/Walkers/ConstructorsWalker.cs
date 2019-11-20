@@ -30,7 +30,7 @@
 
         internal ConstructorDeclarationSyntax? Default { get; private set; }
 
-        private INamedTypeSymbol Type => this.type ?? (this.type = this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken) as INamedTypeSymbol);
+        private INamedTypeSymbol Type => this.type ?? (this.type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken)!);
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {

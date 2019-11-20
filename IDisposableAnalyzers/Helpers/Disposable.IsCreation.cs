@@ -9,7 +9,7 @@
 
     internal static partial class Disposable
     {
-        internal static Result IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol assignedSymbol)
+        internal static Result IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol? assignedSymbol)
         {
             if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
             {
@@ -18,6 +18,12 @@
             }
 
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
+            if (symbol is null)
+            {
+                assignedSymbol = null;
+                return Result.No;
+            }
+
             if (symbol is IPropertySymbol { SetMethod: { } } property &&
                 IsAssignableFrom(property.Type, semanticModel.Compilation) &&
                 property.TryGetSetter(cancellationToken, out var setter) &&

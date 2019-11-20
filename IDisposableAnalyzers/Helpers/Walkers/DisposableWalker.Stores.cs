@@ -123,7 +123,7 @@
                     return false;
             }
 
-            bool StoresOrAssigns(ExpressionSyntax expression, out ISymbol result)
+            bool StoresOrAssigns(ExpressionSyntax expression, out ISymbol? result)
             {
                 if (Stores(expression, recursion, out result))
                 {

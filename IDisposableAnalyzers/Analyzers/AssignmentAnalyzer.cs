@@ -63,8 +63,8 @@
                 return false;
             }
 
-            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol)
-                          .IsEither(Result.No, Result.AssumeNo, Result.Unknown))
+            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol).IsEither(Result.No, Result.AssumeNo, Result.Unknown) ||
+                assignedSymbol is null)
             {
                 return false;
             }

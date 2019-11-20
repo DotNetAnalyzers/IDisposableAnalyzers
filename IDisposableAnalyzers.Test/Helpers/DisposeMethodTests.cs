@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
@@ -47,7 +47,7 @@ namespace N
             Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
 
-        [Explicit("Not sure if we want to find explicit.")]
+        [Ignore("Not sure if we want to find explicit.")]
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
         public static void TryFindIDisposableDisposeWhenExplicit(Search search)
