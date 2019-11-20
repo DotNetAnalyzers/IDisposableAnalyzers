@@ -12,12 +12,10 @@
     {
         internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            if (recursion.Target(candidate) is { } target)
             {
-                if (recursion.Target(candidate) is { } target)
-                {
-                    return DisposedByReturnValue(target, recursion, out creation);
-                }
+                return DisposedByReturnValue(target, recursion, out creation);
             }
 
             creation = null;

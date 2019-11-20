@@ -10,15 +10,13 @@
     {
         internal static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var walker = CreateUsagesWalker(localOrParameter, recursion);
+            foreach (var usage in walker.usages)
             {
-                using var walker = CreateUsagesWalker(localOrParameter, recursion);
-                foreach (var usage in walker.usages)
+                if (Returns(usage, recursion))
                 {
-                    if (Returns(usage, recursion))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
