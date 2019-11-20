@@ -92,7 +92,7 @@
                 return false;
             }
 
-            if (TryGetAssignedLocal(out var local) &&
+            if (AssignedLocal() is { } local &&
                 DisposableWalker.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
             {
                 return false;
@@ -100,9 +100,8 @@
 
             return true;
 
-            bool TryGetAssignedLocal(out ILocalSymbol result)
+            ILocalSymbol? AssignedLocal()
             {
-                result = null!;
                 if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
                 {
                     using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
@@ -112,10 +111,12 @@
                                     symbol.Equals(assignedSymbol),
                                 out var match) &&
                             match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
-                            context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out result);
+                            context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out ILocalSymbol? result)
+                            ? result
+                            : null;
                 }
 
-                return false;
+                return null;
             }
         }
 
