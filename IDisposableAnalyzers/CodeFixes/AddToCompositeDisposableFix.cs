@@ -57,8 +57,7 @@
 
                             void AddToExisting(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                if (TryGetPreviousStatement(out var previous) &&
-                                    previous is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } } &&
+                                if (PreviousStatement() is ExpressionStatementSyntax { Expression: AssignmentExpressionSyntax { Left: { } left, Right: ObjectCreationExpressionSyntax objectCreation } } &&
                                     IsField(left))
                                 {
                                     switch (objectCreation)
@@ -151,11 +150,12 @@
                                                           SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(statement.Expression))))
                                                       .WithTriviaFrom(x));
 
-                                bool TryGetPreviousStatement(out StatementSyntax result)
+                                StatementSyntax? PreviousStatement()
                                 {
-                                    result = null!;
                                     return statement.Parent is BlockSyntax block &&
-                                           block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out result);
+                                           block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out var result)
+                                           ? result
+                                           : null;
                                 }
 
                                 bool IsField(ExpressionSyntax e)
