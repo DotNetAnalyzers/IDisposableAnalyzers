@@ -498,13 +498,14 @@
                     }
                 }
 
-                if ((this.CurrentSymbol is IFieldSymbol field && !field.IsReadOnly) ||
-                    (this.CurrentSymbol is IPropertySymbol property && !property.IsReadOnly))
+                if ((this.CurrentSymbol is IFieldSymbol { IsReadOnly: false } field) ||
+                    (this.CurrentSymbol is IPropertySymbol { IsReadOnly: false } property))
                 {
                     if (TryGetScope(this.context.Node, out scope) &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
-                        while (type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
+                        while (type != null &&
+                               type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
                         {
                             foreach (var reference in type.DeclaringSyntaxReferences)
                             {
