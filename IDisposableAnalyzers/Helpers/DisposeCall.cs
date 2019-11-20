@@ -21,30 +21,26 @@
             if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifier) &&
                (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { })
             {
-                var property = semanticModel.GetSymbolSafe(disposedMember, cancellationToken) as IPropertySymbol;
-                if (property == null ||
-                    property.IsAutoProperty())
+                switch (semanticModel.GetSymbolSafe(disposedMember, cancellationToken))
                 {
-                    return true;
-                }
+                    case IPropertySymbol { GetMethod: null }:
+                        return false;
+                    case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
+                        when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
+                        {
+                            using var pooled = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                            if (pooled.Count == 0)
+                            {
+                                return true;
+                            }
 
-                if (property.GetMethod == null)
-                {
-                    return false;
-                }
+                            return pooled.TrySingle(out var expression) &&
+                                   MemberPath.TryFindRoot(expression, out rootIdentifier) &&
+                                   (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
+                        }
 
-                foreach (var reference in property.GetMethod.DeclaringSyntaxReferences)
-                {
-                    var node = reference.GetSyntax(cancellationToken);
-                    using var pooled = ReturnValueWalker.Borrow(node, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
-                    if (pooled.Count == 0)
-                    {
+                    default:
                         return true;
-                    }
-
-                    return pooled.TrySingle(out var expression) &&
-                           MemberPath.TryFindRoot(expression, out rootIdentifier) &&
-                           (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
                 }
             }
 
