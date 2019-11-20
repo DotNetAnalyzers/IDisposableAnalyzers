@@ -231,7 +231,7 @@
             return BorrowCore(symbol, context, semanticModel, cancellationToken);
         }
 
-        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax argumentList)
+        internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax? argumentList)
         {
             if (method != null &&
                 (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
@@ -239,7 +239,7 @@
             {
                 if (TryGetWalker(out var walker))
                 {
-                    foreach (var value in walker.values)
+                    foreach (var value in walker!.values)
                     {
                         this.values.Add(GetArgumentValue(value));
                     }
@@ -249,7 +249,7 @@
                         this.values.Add(GetArgumentValue(outValue));
                     }
                 }
-                else
+                else if (argumentList != null)
                 {
                     foreach (var outParameter in this.outParameters)
                     {
@@ -362,7 +362,8 @@
                     method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter) &&
                     parameter.RefKind != RefKind.Out)
                 {
-                    if (argumentList.TryFind(parameter, out var argument))
+                    if (argumentList != null &&
+                        argumentList.TryFind(parameter, out var argument))
                     {
                         return argument.Expression;
                     }
@@ -425,17 +426,17 @@
                 local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                 TryGetScope(declaration, out var scope))
             {
-                this.Visit(scope);
+                this.Visit(scope!);
             }
             else if (this.CurrentSymbol.Kind == SymbolKind.Discard &&
                      TryGetScope(this.context.Node, out scope))
             {
-                this.Visit(scope);
+                this.Visit(scope!);
             }
             else if (this.CurrentSymbol.Kind == SymbolKind.Parameter &&
                      TryGetScope(this.context.Node, out scope))
             {
-                this.Visit(scope);
+                this.Visit(scope!);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
                      this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? typeDeclaration) &&
@@ -487,8 +488,10 @@
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
                             this.VisitObjectCreationExpression(creation);
-                            var method = this.semanticModel.GetSymbolSafe(creation, this.cancellationToken);
-                            this.HandleInvoke(method, creation.ArgumentList);
+                            if (this.semanticModel.GetSymbolSafe(creation, this.cancellationToken) is { } method)
+                            {
+                                this.HandleInvoke(method, creation.ArgumentList);
+                            }
                         }
 
                         foreach (var ctor in ctorWalker.NonPrivateCtors)
@@ -518,7 +521,7 @@
                 }
             }
 
-            bool TryGetScope(SyntaxNode location, out SyntaxNode result)
+            bool TryGetScope(SyntaxNode location, out SyntaxNode? result)
             {
                 if (location is SingleVariableDesignationSyntax designation &&
                     this.context.Node is ExpressionSyntax expression &&
