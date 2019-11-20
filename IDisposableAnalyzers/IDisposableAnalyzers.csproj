@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>BUGFIX IDISP011: when disposing before foreach.
