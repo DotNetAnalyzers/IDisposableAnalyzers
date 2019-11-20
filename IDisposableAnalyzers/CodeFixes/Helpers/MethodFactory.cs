@@ -200,14 +200,14 @@
                         SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)));
             }
 
-            IfStatementSyntax IfDisposing(IParameterSymbol parameter)
+            static IfStatementSyntax IfDisposing(IParameterSymbol parameter)
             {
                 return SyntaxFactory.IfStatement(
                     SyntaxFactory.IdentifierName(parameter.Name),
                     SyntaxFactory.Block());
             }
 
-            ExpressionStatementSyntax BaseDispose(IParameterSymbol parameter)
+            static ExpressionStatementSyntax BaseDispose(IParameterSymbol parameter)
             {
                 return SyntaxFactory.ExpressionStatement(
                     SyntaxFactory.InvocationExpression(

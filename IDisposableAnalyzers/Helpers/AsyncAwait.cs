@@ -99,7 +99,7 @@
             {
                 return TryPeel(invocation.Expression, out result);
 
-                bool TryPeel(ExpressionSyntax e, out InvocationExpressionSyntax peeled)
+                static bool TryPeel(ExpressionSyntax e, out InvocationExpressionSyntax peeled)
                 {
                     switch (e)
                     {

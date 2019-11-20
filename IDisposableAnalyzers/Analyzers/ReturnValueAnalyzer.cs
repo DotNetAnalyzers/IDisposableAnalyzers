@@ -134,15 +134,14 @@
                 return false;
             }
 
-            switch (returnValue)
+            return returnValue switch
             {
-                case InvocationExpressionSyntax invocation:
-                    return !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken);
-                case MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess:
-                    return !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken);
-            }
-
-            return true;
+                InvocationExpressionSyntax invocation
+                    => !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken),
+                MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess
+                    => !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
+                _ => true,
+            };
         }
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)

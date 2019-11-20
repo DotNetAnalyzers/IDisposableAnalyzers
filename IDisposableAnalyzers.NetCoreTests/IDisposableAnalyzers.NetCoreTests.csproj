@@ -2,8 +2,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
     <IsPackable>false</IsPackable>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.NetCoreTests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
