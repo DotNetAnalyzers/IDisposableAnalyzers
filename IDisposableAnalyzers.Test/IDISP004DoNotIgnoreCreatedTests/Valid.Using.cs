@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -47,8 +47,65 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
+        [TestCase("await Task.FromResult(new Disposable())")]
+        [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new Disposable())")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new Disposable()).Result")]
+        [TestCase("await Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+        public static void AwaitSimple(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    class C
+    {
+        public async Task M()
+        {
+            using (await Task.FromResult(new Disposable()))
+            {
+            }
+            
+            await Task.Delay(10);
+        }
+    }
+}".AssertReplace("await Task.FromResult(new Disposable())", expression);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
+
+        [TestCase("await Task.FromResult(new Disposable())")]
+        [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new Disposable())")]
+        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
+        [TestCase("await Task.Run(() => new Disposable()).Result")]
+        [TestCase("await Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+        public static void AwaitSimpleUsingDeclaration(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
+    class C
+    {
+        public async Task M()
+        {
+            using var disposable = await Task.FromResult(new Disposable());
+            await Task.Delay(10);
+        }
+    }
+}".AssertReplace("await Task.FromResult(new Disposable())", expression);
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
+
         [Test]
-        public static void SampleWithAwait()
+        public static void AwaitWeirdCase()
         {
             var code = @"
 namespace N

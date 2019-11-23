@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -49,6 +49,26 @@ namespace ValidCode
             using (var disposable = await Task.Run(() => new Disposable()).ConfigureAwait(false))
             {
             }
+
+            using (Task.FromResult(new Disposable()).GetAwaiter().GetResult())
+            {
+            }
+
+            using (var disposable = Task.FromResult(new Disposable()).GetAwaiter().GetResult())
+            {
+            }
+
+            using var disposable1 = Task.FromResult(new Disposable()).GetAwaiter().GetResult();
+
+            using (Task.FromResult(new Disposable()).Result)
+            {
+            }
+
+            using (var disposable = Task.FromResult(new Disposable()).Result)
+            {
+            }
+
+            using var disposable2 = Task.FromResult(new Disposable()).Result;
         }
 
         public static async Task<string> Bar1Async()
