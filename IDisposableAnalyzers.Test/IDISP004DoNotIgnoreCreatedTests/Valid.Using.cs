@@ -51,8 +51,8 @@ namespace N
         [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
         [TestCase("await Task.Run(() => new Disposable())")]
         [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
-        [TestCase("await Task.Run(() => new Disposable()).Result")]
-        [TestCase("await Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+        [TestCase("Task.Run(() => new Disposable()).Result")]
+        [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
         public static void AwaitSimple(string expression)
         {
             var code = @"
@@ -81,8 +81,8 @@ namespace N
         [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
         [TestCase("await Task.Run(() => new Disposable())")]
         [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
-        [TestCase("await Task.Run(() => new Disposable()).Result")]
-        [TestCase("await Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+        [TestCase("Task.Run(() => new Disposable()).Result")]
+        [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
         public static void AwaitSimpleUsingDeclaration(string expression)
         {
             var code = @"
