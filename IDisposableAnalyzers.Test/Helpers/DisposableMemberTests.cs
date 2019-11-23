@@ -34,5 +34,41 @@ namespace N
             var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
             Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
         }
+
+        [Test]
+        public static void DiposedInOverridden()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    abstract class BaseClass : IDisposable
+    {
+        public void Dispose()
+        {
+            this.M();
+        }
+
+        protected abstract void M();
+    }
+
+    class C : BaseClass
+    {
+        private readonly IDisposable stream = File.OpenRead(string.Empty);
+
+        protected override void M()
+        {
+            this.stream.Dispose();
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var field = syntaxTree.FindFieldDeclaration("stream");
+            var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
+            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
+        }
     }
 }

@@ -173,6 +173,46 @@ namespace N
 
                 RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseClass, code);
             }
+
+            [Test]
+            public static void WhenOverriddenIsNotVirtualDispose()
+            {
+                var baseClass = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    abstract class BaseClass : IDisposable
+    {
+        public void Dispose()
+        {
+            this.M();
+        }
+
+        protected abstract void M();
+    }
+}";
+
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    class C : BaseClass
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+
+        protected override void M()
+        {
+            this.stream.Dispose();
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, Descriptor, baseClass, code);
+            }
         }
     }
 }

@@ -37,12 +37,13 @@
             base.VisitIdentifierName(node);
         }
 
-        internal static DisposeWalker Borrow(ITypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static DisposeWalker Borrow(INamedTypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
-                DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod))
+                DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
             {
-                return Borrow(disposeMethod, semanticModel, cancellationToken);
+                return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
             }
 
             return Borrow(() => new DisposeWalker());

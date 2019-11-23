@@ -9,7 +9,7 @@
     {
         internal static Result IsDisposed(FieldOrProperty member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (semanticModel.TryGetSymbol(context, cancellationToken, out var symbol))
+            if (semanticModel.TryGetNamedType(context, cancellationToken, out var symbol))
             {
                 return IsDisposed(member, symbol, semanticModel, cancellationToken);
             }
@@ -17,7 +17,7 @@
             return Result.Unknown;
         }
 
-        internal static Result IsDisposed(FieldOrProperty member, ITypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (context == null)
             {
