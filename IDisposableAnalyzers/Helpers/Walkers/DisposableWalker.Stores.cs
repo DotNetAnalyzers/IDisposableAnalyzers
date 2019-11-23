@@ -12,7 +12,7 @@
     {
         internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? container)
         {
-            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
             using var walker = CreateUsagesWalker(localOrParameter, recursion);
             foreach (var usage in walker.usages)
             {

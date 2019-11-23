@@ -33,9 +33,7 @@
                 context.ContainingSymbol is IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method &&
                 context.Node is MethodDeclarationSyntax methodDeclaration)
             {
-                if (method.Parameters.Length == 0 &&
-                    method.DeclaredAccessibility == Accessibility.Public &&
-                    method.OverriddenMethod == null &&
+                if (method is { DeclaredAccessibility: Accessibility.Public, OverriddenMethod: null, Parameters: { Length: 0 } } &&
                     method.GetAttributes().Length == 0)
                 {
                     if (!method.ExplicitInterfaceImplementations.Any() &&

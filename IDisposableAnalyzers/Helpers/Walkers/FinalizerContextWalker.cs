@@ -48,7 +48,7 @@
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, SearchScope.Member, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
             if (node is MethodDeclarationSyntax)
             {
                 walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
@@ -58,7 +58,7 @@
             {
                 if (!IsInIfDisposing(target.Source))
                 {
-                    using var recursiveWalker = TargetWalker.Borrow(target, walker.ContainingType, walker.Recursion);
+                    using var recursiveWalker = TargetWalker.Borrow(target, walker.Recursion);
                     if (recursiveWalker.UsedReferenceTypes.Count > 0)
                     {
                         walker.usedReferenceTypes.Add(target.Source);
@@ -134,9 +134,9 @@
                 base.VisitIdentifierName(node);
             }
 
-            internal static TargetWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, INamedTypeSymbol containingType, Recursion recursion)
+            internal static TargetWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, Recursion recursion)
             {
-                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, containingType, recursion, () => new TargetWalker());
+                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, recursion, () => new TargetWalker());
             }
 
             protected override void Clear()

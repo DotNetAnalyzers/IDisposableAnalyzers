@@ -13,7 +13,7 @@
         {
             if (localOrParameter.TryGetScope(cancellationToken, out var scope))
             {
-                using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+                using var recursion = Recursion.Borrow(scope, semanticModel, cancellationToken);
                 return Assigns(new Target<SyntaxNode, ISymbol, SyntaxNode>(null!, localOrParameter.Symbol, scope), recursion, out first);
             }
 

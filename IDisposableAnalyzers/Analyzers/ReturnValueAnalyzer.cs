@@ -146,13 +146,13 @@
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(invocation, semanticModel, cancellationToken);
             return IsLazyEnumerable(invocation, recursion);
         }
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, Recursion recursion)
         {
-            if (recursion.Target(invocation) is { Symbol: { } method, TargetNode: { } declaration } sad &&
+            if (recursion.Target(invocation) is { Symbol: { } method, TargetNode: { } declaration } &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, recursion.SemanticModel.Compilation))
             {
                 if (YieldStatementWalker.Any(declaration))

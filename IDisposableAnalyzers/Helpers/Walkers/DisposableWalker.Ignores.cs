@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System;
     using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -12,7 +11,7 @@
     {
         internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(node, semanticModel, cancellationToken);
             return Ignores(node, recursion);
         }
 

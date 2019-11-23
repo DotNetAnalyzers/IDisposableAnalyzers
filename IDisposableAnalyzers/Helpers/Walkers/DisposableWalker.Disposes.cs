@@ -16,7 +16,7 @@
                 return false;
             }
 
-            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
             using var walker = CreateUsagesWalker(localOrParameter, recursion);
             foreach (var usage in walker.usages)
             {
@@ -57,7 +57,7 @@
                 return true;
             }
 
-            using var recursion = Recursion.Borrow(semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken);
             using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
             foreach (var usage in walker.usages)
             {
@@ -73,7 +73,7 @@
 
         internal static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
             {
                 using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
                 foreach (var usage in walker.usages)
@@ -102,7 +102,7 @@
                 }
             }
 
-            using (var recursion = Recursion.Borrow(semanticModel, cancellationToken))
+            using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
             {
                 using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
                 foreach (var usage in walker.usages)
