@@ -7,18 +7,14 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class FinalizerContextWalker : ExecutionWalker<FinalizerContextWalker>
+    internal sealed class FinalizerContextWalker : RecursiveWalker<FinalizerContextWalker>
     {
         private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
-        private readonly List<Recursive> recursive = new List<Recursive>();
 
         private FinalizerContextWalker()
         {
         }
 
-        /// <summary>
-        /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
-        /// </summary>
         internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
@@ -37,7 +33,6 @@
             }
         }
 
-        /// <inheritdoc />
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
             if (!IsAssignedNull(node) &&
@@ -51,50 +46,33 @@
             base.VisitIdentifierName(node);
         }
 
-        /// <summary>
-        /// Get a walker that has visited <paramref name="node"/>.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="semanticModel">The <see cref="SemanticModel"/>.</param>
-        /// <param name="cancellationToken">The <see cref="CancellationToken"/>.</param>
-        /// <returns>A walker that has visited <paramref name="node"/>.</returns>
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit(node, SearchScope.Member, semanticModel, cancellationToken, () => new FinalizerContextWalker());
             if (node is MethodDeclarationSyntax)
             {
                 walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
-                walker.recursive.RemoveAll(x => IsInIfDisposing(x.Node));
             }
 
-            foreach (var item in walker.recursive)
+            foreach (var target in walker.Targets)
             {
-                using var recursiveWalker = RecursiveWalker.Borrow(item.Target, semanticModel, cancellationToken);
-                if (recursiveWalker.UsedReferenceTypes.Count > 0)
+                if (!IsInIfDisposing(target.Source))
                 {
-                    walker.usedReferenceTypes.Add(item.Node);
+                    using var recursiveWalker = TargetWalker.Borrow(target, walker.ContainingType, walker.Recursion);
+                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
+                    {
+                        walker.usedReferenceTypes.Add(target.Source);
+                    }
                 }
             }
 
             return walker;
         }
 
-        /// <inheritdoc />
         protected override void Clear()
         {
             this.usedReferenceTypes.Clear();
-            this.recursive.Clear();
             base.Clear();
-        }
-
-        protected override bool TryGetTargetSymbol<TSource, TSymbol, TDeclaration>(TSource node, out Target<TSource, TSymbol, TDeclaration> sad)
-        {
-            if (base.TryGetTargetSymbol(node, out sad))
-            {
-                this.recursive.Add(new Recursive(node, Target.Create<SyntaxNode, ISymbol, SyntaxNode>(node, sad.Symbol, sad.TargetNode)));
-            }
-
-            return false;
         }
 
         private static bool IsAssignedNull(SyntaxNode node)
@@ -133,32 +111,16 @@
             return false;
         }
 
-        private struct Recursive
-        {
-            internal readonly SyntaxNode Node;
-            internal readonly Target<SyntaxNode, ISymbol, SyntaxNode> Target;
-
-            internal Recursive(SyntaxNode node, Target<SyntaxNode, ISymbol, SyntaxNode> target)
-            {
-                this.Node = node;
-                this.Target = target;
-            }
-        }
-
-        private sealed class RecursiveWalker : ExecutionWalker<RecursiveWalker>
+        private sealed class TargetWalker : ExecutionWalker<TargetWalker>
         {
             private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
 
-            private RecursiveWalker()
+            private TargetWalker()
             {
             }
 
-            /// <summary>
-            /// Gets the <see cref="IdentifierNameSyntax"/>s found in the scope.
-            /// </summary>
             internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
-            /// <inheritdoc />
             public override void VisitIdentifierName(IdentifierNameSyntax node)
             {
                 if (!IsAssignedNull(node) &&
@@ -172,12 +134,11 @@
                 base.VisitIdentifierName(node);
             }
 
-            internal static RecursiveWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static TargetWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, INamedTypeSymbol containingType, Recursion recursion)
             {
-                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, semanticModel, cancellationToken, () => new RecursiveWalker());
+                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, containingType, recursion, () => new TargetWalker());
             }
 
-            /// <inheritdoc />
             protected override void Clear()
             {
                 this.usedReferenceTypes.Clear();
