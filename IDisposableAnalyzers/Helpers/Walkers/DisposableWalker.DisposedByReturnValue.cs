@@ -119,7 +119,7 @@
                     }
 
                     break;
-                case { Symbol: { ContainingSymbol: IMethodSymbol method } parameter, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                case { Symbol: { ContainingSymbol: IMethodSymbol method } , Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
                     if (method == KnownSymbol.Task.FromResult)
                     {
                         creation = invocation;

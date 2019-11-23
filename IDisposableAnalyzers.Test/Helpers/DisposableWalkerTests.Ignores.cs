@@ -652,6 +652,33 @@ namespace N
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(false, DisposableWalker.Ignores(value, semanticModel, CancellationToken.None));
             }
+
+            [TestCase("File.OpenRead(fileName)")]
+            [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
+            [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+            public static void WhenUsingDeclaration(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    class C
+    {
+        C(string fileName)
+        {
+            using var disposable = File.OpenRead(fileName);
+        }
+    }
+}".AssertReplace("File.OpenRead(fileName)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(false, DisposableWalker.Ignores(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

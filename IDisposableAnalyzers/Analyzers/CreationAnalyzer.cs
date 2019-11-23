@@ -11,12 +11,10 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class CreationAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP004DoNotIgnoreCreated,
             Descriptors.IDISP014UseSingleInstanceOfHttpClient);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);

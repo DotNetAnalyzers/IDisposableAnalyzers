@@ -79,6 +79,7 @@ namespace N
 
         [TestCase("await Task.FromResult(new Disposable())")]
         [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
+        [TestCase("Task.FromResult(new Disposable()).GetAwaiter().GetResult()")]
         [TestCase("await Task.Run(() => new Disposable())")]
         [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
         [TestCase("Task.Run(() => new Disposable()).Result")]

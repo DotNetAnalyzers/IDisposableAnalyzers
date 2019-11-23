@@ -87,7 +87,7 @@ namespace N
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
+                var value = syntaxTree.FindVariableDeclaration("disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
                 Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
