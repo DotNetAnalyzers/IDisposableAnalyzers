@@ -136,23 +136,23 @@
 
         private static bool Disposes(ExpressionSyntax candidate, Recursion recursion)
         {
-            switch (candidate.Parent.Kind())
-            {
-                case SyntaxKind.UsingStatement:
-                    return true;
-            }
-
             switch (candidate.Parent)
             {
+                case UsingStatementSyntax _:
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } }:
+                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } }:
+                    return true;
                 case ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation }:
-                    return IsDispose(invocation);
+                    return IsDisposeOrReturnValueDisposed(invocation);
                 case MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation }:
-                    return IsDispose(invocation);
+                    return IsDisposeOrReturnValueDisposed(invocation);
+                case ConditionalAccessExpressionSyntax { }:
+                case MemberAccessExpressionSyntax { }:
+                    return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, recursion, out var creation) &&
+                           Disposes(creation, recursion);
                 case AssignmentExpressionSyntax { Left: { } left } assignment
                     when left == candidate:
                     return Disposes(assignment, recursion);
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } }:
-                    return true;
                 case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
                     when recursion.Target(variableDeclarator) is { } target:
                     return Disposes(target, recursion);
@@ -164,11 +164,22 @@
                     return Disposes(parent, recursion);
                 case ArgumentSyntax argument
                     when recursion.Target(argument) is { } target:
-                    return DisposedByReturnValue(target, recursion, out var creation) &&
-                           Disposes(creation, recursion);
+                    return DisposedByReturnValue(target, recursion, out var wrapper) &&
+                           Disposes(wrapper, recursion);
             }
 
             return false;
+
+            bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)
+            {
+                if (IsDispose(invocation))
+                {
+                    return true;
+                }
+
+                return DisposedByReturnValue(invocation, recursion, out var creation) &&
+                       Disposes(creation, recursion);
+            }
 
             static bool IsDispose(InvocationExpressionSyntax invocation)
             {

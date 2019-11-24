@@ -32,25 +32,25 @@
                     return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, recursion, out creation);
             }
 
-            switch (candidate.Parent)
+            switch (candidate)
             {
-                case ArgumentSyntax argument
+                case { Parent: ArgumentSyntax argument }
                     when recursion.Target(argument) is { } target:
                     return DisposedByReturnValue(target, recursion, out creation);
-                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation }
+                case { Parent: InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                     when recursion.SemanticModel.TryGetType(objectCreation, recursion.CancellationToken, out var type) &&
                          type == KnownSymbol.CompositeDisposable:
                     creation = objectCreation;
                     return true;
-                case MemberAccessExpressionSyntax memberAccess
-                    when recursion.Target<MemberAccessExpressionSyntax, ISymbol, CSharpSyntaxNode>(memberAccess) is { } target &&
-                         DisposedByReturnValue(target, recursion):
-                    creation = memberAccess;
+                case ExpressionSyntax { Parent: AwaitExpressionSyntax await } expression
+                     when recursion.Target(expression) is { } target &&
+                          DisposedByReturnValue(target, recursion):
+                    creation = await;
                     return true;
-                case ConditionalAccessExpressionSyntax conditionalAccess
-                    when recursion.Target<ConditionalAccessExpressionSyntax, ISymbol, CSharpSyntaxNode>(conditionalAccess) is { } target &&
-                         DisposedByReturnValue(target, recursion):
-                    creation = conditionalAccess;
+                case ExpressionSyntax expression
+                     when recursion.Target(expression) is { } target &&
+                          DisposedByReturnValue(target, recursion):
+                    creation = expression;
                     return true;
                 default:
                     creation = null;
@@ -119,7 +119,7 @@
                     }
 
                     break;
-                case { Symbol: { ContainingSymbol: IMethodSymbol method } , Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
                     if (method == KnownSymbol.Task.FromResult)
                     {
                         creation = invocation;
@@ -153,12 +153,14 @@
                 case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
                     return false;
                 case IMethodSymbol { ReturnType: { MetadataName: "ConfiguredTaskAwaitable`1" } }:
+                case IMethodSymbol { ReturnType: { MetadataName: "TaskAwaiter`1" } }:
+                case IMethodSymbol { ContainingSymbol: { MetadataName: "TaskAwaiter`1" }, Name: "GetResult" }:
                     return true;
                 case IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "Task`1" } taskOfT }
                     when taskOfT.TypeArguments.TrySingle(out var type):
                     return Disposable.IsAssignableFrom(type, recursion.SemanticModel.Compilation);
                 case IMethodSymbol { ReturnType: { } returnType, DeclaringSyntaxReferences: { Length: 0 } }:
-                    // we assume here not sure it is the best assumption.
+                    // we assume here, not sure it is the best assumption.
                     return Disposable.IsAssignableFrom(returnType, recursion.SemanticModel.Compilation);
                 case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
                      when reducedFrom.Parameters.TryFirst(out var parameter):

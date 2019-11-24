@@ -51,7 +51,7 @@
                     }
 
                     return true;
-                case InitializerExpressionSyntax { Parent: ExpressionSyntax creation } initializer:
+                case InitializerExpressionSyntax { Parent: ExpressionSyntax creation }:
                     return Ignores(creation, recursion);
             }
 

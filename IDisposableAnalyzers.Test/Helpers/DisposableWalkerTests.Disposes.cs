@@ -40,7 +40,7 @@ namespace N
             [TestCase("disposable?.Dispose()")]
             [TestCase("(disposable as IDisposable)?.Dispose()")]
             [TestCase("((IDisposable)disposable)?.Dispose()")]
-            public static void WhenDisposed(string expression)
+            public static void DisposeInvocation(string expression)
             {
                 var code = @"
 namespace N
@@ -66,7 +66,7 @@ namespace N
             }
 
             [Test]
-            public static void WhenUsing()
+            public static void Using()
             {
                 var code = @"
 namespace N
@@ -93,7 +93,32 @@ namespace N
             }
 
             [Test]
-            public static void WhenUsingAfterDeclaration()
+            public static void UsingDeclaration()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    internal class C
+    {
+        internal C(string fileName)
+        {
+            using var disposable = File.OpenRead(fileName);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindVariableDeclaration("disposable");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
+                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public static void UsingAfterDeclaration()
             {
                 var code = @"
 namespace N
