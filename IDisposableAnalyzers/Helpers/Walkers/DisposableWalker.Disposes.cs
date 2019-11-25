@@ -136,36 +136,39 @@
 
         private static bool Disposes(ExpressionSyntax candidate, Recursion recursion)
         {
-            switch (candidate.Parent)
+            return candidate switch
             {
-                case UsingStatementSyntax _:
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } }:
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } }:
-                    return true;
-                case ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation }:
-                    return IsDisposeOrReturnValueDisposed(invocation);
-                case MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation }:
-                    return IsDisposeOrReturnValueDisposed(invocation);
-                case ConditionalAccessExpressionSyntax { }:
-                case MemberAccessExpressionSyntax { }:
-                    return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, recursion, out var creation) &&
-                           Disposes(creation, recursion);
-                case AssignmentExpressionSyntax { Left: { } left } assignment
-                    when left == candidate:
-                    return Disposes(assignment, recursion);
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when recursion.Target(variableDeclarator) is { } target:
-                    return Disposes(target, recursion);
-                case ExpressionSyntax parent
-                    when IsIdentity(parent):
-                    return Disposes(parent, recursion);
-                case ArgumentSyntax argument
-                    when recursion.Target(argument) is { } target:
-                    return DisposedByReturnValue(target, recursion, out var wrapper) &&
-                           Disposes(wrapper, recursion);
-            }
-
-            return false;
+                { Parent: UsingStatementSyntax _ }
+                => true,
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } } }
+                => true,
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
+                => true,
+                { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
+                => IsDisposeOrReturnValueDisposed(invocation),
+                { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
+                => IsDisposeOrReturnValueDisposed(invocation),
+                { Parent: ConditionalAccessExpressionSyntax { } parent }
+                => DisposedByReturnValue(parent, recursion, out var creation) &&
+                   Disposes(creation, recursion),
+                { Parent: MemberAccessExpressionSyntax { } parent }
+                => DisposedByReturnValue(parent, recursion, out var creation) &&
+                   Disposes(creation, recursion),
+                { Parent: AssignmentExpressionSyntax { Left: { } left } assignment }
+                when left == candidate
+                => Disposes(assignment, recursion),
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
+                when recursion.Target(variableDeclarator) is { } target
+                => Disposes(target, recursion),
+                { Parent: ArgumentSyntax argument }
+                when recursion.Target(argument) is { } target
+                => DisposedByReturnValue(target, recursion, out var wrapper) &&
+                   Disposes(wrapper, recursion),
+                { }
+                when Identity(candidate) is { } id
+                => Disposes(id, recursion),
+                _ => false
+            };
 
             bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)
             {

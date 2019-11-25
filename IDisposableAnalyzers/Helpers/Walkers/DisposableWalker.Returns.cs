@@ -44,17 +44,18 @@
 
         private static bool Returns(ExpressionSyntax candidate, Recursion recursion)
         {
-            return candidate.Parent switch
+            return candidate switch
             {
-                ReturnStatementSyntax _
-                    => true,
-                ArrowExpressionClauseSyntax _
-                    => true,
-                EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    => recursion.Target(variableDeclarator) is { } target &&
-                       Returns(target, recursion),
-                ExpressionSyntax parent
-                    when IsIdentity(parent) => Returns(parent, recursion),
+                { Parent: ReturnStatementSyntax _ }
+                => true,
+                { Parent: ArrowExpressionClauseSyntax _ }
+                => true,
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
+                => recursion.Target(variableDeclarator) is { } target &&
+                   Returns(target, recursion),
+                { }
+                when Identity(candidate) is { } id
+                => Returns(id, recursion),
                 _ => false,
             };
         }

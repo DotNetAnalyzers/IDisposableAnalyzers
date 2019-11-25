@@ -48,19 +48,19 @@
             return candidate switch
             {
                 { Parent: AssignmentExpressionSyntax { Left: { } left, Right: { } right } }
-                    => right.Contains(candidate) &&
-                       recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
-                       FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty),
+                => right.Contains(candidate) &&
+                   recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
+                   FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty),
                 { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax _ } } argument }
-                   => recursion.Target(argument) is { } target &&
-                      Assigns(target, recursion, out fieldOrProperty) &&
-                      recursion.ContainingType.IsAssignableTo(fieldOrProperty.Symbol.ContainingType, recursion.SemanticModel.Compilation),
+                => recursion.Target(argument) is { } target &&
+                   Assigns(target, recursion, out fieldOrProperty) &&
+                   recursion.ContainingType.IsAssignableTo(fieldOrProperty.Symbol.ContainingType, recursion.SemanticModel.Compilation),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
-                    => recursion.Target(variableDeclarator) is { } target &&
-                       Assigns(target, recursion, out fieldOrProperty),
-                { Parent: ExpressionSyntax { } parent }
-                        when IsIdentity(parent)
-                        => Assigns(parent, recursion, out fieldOrProperty),
+                => recursion.Target(variableDeclarator) is { } target &&
+                   Assigns(target, recursion, out fieldOrProperty),
+                { }
+                when Identity(candidate) is { } id
+                => Assigns(id, recursion, out fieldOrProperty),
                 _ => false,
             };
         }

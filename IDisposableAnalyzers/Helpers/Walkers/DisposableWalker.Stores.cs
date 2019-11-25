@@ -49,18 +49,18 @@
 
         private static bool Stores(ExpressionSyntax candidate, Recursion recursion, [NotNullWhen(true)] out ISymbol? container)
         {
-            switch (candidate.Parent)
+            switch (candidate)
             {
-                case InitializerExpressionSyntax { Parent: ImplicitArrayCreationExpressionSyntax arrayCreation }:
+                case { Parent: InitializerExpressionSyntax { Parent: ImplicitArrayCreationExpressionSyntax arrayCreation } }:
                     return StoresOrAssigns(arrayCreation, out container);
-                case InitializerExpressionSyntax { Parent: ArrayCreationExpressionSyntax arrayCreation }:
+                case { Parent: InitializerExpressionSyntax { Parent: ArrayCreationExpressionSyntax arrayCreation } }:
                     return StoresOrAssigns(arrayCreation, out container);
-                case InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectInitializer }:
+                case { Parent: InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectInitializer } }:
                     return StoresOrAssigns(objectInitializer, out container);
-                case AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } }
+                case { Parent: AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } } }
                     when right.Contains(candidate):
                     return recursion.SemanticModel.TryGetSymbol(element, recursion.CancellationToken, out container);
-                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument
+                case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument }
                     when recursion.Target(argument) is { } target:
                     if (DisposedByReturnValue(target, recursion, out var objectCreation) ||
                         AccessibleInReturnValue(target, recursion, out objectCreation))
@@ -70,9 +70,9 @@
 
                     container = null;
                     return false;
-                case ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression }:
+                case { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax tupleExpression } }:
                     return StoresOrAssigns(tupleExpression, out container);
-                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
+                case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                     when recursion.Target(argument) is { Symbol: { } parameter } target:
                     if (target.TargetNode is null &&
                         parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
@@ -107,13 +107,13 @@
                     container = null;
                     return false;
 
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                case { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                     when recursion.Target(variableDeclarator) is { } target:
                     return Stores(target, recursion, out container);
 
-                case ExpressionSyntax parent
-                    when IsIdentity(parent):
-                    return Stores(parent, recursion, out container);
+                case { }
+                    when Identity(candidate) is { } id:
+                    return Stores(id, recursion, out container);
                 default:
                     container = null;
                     return false;

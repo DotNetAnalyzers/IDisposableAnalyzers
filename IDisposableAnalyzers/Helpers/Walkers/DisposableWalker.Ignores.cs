@@ -9,56 +9,59 @@
 
     internal sealed partial class DisposableWalker
     {
-        internal static bool Ignores(ExpressionSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool Ignores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var recursion = Recursion.Borrow(node, semanticModel, cancellationToken);
-            return Ignores(node, recursion);
+            using var recursion = Recursion.Borrow(candidate, semanticModel, cancellationToken);
+            return Ignores(candidate, recursion);
         }
 
-        private static bool Ignores(ExpressionSyntax node, Recursion recursion)
+        private static bool Ignores(ExpressionSyntax candidate, Recursion recursion)
         {
-            if (Disposes(node, recursion) ||
-                Assigns(node, recursion, out _) ||
-                Stores(node, recursion, out _) ||
-                Returns(node, recursion))
+            if (Disposes(candidate, recursion) ||
+                Assigns(candidate, recursion, out _) ||
+                Stores(candidate, recursion, out _) ||
+                Returns(candidate, recursion))
             {
                 return false;
             }
 
-            switch (node.Parent)
+            return candidate switch
             {
-                case AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } }:
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier: { ValueText: "_" } } }:
-                    return true;
-                case AnonymousFunctionExpressionSyntax _:
-                case UsingStatementSyntax _:
-                case ReturnStatementSyntax _:
-                case ArrowExpressionClauseSyntax _:
+                { Parent: AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } } }
+                => true,
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier: { ValueText: "_" } } } }
+                => true,
+                { Parent: AnonymousFunctionExpressionSyntax _ }
+                => false,
+                { Parent: StatementSyntax _ }
+                => true,
+                { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax tuple } }
+                => Ignores(tuple, recursion),
+                { Parent: ArgumentSyntax argument }
+                when recursion.Target(argument) is { } target
+                => Ignores(target, recursion),
+                { Parent: MemberAccessExpressionSyntax _ }
+                => WrappedAndIgnored(),
+                { Parent: ConditionalAccessExpressionSyntax _ }
+                => WrappedAndIgnored(),
+                { Parent: InitializerExpressionSyntax { Parent: ExpressionSyntax creation } }
+                => Ignores(creation, recursion),
+                { }
+                when Identity(candidate) is { } id
+                => Ignores(id, recursion),
+                _ => false
+            };
+
+            bool WrappedAndIgnored()
+            {
+                if (DisposedByReturnValue(candidate, recursion, out var returnValue) &&
+                    !Ignores(returnValue, recursion))
+                {
                     return false;
-                case StatementSyntax _:
-                    return true;
-                case ArgumentSyntax { Parent: TupleExpressionSyntax tuple }:
-                    return Ignores(tuple, recursion);
-                case ArgumentSyntax argument
-                    when recursion.Target(argument) is { } target:
-                    return Ignores(target, recursion);
-                case MemberAccessExpressionSyntax _:
-                case ConditionalAccessExpressionSyntax _:
-                    if (DisposedByReturnValue(node, recursion, out var returnValue) &&
-                       !Ignores(returnValue, recursion))
-                    {
-                        return false;
-                    }
+                }
 
-                    return true;
-                case InitializerExpressionSyntax { Parent: ExpressionSyntax creation }:
-                    return Ignores(creation, recursion);
-                case ExpressionSyntax parent
-                    when IsIdentity(parent):
-                    return Ignores(parent, recursion);
+                return true;
             }
-
-            return false;
         }
 
         private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)

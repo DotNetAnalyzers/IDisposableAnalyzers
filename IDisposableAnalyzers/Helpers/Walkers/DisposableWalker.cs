@@ -23,22 +23,6 @@
             this.usages.Clear();
         }
 
-        private static bool IsIdentity(ExpressionSyntax expression)
-        {
-            switch (expression.Kind())
-            {
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.AwaitExpression:
-                case SyntaxKind.CastExpression:
-                case SyntaxKind.CoalesceExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.ParenthesizedExpression:
-                    return true;
-                default:
-                    return false;
-            }
-        }
-
         private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, Recursion recursion)
         {
             if (localOrParameter.TryGetScope(recursion.CancellationToken, out var scope))

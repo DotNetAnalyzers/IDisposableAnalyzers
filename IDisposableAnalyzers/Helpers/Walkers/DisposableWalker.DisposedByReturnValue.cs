@@ -33,9 +33,9 @@
                          type == KnownSymbol.CompositeDisposable:
                     creation = objectCreation;
                     return true;
-                case { Parent: ExpressionSyntax { } parent }
-                    when IsIdentity(parent):
-                    creation = parent;
+                case { }
+                    when Identity(candidate) is { } id:
+                    creation = id;
                     return true;
                 case { } expression
                      when recursion.Target(expression) is { } target &&
