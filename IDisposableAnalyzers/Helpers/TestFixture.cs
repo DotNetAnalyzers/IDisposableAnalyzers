@@ -60,14 +60,14 @@
 
             var attributeType = semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type;
 
-            var teardOwnAttributeType = attributeType == KnownSymbol.NUnitSetUpAttribute
+            var tearDownAttributeType = attributeType == KnownSymbol.NUnitSetUpAttribute
                 ? KnownSymbol.NUnitTearDownAttribute
                 : KnownSymbol.NUnitOneTimeTearDownAttribute;
             foreach (var member in typeDeclarationSyntax.Members)
             {
                 if (member is MethodDeclarationSyntax methodDeclaration)
                 {
-                    if (Attribute.TryFind(methodDeclaration, teardOwnAttributeType, semanticModel, cancellationToken, out _))
+                    if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
                     {
                         result = methodDeclaration;
                         return true;
