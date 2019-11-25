@@ -1354,5 +1354,58 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void Issue185()
+        {
+            var c1 = @"
+namespace N
+{
+    using System;
+
+    public class C1 : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+            var code = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        C1 _c1;
+
+        public C() { }
+
+        public C(C1 c1)
+        {
+            _c1 = c1;
+        }
+
+        public C1 M1() => _c1;
+
+        public C1 M2() => _c1 = new C1();
+
+        public C1 GetOrCreateFoo()
+        {
+            var c1 = this.M1();
+            if (c1 != null)
+                return c1;
+
+            c1 = M2();
+            if (c1 != null)
+                return c1;
+
+            throw new Exception();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, c1, code);
+        }
     }
 }

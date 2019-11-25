@@ -80,11 +80,18 @@
                 return false;
             }
 
-            if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty) &&
-                context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
-                TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
+            if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty))
             {
-                return false;
+                if (context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
+                    TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
+                {
+                    return false;
+                }
+
+                if (Disposable.IsAssignedWithInjected(fieldOrProperty.Symbol, assignment, context.SemanticModel, context.CancellationToken))
+                {
+                    return false;
+                }
             }
 
             if (IsNullChecked(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))

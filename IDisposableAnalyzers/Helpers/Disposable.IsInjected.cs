@@ -90,6 +90,13 @@
             return result;
         }
 
+        internal static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+        }
+
         private static Result IsInjectedCore(ISymbol symbol)
         {
             if (symbol == null)
@@ -148,13 +155,6 @@
             }
 
             return Result.No;
-        }
-
-        private static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
-            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-            return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
         }
     }
 }
