@@ -70,32 +70,29 @@
                     }
                     else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax? statement))
                     {
-                        if (statement is LocalDeclarationStatementSyntax lds)
-                        {
-                            context.RegisterCodeFix(
-                                "using",
-                                (editor, _) => editor.ReplaceNode(
-                                    lds,
-                                    x => x.WithUsingKeyword(SyntaxFactory.Token(SyntaxKind.UsingKeyword)
-                                                                         .WithLeadingTrivia(x.Declaration.GetLeadingTrivia()))
-                                          .WithDeclaration(x.Declaration.WithLeadingTrivia(SyntaxFactory.TriviaList()))),
-                                "using",
-                                diagnostic);
-                        }
-
                         switch (statement)
                         {
-                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: BlockSyntax _ } localDeclarationStatement:
+                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: BlockSyntax _ } localDeclaration:
+                                context.RegisterCodeFix(
+                                    "using",
+                                    (editor, _) => editor.ReplaceNode(
+                                        localDeclaration,
+                                        x => x.WithUsingKeyword(SyntaxFactory.Token(SyntaxKind.UsingKeyword)
+                                                                     .WithLeadingTrivia(x.Declaration.GetLeadingTrivia()))
+                                                                     .WithDeclaration(x.Declaration.WithLeadingTrivia(SyntaxFactory.TriviaList()))),
+                                    "using",
+                                    diagnostic);
+
                                 context.RegisterCodeFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclarationStatement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclaration),
                                     "Add using to end of block.",
                                     diagnostic);
                                 break;
-                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: SwitchSectionSyntax _ } localDeclarationStatement:
+                            case LocalDeclarationStatementSyntax { Declaration: { }, Parent: SwitchSectionSyntax _ } localDeclaration:
                                 context.RegisterCodeFix(
                                     "Add using to end of block.",
-                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclarationStatement),
+                                    (editor, _) => AddUsingToEndOfBlock(editor, localDeclaration),
                                     "Add using to end of block.",
                                     diagnostic);
                                 break;
