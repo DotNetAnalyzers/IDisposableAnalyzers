@@ -34,9 +34,8 @@
                     creation = objectCreation;
                     return true;
                 case { }
-                    when Identity(candidate) is { } id:
-                    creation = id;
-                    return true;
+                    when Identity(candidate, recursion) is { } id:
+                    return DisposedByReturnValue(id, recursion, out creation);
                 case { } expression
                      when recursion.Target(expression) is { } target &&
                           DisposedByReturnValue(target, recursion):

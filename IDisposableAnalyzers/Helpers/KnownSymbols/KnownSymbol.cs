@@ -54,6 +54,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
+        internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
         internal static readonly QualifiedType HttpMessageHandler = new QualifiedType("System.Net.Http.HttpMessageHandler");
         internal static readonly HttpResponseMessageType HttpResponseMessage = new HttpResponseMessageType();

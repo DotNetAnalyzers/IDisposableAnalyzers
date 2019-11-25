@@ -35,6 +35,9 @@
                 => false,
                 { Parent: StatementSyntax _ }
                 => true,
+                { }
+                when Identity(candidate, recursion) is { } id
+                => Ignores(id, recursion),
                 { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax tuple } }
                 => Ignores(tuple, recursion),
                 { Parent: ArgumentSyntax argument }
@@ -46,9 +49,6 @@
                 => WrappedAndIgnored(),
                 { Parent: InitializerExpressionSyntax { Parent: ExpressionSyntax creation } }
                 => Ignores(creation, recursion),
-                { }
-                when Identity(candidate) is { } id
-                => Ignores(id, recursion),
                 _ => false
             };
 

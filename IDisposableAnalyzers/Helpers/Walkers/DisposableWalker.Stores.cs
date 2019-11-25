@@ -60,6 +60,9 @@
                 case { Parent: AssignmentExpressionSyntax { Right: { } right, Left: ElementAccessExpressionSyntax { Expression: { } element } } }
                     when right.Contains(candidate):
                     return recursion.SemanticModel.TryGetSymbol(element, recursion.CancellationToken, out container);
+                case { }
+                    when Identity(candidate, recursion) is { } id:
+                    return Stores(id, recursion, out container);
                 case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument }
                     when recursion.Target(argument) is { } target:
                     if (DisposedByReturnValue(target, recursion, out var objectCreation) ||
@@ -110,10 +113,6 @@
                 case { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                     when recursion.Target(variableDeclarator) is { } target:
                     return Stores(target, recursion, out container);
-
-                case { }
-                    when Identity(candidate) is { } id:
-                    return Stores(id, recursion, out container);
                 default:
                     container = null;
                     return false;

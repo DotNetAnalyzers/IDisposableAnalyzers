@@ -54,7 +54,7 @@
                 => recursion.Target(variableDeclarator) is { } target &&
                    Returns(target, recursion),
                 { }
-                when Identity(candidate) is { } id
+                when Identity(candidate, recursion) is { } id
                 => Returns(id, recursion),
                 _ => false,
             };

@@ -144,6 +144,9 @@
                 => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
                 => true,
+                { }
+                when Identity(candidate, recursion) is { } id
+                => Disposes(id, recursion),
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
@@ -164,9 +167,6 @@
                 when recursion.Target(argument) is { } target
                 => DisposedByReturnValue(target, recursion, out var wrapper) &&
                    Disposes(wrapper, recursion),
-                { }
-                when Identity(candidate) is { } id
-                => Disposes(id, recursion),
                 _ => false
             };
 

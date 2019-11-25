@@ -47,6 +47,9 @@
         {
             return candidate switch
             {
+                { }
+                when Identity(candidate, recursion) is { } id
+                => Assigns(id, recursion, out fieldOrProperty),
                 { Parent: AssignmentExpressionSyntax { Left: { } left, Right: { } right } }
                 => right.Contains(candidate) &&
                    recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
@@ -58,9 +61,6 @@
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                 => recursion.Target(variableDeclarator) is { } target &&
                    Assigns(target, recursion, out fieldOrProperty),
-                { }
-                when Identity(candidate) is { } id
-                => Assigns(id, recursion, out fieldOrProperty),
                 _ => false,
             };
         }

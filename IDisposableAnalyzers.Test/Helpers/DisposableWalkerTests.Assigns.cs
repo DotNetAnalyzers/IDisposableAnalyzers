@@ -212,8 +212,9 @@ namespace N
 
             [TestCase("Task.FromResult(File.OpenRead(fileName))")]
             [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+            //[TestCase("Task.Run(() => File.OpenRead(fileName))")]
+            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); })")]
+            //[TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
             public static void AssigningFieldAwait(string expression)
             {
                 var code = @"
@@ -244,6 +245,45 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(true, DisposableWalker.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
+                Assert.AreEqual("disposable", fieldOrProperty.Name);
+            }
+
+            [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
+            [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+            //[TestCase("Task.Run(() => File.OpenRead(fileName)).Result")]
+            //[TestCase("Task.Run(() => File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); }).Result")]
+            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); }).GetAwaiter().GetResult()")]
+            public static void AssigningFieldGetAwaiterGetResult(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public sealed class C : IDisposable
+    {
+        private IDisposable disposable;
+
+        public async Task M(string fileName)
+        {
+            this.disposable?.Dispose();
+            this.disposable = Task.FromResult(File.OpenRead(fileName));
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
+    }
+}".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true,         DisposableWalker.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
                 Assert.AreEqual("disposable", fieldOrProperty.Name);
             }
         }
