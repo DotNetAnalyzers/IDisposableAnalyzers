@@ -61,6 +61,7 @@ namespace IDisposableAnalyzers
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
         internal static readonly RxDisposableType RxDisposable = new RxDisposableType();
+        internal static readonly QualifiedType RxIScheduler = new QualifiedType("System.Reactive.Concurrency.IScheduler");
         internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
         internal static readonly CompositeDisposableType CompositeDisposable = new CompositeDisposableType();
 

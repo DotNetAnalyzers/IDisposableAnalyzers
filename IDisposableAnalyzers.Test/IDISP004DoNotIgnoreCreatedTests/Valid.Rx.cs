@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -302,6 +302,27 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, code);
+        }
+
+        [Test]
+        public static void ISchedulerSchedule()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Reactive.Concurrency;
+
+    class C
+    {
+        internal void M(IScheduler scheduler)
+        {
+            scheduler.Schedule(() => Console.WriteLine());
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }
