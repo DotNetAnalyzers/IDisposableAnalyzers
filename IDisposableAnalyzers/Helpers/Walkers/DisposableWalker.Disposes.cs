@@ -157,10 +157,7 @@
                     when recursion.Target(variableDeclarator) is { } target:
                     return Disposes(target, recursion);
                 case ExpressionSyntax parent
-                    when parent.IsKind(SyntaxKind.CastExpression) ||
-                         parent.IsKind(SyntaxKind.AsExpression) ||
-                         parent.IsKind(SyntaxKind.AsExpression) ||
-                         parent.IsKind(SyntaxKind.ParenthesizedExpression):
+                    when IsIdentity(parent):
                     return Disposes(parent, recursion);
                 case ArgumentSyntax argument
                     when recursion.Target(argument) is { } target:

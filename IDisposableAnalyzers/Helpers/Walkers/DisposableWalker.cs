@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed partial class DisposableWalker : PooledWalker<DisposableWalker>
@@ -20,6 +21,22 @@
         protected override void Clear()
         {
             this.usages.Clear();
+        }
+
+        private static bool IsIdentity(ExpressionSyntax expression)
+        {
+            switch (expression.Kind())
+            {
+                case SyntaxKind.AsExpression:
+                case SyntaxKind.AwaitExpression:
+                case SyntaxKind.CastExpression:
+                case SyntaxKind.CoalesceExpression:
+                case SyntaxKind.ConditionalExpression:
+                case SyntaxKind.ParenthesizedExpression:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private static DisposableWalker CreateUsagesWalker(LocalOrParameter localOrParameter, Recursion recursion)

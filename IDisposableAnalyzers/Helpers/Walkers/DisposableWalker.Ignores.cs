@@ -53,6 +53,9 @@
                     return true;
                 case InitializerExpressionSyntax { Parent: ExpressionSyntax creation }:
                     return Ignores(creation, recursion);
+                case ExpressionSyntax parent
+                    when IsIdentity(parent):
+                    return Ignores(parent, recursion);
             }
 
             return false;
@@ -60,10 +63,9 @@
 
         private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
         {
-            if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } } &&
-                recursion.SemanticModel.TryGetSymbol(parentExpression, recursion.CancellationToken, out IMethodSymbol? method))
+            if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } })
             {
-                if (method.DeclaringSyntaxReferences.IsEmpty)
+                if (target.TargetNode is null)
                 {
                     if (!Ignores(parentExpression, recursion))
                     {

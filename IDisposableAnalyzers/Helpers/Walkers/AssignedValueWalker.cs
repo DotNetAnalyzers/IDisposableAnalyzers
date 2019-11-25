@@ -501,8 +501,8 @@
                     }
                 }
 
-                if ((this.CurrentSymbol is IFieldSymbol { IsReadOnly: false } field) ||
-                    (this.CurrentSymbol is IPropertySymbol { IsReadOnly: false } property))
+                if ((this.CurrentSymbol is IFieldSymbol { IsReadOnly: false }) ||
+                    (this.CurrentSymbol is IPropertySymbol { IsReadOnly: false }))
                 {
                     if (TryGetScope(this.context.Node, out scope) &&
                         !(scope is ConstructorDeclarationSyntax))

@@ -1,10 +1,8 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed partial class DisposableWalker
@@ -18,6 +16,12 @@
             }
 
             return false;
+        }
+
+        internal static bool Assigns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
+        {
+            using var recursion = Recursion.Borrow(candidate, semanticModel, cancellationToken);
+            return Assigns(candidate, recursion, out first);
         }
 
         private static bool Assigns<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion, out FieldOrProperty fieldOrProperty)
@@ -41,32 +45,24 @@
 
         private static bool Assigns(ExpressionSyntax candidate, Recursion recursion, out FieldOrProperty fieldOrProperty)
         {
-            switch (candidate.Parent.Kind())
+            return candidate switch
             {
-                case SyntaxKind.CastExpression:
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.CoalesceExpression:
-                    return Assigns((ExpressionSyntax)candidate.Parent, recursion, out fieldOrProperty);
-            }
-
-            switch (candidate.Parent)
-            {
-                case AssignmentExpressionSyntax { Left: { } left, Right: { } right }:
-                    return right.Contains(candidate) &&
-                           recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
-                           FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty);
-                case ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument
-                    when invocation.IsPotentialThisOrBase() &&
-                         recursion.Target(argument) is { } target:
-                    return Assigns(target, recursion, out fieldOrProperty);
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when recursion.Target(variableDeclarator) is { } target:
-                    return Assigns(target, recursion, out fieldOrProperty);
-
-                default:
-                    return false;
-            }
+                { Parent: AssignmentExpressionSyntax { Left: { } left, Right: { } right } }
+                    => right.Contains(candidate) &&
+                       recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
+                       FieldOrProperty.TryCreate(assignedSymbol, out fieldOrProperty),
+                { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax _ } } argument }
+                   => recursion.Target(argument) is { } target &&
+                      Assigns(target, recursion, out fieldOrProperty) &&
+                      recursion.ContainingType.IsAssignableTo(fieldOrProperty.Symbol.ContainingType, recursion.SemanticModel.Compilation),
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
+                    => recursion.Target(variableDeclarator) is { } target &&
+                       Assigns(target, recursion, out fieldOrProperty),
+                { Parent: ExpressionSyntax { } parent }
+                        when IsIdentity(parent)
+                        => Assigns(parent, recursion, out fieldOrProperty),
+                _ => false,
+            };
         }
     }
 }

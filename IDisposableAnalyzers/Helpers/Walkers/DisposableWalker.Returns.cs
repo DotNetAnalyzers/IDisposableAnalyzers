@@ -3,7 +3,6 @@
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed partial class DisposableWalker
@@ -45,27 +44,19 @@
 
         private static bool Returns(ExpressionSyntax candidate, Recursion recursion)
         {
-            switch (candidate.Parent.Kind())
+            return candidate.Parent switch
             {
-                case SyntaxKind.ReturnStatement:
-                case SyntaxKind.ArrowExpressionClause:
-                    return true;
-                case SyntaxKind.CastExpression:
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.CoalesceExpression:
-                    return Returns((ExpressionSyntax)candidate.Parent, recursion);
-            }
-
-            switch (candidate.Parent)
-            {
-                case EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
-                    when recursion.Target(variableDeclarator) is { } target:
-                    return Returns(target, recursion);
-
-                default:
-                    return false;
-            }
+                ReturnStatementSyntax _
+                    => true,
+                ArrowExpressionClauseSyntax _
+                    => true,
+                EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator }
+                    => recursion.Target(variableDeclarator) is { } target &&
+                       Returns(target, recursion),
+                ExpressionSyntax parent
+                    when IsIdentity(parent) => Returns(parent, recursion),
+                _ => false,
+            };
         }
     }
 }

@@ -51,8 +51,6 @@
         {
             switch (candidate.Parent)
             {
-                case CastExpressionSyntax cast:
-                    return StoresOrAssigns(cast, out container);
                 case InitializerExpressionSyntax { Parent: ImplicitArrayCreationExpressionSyntax arrayCreation }:
                     return StoresOrAssigns(arrayCreation, out container);
                 case InitializerExpressionSyntax { Parent: ArrayCreationExpressionSyntax arrayCreation }:
@@ -114,9 +112,7 @@
                     return Stores(target, recursion, out container);
 
                 case ExpressionSyntax parent
-                    when parent.IsKind(SyntaxKind.AsExpression) ||
-                         parent.IsKind(SyntaxKind.ConditionalExpression) ||
-                         parent.IsKind(SyntaxKind.CoalesceExpression):
+                    when IsIdentity(parent):
                     return Stores(parent, recursion, out container);
                 default:
                     container = null;
@@ -174,7 +170,7 @@
 
                     return false;
 
-                case { Symbol: { ContainingSymbol: { } constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } } }:
+                case { Symbol: { ContainingSymbol: { } constructor }, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } } }:
                     if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
                     {
                         creation = objectCreation;

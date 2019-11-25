@@ -209,6 +209,43 @@ namespace N
                 Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
                 Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
+
+            [TestCase("Task.FromResult(File.OpenRead(fileName))")]
+            [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+            public static void AssigningFieldAwait(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public sealed class C : IDisposable
+    {
+        private IDisposable disposable;
+
+        public async Task M(string fileName)
+        {
+            this.disposable?.Dispose();
+            this.disposable = await Task.FromResult(File.OpenRead(fileName));
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
+    }
+}".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+                Assert.AreEqual(true, DisposableWalker.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
+                Assert.AreEqual("disposable", fieldOrProperty.Name);
+            }
         }
     }
 }

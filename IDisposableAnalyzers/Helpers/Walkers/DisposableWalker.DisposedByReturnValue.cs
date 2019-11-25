@@ -23,15 +23,6 @@
 
         private static bool DisposedByReturnValue(ExpressionSyntax candidate, Recursion recursion, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
-            switch (candidate.Parent.Kind())
-            {
-                case SyntaxKind.CastExpression:
-                case SyntaxKind.AsExpression:
-                case SyntaxKind.ConditionalExpression:
-                case SyntaxKind.CoalesceExpression:
-                    return DisposedByReturnValue((ExpressionSyntax)candidate.Parent, recursion, out creation);
-            }
-
             switch (candidate)
             {
                 case { Parent: ArgumentSyntax argument }
@@ -42,12 +33,11 @@
                          type == KnownSymbol.CompositeDisposable:
                     creation = objectCreation;
                     return true;
-                case ExpressionSyntax { Parent: AwaitExpressionSyntax await } expression
-                     when recursion.Target(expression) is { } target &&
-                          DisposedByReturnValue(target, recursion):
-                    creation = await;
+                case { Parent: ExpressionSyntax { } parent }
+                    when IsIdentity(parent):
+                    creation = parent;
                     return true;
-                case ExpressionSyntax expression
+                case { } expression
                      when recursion.Target(expression) is { } target &&
                           DisposedByReturnValue(target, recursion):
                     creation = expression;
