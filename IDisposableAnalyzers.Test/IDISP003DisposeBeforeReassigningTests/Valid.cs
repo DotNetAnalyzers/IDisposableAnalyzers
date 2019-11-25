@@ -1328,5 +1328,31 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void AssigningInjectedInFactoryMethod()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading;
+
+    public class C
+    {
+        private IDisposable disposable;
+
+        public static C M(IDisposable d)
+        {
+            var c = new C();
+            c.disposable = d;
+            c.disposable = null;
+            return c;
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
