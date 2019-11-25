@@ -48,7 +48,7 @@
         {
             return context.Node switch
             {
-                InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression:{} expression, Name: { Identifier: { ValueText: "Schedule" } } } }
+                InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: { Identifier: { ValueText: "Schedule" } } } }
                 when context.SemanticModel.TryGetNamedType(expression, context.CancellationToken, out var type) &&
                      type.IsAssignableTo(KnownSymbol.RxIScheduler, context.SemanticModel.Compilation)
                 => null,
