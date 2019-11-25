@@ -17,7 +17,7 @@
                 return Result.No;
             }
 
-            if (disposable is { Parent: AssignmentExpressionSyntax { Parent: ArrowExpressionClauseSyntax { Parent: ConstructorDeclarationSyntax _} } })
+            if (disposable is { Parent: AssignmentExpressionSyntax { Parent: ArrowExpressionClauseSyntax { Parent: ConstructorDeclarationSyntax _ } } })
             {
                 assignedSymbol = null;
                 return Result.No;

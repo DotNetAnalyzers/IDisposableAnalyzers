@@ -70,22 +70,16 @@
 
         private static bool IsStaticFieldInitializer(ObjectCreationExpressionSyntax objectCreation)
         {
-            return objectCreation.Parent is EqualsValueClauseSyntax equalsValueClause &&
-                   equalsValueClause.Parent is VariableDeclaratorSyntax variableDeclarator &&
-                   variableDeclarator.Parent is VariableDeclarationSyntax variableDeclaration &&
-                   variableDeclaration.Parent is FieldDeclarationSyntax fieldDeclaration &&
+            return objectCreation.Parent is EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: FieldDeclarationSyntax fieldDeclaration } } } &&
                    fieldDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
         }
 
         private static bool IsStaticPropertyInitializer(ObjectCreationExpressionSyntax objectCreation)
         {
-            return objectCreation.Parent is EqualsValueClauseSyntax equalsValueClause &&
-                   equalsValueClause.Parent is PropertyDeclarationSyntax propertyDeclaration &&
+            return objectCreation.Parent is EqualsValueClauseSyntax { Parent: PropertyDeclarationSyntax propertyDeclaration } &&
                    propertyDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword);
         }
 
-        private static bool IsStaticCtor(ISymbol containingSymbol) => containingSymbol.IsStatic &&
-                                                                      containingSymbol is IMethodSymbol method &&
-                                                                      method.MethodKind == MethodKind.SharedConstructor;
+        private static bool IsStaticCtor(ISymbol containingSymbol) => containingSymbol is IMethodSymbol { IsStatic: true, MethodKind: MethodKind.SharedConstructor };
     }
 }
