@@ -136,18 +136,9 @@
         {
             switch (target.Symbol)
             {
-                case IPropertySymbol { ContainingType: { MetadataName: "Task`1" }, Name: "Result" }:
-                    return true;
                 case IMethodSymbol { ReturnsVoid: true }:
                 case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
                     return false;
-                case IMethodSymbol { ReturnType: { MetadataName: "ConfiguredTaskAwaitable`1" } }:
-                case IMethodSymbol { ReturnType: { MetadataName: "TaskAwaiter`1" } }:
-                case IMethodSymbol { ContainingSymbol: { MetadataName: "TaskAwaiter`1" }, Name: "GetResult" }:
-                    return true;
-                case IMethodSymbol { ReturnType: INamedTypeSymbol { MetadataName: "Task`1" } taskOfT }
-                    when taskOfT.TypeArguments.TrySingle(out var type):
-                    return Disposable.IsAssignableFrom(type, recursion.SemanticModel.Compilation);
                 case IMethodSymbol { ReturnType: { } returnType, DeclaringSyntaxReferences: { Length: 0 } }:
                     // we assume here, not sure it is the best assumption.
                     return Disposable.IsAssignableFrom(returnType, recursion.SemanticModel.Compilation);

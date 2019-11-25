@@ -26,6 +26,14 @@
                 => Recursive(invocation, recursion),
                 { Parent: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier: { ValueText: "GetAwaiter" } }, Parent: InvocationExpressionSyntax invocation } }
                 => Recursive(invocation, recursion),
+                { Parent: LambdaExpressionSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } }
+                when invocation.IsSymbol(KnownSymbol.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
+                => Recursive(invocation, recursion),
+                { Parent:ReturnStatementSyntax returnStatement}
+                when returnStatement.TryFirstAncestor(out LambdaExpressionSyntax? lambda) &&
+                     lambda is { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } &&
+                     invocation.IsSymbol(KnownSymbol.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
+                => Recursive(invocation, recursion),
                 { Parent: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "Result" } } } memberAccess }
                 when recursion.SemanticModel.TryGetNamedType(expression, recursion.CancellationToken, out var type) &&
                      type.IsAssignableTo(KnownSymbol.Task, recursion.SemanticModel.Compilation)

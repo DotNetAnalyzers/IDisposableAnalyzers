@@ -212,9 +212,9 @@ namespace N
 
             [TestCase("Task.FromResult(File.OpenRead(fileName))")]
             [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
-            //[TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); })")]
-            //[TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+            [TestCase("Task.Run(() => { return File.OpenRead(fileName); })")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
             public static void AssigningFieldAwait(string expression)
             {
                 var code = @"
@@ -250,10 +250,10 @@ namespace N
 
             [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
             [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
-            //[TestCase("Task.Run(() => File.OpenRead(fileName)).Result")]
-            //[TestCase("Task.Run(() => File.OpenRead(fileName)).GetAwaiter().GetResult()")]
-            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); }).Result")]
-            //[TestCase("Task.Run(() => { return File.OpenRead(fileName); }).GetAwaiter().GetResult()")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName)).Result")]
+            [TestCase("Task.Run(() => File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+            [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).Result")]
+            [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).GetAwaiter().GetResult()")]
             public static void AssigningFieldGetAwaiterGetResult(string expression)
             {
                 var code = @"
