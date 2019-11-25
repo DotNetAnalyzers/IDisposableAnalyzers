@@ -29,7 +29,7 @@
                 { Parent: LambdaExpressionSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } }
                 when invocation.IsSymbol(KnownSymbol.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
                 => Recursive(invocation, recursion),
-                { Parent:ReturnStatementSyntax returnStatement}
+                { Parent: ReturnStatementSyntax returnStatement }
                 when returnStatement.TryFirstAncestor(out LambdaExpressionSyntax? lambda) &&
                      lambda is { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } &&
                      invocation.IsSymbol(KnownSymbol.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
