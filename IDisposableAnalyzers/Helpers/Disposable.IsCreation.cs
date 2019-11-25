@@ -17,6 +17,12 @@
                 return Result.No;
             }
 
+            if (disposable is { Parent: AssignmentExpressionSyntax { Parent: ArrowExpressionClauseSyntax { Parent: ConstructorDeclarationSyntax _} } })
+            {
+                assignedSymbol = null;
+                return Result.No;
+            }
+
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol is null)
             {

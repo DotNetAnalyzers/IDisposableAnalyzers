@@ -3,6 +3,7 @@
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed partial class DisposableWalker
@@ -48,8 +49,8 @@
             {
                 { Parent: ReturnStatementSyntax _ }
                 => true,
-                { Parent: ArrowExpressionClauseSyntax _ }
-                => true,
+                { Parent: ArrowExpressionClauseSyntax { Parent: { } parent } }
+                => !parent.IsKind(SyntaxKind.ConstructorDeclaration),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                 => recursion.Target(variableDeclarator) is { } target &&
                    Returns(target, recursion),

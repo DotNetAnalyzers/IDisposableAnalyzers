@@ -1308,5 +1308,25 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void AssigningFieldInExpressionBodyCtor()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading;
+
+    public class C
+    {
+        private readonly IDisposable disposable;
+
+        public C()=> this.disposable = new CancellationTokenSource();
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
