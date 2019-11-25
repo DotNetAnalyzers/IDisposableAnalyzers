@@ -145,8 +145,9 @@
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
                 => true,
                 { }
-                when Identity(candidate, recursion) is { } id
-                => Disposes(id, recursion),
+                when Identity(candidate, recursion) is { } id &&
+                     Disposes(id, recursion)
+                => true,
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }

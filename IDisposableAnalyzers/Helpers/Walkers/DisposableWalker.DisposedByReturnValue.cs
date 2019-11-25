@@ -155,13 +155,6 @@
                 using var walker = CreateUsagesWalker(target, recursion);
                 foreach (var usage in walker.usages)
                 {
-                    switch (usage.Parent.Kind())
-                    {
-                        case SyntaxKind.ReturnStatement:
-                        case SyntaxKind.ArrowExpressionClause:
-                            return true;
-                    }
-
                     if (Assigns(usage, recursion, out var fieldOrProperty) &&
                         DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, recursion.SemanticModel, recursion.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {

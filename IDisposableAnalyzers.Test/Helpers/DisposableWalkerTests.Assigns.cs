@@ -210,6 +210,36 @@ namespace N
                 Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
             }
 
+            [Test]
+            public static void PropertyAssignedViaIdentity()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+
+    internal class C
+    {
+        internal C(IDisposable disposable)
+        {
+            this.Disposable = this.M(disposable);
+        }
+
+        public IDisposable Disposable { get; private set; }
+
+        private void M(IDisposable arg) => arg;
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("IDisposable disposable");
+                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, DisposableWalker.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
+            }
+
             [TestCase("Task.FromResult(File.OpenRead(fileName))")]
             [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
             [TestCase("Task.Run(() => File.OpenRead(fileName))")]
@@ -283,7 +313,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true,         DisposableWalker.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
+                Assert.AreEqual(true, DisposableWalker.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
                 Assert.AreEqual("disposable", fieldOrProperty.Name);
             }
         }

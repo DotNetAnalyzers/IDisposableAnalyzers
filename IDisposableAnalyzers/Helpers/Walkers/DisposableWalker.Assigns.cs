@@ -48,8 +48,9 @@
             return candidate switch
             {
                 { }
-                when Identity(candidate, recursion) is { } id
-                => Assigns(id, recursion, out fieldOrProperty),
+                when Identity(candidate, recursion) is { } id &&
+                     Assigns(id, recursion, out fieldOrProperty)
+                => true,
                 { Parent: AssignmentExpressionSyntax { Left: { } left, Right: { } right } }
                 => right.Contains(candidate) &&
                    recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&

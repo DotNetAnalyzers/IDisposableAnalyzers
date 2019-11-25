@@ -36,8 +36,9 @@
                 { Parent: StatementSyntax _ }
                 => true,
                 { }
-                when Identity(candidate, recursion) is { } id
-                => Ignores(id, recursion),
+                when Identity(candidate, recursion) is { } id &&
+                     !Ignores(id, recursion)
+                => false,
                 { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax tuple } }
                 => Ignores(tuple, recursion),
                 { Parent: ArgumentSyntax argument }

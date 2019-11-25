@@ -61,8 +61,9 @@
                     when right.Contains(candidate):
                     return recursion.SemanticModel.TryGetSymbol(element, recursion.CancellationToken, out container);
                 case { }
-                    when Identity(candidate, recursion) is { } id:
-                    return Stores(id, recursion, out container);
+                    when Identity(candidate, recursion) is { } id &&
+                         Stores(id, recursion, out container):
+                    return true;
                 case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax _ } } argument }
                     when recursion.Target(argument) is { } target:
                     if (DisposedByReturnValue(target, recursion, out var objectCreation) ||
