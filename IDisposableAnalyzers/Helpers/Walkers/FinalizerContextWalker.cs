@@ -40,10 +40,8 @@
                                 this.returned = true;
                                 return;
                             }
-                            else
-                            {
-                                this.Visit(statement);
-                            }
+
+                            this.Visit(statement);
                         }
 
                         break;

@@ -1,3 +1,8 @@
+#### 3.1.0
+* BUGFIX IDISP005 when local function.
+* BUGFIX IDISP024 don't call SuppressFinalize if sealed and no finalizer.
+* BUGFIX IDISP025 seal disposable.
+
 #### 2.1.2
 * BUGFIX IDISP011: when disposing before foreach.
 * BUGFIX IDISP003 should not warn when reassigning after dispose.
