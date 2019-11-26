@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -7,7 +7,7 @@ namespace ValidCode
     using System.IO;
     using System.Reactive.Disposables;
 
-    public class Misc : IDisposable
+    public sealed class Misc : IDisposable
     {
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();

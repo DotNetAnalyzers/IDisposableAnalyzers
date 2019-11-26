@@ -31,7 +31,7 @@ namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public sealed class C : IDisposable
     {
         private IDisposable disposable;
 
@@ -77,7 +77,7 @@ namespace N
 {
     using System;
 
-    public class C : IDisposable
+    public sealed class C : IDisposable
     {
         private IDisposable disposable;
 

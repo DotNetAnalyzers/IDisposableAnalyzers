@@ -8,12 +8,12 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(RemoveCallFix))]
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SealFix))]
     [Shared]
-    internal class RemoveCallFix : DocumentEditorCodeFixProvider
+    internal class SealFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.IDISP024DoNotCallSuppressFinalize.Id);
+            Descriptors.IDISP025SealDisposable.Id);
 
         protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
@@ -24,12 +24,12 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement))
+                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax? classDeclaration))
                 {
                     context.RegisterCodeFix(
-                        "Remove",
-                        (e, _) => e.RemoveNode(statement),
-                        equivalenceKey: nameof(RemoveCallFix),
+                        "Seal",
+                        (e, _) => e.Seal(classDeclaration),
+                        equivalenceKey: nameof(SealFix),
                         diagnostic);
                 }
             }

@@ -1,9 +1,9 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
 
-    public class Disposable : IDisposable
+    public sealed class Disposable : IDisposable
     {
         public Disposable(string meh)
             : this()

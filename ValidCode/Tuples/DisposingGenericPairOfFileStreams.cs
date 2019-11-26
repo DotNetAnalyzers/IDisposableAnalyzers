@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode.Tuples
 {
     using System;
@@ -42,7 +42,7 @@ namespace ValidCode.Tuples
             public static Pair<T> Create<T>(T item1, T item2) where T : IDisposable => new Pair<T>(item1, item2);
         }
 
-        private class Pair<T> : IDisposable where T : IDisposable
+        private sealed class Pair<T> : IDisposable where T : IDisposable
         {
             private readonly T item1;
             private readonly T item2;

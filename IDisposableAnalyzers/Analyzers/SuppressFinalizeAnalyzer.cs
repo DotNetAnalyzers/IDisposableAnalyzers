@@ -11,7 +11,7 @@
     internal class SuppressFinalizeAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizer);
+            Descriptors.IDISP024DoNotCallSuppressFinalize);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -30,7 +30,7 @@
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
-                        Descriptors.IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizer,
+                        Descriptors.IDISP024DoNotCallSuppressFinalize,
                         invocation.GetLocation()));
             }
         }

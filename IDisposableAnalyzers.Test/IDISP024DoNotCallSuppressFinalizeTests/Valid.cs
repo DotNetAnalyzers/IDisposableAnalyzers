@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizerTests
+﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;

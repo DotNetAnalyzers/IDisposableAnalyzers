@@ -1,11 +1,11 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
     using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
-    public class Rx : IDisposable
+    public sealed class Rx : IDisposable
     {
         private readonly IDisposable subscription;
         private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();

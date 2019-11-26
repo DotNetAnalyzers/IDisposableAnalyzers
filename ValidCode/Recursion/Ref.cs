@@ -1,9 +1,9 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode.Recursion
 {
     using System;
 
-    public class Ref : IDisposable
+    public sealed class Ref : IDisposable
     {
         public Ref()
         {

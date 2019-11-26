@@ -1,10 +1,10 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 #pragma warning disable 1717
 namespace ValidCode.Recursion
 {
     using System;
 
-    public class Properties : IDisposable
+    public sealed class Properties : IDisposable
     {
         private IDisposable withBackingField1;
         private IDisposable withBackingField2;

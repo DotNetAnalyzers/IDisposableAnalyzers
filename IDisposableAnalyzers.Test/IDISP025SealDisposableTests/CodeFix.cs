@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizerTests
+﻿namespace IDisposableAnalyzers.Test.IDISP025SealDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -7,22 +7,21 @@
 
     public static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new SuppressFinalizeAnalyzer();
-        private static readonly CodeFixProvider Fix = new RemoveCallFix();
+        private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
+        private static readonly CodeFixProvider Fix = new SealFix();
 
         [Test]
-        public static void SealedSimple()
+        public static void Simple()
         {
             var before = @"
 namespace N
 {
     using System;
 
-    public sealed class C : IDisposable
+    public class ↓C : IDisposable
     {
         public void Dispose()
         {
-            ↓GC.SuppressFinalize(this);
         }
     }
 }";

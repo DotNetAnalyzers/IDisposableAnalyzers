@@ -38,6 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{BAD2A4EE-6
 		documentation\IDISP022.md = documentation\IDISP022.md
 		documentation\IDISP023.md = documentation\IDISP023.md
 		documentation\IDISP024.md = documentation\IDISP024.md
+		documentation\IDISP025.md = documentation\IDISP025.md
 		README.md = README.md
 		RELEASE_NOTES.md = RELEASE_NOTES.md
 		documentation\SyntaxTreeCacheAnalyzer.md = documentation\SyntaxTreeCacheAnalyzer.md

@@ -211,7 +211,7 @@
             isEnabledByDefault: true,
             description: "Don't use reference types in finalizer context.");
 
-        internal static readonly DiagnosticDescriptor IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizer = Descriptors.Create(
+        internal static readonly DiagnosticDescriptor IDISP024DoNotCallSuppressFinalize = Descriptors.Create(
             id: "IDISP024",
             title: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
             messageFormat: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
@@ -219,6 +219,15 @@
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
             description: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.");
+
+        internal static readonly DiagnosticDescriptor IDISP025SealDisposable = Descriptors.Create(
+            id: "IDISP025",
+            title: "Class with no virtual dispose method should be sealed.",
+            messageFormat: "Class with no virtual dispose method should be sealed.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Class with no virtual dispose method should be sealed.");
 
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="Diagnostic" />.
