@@ -405,6 +405,44 @@ namespace N
 
                 RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
             }
+
+            [Test]
+            public static void IfNotDisposingReturn()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+
+    public abstract class C : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (!disposing)
+                return;
+
+            disposable.Dispose();
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+            }
         }
     }
 }

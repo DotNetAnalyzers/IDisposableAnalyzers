@@ -79,7 +79,7 @@
 
             return false;
 
-            QualifiedType? TearDown(ITypeSymbol? initialize)
+            static QualifiedType? TearDown(ITypeSymbol? initialize)
             {
                 if (initialize is null)
                 {
