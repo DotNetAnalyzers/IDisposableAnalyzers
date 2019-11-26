@@ -211,6 +211,15 @@
             isEnabledByDefault: true,
             description: "Don't use reference types in finalizer context.");
 
+        internal static readonly DiagnosticDescriptor IDISP024DoNotCallSuppressFinalizeIfSealedAndNoFinalizer = Descriptors.Create(
+            id: "IDISP024",
+            title: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
+            messageFormat: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.");
+
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="Diagnostic" />.
         /// </summary>

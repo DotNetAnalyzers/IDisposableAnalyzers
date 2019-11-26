@@ -223,7 +223,7 @@
 
         private static ITypeSymbol? ReturnType(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is {} lambda)
+            if (context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is { } lambda)
             {
                 var method = context.SemanticModel.GetSymbolSafe(lambda, context.CancellationToken) as IMethodSymbol;
                 return method?.ReturnType;
