@@ -10,6 +10,7 @@
     internal sealed class FinalizerContextWalker : RecursiveWalker<FinalizerContextWalker>
     {
         private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
+        private bool returned;
 
         private FinalizerContextWalker()
         {
@@ -19,15 +20,45 @@
 
         public override void VisitIfStatement(IfStatementSyntax node)
         {
-            if (node.Condition is IdentifierNameSyntax identifierName &&
-                node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
-                methodDeclaration.TryFindParameter(identifierName.Identifier.Text, out _))
+            if (IsParameter(node.Condition as IdentifierNameSyntax))
             {
                 this.Visit(node.Else);
+            }
+            else if (node.Condition is PrefixUnaryExpressionSyntax { Operand: IdentifierNameSyntax identifierName, OperatorToken: { ValueText: "!" } } &&
+                     IsParameter(identifierName))
+            {
+                switch (node.Statement)
+                {
+                    case ReturnStatementSyntax _:
+                        this.returned = true;
+                        break;
+                    case BlockSyntax block:
+                        foreach (var statement in block.Statements)
+                        {
+                            if (statement is ReturnStatementSyntax)
+                            {
+                                this.returned = true;
+                                return;
+                            }
+                            else
+                            {
+                                this.Visit(statement);
+                            }
+                        }
+
+                        break;
+                }
             }
             else
             {
                 base.VisitIfStatement(node);
+            }
+
+            bool IsParameter(IdentifierNameSyntax? id)
+            {
+                return id is { } &&
+                       node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
+                       methodDeclaration.TryFindParameter(id.Identifier.Text, out _);
             }
         }
 
@@ -49,7 +80,8 @@
 
         public override void VisitIdentifierName(IdentifierNameSyntax node)
         {
-            if (!IsAssignedNull(node) &&
+            if (!this.returned &&
+                !IsAssignedNull(node) &&
                 this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
                 type.IsReferenceType &&
                 type.TypeKind != TypeKind.Error)
@@ -79,6 +111,7 @@
         protected override void Clear()
         {
             this.usedReferenceTypes.Clear();
+            this.returned = false;
             base.Clear();
         }
 
