@@ -17,6 +17,20 @@
 
         internal IReadOnlyList<SyntaxNode> UsedReferenceTypes => this.usedReferenceTypes;
 
+        public override void VisitIfStatement(IfStatementSyntax node)
+        {
+            if (node.Condition is IdentifierNameSyntax identifierName &&
+                node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
+                methodDeclaration.TryFindParameter(identifierName.Identifier.Text, out _))
+            {
+                this.Visit(node.Else);
+            }
+            else
+            {
+                base.VisitIfStatement(node);
+            }
+        }
+
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
             if (!IsDisposeBool(node))
@@ -48,21 +62,14 @@
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, SearchScope.Recursive, semanticModel, cancellationToken, () => new FinalizerContextWalker());
-            if (node is MethodDeclarationSyntax)
-            {
-                walker.usedReferenceTypes.RemoveAll(x => IsInIfDisposing(x));
-            }
+            var walker = BorrowAndVisit(node, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
 
             foreach (var target in walker.Targets)
             {
-                if (!IsInIfDisposing(target.Source))
+                using var recursiveWalker = TargetWalker.Borrow(target, walker.Recursion);
+                if (recursiveWalker.UsedReferenceTypes.Count > 0)
                 {
-                    using var recursiveWalker = TargetWalker.Borrow(target, walker.Recursion);
-                    if (recursiveWalker.UsedReferenceTypes.Count > 0)
-                    {
-                        walker.usedReferenceTypes.Add(target.Source);
-                    }
+                    walker.usedReferenceTypes.Add(target.Source);
                 }
             }
 
@@ -88,24 +95,6 @@
                 assignment.Right?.IsKind(SyntaxKind.NullLiteralExpression) == true)
             {
                 return true;
-            }
-
-            return false;
-        }
-
-        private static bool IsInIfDisposing(SyntaxNode node)
-        {
-            if (node.TryFirstAncestor(out IfStatementSyntax? ifStatement))
-            {
-                if (ifStatement.Statement.Contains(node) &&
-                    ifStatement.Condition is IdentifierNameSyntax identifierName &&
-                    ifStatement.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
-                    methodDeclaration.TryFindParameter(identifierName.Identifier.Text, out _))
-                {
-                    return true;
-                }
-
-                return IsInIfDisposing(ifStatement);
             }
 
             return false;
