@@ -1107,5 +1107,36 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void DisposedInCatchThenRethrow()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public MemoryStream M()
+        {
+            var ms = new MemoryStream();
+            try
+            {
+            }
+            catch (Exception)
+            {
+                ms.Dispose();
+                throw;
+            }
+
+            return ms;
+        }
+    }
+}
+";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
