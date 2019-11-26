@@ -972,5 +972,33 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
         }
+
+        [Test]
+        public static void LocalFactory()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        public static object M()
+        {
+            using (var disposable = Create())
+            {
+            }
+
+            return null;
+            IDisposable Create()
+            {
+                return new Disposable();
+            }
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
+        }
     }
 }

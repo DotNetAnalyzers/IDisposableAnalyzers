@@ -223,10 +223,15 @@
 
         private static ITypeSymbol? ReturnType(SyntaxNodeAnalysisContext context)
         {
-            var anonymousFunction = context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>();
-            if (anonymousFunction != null)
+            if (context.Node.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() is {} lambda)
             {
-                var method = context.SemanticModel.GetSymbolSafe(anonymousFunction, context.CancellationToken) as IMethodSymbol;
+                var method = context.SemanticModel.GetSymbolSafe(lambda, context.CancellationToken) as IMethodSymbol;
+                return method?.ReturnType;
+            }
+
+            if (context.Node.TryFirstAncestor(out LocalFunctionStatementSyntax? local))
+            {
+                var method = context.SemanticModel.GetDeclaredSymbol(local, context.CancellationToken) as IMethodSymbol;
                 return method?.ReturnType;
             }
 
