@@ -3,7 +3,6 @@
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal sealed partial class DisposableWalker
@@ -96,8 +95,7 @@
                 switch (declaration)
                 {
                     case { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } }:
-                    case { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: var usingKeywod } } }
-                        when usingKeywod.IsKind(SyntaxKind.UsingKeyword):
+                    case { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } }:
                         return true;
                 }
             }
@@ -140,7 +138,7 @@
             {
                 { Parent: UsingStatementSyntax _ }
                 => true,
-                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: UsingStatementSyntax _ } } }
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } } } }
                 => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
                 => true,

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -221,6 +221,45 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
+        }
+
+        [Test]
+        public static void Issue174()
+        {
+            var code = @"
+namespace Gu.Inject.Tests
+{
+    using System;
+    using NUnit.Framework;
+
+    public class Sandbox
+    {
+        [Test]
+        public void M()
+        {
+            using (var kernel = new Kernel().AutoBind<int>())
+            {
+            }
+        }
+    }
+
+    public class Kernel : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public static class KernelExtensions
+    {
+        public static Kernel AutoBind<T>(this Kernel kernel)
+        {
+            return kernel;
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }
