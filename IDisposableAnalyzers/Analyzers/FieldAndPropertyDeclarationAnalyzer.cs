@@ -84,12 +84,12 @@
                 }
                 else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
                          DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
-                         !TestFixture.IsAssignedAndDisposedInSetupAndTearDown(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
+                         !TestFixture.IsAssignedInInitializeAndDisposedInCleanup(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
                     if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
-                        !TestFixture.IsAssignedInSetUp(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
+                        !TestFixture.IsAssignedInInitialize(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
                     }

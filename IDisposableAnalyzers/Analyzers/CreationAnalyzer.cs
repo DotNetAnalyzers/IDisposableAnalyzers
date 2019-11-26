@@ -26,6 +26,12 @@
             if (!context.IsExcludedFromAnalysis() &&
                 ShouldCheck(context) is { } expression)
             {
+                if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    DisposableWalker.Ignores(expression, context.SemanticModel, context.CancellationToken))
+                {
+                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated, context.Node.GetLocation()));
+                }
+
                 if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                     context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
                     type.IsAssignableTo(KnownSymbol.HttpClient, context.Compilation) &&
@@ -34,12 +40,6 @@
                     !IsStaticCtor(context.ContainingSymbol))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP014UseSingleInstanceOfHttpClient, objectCreation.GetLocation()));
-                }
-
-                if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    DisposableWalker.Ignores(expression, context.SemanticModel, context.CancellationToken))
-                {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated, context.Node.GetLocation()));
                 }
             }
         }

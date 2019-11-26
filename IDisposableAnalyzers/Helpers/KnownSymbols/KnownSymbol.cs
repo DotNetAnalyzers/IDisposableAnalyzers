@@ -66,10 +66,17 @@ namespace IDisposableAnalyzers
         internal static readonly CompositeDisposableType CompositeDisposable = new CompositeDisposableType();
 
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
+
         internal static readonly QualifiedType NUnitSetUpAttribute = new QualifiedType("NUnit.Framework.SetUpAttribute");
         internal static readonly QualifiedType NUnitTearDownAttribute = new QualifiedType("NUnit.Framework.TearDownAttribute");
         internal static readonly QualifiedType NUnitOneTimeSetUpAttribute = new QualifiedType("NUnit.Framework.OneTimeSetUpAttribute");
         internal static readonly QualifiedType NUnitOneTimeTearDownAttribute = new QualifiedType("NUnit.Framework.OneTimeTearDownAttribute");
+
+        internal static readonly QualifiedType TestInitializeAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute");
+        internal static readonly QualifiedType ClassInitializeAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute");
+        internal static readonly QualifiedType TestCleanupAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute");
+        internal static readonly QualifiedType ClassCleanupAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute");
+
         internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
         internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
 

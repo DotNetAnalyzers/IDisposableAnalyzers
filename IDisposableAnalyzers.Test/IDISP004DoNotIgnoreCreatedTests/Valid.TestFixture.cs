@@ -1,10 +1,9 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+    public static partial class Valid
     {
         [Test]
         public static void DisposingFieldInTearDown()

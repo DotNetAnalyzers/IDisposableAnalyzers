@@ -1,6 +1,7 @@
-using Gu.Roslyn.Asserts;
+﻿using Gu.Roslyn.Asserts;
 
 [assembly: TransitiveMetadataReferences(typeof(IDisposableAnalyzers.Test.ValidWithAllAnalyzers))]
+[assembly: TransitiveMetadataReferences(typeof(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute))]
 [assembly: MetadataReferences(
     typeof(System.Linq.Enumerable),
     typeof(System.Net.WebClient),

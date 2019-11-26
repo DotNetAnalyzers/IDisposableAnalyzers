@@ -38,7 +38,7 @@
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? memberSymbol) &&
                     FieldOrProperty.TryCreate(memberSymbol, out var fieldOrProperty) &&
                     member.FirstAncestor<ClassDeclarationSyntax>() is { } classDeclaration &&
-                    TestFixture.IsAssignedInSetUp(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
+                    TestFixture.IsAssignedInInitialize(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
                     assignment is { Left: { } left })
                 {
                     if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDown))

@@ -9,40 +9,44 @@
 
     internal static class TestFixture
     {
-        internal static bool IsAssignedAndDisposedInSetupAndTearDown(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedInInitializeAndDisposedInCleanup(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
-                if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _))
-                {
-                    if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitTearDownAttribute), out var tearDown))
-                    {
-                        return DisposableMember.IsDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
-                    }
-                }
-
-                if (Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _))
-                {
-                    if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(
-                        x => x.GetAttributes().Any(a => a.AttributeClass == KnownSymbol.NUnitOneTimeTearDownAttribute),
-                        out var tearDown))
-                    {
-                        return DisposableMember.IsDisposed(fieldOrProperty, tearDown, semanticModel, cancellationToken);
-                    }
-                }
+                var cleanup = TearDown(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
+                              TearDown(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
+                              TearDown(KnownSymbol.TestInitializeAttribute,  KnownSymbol.TestCleanupAttribute) ??
+                              TearDown(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute);
+                return cleanup is { } &&
+                       DisposableMember.IsDisposed(fieldOrProperty, cleanup, semanticModel, cancellationToken);
             }
 
             return false;
+
+            IMethodSymbol? TearDown(QualifiedType initialize, QualifiedType cleanup)
+            {
+                if (Attribute.TryFind(methodDeclaration, initialize, semanticModel, cancellationToken, out _))
+                {
+                    if (fieldOrProperty.ContainingType.TryFindFirstMethodRecursive(x => x.GetAttributes().Any(a => a.AttributeClass == cleanup), out var tearDown))
+                    {
+                        return tearDown;
+                    }
+                }
+
+                return null;
+            }
         }
 
-        internal static bool IsAssignedInSetUp(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
+        internal static bool IsAssignedInInitialize(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute);
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.TestInitializeAttribute, semanticModel, cancellationToken, out attribute) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.ClassInitializeAttribute, semanticModel, cancellationToken, out attribute);
             }
 
             attribute = null;
@@ -58,24 +62,52 @@
                 return false;
             }
 
-            var attributeType = semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type;
-
-            var tearDownAttributeType = attributeType == KnownSymbol.NUnitSetUpAttribute
-                ? KnownSymbol.NUnitTearDownAttribute
-                : KnownSymbol.NUnitOneTimeTearDownAttribute;
-            foreach (var member in typeDeclarationSyntax.Members)
+            if (TearDown(semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type) is { } tearDownAttributeType)
             {
-                if (member is MethodDeclarationSyntax methodDeclaration)
+                foreach (var member in typeDeclarationSyntax.Members)
                 {
-                    if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
+                    if (member is MethodDeclarationSyntax methodDeclaration)
                     {
-                        result = methodDeclaration;
-                        return true;
+                        if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
+                        {
+                            result = methodDeclaration;
+                            return true;
+                        }
                     }
                 }
             }
 
             return false;
+
+            QualifiedType? TearDown(ITypeSymbol? initialize)
+            {
+                if (initialize is null)
+                {
+                    return null;
+                }
+
+                if (initialize == KnownSymbol.NUnitSetUpAttribute)
+                {
+                    return KnownSymbol.NUnitTearDownAttribute;
+                }
+
+                if (initialize == KnownSymbol.NUnitOneTimeSetUpAttribute)
+                {
+                    return KnownSymbol.NUnitOneTimeTearDownAttribute;
+                }
+
+                if (initialize == KnownSymbol.TestInitializeAttribute)
+                {
+                    return KnownSymbol.TestCleanupAttribute;
+                }
+
+                if (initialize == KnownSymbol.ClassInitializeAttribute)
+                {
+                    return KnownSymbol.ClassCleanupAttribute;
+                }
+
+                return null;
+            }
         }
     }
 }
