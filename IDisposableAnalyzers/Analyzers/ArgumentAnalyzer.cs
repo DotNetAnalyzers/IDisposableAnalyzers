@@ -11,12 +11,10 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class ArgumentAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP001DisposeCreated,
             Descriptors.IDISP003DisposeBeforeReassigning);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -27,9 +25,7 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.Node is ArgumentSyntax argument &&
-                argument.Parent is ArgumentListSyntax argumentList &&
-                argumentList.Parent is InvocationExpressionSyntax invocation &&
+                context.Node is ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument &&
                 argument.RefOrOutKeyword.IsEither(SyntaxKind.RefKeyword, SyntaxKind.OutKeyword) &&
                 IsCreation(argument, context.SemanticModel, context.CancellationToken) &&
                 context.SemanticModel.TryGetSymbol(argument.Expression, context.CancellationToken, out var symbol))
