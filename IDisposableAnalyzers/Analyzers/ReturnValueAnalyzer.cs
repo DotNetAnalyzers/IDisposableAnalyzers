@@ -87,7 +87,8 @@
                     }
                 }
             }
-            else if (returnValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } invocation)
+            else if (returnValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } invocation &&
+                     context.ContainingSymbol is { ContainingType: { } containingType })
             {
                 foreach (var argument in arguments)
                 {
@@ -98,7 +99,7 @@
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, expression, context.SemanticModel, context.CancellationToken))
                         {
-                            if (IsLazyEnumerable(invocation, context.SemanticModel, context.CancellationToken))
+                            if (IsLazyEnumerable(invocation, containingType, context.SemanticModel, context.CancellationToken))
                             {
                                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP011DontReturnDisposed, argument.GetLocation()));
                             }
@@ -144,9 +145,9 @@
             };
         }
 
-        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, INamedTypeSymbol containingType, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var recursion = Recursion.Borrow(invocation, semanticModel, cancellationToken);
+            using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
             return IsLazyEnumerable(invocation, recursion);
         }
 

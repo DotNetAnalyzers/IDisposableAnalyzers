@@ -11,10 +11,14 @@
     {
         internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
-            using var recursion = Recursion.Borrow(candidate, semanticModel, cancellationToken);
-            if (recursion.Target(candidate) is { } target)
+            if (candidate.TryFirstAncestor(out TypeDeclarationSyntax? containingTypeDeclaration) &&
+                semanticModel.TryGetNamedType(containingTypeDeclaration, cancellationToken, out var containingType))
             {
-                return DisposedByReturnValue(target, recursion, out creation);
+                using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+                if (recursion.Target(candidate) is { } target)
+                {
+                    return DisposedByReturnValue(target, recursion, out creation);
+                }
             }
 
             creation = null;

@@ -9,9 +9,10 @@
     {
         internal static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
         {
-            if (localOrParameter.TryGetScope(cancellationToken, out var scope))
+            if (localOrParameter.TryGetScope(cancellationToken, out var scope) &&
+                localOrParameter is { ContainingSymbol: { ContainingType: { } containingType } })
             {
-                using var recursion = Recursion.Borrow(scope, semanticModel, cancellationToken);
+                using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
                 return Assigns(new Target<SyntaxNode, ISymbol, SyntaxNode>(null!, localOrParameter.Symbol, scope), recursion, out first);
             }
 
@@ -20,8 +21,14 @@
 
         internal static bool Assigns(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
         {
-            using var recursion = Recursion.Borrow(candidate, semanticModel, cancellationToken);
-            return Assigns(candidate, recursion, out first);
+            if (candidate.TryFirstAncestor(out TypeDeclarationSyntax? containingTypeDeclaration) &&
+                semanticModel.TryGetNamedType(containingTypeDeclaration, cancellationToken, out var containingType))
+            {
+                using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+                return Assigns(candidate, recursion, out first);
+            }
+
+            return false;
         }
 
         private static bool Assigns<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion, out FieldOrProperty fieldOrProperty)

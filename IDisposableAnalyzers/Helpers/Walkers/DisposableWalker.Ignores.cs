@@ -11,8 +11,14 @@
     {
         internal static bool Ignores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var recursion = Recursion.Borrow(candidate, semanticModel, cancellationToken);
-            return Ignores(candidate, recursion);
+            if (candidate.TryFirstAncestor(out TypeDeclarationSyntax? containingTypeDeclaration) &&
+                semanticModel.TryGetNamedType(containingTypeDeclaration, cancellationToken, out var containingType))
+            {
+                using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+                return Ignores(candidate, recursion);
+            }
+
+            return false;
         }
 
         private static bool Ignores(ExpressionSyntax candidate, Recursion recursion)
