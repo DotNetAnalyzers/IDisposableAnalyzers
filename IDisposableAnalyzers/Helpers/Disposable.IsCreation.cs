@@ -89,25 +89,23 @@
                 return Result.No;
             }
 
-            using (var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken))
+            using var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken);
+            assignedSymbol = assignedValues.CurrentSymbol;
+            if (assignedValues.Count == 1 &&
+                disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } &&
+                binary.IsKind(SyntaxKind.CoalesceExpression))
             {
-                assignedSymbol = assignedValues.CurrentSymbol;
-                if (assignedValues.Count == 1 &&
-                    disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } &&
-                    binary.IsKind(SyntaxKind.CoalesceExpression))
-                {
-                    // lazy
-                    return Result.No;
-                }
-
-                if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
-                {
-                    assignedValues.RemoveAll(x => IsReturnedBefore(x));
-                }
-
-                using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                return IsAnyCreation(recursive, semanticModel, cancellationToken);
+                // lazy
+                return Result.No;
             }
+
+            if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
+            {
+                assignedValues.RemoveAll(x => IsReturnedBefore(x));
+            }
+
+            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            return IsAnyCreation(recursive, semanticModel, cancellationToken);
 
             bool IsReturnedBefore(ExpressionSyntax expression)
             {
@@ -358,9 +356,10 @@
                         return Result.No;
                     }
 
-                    if (method.ReturnType == KnownSymbol.TaskOfT)
+                    if (method.ReturnType is INamedTypeSymbol { IsGenericType: true } returnType &&
+                        method.ReturnType == KnownSymbol.TaskOfT)
                     {
-                        return method.TypeArguments.TrySingle(out var typeArg) &&
+                        return returnType.TypeArguments.TrySingle(out var typeArg) &&
                                IsAssignableFrom(typeArg, compilation)
                             ? Result.AssumeYes
                             : Result.No;

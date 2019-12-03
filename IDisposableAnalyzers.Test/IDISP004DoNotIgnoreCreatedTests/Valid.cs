@@ -771,5 +771,24 @@ namespace N
 }".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void DispatcherInvoke()
+        {
+            var code = @"
+namespace N
+{
+    using System.Threading.Tasks;
+
+    public sealed class C
+    {
+        public async Task M()
+        {
+            await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

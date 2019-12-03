@@ -69,6 +69,8 @@ namespace ValidCode
             }
 
             using var disposable2 = Task.FromResult(new Disposable()).Result;
+
+            await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
         }
 
         public static async Task<string> Bar1Async()
