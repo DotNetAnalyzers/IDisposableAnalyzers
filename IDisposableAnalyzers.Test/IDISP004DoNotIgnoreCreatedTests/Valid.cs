@@ -790,5 +790,27 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void WhenAddedToFormComponents()
+        {
+            var code = @"
+namespace ValidCode
+{
+    using System.IO;
+    using System.Windows.Forms;
+
+    public class Winform : Form
+    {
+        Winform()
+        {
+            var stream = File.OpenRead(string.Empty);
+            // Since this is added to components, it is automatically disposed of with the form.
+            this.components.Add(stream);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
