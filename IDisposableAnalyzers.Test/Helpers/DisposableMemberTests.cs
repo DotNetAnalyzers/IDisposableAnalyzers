@@ -36,7 +36,7 @@ namespace N
         }
 
         [Test]
-        public static void DiposedInOverridden()
+        public static void DisposedInOverridden()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -64,6 +64,36 @@ namespace N
         }
     }
 }");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var field = syntaxTree.FindFieldDeclaration("stream");
+            var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
+            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
+        }
+
+        [Ignore("tbd")]
+        [TestCase("this.components.Add(this.stream)")]
+        [TestCase("components.Add(stream)")]
+        public static void FieldAddedToFormComponents(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace ValidCode
+{
+    using System.IO;
+    using System.Windows.Forms;
+
+    public class Winform : Form
+    {
+        private readonly Stream stream;
+
+        Winform()
+        {
+            this.stream = File.OpenRead(string.Empty);
+            // Since this is added to components, it is automatically disposed of with the form.
+            this.components.Add(this.stream);
+        }
+    }
+}".AssertReplace("this.components.Add(this.stream)", expression));
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var field = syntaxTree.FindFieldDeclaration("stream");

@@ -162,6 +162,9 @@
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                 when recursion.Target(variableDeclarator) is { } target
                 => Disposes(target, recursion),
+                { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }
+                when Winform.IsComponentsAdd(invocation, recursion.SemanticModel, recursion.CancellationToken)
+                => true,
                 { Parent: ArgumentSyntax argument }
                 when recursion.Target(argument) is { } target
                 => DisposedByReturnValue(target, recursion, out var wrapper) &&

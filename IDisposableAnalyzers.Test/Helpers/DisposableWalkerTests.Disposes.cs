@@ -144,6 +144,33 @@ namespace N
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
                 Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
             }
+
+            [Test]
+            public static void WhenAddedToFormComponents()
+            {
+                var code = @"
+namespace ValidCode
+{
+    using System.IO;
+    using System.Windows.Forms;
+
+    public class Winform : Form
+    {
+        Winform()
+        {
+            var stream = File.OpenRead(string.Empty);
+            // Since this is added to components, it is automatically disposed of with the form.
+            this.components.Add(stream);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindVariableDeclaration("stream = File.OpenRead(string.Empty)");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
+                Assert.AreEqual(true, DisposableWalker.Disposes(symbol, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

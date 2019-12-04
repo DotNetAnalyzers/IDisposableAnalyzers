@@ -17,6 +17,7 @@
     typeof(System.Xaml.XamlLanguage),
     typeof(Moq.Mock<>),
     typeof(Ninject.KernelConfiguration),
+    typeof(System.Windows.Forms.Form),
     typeof(Gu.Roslyn.AnalyzerExtensions.SyntaxTokenExt),
     typeof(Gu.Roslyn.CodeFixExtensions.Parse),
     typeof(NUnit.Framework.Assert))]
