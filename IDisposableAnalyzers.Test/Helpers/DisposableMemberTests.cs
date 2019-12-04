@@ -30,9 +30,9 @@ namespace N
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var field = syntaxTree.FindFieldDeclaration("stream");
-            var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
+            var declaration = syntaxTree.FindFieldDeclaration("stream");
+            var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
+            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -66,12 +66,11 @@ namespace N
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var field = syntaxTree.FindFieldDeclaration("stream");
-            var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
+            var declaration = syntaxTree.FindFieldDeclaration("stream");
+            var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
+            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
 
-        [Ignore("tbd")]
         [TestCase("this.components.Add(this.stream)")]
         [TestCase("components.Add(stream)")]
         public static void FieldAddedToFormComponents(string expression)
@@ -96,9 +95,9 @@ namespace ValidCode
 }".AssertReplace("this.components.Add(this.stream)", expression));
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var field = syntaxTree.FindFieldDeclaration("stream");
-            var fieldSymbol = semanticModel.GetDeclaredSymbolSafe(field, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrProperty(fieldSymbol), (TypeDeclarationSyntax)field.Parent, semanticModel, CancellationToken.None));
+            var declaration = syntaxTree.FindFieldDeclaration("stream");
+            var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
+            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
     }
 }
