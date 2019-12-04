@@ -27,13 +27,11 @@
         private static void HandleField(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is IFieldSymbol field &&
-                !field.IsStatic &&
-                !field.IsConst &&
-                FieldOrProperty.TryCreate(field, out var fieldOrProperty) &&
+                context.ContainingSymbol is IFieldSymbol { IsStatic: false, IsConst: false } field &&
+                context.Node is FieldDeclarationSyntax declaration &&
                 Disposable.IsPotentiallyAssignableFrom(field.Type, context.Compilation))
             {
-                HandleFieldOrProperty(context, fieldOrProperty);
+                HandleFieldOrProperty(context, new FieldOrPropertyAndDeclaration(field, declaration));
             }
         }
 
@@ -51,45 +49,43 @@
                 return;
             }
 
-            var propertyDeclaration = (PropertyDeclarationSyntax)context.Node;
-            if (propertyDeclaration.ExpressionBody != null)
+            var declaration = (PropertyDeclarationSyntax)context.Node;
+            if (declaration.ExpressionBody != null)
             {
                 return;
             }
 
-            if (propertyDeclaration.TryGetSetter(out var setter) &&
+            if (declaration.TryGetSetter(out var setter) &&
                 setter.Body != null)
             {
                 // Handle the backing field
                 return;
             }
 
-            if (FieldOrProperty.TryCreate(property, out var fieldOrProperty) &&
-                Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
+            if (Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {
-                HandleFieldOrProperty(context, fieldOrProperty);
+                HandleFieldOrProperty(context, new FieldOrPropertyAndDeclaration(property, declaration));
             }
         }
 
-        private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, FieldOrProperty fieldOrProperty)
+        private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, FieldOrPropertyAndDeclaration member)
         {
-            using var assignedValues = AssignedValueWalker.Borrow(fieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
+            using var assignedValues = AssignedValueWalker.Borrow(member.FieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
             using var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken);
             if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
             {
                 if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                    IsMutableFromOutside(fieldOrProperty))
+                    IsMutableFromOutside(member.FieldOrProperty))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
-                else if (context.Node.TryFirstAncestorOrSelf<TypeDeclarationSyntax>(out var typeDeclaration) &&
-                         DisposableMember.IsDisposed(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
-                         !TestFixture.IsAssignedInInitializeAndDisposedInCleanup(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken))
+                else if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                         !TestFixture.IsAssignedInInitializeAndDisposedInCleanup(member, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
-                    if (!DisposeMethod.TryFindFirst(fieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
-                        !TestFixture.IsAssignedInInitialize(fieldOrProperty, typeDeclaration, context.SemanticModel, context.CancellationToken, out _, out _))
+                    if (!DisposeMethod.TryFindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
+                        !TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out _))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
                     }

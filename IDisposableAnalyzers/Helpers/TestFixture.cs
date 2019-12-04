@@ -9,6 +9,11 @@
 
     internal static class TestFixture
     {
+        internal static bool IsAssignedInInitializeAndDisposedInCleanup(FieldOrPropertyAndDeclaration fieldOrProperty, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return IsAssignedInInitializeAndDisposedInCleanup(fieldOrProperty.FieldOrProperty, (TypeDeclarationSyntax)fieldOrProperty.Declaration.Parent, semanticModel, cancellationToken);
+        }
+
         internal static bool IsAssignedInInitializeAndDisposedInCleanup(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
@@ -16,7 +21,7 @@
             {
                 var cleanup = TearDown(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
                               TearDown(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
-                              TearDown(KnownSymbol.TestInitializeAttribute,  KnownSymbol.TestCleanupAttribute) ??
+                              TearDown(KnownSymbol.TestInitializeAttribute, KnownSymbol.TestCleanupAttribute) ??
                               TearDown(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute);
                 return cleanup is { } &&
                        DisposableMember.IsDisposed(fieldOrProperty, cleanup, semanticModel, cancellationToken);
@@ -36,6 +41,11 @@
 
                 return null;
             }
+        }
+
+        internal static bool IsAssignedInInitialize(FieldOrPropertyAndDeclaration fieldOrProperty, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
+        {
+            return IsAssignedInInitialize(fieldOrProperty.FieldOrProperty, (TypeDeclarationSyntax)fieldOrProperty.Declaration.Parent, semanticModel, cancellationToken, out assignment, out attribute);
         }
 
         internal static bool IsAssignedInInitialize(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)

@@ -3,18 +3,12 @@
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposableMember
     {
-        internal static Result IsDisposed(FieldOrProperty member, TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static Result IsDisposed(FieldOrPropertyAndDeclaration member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (semanticModel.TryGetNamedType(context, cancellationToken, out var symbol))
-            {
-                return IsDisposed(member, symbol, semanticModel, cancellationToken);
-            }
-
-            return Result.Unknown;
+            return IsDisposed(member.FieldOrProperty, member.FieldOrProperty.ContainingType, semanticModel, cancellationToken);
         }
 
         internal static Result IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
