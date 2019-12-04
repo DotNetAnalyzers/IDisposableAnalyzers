@@ -25,5 +25,27 @@
                        containingType.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation);
             }
         }
+
+        internal static bool IsAddedToComponents(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            if (context.TrySingleDeclaration(cancellationToken, out ClassDeclarationSyntax? containingType))
+            {
+                using var walker = UsagesWalker.Borrow(member.Symbol, containingType, semanticModel, cancellationToken);
+                foreach (var usage in walker.Usages)
+                {
+                    switch (usage)
+                    {
+                        case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }
+                            when IsComponentsAdd(invocation, semanticModel, cancellationToken):
+                            return true;
+                        case { Parent: MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } }
+                            when IsComponentsAdd(invocation, semanticModel, cancellationToken):
+                            return true;
+                    }
+                }
+            }
+
+            return false;
+        }
     }
 }

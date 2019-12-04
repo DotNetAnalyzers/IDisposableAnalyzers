@@ -19,7 +19,21 @@
             }
 
             using var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken);
-            return walker.IsMemberDisposed(member.Symbol);
+            var isMemberDisposed = walker.IsMemberDisposed(member.Symbol);
+            switch (isMemberDisposed)
+            {
+                case Result.Yes:
+                case Result.AssumeYes:
+                    return isMemberDisposed;
+                default:
+                    if (context.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation) &&
+                        Winform.IsAddedToComponents(member, context, semanticModel, cancellationToken))
+                    {
+                        return Result.Yes;
+                    }
+
+                    return isMemberDisposed;
+            }
         }
 
         internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)

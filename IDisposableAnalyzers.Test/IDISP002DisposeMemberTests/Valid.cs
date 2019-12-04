@@ -1088,7 +1088,6 @@ namespace ValidCode
             RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
 
-        [Ignore("tbd")]
         [TestCase("this.components.Add(this.stream)")]
         [TestCase("components.Add(stream)")]
         public static void FieldAddedToFormComponents(string expression)
