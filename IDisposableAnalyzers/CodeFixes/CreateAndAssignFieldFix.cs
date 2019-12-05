@@ -45,7 +45,7 @@
                     async Task CreateAndAssignFieldAsync(DocumentEditor editor, CancellationToken cancellationToken)
                     {
                         var fieldAccess = await editor.AddFieldAsync(
-                                                          containingType,
+                                                          containingType!,
                                                           local.Identifier.ValueText,
                                                           Accessibility.Private,
                                                           DeclarationModifiers.ReadOnly,
@@ -62,7 +62,8 @@
                 }
                 else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
                          node.TryFirstAncestorOrSelf<ExpressionStatementSyntax>(out var statement) &&
-                         statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out var ctor))
+                         statement.TryFirstAncestor<ConstructorDeclarationSyntax>(out var ctor) &&
+                         ctor is { Parent: TypeDeclarationSyntax parent })
                 {
                     context.RegisterCodeFix(
                         "Create and assign field.",
@@ -73,7 +74,7 @@
                     async Task CreateAndAssignFieldAsync(DocumentEditor editor, CancellationToken cancellationToken)
                     {
                         var fieldAccess = await editor.AddFieldAsync(
-                                                          (TypeDeclarationSyntax)ctor.Parent,
+                                                          parent,
                                                           "disposable",
                                                           Accessibility.Private,
                                                           DeclarationModifiers.ReadOnly,
@@ -82,7 +83,7 @@
                                                       .ConfigureAwait(false);
 
                         _ = editor.ReplaceNode(
-                            statement,
+                            statement!,
                             x => SyntaxFactory.ExpressionStatement(
                                            SyntaxFactory.AssignmentExpression(SyntaxKind.SimpleAssignmentExpression, fieldAccess, x.Expression))
                                        .WithTriviaFrom(x));

@@ -76,7 +76,7 @@
                                     SyntaxFactory.ParseTypeName("bool"),
                                     cancellationToken).ConfigureAwait(false);
 
-                                _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, baseDispose))
+                                _ = editor.AddMethod(classDeclaration, MethodFactory.OverrideDispose(disposed, baseDispose!))
                                           .AddThrowIfDisposed(classDeclaration, disposed, cancellationToken);
                             }
                         }
@@ -188,7 +188,7 @@
 
                         bool CanImplement()
                         {
-                            return !type.TryFindFirstMethodRecursive("Dispose", out var disposeMethod) ||
+                            return !type!.TryFindFirstMethodRecursive("Dispose", out var disposeMethod) ||
                                    disposeMethod.Parameters.Length != 0;
                         }
                     }

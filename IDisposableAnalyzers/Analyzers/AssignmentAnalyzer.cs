@@ -142,7 +142,7 @@
                             isPattern.Pattern is ConstantPatternSyntax constantPattern &&
                             constantPattern.Expression.IsKind(SyntaxKind.NullLiteralExpression))
                         {
-                            return !IsAssignedBefore(ifStatement);
+                            return !IsAssignedBefore(ifStatement!);
                         }
 
                         break;
@@ -152,13 +152,13 @@
                         if (binary.Left.IsKind(SyntaxKind.NullLiteralExpression) &&
                             IsSymbol(binary.Right))
                         {
-                            return !IsAssignedBefore(ifStatement);
+                            return !IsAssignedBefore(ifStatement!);
                         }
 
                         if (IsSymbol(binary.Left) &&
                             binary.Right.IsKind(SyntaxKind.NullLiteralExpression))
                         {
-                            return !IsAssignedBefore(ifStatement);
+                            return !IsAssignedBefore(ifStatement!);
                         }
 
                         break;
@@ -174,7 +174,7 @@
                             if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                                 invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                             {
-                                return !IsAssignedBefore(ifStatement);
+                                return !IsAssignedBefore(ifStatement!);
                             }
                         }
                         else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
@@ -187,7 +187,7 @@
                             if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
                                 invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                             {
-                                return !IsAssignedBefore(ifStatement);
+                                return !IsAssignedBefore(ifStatement!);
                             }
                         }
 

@@ -46,14 +46,14 @@
 
                             void Dispose(DocumentEditor editor, CancellationToken cancellationToken)
                             {
-                                if (TryFindIfNotDisposingReturn(disposeDeclaration, out var ifNotDisposingReturn) &&
+                                if (TryFindIfNotDisposingReturn(disposeDeclaration!, out var ifNotDisposingReturn) &&
                                     ifNotDisposingReturn.Parent is BlockSyntax)
                                 {
                                     editor.InsertAfter(
                                         ifNotDisposingReturn,
                                         IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
                                 }
-                                else if (TryFindIfDisposing(disposeDeclaration, out var ifDisposing))
+                                else if (TryFindIfDisposing(disposeDeclaration!, out var ifDisposing))
                                 {
                                     _ = editor.ReplaceNode(
                                         ifDisposing.Statement,
@@ -66,7 +66,7 @@
                                     ifDisposing = SyntaxFactory.IfStatement(
                                         SyntaxFactory.IdentifierName(parameters[0].Identifier),
                                         SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
-                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration!, editor.SemanticModel, cancellationToken, out var baseCall))
                                     {
                                         editor.InsertBefore(baseCall.Parent, ifDisposing);
                                     }
@@ -103,7 +103,7 @@
 
                                 void Dispose(DocumentEditor editor, CancellationToken cancellationToken)
                                 {
-                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    if (DisposeMethod.TryFindBaseCall(disposeDeclaration!, editor.SemanticModel, cancellationToken, out var baseCall))
                                     {
                                         editor.InsertBefore(
                                             baseCall.Parent,

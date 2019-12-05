@@ -164,7 +164,7 @@
                     bool IsParameter(ExpressionSyntax value)
                     {
                         return value is IdentifierNameSyntax id &&
-                               baseMethod.TryFindParameter(id.Identifier.ValueText, out _);
+                               baseMethod!.TryFindParameter(id.Identifier.ValueText, out _);
                     }
                 }
 
@@ -198,7 +198,7 @@
                     bool IsParameter(ExpressionSyntax value)
                     {
                         return value is IdentifierNameSyntax id &&
-                               localFunction.ParameterList.TryFind(id.Identifier.ValueText, out _);
+                               localFunction!.ParameterList.TryFind(id.Identifier.ValueText, out _);
                     }
                 }
             }
@@ -264,7 +264,7 @@
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
                         if (this.search != ReturnValueSearch.RecursiveInside &&
-                            invocation.TryFindArgument(parameter, out var argument))
+                            invocation!.TryFindArgument(parameter, out var argument))
                         {
                             this.AddReturnValue(argument.Expression);
                         }

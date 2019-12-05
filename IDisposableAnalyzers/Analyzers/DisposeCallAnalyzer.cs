@@ -127,17 +127,14 @@
 
             bool DeclarationIsAssignment()
             {
-                return localDeclarationStatement.Parent == expressionStatement.Parent &&
+                return localDeclarationStatement!.Parent == expressionStatement!.Parent &&
                        declarator is { Initializer: { Value: { } value } } &&
                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken) == Result.Yes;
             }
 
             bool IsTrivialTryFinally()
             {
-                return expressionStatement.Parent is BlockSyntax block &&
-                       block.Statements.Count == 1 &&
-                       block.Parent is FinallyClauseSyntax finallyClause &&
-                       finallyClause.Parent is TryStatementSyntax tryStatement &&
+                return expressionStatement!.Parent is BlockSyntax { Statements: { Count: 1 }, Parent: FinallyClauseSyntax { Parent: TryStatementSyntax tryStatement } } &&
                        !tryStatement.Catches.Any();
             }
 

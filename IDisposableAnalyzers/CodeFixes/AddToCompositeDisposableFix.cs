@@ -45,7 +45,8 @@
             {
                 foreach (var diagnostic in context.Diagnostics)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement))
+                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement) &&
+                        statement is { Expression: { } expression })
                     {
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
                         {
@@ -75,7 +76,7 @@
                                             {
                                                 if (old.Expressions.Count == 0)
                                                 {
-                                                    yield return statement.Expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation);
                                                 }
                                                 else
                                                 {
@@ -85,7 +86,7 @@
                                                     }
 
                                                     yield return old.Expressions.Last().WithoutTrailingTrivia();
-                                                    yield return statement.Expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation);
                                                 }
                                             }
 
@@ -113,7 +114,7 @@
                                                     }
                                                 }
 
-                                                return separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, statement.GetTrailingTrivia()));
+                                                return separators.Append(SyntaxFactory.Token(default, SyntaxKind.CommaToken, statement!.GetTrailingTrivia()));
                                             }
 
                                             break;
@@ -122,7 +123,7 @@
                                             editor.RemoveNode(statement);
                                             editor.ReplaceNode(
                                                 argumentList,
-                                                x => x.AddArguments(SyntaxFactory.Argument(statement.Expression)));
+                                                x => x.AddArguments(SyntaxFactory.Argument(expression)));
                                             break;
                                         default:
                                             editor.RemoveNode(statement);
@@ -133,7 +134,7 @@
 
                                             editor.ReplaceNode(
                                                 objectCreation,
-                                                x => x.WithInitializer(CreateInitializer(statement)));
+                                                x => x.WithInitializer(CreateInitializer(statement!)));
                                             break;
                                     }
 
@@ -141,18 +142,18 @@
                                 }
 
                                 _ = editor.ReplaceNode(
-                                    statement.Expression,
+                                    expression,
                                     x => SyntaxFactory.InvocationExpression(
                                                           SyntaxFactory.MemberAccessExpression(
                                                               SyntaxKind.SimpleMemberAccessExpression,
-                                                              IDisposableFactory.MemberAccess(field.Identifier, semanticModel, cancellationToken),
+                                                              IDisposableFactory.MemberAccess(field!.Identifier, semanticModel, cancellationToken),
                                                               SyntaxFactory.IdentifierName("Add")),
-                                                          SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(statement.Expression))))
+                                                          SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(x))))
                                                       .WithTriviaFrom(x));
 
                                 StatementSyntax? PreviousStatement()
                                 {
-                                    return statement.Parent is BlockSyntax block &&
+                                    return statement is { Parent: BlockSyntax block } &&
                                            block.Statements.TryElementAt(block.Statements.IndexOf(statement) - 1, out var result)
                                            ? result
                                            : null;
@@ -163,9 +164,9 @@
                                     switch (e)
                                     {
                                         case IdentifierNameSyntax identifierName
-                                            when identifierName.Identifier.ValueText == field.Identifier.ValueText:
+                                            when identifierName.Identifier.ValueText == field!.Identifier.ValueText:
                                         case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: { } name }
-                                            when name.Identifier.ValueText == field.Identifier.ValueText:
+                                            when name.Identifier.ValueText == field!.Identifier.ValueText:
                                             return true;
                                         default:
                                             return false;
@@ -192,7 +193,7 @@
                                     cancellationToken).ConfigureAwait(false);
 
                                 _ = editor.ReplaceNode(
-                                    statement,
+                                    statement!,
                                     x => x.WithExpression(
                                         SyntaxFactory.AssignmentExpression(
                                             SyntaxKind.SimpleAssignmentExpression,
