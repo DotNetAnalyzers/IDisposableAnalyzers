@@ -69,15 +69,15 @@
             {
                 case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
                      when reducedFrom.Parameters.TryFirst(out var parameter):
-                    return IsIdentity(Target.Create(target.Source, parameter, target.TargetNode), recursion);
+                    return IsIdentity(Target.Create(target.Source, parameter, target.Declaration), recursion);
                 case IFieldSymbol _:
                 case IPropertySymbol _:
                     return false;
             }
 
-            if (target.TargetNode is { })
+            if (target.Declaration is { })
             {
-                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                 foreach (var usage in walker.Usages)
                 {
                     switch (usage.Parent.Kind())

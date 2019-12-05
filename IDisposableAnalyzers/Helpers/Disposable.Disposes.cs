@@ -120,9 +120,9 @@
             where TSymbol : class, ISymbol
             where TNode : SyntaxNode
         {
-            if (target.TargetNode is { })
+            if (target.Declaration is { })
             {
-                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                 foreach (var usage in walker.Usages)
                 {
                     if (Disposes(usage, recursion))

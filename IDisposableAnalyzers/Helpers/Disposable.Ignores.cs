@@ -75,7 +75,7 @@
         {
             if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } })
             {
-                if (target.TargetNode is null)
+                if (target.Declaration is null)
                 {
                     if (!Ignores(parentExpression, recursion))
                     {
@@ -86,7 +86,7 @@
                     return true;
                 }
 
-                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                 if (walker.Usages.Count == 0)
                 {
                     return true;

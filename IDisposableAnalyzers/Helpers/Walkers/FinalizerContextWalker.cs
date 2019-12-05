@@ -156,7 +156,7 @@
 
             internal static TargetWalker Borrow(Target<SyntaxNode, ISymbol, SyntaxNode> target, Recursion recursion)
             {
-                return BorrowAndVisit(target.TargetNode!, SearchScope.Recursive, recursion, () => new TargetWalker());
+                return BorrowAndVisit(target.Declaration!, SearchScope.Recursive, recursion, () => new TargetWalker());
             }
 
             protected override void Clear()

@@ -31,9 +31,9 @@
             where TSymbol : ISymbol
             where TNode : SyntaxNode
         {
-            if (target.TargetNode is { })
+            if (target.Declaration is { })
             {
-                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                 foreach (var usage in walker.Usages)
                 {
                     if (Stores(usage, recursion, out container))
@@ -78,7 +78,7 @@
                     return StoresOrAssigns(tupleExpression, out container);
                 case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                     when recursion.Target(argument) is { Symbol: { } parameter } target:
-                    if (target.TargetNode is null &&
+                    if (target.Declaration is null &&
                         parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
                         invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
@@ -154,9 +154,9 @@
                         return false;
                     }
 
-                    if (target.TargetNode is { })
+                    if (target.Declaration is { })
                     {
-                        using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                        using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                         foreach (var usage in walker.Usages)
                         {
                             if (usage.Parent is ArgumentSyntax containingArgument &&
@@ -178,9 +178,9 @@
                         return true;
                     }
 
-                    if (target.TargetNode is { })
+                    if (target.Declaration is { })
                     {
-                        using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                        using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                         foreach (var usage in walker.Usages)
                         {
                             if (Stores(usage, recursion, out var container) &&
