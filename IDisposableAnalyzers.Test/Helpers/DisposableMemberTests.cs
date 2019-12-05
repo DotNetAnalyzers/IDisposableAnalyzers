@@ -75,7 +75,7 @@ namespace N
         public static void FieldAddedToFormComponents(string expression)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace ValidCode
+namespace N
 {
     using System.IO;
     using System.Windows.Forms;

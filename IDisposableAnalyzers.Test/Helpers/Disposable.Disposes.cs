@@ -149,7 +149,7 @@ namespace N
             public static void WhenAddedToFormComponents()
             {
                 var code = @"
-namespace ValidCode
+namespace N
 {
     using System.IO;
     using System.Windows.Forms;

@@ -881,7 +881,7 @@ namespace N
         public static void Issue150()
         {
             var code = @"
-namespace ValidCode
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
@@ -1070,7 +1070,7 @@ namespace N
         public static void LocalAddedToFormComponents(string expression)
         {
             var code = @"
-namespace ValidCode
+namespace N
 {
     using System.IO;
     using System.Windows.Forms;
@@ -1093,7 +1093,7 @@ namespace ValidCode
         public static void FieldAddedToFormComponents(string expression)
         {
             var code = @"
-namespace ValidCode
+namespace N
 {
     using System.IO;
     using System.Windows.Forms;

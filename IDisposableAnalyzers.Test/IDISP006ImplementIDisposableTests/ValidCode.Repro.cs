@@ -125,7 +125,7 @@ namespace ProjectX.Commands
             public static void Issue150()
             {
                 var code = @"
-namespace ValidCode
+namespace N
 {
     using System.Collections.Generic;
     using System.IO;
