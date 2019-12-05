@@ -6,13 +6,13 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool Returns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
-            using var walker = CreateUsagesWalker(localOrParameter, recursion);
-            foreach (var usage in walker.usages)
+            using var walker = UsagesWalker.Borrow(localOrParameter, recursion.SemanticModel, recursion.CancellationToken);
+            foreach (var usage in walker.Usages)
             {
                 if (Returns(usage, recursion))
                 {
@@ -30,8 +30,8 @@
         {
             if (target.TargetNode is { })
             {
-                using var walker = CreateUsagesWalker(target, recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (Returns(usage, recursion))
                     {

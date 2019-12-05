@@ -5,7 +5,7 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -16,8 +16,8 @@
             }
 
             using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
-            using var walker = CreateUsagesWalker(localOrParameter, recursion);
-            foreach (var usage in walker.usages)
+            using var walker = UsagesWalker.Borrow(localOrParameter, semanticModel, cancellationToken);
+            foreach (var usage in walker.Usages)
             {
                 if (Returns(usage, recursion))
                 {
@@ -57,8 +57,8 @@
             }
 
             using var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken);
-            using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
-            foreach (var usage in walker.usages)
+            using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
+            foreach (var usage in walker.Usages)
             {
                 if (location.IsExecutedBefore(usage).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
                     Disposes(usage, recursion))
@@ -74,8 +74,8 @@
         {
             using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
             {
-                using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
                         Disposes(usage, recursion))
@@ -102,8 +102,8 @@
 
             using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
             {
-                using var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (Disposes(usage, recursion))
                     {
@@ -120,12 +120,15 @@
             where TSymbol : class, ISymbol
             where TNode : SyntaxNode
         {
-            using var walker = CreateUsagesWalker(target, recursion);
-            foreach (var usage in walker.usages)
+            if (target.TargetNode is { })
             {
-                if (Disposes(usage, recursion))
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
-                    return true;
+                    if (Disposes(usage, recursion))
+                    {
+                        return true;
+                    }
                 }
             }
 

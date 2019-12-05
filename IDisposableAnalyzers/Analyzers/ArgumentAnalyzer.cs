@@ -32,7 +32,7 @@
             {
                 if (symbol.Kind == SymbolKind.Discard ||
                     (LocalOrParameter.TryCreate(symbol, out var localOrParameter) &&
-                     DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken)))
+                     Disposable.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken)))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, argument.GetLocation()));
                 }

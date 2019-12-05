@@ -34,7 +34,7 @@
             {
                 if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&
                     Disposable.IsCreation(right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    DisposableWalker.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
+                    Disposable.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, assignment.GetLocation()));
                 }
@@ -100,7 +100,7 @@
             }
 
             if (AssignedLocal() is { } local &&
-                DisposableWalker.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
+                Disposable.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
             {
                 return false;
             }

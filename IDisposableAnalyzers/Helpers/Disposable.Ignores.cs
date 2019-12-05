@@ -7,7 +7,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool Ignores(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
@@ -86,13 +86,13 @@
                     return true;
                 }
 
-                using var walker = CreateUsagesWalker(target, recursion);
-                if (walker.usages.Count == 0)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                if (walker.Usages.Count == 0)
                 {
                     return true;
                 }
 
-                return walker.usages.All(x => IsIgnored(x));
+                return walker.Usages.All(x => IsIgnored(x));
 
                 bool IsIgnored(IdentifierNameSyntax candidate)
                 {
@@ -148,14 +148,12 @@
                     return false;
                 }
 
-                using (var walker = CreateUsagesWalker(new LocalOrParameter(local), recursion))
+                using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
-                    foreach (var usage in walker.usages)
+                    if (!Ignores(usage, recursion))
                     {
-                        if (!Ignores(usage, recursion))
-                        {
-                            return false;
-                        }
+                        return false;
                     }
                 }
 

@@ -7,7 +7,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool DisposedByReturnValue(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? creation)
         {
@@ -156,8 +156,8 @@
 
             if (target.TargetNode is { })
             {
-                using var walker = CreateUsagesWalker(target, recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (Assigns(usage, recursion, out var fieldOrProperty) &&
                         DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, recursion.SemanticModel, recursion.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))

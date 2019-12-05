@@ -5,7 +5,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         private static ExpressionSyntax? Identity(ExpressionSyntax candidate, Recursion recursion)
         {
@@ -77,8 +77,8 @@
 
             if (target.TargetNode is { })
             {
-                using var walker = CreateUsagesWalker(target, recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     switch (usage.Parent.Kind())
                     {

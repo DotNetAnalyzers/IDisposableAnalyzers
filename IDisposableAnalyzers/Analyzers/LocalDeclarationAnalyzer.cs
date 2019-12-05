@@ -31,7 +31,7 @@
                         statement.UsingKeyword.IsKind(SyntaxKind.None) &&
                         Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                         context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
-                        DisposableWalker.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
+                        Disposable.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, localDeclaration.GetLocation()));
                     }

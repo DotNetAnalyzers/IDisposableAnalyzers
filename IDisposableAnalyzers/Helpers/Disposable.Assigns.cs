@@ -5,7 +5,7 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
         {
@@ -36,9 +36,10 @@
               where TSymbol : class, ISymbol
               where TNode : SyntaxNode
         {
-            using (var walker = CreateUsagesWalker(target, recursion))
+            if (target.TargetNode is { })
             {
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (Assigns(usage, recursion, out fieldOrProperty))
                     {

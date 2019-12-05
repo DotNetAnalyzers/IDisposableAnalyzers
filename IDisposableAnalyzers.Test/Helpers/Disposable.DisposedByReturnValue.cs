@@ -5,7 +5,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using NUnit.Framework;
 
-    public static partial class DisposableWalkerTests
+    public static partial class DisposableTests
     {
         public static class DisposedByReturnValue
         {
@@ -39,7 +39,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
-                Assert.AreEqual(true, DisposableWalker.DisposedByReturnValue(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.DisposedByReturnValue(value, semanticModel, CancellationToken.None, out _));
             }
         }
     }

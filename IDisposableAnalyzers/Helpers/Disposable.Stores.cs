@@ -8,13 +8,13 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed partial class DisposableWalker
+    internal static partial class Disposable
     {
         internal static bool Stores(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? container)
         {
             using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
-            using var walker = CreateUsagesWalker(localOrParameter, recursion);
-            foreach (var usage in walker.usages)
+            using var walker = UsagesWalker.Borrow(localOrParameter, semanticModel, cancellationToken);
+            foreach (var usage in walker.Usages)
             {
                 if (Stores(usage, recursion, out container))
                 {
@@ -33,8 +33,8 @@
         {
             if (target.TargetNode is { })
             {
-                using var walker = CreateUsagesWalker(target, recursion);
-                foreach (var usage in walker.usages)
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
                 {
                     if (Stores(usage, recursion, out container))
                     {
@@ -154,9 +154,10 @@
                         return false;
                     }
 
-                    using (var walker = CreateUsagesWalker(target, recursion))
+                    if (target.TargetNode is { })
                     {
-                        foreach (var usage in walker.usages)
+                        using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                        foreach (var usage in walker.Usages)
                         {
                             if (usage.Parent is ArgumentSyntax containingArgument &&
                                 recursion.Target(containingArgument) is { } argumentTarget &&
@@ -177,9 +178,10 @@
                         return true;
                     }
 
-                    using (var walker = CreateUsagesWalker(target, recursion))
+                    if (target.TargetNode is { })
                     {
-                        foreach (var usage in walker.usages)
+                        using var walker = UsagesWalker.Borrow(target.Symbol, target.TargetNode, recursion.SemanticModel, recursion.CancellationToken);
+                        foreach (var usage in walker.Usages)
                         {
                             if (Stores(usage, recursion, out var container) &&
                                 FieldOrProperty.TryCreate(container, out var containerMember) &&

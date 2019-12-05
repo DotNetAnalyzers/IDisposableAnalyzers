@@ -153,7 +153,7 @@
 
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, Recursion recursion)
         {
-            if (recursion.Target(invocation) is { Symbol: { } method, TargetNode: { } declaration } &&
+            if (recursion.Target(invocation) is { Symbol: IMethodSymbol method, TargetNode: { } declaration } &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, recursion.SemanticModel.Compilation))
             {
                 if (YieldStatementWalker.Any(declaration))

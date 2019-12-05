@@ -27,7 +27,7 @@
                 ShouldCheck(context) is { } expression)
             {
                 if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                    DisposableWalker.Ignores(expression, context.SemanticModel, context.CancellationToken))
+                    Disposable.Ignores(expression, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated, context.Node.GetLocation()));
                 }
