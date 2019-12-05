@@ -33,6 +33,7 @@ namespace N
             [TestCase("null ?? System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)")]
             [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null")]
+            [TestCase("o switch { int _ => File.OpenRead(string.Empty), _ => null }")]
             public static void LanguageConstructs(string expression)
             {
                 var code = @"
@@ -41,9 +42,9 @@ namespace N
     using System;
     using System.IO;
 
-    internal class C
+    class C
     {
-        internal C()
+        void M(object o)
         {
             ↓var value = new Disposable();
         }

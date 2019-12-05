@@ -135,6 +135,14 @@
                     var whenTrue = this.AddRecursiveValues(conditional.WhenTrue);
                     var whenFalse = this.AddRecursiveValues(conditional.WhenFalse);
                     return whenTrue || whenFalse;
+                case SwitchExpressionSyntax { Arms: { } arms }:
+                    var added = false;
+                    foreach (var arm in arms)
+                    {
+                        added |= this.AddRecursiveValues(arm.Expression);
+                    }
+
+                    return added;
                 case AwaitExpressionSyntax awaitExpression:
                     using (var walker = ReturnValueWalker.Borrow(awaitExpression, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                     {
