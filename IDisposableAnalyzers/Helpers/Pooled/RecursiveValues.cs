@@ -123,23 +123,15 @@
                 case TypeOfExpressionSyntax _:
                     this.values.Add(assignedValue);
                     return true;
-
-                case BinaryExpressionSyntax binaryExpression:
-                    switch (binaryExpression.Kind())
-                    {
-                        case SyntaxKind.CoalesceExpression:
-                            var left = this.AddRecursiveValues(binaryExpression.Left);
-                            var right = this.AddRecursiveValues(binaryExpression.Right);
-                            return left || right;
-                        case SyntaxKind.AsExpression:
-                            return this.AddRecursiveValues(binaryExpression.Left);
-                        default:
-                            return false;
-                    }
-
+                case BinaryExpressionSyntax { Left: { }, OperatorToken: { ValueText: "as" } } binary:
+                    return this.AddRecursiveValues(binary.Left);
+                case BinaryExpressionSyntax { Left: { }, OperatorToken: { ValueText: "??" }, Right: { } } binary:
+                    var left = this.AddRecursiveValues(binary.Left);
+                    var right = this.AddRecursiveValues(binary.Right);
+                    return left || right;
                 case CastExpressionSyntax cast:
                     return this.AddRecursiveValues(cast.Expression);
-                case ConditionalExpressionSyntax conditional:
+                case ConditionalExpressionSyntax { WhenTrue: { }, WhenFalse: { } } conditional:
                     var whenTrue = this.AddRecursiveValues(conditional.WhenTrue);
                     var whenFalse = this.AddRecursiveValues(conditional.WhenFalse);
                     return whenTrue || whenFalse;
