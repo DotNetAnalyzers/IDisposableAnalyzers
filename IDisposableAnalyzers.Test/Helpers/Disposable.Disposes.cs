@@ -148,7 +148,7 @@ namespace N
             [Test]
             public static void WhenAddedToFormComponents()
             {
-                var code = @"
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.IO;
@@ -163,11 +163,34 @@ namespace N
             this.components.Add(stream);
         }
     }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("stream = File.OpenRead(string.Empty)");
+                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
+                Assert.AreEqual(true, Disposable.Disposes(symbol, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public static void IgnoreNewFormShow()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    using System.Windows.Forms;
+
+    public class Winform : Form
+    {
+        public static void M()
+        {
+            var form = new Winform();
+            form.Show();
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindVariableDeclaration("var form = new Winform()");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
                 Assert.AreEqual(true, Disposable.Disposes(symbol, semanticModel, CancellationToken.None));
             }

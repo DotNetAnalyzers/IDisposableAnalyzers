@@ -52,5 +52,33 @@ namespace N
 }".AssertReplace("this.components.Add(this.stream)", expression);
             RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
+
+        [Test]
+        public static void IgnoreNewFormShow()
+        {
+            var winForm = @"
+namespace N
+{
+    using System.Windows.Forms;
+
+    public class Winform : Form
+    {
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    public class C
+    {
+        void M()
+        {
+            var form = new Winform();
+            form.Show();
+        }
+    }
+}";
+            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, winForm, code);
+        }
     }
 }

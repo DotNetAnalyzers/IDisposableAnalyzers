@@ -152,6 +152,9 @@
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
+                when invocation.IsSymbol(KnownSymbol.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken)
+                => true, // disposed by form.Close()
+                { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: ConditionalAccessExpressionSyntax { } parent }
                 => DisposedByReturnValue(parent, recursion, out var creation) &&
