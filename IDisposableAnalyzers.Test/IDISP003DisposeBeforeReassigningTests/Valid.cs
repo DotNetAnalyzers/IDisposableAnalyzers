@@ -27,7 +27,7 @@ namespace N
 }";
 
         [Test]
-        public static void LocalDeclaration()
+        public static void LocalAssignedOnce()
         {
             var code = @"
 namespace N
@@ -40,6 +40,29 @@ namespace N
         public void M()
         {
             var stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void LocalAssignDisposeAssign()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stream.Dispose();
+            stream = File.OpenRead(string.Empty);
         }
     }
 }";
