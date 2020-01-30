@@ -1,5 +1,4 @@
-// ReSharper disable All
-namespace N
+﻿namespace ValidCode.Constructors
 {
     using System;
 

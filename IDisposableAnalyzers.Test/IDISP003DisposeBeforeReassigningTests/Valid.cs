@@ -1455,5 +1455,44 @@ namespace N
 }".AssertReplace("this.components.Add(this.stream)", expression);
             RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
+
+        [Test]
+        public static void TwoConstructors()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private readonly IDisposable disposable;
+        private bool disposed;
+
+        public C(int _)
+        {
+            this.disposable = new Disposable();
+        }
+
+        public C(string _)
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
     }
 }
