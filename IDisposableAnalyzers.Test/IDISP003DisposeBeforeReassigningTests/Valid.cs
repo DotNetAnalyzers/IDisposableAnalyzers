@@ -1539,5 +1539,56 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
+
+        [Test]
+        public static void TwoChainedBaseConstructors()
+        {
+            var baseClass = @"
+namespace N
+{
+    public abstract class BaseClass
+    {
+        protected BaseClass()
+        {
+        }
+    }
+}";
+            var code = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : BaseClass, IDisposable
+    {
+        private readonly IDisposable disposable;
+        private bool disposed;
+
+        public C(int _)
+            : base()
+        {
+            this.disposable = new Disposable();
+        }
+
+        public C(string _)
+            : base()
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
+        }
     }
 }
