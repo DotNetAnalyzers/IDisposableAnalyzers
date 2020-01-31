@@ -115,7 +115,7 @@
                 if (this.context.Node is ElementAccessExpressionSyntax &&
                     method.Name == "Add" &&
                     MemberPath.TrySingle(node, out var memberIdentifier) &&
-                    memberIdentifier.Parent is IdentifierNameSyntax { } member &&
+                    memberIdentifier.Parent is IdentifierNameSyntax member &&
                     this.semanticModel.TryGetSymbol(member, this.cancellationToken, out var memberSymbol) &&
                     memberSymbol.Equals(this.CurrentSymbol))
                 {
