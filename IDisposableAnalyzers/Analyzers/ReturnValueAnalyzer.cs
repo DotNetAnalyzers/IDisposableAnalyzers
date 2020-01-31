@@ -189,6 +189,11 @@
                 return true;
             }
 
+            if (type == KnownSymbol.IAsyncDisposable)
+            {
+                return true;
+            }
+
             if (type == KnownSymbol.IEnumerator)
             {
                 return true;
@@ -196,15 +201,13 @@
 
             if (type == KnownSymbol.Task)
             {
-                var namedType = type as INamedTypeSymbol;
-                return namedType?.IsGenericType == true &&
+                return type is INamedTypeSymbol { IsGenericType: true } namedType &&
                        Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
             }
 
             if (type == KnownSymbol.Func)
             {
-                var namedType = type as INamedTypeSymbol;
-                return namedType?.IsGenericType == true &&
+                return type is INamedTypeSymbol { IsGenericType: true } namedType &&
                        Disposable.IsAssignableFrom(namedType.TypeArguments[namedType.TypeArguments.Length - 1], compilation);
             }
 
