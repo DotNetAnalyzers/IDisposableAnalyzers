@@ -332,7 +332,7 @@ namespace N
         }
 
         [Test]
-        public static void AssigningFieldInCtor()
+        public static void FieldAssignedInCtor()
         {
             var code = @"
 namespace N
@@ -350,6 +350,31 @@ namespace N
         }
     }
 }";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void FieldAssignDisposeAssignInCtor()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly Stream stream;
+
+        public C()
+        {
+            this.stream = File.OpenRead(string.Empty);
+            this.stream.Dispose();
+            this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
             RoslynAssert.Valid(Analyzer, code);
         }
 
