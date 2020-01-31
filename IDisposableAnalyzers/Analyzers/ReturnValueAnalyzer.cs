@@ -51,8 +51,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 !IsIgnored(context.ContainingSymbol) &&
-                context.Node is LambdaExpressionSyntax lambda &&
-                lambda.Body is ExpressionSyntax expression)
+                context.Node is LambdaExpressionSyntax { Body: ExpressionSyntax expression })
             {
                 HandleReturnValue(context, expression);
             }
@@ -138,9 +137,9 @@
             return returnValue switch
             {
                 InvocationExpressionSyntax invocation
-                    => !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken),
+                => !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken),
                 MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess
-                    => !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
+                => !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
                 _ => true,
             };
         }
@@ -236,9 +235,13 @@
                 return method?.ReturnType;
             }
 
-            return (context.ContainingSymbol as IMethodSymbol)?.ReturnType ??
-                   (context.ContainingSymbol as IFieldSymbol)?.Type ??
-                   (context.ContainingSymbol as IPropertySymbol)?.Type;
+            return context switch
+            {
+                { ContainingSymbol: IFieldSymbol field } => field.Type,
+                { ContainingSymbol: IPropertySymbol property } => property.Type,
+                { ContainingSymbol: IMethodSymbol method } => method.ReturnType,
+                _ => null,
+            };
         }
     }
 }

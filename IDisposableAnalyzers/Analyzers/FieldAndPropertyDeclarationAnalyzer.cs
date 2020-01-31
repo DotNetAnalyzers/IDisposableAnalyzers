@@ -37,32 +37,11 @@
 
         private static void HandleProperty(SyntaxNodeAnalysisContext context)
         {
-            if (context.IsExcludedFromAnalysis())
-            {
-                return;
-            }
-
-            var property = (IPropertySymbol)context.ContainingSymbol;
-            if (property.IsStatic ||
-                property.IsIndexer)
-            {
-                return;
-            }
-
-            var declaration = (PropertyDeclarationSyntax)context.Node;
-            if (declaration.ExpressionBody != null)
-            {
-                return;
-            }
-
-            if (declaration.TryGetSetter(out var setter) &&
-                setter.Body != null)
-            {
-                // Handle the backing field
-                return;
-            }
-
-            if (Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
+            if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is IPropertySymbol { IsStatic: false, IsIndexer: false } property &&
+                context.Node is PropertyDeclarationSyntax { AccessorList: { Accessors: { } accessors } } declaration &&
+                accessors.First() is { Body: null, ExpressionBody: null } &&
+                Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {
                 HandleFieldOrProperty(context, new FieldOrPropertyAndDeclaration(property, declaration));
             }
