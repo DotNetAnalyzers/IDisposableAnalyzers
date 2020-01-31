@@ -67,7 +67,7 @@
         {
             result = null;
             var typeDeclarationSyntax = setupAttribute.FirstAncestor<TypeDeclarationSyntax>();
-            if (typeDeclarationSyntax == null)
+            if (typeDeclarationSyntax is null)
             {
                 return false;
             }

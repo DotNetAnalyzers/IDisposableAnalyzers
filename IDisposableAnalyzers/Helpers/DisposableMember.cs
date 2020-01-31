@@ -13,7 +13,7 @@
 
         internal static Result IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (context == null)
+            if (context is null)
             {
                 return Result.Unknown;
             }
@@ -38,7 +38,7 @@
 
         internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposeMethod == null)
+            if (disposeMethod is null)
             {
                 return false;
             }

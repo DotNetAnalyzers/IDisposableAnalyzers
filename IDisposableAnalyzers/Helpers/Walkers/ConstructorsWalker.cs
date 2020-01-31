@@ -112,14 +112,14 @@
                 }
 
                 if (context is ClassDeclarationSyntax classDeclaration &&
-                    classDeclaration.BaseList == null)
+                    classDeclaration.BaseList is null)
                 {
                     return walker;
                 }
             }
 
             if (walker.nonPrivateCtors.Count == 0 &&
-                walker.Default == null)
+                walker.Default is null)
             {
                 if (Constructor.TryFindDefault(walker.Type, Search.Recursive, out var defaultCtor) &&
                     defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax? defaultCtorDeclaration))

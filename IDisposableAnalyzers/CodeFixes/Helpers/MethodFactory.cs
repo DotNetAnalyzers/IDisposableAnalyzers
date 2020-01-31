@@ -100,7 +100,7 @@
 
         internal static MethodDeclarationSyntax Dispose(ExpressionSyntax disposedField)
         {
-            if (disposedField == null)
+            if (disposedField is null)
             {
                 return EmptyDispose;
             }
@@ -118,7 +118,7 @@
 
         internal static MethodDeclarationSyntax VirtualDispose(ExpressionSyntax disposedField)
         {
-            if (disposedField == null)
+            if (disposedField is null)
             {
                 return DefaultVirtualDispose;
             }
@@ -221,7 +221,7 @@
 
         internal static MethodDeclarationSyntax ProtectedVirtualDispose(ExpressionSyntax disposedField)
         {
-            if (disposedField == null)
+            if (disposedField is null)
             {
                 return DefaultProtectedVirtualDispose;
             }

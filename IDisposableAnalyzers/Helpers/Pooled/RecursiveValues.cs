@@ -82,7 +82,7 @@
 
         private bool AddRecursiveValues(ExpressionSyntax assignedValue)
         {
-            if (assignedValue == null ||
+            if (assignedValue is null ||
                 assignedValue.IsMissing ||
                 !this.checkedLocations.Add(assignedValue))
             {

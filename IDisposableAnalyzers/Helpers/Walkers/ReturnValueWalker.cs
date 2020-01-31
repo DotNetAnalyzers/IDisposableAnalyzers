@@ -33,7 +33,7 @@
 
         public override void Visit(SyntaxNode node)
         {
-            if (node == null)
+            if (node is null)
             {
                 return;
             }
@@ -64,7 +64,7 @@
         internal static ReturnValueWalker Borrow(SyntaxNode node, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = Borrow(() => new ReturnValueWalker());
-            if (node == null)
+            if (node is null)
             {
                 return walker;
             }
@@ -304,7 +304,7 @@
 
         private bool TryHandleLambda(LambdaExpressionSyntax lambda)
         {
-            if (lambda == null)
+            if (lambda is null)
             {
                 return false;
             }

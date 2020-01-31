@@ -38,8 +38,7 @@
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
 
-                if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                    memberAccess.Expression is IdentifierNameSyntax &&
+                if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _ } &&
                     context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol? local))
                 {
                     if (IsUsedAfter(local, invocation, context, out var locations))
@@ -71,7 +70,7 @@
                         !IsAssigned(identifierName) &&
                         !IsReassigned(identifierName))
                     {
-                        if (temp == null)
+                        if (temp is null)
                         {
                             temp = new List<Location>();
                         }

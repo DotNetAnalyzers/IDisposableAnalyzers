@@ -65,7 +65,7 @@
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
-            if (node.Initializer == null &&
+            if (node.Initializer is null &&
                 this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
                 ctor.ContainingType is { BaseType: { } baseType } &&
                 Constructor.TryFindDefault(baseType, Search.Recursive, out var baseCtor))
@@ -400,7 +400,7 @@
 
         private static AssignedValueWalker BorrowCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (symbol == null || context == null)
+            if (symbol is null || context is null)
             {
                 return Borrow(() => new AssignedValueWalker());
             }
@@ -417,7 +417,7 @@
 
         private void Run()
         {
-            if (this.CurrentSymbol == null)
+            if (this.CurrentSymbol is null)
             {
                 return;
             }
@@ -540,7 +540,7 @@
 
         private void HandleAssignedValue(SyntaxNode assigned, ExpressionSyntax value)
         {
-            if (value == null)
+            if (value is null)
             {
                 return;
             }
@@ -572,7 +572,7 @@
                 {
                     case ArrayCreationExpressionSyntax arrayCreation:
                         {
-                            if (arrayCreation.Initializer == null)
+                            if (arrayCreation.Initializer is null)
                             {
                                 return;
                             }
@@ -587,7 +587,7 @@
 
                     case ObjectCreationExpressionSyntax objectCreation:
                         {
-                            if (objectCreation.Initializer == null)
+                            if (objectCreation.Initializer is null)
                             {
                                 return;
                             }
@@ -740,7 +740,7 @@
 
             private static StatementSyntax? GetStopAt(SyntaxNode? location, ISymbol symbol, CancellationToken cancellationToken)
             {
-                if (location == null)
+                if (location is null)
                 {
                     return null;
                 }

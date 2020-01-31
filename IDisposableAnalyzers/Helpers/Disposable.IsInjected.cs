@@ -99,7 +99,7 @@
 
         private static Result IsInjectedCore(ISymbol symbol)
         {
-            if (symbol == null)
+            if (symbol is null)
             {
                 return Result.Unknown;
             }
@@ -143,7 +143,7 @@
                 }
 
                 if (property.IsReadOnly ||
-                    property.SetMethod == null)
+                    property.SetMethod is null)
                 {
                     return Result.No;
                 }

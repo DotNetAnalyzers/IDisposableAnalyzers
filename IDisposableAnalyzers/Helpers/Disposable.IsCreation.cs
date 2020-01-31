@@ -144,7 +144,7 @@
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate == null)
+            if (candidate is null)
             {
                 return Result.Unknown;
             }
@@ -229,7 +229,7 @@
         /// </summary>
         private static Result IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate == null ||
+            if (candidate is null ||
                 candidate.IsMissing)
             {
                 return Result.Unknown;
@@ -277,7 +277,7 @@
 
         private static Result IsCreationCore(ISymbol candidate, Compilation compilation)
         {
-            if (candidate == null)
+            if (candidate is null)
             {
                 return Result.Unknown;
             }

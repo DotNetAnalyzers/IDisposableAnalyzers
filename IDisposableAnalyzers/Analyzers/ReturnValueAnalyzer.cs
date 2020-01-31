@@ -178,7 +178,7 @@
 
         private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol? type, Compilation compilation)
         {
-            if (type == null ||
+            if (type is null ||
                 type == KnownSymbol.Void)
             {
                 return true;

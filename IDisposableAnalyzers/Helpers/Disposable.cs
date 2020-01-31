@@ -25,7 +25,7 @@
 
         internal static bool IsPotentiallyAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
-            if (type == null ||
+            if (type is null ||
                 type is IErrorTypeSymbol)
             {
                 return false;
@@ -48,7 +48,7 @@
 
         internal static bool IsAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
-            if (type == null)
+            if (type is null)
             {
                 return false;
             }
