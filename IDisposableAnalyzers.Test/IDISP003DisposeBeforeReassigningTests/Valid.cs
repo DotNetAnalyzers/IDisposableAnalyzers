@@ -71,6 +71,30 @@ namespace N
         }
 
         [Test]
+        public static void LocalAssignDisposeAssignNullAssign()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            var stream = File.OpenRead(string.Empty);
+            stream.Dispose();
+            stream = null;
+            stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public static void LocalAssignedInSwitch()
         {
             var code = @"
@@ -370,6 +394,32 @@ namespace N
         {
             this.stream = File.OpenRead(string.Empty);
             this.stream.Dispose();
+            this.stream = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void FieldAssignDisposeAssignNullAssignInCtor()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        private readonly Stream stream;
+
+        public C()
+        {
+            this.stream = File.OpenRead(string.Empty);
+            this.stream.Dispose();
+            this.stream = null;
             this.stream = File.OpenRead(string.Empty);
         }
     }

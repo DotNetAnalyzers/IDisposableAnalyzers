@@ -52,12 +52,14 @@
                     result = lambdaBody;
                     return true;
                 }
-                else if (node.FirstAncestor<AccessorDeclarationSyntax>() is { Body: BlockSyntax accessorBody })
+
+                if (node.FirstAncestor<AccessorDeclarationSyntax>() is { Body: BlockSyntax accessorBody })
                 {
                     result = accessorBody;
                     return true;
                 }
-                else if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is { Body: BlockSyntax methodBody })
+
+                if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is { Body: BlockSyntax methodBody })
                 {
                     result = methodBody;
                     return true;
@@ -69,16 +71,17 @@
 
             bool IsReassignedAfter(SyntaxNode scope, InvocationExpressionSyntax disposeCall)
             {
-                using (var walker = MutationWalker.Borrow(scope, SearchScope.Member, semanticModel, cancellationToken))
+                using var walker = AssignmentWalker.Borrow(scope);
+                foreach (var assignment in walker.Assignments)
                 {
-                    foreach (var mutation in walker.All())
+                    if (assignment.TryFirstAncestor(out StatementSyntax? statement) &&
+                        disposeCall.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
+                        statement.IsExecutedBefore(expression) == ExecutedBefore.Yes &&
+                        semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assigned) &&
+                        Equals(assigned, symbol) &&
+                        IsCreation(assignment.Right, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
-                        if (mutation.TryFirstAncestor(out StatementSyntax? statement) &&
-                            disposeCall.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
-                            statement.IsExecutedBefore(expression) == ExecutedBefore.Yes)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
 
