@@ -21,7 +21,8 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType StreamMemoryBlockProvider = Create("System.Reflection.Internal.StreamMemoryBlockProvider");
 
         internal static readonly TupleType Tuple = new TupleType();
-        internal static readonly DisposableType IDisposable = new DisposableType();
+        internal static readonly IDisposableType IDisposable = new IDisposableType();
+        internal static readonly IAsyncDisposableType IAsyncDisposable = new IAsyncDisposableType();
         internal static readonly GCType GC = new GCType();
         internal static readonly QualifiedType IDictionary = Create("System.Collections.IDictionary");
 
