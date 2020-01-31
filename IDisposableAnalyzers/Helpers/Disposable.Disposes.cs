@@ -180,20 +180,13 @@
 
             bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)
             {
-                if (IsDispose(invocation))
+                if (DisposeCall.IsMatch(invocation, recursion.SemanticModel, recursion.CancellationToken))
                 {
                     return true;
                 }
 
                 return DisposedByReturnValue(invocation, recursion, out var creation) &&
                        Disposes(creation, recursion);
-            }
-
-            static bool IsDispose(InvocationExpressionSyntax invocation)
-            {
-                return invocation is { ArgumentList: { Arguments: { Count: 0 } } } &&
-                        invocation.TryGetMethodName(out var name) &&
-                        name == "Dispose";
             }
         }
     }
