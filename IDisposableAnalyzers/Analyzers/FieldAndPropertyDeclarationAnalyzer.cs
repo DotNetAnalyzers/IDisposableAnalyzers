@@ -40,7 +40,7 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.ContainingSymbol is IPropertySymbol { IsStatic: false, IsIndexer: false } property &&
                 context.Node is PropertyDeclarationSyntax { AccessorList: { Accessors: { } accessors } } declaration &&
-                accessors.First() is { Body: null, ExpressionBody: null } &&
+                accessors.FirstOrDefault() is { Body: null, ExpressionBody: null } &&
                 Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {
                 HandleFieldOrProperty(context, new FieldOrPropertyAndDeclaration(property, declaration));
@@ -74,41 +74,30 @@
 
         private static bool IsMutableFromOutside(FieldOrProperty fieldOrProperty)
         {
-            if (fieldOrProperty.Symbol is IFieldSymbol field)
+            return fieldOrProperty.Symbol switch
             {
-                if (field.IsReadOnly)
-                {
-                    return false;
-                }
-
-                return IsAccessible(field.DeclaredAccessibility, field.ContainingType);
-            }
-
-            if (fieldOrProperty.Symbol is IPropertySymbol property)
-            {
-                return IsAccessible(property.DeclaredAccessibility, property.ContainingType) &&
-                       property.SetMethod is { } set &&
-                       IsAccessible(set.DeclaredAccessibility, property.ContainingType);
-            }
-
-            throw new InvalidOperationException("Should not get here.");
+                IFieldSymbol { IsReadOnly: true } => false,
+                IFieldSymbol field
+                => IsAccessible(field.DeclaredAccessibility, field.ContainingType),
+                IPropertySymbol property
+                => IsAccessible(property.DeclaredAccessibility, property.ContainingType) &&
+                   property.SetMethod is { } set &&
+                   IsAccessible(set.DeclaredAccessibility, property.ContainingType),
+                _ => throw new InvalidOperationException("Should not get here."),
+            };
 
             static bool IsAccessible(Accessibility accessibility, INamedTypeSymbol containingType)
             {
-                switch (accessibility)
+                return accessibility switch
                 {
-                    case Accessibility.Private:
-                        return false;
-                    case Accessibility.Protected:
-                        return !containingType.IsSealed;
-                    case Accessibility.Internal:
-                    case Accessibility.ProtectedOrInternal:
-                    case Accessibility.ProtectedAndInternal:
-                    case Accessibility.Public:
-                        return true;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, "Unhandled accessibility");
-                }
+                    Accessibility.Private => false,
+                    Accessibility.Protected => !containingType.IsSealed,
+                    Accessibility.Internal => true,
+                    Accessibility.ProtectedOrInternal => true,
+                    Accessibility.ProtectedAndInternal => true,
+                    Accessibility.Public => true,
+                    _ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, "Unhandled accessibility")
+                };
             }
         }
     }
