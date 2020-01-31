@@ -10,11 +10,9 @@
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     internal class UsingStatementAnalyzer : DiagnosticAnalyzer
     {
-        /// <inheritdoc/>
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
             Descriptors.IDISP007DoNotDisposeInjected);
 
-        /// <inheritdoc/>
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
@@ -40,11 +38,9 @@
                         }
 
                         break;
-                    case { Expression: { } expression }:
-                        if (Disposable.IsCachedOrInjectedOnly(expression, expression, context.SemanticModel, context.CancellationToken))
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, usingStatement.Expression.GetLocation()));
-                        }
+                    case { Expression: { } expression }
+                        when Disposable.IsCachedOrInjectedOnly(expression, expression, context.SemanticModel, context.CancellationToken):
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, usingStatement.Expression.GetLocation()));
 
                         break;
                 }
