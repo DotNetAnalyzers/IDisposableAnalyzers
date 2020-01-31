@@ -29,6 +29,12 @@
             {
                 this.invocations.Add(node);
             }
+
+            if (this.SemanticModel.TryGetSymbol(node, KnownSymbol.IAsyncDisposable.DisposeAsync, this.CancellationToken, out var disposeAsync) &&
+                disposeAsync.Parameters.Length == 0)
+            {
+                this.invocations.Add(node);
+            }
         }
 
         public override void VisitIdentifierName(IdentifierNameSyntax node)
@@ -42,6 +48,13 @@
             if (type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
                 DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
                 disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
+            {
+                return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
+            }
+
+            if (type.IsAssignableTo(KnownSymbol.IAsyncDisposable, semanticModel.Compilation) &&
+                type.TryFindFirstMethod(x => x is { Parameters: { Length: 0 } } && x == KnownSymbol.IAsyncDisposable.DisposeAsync, out disposeMethod) &&
+                disposeMethod.TrySingleDeclaration(cancellationToken, out declaration))
             {
                 return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
             }

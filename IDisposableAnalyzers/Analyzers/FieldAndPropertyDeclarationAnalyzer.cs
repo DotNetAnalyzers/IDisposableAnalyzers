@@ -63,10 +63,10 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
-                    if (!DisposeMethod.TryFindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _) &&
-                        !TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out _))
+                    if (!TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out _) &&
+                        !DisposeMethod.TryFindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, context.Node.GetLocation()));
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
                     }
                 }
             }

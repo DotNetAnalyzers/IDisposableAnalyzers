@@ -29,7 +29,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is InvocationExpressionSyntax invocation &&
-                DisposeCall.IsIDisposableDispose(invocation, context.SemanticModel, context.CancellationToken) &&
+                DisposeCall.IsMatch(invocation, context.SemanticModel, context.CancellationToken) &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 DisposeCall.TryGetDisposedRootMember(invocation, context.SemanticModel, context.CancellationToken, out var root))
             {
