@@ -4,16 +4,13 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
     <CodeAnalysisRuleSet>IDisposableAnalyzers.Test.ruleset</CodeAnalysisRuleSet>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-    <NoWarn>$(NoWarn);IDE1006</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
   </ItemGroup>
