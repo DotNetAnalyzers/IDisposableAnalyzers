@@ -3,6 +3,7 @@
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposableMember
     {
@@ -45,31 +46,36 @@
 
             if (disposeMethod.TrySingleMethodDeclaration(cancellationToken, out var disposeMethodDeclaration))
             {
-                using var walker = DisposeWalker.Borrow(disposeMethodDeclaration, semanticModel, cancellationToken);
-                if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
-                {
-                    foreach (var candidate in walker.Invocations)
-                    {
-                        if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
-                        {
-                            return true;
-                        }
-                    }
+                return IsDisposed(member, disposeMethodDeclaration, semanticModel, cancellationToken);
+            }
 
-                    return false;
-                }
+            return false;
+        }
 
-                foreach (var candidate in walker.Identifiers)
+        internal static bool IsDisposed(FieldOrProperty member, MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            using var walker = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken);
+            if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
+            {
+                foreach (var candidate in walker.Invocations)
                 {
-                    if (candidate.Identifier.Text == member.Name &&
-                        semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
-                        candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                    if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
                     {
                         return true;
                     }
                 }
 
                 return false;
+            }
+
+            foreach (var candidate in walker.Identifiers)
+            {
+                if (candidate.Identifier.Text == member.Name &&
+                    semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
+                    candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                {
+                    return true;
+                }
             }
 
             return false;
