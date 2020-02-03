@@ -41,7 +41,7 @@
                     TestFixture.IsAssignedInInitialize(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
                     assignment is { Left: { } left })
                 {
-                    if (TestFixture.TryGetTearDownMethod(setupAttribute, semanticModel, context.CancellationToken, out var tearDown))
+                    if (TestFixture.FindTearDown(setupAttribute, semanticModel, context.CancellationToken) is { } tearDown)
                     {
                         switch (tearDown)
                         {

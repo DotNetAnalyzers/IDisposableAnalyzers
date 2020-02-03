@@ -58,13 +58,24 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
-                else if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
-                         !TestFixture.IsAssignedInInitializeAndDisposedInCleanup(member, context.SemanticModel, context.CancellationToken))
+                else if (TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
+                {
+                    if (!DisposedInTearDown())
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
+                    }
+
+                    bool DisposedInTearDown()
+                    {
+                        return TestFixture.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken) is { } tearDown &&
+                               DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken);
+                    }
+                }
+                else if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
-                    if (!TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out _) &&
-                        DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
+                    if (DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
                     }

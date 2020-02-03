@@ -63,13 +63,12 @@
             return false;
         }
 
-        internal static bool TryGetTearDownMethod(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out MethodDeclarationSyntax? result)
+        internal static MethodDeclarationSyntax? FindTearDown(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            result = null;
             var typeDeclarationSyntax = setupAttribute.FirstAncestor<TypeDeclarationSyntax>();
             if (typeDeclarationSyntax is null)
             {
-                return false;
+                return null;
             }
 
             if (TearDown(semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type) is { } tearDownAttributeType)
@@ -80,14 +79,13 @@
                     {
                         if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
                         {
-                            result = methodDeclaration;
-                            return true;
+                            return methodDeclaration;
                         }
                     }
                 }
             }
 
-            return false;
+            return null;
 
             static QualifiedType? TearDown(ITypeSymbol? initialize)
             {
