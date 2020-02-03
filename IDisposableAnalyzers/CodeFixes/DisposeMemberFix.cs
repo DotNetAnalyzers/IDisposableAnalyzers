@@ -78,14 +78,14 @@
                             }
                         }
                     }
-                    else if (DisposeMethod.TryFind(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
-                             disposeSymbol.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
+                    else if (DisposeMethod.Find(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel) is { } disposeMethod &&
+                             disposeMethod.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
                     {
                         switch (disposeDeclaration)
                         {
                             case { ExpressionBody: { Expression: { } expression } }:
                                 context.RegisterCodeFix(
-                                    $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                    $"{symbol.Name}.Dispose() in {disposeMethod}",
                                     (editor, cancellationToken) => editor.ReplaceNode(
                                         disposeDeclaration,
                                         x => x.AsBlockBody(
@@ -96,7 +96,7 @@
                                 break;
                             case { Body: { } body }:
                                 context.RegisterCodeFix(
-                                    $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                    $"{symbol.Name}.Dispose() in {disposeMethod}",
                                     (editor, cancellationToken) => Dispose(editor, cancellationToken),
                                     "Dispose member.",
                                     diagnostic);

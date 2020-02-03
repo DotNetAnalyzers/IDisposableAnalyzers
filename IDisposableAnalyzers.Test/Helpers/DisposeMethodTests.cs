@@ -9,7 +9,7 @@
     {
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public static void TryFindIDisposableDispose(Search search)
+        public static void Find(Search search)
         {
             var code = @"
 namespace N
@@ -43,14 +43,13 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual(true, DisposeMethod.TryFind(method, compilation, search, out var match));
-            Assert.AreEqual("N.C.Dispose()", match.ToString());
+            Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
         }
 
         [Ignore("Not sure if we want to find explicit.")]
         [TestCase(Search.TopLevel)]
         [TestCase(Search.Recursive)]
-        public static void TryFindIDisposableDisposeWhenExplicit(Search search)
+        public static void FindWhenExplicit(Search search)
         {
             var code = @"
 namespace N
@@ -84,8 +83,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual(true, DisposeMethod.TryFind(method, compilation, search, out var match));
-            Assert.AreEqual("N.C.Dispose()", match.ToString());
+            Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
         }
 
         [TestCase(Search.TopLevel)]

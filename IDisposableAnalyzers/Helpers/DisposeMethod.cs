@@ -9,53 +9,23 @@
 
     internal static class DisposeMethod
     {
-        internal static bool TryFindFirst(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        internal static IMethodSymbol? Find(ITypeSymbol type, Compilation compilation, Search search)
         {
-            if (search == Search.TopLevel)
-            {
-                return TryFind(type, compilation, search, out disposeMethod) ||
-                       TryFindVirtual(type, compilation, search, out disposeMethod);
-            }
-
-            while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
-            {
-                if (TryFindFirst(type, compilation, Search.TopLevel, out disposeMethod))
-                {
-                    return true;
-                }
-
-                type = type.BaseType;
-            }
-
-            disposeMethod = null;
-            return false;
-        }
-
-        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
-        {
-            if (type.TypeKind == TypeKind.Interface)
-            {
-                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
-            }
-
-            return TryFind(type, compilation, Search.Recursive, out var disposeMethod) &&
-                   disposeMethod.ExplicitInterfaceImplementations.IsEmpty;
-        }
-
-        internal static bool TryFind(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
-        {
-            disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
             {
-                return false;
+                return null;
             }
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out var topLevel)
+                    ? topLevel
+                    : null;
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out var recursive)
+                ? recursive
+                : null;
 
             static bool IsMatch(IMethodSymbol candidate)
             {
@@ -83,6 +53,43 @@
                 return IsOverrideDispose(candidate) ||
                        IsVirtualDispose(candidate);
             }
+        }
+
+        internal static bool TryFindFirst(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        {
+            if (search == Search.TopLevel)
+            {
+                if (Find(type, compilation, search) is { } match)
+                {
+                    disposeMethod = match;
+                    return true;
+                }
+
+                return TryFindVirtual(type, compilation, search, out disposeMethod);
+            }
+
+            while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
+            {
+                if (TryFindFirst(type, compilation, Search.TopLevel, out disposeMethod))
+                {
+                    return true;
+                }
+
+                type = type.BaseType;
+            }
+
+            disposeMethod = null;
+            return false;
+        }
+
+        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
+        {
+            if (type.TypeKind == TypeKind.Interface)
+            {
+                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+            }
+
+            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
         }
 
         internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? baseCall)
