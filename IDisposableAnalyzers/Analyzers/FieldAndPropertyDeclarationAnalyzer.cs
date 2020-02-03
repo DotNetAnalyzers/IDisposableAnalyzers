@@ -87,14 +87,21 @@
                                 additionalLocations: disposeAsync.Locations));
                     }
 
-                    if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo))
+                    if (DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is { } dispose &&
+                        !DisposableMember.IsDisposed(member.FieldOrProperty, dispose, context.SemanticModel, context.CancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
+                        dispose = DisposeMethod.FindVirtual(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) ?? dispose;
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.IDISP002DisposeMember,
+                                context.Node.GetLocation(),
+                                additionalLocations: dispose.Locations));
+                    }
 
-                        if (DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
-                        {
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
-                        }
+                    if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                        DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
                     }
                 }
             }

@@ -293,35 +293,24 @@
             {
                 using (var walker = MutationWalker.For(disposable, semanticModel, cancellationToken))
                 {
-                    if (IsNeverNull(out var neverNull))
+                    if (walker.TrySingle(out var mutation) &&
+                        mutation is AssignmentExpressionSyntax { Left: { } single, Right: ObjectCreationExpressionSyntax _, Parent: ExpressionStatementSyntax { Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } } &&
+                        disposable.Symbol.ContainingType.Constructors.Length == 1)
                     {
-                        return new MemberAccessContext(neverNull.WithoutTrivia(), null);
+                        return new MemberAccessContext(single.WithoutTrivia(), null);
+                    }
+
+                    if (walker.IsEmpty &&
+                        disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ })
+                    {
+                        return new MemberAccessContext(
+                            MemberAccess(disposable, semanticModel, cancellationToken),
+                            null);
                     }
 
                     if (walker.Assignments.TryFirst(out var first))
                     {
                         return new MemberAccessContext(null, first.Left.WithoutTrivia());
-                    }
-
-                    bool IsNeverNull(out ExpressionSyntax memberAccess)
-                    {
-                        if (walker.TrySingle(out var mutation) &&
-                            mutation is AssignmentExpressionSyntax { Left: { } single, Right: ObjectCreationExpressionSyntax _, Parent: ExpressionStatementSyntax { Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } } &&
-                            disposable.Symbol.ContainingType.Constructors.Length == 1)
-                        {
-                            memberAccess = single;
-                            return true;
-                        }
-
-                        if (walker.IsEmpty &&
-                            disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ })
-                        {
-                            memberAccess = MemberAccess(disposable, semanticModel, cancellationToken);
-                            return true;
-                        }
-
-                        memberAccess = null!;
-                        return false;
                     }
                 }
 

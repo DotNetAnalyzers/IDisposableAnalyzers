@@ -52,7 +52,7 @@
         {
             if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed))
             {
-                if (disposed.Equals(symbol))
+                if (disposed.IsEquivalentTo(symbol))
                 {
                     return true;
                 }
