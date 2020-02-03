@@ -33,13 +33,13 @@
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? symbol) &&
                     FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
-                    if (DisposeMethod.TryFindVirtual(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
-                        disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? disposeDeclaration))
+                    if (DisposeMethod.FindVirtual(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel) is { } virtualDispose &&
+                        virtualDispose.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? disposeDeclaration))
                     {
                         if (disposeDeclaration is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } block })
                         {
                             context.RegisterCodeFix(
-                                $"{symbol.Name}.Dispose() in {disposeSymbol}",
+                                $"{symbol.Name}.Dispose() in {virtualDispose}",
                                 (editor, token) => Dispose(editor, token),
                                 "Dispose member.",
                                 diagnostic);

@@ -46,15 +46,15 @@
         internal static DisposeWalker Borrow(INamedTypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
-                DisposeMethod.TryFindFirst(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                DisposeMethod.FindFirst(type, semanticModel.Compilation, Search.Recursive) is { } disposeMethod &&
                 disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
             {
                 return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
             }
 
             if (type.IsAssignableTo(KnownSymbol.IAsyncDisposable, semanticModel.Compilation) &&
-                type.TryFindFirstMethod(x => x is { Parameters: { Length: 0 } } && x == KnownSymbol.IAsyncDisposable.DisposeAsync, out disposeMethod) &&
-                disposeMethod.TrySingleDeclaration(cancellationToken, out declaration))
+                type.TryFindFirstMethod(x => x is { Parameters: { Length: 0 } } && x == KnownSymbol.IAsyncDisposable.DisposeAsync, out var disposeAsync) &&
+                disposeAsync.TrySingleDeclaration(cancellationToken, out declaration))
             {
                 return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
             }

@@ -33,20 +33,23 @@
             }
         }
 
-        internal static bool TryFindVirtual(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        internal static IMethodSymbol? FindVirtual(ITypeSymbol type, Compilation compilation, Search search)
         {
-            disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
             {
-                return false;
+                return null;
             }
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out var topLevel)
+                    ? topLevel
+                    : null;
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out var recursive)
+                ? recursive
+                : null;
 
             static bool IsMatch(IMethodSymbol candidate)
             {
@@ -55,31 +58,25 @@
             }
         }
 
-        internal static bool TryFindFirst(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        internal static IMethodSymbol? FindFirst(ITypeSymbol type, Compilation compilation, Search search)
         {
             if (search == Search.TopLevel)
             {
-                if (Find(type, compilation, search) is { } match)
-                {
-                    disposeMethod = match;
-                    return true;
-                }
-
-                return TryFindVirtual(type, compilation, search, out disposeMethod);
+                return Find(type, compilation, Search.TopLevel) ??
+                       FindVirtual(type, compilation, Search.TopLevel);
             }
 
             while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
             {
-                if (TryFindFirst(type, compilation, Search.TopLevel, out disposeMethod))
+                if (FindFirst(type, compilation, Search.TopLevel) is { } disposeMethod)
                 {
-                    return true;
+                    return disposeMethod;
                 }
 
                 type = type.BaseType;
             }
 
-            disposeMethod = null;
-            return false;
+            return null;
         }
 
         internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)

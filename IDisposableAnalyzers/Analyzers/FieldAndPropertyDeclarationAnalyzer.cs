@@ -64,7 +64,7 @@
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
 
                     if (!TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out _) &&
-                        !DisposeMethod.TryFindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel, out _))
+                        DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
                     }

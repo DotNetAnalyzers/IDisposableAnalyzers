@@ -111,7 +111,7 @@
                             when right == candidate &&
                                  recursion.SemanticModel.TryGetSymbol(left, recursion.CancellationToken, out var assignedSymbol) &&
                                  FieldOrProperty.TryCreate(assignedSymbol, out var assignedMember):
-                            if (DisposeMethod.TryFindFirst(assignedMember.ContainingType, recursion.SemanticModel.Compilation, Search.TopLevel, out var disposeMethod) &&
+                            if (DisposeMethod.FindFirst(assignedMember.ContainingType, recursion.SemanticModel.Compilation, Search.TopLevel) is { } disposeMethod &&
                                 DisposableMember.IsDisposed(assignedMember, disposeMethod, recursion.SemanticModel, recursion.CancellationToken))
                             {
                                 return Ignores(parentExpression, recursion);

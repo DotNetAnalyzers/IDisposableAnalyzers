@@ -26,7 +26,7 @@
                 context.ContainingSymbol is INamedTypeSymbol { IsSealed: false } type &&
                 type.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation) &&
                 DisposeMethod.Find(type, context.Compilation, Search.TopLevel) is { IsVirtual: false, IsOverride: false } disposeMethod &&
-                !DisposeMethod.TryFindVirtual(type, context.Compilation, Search.TopLevel, out _))
+                DisposeMethod.FindVirtual(type, context.Compilation, Search.TopLevel) is null)
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(
