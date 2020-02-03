@@ -13,8 +13,8 @@
         {
             if (search == Search.TopLevel)
             {
-                return TryFindIDisposableDispose(type, compilation, search, out disposeMethod) ||
-                       TryFindVirtualDispose(type, compilation, search, out disposeMethod);
+                return TryFind(type, compilation, search, out disposeMethod) ||
+                       TryFindVirtual(type, compilation, search, out disposeMethod);
             }
 
             while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
@@ -38,11 +38,11 @@
                 return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
             }
 
-            return TryFindIDisposableDispose(type, compilation, Search.Recursive, out var disposeMethod) &&
+            return TryFind(type, compilation, Search.Recursive, out var disposeMethod) &&
                    disposeMethod.ExplicitInterfaceImplementations.IsEmpty;
         }
 
-        internal static bool TryFindIDisposableDispose(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        internal static bool TryFind(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
         {
             disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
@@ -52,18 +52,18 @@
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out disposeMethod);
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out disposeMethod);
 
-            static bool IsIDisposableDispose(IMethodSymbol candidate)
+            static bool IsMatch(IMethodSymbol candidate)
             {
                 return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } };
             }
         }
 
-        internal static bool TryFindVirtualDispose(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
+        internal static bool TryFindVirtual(ITypeSymbol type, Compilation compilation, Search search, [NotNullWhen(true)] out IMethodSymbol? disposeMethod)
         {
             disposeMethod = null;
             if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
@@ -73,12 +73,12 @@
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
+                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out disposeMethod);
             }
 
-            return type.TryFindFirstMethodRecursive("Dispose", x => IsIDisposableDispose(x), out disposeMethod);
+            return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out disposeMethod);
 
-            static bool IsIDisposableDispose(IMethodSymbol candidate)
+            static bool IsMatch(IMethodSymbol candidate)
             {
                 return IsOverrideDispose(candidate) ||
                        IsVirtualDispose(candidate);

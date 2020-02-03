@@ -91,7 +91,7 @@
                 if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
                 {
                     if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
-                        DisposeMethod.TryFindIDisposableDispose(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                        DisposeMethod.TryFind(type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
                         disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
                     {
                         return e.WithoutTrivia()
@@ -113,7 +113,7 @@
                 if (IsNeverNull(out var neverNull))
                 {
                     if (disposable.Type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
-                        DisposeMethod.TryFindIDisposableDispose(disposable.Type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
+                        DisposeMethod.TryFind(disposable.Type, semanticModel.Compilation, Search.Recursive, out var disposeMethod) &&
                         disposeMethod.ExplicitInterfaceImplementations.IsEmpty)
                     {
                         return DisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();

@@ -25,9 +25,9 @@
             if (context.Node is ClassDeclarationSyntax { } classDeclaration &&
                 context.ContainingSymbol is INamedTypeSymbol { IsSealed: false } type &&
                 type.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation) &&
-                DisposeMethod.TryFindIDisposableDispose(type, context.Compilation, Search.TopLevel, out var disposeMethod) &&
+                DisposeMethod.TryFind(type, context.Compilation, Search.TopLevel, out var disposeMethod) &&
                 disposeMethod is { IsVirtual: false, IsOverride: false } &&
-                !DisposeMethod.TryFindVirtualDispose(type, context.Compilation, Search.TopLevel, out _))
+                !DisposeMethod.TryFindVirtual(type, context.Compilation, Search.TopLevel, out _))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(

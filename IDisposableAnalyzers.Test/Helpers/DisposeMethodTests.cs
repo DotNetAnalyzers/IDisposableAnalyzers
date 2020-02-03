@@ -43,7 +43,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
+            Assert.AreEqual(true, DisposeMethod.TryFind(method, compilation, search, out var match));
             Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
 
@@ -84,7 +84,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual(true, DisposeMethod.TryFindIDisposableDispose(method, compilation, search, out var match));
+            Assert.AreEqual(true, DisposeMethod.TryFind(method, compilation, search, out var match));
             Assert.AreEqual("N.C.Dispose()", match.ToString());
         }
 
@@ -132,7 +132,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual(true, DisposeMethod.TryFindVirtualDispose(method, compilation, search, out var match));
+            Assert.AreEqual(true, DisposeMethod.TryFindVirtual(method, compilation, search, out var match));
             Assert.AreEqual("N.C.Dispose(bool)", match.ToString());
         }
 

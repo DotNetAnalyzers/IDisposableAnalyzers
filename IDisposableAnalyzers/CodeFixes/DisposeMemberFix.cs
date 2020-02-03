@@ -33,7 +33,7 @@
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? symbol) &&
                     FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
-                    if (DisposeMethod.TryFindVirtualDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
+                    if (DisposeMethod.TryFindVirtual(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out var disposeSymbol) &&
                         disposeSymbol.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? disposeDeclaration))
                     {
                         if (disposeDeclaration is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } block })
@@ -78,7 +78,7 @@
                             }
                         }
                     }
-                    else if (DisposeMethod.TryFindIDisposableDispose(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
+                    else if (DisposeMethod.TryFind(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel, out disposeSymbol) &&
                              disposeSymbol.TrySingleDeclaration(context.CancellationToken, out disposeDeclaration))
                     {
                         switch (disposeDeclaration)
