@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Composition;
     using System.Diagnostics.CodeAnalysis;
@@ -33,7 +34,65 @@
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? symbol) &&
                     FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
-                    if (DisposeMethod.FindVirtual(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel) is { } virtualDispose &&
+                    if (diagnostic.AdditionalLocations.TrySingle(out var additionalLocation) &&
+                        syntaxRoot.TryFindNodeOrAncestor(additionalLocation, out MethodDeclarationSyntax? method))
+                    {
+                        switch (method)
+                        {
+                            case { Identifier: { ValueText: "DisposeAsync" } }:
+                                context.RegisterCodeFix(
+                                    $"{symbol.Name}.DisposeAsync() in {method}",
+                                    (editor, cancellationToken) => editor.ReplaceNode(
+                                        method,
+                                        x => DisposeAsync(x, editor, cancellationToken)),
+                                    "DisposeAsync",
+                                    diagnostic);
+
+                                MethodDeclarationSyntax DisposeAsync(MethodDeclarationSyntax old, DocumentEditor editor, CancellationToken cancellationToken)
+                                {
+                                    return old switch
+                                    {
+                                        { ExpressionBody: { Expression: { } expression } }
+                                        => old.AsBlockBody(
+                                            SyntaxFactory.ExpressionStatement(expression),
+                                            IDisposableFactory.DisposeAsyncStatement(disposable, editor.SemanticModel, cancellationToken)),
+                                        { Body: { } body }
+                                        => old.WithBody(
+                                            body.AddStatements(IDisposableFactory.DisposeAsyncStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                        _ => throw new InvalidOperationException("Error generating DisposeAsync"),
+                                    };
+                                }
+
+                                break;
+
+                            default:
+                                context.RegisterCodeFix(
+                                    $"{symbol.Name}.Dispose() in {method}",
+                                    (editor, cancellationToken) => editor.ReplaceNode(
+                                        method,
+                                        x => Dispose(x, editor, cancellationToken)),
+                                    "TearDown",
+                                    diagnostic);
+
+                                MethodDeclarationSyntax Dispose(MethodDeclarationSyntax old, DocumentEditor editor, CancellationToken cancellationToken)
+                                {
+                                    return old switch
+                                    {
+                                        { ExpressionBody: { Expression: { } expression } }
+                                        => old.AsBlockBody(
+                                            SyntaxFactory.ExpressionStatement(expression),
+                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)),
+                                        { Body: { } body }
+                                        => old.WithBody(body.AddStatements(
+                                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                        _ => throw new InvalidOperationException("Error generating Dispose"),
+                                    };
+                                }
+
+                                break;
+                        }
+                    }
+                    else if (DisposeMethod.FindVirtual(symbol.ContainingType, semanticModel.Compilation, Search.TopLevel) is { } virtualDispose &&
                         virtualDispose.TrySingleDeclaration(context.CancellationToken, out MethodDeclarationSyntax? disposeDeclaration))
                     {
                         if (disposeDeclaration is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } block })

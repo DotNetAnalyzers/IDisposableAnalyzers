@@ -79,6 +79,30 @@
             return null;
         }
 
+        internal static IMethodSymbol? FindDisposeAsync(ITypeSymbol type, Compilation compilation, Search search)
+        {
+            if (!type.IsAssignableTo(KnownSymbol.IAsyncDisposable, compilation))
+            {
+                return null;
+            }
+
+            if (search == Search.TopLevel)
+            {
+                return type.TryFindFirstMethod("DisposeAsync", x => IsMatch(x), out var topLevel)
+                    ? topLevel
+                    : null;
+            }
+
+            return type.TryFindFirstMethodRecursive("DisposeAsync", x => IsMatch(x), out var recursive)
+                ? recursive
+                : null;
+
+            static bool IsMatch(IMethodSymbol candidate)
+            {
+                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: false, Name: "DisposeAsync", Parameters: { Length: 0 } };
+            }
+        }
+
         internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
         {
             if (type.TypeKind == TypeKind.Interface)

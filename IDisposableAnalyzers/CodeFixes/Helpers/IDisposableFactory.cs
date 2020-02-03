@@ -19,6 +19,10 @@
             SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IDisposable"))
                          .WithAdditionalAnnotations(Simplifier.Annotation);
 
+        internal static readonly TypeSyntax SystemIAsyncDisposable =
+            SyntaxFactory.QualifiedName(SyntaxFactory.IdentifierName("System"), SyntaxFactory.IdentifierName("IAsyncDisposable"))
+                         .WithAdditionalAnnotations(Simplifier.Annotation);
+
         internal static readonly StatementSyntax GcSuppressFinalizeThis =
             SyntaxFactory.ExpressionStatement(
                              SyntaxFactory.InvocationExpression(
@@ -105,12 +109,45 @@
             }
         }
 
+        internal static ExpressionStatementSyntax DisposeAsyncStatement(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            switch (MemberAccessContext.Create(disposable, semanticModel, cancellationToken))
+            {
+                case { NeverNull: { } neverNull }:
+                    if (disposable.Type.IsAssignableTo(KnownSymbol.IAsyncDisposable, semanticModel.Compilation) &&
+                        DisposeMethod.FindDisposeAsync(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
+                    {
+                        return AsyncDisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();
+                    }
+
+                    return AsyncDisposeStatement(
+                            SyntaxFactory.CastExpression(
+                                SystemIAsyncDisposable,
+                                neverNull.WithoutTrivia()))
+                        .WithLeadingElasticLineFeed();
+
+                    static ExpressionStatementSyntax AsyncDisposeStatement(ExpressionSyntax expression)
+                    {
+                        return SyntaxFactory.ExpressionStatement(
+                            SyntaxFactory.AwaitExpression(
+                                expression: SyntaxFactory.InvocationExpression(
+                                    expression: SyntaxFactory.MemberAccessExpression(
+                                        kind: SyntaxKind.SimpleMemberAccessExpression,
+                                        expression: expression,
+                                        name: SyntaxFactory.IdentifierName("DisposeAsync")),
+                                    argumentList: SyntaxFactory.ArgumentList())));
+                    }
+
+                default:
+                    throw new InvalidOperationException("Error generating DisposeAsyncStatement.");
+            }
+        }
+
         internal static ExpressionStatementSyntax DisposeStatement(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using (var walker = MutationWalker.For(disposable, semanticModel, cancellationToken))
+            switch (MemberAccessContext.Create(disposable, semanticModel, cancellationToken))
             {
-                if (IsNeverNull(out var neverNull))
-                {
+                case { NeverNull: { } neverNull }:
                     if (disposable.Type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
                         DisposeMethod.Find(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
                     {
@@ -118,45 +155,25 @@
                     }
 
                     return DisposeStatement(
-                        SyntaxFactory.CastExpression(
-                            SystemIDisposable,
-                            neverNull.WithoutTrivia()))
+                            SyntaxFactory.CastExpression(
+                                SystemIDisposable,
+                                neverNull.WithoutTrivia()))
                         .WithLeadingElasticLineFeed();
-                }
-
-                bool IsNeverNull(out ExpressionSyntax memberAccess)
-                {
-                    if (walker.TrySingle(out var mutation) &&
-                        mutation is AssignmentExpressionSyntax { Left: { } single, Right: ObjectCreationExpressionSyntax _, Parent: ExpressionStatementSyntax { Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } } &&
-                        disposable.Symbol.ContainingType.Constructors.Length == 1)
+                case { MaybeNull: { } maybeNull }:
+                    if (DisposeMethod.IsAccessibleOn(disposable.Type, semanticModel.Compilation))
                     {
-                        memberAccess = single;
-                        return true;
+                        return ConditionalDisposeStatement(maybeNull).WithLeadingElasticLineFeed();
                     }
 
-                    if (walker.IsEmpty &&
-                        disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ })
-                    {
-                        memberAccess = MemberAccess(disposable, semanticModel, cancellationToken);
-                        return true;
-                    }
-
-                    memberAccess = null!;
-                    return false;
-                }
+                    return ConditionalDisposeStatement(
+                            SyntaxFactory.BinaryExpression(
+                                SyntaxKind.AsExpression,
+                                maybeNull,
+                                SystemIDisposable))
+                        .WithLeadingElasticLineFeed();
+                default:
+                    throw new InvalidOperationException("Error generating DisposeStatement.");
             }
-
-            if (DisposeMethod.IsAccessibleOn(disposable.Type, semanticModel.Compilation))
-            {
-                return ConditionalDisposeStatement(MemberAccess(disposable, semanticModel, cancellationToken)).WithLeadingElasticLineFeed();
-            }
-
-            return ConditionalDisposeStatement(
-                    SyntaxFactory.BinaryExpression(
-                        SyntaxKind.AsExpression,
-                        MemberAccess(disposable, semanticModel, cancellationToken),
-                        SystemIDisposable))
-                .WithLeadingElasticLineFeed();
         }
 
         internal static ExpressionSyntax MemberAccess(SyntaxToken memberIdentifier, SemanticModel semanticModel, CancellationToken cancellationToken)
@@ -259,6 +276,59 @@
         internal static ArgumentListSyntax Arguments(ExpressionSyntax expression)
         {
             return SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(expression)));
+        }
+
+        private struct MemberAccessContext
+        {
+            internal readonly ExpressionSyntax? NeverNull;
+            internal readonly ExpressionSyntax? MaybeNull;
+
+            private MemberAccessContext(ExpressionSyntax? neverNull, ExpressionSyntax? maybeNull)
+            {
+                this.NeverNull = neverNull;
+                this.MaybeNull = maybeNull;
+            }
+
+            internal static MemberAccessContext Create(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+            {
+                using (var walker = MutationWalker.For(disposable, semanticModel, cancellationToken))
+                {
+                    if (IsNeverNull(out var neverNull))
+                    {
+                        return new MemberAccessContext(neverNull.WithoutTrivia(), null);
+                    }
+
+                    if (walker.Assignments.TryFirst(out var first))
+                    {
+                        return new MemberAccessContext(null, first.Left.WithoutTrivia());
+                    }
+
+                    bool IsNeverNull(out ExpressionSyntax memberAccess)
+                    {
+                        if (walker.TrySingle(out var mutation) &&
+                            mutation is AssignmentExpressionSyntax { Left: { } single, Right: ObjectCreationExpressionSyntax _, Parent: ExpressionStatementSyntax { Parent: BlockSyntax { Parent: ConstructorDeclarationSyntax _ } } } &&
+                            disposable.Symbol.ContainingType.Constructors.Length == 1)
+                        {
+                            memberAccess = single;
+                            return true;
+                        }
+
+                        if (walker.IsEmpty &&
+                            disposable.Initializer(cancellationToken) is { Value: ObjectCreationExpressionSyntax _ })
+                        {
+                            memberAccess = MemberAccess(disposable, semanticModel, cancellationToken);
+                            return true;
+                        }
+
+                        memberAccess = null!;
+                        return false;
+                    }
+                }
+
+                return new MemberAccessContext(
+                    null,
+                    MemberAccess(disposable, semanticModel, cancellationToken));
+            }
         }
     }
 }

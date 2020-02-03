@@ -60,24 +60,41 @@
                 }
                 else if (TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
                 {
-                    if (!DisposedInTearDown())
+                    switch (TestFixture.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
-                    }
-
-                    bool DisposedInTearDown()
-                    {
-                        return TestFixture.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken) is { } tearDown &&
-                               DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken);
+                        case { } tearDown
+                            when !DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken):
+                            context.ReportDiagnostic(
+                                Diagnostic.Create(
+                                    Descriptors.IDISP002DisposeMember,
+                                    context.Node.GetLocation(),
+                                    additionalLocations: new[] { tearDown.GetLocation() }));
+                            break;
+                        case null:
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
+                            break;
                     }
                 }
-                else if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo))
+                else
                 {
-                    context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
-
-                    if (DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
+                    if (DisposeMethod.FindDisposeAsync(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is { } disposeAsync &&
+                        !DisposableMember.IsDisposed(member.FieldOrProperty, disposeAsync, context.SemanticModel, context.CancellationToken))
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
+                        context.ReportDiagnostic(
+                            Diagnostic.Create(
+                                Descriptors.IDISP002DisposeMember,
+                                context.Node.GetLocation(),
+                                additionalLocations: disposeAsync.Locations));
+                    }
+
+                    if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
+
+                        if (DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
+                        }
                     }
                 }
             }
