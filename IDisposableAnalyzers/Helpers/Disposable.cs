@@ -48,19 +48,15 @@
 
         internal static bool IsAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
-            if (type is null)
+            return type switch
             {
-                return false;
-            }
-
-            // https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
-            if (type == KnownSymbol.Task)
-            {
-                return false;
-            }
-
-            return type == KnownSymbol.IDisposable ||
-                   type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+                null => false,
+                //// https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
+                { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task" } => false,
+                INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
+                => IsAssignableFrom(arguments[0], compilation),
+                _ => type.IsAssignableTo(KnownSymbol.IDisposable, compilation),
+            };
         }
 
         internal static bool IsNop(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)

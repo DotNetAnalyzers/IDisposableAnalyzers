@@ -51,6 +51,12 @@
                 => true,
                 { Parent: ArrowExpressionClauseSyntax { Parent: { } parent } }
                 => !parent.IsKind(SyntaxKind.ConstructorDeclaration),
+                { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
+                => DisposedByReturnValue(invocation, recursion, out _) &&
+                   Returns(invocation, recursion),
+                { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } conditionalAccess }
+                => DisposedByReturnValue(invocation, recursion, out _) &&
+                   Returns(conditionalAccess, recursion),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                 => recursion.Target(variableDeclarator) is { } target &&
                    Returns(target, recursion),

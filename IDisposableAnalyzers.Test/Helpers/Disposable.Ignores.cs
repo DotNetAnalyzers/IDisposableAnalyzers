@@ -380,6 +380,55 @@ namespace N
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("new StreamReader(File.OpenRead(string.Empty))")]
+            [TestCase("File.OpenRead(string.Empty).M2()")]
+            [TestCase("File.OpenRead(string.Empty)?.M2()")]
+            [TestCase("M2(File.OpenRead(string.Empty))")]
+            public static void ReturnedStreamWrappedInStreamReader(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System.IO;
+
+    public static class C
+    {
+        public StreamReader M1() => File.OpenRead(string.Empty).M2();
+
+        private static StreamReader M2(this Stream stream) => new StreamReader(stream);
+    }
+}".AssertReplace("File.OpenRead(string.Empty).M2()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("await File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
+            [TestCase("await File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
+            [TestCase("File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
+            [TestCase("File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
+            public static void FileOpenReadReadAsync(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public async Task<int> M() => await File.OpenRead(string.Empty).ReadAsync(null, 0, 0);
+    }
+}".AssertReplace("await File.OpenRead(string.Empty).ReadAsync(null, 0, 0)", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
+                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
             [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
             [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
             public static void ReturnedInCompositeDisposable(string expression)

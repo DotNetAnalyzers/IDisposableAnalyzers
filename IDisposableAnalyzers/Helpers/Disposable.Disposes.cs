@@ -156,10 +156,10 @@
                 => true, // disposed by form.Close()
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
-                { Parent: ConditionalAccessExpressionSyntax { } parent }
+                { Parent: ConditionalAccessExpressionSyntax parent }
                 => DisposedByReturnValue(parent, recursion, out var creation) &&
                    Disposes(creation, recursion),
-                { Parent: MemberAccessExpressionSyntax { } parent }
+                { Parent: MemberAccessExpressionSyntax parent }
                 => DisposedByReturnValue(parent, recursion, out var creation) &&
                    Disposes(creation, recursion),
                 { Parent: AssignmentExpressionSyntax { Left: { } left } assignment }

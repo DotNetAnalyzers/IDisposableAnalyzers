@@ -131,7 +131,7 @@
 
                                 break;
 
-                            case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 0 } }, ExpressionBody: { Expression:{} expression } }:
+                            case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 0 } }, ExpressionBody: { Expression: { } expression } }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, cancellationToken) => editor.ReplaceNode(

@@ -23,12 +23,36 @@
 
         private static bool Ignores(ExpressionSyntax candidate, Recursion recursion)
         {
-            if (Disposes(candidate, recursion) ||
-                Assigns(candidate, recursion, out _) ||
-                Stores(candidate, recursion, out _) ||
-                Returns(candidate, recursion))
+            using (var temp = Recursion.Borrow(recursion.ContainingType, recursion.SemanticModel, recursion.CancellationToken))
             {
-                return false;
+                if (Disposes(candidate, temp))
+                {
+                    return false;
+                }
+            }
+
+            using (var temp = Recursion.Borrow(recursion.ContainingType, recursion.SemanticModel, recursion.CancellationToken))
+            {
+                if (Assigns(candidate, temp, out _))
+                {
+                    return false;
+                }
+            }
+
+            using (var temp = Recursion.Borrow(recursion.ContainingType, recursion.SemanticModel, recursion.CancellationToken))
+            {
+                if (Stores(candidate, temp, out _))
+                {
+                    return false;
+                }
+            }
+
+            using (var temp = Recursion.Borrow(recursion.ContainingType, recursion.SemanticModel, recursion.CancellationToken))
+            {
+                if (Returns(candidate, temp))
+                {
+                    return false;
+                }
             }
 
             return candidate switch

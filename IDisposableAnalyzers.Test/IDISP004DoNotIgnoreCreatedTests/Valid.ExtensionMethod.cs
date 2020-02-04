@@ -224,6 +224,24 @@ namespace N
         }
 
         [Test]
+        public static void ExtensionMethodWrappingStreamInStreamReader()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public static class C
+    {
+        public static StreamReader M1() => File.OpenRead(string.Empty).M2();
+
+        private static StreamReader M2(this Stream stream) => new StreamReader(stream);
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public static void Issue174()
         {
             var code = @"
