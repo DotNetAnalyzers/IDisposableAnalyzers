@@ -6,7 +6,7 @@
 
     public class Issue199 : IAsyncDisposable
     {
-        private Timer _timer;
+        private Timer? _timer;
 
         public async Task ResetTimerAsync()
         {
@@ -19,7 +19,10 @@
 
         public async ValueTask DisposeAsync()
         {
-            await _timer.DisposeAsync();
+            if (this._timer is { })
+            {
+                await _timer.DisposeAsync().ConfigureAwait(false);
+            }
         }
     }
 }
