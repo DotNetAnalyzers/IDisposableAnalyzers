@@ -1,3 +1,6 @@
+#### 3.3.0
+* FEAUTURE: Initial support for AsyncDisposable
+
 #### 3.1.0
 * BUGFIX IDISP005 when local function.
 * BUGFIX IDISP024 don't call SuppressFinalize if sealed and no finalizer.
