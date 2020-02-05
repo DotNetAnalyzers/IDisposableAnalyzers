@@ -39,30 +39,32 @@
                     {
                         switch (method)
                         {
-                            case { Identifier: { ValueText: "DisposeAsync" } }:
-                                // Not sure how we want the code gen.
-                                ////context.RegisterCodeFix(
-                                ////    $"{symbol.Name}.DisposeAsync() in {method}",
-                                ////    (editor, cancellationToken) => editor.ReplaceNode(
-                                ////        method,
-                                ////        x => DisposeAsync(x, editor, cancellationToken)),
-                                ////    "DisposeAsync",
-                                ////    diagnostic);
+                            case { Identifier: { ValueText: "DisposeAsync" } }
+                                when IDisposableFactory.MemberAccessContext.Create(disposable, method, semanticModel, context.CancellationToken) is { NotNull: { } }:
+                                context.RegisterCodeFix(
+                                    $"{symbol.Name}.DisposeAsync() in {method}",
+                                    (editor, cancellationToken) => editor.ReplaceNode(
+                                        method,
+                                        x => DisposeAsync(x, editor, cancellationToken)),
+                                    "DisposeAsync",
+                                    diagnostic);
 
-                                ////MethodDeclarationSyntax DisposeAsync(MethodDeclarationSyntax old, DocumentEditor editor, CancellationToken cancellationToken)
-                                ////{
-                                ////    return old switch
-                                ////    {
-                                ////        { ExpressionBody: { Expression: { } expression } }
-                                ////        => old.AsBlockBody(
-                                ////            SyntaxFactory.ExpressionStatement(expression),
-                                ////            IDisposableFactory.DisposeAsyncStatement(disposable, editor.SemanticModel, cancellationToken)),
-                                ////        { Body: { } body }
-                                ////        => old.WithBody(
-                                ////            body.AddStatements(IDisposableFactory.DisposeAsyncStatement(disposable, editor.SemanticModel, cancellationToken))),
-                                ////        _ => throw new InvalidOperationException("Error generating DisposeAsync"),
-                                ////    };
-                                ////}
+                                MethodDeclarationSyntax DisposeAsync(MethodDeclarationSyntax old, DocumentEditor editor, CancellationToken cancellationToken)
+                                {
+                                    return old switch
+                                    {
+                                        { ExpressionBody: { Expression: { } expression } }
+                                        => old.AsBlockBody(
+                                            SyntaxFactory.ExpressionStatement(expression),
+                                            IDisposableFactory.DisposeAsyncStatement(disposable, method!, editor.SemanticModel, cancellationToken))
+                                              .WithAsync(),
+                                        { Body: { } body }
+                                        => old.WithBody(
+                                            body.AddStatements(IDisposableFactory.DisposeAsyncStatement(disposable, method!, editor.SemanticModel, cancellationToken)))
+                                              .WithAsync(),
+                                        _ => throw new InvalidOperationException("Error generating DisposeAsync"),
+                                    };
+                                }
 
                                 break;
                             case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body }:
@@ -79,21 +81,21 @@
                                     {
                                         editor.InsertAfter(
                                             ifNotDisposingReturn,
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                            IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken));
                                     }
                                     else if (TryFindIfDisposing(method!, out var ifDisposing))
                                     {
                                         _ = editor.ReplaceNode(
                                             ifDisposing.Statement,
                                             x => x is BlockSyntax ifBlock
-                                                ? ifBlock.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))
-                                                : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                                ? ifBlock.AddStatements(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken))
+                                                : SyntaxFactory.Block(x, IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
                                     }
                                     else
                                     {
                                         ifDisposing = SyntaxFactory.IfStatement(
                                             SyntaxFactory.IdentifierName(parameters[0].Identifier),
-                                            SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                            SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
                                         if (DisposeMethod.TryFindBaseCall(method!, editor.SemanticModel, cancellationToken, out var baseCall))
                                         {
                                             editor.InsertBefore(baseCall.Parent, ifDisposing);
@@ -119,13 +121,13 @@
                                     {
                                         editor.InsertBefore(
                                             baseCall.Parent,
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken));
+                                            IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken));
                                     }
                                     else
                                     {
                                         _ = editor.ReplaceNode(
                                             body,
-                                            x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)));
+                                            x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
                                     }
                                 }
 
@@ -138,11 +140,12 @@
                                         method,
                                         x => x.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                            IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken))),
                                     "Dispose member.",
                                     diagnostic);
                                 break;
                             case { Identifier: { ValueText: "Dispose" } }:
+                            case { Identifier: { ValueText: "DisposeAsync" } }:
                                 break;
                             default:
                                 context.RegisterCodeFix(
@@ -160,10 +163,10 @@
                                         { ExpressionBody: { Expression: { } expression } }
                                         => old.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
-                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken)),
+                                            IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)),
                                         { Body: { } body }
                                         => old.WithBody(body.AddStatements(
-                                                            IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken))),
+                                                            IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken))),
                                         _ => throw new InvalidOperationException("Error generating Dispose"),
                                     };
                                 }

@@ -109,21 +109,22 @@
             }
         }
 
-        internal static ExpressionStatementSyntax DisposeAsyncStatement(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionStatementSyntax DisposeAsyncStatement(FieldOrProperty disposable, MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (MemberAccessContext.Create(disposable, semanticModel, cancellationToken))
+            switch (MemberAccessContext.Create(disposable, method, semanticModel, cancellationToken))
             {
-                case { NeverNull: { } neverNull }:
+                case { NotNull: { } notNull }:
                     if (disposable.Type.IsAssignableTo(KnownSymbol.IAsyncDisposable, semanticModel.Compilation) &&
                         DisposeMethod.FindDisposeAsync(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
                     {
-                        return AsyncDisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();
+                        return AsyncDisposeStatement(notNull.WithoutTrivia()).WithLeadingElasticLineFeed();
                     }
 
                     return AsyncDisposeStatement(
-                            SyntaxFactory.CastExpression(
-                                SystemIAsyncDisposable,
-                                neverNull.WithoutTrivia()))
+                            SyntaxFactory.ParenthesizedExpression(
+                                SyntaxFactory.CastExpression(
+                                    SystemIAsyncDisposable,
+                                    notNull.WithoutTrivia())))
                         .WithLeadingElasticLineFeed();
 
                     static ExpressionStatementSyntax AsyncDisposeStatement(ExpressionSyntax expression)
@@ -133,9 +134,16 @@
                                 expression: SyntaxFactory.InvocationExpression(
                                     expression: SyntaxFactory.MemberAccessExpression(
                                         kind: SyntaxKind.SimpleMemberAccessExpression,
-                                        expression: expression,
-                                        name: SyntaxFactory.IdentifierName("DisposeAsync")),
-                                    argumentList: SyntaxFactory.ArgumentList())));
+                                        expression: SyntaxFactory.InvocationExpression(
+                                            expression: SyntaxFactory.MemberAccessExpression(
+                                                kind: SyntaxKind.SimpleMemberAccessExpression,
+                                                expression: expression,
+                                                name: SyntaxFactory.IdentifierName("DisposeAsync")),
+                                            argumentList: SyntaxFactory.ArgumentList()),
+                                        name: SyntaxFactory.IdentifierName("ConfigureAwait")),
+                                    argumentList: SyntaxFactory.ArgumentList(
+                                        SyntaxFactory.SingletonSeparatedList(
+                                            SyntaxFactory.Argument(SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)))))));
                     }
 
                 default:
@@ -143,11 +151,11 @@
             }
         }
 
-        internal static ExpressionStatementSyntax DisposeStatement(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionStatementSyntax DisposeStatement(FieldOrProperty disposable, MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (MemberAccessContext.Create(disposable, semanticModel, cancellationToken))
+            switch (MemberAccessContext.Create(disposable, method, semanticModel, cancellationToken))
             {
-                case { NeverNull: { } neverNull }:
+                case { NotNull: { } neverNull }:
                     if (disposable.Type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
                         DisposeMethod.Find(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
                     {
@@ -268,6 +276,16 @@
                          .WithBody(SyntaxFactory.Block(statements));
         }
 
+        internal static MethodDeclarationSyntax WithAsync(this MethodDeclarationSyntax method)
+        {
+            if (method.Modifiers.Any(SyntaxKind.AsyncKeyword))
+            {
+                return method;
+            }
+
+            return method.AddModifiers(SyntaxFactory.Token(SyntaxKind.AsyncKeyword));
+        }
+
         internal static ParenthesizedExpressionSyntax AsIDisposable(ExpressionSyntax e)
         {
             return SyntaxFactory.ParenthesizedExpression(SyntaxFactory.BinaryExpression(SyntaxKind.AsExpression, e, SystemIDisposable));
@@ -278,18 +296,18 @@
             return SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(expression)));
         }
 
-        private struct MemberAccessContext
+        internal struct MemberAccessContext
         {
-            internal readonly ExpressionSyntax? NeverNull;
+            internal readonly ExpressionSyntax? NotNull;
             internal readonly ExpressionSyntax? MaybeNull;
 
-            private MemberAccessContext(ExpressionSyntax? neverNull, ExpressionSyntax? maybeNull)
+            private MemberAccessContext(ExpressionSyntax? notNull, ExpressionSyntax? maybeNull)
             {
-                this.NeverNull = neverNull;
+                this.NotNull = notNull;
                 this.MaybeNull = maybeNull;
             }
 
-            internal static MemberAccessContext Create(FieldOrProperty disposable, SemanticModel semanticModel, CancellationToken cancellationToken)
+            internal static MemberAccessContext Create(FieldOrProperty disposable, MethodDeclarationSyntax method, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
                 using (var walker = MutationWalker.For(disposable, semanticModel, cancellationToken))
                 {
@@ -310,13 +328,33 @@
 
                     if (walker.Assignments.TryFirst(out var first))
                     {
-                        return new MemberAccessContext(null, first.Left.WithoutTrivia());
+                        return Default(first.Left);
                     }
                 }
 
-                return new MemberAccessContext(
-                    null,
-                    MemberAccess(disposable, semanticModel, cancellationToken));
+                return Default(MemberAccess(disposable, semanticModel, cancellationToken));
+
+                MemberAccessContext Default(ExpressionSyntax expression)
+                {
+                    if (semanticModel.GetNullableContext(disposable.Symbol.Locations[0].SourceSpan.Start) == NullableContext.Enabled)
+                    {
+                        return semanticModel.GetSpeculativeTypeInfo(Position(), expression, SpeculativeBindingOption.BindAsExpression).Nullability.FlowState == NullableFlowState.NotNull
+                            ? new MemberAccessContext(expression, null)
+                            : new MemberAccessContext(null, expression);
+
+                        int Position()
+                        {
+                            return method switch
+                            {
+                                { Body: { } body } => body.SpanStart,
+                                { ExpressionBody: { Expression: { } expression } } => expression.SpanStart,
+                                _ => method.SpanStart,
+                            };
+                        }
+                    }
+
+                    return new MemberAccessContext(null, expression);
+                }
             }
         }
     }
