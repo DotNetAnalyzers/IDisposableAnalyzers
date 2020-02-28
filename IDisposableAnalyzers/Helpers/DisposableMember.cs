@@ -64,8 +64,6 @@
                         return true;
                     }
                 }
-
-                return false;
             }
 
             foreach (var candidate in walker.Identifiers)
