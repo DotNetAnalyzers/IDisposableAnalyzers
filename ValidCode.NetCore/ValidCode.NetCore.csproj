@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IDisposableAnalyzers" Version="3.3.0" PrivateAssets="all" />
+    <PackageReference Include="IDisposableAnalyzers" Version="3.3.1" PrivateAssets="all" />
   </ItemGroup>
 </Project>
