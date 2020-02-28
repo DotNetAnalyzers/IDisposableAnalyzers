@@ -180,7 +180,7 @@
 
             bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)
             {
-                if (DisposeCall.IsMatch(invocation, recursion.SemanticModel, recursion.CancellationToken))
+                if (DisposeCall.IsMatchAny(invocation, recursion.SemanticModel, recursion.CancellationToken))
                 {
                     return true;
                 }

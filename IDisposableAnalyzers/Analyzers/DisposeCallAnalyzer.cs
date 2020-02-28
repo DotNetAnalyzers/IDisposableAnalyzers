@@ -29,7 +29,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is InvocationExpressionSyntax invocation &&
-                DisposeCall.IsMatch(invocation, context.SemanticModel, context.CancellationToken) &&
+                DisposeCall.IsMatchAny(invocation, context.SemanticModel, context.CancellationToken) &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 DisposeCall.TryGetDisposedRootMember(invocation, context.SemanticModel, context.CancellationToken, out var root))
             {
@@ -117,7 +117,8 @@
 
         private static bool IsPreferUsing(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context)
         {
-            return local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
+            return invocation.IsSymbol(KnownSymbol.IDisposable.Dispose, context.SemanticModel, context.CancellationToken) &&
+                   local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                    declaration is VariableDeclaratorSyntax declarator &&
                    declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax? localDeclarationStatement) &&
                    invocation.TryFirstAncestor(out ExpressionStatementSyntax? expressionStatement) &&

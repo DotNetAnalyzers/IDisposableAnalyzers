@@ -11,7 +11,7 @@
         internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? disposed)
         {
             disposed = null;
-            return IsMatch(disposeCall, semanticModel, cancellationToken) &&
+            return IsMatchAny(disposeCall, semanticModel, cancellationToken) &&
                    MemberPath.TrySingle(disposeCall, out var expression) &&
                    semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
         }
@@ -71,7 +71,7 @@
             return false;
         }
 
-        internal static bool IsMatch(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsMatchAny(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
                    (candidate.IsSymbol(KnownSymbol.IDisposable.Dispose, semanticModel, cancellationToken) ||
