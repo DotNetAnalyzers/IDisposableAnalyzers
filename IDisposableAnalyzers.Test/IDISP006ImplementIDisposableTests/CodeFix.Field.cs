@@ -11,7 +11,7 @@
         {
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
             private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
 
             [Test]
             public static void ImplementIDisposableAndMakeSealed()
