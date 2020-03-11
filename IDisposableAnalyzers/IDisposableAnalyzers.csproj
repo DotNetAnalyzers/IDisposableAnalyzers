@@ -25,8 +25,7 @@
     <Version>3.3.2</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
-    <Description>BUGFIX Handle Dipatcher.Invoke
-FEATURE Handle some Winforms specific use cases.</Description>
+    <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       3.3.2
