@@ -1688,5 +1688,27 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
+
+        [Test]
+        public static void DiscardedTwice()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C
+    {
+        public void M()
+        {
+            _ = File.OpenRead(string.Empty);
+            _ = File.OpenRead(string.Empty);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
