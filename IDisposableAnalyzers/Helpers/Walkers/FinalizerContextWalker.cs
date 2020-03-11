@@ -92,7 +92,7 @@
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit(node, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var walker = BorrowAndVisit((SyntaxNode)node.Body ?? node.ExpressionBody, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
 
             foreach (var target in walker.Targets)
             {

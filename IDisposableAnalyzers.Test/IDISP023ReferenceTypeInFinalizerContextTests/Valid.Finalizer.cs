@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
+﻿namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -151,6 +151,34 @@ namespace N
         ~C()
         {
              this.Builder = null;
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, code);
+            }
+
+            [Test]
+            public static void AttributedFinalizer()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+
+    [AttributeUsage(AttributeTargets.All)]
+    public class FooAttribute : Attribute { }
+
+    public sealed class C : IDisposable
+    {
+        [Foo]
+        ~C()
+        {
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }";
