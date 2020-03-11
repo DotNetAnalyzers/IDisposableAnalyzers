@@ -22,13 +22,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.3.1</Version>
+    <Version>3.3.2</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>BUGFIX Handle Dipatcher.Invoke
 FEATURE Handle some Winforms specific use cases.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.3.2
+      BUGFIX IDISP023 don't warn on attribute.
       3.3.1
       BUGFIX IDISP017: when DisposeAsync()
       BUGFIX IDISP004 when pooled
