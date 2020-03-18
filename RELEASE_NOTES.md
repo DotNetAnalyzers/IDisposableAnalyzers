@@ -1,5 +1,5 @@
 #### 3.3.0
-* FEAUTURE: Initial support for AsyncDisposable
+* FEATURE: Initial support for AsyncDisposable
 
 #### 3.1.0
 * BUGFIX IDISP005 when local function.
