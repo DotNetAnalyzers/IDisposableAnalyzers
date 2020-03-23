@@ -18,7 +18,7 @@
     <PackageReference Include="Gu.Analyzers" Version="1.6.7-dev" PrivateAssets="all" />
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.0" />
     <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.2.10" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.13.1" />
+    <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.14.0-beta3" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.3.1" />
     <PackageReference Include="Microsoft.CodeAnalysis.FxCopAnalyzers" Version="2.9.8" PrivateAssets="all" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.5.0" />
