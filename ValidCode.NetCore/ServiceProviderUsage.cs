@@ -7,12 +7,20 @@ namespace ValidCode.NetCore
 
     public class ServiceProviderUsage
     {
+        private readonly IServiceProvider serviceProvider;
+
         public ServiceProviderUsage(IServiceProvider serviceProvider)
         {
-            var disposable = serviceProvider.GetRequiredService<Disposable>();
+            var disposable1 = serviceProvider.GetRequiredService<Disposable>();
             _ = serviceProvider.GetRequiredService<Disposable>();
-            var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();
+            var loggerFactory1 = serviceProvider.GetRequiredService<ILoggerFactory>();
             _ = serviceProvider.GetRequiredService<ILoggerFactory>();
+
+            this.serviceProvider = serviceProvider;
+            var disposable2 = this.serviceProvider.GetRequiredService<Disposable>();
+            _ = this.serviceProvider.GetRequiredService<Disposable>();
+            var loggerFactory2 = this.serviceProvider.GetRequiredService<ILoggerFactory>();
+            _ = this.serviceProvider.GetRequiredService<ILoggerFactory>();
         }
 
         public sealed class Disposable : IDisposable
