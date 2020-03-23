@@ -80,7 +80,7 @@
                 => WrappedAndIgnored(),
                 { Parent: InitializerExpressionSyntax { Parent: ExpressionSyntax creation } }
                 => Ignores(creation, recursion),
-                _ => false
+                _ => false,
             };
 
             bool WrappedAndIgnored()

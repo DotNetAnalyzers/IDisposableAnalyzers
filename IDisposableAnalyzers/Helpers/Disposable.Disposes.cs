@@ -175,7 +175,7 @@
                 when recursion.Target(argument) is { } target
                 => DisposedByReturnValue(target, recursion, out var wrapper) &&
                    Disposes(wrapper, recursion),
-                _ => false
+                _ => false,
             };
 
             bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)

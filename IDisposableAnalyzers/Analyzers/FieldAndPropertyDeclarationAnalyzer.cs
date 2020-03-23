@@ -131,7 +131,7 @@
                     Accessibility.ProtectedOrInternal => true,
                     Accessibility.ProtectedAndInternal => true,
                     Accessibility.Public => true,
-                    _ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, "Unhandled accessibility")
+                    _ => throw new ArgumentOutOfRangeException(nameof(accessibility), accessibility, "Unhandled accessibility"),
                 };
             }
         }
