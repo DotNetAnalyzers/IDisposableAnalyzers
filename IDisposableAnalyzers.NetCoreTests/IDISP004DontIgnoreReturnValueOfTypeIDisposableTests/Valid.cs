@@ -100,5 +100,39 @@ namespace N
 }".AssertReplace("var disposable = serviceProvider.GetRequiredService<Disposable>();", statement);
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [TestCase("var disposable = this.serviceProvider.GetRequiredService<Disposable>();")]
+        [TestCase("_ = this.serviceProvider.GetRequiredService<Disposable>();")]
+        [TestCase("var loggerFactory = this.serviceProvider.GetRequiredService<ILoggerFactory>();")]
+        [TestCase("_ = this.serviceProvider.GetRequiredService<ILoggerFactory>();")]
+        public static void IServiceProviderGetRequiredServiceField(string statement)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Logging;
+
+    public class C
+    {
+        private readonly IServiceProvider serviceProvider;
+
+        public C(IServiceProvider serviceProvider)
+        {
+            this.serviceProvider = serviceProvider;
+            var disposable = this.serviceProvider.GetRequiredService<Disposable>();
+        }
+
+        public sealed class Disposable : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+}".AssertReplace("var disposable = this.serviceProvider.GetRequiredService<Disposable>();", statement);
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
