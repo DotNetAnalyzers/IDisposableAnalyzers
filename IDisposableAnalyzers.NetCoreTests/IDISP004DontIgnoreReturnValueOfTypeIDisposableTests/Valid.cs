@@ -10,6 +10,43 @@ namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeI
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
         [Test]
+        public static void AwaitUsing()
+        {
+            var asyncDisposable = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class AsyncDisposable : IAsyncDisposable
+    {
+        private readonly IAsyncDisposable disposable = File.OpenRead(string.Empty);
+
+        public async ValueTask DisposeAsync()
+        {
+            await this.disposable.DisposeAsync().ConfigureAwait(false);
+        }
+    }
+}";
+            var code = @"
+namespace N
+{
+    using System.Threading.Tasks;
+
+    class C
+    {
+        public async Task M()
+        {
+            await using var asyncDisposable = new AsyncDisposable();
+        }
+    }
+}
+";
+            RoslynAssert.Valid(Analyzer, asyncDisposable, code);
+        }
+
+        [Test]
         public static void ILoggerFactoryAddApplicationInsights()
         {
             var code = @"
