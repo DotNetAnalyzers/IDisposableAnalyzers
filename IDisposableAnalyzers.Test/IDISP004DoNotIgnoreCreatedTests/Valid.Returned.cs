@@ -475,5 +475,26 @@ namespace N
 }".AssertReplace("new CompositeDisposable(File.OpenRead(fileName))", expression);
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void YieldReturnFileOpenRead()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+
+    class C
+    {
+        IEnumerable<IDisposable> M()
+        {
+            yield return File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

@@ -49,6 +49,8 @@
             {
                 { Parent: ReturnStatementSyntax _ }
                 => true,
+                { Parent: YieldStatementSyntax _ }
+                => true,
                 { Parent: ArrowExpressionClauseSyntax { Parent: { } parent } }
                 => !parent.IsKind(SyntaxKind.ConstructorDeclaration),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
