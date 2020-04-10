@@ -16,8 +16,6 @@ Call SuppressFinalize as there is a virtual dispose method.
 ## Motivation
 
 Call SuppressFinalize(this) as the type has a virtual dispose method.
-In case subclasses add finalizers.
-
 
 ## How to fix violations
 
