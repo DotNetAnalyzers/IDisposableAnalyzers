@@ -156,5 +156,28 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void GenericOut()
+        {
+            var code = @"
+namespace N
+{
+    public sealed class C
+    {
+        public T M<T>(out T t)
+        {
+            return M(0, out t);
+        }
+
+        public T M<T>(int _, out T t)
+        {
+            t = default;
+            return default;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

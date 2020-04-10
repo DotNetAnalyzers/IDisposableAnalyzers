@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -15,8 +16,8 @@
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
         private readonly MemberWalkers memberWalkers = new MemberWalkers();
-        private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
-        private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(SymbolComparer.Default);
+        private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(ParameterSymbolComparer.Default);
+        private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(ParameterSymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
         private readonly CtorArgWalker ctorArgWalker;
 
@@ -711,7 +712,7 @@
             }
         }
 
-        private struct Context
+        private readonly struct Context
         {
             internal readonly SyntaxNode Node;
             private readonly StatementSyntax? stopAt;

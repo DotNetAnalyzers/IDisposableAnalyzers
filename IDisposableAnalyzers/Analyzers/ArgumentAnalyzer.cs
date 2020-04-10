@@ -47,8 +47,7 @@
 
         private static bool IsCreation(ArgumentSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate.Parent is ArgumentListSyntax argumentList &&
-                argumentList.Parent is InvocationExpressionSyntax invocation &&
+            if (candidate.Parent is ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } &&
                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
                 method.TryFindParameter(candidate, out var parameter) &&
                 Disposable.IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))

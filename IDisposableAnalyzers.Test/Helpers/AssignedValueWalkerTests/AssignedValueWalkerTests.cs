@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -42,6 +42,34 @@ namespace N
             using var assignedValues = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
             var actual = string.Join(", ", assignedValues);
             Assert.AreEqual(expected, actual);
+        }
+
+        [Test]
+        public static void GenericOut()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    public sealed class C
+    {
+        public T M<T>(out T t1)
+        {
+            return M(0, out t1);
+        }
+
+        public T M<T>(int _, out T t2)
+        {
+            t2 = default;
+            return default;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var argument = syntaxTree.FindArgument("t1");
+            using var assignedValues = AssignedValueWalker.Borrow(argument.Expression, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", assignedValues);
+            Assert.AreEqual("default", actual);
         }
     }
 }
