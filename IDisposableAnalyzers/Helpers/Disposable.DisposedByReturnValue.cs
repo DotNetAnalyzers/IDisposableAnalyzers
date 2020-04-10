@@ -72,6 +72,7 @@
                             constructor.ContainingType == KnownSymbol.StreamWriter ||
                             constructor.ContainingType == KnownSymbol.CryptoStream ||
                             constructor.ContainingType == KnownSymbol.DeflateStream ||
+                            constructor.ContainingType == KnownSymbol.Attachment ||
                             constructor.ContainingType == KnownSymbol.GZipStream ||
                             constructor.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
                         {

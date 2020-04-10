@@ -706,6 +706,7 @@ namespace N
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest)", true)]
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest, leaveOpen: true)", false)]
             [TestCase("new GZipStream(stream, CompressionLevel.Fastest, leaveOpen: false)", true)]
+            [TestCase("new System.Net.Mail.Attachment(stream, string.Empty)", true)]
             public static void InLeaveOpen(string expression, bool stores)
             {
                 var code = @"

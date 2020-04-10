@@ -7,6 +7,7 @@
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Linq.Observable))]
 [assembly: MetadataReferences(
     typeof(System.Net.WebClient),
+    typeof(System.Net.Mail.Attachment),
     typeof(System.Data.Common.DbConnection),
     typeof(System.Threading.Tasks.ValueTask),
     typeof(System.Xml.Serialization.XmlSerializer),

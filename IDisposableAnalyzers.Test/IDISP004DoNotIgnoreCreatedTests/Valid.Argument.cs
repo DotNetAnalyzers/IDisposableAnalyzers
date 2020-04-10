@@ -259,6 +259,27 @@ namespace N
             RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
         }
 
+        [TestCase("new StreamReader(File.OpenRead(fileName))")]
+        [TestCase("new StreamReader(File.OpenRead(fileName), new System.Text.UTF8Encoding(), true, 1024, leaveOpen: false)")]
+        [TestCase("new System.Net.Mail.Attachment(File.OpenRead(fileName), string.Empty)")]
+        public static void LeaveOpenFalse(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public class C
+    {
+        public void M(string fileName)
+        {
+            using var reader = new StreamReader(File.OpenRead(fileName));
+        }
+    }
+}".AssertReplace("new StreamReader(File.OpenRead(fileName))", expression);
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
         [Test]
         public static void UsingStreamInStreamReader()
         {

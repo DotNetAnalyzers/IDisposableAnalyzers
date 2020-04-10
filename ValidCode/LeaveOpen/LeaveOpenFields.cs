@@ -1,4 +1,4 @@
-namespace ValidCode.LeaveOpen
+﻿namespace ValidCode.LeaveOpen
 {
     using System;
     using System.IO;
@@ -12,7 +12,7 @@ namespace ValidCode.LeaveOpen
         public LeaveOpenFields(string fileName)
         {
             this.stream = File.OpenRead(fileName);
-            this.reader = new StreamReader(stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
+            this.reader = new StreamReader(this.stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
         }
 
         public string ReadLine() => this.reader.ReadLine();

@@ -19,6 +19,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType DeflateStream = Create("System.IO.Compression.DeflateStream");
         internal static readonly QualifiedType GZipStream = Create("System.IO.Compression.GZipStream");
         internal static readonly QualifiedType StreamMemoryBlockProvider = Create("System.Reflection.Internal.StreamMemoryBlockProvider");
+        internal static readonly QualifiedType Attachment = Create("System.Net.Mail.Attachment");
 
         internal static readonly TupleType Tuple = new TupleType();
         internal static readonly IDisposableType IDisposable = new IDisposableType();
