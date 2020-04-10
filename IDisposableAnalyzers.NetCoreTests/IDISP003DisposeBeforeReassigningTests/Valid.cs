@@ -39,5 +39,28 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void NullableAnnotated()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    class C
+    {
+        private IDisposable? _disposable;
+
+        void M()
+        {
+            _disposable!.Dispose();
+            _disposable = File.OpenRead(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
