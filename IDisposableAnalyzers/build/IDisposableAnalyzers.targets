@@ -1,0 +1,13 @@
+<Project>
+
+  <PropertyGroup>
+    <OwnershipAttributesPath Condition="'$(OwnershipAttributesPath)' == ''">$(MSBuildThisFileDirectory)OwnershipAttributes$(DefaultLanguageSourceExtension)</OwnershipAttributesPath>
+
+    <IncludeOwnershipAttributes Condition="'$(IncludeOwnershipAttributes)' == '' and Exists($(OwnershipAttributesPath))">true</IncludeOwnershipAttributes>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(IncludeOwnershipAttributes)' == 'true'">
+    <Compile Include="$(OwnershipAttributesPath)" Visible="false" />
+  </ItemGroup>
+
+</Project>

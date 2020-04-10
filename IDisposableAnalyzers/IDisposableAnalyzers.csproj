@@ -66,7 +66,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="tools\*" Pack="true" PackagePath="" />
+    <None Update="tools\*;build\*" Pack="true" PackagePath="" />
+    <Compile Remove="build\*.cs" />
+    <None Include="build\*.cs" Pack="true" PackagePath="build" />
+
     <None Include="$(OutputPath)\$(AssemblyName).dll;$(OutputPath)\Gu.Roslyn.Extensions.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
 </Project>
