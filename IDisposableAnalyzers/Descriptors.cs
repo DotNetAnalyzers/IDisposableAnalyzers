@@ -126,7 +126,7 @@
             title: "Use a single instance of HttpClient.",
             messageFormat: "Use a single instance of HttpClient.",
             category: AnalyzerCategory.Correctness,
-            defaultSeverity: DiagnosticSeverity.Warning,
+            defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
             description: "Use a single instance of HttpClient.");
 
