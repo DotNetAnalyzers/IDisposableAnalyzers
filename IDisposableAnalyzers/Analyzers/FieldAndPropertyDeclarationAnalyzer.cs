@@ -60,7 +60,7 @@
                 }
                 else if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
                 {
-                    switch (InitializeAndCleanup.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken))
+                    switch (InitializeAndCleanup.FindCleanup(setupAttribute!, context.SemanticModel, context.CancellationToken))
                     {
                         case { } tearDown
                             when !DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken):

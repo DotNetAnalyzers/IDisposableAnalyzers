@@ -17,7 +17,8 @@
                 var cleanup = FindCleanup(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
                               FindCleanup(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
                               FindCleanup(KnownSymbol.TestInitializeAttribute, KnownSymbol.TestCleanupAttribute) ??
-                              FindCleanup(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute);
+                              FindCleanup(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute) ??
+                    FindStopAsync();
                 return cleanup is { } &&
                        DisposableMember.IsDisposed(fieldOrProperty, cleanup, semanticModel, cancellationToken);
             }
@@ -35,6 +36,16 @@
                 }
 
                 return null;
+            }
+
+            IMethodSymbol? FindStopAsync()
+            {
+                return fieldOrProperty.ContainingType.IsAssignableTo(KnownSymbol.IHostedService, semanticModel.Compilation) &&
+                       methodDeclaration is { Identifier: { ValueText: "StartAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                       parameters[0].Type == KnownSymbol.CancellationToken &&
+                       fieldOrProperty.ContainingType.TryFindFirstMethod("StopAsync", x => x == KnownSymbol.IHostedService.StopAsync, out var stopAsync)
+                    ? stopAsync
+                    : null;
             }
         }
 
@@ -58,7 +69,7 @@
             return false;
         }
 
-        internal static MethodDeclarationSyntax? FindTearDown(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MethodDeclarationSyntax? FindCleanup(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var typeDeclarationSyntax = setupAttribute.FirstAncestor<TypeDeclarationSyntax>();
             if (typeDeclarationSyntax is null)
@@ -66,7 +77,7 @@
                 return null;
             }
 
-            if (TearDown(semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type) is { } tearDownAttributeType)
+            if (TearDownAttribute(semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type) is { } tearDownAttributeType)
             {
                 foreach (var member in typeDeclarationSyntax.Members)
                 {
@@ -82,7 +93,7 @@
 
             return null;
 
-            static QualifiedType? TearDown(ITypeSymbol? initialize)
+            static QualifiedType? TearDownAttribute(ITypeSymbol? initialize)
             {
                 if (initialize is null)
                 {

@@ -62,5 +62,37 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void IHostedService()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+
+    class C : IHostedService
+    {
+        private IDisposable? disposable;
+
+        public Task StartAsync(CancellationToken token)
+        {
+            this.disposable = File.OpenRead(string.Empty);
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken token)
+        {
+            this.disposable.Dispose();
+            return Task.CompletedTask;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

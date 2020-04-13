@@ -41,7 +41,7 @@
                     InitializeAndCleanup.IsAssignedInInitialize(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
                     assignment is { Left: { } left })
                 {
-                    if (InitializeAndCleanup.FindTearDown(setupAttribute, semanticModel, context.CancellationToken) is { } tearDown)
+                    if (InitializeAndCleanup.FindCleanup(setupAttribute, semanticModel, context.CancellationToken) is { } tearDown)
                     {
                         switch (tearDown)
                         {

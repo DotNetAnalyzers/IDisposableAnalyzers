@@ -47,7 +47,6 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ImmutableSortedDictionaryOfTKeyTValue = Create("System.Collections.Immutable.ImmutableSortedDictionary`2");
 
         internal static readonly ResourceManagerType ResourceManager = new ResourceManagerType();
-
         internal static readonly QualifiedType RegistryKey = new QualifiedType("Microsoft.Win32.RegistryKey");
         internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
         internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
@@ -56,6 +55,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
         internal static readonly TaskType Task = new TaskType();
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
+        internal static readonly QualifiedType CancellationToken = new QualifiedType("System.Threading.CancellationToken");
         internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
         internal static readonly QualifiedType HttpMessageHandler = new QualifiedType("System.Net.Http.HttpMessageHandler");
@@ -83,6 +83,7 @@ namespace IDisposableAnalyzers
 
         internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
         internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
+        internal static readonly IHostedServiceType IHostedService = new IHostedServiceType();
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
