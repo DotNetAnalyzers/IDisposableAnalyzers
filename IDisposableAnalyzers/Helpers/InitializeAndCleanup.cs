@@ -47,41 +47,59 @@
             }
         }
 
-        internal static bool IsAssignedInInitialize(FieldOrPropertyAndDeclaration fieldOrProperty, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
+        internal static bool IsAssignedInInitialize(FieldOrPropertyAndDeclaration fieldOrProperty, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out MethodDeclarationSyntax? initialize)
         {
-            return IsAssignedInInitialize(fieldOrProperty.FieldOrProperty, (TypeDeclarationSyntax)fieldOrProperty.Declaration.Parent, semanticModel, cancellationToken, out assignment, out attribute);
+            return IsAssignedInInitialize(fieldOrProperty.FieldOrProperty, (TypeDeclarationSyntax)fieldOrProperty.Declaration.Parent, semanticModel, cancellationToken, out assignment, out initialize);
         }
 
-        internal static bool IsAssignedInInitialize(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out AttributeSyntax? attribute)
+        internal static bool IsAssignedInInitialize(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out AssignmentExpressionSyntax? assignment, [NotNullWhen(true)] out MethodDeclarationSyntax? initialize)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
-                return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out attribute) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.TestInitializeAttribute, semanticModel, cancellationToken, out attribute) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.ClassInitializeAttribute, semanticModel, cancellationToken, out attribute);
+                initialize = methodDeclaration;
+                return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.TestInitializeAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbol.ClassInitializeAttribute, semanticModel, cancellationToken, out _) ||
+                       IsStartAsync(methodDeclaration, semanticModel, cancellationToken);
             }
 
-            attribute = null;
+            initialize = null;
             return false;
         }
 
-        internal static MethodDeclarationSyntax? FindCleanup(AttributeSyntax setupAttribute, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static MethodDeclarationSyntax? FindCleanup(MethodDeclarationSyntax initialize, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var typeDeclarationSyntax = setupAttribute.FirstAncestor<TypeDeclarationSyntax>();
-            if (typeDeclarationSyntax is null)
+            if (initialize.FirstAncestor<TypeDeclarationSyntax>() is { } typeDeclarationSyntax)
             {
-                return null;
-            }
-
-            if (TearDownAttribute(semanticModel.GetTypeInfoSafe(setupAttribute, cancellationToken).Type) is { } tearDownAttributeType)
-            {
-                foreach (var member in typeDeclarationSyntax.Members)
+                foreach (var attributeList in initialize.AttributeLists)
                 {
-                    if (member is MethodDeclarationSyntax methodDeclaration)
+                    foreach (var attribute in attributeList.Attributes)
                     {
-                        if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
+                        if (TearDownAttribute(semanticModel.GetTypeInfoSafe(attribute, cancellationToken).Type) is { } tearDownAttributeType)
+                        {
+                            foreach (var member in typeDeclarationSyntax.Members)
+                            {
+                                if (member is MethodDeclarationSyntax methodDeclaration)
+                                {
+                                    if (Attribute.TryFind(methodDeclaration, tearDownAttributeType, semanticModel, cancellationToken, out _))
+                                    {
+                                        return methodDeclaration;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (IsStartAsync(initialize, semanticModel, cancellationToken))
+                {
+                    foreach (var member in typeDeclarationSyntax.Members)
+                    {
+                        if (member is MethodDeclarationSyntax methodDeclaration &&
+                            methodDeclaration is { Identifier: { ValueText: "StopAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                            parameters[0].Type == KnownSymbol.CancellationToken)
                         {
                             return methodDeclaration;
                         }
@@ -91,29 +109,29 @@
 
             return null;
 
-            static QualifiedType? TearDownAttribute(ITypeSymbol? initialize)
+            static QualifiedType? TearDownAttribute(ITypeSymbol? initializeAttribute)
             {
-                if (initialize is null)
+                if (initializeAttribute is null)
                 {
                     return null;
                 }
 
-                if (initialize == KnownSymbol.NUnitSetUpAttribute)
+                if (initializeAttribute == KnownSymbol.NUnitSetUpAttribute)
                 {
                     return KnownSymbol.NUnitTearDownAttribute;
                 }
 
-                if (initialize == KnownSymbol.NUnitOneTimeSetUpAttribute)
+                if (initializeAttribute == KnownSymbol.NUnitOneTimeSetUpAttribute)
                 {
                     return KnownSymbol.NUnitOneTimeTearDownAttribute;
                 }
 
-                if (initialize == KnownSymbol.TestInitializeAttribute)
+                if (initializeAttribute == KnownSymbol.TestInitializeAttribute)
                 {
                     return KnownSymbol.TestCleanupAttribute;
                 }
 
-                if (initialize == KnownSymbol.ClassInitializeAttribute)
+                if (initializeAttribute == KnownSymbol.ClassInitializeAttribute)
                 {
                     return KnownSymbol.ClassCleanupAttribute;
                 }

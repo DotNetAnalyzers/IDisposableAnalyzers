@@ -58,21 +58,22 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
-                else if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
+                else if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var initialize))
                 {
-                    switch (InitializeAndCleanup.FindCleanup(setupAttribute!, context.SemanticModel, context.CancellationToken))
+                    if (InitializeAndCleanup.FindCleanup(initialize, context.SemanticModel, context.CancellationToken) is { } cleanup)
                     {
-                        case { } tearDown
-                            when !DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken):
+                        if (!DisposableMember.IsDisposed(member.FieldOrProperty, cleanup, context.SemanticModel, context.CancellationToken))
+                        {
                             context.ReportDiagnostic(
                                 Diagnostic.Create(
                                     Descriptors.IDISP002DisposeMember,
                                     context.Node.GetLocation(),
-                                    additionalLocations: new[] { tearDown.GetLocation() }));
-                            break;
-                        case null:
-                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
-                            break;
+                                    additionalLocations: new[] { cleanup.GetLocation() }));
+                        }
+                    }
+                    else
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
                     }
                 }
                 else

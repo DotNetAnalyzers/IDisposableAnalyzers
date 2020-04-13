@@ -38,53 +38,66 @@
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? memberSymbol) &&
                     FieldOrProperty.TryCreate(memberSymbol, out var fieldOrProperty) &&
                     member.FirstAncestor<ClassDeclarationSyntax>() is { } classDeclaration &&
-                    InitializeAndCleanup.IsAssignedInInitialize(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var setupAttribute) &&
+                    InitializeAndCleanup.IsAssignedInInitialize(fieldOrProperty, classDeclaration, semanticModel, context.CancellationToken, out var assignment, out var initialize) &&
                     assignment is { Left: { } left })
                 {
-                    if (InitializeAndCleanup.FindCleanup(setupAttribute, semanticModel, context.CancellationToken) is { } tearDown)
+                    if (InitializeAndCleanup.FindCleanup(initialize, semanticModel, context.CancellationToken) is { } cleanup)
                     {
-                        switch (tearDown)
+                        switch (cleanup)
                         {
                             case { Body: { } body }:
                                 context.RegisterCodeFix(
-                                    $"Dispose member in {tearDown.Identifier.ValueText}.",
+                                    $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     (editor, cancellationToken) => editor.ReplaceNode(
                                         body,
                                         x => x.AddStatements(IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
-                                    $"Dispose member in {tearDown.Identifier.ValueText}.",
+                                    $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     diagnostic);
                                 break;
                             case { ExpressionBody: { Expression: { } expression } }:
                                 context.RegisterCodeFix(
-                                    $"Dispose member in {tearDown.Identifier.ValueText}.",
+                                    $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     (editor, cancellationToken) => editor.ReplaceNode(
-                                        tearDown,
+                                        cleanup,
                                         x => x.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
                                             IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
-                                    $"Dispose member in {tearDown.Identifier.ValueText}.",
+                                    $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     diagnostic);
                                 break;
                         }
                     }
-                    else if (setupAttribute.TryFirstAncestor<MethodDeclarationSyntax>(out var setupMethod))
+                    else if (TearDown() is { } tearDown)
                     {
-                        tearDown = semanticModel.GetTypeInfoSafe(setupAttribute, context.CancellationToken).Type == KnownSymbol.NUnitSetUpAttribute
-                            ? TearDownMethod
-                            : OneTimeTearDownMethod;
-
-                        if (setupMethod.Modifiers.Any(SyntaxKind.StaticKeyword))
-                        {
-                            tearDown = tearDown.AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword));
-                        }
-
                         context.RegisterCodeFix(
                             $"Create {tearDown.Identifier.ValueText} method and dispose member.",
                             (editor, cancellationToken) => editor.InsertAfter(
-                                setupMethod,
+                                initialize,
                                 tearDown.AddBodyStatements(IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),
                             $"Create",
                             diagnostic);
+                    }
+
+                    MethodDeclarationSyntax? TearDown()
+                    {
+                        if (Attribute.TryFind(initialize!, KnownSymbol.NUnitSetUpAttribute, semanticModel, context.CancellationToken, out _))
+                        {
+                            return AdjustStatic(TearDownMethod);
+                        }
+
+                        if (Attribute.TryFind(initialize!, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, context.CancellationToken, out _))
+                        {
+                            return AdjustStatic(OneTimeTearDownMethod);
+                        }
+
+                        return null;
+
+                        MethodDeclarationSyntax AdjustStatic(MethodDeclarationSyntax method)
+                        {
+                            return initialize!.Modifiers.Any(SyntaxKind.StaticKeyword)
+                                ? method.AddModifiers(SyntaxFactory.Token(SyntaxKind.StaticKeyword))
+                                : method;
+                        }
                     }
                 }
 

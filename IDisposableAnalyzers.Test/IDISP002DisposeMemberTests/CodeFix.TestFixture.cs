@@ -14,7 +14,7 @@
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
             [Test]
-            public static void AssigningFieldInSetUp()
+            public static void AssigningFieldInSetUpWhenNoTearDown()
             {
                 var before = @"
 namespace N
