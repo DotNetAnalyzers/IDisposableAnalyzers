@@ -7,29 +7,24 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class TestFixture
+    internal static class InitializeAndCleanup
     {
-        internal static bool IsAssignedInInitializeAndDisposedInCleanup(FieldOrPropertyAndDeclaration fieldOrProperty, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return IsAssignedInInitializeAndDisposedInCleanup(fieldOrProperty.FieldOrProperty, (TypeDeclarationSyntax)fieldOrProperty.Declaration.Parent, semanticModel, cancellationToken);
-        }
-
-        internal static bool IsAssignedInInitializeAndDisposedInCleanup(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedAndDisposed(FieldOrProperty fieldOrProperty, TypeDeclarationSyntax scope, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
-                var cleanup = TearDown(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
-                              TearDown(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
-                              TearDown(KnownSymbol.TestInitializeAttribute, KnownSymbol.TestCleanupAttribute) ??
-                              TearDown(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute);
+                var cleanup = FindCleanup(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
+                              FindCleanup(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
+                              FindCleanup(KnownSymbol.TestInitializeAttribute, KnownSymbol.TestCleanupAttribute) ??
+                              FindCleanup(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute);
                 return cleanup is { } &&
                        DisposableMember.IsDisposed(fieldOrProperty, cleanup, semanticModel, cancellationToken);
             }
 
             return false;
 
-            IMethodSymbol? TearDown(QualifiedType initialize, QualifiedType cleanup)
+            IMethodSymbol? FindCleanup(QualifiedType initialize, QualifiedType cleanup)
             {
                 if (Attribute.TryFind(methodDeclaration, initialize, semanticModel, cancellationToken, out _))
                 {

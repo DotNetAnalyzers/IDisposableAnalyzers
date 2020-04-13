@@ -82,7 +82,7 @@
             if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty))
             {
                 if (context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
-                    TestFixture.IsAssignedInInitializeAndDisposedInCleanup(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
+                    InitializeAndCleanup.IsAssignedAndDisposed(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
                 {
                     return false;
                 }

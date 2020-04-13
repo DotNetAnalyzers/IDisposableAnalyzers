@@ -58,9 +58,9 @@
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
-                else if (TestFixture.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
+                else if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var setupAttribute))
                 {
-                    switch (TestFixture.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken))
+                    switch (InitializeAndCleanup.FindTearDown(setupAttribute!, context.SemanticModel, context.CancellationToken))
                     {
                         case { } tearDown
                             when !DisposableMember.IsDisposed(member.FieldOrProperty, tearDown, context.SemanticModel, context.CancellationToken):
