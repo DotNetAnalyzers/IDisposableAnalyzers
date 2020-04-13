@@ -40,9 +40,7 @@
 
             IMethodSymbol? FindStopAsync()
             {
-                return fieldOrProperty.ContainingType.IsAssignableTo(KnownSymbol.IHostedService, semanticModel.Compilation) &&
-                       methodDeclaration is { Identifier: { ValueText: "StartAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
-                       parameters[0].Type == KnownSymbol.CancellationToken &&
+                return IsStartAsync(methodDeclaration, semanticModel, cancellationToken) &&
                        fieldOrProperty.ContainingType.TryFindFirstMethod("StopAsync", x => x == KnownSymbol.IHostedService.StopAsync, out var stopAsync)
                     ? stopAsync
                     : null;
@@ -122,6 +120,14 @@
 
                 return null;
             }
+        }
+
+        private static bool IsStartAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return methodDeclaration is { Identifier: { ValueText: "StartAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                   parameters[0].Type == KnownSymbol.CancellationToken &&
+                   semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
+                   method == KnownSymbol.IHostedService.StartAsync;
         }
     }
 }
