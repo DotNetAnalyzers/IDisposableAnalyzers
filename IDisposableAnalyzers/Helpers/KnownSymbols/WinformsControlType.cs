@@ -9,7 +9,7 @@
         internal WinformsControlType()
             : base("System.Windows.Forms.Control")
         {
-            this.Show = new QualifiedMethod(this, "Show");
+            this.Show = new QualifiedMethod(this, nameof(this.Show));
         }
     }
 }

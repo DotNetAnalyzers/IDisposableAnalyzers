@@ -71,7 +71,7 @@ namespace IDisposableAnalyzers
         internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
         internal static readonly QualifiedType SystemWindowsFormsForm = new QualifiedType("System.Windows.Forms.Form");
         internal static readonly WinformsControlType SystemWindowsFormsControl = new WinformsControlType();
-
+        internal static readonly HostingAbstractionsHostExtensionsType HostingAbstractionsHostExtensions = new HostingAbstractionsHostExtensionsType();
         internal static readonly QualifiedType NUnitSetUpAttribute = new QualifiedType("NUnit.Framework.SetUpAttribute");
         internal static readonly QualifiedType NUnitTearDownAttribute = new QualifiedType("NUnit.Framework.TearDownAttribute");
         internal static readonly QualifiedType NUnitOneTimeSetUpAttribute = new QualifiedType("NUnit.Framework.OneTimeSetUpAttribute");

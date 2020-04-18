@@ -154,6 +154,12 @@
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                 when invocation.IsSymbol(KnownSymbol.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken)
                 => true, // disposed by form.Close()
+                { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "Run" } }, Parent: InvocationExpressionSyntax invocation } }
+                when invocation.IsSymbol(KnownSymbol.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
+                => true,
+                { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "RunAsync" } }, Parent: InvocationExpressionSyntax invocation } }
+                when invocation.IsSymbol(KnownSymbol.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
+                => true,
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: ConditionalAccessExpressionSyntax parent }

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.NetCoreTests.Helpers
+﻿namespace IDisposableAnalyzers.NetCoreTests.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;

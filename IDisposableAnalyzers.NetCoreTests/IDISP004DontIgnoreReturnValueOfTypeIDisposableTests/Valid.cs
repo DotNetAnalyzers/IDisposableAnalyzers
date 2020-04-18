@@ -134,5 +134,44 @@ namespace N
 }".AssertReplace("var disposable = this.serviceProvider.GetRequiredService<Disposable>();", statement);
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void HostBuildRun()
+        {
+            var code = @"
+namespace N
+{
+    using Microsoft.Extensions.Hosting;
+
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            Host.CreateDefaultBuilder(args).Build().Run();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void HostBuildRunAsync()
+        {
+            var code = @"
+namespace N
+{
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+
+    public class Program
+    {
+        public static async Task Main(string[] args)
+        {
+            await Host.CreateDefaultBuilder(args).Build().RunAsync();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
