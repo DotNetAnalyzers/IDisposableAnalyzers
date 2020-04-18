@@ -18,6 +18,14 @@ namespace ValidCode
             {
             }
 
+            using (await CreateDisposableValueAsync())
+            {
+            }
+
+            using (var disposable = await CreateDisposableValueAsync())
+            {
+            }
+
             using (await Task.FromResult(new Disposable()))
             {
             }
@@ -109,6 +117,12 @@ namespace ValidCode
         }
 
         private static async Task<IDisposable> CreateDisposableAsync()
+        {
+            await Task.Delay(0).ConfigureAwait(false);
+            return new Disposable();
+        }
+
+        private static async ValueTask<IDisposable> CreateDisposableValueAsync()
         {
             await Task.Delay(0).ConfigureAwait(false);
             return new Disposable();
