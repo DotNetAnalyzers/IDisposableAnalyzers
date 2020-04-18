@@ -22,7 +22,7 @@ namespace N
 }";
 
         [Test]
-        public static void WhenCallingBaseDispose()
+        public static void WhenCallingBaseDisposeDisposing()
         {
             var baseClass = @"
 namespace N
@@ -64,6 +64,48 @@ namespace N
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, baseClass, code);
+        }
+
+        [Test]
+        public static void WhenCallingOverriddenDispose()
+        {
+            var baseClass = @"
+namespace N
+{
+    using System;
+
+    public abstract class BaseClass : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable.Dispose();
+            GC.SuppressFinalize(this);
+        }
+    }
+}";
+            var code = @"
+namespace N
+{
+    public class C : BaseClass
+    {
+        public override void Dispose()
+        {
+            base.Dispose();
         }
     }
 }";

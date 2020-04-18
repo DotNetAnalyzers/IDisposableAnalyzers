@@ -25,26 +25,44 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax disposeMethod &&
-                    disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: BlockSyntax body } &&
-                    parameters.TrySingle(out var parameter))
+                if (syntaxRoot.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax { Body: BlockSyntax body } disposeMethod)
                 {
-                    context.RegisterCodeFix(
-                        $"base.Dispose({parameter.Identifier.ValueText})",
-                        (e, _) => e.ReplaceNode(
-                            body,
-                            x => x.AddStatements(
-                                SyntaxFactory.ExpressionStatement(
-                                    SyntaxFactory.InvocationExpression(
-                                        SyntaxFactory.MemberAccessExpression(
-                                            SyntaxKind.SimpleMemberAccessExpression,
-                                            SyntaxFactory.BaseExpression(),
-                                            SyntaxFactory.IdentifierName(disposeMethod.Identifier)),
-                                        SyntaxFactory.ArgumentList(
-                                            SyntaxFactory.SingletonSeparatedList(
-                                                SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))))),
-                        "base.Dispose()",
-                        diagnostic);
+                    if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                        parameters.TrySingle(out var parameter))
+                    {
+                        context.RegisterCodeFix(
+                            $"base.Dispose({parameter.Identifier.ValueText})",
+                            (e, _) => e.ReplaceNode(
+                                body,
+                                x => x.AddStatements(
+                                    SyntaxFactory.ExpressionStatement(
+                                        SyntaxFactory.InvocationExpression(
+                                            SyntaxFactory.MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                SyntaxFactory.BaseExpression(),
+                                                SyntaxFactory.IdentifierName(disposeMethod.Identifier)),
+                                            SyntaxFactory.ArgumentList(
+                                                SyntaxFactory.SingletonSeparatedList(
+                                                    SyntaxFactory.Argument(SyntaxFactory.IdentifierName(parameter.Identifier)))))))),
+                            "base.Dispose()",
+                            diagnostic);
+                    }
+                    else if (disposeMethod is { ParameterList: { Parameters: { Count: 0 } } })
+                    {
+                        context.RegisterCodeFix(
+                            "base.Dispose()",
+                            (e, _) => e.ReplaceNode(
+                                body,
+                                x => x.AddStatements(
+                                    SyntaxFactory.ExpressionStatement(
+                                        SyntaxFactory.InvocationExpression(
+                                            SyntaxFactory.MemberAccessExpression(
+                                                SyntaxKind.SimpleMemberAccessExpression,
+                                                SyntaxFactory.BaseExpression(),
+                                                SyntaxFactory.IdentifierName(disposeMethod.Identifier)))))),
+                            "base.Dispose()",
+                            diagnostic);
+                    }
                 }
             }
         }

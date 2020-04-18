@@ -126,5 +126,60 @@ namespace N
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
         }
+
+        [Test]
+        public static void WhenNotCallingOverriddenDispose()
+        {
+            var baseClass = @"
+namespace N
+{
+    using System;
+
+    public abstract class BaseClass : IDisposable
+    {
+        private readonly IDisposable disposable = new Disposable();
+        private bool disposed;
+
+        /// <inheritdoc/>
+        public virtual void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable.Dispose();
+            GC.SuppressFinalize(this);
+        }
+    }
+}";
+
+            var before = @"
+namespace N
+{
+    public class C : BaseClass
+    {
+        public override void ↓Dispose()
+        {
+        }
+    }
+}";
+
+            var after = @"
+namespace N
+{
+    public class C : BaseClass
+    {
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+        }
     }
 }

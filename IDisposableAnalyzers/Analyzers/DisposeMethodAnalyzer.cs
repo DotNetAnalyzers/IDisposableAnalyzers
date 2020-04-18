@@ -33,13 +33,18 @@
                 context.ContainingSymbol is IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method &&
                 context.Node is MethodDeclarationSyntax methodDeclaration)
             {
-                if (method is { DeclaredAccessibility: Accessibility.Public, OverriddenMethod: null, Parameters: { Length: 0 } } &&
+                if (method is { DeclaredAccessibility: Accessibility.Public, Parameters: { Length: 0 } } &&
                     method.GetAttributes().Length == 0)
                 {
                     if (!method.ExplicitInterfaceImplementations.Any() &&
                         !IsInterfaceImplementation(method))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP009IsIDisposable, methodDeclaration.Identifier.GetLocation()));
+                    }
+
+                    if (ShouldCallBase(SymbolAndDeclaration.Create(method, methodDeclaration), context))
+                    {
+                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP010CallBaseDispose, methodDeclaration.Identifier.GetLocation()));
                     }
 
                     if (DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out var suppressFinalize))
@@ -70,7 +75,7 @@
                 if (method.Parameters.TrySingle(out var parameter) &&
                     parameter.Type == KnownSymbol.Boolean)
                 {
-                    if (ShouldCallBase(method, methodDeclaration, context))
+                    if (ShouldCallBase(SymbolAndDeclaration.Create(method, methodDeclaration), context))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP010CallBaseDispose, methodDeclaration.Identifier.GetLocation(), parameter.Name));
                     }
@@ -105,11 +110,10 @@
             return false;
         }
 
-        private static bool ShouldCallBase(IMethodSymbol method, MethodDeclarationSyntax methodDeclaration, SyntaxNodeAnalysisContext context)
+        private static bool ShouldCallBase(SymbolAndDeclaration<IMethodSymbol, MethodDeclarationSyntax> method, SyntaxNodeAnalysisContext context)
         {
-            if (method is { IsOverride: true, OverriddenMethod: { } overridden, Parameters: { Length: 1 } parameters } &&
-                parameters[0].Type.SpecialType == SpecialType.System_Boolean &&
-                !DisposeMethod.TryFindBaseCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out _))
+            if (method is { Symbol: { IsOverride: true, OverriddenMethod: { } overridden } } &&
+                !DisposeMethod.TryFindBaseCall(method.Declaration, context.SemanticModel, context.CancellationToken, out _))
             {
                 if (overridden.DeclaringSyntaxReferences.Length == 0)
                 {
@@ -122,7 +126,7 @@
                     {
                         if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
                             FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
-                            !DisposableMember.IsDisposed(fieldOrProperty, method, context.SemanticModel, context.CancellationToken))
+                            !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))
                         {
                             return true;
                         }
