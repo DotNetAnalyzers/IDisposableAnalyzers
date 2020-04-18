@@ -22,12 +22,16 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.3.5</Version>
+    <Version>3.3.6</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.3.6
+      Handle ValueTask
+      Handle HostingAbstractionsHostExtensions
+      BUGFIX: IDISP010 when public override void Dispose()
       3.3.5
       Handle IHostedService
       3.3.4
