@@ -205,6 +205,12 @@
                        Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
             }
 
+            if (type == KnownSymbol.ValueTaskOfT)
+            {
+                return type is INamedTypeSymbol { IsGenericType: true } namedType &&
+                       Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
+            }
+
             if (type == KnownSymbol.Func)
             {
                 return type is INamedTypeSymbol { IsGenericType: true } namedType &&

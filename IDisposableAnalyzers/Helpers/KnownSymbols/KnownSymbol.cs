@@ -54,6 +54,7 @@ namespace IDisposableAnalyzers
         internal static readonly EnumerableType Enumerable = new EnumerableType();
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
         internal static readonly TaskType Task = new TaskType();
+        internal static readonly QualifiedType ValueTaskOfT = new QualifiedType("System.Threading.Tasks.ValueTask`1");
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
         internal static readonly QualifiedType CancellationToken = new QualifiedType("System.Threading.CancellationToken");
         internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
