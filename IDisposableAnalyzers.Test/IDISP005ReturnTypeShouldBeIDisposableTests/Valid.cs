@@ -570,6 +570,57 @@ namespace N
         }
 
         [Test]
+        public static void MethodReturningValueTaskFromResultOfDisposable()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public void M()
+        {
+            CreateDisposableAsync();
+        }
+
+        private static ValueTask<IDisposable> CreateDisposableAsync()
+        {
+            return new ValueTask<IDisposable>(new Disposable());
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
+
+        [Test]
+        public static void MethodReturningValueTaskOfDisposableAsync()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public void M()
+        {
+            CreateDisposableAsync();
+        }
+
+        private static async ValueTask<IDisposable> CreateDisposableAsync()
+        {
+            await Task.Delay(0).ConfigureAwait(false);
+            return new Disposable();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
+
+        [Test]
         public static void GenericMethod()
         {
             var code = @"
