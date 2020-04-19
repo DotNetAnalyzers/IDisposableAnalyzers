@@ -1,15 +1,14 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class InterfaceOnlyVirtual
         {
-            private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("CS0535");
+            // ReSharper disable once InconsistentNaming
+            private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create("CS0535");
 
             [Test]
             public static void AbstractClass()
@@ -52,8 +51,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
             }
 
             [Test]
@@ -106,8 +105,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
@@ -192,8 +191,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
@@ -277,8 +276,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-                RoslynAssert.FixAll(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
 
             [Test]
@@ -322,7 +321,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
             }
 
             [Test]
@@ -375,7 +374,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
             }
         }
     }

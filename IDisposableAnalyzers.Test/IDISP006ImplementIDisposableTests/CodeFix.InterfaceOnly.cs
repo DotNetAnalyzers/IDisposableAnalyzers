@@ -1,14 +1,12 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class InterfaceOnly
         {
-            private static readonly CodeFixProvider Fix = new ImplementIDisposableFix();
             //// ReSharper disable once InconsistentNaming
             private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
