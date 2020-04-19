@@ -148,6 +148,9 @@
                     {
                         return this.AddManyRecursively(walker);
                     }
+
+                case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull }:
+                    return this.AddRecursiveValues(whenNotNull);
             }
 
             if (this.semanticModel.TryGetSymbol(assignedValue, this.cancellationToken, out var symbol))

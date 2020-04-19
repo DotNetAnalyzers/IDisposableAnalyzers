@@ -28,7 +28,7 @@ namespace ValidCode
         public void Dispose()
         {
             this.subscription1.Dispose();
-            this.subscription1?.Dispose();
+            this.subscription2?.Dispose();
             this.singleAssignmentDisposable.Dispose();
         }
 

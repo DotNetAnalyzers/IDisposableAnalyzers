@@ -110,6 +110,53 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
             }
+
+            [Test]
+            public static void ObservableElvisSubscribe()
+            {
+                var before = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        ↓private readonly IDisposable disposable;
+
+        public C(IObservable<object> observable)
+        {
+            this.disposable = observable?.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private readonly IDisposable disposable;
+
+        public C(IObservable<object> observable)
+        {
+            this.disposable = observable?.Subscribe(_ => { });
+        }
+
+        public void Dispose()
+        {
+            this.disposable?.Dispose();
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
         }
     }
 }

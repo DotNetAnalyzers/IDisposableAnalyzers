@@ -11,6 +11,54 @@
             private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
             [Test]
+            public static void SimpleImplementIDisposableAndMakeSealed()
+            {
+                var before = @"
+namespace N
+{
+    using System.IO;
+
+    public class C
+    {
+        ↓private readonly Stream stream = File.OpenRead(string.Empty);
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Stream stream = File.OpenRead(string.Empty);
+        private bool disposed;
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, "Implement IDisposable and make class sealed.");
+            }
+
+            [Test]
             public static void ImplementIDisposableAndMakeSealed()
             {
                 var before = @"
