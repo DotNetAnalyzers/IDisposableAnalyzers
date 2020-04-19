@@ -7,7 +7,8 @@ namespace ValidCode
 
     public sealed class Rx : IDisposable
     {
-        private readonly IDisposable subscription;
+        private readonly IDisposable subscription1;
+        private readonly IDisposable subscription2;
         private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
 
         public Rx(int no)
@@ -17,7 +18,8 @@ namespace ValidCode
 
         public Rx(IObservable<object> observable)
         {
-            this.subscription = observable.Subscribe(_ => { });
+            this.subscription1 = observable.Subscribe(_ => { });
+            this.subscription2 = observable?.Subscribe(_ => { });
             this.singleAssignmentDisposable.Disposable = observable.Subscribe(_ => { });
         }
 
@@ -25,7 +27,8 @@ namespace ValidCode
 
         public void Dispose()
         {
-            this.subscription.Dispose();
+            this.subscription1.Dispose();
+            this.subscription1?.Dispose();
             this.singleAssignmentDisposable.Dispose();
         }
 

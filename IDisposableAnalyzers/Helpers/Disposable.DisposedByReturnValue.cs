@@ -37,6 +37,12 @@
                          type == KnownSymbol.CompositeDisposable:
                     creation = objectCreation;
                     return true;
+                case { Parent: ConditionalAccessExpressionSyntax conditional }
+                    when conditional.WhenNotNull == candidate &&
+                         recursion.Target(candidate) is { } target &&
+                         DisposedByReturnValue(target, recursion):
+                    creation = conditional;
+                    return true;
                 case { }
                     when Identity(candidate, recursion) is { } id:
                     return DisposedByReturnValue(id, recursion, out creation);

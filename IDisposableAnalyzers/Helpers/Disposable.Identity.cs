@@ -28,6 +28,9 @@
                 => Recursive(parent, recursion),
                 { Parent: ConditionalExpressionSyntax parent }
                 => Recursive(parent, recursion),
+                { Parent: ConditionalAccessExpressionSyntax parent }
+                when parent.WhenNotNull == candidate
+                => Recursive(parent, recursion),
                 { Parent: LambdaExpressionSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } }
                 when invocation.IsSymbol(KnownSymbol.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
                 => Recursive(invocation, recursion),
