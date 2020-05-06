@@ -27,7 +27,33 @@ namespace N
         }
 
         [Test]
-        public static void VrirtualSimple()
+        public static void SealedPartial()
+        {
+            var part1 = @"
+namespace N
+{
+    using System;
+
+    public sealed partial class C : IDisposable
+    {
+    }
+}";
+
+            var part2 = @"
+namespace N
+{
+    public sealed partial class C
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, part1, part2);
+        }
+
+        [Test]
+        public static void VirtualSimple()
         {
             var code = @"
 namespace N
@@ -42,6 +68,32 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void VirtualPartial()
+        {
+            var part1 = @"
+namespace N
+{
+    using System;
+
+    public partial class C : IDisposable
+    {
+    }
+}";
+
+            var part2 = @"
+namespace N
+{
+    public partial class C
+    {
+        public virtual void Dispose()
+        {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, part1, part2);
         }
     }
 }
