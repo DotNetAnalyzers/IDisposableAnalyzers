@@ -95,5 +95,47 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, part1, part2);
         }
+
+        [Test]
+        public static void ProtectedVirtualPartial()
+        {
+            var part1 = @"
+namespace N
+{
+    using System;
+
+    public partial class C : IDisposable
+    {
+        private bool disposed;
+
+        public virtual void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+    }
+}";
+
+            var part2 = @"
+namespace N
+{
+    public partial class C
+    {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+            }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, part1, part2);
+        }
     }
 }
