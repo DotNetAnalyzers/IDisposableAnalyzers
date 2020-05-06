@@ -1220,5 +1220,59 @@ namespace N
 ";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void Partial()
+        {
+            var part1 = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public partial class C : IDisposable
+    {
+        private readonly IDisposable disposable = File.OpenRead(string.Empty);
+
+        private bool disposed;
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+    }
+}";
+
+            var part2 = @"
+namespace N
+{
+    public partial class C
+    {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, part1, part2);
+        }
     }
 }
