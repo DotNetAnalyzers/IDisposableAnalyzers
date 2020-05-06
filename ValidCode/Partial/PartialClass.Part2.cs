@@ -12,6 +12,7 @@
             this.disposed = true;
             if (disposing)
             {
+                this.disposable.Dispose();
             }
         }
     }
