@@ -366,7 +366,7 @@
                     }
 
                     if (method.IsGenericMethod &&
-                        ReferenceEquals(method.TypeArguments[0], method.ReturnType))
+                        Equals(method.TypeArguments[0], method.ReturnType))
                     {
                         return Result.AssumeNo;
                     }
