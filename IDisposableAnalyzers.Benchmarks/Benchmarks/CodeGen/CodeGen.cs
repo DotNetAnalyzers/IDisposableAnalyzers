@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Benchmarks.Benchmarks
+﻿namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;
@@ -52,34 +52,34 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
         {
             var fileName = Path.Combine(Code.BenchmarksDirectory, "AllBenchmarks.cs");
             var builder = new StringBuilder();
-            builder.AppendLine("// ReSharper disable RedundantNameQualifier")
-                   .AppendLine($"namespace {this.GetType().Namespace}")
-                   .AppendLine("{")
-                   .AppendLine("    [BenchmarkDotNet.Attributes.MemoryDiagnoser]")
-                   .AppendLine("    public class AllBenchmarks")
-                   .AppendLine("    {");
+            _ = builder.AppendLine("// ReSharper disable RedundantNameQualifier")
+                       .AppendLine($"namespace {this.GetType().Namespace}")
+                       .AppendLine("{")
+                       .AppendLine("    [BenchmarkDotNet.Attributes.MemoryDiagnoser]")
+                       .AppendLine("    public class AllBenchmarks")
+                       .AppendLine("    {");
             foreach (var analyzer in AllAnalyzers)
             {
-                builder.AppendLine(
+                _ = builder.AppendLine(
                            $"        private static readonly Gu.Roslyn.Asserts.Benchmark {analyzer.GetType().Name}Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new {analyzer.GetType().FullName}());")
                        .AppendLine();
             }
 
             foreach (var analyzer in AllAnalyzers)
             {
-                builder.AppendLine($"        [BenchmarkDotNet.Attributes.Benchmark]")
-                       .AppendLine($"        public void {analyzer.GetType().Name}()")
-                       .AppendLine("        {")
-                       .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
-                       .AppendLine("        }");
+                _ = builder.AppendLine($"        [BenchmarkDotNet.Attributes.Benchmark]")
+                           .AppendLine($"        public void {analyzer.GetType().Name}()")
+                           .AppendLine("        {")
+                           .AppendLine($"            {analyzer.GetType().Name}Benchmark.Run();")
+                           .AppendLine("        }");
                 if (!ReferenceEquals(analyzer, AllAnalyzers[^1]))
                 {
-                    builder.AppendLine();
+                    _ = builder.AppendLine();
                 }
             }
 
-            builder.AppendLine("    }")
-                   .AppendLine("}");
+            _ = builder.AppendLine("    }")
+                       .AppendLine("}");
 
             var code = builder.ToString();
             if (!File.Exists(fileName) ||
