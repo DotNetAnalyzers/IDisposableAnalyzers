@@ -586,5 +586,70 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void StaticFactory()
+        {
+            var staticFactory = @"
+namespace N
+{
+    using System;
+
+    public static class StaticFactory
+    {
+        public static IDisposable Create() => new Disposable();
+    }
+}";
+
+            var c = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        public void M()
+        {
+            using (StaticFactory.Create())
+            {
+            }
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, Disposable, staticFactory, c);
+        }
+
+        [Test]
+        public static void Factory()
+        {
+            var factory = @"
+namespace N
+{
+    using System;
+
+    public class Factory
+    {
+        public IDisposable Create() => new Disposable();
+    }
+}";
+
+            var c = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        public void M(Factory factory)
+        {
+            using (factory.Create())
+            {
+            }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, Disposable, factory, c);
+        }
     }
 }
