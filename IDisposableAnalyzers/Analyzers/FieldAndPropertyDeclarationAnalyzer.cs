@@ -72,7 +72,7 @@
                     }
                 }
                 else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                       IsMutableFromOutside(member.FieldOrProperty))
+                         IsMutableFromOutside(member.FieldOrProperty))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
                 }
@@ -100,9 +100,19 @@
                     }
 
                     if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                        !IsDisposedInCleanup() &&
                         DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP006ImplementIDisposable, member.Declaration.GetLocation()));
+                    }
+
+                    bool IsDisposedInCleanup()
+                    {
+                        return member.Declaration.Parent is TypeDeclarationSyntax containingType &&
+                               containingType.TryFindMethod("StopAsync", x => IsStopAsync(x), out var stopAsync) &&
+                               DisposableMember.IsDisposed(member.FieldOrProperty, stopAsync, context.SemanticModel, context.CancellationToken);
+
+                        bool IsStopAsync(MethodDeclarationSyntax candidate) => InitializeAndCleanup.IsStopAsync(candidate, context.SemanticModel, context.CancellationToken);
                     }
                 }
             }

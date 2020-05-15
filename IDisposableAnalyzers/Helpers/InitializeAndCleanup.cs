@@ -98,8 +98,7 @@
                     foreach (var member in typeDeclarationSyntax.Members)
                     {
                         if (member is MethodDeclarationSyntax methodDeclaration &&
-                            methodDeclaration is { Identifier: { ValueText: "StopAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
-                            parameters[0].Type == KnownSymbol.CancellationToken)
+                            IsStopAsync(methodDeclaration, semanticModel, cancellationToken))
                         {
                             return methodDeclaration;
                         }
@@ -138,6 +137,14 @@
 
                 return null;
             }
+        }
+
+        internal static bool IsStopAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return methodDeclaration is { Identifier: { ValueText: "StopAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                   parameters[0].Type == KnownSymbol.CancellationToken &&
+                   semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
+                   method == KnownSymbol.IHostedService.StopAsync;
         }
 
         private static bool IsStartAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)

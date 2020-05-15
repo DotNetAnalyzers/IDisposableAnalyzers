@@ -62,5 +62,97 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void IHostedServiceWhenAssignedInFieldInitializer()
+        {
+            var code = @"
+namespace N
+{
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+
+    public class C : IHostedService
+    {
+        private readonly SemaphoreSlim semaphore = new SemaphoreSlim(1);
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            this.semaphore.Dispose();
+            return Task.CompletedTask;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void IHostedServiceWhenAssignedInConstructor()
+        {
+            var code = @"
+namespace N
+{
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+
+    public class C : IHostedService
+    {
+        private readonly SemaphoreSlim semaphore;
+
+        public C()
+        {
+            this.semaphore = new SemaphoreSlim(1);
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            this.semaphore.Dispose();
+            return Task.CompletedTask;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void IHostedServiceWhenAssignedInPropertyInitializer()
+        {
+            var code = @"
+namespace N
+{
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Hosting;
+
+    public class C : IHostedService
+    {
+        public SemaphoreSlim Semaphore { get; } = new SemaphoreSlim(1);
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            this.Semaphore.Dispose();
+            return Task.CompletedTask;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
