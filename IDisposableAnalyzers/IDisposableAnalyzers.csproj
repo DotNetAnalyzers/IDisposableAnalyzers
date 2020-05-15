@@ -22,12 +22,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.3.8</Version>
+    <Version>3.3.9</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.3.9
+      BUGFIX: Special case IHostedService more
       3.3.8
       BUGFIX: Handle nullable
       3.3.7
