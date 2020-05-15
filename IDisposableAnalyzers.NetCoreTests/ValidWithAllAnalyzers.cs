@@ -17,7 +17,7 @@ namespace IDisposableAnalyzers.NetCoreTests
             .Assembly
             .GetTypes()
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
             .ToImmutableArray();
 
         // ReSharper disable once InconsistentNaming
@@ -26,7 +26,7 @@ namespace IDisposableAnalyzers.NetCoreTests
             AllAnalyzers,
             MetadataReferences.FromAttributes());
 
-        private static IDisposable cacheTransaction;
+        private static IDisposable? cacheTransaction;
 
         [OneTimeSetUp]
         public static void OneTimeSetUp()
@@ -39,7 +39,7 @@ namespace IDisposableAnalyzers.NetCoreTests
         [OneTimeTearDown]
         public static void OneTimeTearDown()
         {
-            cacheTransaction.Dispose();
+            cacheTransaction?.Dispose();
         }
 
         [Test]
