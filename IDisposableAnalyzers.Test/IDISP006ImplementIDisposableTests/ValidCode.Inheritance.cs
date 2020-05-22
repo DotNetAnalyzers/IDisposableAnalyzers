@@ -57,7 +57,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseClass, code);
+                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
             }
 
             [Test]
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseClass, code);
+                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
             }
 
             [Test]
@@ -171,7 +171,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, baseClass, code);
+                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
             }
 
             [Test]

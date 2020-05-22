@@ -49,7 +49,7 @@ namespace N
         public static C Create() => new C(Cached);
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
 
             [Test]

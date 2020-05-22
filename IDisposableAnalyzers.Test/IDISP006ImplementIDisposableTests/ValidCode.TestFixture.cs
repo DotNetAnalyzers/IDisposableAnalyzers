@@ -32,7 +32,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
 
             [Test]
@@ -60,7 +60,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
         }
     }

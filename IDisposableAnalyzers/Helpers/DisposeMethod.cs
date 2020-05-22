@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
     using Microsoft.CodeAnalysis;
@@ -18,9 +19,18 @@
 
             if (search == Search.TopLevel)
             {
-                return type.TryFindFirstMethod("Dispose", x => IsMatch(x), out var topLevel)
-                    ? topLevel
-                    : null;
+                if (type.TryFindFirstMethod("Dispose", x => IsMatch(x), out var topLevel))
+                {
+                    return topLevel;
+                }
+                else if (type.TryFindFirstMethod("System.IDisposable.Dispose", out topLevel))
+                {
+                    return topLevel;
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             return type.TryFindFirstMethodRecursive("Dispose", x => IsMatch(x), out var recursive)

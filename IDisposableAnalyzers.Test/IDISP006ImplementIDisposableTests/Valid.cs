@@ -8,7 +8,7 @@
         private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP006ImplementIDisposable;
 
-        private const string DisposableCode = @"
+        private const string Disposable = @"
 namespace N
 {
     using System;

@@ -28,6 +28,7 @@
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      BUGFIX: IDISP006 when explicit implementation.
       3.3.9
       BUGFIX: Special case IHostedService more
       3.3.8

@@ -119,7 +119,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
 
             [Test]
@@ -136,7 +136,7 @@ namespace N
         public void Dispose() => _disposable.Dispose();
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
 
             [Test]
@@ -542,6 +542,27 @@ namespace N
     }
 }";
                 RoslynAssert.Valid(Analyzer, code);
+            }
+
+            [Test]
+            public static void ExplicitImplementation()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Disposable disposable = new Disposable();
+
+        void IDisposable.Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+                RoslynAssert.Valid(Analyzer, Disposable, code);
             }
         }
     }

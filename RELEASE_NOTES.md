@@ -1,3 +1,5 @@
+* BUGFIX: IDISP006 when explicit implementation.
+
 #### 3.3.0
 * FEATURE: Initial support for AsyncDisposable
 
