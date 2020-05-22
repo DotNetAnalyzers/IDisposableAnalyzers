@@ -1,3 +1,5 @@
+#### 3.3.10
+* FEATURE: Handle DisposableMixins.DisposeWith
 * BUGFIX: IDISP025 when abstract dispose method.
 * BUGFIX: IDISP006 when explicit implementation.
 

@@ -918,6 +918,40 @@ namespace N
                 Assert.AreEqual("disposable", container.Name);
                 Assert.AreEqual(SymbolKind.Parameter, container.Kind);
             }
+
+            [Test]
+            public static void DisposableMixinsDisposeWith()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    sealed class C : IDisposable
+    {
+        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+        public DisposeWith(Stream stream)
+        {
+            this.disposable = stream.DisposeWith(this.compositeDisposable);
+        }
+
+        public void Dispose()
+        {
+            this.compositeDisposable.Dispose();
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindParameter("Stream stream");
+                Assert.AreEqual(true,  semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+                Assert.AreEqual(true,  LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+                Assert.AreEqual(true, Disposable.Stores(localOrParameter, semanticModel, CancellationToken.None, out _));
+            }
         }
     }
 }

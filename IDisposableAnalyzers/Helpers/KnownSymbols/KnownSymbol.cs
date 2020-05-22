@@ -85,6 +85,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
         internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
         internal static readonly IHostedServiceType IHostedService = new IHostedServiceType();
+        internal static readonly DisposableMixins DisposableMixins = new DisposableMixins();
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
