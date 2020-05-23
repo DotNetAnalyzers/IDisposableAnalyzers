@@ -1,3 +1,6 @@
+#### 3.4.1
+* Publish with binaries.
+
 #### 3.4.0
 * FEATURE: Handle DisposableMixins.DisposeWith
 * BUGFIX: IDISP025 when abstract dispose method.
