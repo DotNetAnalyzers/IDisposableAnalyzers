@@ -102,7 +102,7 @@
                                         }
                                         else
                                         {
-                                            _ = editor.ReplaceNode(body, x => x.AddStatements(ifDisposing));
+                                            _ = editor.ReplaceNode(body!, x => x.AddStatements(ifDisposing));
                                         }
                                     }
                                 }
@@ -126,7 +126,7 @@
                                     else
                                     {
                                         _ = editor.ReplaceNode(
-                                            body,
+                                            body!,
                                             x => x.AddStatements(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
                                     }
                                 }

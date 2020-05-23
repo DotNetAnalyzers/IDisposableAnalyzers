@@ -46,10 +46,10 @@
                     {
                         var fieldAccess = await editor.AddFieldAsync(
                                                           containingType!,
-                                                          local.Identifier.ValueText,
+                                                          local!.Identifier.ValueText,
                                                           Accessibility.Private,
                                                           DeclarationModifiers.ReadOnly,
-                                                          editor.SemanticModel.GetTypeInfoSafe(type, cancellationToken).Type,
+                                                          editor.SemanticModel.GetTypeInfoSafe(type!, cancellationToken).Type,
                                                           cancellationToken)
                                                       .ConfigureAwait(false);
 

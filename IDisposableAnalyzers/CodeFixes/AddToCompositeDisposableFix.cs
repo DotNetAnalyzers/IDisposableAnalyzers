@@ -76,7 +76,7 @@
                                             {
                                                 if (old.Expressions.Count == 0)
                                                 {
-                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation)!;
                                                 }
                                                 else
                                                 {
@@ -86,7 +86,7 @@
                                                     }
 
                                                     yield return old.Expressions.Last().WithoutTrailingTrivia();
-                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation);
+                                                    yield return expression.WithAdditionalAnnotations(Formatter.Annotation)!;
                                                 }
                                             }
 
@@ -142,11 +142,11 @@
                                 }
 
                                 _ = editor.ReplaceNode(
-                                    expression,
+                                    expression!,
                                     x => SyntaxFactory.InvocationExpression(
                                                           SyntaxFactory.MemberAccessExpression(
                                                               SyntaxKind.SimpleMemberAccessExpression,
-                                                              IDisposableFactory.MemberAccess(field!.Identifier, semanticModel, cancellationToken),
+                                                              IDisposableFactory.MemberAccess(field!.Identifier, semanticModel!, cancellationToken),
                                                               SyntaxFactory.IdentifierName("Add")),
                                                           SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(x))))
                                                       .WithTriviaFrom(x));
@@ -185,7 +185,7 @@
                             async Task CreateAndInitializeAsync(DocumentEditor editor, CancellationToken cancellationToken)
                             {
                                 var disposable = await editor.AddFieldAsync(
-                                    containingType,
+                                    containingType!,
                                     "disposable",
                                     Accessibility.Private,
                                     DeclarationModifiers.ReadOnly,
