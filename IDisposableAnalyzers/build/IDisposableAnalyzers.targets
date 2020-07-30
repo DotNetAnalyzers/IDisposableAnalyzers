@@ -8,6 +8,9 @@
 
   <ItemGroup Condition="'$(IncludeOwnershipAttributes)' == 'true'">
     <Compile Include="$(OwnershipAttributesPath)" Visible="false" />
+
+    <!-- Workaround for https://github.com/dotnet/wpf/issues/810 -->
+    <_GeneratedCodeFiles Include="$(OwnershipAttributesPath)" Visible="false" Condition="'$(UseWPF)' == 'true'" />
   </ItemGroup>
 
 </Project>
