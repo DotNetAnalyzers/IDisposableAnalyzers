@@ -13,7 +13,6 @@
     {
         private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
-        private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private ReturnValueSearch search;
         private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
@@ -63,7 +62,6 @@
         {
             this.returnValues.Clear();
             this.recursiveWalkers.Clear();
-            this.assignedValueWalkers.Clear();
             this.semanticModel = null!;
             this.cancellationToken = CancellationToken.None;
         }
@@ -287,11 +285,6 @@
 
         private bool TryHandleLambda(LambdaExpressionSyntax lambda)
         {
-            if (lambda is null)
-            {
-                return false;
-            }
-
             if (lambda.Body is ExpressionSyntax expressionBody)
             {
                 this.AddReturnValue(expressionBody);
@@ -334,14 +327,8 @@
                     case IdentifierNameSyntax identifierName
                         when this.semanticModel.TryGetSymbol(identifierName, this.cancellationToken, out var candidate) &&
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
-                        if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
-                        {
-                            this.returnValues.Add(value);
-                            return;
-                        }
 
                         var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken);
-                        this.assignedValueWalkers.Add(identifierName, assignedValues);
                         if (assignedValues.Count == 0)
                         {
                             this.returnValues.Add(value);
@@ -404,31 +391,6 @@
 
                 this.map.Clear();
                 this.Parent = null;
-            }
-        }
-
-        private class AssignedValueWalkers
-        {
-            private readonly Dictionary<IdentifierNameSyntax, AssignedValueWalker> map = new Dictionary<IdentifierNameSyntax, AssignedValueWalker>();
-
-            internal void Add(IdentifierNameSyntax location, AssignedValueWalker walker)
-            {
-                this.map.Add(location, walker);
-            }
-
-            internal bool TryGetValue(IdentifierNameSyntax location, [NotNullWhen(true)] out AssignedValueWalker? walker)
-            {
-                return this.map.TryGetValue(location, out walker);
-            }
-
-            internal void Clear()
-            {
-                foreach (var walker in this.map.Values)
-                {
-                    ((IDisposable)walker)?.Dispose();
-                }
-
-                this.map.Clear();
             }
         }
     }
