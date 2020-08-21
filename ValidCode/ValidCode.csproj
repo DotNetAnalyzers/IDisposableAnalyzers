@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
-    <CodeAnalysisRuleSet>ValidCode.ruleset</CodeAnalysisRuleSet>
     <Description>A project only used by the HappyPathTests. It contains all kinds of weird variations that is still valid code. We use it to test all analyzers. If a bug is found we extract it to a minimal repro and use it in a test for the analyzer but we leave this project as is.</Description>
   </PropertyGroup>
 
