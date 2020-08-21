@@ -29,7 +29,7 @@ namespace N
             var temp2 = this.value;
         }
 
-        internal void M(int arg)
+        internal void M()
         {
             var temp3 = this.value;
         }
@@ -62,7 +62,7 @@ namespace N
             var temp2 = this.value;
         }
 
-        internal void M(int arg)
+        internal void M()
         {
             var temp3 = this.value;
         }
