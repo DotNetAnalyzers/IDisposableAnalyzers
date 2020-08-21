@@ -1,0 +1,16 @@
+[*.cs]
+
+# CA1062: In externally visible method 'void CodeGen.AnalyzersBenchmark(DiagnosticAnalyzer analyzer)', validate parameter 'analyzer' is non-null before using it. If appropriate, throw an ArgumentNullException when the argument is null or add a Code Contract precondition asserting non-null argument.
+dotnet_diagnostic.CA1062.severity = none
+# CA1303: Method 'void Program.Main()' passes a literal string as parameter 'value' of a call to 'void Console.WriteLine(string value)'. Retrieve the following string(s) from a resource table instead: "Attach profiler and press any key to continue...".
+dotnet_diagnostic.CA1303.severity = none
+# CA1724: The type name Code conflicts in whole or in part with the namespace name 'BenchmarkDotNet.Code'. Change either name to eliminate the conflict.
+dotnet_diagnostic.CA1724.severity = none
+# CA1822: Member 'ArgumentAnalyzer' does not access instance data and can be marked as static
+dotnet_diagnostic.CA1822.severity = none
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.DocumentationRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
