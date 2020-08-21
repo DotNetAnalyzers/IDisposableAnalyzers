@@ -1,3 +1,16 @@
 [*.cs]
-dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.IDE1006.severity = none
+
+dotnet_diagnostic.CA1000.severity = none
+# CA1034: Do not nest type Ignores. Alternatively, change its accessibility so that it is not externally visible.
+dotnet_diagnostic.CA1034.severity = none
+# CS8002: Referenced assembly 'ValidCode.NetCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' does not have a strong name.
+dotnet_diagnostic.CS8002.severity = none
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.DocumentationRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+# SA1203: Constant fields should appear before non-constant fields
+dotnet_diagnostic.SA1203.severity = none
+
