@@ -1,7 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
@@ -10,7 +9,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>, IReadOnlyList<ExpressionSyntax>
+    internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>
     {
         private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
@@ -23,21 +22,10 @@
         {
         }
 
-        public int Count => this.returnValues.Count;
-
-        public ExpressionSyntax this[int index] => this.returnValues[index];
-
-        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.returnValues.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        internal IReadOnlyList<ExpressionSyntax> ReturnValues => this.returnValues;
 
         public override void Visit(SyntaxNode node)
         {
-            if (node is null)
-            {
-                return;
-            }
-
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleLambdaExpression:
@@ -64,11 +52,6 @@
         internal static ReturnValueWalker Borrow(SyntaxNode node, ReturnValueSearch search, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             var walker = Borrow(() => new ReturnValueWalker());
-            if (node is null)
-            {
-                return walker;
-            }
-
             walker.search = search;
             walker.semanticModel = semanticModel;
             walker.cancellationToken = cancellationToken;

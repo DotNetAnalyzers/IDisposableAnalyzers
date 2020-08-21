@@ -28,13 +28,13 @@
                     case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
                         when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
                         {
-                            using var pooled = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
-                            if (pooled.Count == 0)
+                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                            if (walker.ReturnValues.Count == 0)
                             {
                                 return true;
                             }
 
-                            return pooled.TrySingle(out var expression) &&
+                            return walker.ReturnValues.TrySingle(out var expression) &&
                                    MemberPath.TryFindRoot(expression, out rootIdentifier) &&
                                    (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
                         }
@@ -61,7 +61,7 @@
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
                     using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
-                    return walker.TrySingle(out var returnValue) &&
+                    return walker.ReturnValues.TrySingle(out var returnValue) &&
                            MemberPath.TrySingle(returnValue, out var expression) &&
                            semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
                            nested.Equals(symbol);

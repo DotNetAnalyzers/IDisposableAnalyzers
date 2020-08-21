@@ -146,7 +146,7 @@
                 case AwaitExpressionSyntax awaitExpression:
                     using (var walker = ReturnValueWalker.Borrow(awaitExpression, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(walker);
+                        return this.AddManyRecursively(walker.ReturnValues);
                     }
 
                 case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull }:
@@ -181,9 +181,9 @@
                             return true;
                         }
 
-                        using (var returnValues = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
+                        using (var walker = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                         {
-                            return this.AddManyRecursively(returnValues);
+                            return this.AddManyRecursively(walker.ReturnValues);
                         }
                 }
             }
