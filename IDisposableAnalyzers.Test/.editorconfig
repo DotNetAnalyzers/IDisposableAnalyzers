@@ -1,3 +1,23 @@
 [*.cs]
-dotnet_diagnostic.CA1000.severity = none
 dotnet_diagnostic.IDE1006.severity = none
+
+dotnet_diagnostic.CA1000.severity = none
+# CA1034: Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = none
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+# CA1716: Rename type CodeFix.Property so that it no longer conflicts with the reserved language keyword 'Property'. Using a reserved keyword as the name of a type makes it harder for consumers in other languages to use the type.
+dotnet_diagnostic.CA1716.severity = none
+# CA1724: The type name Diagnostics conflicts in whole or in part with the namespace name 'System.Diagnostics' defined in the .NET Framework. Rename the type to eliminate the conflict.
+dotnet_diagnostic.CA1724.severity = none
+
+# CS8002: Referenced assembly 'ReactiveUI, Version=11.5.0.0, Culture=neutral, PublicKeyToken=null' does not have a strong name.
+dotnet_diagnostic.CS8002.severity = none
+
+# Default severity for analyzer diagnostics with category 'StyleCop.CSharp.DocumentationRules'
+dotnet_analyzer_diagnostic.category-StyleCop.CSharp.DocumentationRules.severity = none
+# SA0001: XML comment analysis is disabled due to project configuration
+dotnet_diagnostic.SA0001.severity = none
+# SA1203: Constant fields should appear before non-constant fields
+dotnet_diagnostic.SA1203.severity = none
+
