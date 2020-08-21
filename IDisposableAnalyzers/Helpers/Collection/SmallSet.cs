@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     using System;
     using System.Collections;
@@ -22,8 +22,6 @@ namespace IDisposableAnalyzers
         internal void RemoveAll(Predicate<T> match) => this.inner.RemoveAll(match);
 
         internal void Clear() => this.inner.Clear();
-
-        internal bool Contains(T item) => this.inner.Contains(item);
 
         internal bool Add(T item)
         {
