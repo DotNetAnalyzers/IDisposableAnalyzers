@@ -1,5 +1,4 @@
 ﻿// ReSharper disable All
-#pragma warning disable 1717
 namespace ValidCode.Recursion
 {
     using System;

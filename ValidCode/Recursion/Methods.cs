@@ -1,6 +1,4 @@
-// ReSharper disable All
-#pragma warning disable 169
-#pragma warning disable 1717
+﻿// ReSharper disable All
 namespace ValidCode.Recursion
 {
     using System;
@@ -97,6 +95,18 @@ namespace ValidCode.Recursion
             value = this.Cycle1();
             value = this.Cycle2();
             value = value;
+        }
+
+        public IDisposable Return(IDisposable p)
+        {
+            if (true)
+            {
+                var temp = p;
+                return p;
+            }
+
+            p = p;
+            return p;
         }
     }
 }
