@@ -28,7 +28,7 @@
                     case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
                         when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
                         {
-                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);
                             if (walker.ReturnValues.Count == 0)
                             {
                                 return true;
@@ -60,7 +60,7 @@
                 if (disposed is IPropertySymbol property &&
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
-                    using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, semanticModel, cancellationToken);
+                    using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, semanticModel, cancellationToken);
                     return walker.ReturnValues.TrySingle(out var returnValue) &&
                            MemberPath.TrySingle(returnValue, out var expression) &&
                            semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&

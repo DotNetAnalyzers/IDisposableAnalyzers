@@ -160,7 +160,7 @@
                     return true;
                 }
 
-                using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.TopLevel, recursion.SemanticModel, recursion.CancellationToken);
+                using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, recursion.SemanticModel, recursion.CancellationToken);
                 foreach (var returnValue in walker.ReturnValues)
                 {
                     if (returnValue is InvocationExpressionSyntax nestedInvocation)
