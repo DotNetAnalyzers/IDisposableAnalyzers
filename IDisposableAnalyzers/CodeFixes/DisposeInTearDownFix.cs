@@ -9,7 +9,6 @@
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
-    using Microsoft.CodeAnalysis.Formatting;
 
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(DisposeInTearDownFix))]
     [Shared]
@@ -124,17 +123,35 @@
 
         private static MethodDeclarationSyntax CreateTearDownMethod(QualifiedType tearDownType)
         {
-            var code = StringBuilderPool.Borrow()
-                                        .AppendLine($"[{tearDownType.FullName}]")
-                                        .AppendLine($"public void {tearDownType.Type.Replace("Attribute", string.Empty)}()")
-                                        .AppendLine("{")
-                                        .AppendLine("}")
-                                        .Return();
-            return Parse.MethodDeclaration(code)
-                        .WithSimplifiedNames()
-                        .WithLeadingTrivia(SyntaxFactory.ElasticMarker)
-                        .WithTrailingTrivia(SyntaxFactory.ElasticMarker)
-                        .WithAdditionalAnnotations(Formatter.Annotation);
+            return SyntaxFactory.MethodDeclaration(
+                attributeLists: SyntaxFactory.SingletonList<AttributeListSyntax>(
+                    SyntaxFactory.AttributeList(
+                        openBracketToken: SyntaxFactory.Token(SyntaxKind.OpenBracketToken),
+                        target: default,
+                        attributes: SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
+                            SyntaxFactory.Attribute(
+                                name: SyntaxFactory.QualifiedName(
+                                    left: SyntaxFactory.QualifiedName(
+                                        left: SyntaxFactory.IdentifierName("NUnit"),
+                                        dotToken: SyntaxFactory.Token(SyntaxKind.DotToken),
+                                        right: SyntaxFactory.IdentifierName("Framework")),
+                                    dotToken: SyntaxFactory.Token(SyntaxKind.DotToken),
+                                    right: SyntaxFactory.IdentifierName(tearDownType.Alias))
+                                                   .WithSimplifiedNames(),
+                                argumentList: default)),
+                        closeBracketToken: SyntaxFactory.Token(SyntaxKind.CloseBracketToken))),
+                modifiers: SyntaxFactory.TokenList(
+                    SyntaxFactory.Token(SyntaxKind.PublicKeyword)),
+                returnType: SyntaxFactory.PredefinedType(
+                    keyword: SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
+                explicitInterfaceSpecifier: default,
+                identifier: SyntaxFactory.Identifier(tearDownType.Alias),
+                typeParameterList: default,
+                parameterList: SyntaxFactory.ParameterList(),
+                constraintClauses: default,
+                body: SyntaxFactory.Block(),
+                expressionBody: default,
+                semicolonToken: default);
         }
     }
 }
