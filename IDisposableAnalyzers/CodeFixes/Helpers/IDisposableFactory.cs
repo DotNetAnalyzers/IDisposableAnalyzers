@@ -4,11 +4,14 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
+    using Microsoft.CodeAnalysis.Editing;
     using Microsoft.CodeAnalysis.Formatting;
     using Microsoft.CodeAnalysis.Simplification;
 
@@ -258,11 +261,15 @@
         {
             return lambda switch
             {
-                { Body: ExpressionSyntax body } => lambda.ReplaceNode(
-                                                             body,
-                                                             SyntaxFactory.Block(statements.Append(SyntaxFactory.ExpressionStatement(body)))
-                                                                          .WithLeadingLineFeed())
-                                                         .WithAdditionalAnnotations(Formatter.Annotation),
+                ParenthesizedLambdaExpressionSyntax { ParameterList: { } parameterList, Body: ExpressionSyntax body } =>
+                    SyntaxFactory.ParenthesizedLambdaExpression(
+                        parameterList,
+                        SyntaxFactory.Block(statements.Append(SyntaxFactory.ExpressionStatement(body)))),
+                SimpleLambdaExpressionSyntax { Parameter: { } parameter, Body: ExpressionSyntax body } =>
+                    SyntaxFactory.SimpleLambdaExpression(
+                        parameter,
+                        SyntaxFactory.Block(statements.Append(SyntaxFactory.ExpressionStatement(body)))),
+                { Body: ExpressionSyntax _ } => throw new InvalidOperationException("There was a breaking between Roslyn 3.3.1 and 3.7.0."),
                 { Body: BlockSyntax block } => lambda.ReplaceNode(block, block.AddStatements(statements)),
                 _ => throw new NotSupportedException(
                     $"No support for adding statements to lambda with the shape: {lambda?.ToString() ?? "null"}"),
