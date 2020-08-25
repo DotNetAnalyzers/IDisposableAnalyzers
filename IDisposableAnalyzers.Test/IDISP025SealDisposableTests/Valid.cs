@@ -153,5 +153,27 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void ProtectedAbstract()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    public abstract class C : IDisposable
+    {
+        public void Dispose()
+        {
+            this.Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected abstract void Dispose(bool disposing);
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
