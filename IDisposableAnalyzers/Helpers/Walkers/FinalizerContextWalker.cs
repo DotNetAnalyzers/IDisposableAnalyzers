@@ -2,7 +2,9 @@
 {
     using System.Collections.Generic;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -92,7 +94,13 @@
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var walker = BorrowAndVisit((SyntaxNode)node.Body ?? node.ExpressionBody, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+            var body = (SyntaxNode)node.Body ?? node.ExpressionBody;
+            if (body is null)
+            {
+                return Borrow(() => new FinalizerContextWalker());
+            }
+
+            var walker = BorrowAndVisit(body, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
 
             foreach (var target in walker.Targets)
             {

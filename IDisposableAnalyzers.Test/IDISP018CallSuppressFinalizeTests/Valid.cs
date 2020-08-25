@@ -6,7 +6,7 @@
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
 
         [Test]
         public static void SealedSimple()

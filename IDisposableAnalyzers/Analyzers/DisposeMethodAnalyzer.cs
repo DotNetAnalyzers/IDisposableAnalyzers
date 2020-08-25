@@ -119,17 +119,15 @@
                 {
                     return true;
                 }
-                else
+
+                using var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken);
+                foreach (var disposeCall in disposeWalker.Invocations)
                 {
-                    using var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken);
-                    foreach (var disposeCall in disposeWalker.Invocations)
+                    if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                        FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                        !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))
                     {
-                        if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                            FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
-                            !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
             }

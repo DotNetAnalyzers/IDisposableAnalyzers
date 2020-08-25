@@ -1,4 +1,4 @@
-namespace ValidCode.Inheritance
+﻿namespace ValidCode.Inheritance
 {
     using System;
     using System.IO;
