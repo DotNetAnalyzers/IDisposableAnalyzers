@@ -16,4 +16,5 @@ steps:
   displayName: Test
   inputs:
     command: 'test'
-    arguments: '--no-build --configuration=$(buildConfiguration)'
+    nobuild: true
+    arguments: '--configuration=$(buildConfiguration)'
