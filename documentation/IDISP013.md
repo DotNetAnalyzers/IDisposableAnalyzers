@@ -15,11 +15,27 @@ Await in using.
 
 ## Motivation
 
-ADD MOTIVATION HERE
+```cs
+public Task<string> M(string url)
+{
+    using var client = new Client();
+    return client.GetStringAsync(url);
+}
+```
+
+In the above code the `client` is disposed when the method returns which may be before the task completes and depending on implementation this can lead to `ObjectDisposedException`
 
 ## How to fix violations
 
-ADD HOW TO FIX VIOLATIONS HERE
+Use the fix to change the code to:
+
+```cs
+public async Task<string> M(string url)
+{
+    using var client = new Client();
+    return await client.GetStringAsync(url);
+}
+```
 
 <!-- start generated config severity -->
 ## Configure severity
