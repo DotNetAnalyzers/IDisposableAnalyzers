@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <NeutralLanguage>en-US</NeutralLanguage>
     <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
-    <NoWarn>$(NoWarn);IDE0009</NoWarn>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -22,12 +21,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.1</Version>
+    <Version>3.4.2</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.4.2
+      Handle some regressions in Roslyn 3.7
       3.4.1
       Publish with binaries.
       3.4.0

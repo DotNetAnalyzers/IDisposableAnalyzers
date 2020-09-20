@@ -1,3 +1,6 @@
+#### 3.4.2
+* Handle some regressions in Roslyn 3.7
+
 #### 3.4.1
 * Publish with binaries.
 
