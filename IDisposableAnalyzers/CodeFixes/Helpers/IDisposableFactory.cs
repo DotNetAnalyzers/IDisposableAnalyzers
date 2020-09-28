@@ -164,9 +164,10 @@
                     }
 
                     return DisposeStatement(
-                            SyntaxFactory.CastExpression(
+                            SyntaxFactory.ParenthesizedExpression(
+                                SyntaxFactory.CastExpression(
                                 SystemIDisposable,
-                                neverNull.WithoutTrivia()))
+                                neverNull.WithoutTrivia())))
                         .WithLeadingElasticLineFeed();
                 case { MaybeNull: { } maybeNull }:
                     if (DisposeMethod.IsAccessibleOn(disposable.Type, semanticModel.Compilation))
