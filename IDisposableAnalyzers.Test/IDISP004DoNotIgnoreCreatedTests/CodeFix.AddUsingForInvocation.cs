@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
+
     using NUnit.Framework;
 
     public static partial class CodeFix
@@ -139,6 +140,53 @@ namespace N
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            }
+
+            [Test]
+            public static void UsingChainedReturningThis()
+            {
+                var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public Disposable M() => this;
+
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+                var before = @"
+namespace N
+{
+    public sealed class C
+    {
+        public void M()
+        {
+            ↓new Disposable().M();
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    public sealed class C
+    {
+        public void M()
+        {
+            using (new Disposable().M())
+            {
+            }
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -73,6 +74,20 @@
                 case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
                      when reducedFrom.Parameters.TryFirst(out var parameter):
                     return IsIdentity(Target.Create(target.Source, parameter, target.Declaration), recursion);
+                case IMethodSymbol { IsStatic: false }
+                    when target.Declaration is MethodDeclarationSyntax methodDeclaration:
+                    using (var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(methodDeclaration))
+                    {
+                        foreach (var returnValue in walker.ReturnValues)
+                        {
+                            if (returnValue is ThisExpressionSyntax)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    break;
                 case IFieldSymbol _:
                 case IPropertySymbol _:
                     return false;
