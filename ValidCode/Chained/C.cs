@@ -10,5 +10,12 @@
         {
             using var disposable = new Disposable().M();
         }
+
+        public static IDisposable CreateId() => new Disposable().Id();
+
+        public static void UseId()
+        {
+            using var disposable = new Disposable().Id();
+        }
     }
 }

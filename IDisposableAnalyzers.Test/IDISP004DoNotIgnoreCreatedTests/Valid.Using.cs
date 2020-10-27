@@ -166,5 +166,44 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, disposable, code);
         }
+
+        [Test]
+        public static void UsingChainedExtension()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var disposableExt = @"
+namespace N
+{
+    public static class DisposableExt
+    {
+        public static Disposable M<Disposable>(this Disposable disposable) => disposable;
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    public static class C
+    {
+        public static void M()
+        {
+            using var disposable = new Disposable().M();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
+        }
     }
 }

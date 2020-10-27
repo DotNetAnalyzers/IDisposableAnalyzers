@@ -2,7 +2,7 @@
 {
     using System;
 
-    public class Disposable : IDisposable
+    public sealed class Disposable : IDisposable
     {
         public Disposable M() => this;
 
