@@ -16,16 +16,17 @@
                 using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
                 if (assignedValues.Count == 0)
                 {
-                    switch (value)
+                    return value switch
                     {
-                        case IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Expression: { } parent, Name: { } name } }
-                            when value == name:
-                            return IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken);
-                        case IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent } } } } }:
-                            return IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken);
-                        default:
-                            return IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes);
-                    }
+                        IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Expression: { } parent, Name: { } name } }
+                            when value == name
+                            => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
+                        IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent, Parent: ExpressionStatementSyntax _ } } } } }
+                            => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
+                        IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent, Parent: ExpressionStatementSyntax _ } } } }
+                            => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
+                        _ => IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)
+                    };
                 }
 
                 using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);

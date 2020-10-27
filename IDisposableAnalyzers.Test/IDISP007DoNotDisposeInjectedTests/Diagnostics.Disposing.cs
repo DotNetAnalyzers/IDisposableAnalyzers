@@ -343,7 +343,6 @@ namespace N
             [TestCase("this.foo?.Disposable.Dispose()")]
             [TestCase("this.foo?.Disposable?.Dispose()")]
             [TestCase("this.foo.Disposable?.Dispose()")]
-
             [TestCase("foo.Disposable.Dispose()")]
             [TestCase("foo?.Disposable.Dispose()")]
             [TestCase("foo?.Disposable?.Dispose()")]
