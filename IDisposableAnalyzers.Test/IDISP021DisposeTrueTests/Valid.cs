@@ -43,7 +43,6 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-
         [Test]
         public static void Abstract()
         {
