@@ -313,7 +313,8 @@
                     if (method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
                         method.ContainingType == KnownSymbol.File ||
                         method.ContainingType == KnownSymbol.FileInfo ||
-                        method.ContainingType == KnownSymbol.RegistryKey)
+                        method.ContainingType == KnownSymbol.RegistryKey ||
+                        method.Name == "CreateConnection")
                     {
                         return Result.Yes;
                     }

@@ -546,6 +546,7 @@ namespace N
             [TestCase("Microsoft.Win32.RegistryKey key",                                                    "key.CreateSubKey(string.Empty)",                 Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                             Result.Yes)]
             [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
+            [TestCase("System.Data.Entity.Infrastructure.SqlConnectionFactory factory",                     "factory.CreateConnection(string.Empty)",         Result.Yes)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()", Result.No)]
             [TestCase("System.Collections.Generic.List<IDisposable> xs",                                    "xs.First()",                                     Result.No)]
             [TestCase("System.Collections.Generic.Dictionary<int, IDisposable> map",                        "map[0]",                                         Result.No)]
