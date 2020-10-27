@@ -33,6 +33,8 @@
                         return TryGetName(expression, out name);
                     case CastExpressionSyntax { Expression: { } expression }:
                         return TryGetName(expression, out name);
+                    case PostfixUnaryExpressionSyntax { Operand: { } expression, OperatorToken: { ValueText: "!" } }:
+                        return TryGetName(expression, out name);
                     case BinaryExpressionSyntax { Left: { } expression, OperatorToken: { ValueText: "as" } }:
                         return TryGetName(expression, out name);
                     case IdentifierNameSyntax identifierName:
