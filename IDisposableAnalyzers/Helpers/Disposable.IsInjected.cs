@@ -25,7 +25,7 @@
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
                         IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent, Parent: ExpressionStatementSyntax _ } } } }
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
-                        _ => IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)
+                        _ => IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes),
                     };
                 }
 

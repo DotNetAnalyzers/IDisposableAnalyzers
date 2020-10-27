@@ -73,7 +73,7 @@
         }
 
         /// <inheritdoc />
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             return obj is Maybe<T> maybe &&
                    this.Equals(maybe);

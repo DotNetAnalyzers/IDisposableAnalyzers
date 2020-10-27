@@ -2,6 +2,7 @@
 {
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
 
@@ -40,7 +41,7 @@
             this.inner.Remove(Maybe<TKey>.Some(key));
         }
 
-        internal bool TryGetValue(TKey key, out TValue result)
+        internal bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue result)
         {
             return this.inner.TryGetValue(Maybe<TKey>.Some(key), out result);
         }
