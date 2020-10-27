@@ -184,7 +184,7 @@
 
         private static void ReplaceWithUsing(DocumentEditor editor, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
-            if (DisposeCall.TryGetDisposedRootMember(invocation, editor.SemanticModel, cancellationToken, out var root) &&
+            if (DisposeCall.TryGetDisposed(invocation, editor.SemanticModel, cancellationToken, out var root) &&
                 editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol? local) &&
                 local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax? declaration) &&
                 invocation.TryFirstAncestor(out ExpressionStatementSyntax? expressionStatement) &&

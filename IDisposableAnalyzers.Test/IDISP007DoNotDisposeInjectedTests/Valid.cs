@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
@@ -753,6 +754,59 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void WhenAssumingCreated()
+        {
+            var binaryReferencedCode = @"
+namespace BinaryReferencedAssembly
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public class Factory
+    {
+        public IDisposable Create() => new Disposable();
+    }
+}";
+            var binaryReference = BinaryReference.Compile(binaryReferencedCode);
+
+            var code = @"
+namespace N
+{
+    using BinaryReferencedAssembly;
+
+    public class C
+    {
+        private Factory factory;
+
+        public C(Factory factory)
+        {
+            this.factory = factory;
+        }
+
+        public void M()
+        {
+            this.factory.Create().Dispose();
+            this.factory.Create()?.Dispose();
+        }
+    }
+}";
+
+            var solution = CodeFactory.CreateSolution(
+                code,
+                CodeFactory.DefaultCompilationOptions(new[] { Analyzer })
+                           .WithMetadataImportOptions(MetadataImportOptions.Public),
+                MetadataReferences.FromAttributes().Add(binaryReference));
+
+            RoslynAssert.Valid(Analyzer, solution);
         }
     }
 }

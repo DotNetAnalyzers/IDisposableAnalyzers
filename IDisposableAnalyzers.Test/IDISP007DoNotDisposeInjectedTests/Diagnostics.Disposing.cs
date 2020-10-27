@@ -343,6 +343,11 @@ namespace N
             [TestCase("this.foo?.Disposable.Dispose()")]
             [TestCase("this.foo?.Disposable?.Dispose()")]
             [TestCase("this.foo.Disposable?.Dispose()")]
+
+            [TestCase("foo.Disposable.Dispose()")]
+            [TestCase("foo?.Disposable.Dispose()")]
+            [TestCase("foo?.Disposable?.Dispose()")]
+            [TestCase("foo.Disposable?.Dispose()")]
             public static void DisposingNestedField(string disposeCall)
             {
                 var fooCode = @"
@@ -518,8 +523,11 @@ namespace N
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, baseClass, code);
             }
 
-            [Test]
-            public static void InjectedViaMethod()
+            [TestCase("this.disposable.Dispose()")]
+            [TestCase("this.disposable?.Dispose()")]
+            [TestCase("disposable.Dispose()")]
+            [TestCase("disposable?.Dispose()")]
+            public static void InjectedViaMethod(string expression)
             {
                 var code = @"
 namespace N
@@ -540,7 +548,7 @@ namespace N
             ↓this.disposable.Dispose();
         }
     }
-}";
+}".AssertReplace("this.disposable.Dispose()", expression);
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
@@ -610,7 +618,6 @@ namespace N
 namespace Gu.Reactive
 {
     using System;
-    using System.IO;
     using System.Reactive.Disposables;
 
     public abstract class C : IDisposable

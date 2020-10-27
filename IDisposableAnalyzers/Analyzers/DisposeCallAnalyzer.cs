@@ -31,15 +31,15 @@
                 context.Node is InvocationExpressionSyntax invocation &&
                 DisposeCall.IsMatchAny(invocation, context.SemanticModel, context.CancellationToken) &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
-                DisposeCall.TryGetDisposedRootMember(invocation, context.SemanticModel, context.CancellationToken, out var root))
+                DisposeCall.TryGetDisposed(invocation, context.SemanticModel, context.CancellationToken, out var disposed))
             {
-                if (Disposable.IsCachedOrInjectedOnly(root, invocation, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsCachedOrInjectedOnly(disposed, invocation, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
 
                 if (invocation.Expression is MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax _ } &&
-                    context.SemanticModel.TryGetSymbol(root, context.CancellationToken, out ILocalSymbol? local))
+                    context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out ILocalSymbol? local))
                 {
                     if (IsUsedAfter(local, invocation, context, out var locations))
                     {

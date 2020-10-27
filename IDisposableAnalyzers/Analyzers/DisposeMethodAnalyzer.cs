@@ -124,7 +124,8 @@
                 foreach (var disposeCall in disposeWalker.Invocations)
                 {
                     if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
-                        FieldOrProperty.TryCreate(disposed, out var fieldOrProperty) &&
+                        context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out var disposedSymbol) &&
+                        FieldOrProperty.TryCreate(disposedSymbol, out var fieldOrProperty) &&
                         !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))
                     {
                         return true;

@@ -6,6 +6,7 @@
 [assembly: TransitiveMetadataReferences(typeof(System.Windows.Controls.Control))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Linq.Observable))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Disposables.DisposableMixins))]
+[assembly: TransitiveMetadataReferences(typeof(System.Data.Entity.DbContext))]
 [assembly: MetadataReferences(
     typeof(System.Net.WebClient),
     typeof(System.Net.Mail.Attachment),

@@ -2,62 +2,107 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class DisposeCall
     {
-        internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? disposed)
+        internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
         {
-            disposed = null;
-            return IsMatchAny(disposeCall, semanticModel, cancellationToken) &&
-                   MemberPath.TrySingle(disposeCall, out var expression) &&
-                   semanticModel.TryGetSymbol(expression, cancellationToken, out disposed);
-        }
-
-        internal static bool TryGetDisposedRootMember(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
-        {
-            if (MemberPath.TryFindRoot(disposeCall, out var rootIdentifier) &&
-               (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { })
+            switch (disposeCall)
             {
-                switch (semanticModel.GetSymbolSafe(disposedMember, cancellationToken))
-                {
-                    case IPropertySymbol { GetMethod: null }:
-                        return false;
-                    case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
-                        when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
-                        {
-                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);
-                            if (walker.ReturnValues.Count == 0)
-                            {
-                                return true;
-                            }
-
-                            return walker.ReturnValues.TrySingle(out var expression) &&
-                                   MemberPath.TryFindRoot(expression, out rootIdentifier) &&
-                                   (disposedMember = rootIdentifier.Parent as IdentifierNameSyntax) is { };
-                        }
-
-                    default:
-                        return true;
-                }
+                case { Expression: MemberAccessExpressionSyntax { Expression: { } expression } }
+                    when TryGetName(expression, out var candidate):
+                    return TryGetRoot(candidate, out disposedMember);
+                case { Expression: MemberBindingExpressionSyntax _, Parent: ConditionalAccessExpressionSyntax { Expression: { } expression } }
+                    when TryGetName(expression, out var candidate):
+                    return TryGetRoot(candidate, out disposedMember);
             }
 
             disposedMember = null;
             return false;
+
+            static bool TryGetName(ExpressionSyntax candidate, out IdentifierNameSyntax name)
+            {
+                switch (candidate)
+                {
+                    case ParenthesizedExpressionSyntax { Expression: { } expression }:
+                        return TryGetName(expression, out name);
+                    case CastExpressionSyntax { Expression: { } expression }:
+                        return TryGetName(expression, out name);
+                    case BinaryExpressionSyntax { Left: { } expression, OperatorToken: { ValueText: "as" } }:
+                        return TryGetName(expression, out name);
+                    case IdentifierNameSyntax identifierName:
+                        name = identifierName;
+                        return true;
+                    case MemberAccessExpressionSyntax { Expression: { }, Name: IdentifierNameSyntax identifierName }:
+                        name = identifierName;
+                        return true;
+                    case MemberBindingExpressionSyntax { Name: IdentifierNameSyntax identifierName }:
+                        name = identifierName;
+                        return true;
+                    default:
+                        name = null!;
+                        return false;
+                }
+            }
+
+            bool TryGetRoot(IdentifierNameSyntax expression, out IdentifierNameSyntax root)
+            {
+                switch (semanticModel.GetSymbolSafe(expression, cancellationToken))
+                {
+                    case IPropertySymbol { GetMethod: null }:
+                        root = null!;
+                        return false;
+                    case IPropertySymbol property
+                        when property.IsAbstract || property.IsAutoProperty():
+                        root = expression;
+                        return true;
+                    case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
+                        when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
+                        {
+                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);
+                            if (walker.ReturnValues.TrySingle(out var returnValue))
+                            {
+                                switch (returnValue)
+                                {
+                                    case IdentifierNameSyntax name:
+                                        root = name;
+                                        return true;
+                                    case MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: IdentifierNameSyntax name }:
+                                        root = name;
+                                        return true;
+                                    case MemberAccessExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax _, Name: IdentifierNameSyntax name } }:
+                                        root = name;
+                                        return true;
+                                }
+                            }
+                        }
+
+                        root = null!;
+                        return false;
+
+                    default:
+                        root = expression;
+                        return true;
+                }
+            }
         }
 
         internal static bool IsDisposing(InvocationExpressionSyntax disposeCall, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed))
+            if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed) &&
+                semanticModel.TryGetSymbol(disposed, cancellationToken, out var disposedSymbol))
             {
-                if (disposed.IsEquivalentTo(symbol))
+                if (disposedSymbol.IsEquivalentTo(symbol))
                 {
                     return true;
                 }
 
-                if (disposed is IPropertySymbol property &&
+                if (disposedSymbol is IPropertySymbol property &&
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
                     using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, semanticModel, cancellationToken);

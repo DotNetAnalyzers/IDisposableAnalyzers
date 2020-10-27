@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -12,9 +14,22 @@
             if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
                 using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+                if (assignedValues.Count == 0)
+                {
+                    switch (value)
+                    {
+                        case IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Expression: { } parent, Name: { } name } }
+                            when value == name:
+                            return IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken);
+                        case IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent } } } } }:
+                            return IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken);
+                        default:
+                            return IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes);
+                    }
+                }
+
                 using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                return (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
-                        IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes)) &&
+                return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                        !IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
             }
 
