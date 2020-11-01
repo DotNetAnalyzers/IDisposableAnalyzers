@@ -15,17 +15,17 @@ namespace IDisposableAnalyzers.Test.Helpers
         internal static class IsCreation
 #pragma warning restore GURA07 // Test class should be public static.
         {
-            [TestCase("1",                                                   Result.No)]
-            [TestCase("new string(' ', 1)",                                  Result.No)]
-            [TestCase("new Disposable()",                                    Result.Yes)]
-            [TestCase("new Disposable() as object",                          Result.Yes)]
-            [TestCase("(object) new Disposable()",                           Result.Yes)]
-            [TestCase("typeof(IDisposable)",                                 Result.No)]
-            [TestCase("(IDisposable)null",                                   Result.No)]
-            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null",       Result.Yes)]
-            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
-            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.Yes)]
-            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.Yes)]
+            [TestCase("1",                                                         Result.No)]
+            [TestCase("new string(' ', 1)",                                        Result.No)]
+            [TestCase("new Disposable()",                                          Result.Yes)]
+            [TestCase("new Disposable() as object",                                Result.Yes)]
+            [TestCase("(object) new Disposable()",                                 Result.Yes)]
+            [TestCase("typeof(IDisposable)",                                       Result.No)]
+            [TestCase("(IDisposable)null",                                         Result.No)]
+            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null",             Result.Yes)]
+            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",             Result.Yes)]
+            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
+            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null",       Result.Yes)]
             public static void LanguageConstructs(string expression, Result expected)
             {
                 var code = @"
@@ -578,6 +578,44 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
+                Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
+                Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("Activator.CreateInstance<Disposable>()",                                                     Result.Yes)]
+            [TestCase("(Disposable)Activator.CreateInstance(typeof(Disposable))",                                   Result.Yes)]
+            [TestCase("Activator.CreateInstance<System.Text.StringBuilder>()",                                      Result.No)]
+            [TestCase("Activator.CreateInstance(typeof(System.Text.StringBuilder))",                                Result.No)]
+            [TestCase("(System.Text.StringBuilder)Activator.CreateInstance(typeof(System.Text.StringBuilder))",     Result.No)]
+            public static void Reflection(string expression, Result expected)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Reflection;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    class C
+    {
+        static void M(ConstructorInfo constructorInfo)
+        {
+            var value = Activator.CreateInstance<Disposable>();
+        }
+    }
+}".AssertReplace("Activator.CreateInstance<Disposable>()", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation =
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
                 Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));

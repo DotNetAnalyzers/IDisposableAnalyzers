@@ -2,7 +2,9 @@
 {
     using System;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -264,6 +266,19 @@
 
             if (semanticModel.TryGetSymbol(candidate, cancellationToken, out var symbol))
             {
+                if (symbol is IMethodSymbol { ContainingType: { Name: "ConstructorInfo" }, Name: "Invoke" } ||
+                    symbol is IMethodSymbol { ContainingType: { Name: "Activator" }, Name: "CreateInstance", IsGenericMethod: false })
+                {
+                    if (candidate.Parent is CastExpressionSyntax { Type: { } castType } &&
+                        semanticModel.TryGetType(castType, cancellationToken, out var type) &&
+                        IsAssignableFrom(type, semanticModel.Compilation))
+                    {
+                        return Result.Yes;
+                    }
+
+                    return Result.AssumeNo;
+                }
+
                 switch (symbol)
                 {
                     case IPropertySymbol _:
@@ -310,11 +325,13 @@
                         return Result.No;
                     }
 
-                    if (method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
+                    if (method is { ContainingType: { Name: "Activator" }, Name: "CreateInstance" } ||
+                        method is { ContainingType: { Name: "ActivatorUtilities" }, Name: "CreateInstance" } ||
+                        method.Name == "CreateConnection" ||
+                        method == KnownSymbol.IEnumerableOfT.GetEnumerator ||
                         method.ContainingType == KnownSymbol.File ||
                         method.ContainingType == KnownSymbol.FileInfo ||
-                        method.ContainingType == KnownSymbol.RegistryKey ||
-                        method.Name == "CreateConnection")
+                        method.ContainingType == KnownSymbol.RegistryKey)
                     {
                         return Result.Yes;
                     }

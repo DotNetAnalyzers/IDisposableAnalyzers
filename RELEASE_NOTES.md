@@ -1,3 +1,6 @@
+#### 
+* FEATURE: Handle some common uses of reflection.
+
 #### 3.4.3
 * Special case ConnectionFactory.CreateConnection
 * BUGFIX: Handle chained calls

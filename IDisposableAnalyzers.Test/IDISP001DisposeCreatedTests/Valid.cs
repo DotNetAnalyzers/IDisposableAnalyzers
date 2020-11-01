@@ -651,5 +651,29 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, Disposable, factory, c);
         }
+
+        [TestCase("System.Activator.CreateInstance<StringBuilder>()")]
+        [TestCase("(StringBuilder)System.Activator.CreateInstance(typeof(StringBuilder))")]
+        [TestCase("System.Activator.CreateInstance(typeof(StringBuilder))")]
+        [TestCase("(StringBuilder)constructorInfo.Invoke(null)")]
+        public static void Reflection(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System.Reflection;
+    using System.Text;
+
+    public class C
+    {
+        public static void M(ConstructorInfo constructorInfo)
+        {
+            var disposable = Activator.CreateInstance<StringBuilder>();
+        }
+    }
+}".AssertReplace("Activator.CreateInstance<StringBuilder>()", expression);
+
+            RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
     }
 }
