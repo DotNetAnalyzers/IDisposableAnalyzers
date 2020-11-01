@@ -586,7 +586,7 @@ namespace N
             [TestCase("Activator.CreateInstance<Disposable>()",                                                     Result.Yes)]
             [TestCase("(Disposable)Activator.CreateInstance(typeof(Disposable))",                                   Result.Yes)]
             [TestCase("Activator.CreateInstance<System.Text.StringBuilder>()",                                      Result.No)]
-            [TestCase("Activator.CreateInstance(typeof(System.Text.StringBuilder))",                                Result.No)]
+            [TestCase("Activator.CreateInstance(typeof(System.Text.StringBuilder))",                                Result.AssumeNo)]
             [TestCase("(System.Text.StringBuilder)Activator.CreateInstance(typeof(System.Text.StringBuilder))",     Result.No)]
             public static void Reflection(string expression, Result expected)
             {
