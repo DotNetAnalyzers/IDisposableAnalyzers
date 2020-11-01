@@ -598,6 +598,91 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
             }
+
+            [TestCase("await task")]
+            [TestCase("await task.ConfigureAwait(true)")]
+            public static void HttpClientIssue242(string expression)
+            {
+                var before = @"
+namespace N
+{
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    public static  class C
+    {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        public static async Task M()
+        {
+            var task = HttpClient.GetAsync(""http://example.com"");
+            ↓var response = await task;
+        }
+    }
+}".AssertReplace("await task", expression);
+
+                var after = @"
+namespace N
+{
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    public static  class C
+    {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        public static async Task M()
+        {
+            var task = HttpClient.GetAsync(""http://example.com"");
+            using var response = await task;
+        }
+    }
+}".AssertReplace("await task", expression);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            }
+
+            [Test]
+            public static void HttpClientIssue242Result()
+            {
+                var before = @"
+namespace N
+{
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    public static  class C
+    {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        public static void M()
+        {
+            var task = HttpClient.GetAsync(""http://example.com"");
+            ↓var response = task.Result;
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System.Net.Http;
+    using System.Threading.Tasks;
+
+    public static  class C
+    {
+        private static readonly HttpClient HttpClient = new HttpClient();
+
+        public static void M()
+        {
+            var task = HttpClient.GetAsync(""http://example.com"");
+            using var response = task.Result;
+        }
+    }
+}";
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            }
         }
     }
 }
