@@ -1,3 +1,8 @@
+#### 3.4.3
+* Special case ConnectionFactory.CreateConnection
+* BUGFIX: Handle chained calls
+* BUGFIX: Cast and dispose correctly.
+
 #### 3.4.2
 * Handle some regressions in Roslyn 3.7
 
