@@ -12,7 +12,7 @@
         [MaybeNull]
         private readonly T value;
 
-        private Maybe(bool hasValue, [AllowNull] T value)
+        private Maybe(bool hasValue, [MaybeNull] T value)
         {
             this.HasValue = hasValue;
             this.value = value;
@@ -32,7 +32,9 @@
         [MaybeNull]
         public T Value
         {
+#pragma warning disable CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
             get
+#pragma warning restore CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member (possibly because of nullability attributes).
             {
                 if (!this.HasValue)
                 {
@@ -63,7 +65,7 @@
         /// <summary>
         /// Create an instance with a value.
         /// </summary>
-        public static Maybe<T> Some([AllowNull] T value) => new Maybe<T>(hasValue: true, value: value);
+        public static Maybe<T> Some([MaybeNull] T value) => new Maybe<T>(hasValue: true, value: value);
 #pragma warning restore CA1000 // Do not declare static members on generic types
 
         /// <inheritdoc />
@@ -88,7 +90,7 @@
         public override int GetHashCode()
         {
             return this.HasValue
-                ? EqualityComparer<T>.Default.GetHashCode(this.value)
+                ? EqualityComparer<T>.Default.GetHashCode(this.value!)
                 : 0;
         }
 

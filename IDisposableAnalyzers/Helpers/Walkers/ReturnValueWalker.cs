@@ -134,7 +134,7 @@
                                      parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                      parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                this.returnValues.Add(defaultValue);
+                                _ = this.returnValues.Add(defaultValue);
                             }
                         }
 
@@ -168,7 +168,7 @@
                                      parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                      parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                this.returnValues.Add(defaultValue);
+                                _ = this.returnValues.Add(defaultValue);
                             }
                         }
 
@@ -255,7 +255,7 @@
                                  parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                  parameterDeclaration is { Default: { Value: { } value } })
                         {
-                            this.returnValues.Add(value);
+                            _ = this.returnValues.Add(value);
                         }
                     }
 
@@ -315,7 +315,7 @@
                             method != null &&
                             method.DeclaringSyntaxReferences.Length == 0)
                         {
-                            this.returnValues.Add(invocation);
+                            _ = this.returnValues.Add(invocation);
                         }
 
                         break;
@@ -336,7 +336,7 @@
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
                         if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
                         {
-                            this.returnValues.Add(value);
+                            _ = this.returnValues.Add(value);
                             return;
                         }
 
@@ -344,7 +344,7 @@
                         this.assignedValueWalkers.Add(identifierName, assignedValues);
                         if (assignedValues.Count == 0)
                         {
-                            this.returnValues.Add(value);
+                            _ = this.returnValues.Add(value);
                         }
                         else
                         {
@@ -361,7 +361,7 @@
                             property != null &&
                             property.DeclaringSyntaxReferences.Length == 0)
                         {
-                            this.returnValues.Add(value);
+                            _ = this.returnValues.Add(value);
                         }
 
                         break;
@@ -372,7 +372,7 @@
             }
             else
             {
-                this.returnValues.Add(value);
+                _ = this.returnValues.Add(value);
             }
         }
 
