@@ -30,7 +30,7 @@
 
         internal ConstructorDeclarationSyntax? Default { get; private set; }
 
-        private INamedTypeSymbol Type => this.type ?? (this.type = (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken)!);
+        private INamedTypeSymbol Type => this.type ??= (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken)!;
 
         public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
         {
@@ -111,8 +111,7 @@
                     return walker;
                 }
 
-                if (context is ClassDeclarationSyntax classDeclaration &&
-                    classDeclaration.BaseList is null)
+                if (context is ClassDeclarationSyntax { BaseList: null })
                 {
                     return walker;
                 }
