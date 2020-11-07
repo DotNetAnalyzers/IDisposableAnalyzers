@@ -5,7 +5,6 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <CodeAnalysisRuleSet></CodeAnalysisRuleSet>
   </PropertyGroup>
   
   <PropertyGroup>
