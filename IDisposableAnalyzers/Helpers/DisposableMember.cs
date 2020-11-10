@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -59,7 +61,8 @@
             {
                 foreach (var candidate in walker.Invocations)
                 {
-                    if (DisposeCall.IsDisposing(candidate, member.Symbol, semanticModel, cancellationToken))
+                    if (DisposeCall.MatchAny(candidate, semanticModel, cancellationToken) is { } dispose &&
+                        dispose.IsDisposing(member.Symbol, semanticModel, cancellationToken))
                     {
                         return true;
                     }
@@ -70,7 +73,7 @@
             {
                 if (candidate.Identifier.Text == member.Name &&
                     semanticModel.TryGetSymbol(candidate, cancellationToken, out var candidateSymbol) &&
-                    candidateSymbol.OriginalDefinition.Equals(member.Symbol))
+                   SymbolComparer.Equal(candidateSymbol.OriginalDefinition, member.Symbol))
                 {
                     return true;
                 }

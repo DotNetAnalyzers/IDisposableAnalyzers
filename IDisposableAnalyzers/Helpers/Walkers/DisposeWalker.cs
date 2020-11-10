@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading;
     using Gu.Roslyn.AnalyzerExtensions;
@@ -74,33 +73,15 @@
 
         internal static DisposeWalker Borrow(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposeMethod != null)
-            {
-                return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
-            }
-
-            return Borrow(() => new DisposeWalker());
+            return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
         }
-
-        internal static DisposeWalker Borrow(SyntaxNode scope, SearchScope search, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (scope != null)
-            {
-                return BorrowAndVisit(scope, search, semanticModel, cancellationToken, () => new DisposeWalker());
-            }
-
-            return Borrow(() => new DisposeWalker());
-        }
-
-        internal void RemoveAll(Predicate<InvocationExpressionSyntax> match) => this.invocations.RemoveAll(match);
-
-        internal void RemoveAll(Predicate<IdentifierNameSyntax> match) => this.identifiers.RemoveAll(match);
 
         internal Result IsMemberDisposed(ISymbol member)
         {
             foreach (var invocation in this.invocations)
             {
-                if (DisposeCall.IsDisposing(invocation, member, this.SemanticModel, this.CancellationToken))
+                if (DisposeCall.MatchAny(invocation, this.SemanticModel, this.CancellationToken) is { } dispose &&
+                    dispose.IsDisposing(member, this.SemanticModel, this.CancellationToken))
                 {
                     return Result.Yes;
                 }

@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
@@ -39,20 +38,18 @@
                 : (DisposeCall?)null;
         }
 
-        internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
+        internal IdentifierNameSyntax? FindDisposed(SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (disposeCall)
+            return this.Invocation switch
             {
-                case { Expression: MemberAccessExpressionSyntax { Expression: { } expression } }
-                    when TryGetName(expression, out var candidate):
-                    return TryGetRoot(candidate, out disposedMember);
-                case { Expression: MemberBindingExpressionSyntax _, Parent: ConditionalAccessExpressionSyntax { Expression: { } expression } }
-                    when TryGetName(expression, out var candidate):
-                    return TryGetRoot(candidate, out disposedMember);
-            }
-
-            disposedMember = null;
-            return false;
+                { Expression: MemberAccessExpressionSyntax { Expression: { } expression } }
+                    when TryGetName(expression, out var candidate)
+                    => TryGetRoot(candidate, out var disposedMember) ? disposedMember : null,
+                { Expression: MemberBindingExpressionSyntax _, Parent: ConditionalAccessExpressionSyntax { Expression: { } expression } }
+                    when TryGetName(expression, out var candidate)
+                    => TryGetRoot(candidate, out var disposedMember) ? disposedMember : null,
+                _ => null,
+            };
 
             static bool TryGetName(ExpressionSyntax candidate, out IdentifierNameSyntax name)
             {
@@ -123,9 +120,9 @@
             }
         }
 
-        internal static bool IsDisposing(InvocationExpressionSyntax disposeCall, ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal bool IsDisposing(ISymbol symbol, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (TryGetDisposed(disposeCall, semanticModel, cancellationToken, out var disposed) &&
+            if (this.FindDisposed(semanticModel, cancellationToken) is { } disposed &&
                 semanticModel.TryGetSymbol(disposed, cancellationToken, out var disposedSymbol))
             {
                 if (disposedSymbol.IsEquivalentTo(symbol))
@@ -140,7 +137,7 @@
                     return walker.ReturnValues.TrySingle(out var returnValue) &&
                            MemberPath.TrySingle(returnValue, out var expression) &&
                            semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
-                           nested.Equals(symbol);
+                           SymbolComparer.Equal(nested, symbol);
                 }
             }
 

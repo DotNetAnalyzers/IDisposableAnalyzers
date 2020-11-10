@@ -31,9 +31,9 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is InvocationExpressionSyntax invocation &&
-                DisposeCall.MatchAny(invocation, context.SemanticModel, context.CancellationToken) is { } &&
+                DisposeCall.MatchAny(invocation, context.SemanticModel, context.CancellationToken) is { } call &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
-                DisposeCall.TryGetDisposed(invocation, context.SemanticModel, context.CancellationToken, out var disposed))
+                call.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed)
             {
                 if (Disposable.IsCachedOrInjectedOnly(disposed, invocation, context.SemanticModel, context.CancellationToken))
                 {

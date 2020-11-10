@@ -7,8 +7,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -184,8 +186,9 @@
 
         private static void ReplaceWithUsing(DocumentEditor editor, InvocationExpressionSyntax invocation, CancellationToken cancellationToken)
         {
-            if (DisposeCall.TryGetDisposed(invocation, editor.SemanticModel, cancellationToken, out var root) &&
-                editor.SemanticModel.TryGetSymbol(root, cancellationToken, out ILocalSymbol? local) &&
+            if (DisposeCall.MatchAny(invocation, editor.SemanticModel, cancellationToken) is { } call &&
+                call.FindDisposed(editor.SemanticModel, cancellationToken) is { } disposed &&
+                editor.SemanticModel.TryGetSymbol(disposed, cancellationToken, out ILocalSymbol? local) &&
                 local.TrySingleDeclaration(cancellationToken, out VariableDeclarationSyntax? declaration) &&
                 invocation.TryFirstAncestor(out ExpressionStatementSyntax? expressionStatement) &&
                 declaration.Parent is LocalDeclarationStatementSyntax localDeclarationStatement)

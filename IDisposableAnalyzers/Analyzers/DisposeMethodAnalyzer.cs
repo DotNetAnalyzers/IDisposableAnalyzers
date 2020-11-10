@@ -2,7 +2,9 @@
 {
     using System.Collections.Immutable;
     using System.Linq;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -123,7 +125,8 @@
                 using var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken);
                 foreach (var disposeCall in disposeWalker.Invocations)
                 {
-                    if (DisposeCall.TryGetDisposed(disposeCall, context.SemanticModel, context.CancellationToken, out var disposed) &&
+                    if (DisposeCall.MatchAny(disposeCall, context.SemanticModel, context.CancellationToken) is { } call &&
+                        call.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed &&
                         context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out var disposedSymbol) &&
                         FieldOrProperty.TryCreate(disposedSymbol, out var fieldOrProperty) &&
                         !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))

@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -9,7 +11,7 @@
     {
         internal static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (TryGetScope(expression, out var block))
+            if (Scope(expression) is {} block)
             {
                 using var walker = InvocationWalker.Borrow(block);
                 foreach (var invocation in walker.Invocations)
@@ -19,7 +21,8 @@
                         continue;
                     }
 
-                    if (DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) &&
+                    if (DisposeCall.MatchAny(invocation, semanticModel, cancellationToken) is { } dispose &&
+                        dispose.IsDisposing(symbol, semanticModel, cancellationToken) &&
                         !IsReassignedAfter(block, invocation))
                     {
                         return true;
@@ -34,9 +37,10 @@
                 using var pooled = InvocationWalker.Borrow(setter);
                 foreach (var invocation in pooled.Invocations)
                 {
-                    if ((DisposeCall.IsDisposing(invocation, symbol, semanticModel, cancellationToken) ||
-                         DisposeCall.IsDisposing(invocation, property, semanticModel, cancellationToken)) &&
-                         !IsReassignedAfter(setter, invocation))
+                    if (DisposeCall.MatchAny(invocation, semanticModel, cancellationToken) is { } dispose &&
+                        (dispose.IsDisposing(symbol, semanticModel, cancellationToken) ||
+                         dispose.IsDisposing(property, semanticModel, cancellationToken)) &&
+                        !IsReassignedAfter(setter, invocation))
                     {
                         return true;
                     }
@@ -45,28 +49,24 @@
 
             return false;
 
-            static bool TryGetScope(SyntaxNode node, out BlockSyntax result)
+            static BlockSyntax? Scope(SyntaxNode node)
             {
                 if (node.FirstAncestor<AnonymousFunctionExpressionSyntax>() is { Body: BlockSyntax lambdaBody })
                 {
-                    result = lambdaBody;
-                    return true;
+                    return lambdaBody;
                 }
 
-                if (node.FirstAncestor<AccessorDeclarationSyntax>() is { Body: BlockSyntax accessorBody })
+                if (node.FirstAncestor<AccessorDeclarationSyntax>() is { Body: { } accessorBody })
                 {
-                    result = accessorBody;
-                    return true;
+                    return accessorBody;
                 }
 
-                if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is { Body: BlockSyntax methodBody })
+                if (node.FirstAncestor<BaseMethodDeclarationSyntax>() is { Body: { } methodBody })
                 {
-                    result = methodBody;
-                    return true;
+                    return methodBody;
                 }
 
-                result = null!;
-                return false;
+                return null;
             }
 
             bool IsReassignedAfter(SyntaxNode scope, InvocationExpressionSyntax disposeCall)
