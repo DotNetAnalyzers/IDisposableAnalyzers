@@ -3,8 +3,6 @@
     using System;
     using System.Text;
 
-    using Microsoft.Extensions.DependencyInjection;
-
     public class Cases
     {
         public static void ActivatorCreateInstanceOfDisposable(IServiceProvider provider)

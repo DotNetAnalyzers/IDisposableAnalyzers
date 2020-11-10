@@ -4,7 +4,9 @@
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -29,7 +31,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is InvocationExpressionSyntax invocation &&
-                DisposeCall.IsMatchAny(invocation, context.SemanticModel, context.CancellationToken) &&
+                DisposeCall.MatchAny(invocation, context.SemanticModel, context.CancellationToken) is { } &&
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 DisposeCall.TryGetDisposed(invocation, context.SemanticModel, context.CancellationToken, out var disposed))
             {

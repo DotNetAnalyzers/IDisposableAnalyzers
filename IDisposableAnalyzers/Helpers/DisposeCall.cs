@@ -8,8 +8,37 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class DisposeCall
+    internal readonly struct DisposeCall
     {
+        internal readonly InvocationExpressionSyntax Invocation;
+
+        private DisposeCall(InvocationExpressionSyntax invocation)
+        {
+            this.Invocation = invocation;
+        }
+
+        internal static DisposeCall? MatchAny(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return MatchDispose(candidate, semanticModel, cancellationToken) ??
+                   MatchDisposeAsync(candidate, semanticModel, cancellationToken);
+        }
+
+        internal static DisposeCall? MatchDispose(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
+                   candidate.IsSymbol(KnownSymbol.IDisposable.Dispose, semanticModel, cancellationToken)
+             ? new DisposeCall(candidate)
+             : (DisposeCall?)null;
+        }
+
+        internal static DisposeCall? MatchDisposeAsync(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        {
+            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
+                   candidate.IsSymbol(KnownSymbol.IAsyncDisposable.DisposeAsync, semanticModel, cancellationToken)
+                ? new DisposeCall(candidate)
+                : (DisposeCall?)null;
+        }
+
         internal static bool TryGetDisposed(InvocationExpressionSyntax disposeCall, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out IdentifierNameSyntax? disposedMember)
         {
             switch (disposeCall)
@@ -116,13 +145,6 @@
             }
 
             return false;
-        }
-
-        internal static bool IsMatchAny(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
-                   (candidate.IsSymbol(KnownSymbol.IDisposable.Dispose, semanticModel, cancellationToken) ||
-                    candidate.IsSymbol(KnownSymbol.IAsyncDisposable.DisposeAsync, semanticModel, cancellationToken));
         }
     }
 }

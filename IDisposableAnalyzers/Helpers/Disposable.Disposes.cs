@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -186,7 +188,7 @@
 
             bool IsDisposeOrReturnValueDisposed(InvocationExpressionSyntax invocation)
             {
-                if (DisposeCall.IsMatchAny(invocation, recursion.SemanticModel, recursion.CancellationToken))
+                if (DisposeCall.MatchAny(invocation, recursion.SemanticModel, recursion.CancellationToken) is { })
                 {
                     return true;
                 }
