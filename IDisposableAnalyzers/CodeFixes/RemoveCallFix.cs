@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,7 +26,7 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement))
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<ExpressionStatementSyntax>() is { } statement)
                 {
                     context.RegisterCodeFix(
                         "Remove",

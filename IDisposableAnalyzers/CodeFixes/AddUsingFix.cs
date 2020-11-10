@@ -38,7 +38,7 @@
             {
                 if (diagnostic.Id == Descriptors.IDISP001DisposeCreated.Id)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ArgumentSyntax? argument) &&
+                    if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax argument &&
                         argument is { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: IfStatementSyntax { Statement: BlockSyntax ifBlock } } } })
                     {
                         if (argument is { Expression: DeclarationExpressionSyntax { Designation: SingleVariableDesignationSyntax { Identifier: { } identifier } } })
