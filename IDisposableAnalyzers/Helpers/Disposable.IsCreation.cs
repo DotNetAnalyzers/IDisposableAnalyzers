@@ -483,13 +483,13 @@
                     }
 
                     if (method.IsGenericMethod &&
-                        Equals(method.TypeArguments[0], method.ReturnType))
+                        TypeSymbolComparer.Equal(method.TypeArguments[0], method.ReturnType))
                     {
                         return Result.AssumeNo;
                     }
 
                     if (method.TryGetThisParameter(out var thisParameter) &&
-                        thisParameter.Type.Equals(method.ReturnType))
+                        TypeSymbolComparer.Equal(thisParameter.Type, method.ReturnType))
                     {
                         if (method.ReturnType == KnownSymbol.ILoggerFactory)
                         {
