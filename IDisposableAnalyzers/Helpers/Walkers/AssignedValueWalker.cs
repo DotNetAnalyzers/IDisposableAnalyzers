@@ -5,7 +5,9 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -232,9 +234,8 @@
 
         internal void HandleInvoke(IMethodSymbol method, ArgumentListSyntax? argumentList)
         {
-            if (method != null &&
-                (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
-                 this.CurrentSymbol.ContainingType?.IsAssignableTo(method.ContainingType, this.semanticModel.Compilation) == true))
+            if (method.Parameters.TryFirst(x => x.RefKind != RefKind.None, out _) ||
+                this.CurrentSymbol.ContainingType?.IsAssignableTo(method.ContainingType, this.semanticModel.Compilation) == true)
             {
                 if (TryGetWalker(out var walker))
                 {
@@ -399,11 +400,6 @@
 
         private static AssignedValueWalker BorrowCore(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (symbol is null || context is null)
-            {
-                return Borrow(() => new AssignedValueWalker());
-            }
-
             var pooled = Borrow(() => new AssignedValueWalker());
             pooled.CurrentSymbol = symbol;
             pooled.context = Context.Create(context, symbol, cancellationToken);
@@ -423,19 +419,19 @@
 
             if (this.CurrentSymbol is ILocalSymbol local &&
                 local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
-                TryGetScope(declaration, out var scope))
+                Scope(declaration) is { } localScope)
             {
-                this.Visit(scope!);
+                this.Visit(localScope);
             }
             else if (this.CurrentSymbol.Kind == SymbolKind.Discard &&
-                     TryGetScope(this.context.Node, out scope))
+                     Scope(this.context.Node) is { } discardScope)
             {
-                this.Visit(scope!);
+                this.Visit(discardScope);
             }
             else if (this.CurrentSymbol.Kind == SymbolKind.Parameter &&
-                     TryGetScope(this.context.Node, out scope))
+                     Scope(this.context.Node) is { } parameterScope)
             {
-                this.Visit(scope!);
+                this.Visit(parameterScope);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
                      this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? typeDeclaration) &&
@@ -503,7 +499,7 @@
                 if ((this.CurrentSymbol is IFieldSymbol { IsReadOnly: false }) ||
                     (this.CurrentSymbol is IPropertySymbol { IsReadOnly: false }))
                 {
-                    if (TryGetScope(this.context.Node, out scope) &&
+                    if (Scope(this.context.Node) is { } scope &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
                         while (type != null &&
@@ -520,30 +516,23 @@
                 }
             }
 
-            bool TryGetScope(SyntaxNode location, out SyntaxNode? result)
+            SyntaxNode? Scope(SyntaxNode location)
             {
                 if (location is SingleVariableDesignationSyntax designation &&
                     this.context.Node is ExpressionSyntax expression &&
                     expression.Kind() != SyntaxKind.DeclarationExpression &&
                     expression.Contains(designation))
                 {
-                    result = null;
-                    return false;
+                    return null;
                 }
 
-                result = (SyntaxNode)location.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
-                                     location.FirstAncestorOrSelf<MemberDeclarationSyntax>();
-                return result != null;
+                return (SyntaxNode?)location.FirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>() ??
+                                    location.FirstAncestorOrSelf<MemberDeclarationSyntax>();
             }
         }
 
         private void HandleAssignedValue(SyntaxNode assigned, ExpressionSyntax value)
         {
-            if (value is null)
-            {
-                return;
-            }
-
             if (assigned is VariableDeclaratorSyntax declarator &&
                 declarator.Identifier.ValueText != this.CurrentSymbol.Name)
             {
