@@ -3,8 +3,10 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -33,7 +35,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (TryGetMemberAccess(out var member) &&
+                if (FindMemberAccess() is { } member &&
+                    semanticModel is { } &&
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? memberSymbol) &&
                     FieldOrProperty.TryCreate(memberSymbol, out var fieldOrProperty) &&
                     member.FirstAncestor<ClassDeclarationSyntax>() is { } classDeclaration &&
@@ -100,23 +103,14 @@
                     }
                 }
 
-                bool TryGetMemberAccess(out SyntaxNode node)
+                SyntaxNode? FindMemberAccess()
                 {
-                    if (syntaxRoot.TryFindNode(diagnostic, out AssignmentExpressionSyntax? assignment) &&
-                        assignment is { Left: { } left })
+                    return syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) switch
                     {
-                        node = left;
-                        return true;
-                    }
-
-                    if (syntaxRoot.TryFindNode(diagnostic, out MemberDeclarationSyntax? member))
-                    {
-                        node = member;
-                        return true;
-                    }
-
-                    node = null!;
-                    return false;
+                        AssignmentExpressionSyntax { Left: { } l } => l,
+                        MemberDeclarationSyntax m => m,
+                        _ => null,
+                    };
                 }
             }
         }
@@ -124,11 +118,11 @@
         private static MethodDeclarationSyntax CreateTearDownMethod(QualifiedType tearDownType)
         {
             return SyntaxFactory.MethodDeclaration(
-                attributeLists: SyntaxFactory.SingletonList<AttributeListSyntax>(
+                attributeLists: SyntaxFactory.SingletonList(
                     SyntaxFactory.AttributeList(
                         openBracketToken: SyntaxFactory.Token(SyntaxKind.OpenBracketToken),
                         target: default,
-                        attributes: SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(
+                        attributes: SyntaxFactory.SingletonSeparatedList(
                             SyntaxFactory.Attribute(
                                 name: SyntaxFactory.QualifiedName(
                                     left: SyntaxFactory.QualifiedName(
