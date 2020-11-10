@@ -49,11 +49,9 @@
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP010CallBaseDispose, methodDeclaration.Identifier.GetLocation()));
                     }
 
-                    if (DisposeMethod.TryFindSuppressFinalizeCall(methodDeclaration, context.SemanticModel, context.CancellationToken, out var suppressFinalize))
+                    if (GC.SuppressFinalize.Find(methodDeclaration, context.SemanticModel, context.CancellationToken) is { Argument: { Expression: { } expression } argument })
                     {
-                        if (suppressFinalize.ArgumentList is { Arguments: { Count: 1 } arguments } &&
-                            arguments[0] is { Expression: { } expression } argument &&
-                            !expression.IsKind(SyntaxKind.ThisExpression))
+                        if (!expression.IsKind(SyntaxKind.ThisExpression))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP020SuppressFinalizeThis, argument.GetLocation()));
                         }

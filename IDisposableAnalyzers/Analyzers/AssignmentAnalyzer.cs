@@ -2,7 +2,9 @@
 {
     using System.Collections.Immutable;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -165,7 +167,6 @@
                         return IsNullCheck(binary.Left) || IsNullCheck(binary.Right);
                     case InvocationExpressionSyntax invocation:
                         if (invocation.Expression is IdentifierNameSyntax identifierName &&
-                            invocation.ArgumentList != null &&
                             invocation.ArgumentList.Arguments.Count == 2 &&
                             (identifierName.Identifier.ValueText == nameof(ReferenceEquals) ||
                              identifierName.Identifier.ValueText == nameof(Equals)))
@@ -176,9 +177,7 @@
                                 return !IsAssignedBefore(ifStatement!);
                             }
                         }
-                        else if (invocation.Expression is MemberAccessExpressionSyntax memberAccess &&
-                                 memberAccess.Name is IdentifierNameSyntax memberIdentifier &&
-                                 invocation.ArgumentList != null &&
+                        else if (invocation.Expression is MemberAccessExpressionSyntax { Name: IdentifierNameSyntax memberIdentifier } &&
                                  invocation.ArgumentList.Arguments.Count == 2 &&
                                  (memberIdentifier.Identifier.ValueText == nameof(ReferenceEquals) ||
                                   memberIdentifier.Identifier.ValueText == nameof(Equals)))
@@ -204,9 +203,7 @@
                 }
 
                 if (symbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
-                    expression is MemberAccessExpressionSyntax memberAccess &&
-                    memberAccess.Expression is InstanceExpressionSyntax &&
-                    memberAccess.Name is IdentifierNameSyntax identifier)
+                    expression is MemberAccessExpressionSyntax { Expression: InstanceExpressionSyntax _, Name: IdentifierNameSyntax identifier })
                 {
                     return identifier.Identifier.ValueText == symbol.Name;
                 }

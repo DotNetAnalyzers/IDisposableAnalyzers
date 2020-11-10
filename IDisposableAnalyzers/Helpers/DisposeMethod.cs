@@ -170,27 +170,6 @@
             return null;
         }
 
-        internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall)
-        {
-            using (var walker = InvocationWalker.Borrow(disposeMethod))
-            {
-                foreach (var candidate in walker.Invocations)
-                {
-                    if (candidate.ArgumentList is { Arguments: { Count: 1 } } &&
-                        candidate.TryGetMethodName(out var name) &&
-                        name == "SuppressFinalize" &&
-                        semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out _))
-                    {
-                        suppressCall = candidate;
-                        return true;
-                    }
-                }
-            }
-
-            suppressCall = null;
-            return false;
-        }
-
         internal static bool TryFindDisposeBoolCall(BaseMethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall, [NotNullWhen(true)] out ArgumentSyntax? argument)
         {
             using (var walker = InvocationWalker.Borrow(disposeMethod))
