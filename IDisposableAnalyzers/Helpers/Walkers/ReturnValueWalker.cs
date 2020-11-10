@@ -197,6 +197,7 @@
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, [NotNullWhen(true)] out IPropertySymbol? property)
         {
             if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out property) &&
+                property.GetMethod is { } &&
                 property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
                 this.TryGetRecursive(propertyGet, getter, out var walker))
             {
@@ -292,11 +293,6 @@
 
         private bool TryHandleLambda(LambdaExpressionSyntax lambda)
         {
-            if (lambda is null)
-            {
-                return false;
-            }
-
             if (lambda.Body is ExpressionSyntax expressionBody)
             {
                 this.AddReturnValue(expressionBody);

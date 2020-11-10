@@ -93,7 +93,8 @@
 
             ExpressionSyntax Normalize(ExpressionSyntax e)
             {
-                if (semanticModel.ClassifyConversion(e, KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation)).IsImplicit)
+                if (KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation) is { } disposableType &&
+                    semanticModel.ClassifyConversion(e, disposableType).IsImplicit)
                 {
                     if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
                         DisposeMethod.Find(type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
@@ -189,7 +190,7 @@
         internal static ExpressionSyntax MemberAccess(SyntaxToken memberIdentifier, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (semanticModel.SyntaxTree.TryGetRoot(out var root) &&
-                semanticModel.GetSymbolSafe(memberIdentifier.Parent, cancellationToken) is { } member &&
+                semanticModel.GetSymbolSafe(memberIdentifier, cancellationToken) is { } member &&
                 FieldOrProperty.TryCreate(member, out var fieldOrProperty) &&
                 TryGetMemberAccessFromUsage(root, fieldOrProperty, semanticModel, cancellationToken, out var memberAccess))
             {
@@ -236,7 +237,7 @@
                 {
                     if (name.Identifier.ValueText == member.Name &&
                         semanticModel.TryGetSymbol(name, cancellationToken, out var symbol) &&
-                        symbol.Equals(member.Symbol))
+                        SymbolComparer.Equal(symbol, member.Symbol))
                     {
                         switch (name)
                         {
@@ -270,8 +271,7 @@
                         SyntaxFactory.Block(statements.Append(SyntaxFactory.ExpressionStatement(body)))),
                 { Body: ExpressionSyntax _ } => throw new InvalidOperationException("There was a breaking between Roslyn 3.3.1 and 3.7.0."),
                 { Body: BlockSyntax block } => lambda.ReplaceNode(block, block.AddStatements(statements)),
-                _ => throw new NotSupportedException(
-                    $"No support for adding statements to lambda with the shape: {lambda?.ToString() ?? "null"}"),
+                _ => throw new NotSupportedException($"No support for adding statements to lambda with the shape: {lambda}"),
             };
         }
 
@@ -353,7 +353,7 @@
                             return method switch
                             {
                                 { Body: { } body } => body.SpanStart,
-                                { ExpressionBody: { Expression: { } expression } } => expression.SpanStart,
+                                { ExpressionBody: { Expression: { } body } } => body.SpanStart,
                                 _ => method.SpanStart,
                             };
                         }

@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -100,11 +101,6 @@
 
         internal static MethodDeclarationSyntax Dispose(ExpressionSyntax disposedField)
         {
-            if (disposedField is null)
-            {
-                return EmptyDispose;
-            }
-
             return EmptyDispose.AddBodyStatements(
                 SyntaxFactory.IfStatement(
                     disposedField,
@@ -118,11 +114,6 @@
 
         internal static MethodDeclarationSyntax VirtualDispose(ExpressionSyntax disposedField)
         {
-            if (disposedField is null)
-            {
-                return DefaultVirtualDispose;
-            }
-
             return DefaultVirtualDispose.InsertBodyStatements(
                 0,
                 SyntaxFactory.IfStatement(
@@ -137,16 +128,13 @@
 
         internal static MethodDeclarationSyntax OverrideDispose(ExpressionSyntax disposedField, IMethodSymbol toOverride)
         {
-            switch (toOverride)
+            return toOverride switch
             {
-                case { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 0 } }:
-                    return DefaultPublicOverrideDispose.InsertBodyStatements(
-                        0,
-                        IfDisposedReturn(),
-                        DisposedTrue());
-                case { DeclaredAccessibility: Accessibility.Protected, IsVirtual: true, Parameters: { Length: 1 } parameters }
-                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter:
-                    return SyntaxFactory.MethodDeclaration(
+                { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 0 } }
+                    => DefaultPublicOverrideDispose.InsertBodyStatements(0, IfDisposedReturn(), DisposedTrue()),
+                { DeclaredAccessibility: Accessibility.Protected, IsVirtual: true, Parameters: { Length: 1 } parameters }
+                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter
+                    => SyntaxFactory.MethodDeclaration(
                         attributeLists: default,
                         modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
                         returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -155,16 +143,12 @@
                         typeParameterList: default,
                         parameterList: SingleBoolParameter(parameter.Name),
                         constraintClauses: default,
-                        body: SyntaxFactory.Block(
-                            IfDisposedReturn(),
-                            DisposedTrue(),
-                            IfDisposing(parameter),
-                            BaseDispose(parameter)),
+                        body: SyntaxFactory.Block(IfDisposedReturn(), DisposedTrue(), IfDisposing(parameter), BaseDispose(parameter)),
                         expressionBody: default,
-                        semicolonToken: default);
-                case { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 1 } parameters }
-                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter:
-                    return SyntaxFactory.MethodDeclaration(
+                        semicolonToken: default),
+                { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 1 } parameters }
+                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter
+                    => SyntaxFactory.MethodDeclaration(
                         attributeLists: default,
                         modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
                         returnType: SyntaxFactory.PredefinedType(SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
@@ -173,16 +157,11 @@
                         typeParameterList: default,
                         parameterList: SingleBoolParameter(parameter.Name),
                         constraintClauses: default,
-                        body: SyntaxFactory.Block(
-                            IfDisposedReturn(),
-                            DisposedTrue(),
-                            IfDisposing(parameter),
-                            BaseDispose(parameter)),
+                        body: SyntaxFactory.Block(IfDisposedReturn(), DisposedTrue(), IfDisposing(parameter), BaseDispose(parameter)),
                         expressionBody: default,
-                        semicolonToken: default);
-                default:
-                    throw new NotSupportedException($"Could not generate code for overriding {toOverride}");
-            }
+                        semicolonToken: default),
+                _ => throw new NotSupportedException($"Could not generate code for overriding {toOverride}"),
+            };
 
             IfStatementSyntax IfDisposedReturn()
             {

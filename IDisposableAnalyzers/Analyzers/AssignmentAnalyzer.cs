@@ -115,10 +115,10 @@
                     using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
                     return walker.VariableDeclarators.TrySingle(
                                 x => x is { Initializer: { Value: { } value } } &&
-                                    context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
-                                    symbol.Equals(assignedSymbol),
+                                                      context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
+                                                      SymbolComparer.Equal(symbol, assignedSymbol),
                                 out var match) &&
-                            match.Initializer.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
+                            match.Initializer?.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
                             context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out ILocalSymbol? result)
                             ? result
                             : null;
@@ -171,7 +171,7 @@
                             (identifierName.Identifier.ValueText == nameof(ReferenceEquals) ||
                              identifierName.Identifier.ValueText == nameof(Equals)))
                         {
-                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression), out _) &&
                                 invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                             {
                                 return !IsAssignedBefore(ifStatement!);
@@ -182,7 +182,7 @@
                                  (memberIdentifier.Identifier.ValueText == nameof(ReferenceEquals) ||
                                   memberIdentifier.Identifier.ValueText == nameof(Equals)))
                         {
-                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression?.IsKind(SyntaxKind.NullLiteralExpression) == true, out _) &&
+                            if (invocation.ArgumentList.Arguments.TrySingle(x => x.Expression.IsKind(SyntaxKind.NullLiteralExpression), out _) &&
                                 invocation.ArgumentList.Arguments.TrySingle(x => IsSymbol(x.Expression), out _))
                             {
                                 return !IsAssignedBefore(ifStatement!);
