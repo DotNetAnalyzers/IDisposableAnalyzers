@@ -234,6 +234,7 @@
             if (candidate is LiteralExpressionSyntax ||
                 candidate is DefaultExpressionSyntax ||
                 candidate is TypeOfExpressionSyntax ||
+                candidate is InstanceExpressionSyntax ||
                 candidate is ElementAccessExpressionSyntax)
             {
                 return Result.No;
