@@ -65,8 +65,8 @@
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP019CallSuppressFinalizeVirtual, methodDeclaration.Identifier.GetLocation()));
                     }
 
-                    if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, out _, out var isDisposing) &&
-                        isDisposing.Expression?.IsKind(SyntaxKind.TrueLiteralExpression) != true)
+                    if (DisposeBool.Find(methodDeclaration) is { Argument: { Expression: { } } isDisposing } &&
+                        !isDisposing.Expression.IsKind(SyntaxKind.TrueLiteralExpression))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP021DisposeTrue, isDisposing.GetLocation()));
                     }

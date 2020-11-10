@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -26,8 +28,8 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is DestructorDeclarationSyntax methodDeclaration)
             {
-                if (DisposeMethod.TryFindDisposeBoolCall(methodDeclaration, out _, out var isDisposing) &&
-                    isDisposing.Expression?.IsKind(SyntaxKind.FalseLiteralExpression) != true)
+                if (DisposeBool.Find(methodDeclaration) is { Argument: { Expression: { } expression } isDisposing } &&
+                    !expression.IsKind(SyntaxKind.FalseLiteralExpression))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP022DisposeFalse, isDisposing.GetLocation()));
                 }
