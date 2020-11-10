@@ -11,7 +11,7 @@
     {
         internal readonly InvocationExpressionSyntax Invocation;
 
-        private DisposeCall(InvocationExpressionSyntax invocation)
+        internal DisposeCall(InvocationExpressionSyntax invocation)
         {
             this.Invocation = invocation;
         }

@@ -115,7 +115,7 @@
         private static bool ShouldCallBase(SymbolAndDeclaration<IMethodSymbol, MethodDeclarationSyntax> method, SyntaxNodeAnalysisContext context)
         {
             if (method is { Symbol: { IsOverride: true, OverriddenMethod: { } overridden } } &&
-                !DisposeMethod.TryFindBaseCall(method.Declaration, context.SemanticModel, context.CancellationToken, out _))
+                DisposeMethod.FindBaseCall(method.Declaration, context.SemanticModel, context.CancellationToken) is null)
             {
                 if (overridden.DeclaringSyntaxReferences.Length == 0)
                 {

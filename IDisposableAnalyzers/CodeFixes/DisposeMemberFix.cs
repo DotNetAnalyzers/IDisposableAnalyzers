@@ -6,8 +6,10 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -96,9 +98,9 @@
                                         ifDisposing = SyntaxFactory.IfStatement(
                                             SyntaxFactory.IdentifierName(parameters[0].Identifier),
                                             SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
-                                        if (DisposeMethod.TryFindBaseCall(method!, editor.SemanticModel, cancellationToken, out var baseCall))
+                                        if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is { Invocation: { Parent: { } } } baseCall)
                                         {
-                                            editor.InsertBefore(baseCall.Parent, ifDisposing);
+                                            editor.InsertBefore(baseCall.Invocation.Parent, ifDisposing);
                                         }
                                         else
                                         {
@@ -117,10 +119,10 @@
 
                                 void DisposeWhenNoParameter(DocumentEditor editor, CancellationToken cancellationToken)
                                 {
-                                    if (DisposeMethod.TryFindBaseCall(method!, editor.SemanticModel, cancellationToken, out var baseCall))
+                                    if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is { Invocation: { Parent: { } } } baseCall)
                                     {
                                         editor.InsertBefore(
-                                            baseCall.Parent,
+                                            baseCall.Invocation.Parent,
                                             IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken));
                                     }
                                     else

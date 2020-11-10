@@ -77,14 +77,17 @@
                        FindVirtual(type, compilation, Search.TopLevel);
             }
 
-            while (type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
+            while (type is { } &&
+                   type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
             {
                 if (FindFirst(type, compilation, Search.TopLevel) is { } disposeMethod)
                 {
                     return disposeMethod;
                 }
 
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
                 type = type.BaseType;
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
             }
 
             return null;
@@ -114,17 +117,7 @@
             }
         }
 
-        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
-        {
-            if (type.TypeKind == TypeKind.Interface)
-            {
-                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
-            }
-
-            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
-        }
-
-        internal static bool TryFindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? baseCall)
+        internal static DisposeCall? FindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (virtualDispose)
             {
@@ -140,10 +133,9 @@
                                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
                                 semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
                                 method is { IsOverride: true, OverriddenMethod: { } overridden } &&
-                                target.Equals(overridden))
+                                MethodSymbolComparer.Equal(target, overridden))
                             {
-                                baseCall = invocation;
-                                return true;
+                                return new DisposeCall(invocation);
                             }
                         }
 
@@ -165,10 +157,9 @@
                                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
                                 semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
                                 method is { IsOverride: true, OverriddenMethod: { } overridden } &&
-                                target.Equals(overridden))
+                                MethodSymbolComparer.Equal(target, overridden))
                             {
-                                baseCall = invocation;
-                                return true;
+                                return new DisposeCall(invocation);
                             }
                         }
 
@@ -176,8 +167,17 @@
                     }
             }
 
-            baseCall = null;
-            return false;
+            return null;
+        }
+
+        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
+        {
+            if (type.TypeKind == TypeKind.Interface)
+            {
+                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+            }
+
+            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
         }
 
         internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall)
@@ -234,12 +234,6 @@
         {
             return candidate is { IsVirtual: true, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 1 } parameters } &&
                    parameters[0].Type.SpecialType == SpecialType.System_Boolean;
-        }
-
-        internal static bool IsIDisposableDispose(IMethodSymbol candidate, Compilation compilation)
-        {
-            return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } } &&
-                   Disposable.IsAssignableFrom(candidate.ContainingType, compilation);
         }
     }
 }
