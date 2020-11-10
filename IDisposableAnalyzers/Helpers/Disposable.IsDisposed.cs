@@ -11,7 +11,7 @@
     {
         internal static bool IsDisposedBefore(ISymbol symbol, ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (Scope(expression) is {} block)
+            if (Scope(expression) is { } block)
             {
                 using var walker = InvocationWalker.Borrow(block);
                 foreach (var invocation in walker.Invocations)

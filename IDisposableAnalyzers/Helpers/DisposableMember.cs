@@ -16,11 +16,6 @@
 
         internal static Result IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (context is null)
-            {
-                return Result.Unknown;
-            }
-
             using var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken);
             var isMemberDisposed = walker.IsMemberDisposed(member.Symbol);
             switch (isMemberDisposed)
@@ -41,11 +36,6 @@
 
         internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (disposeMethod is null)
-            {
-                return false;
-            }
-
             if (disposeMethod.TrySingleMethodDeclaration(cancellationToken, out var disposeMethodDeclaration))
             {
                 return IsDisposed(member, disposeMethodDeclaration, semanticModel, cancellationToken);

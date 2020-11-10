@@ -26,8 +26,7 @@
                                                    .ConfigureAwait(false);
             foreach (var diagnostic in context.Diagnostics)
             {
-                var node = syntaxRoot.FindNode(diagnostic.Location.SourceSpan);
-                switch (node)
+                switch (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan))
                 {
                     case AssignmentExpressionSyntax { Left: { } left } assignment:
                         context.RegisterCodeFix(
@@ -80,7 +79,7 @@
                               .WithBody(
                                   SyntaxFactory.Block(
                                       IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
-                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
+                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody!.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax method }:
                     editor.ReplaceNode(
@@ -90,7 +89,7 @@
                               .WithBody(
                                   SyntaxFactory.Block(
                                       IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
-                                      SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
+                                      SyntaxFactory.ReturnStatement(x.ExpressionBody!.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
                     when accessor.IsKind(SyntaxKind.GetAccessorDeclaration):
@@ -101,7 +100,7 @@
                               .WithBody(
                                   SyntaxFactory.Block(
                                       IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
-                                      SyntaxFactory.ReturnStatement(x.ExpressionBody.Expression))));
+                                      SyntaxFactory.ReturnStatement(x.ExpressionBody!.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: AccessorDeclarationSyntax accessor }
                     when accessor.IsKind(SyntaxKind.SetAccessorDeclaration):
@@ -112,7 +111,7 @@
                               .WithBody(
                                   SyntaxFactory.Block(
                                       IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
-                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression))));
+                                      SyntaxFactory.ExpressionStatement(x.ExpressionBody!.Expression))));
                     break;
                 case ArrowExpressionClauseSyntax { Parent: PropertyDeclarationSyntax property }:
                     editor.ReplaceNode(
@@ -127,7 +126,7 @@
                                               SyntaxFactory.Block(
                                                   IDisposableFactory.DisposeStatement(disposable, editor.SemanticModel, cancellationToken),
                                                   SyntaxFactory.ReturnStatement(
-                                                      x.ExpressionBody.Expression)))))));
+                                                      x.ExpressionBody!.Expression)))))));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"Dispose before code gen failed for {location.Kind()}, write an issue so we can add support.");

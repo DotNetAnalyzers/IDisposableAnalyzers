@@ -117,7 +117,7 @@
             }
         }
 
-        internal static DisposeCall? FindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static InvocationExpressionSyntax? FindBaseCall(MethodDeclarationSyntax virtualDispose, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (virtualDispose)
             {
@@ -135,7 +135,7 @@
                                 method is { IsOverride: true, OverriddenMethod: { } overridden } &&
                                 MethodSymbolComparer.Equal(target, overridden))
                             {
-                                return new DisposeCall(invocation);
+                                return invocation;
                             }
                         }
 
@@ -159,7 +159,7 @@
                                 method is { IsOverride: true, OverriddenMethod: { } overridden } &&
                                 MethodSymbolComparer.Equal(target, overridden))
                             {
-                                return new DisposeCall(invocation);
+                                return invocation;
                             }
                         }
 
@@ -168,16 +168,6 @@
             }
 
             return null;
-        }
-
-        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
-        {
-            if (type.TypeKind == TypeKind.Interface)
-            {
-                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
-            }
-
-            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
         }
 
         internal static bool TryFindSuppressFinalizeCall(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out InvocationExpressionSyntax? suppressCall)
@@ -222,6 +212,16 @@
             suppressCall = null;
             argument = null;
             return false;
+        }
+
+        internal static bool IsAccessibleOn(ITypeSymbol type, Compilation compilation)
+        {
+            if (type.TypeKind == TypeKind.Interface)
+            {
+                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+            }
+
+            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
         }
 
         internal static bool IsOverrideDispose(IMethodSymbol candidate)

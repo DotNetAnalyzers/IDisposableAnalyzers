@@ -216,15 +216,13 @@
 
             bool IsAssignedBefore(IfStatementSyntax nullCheck)
             {
-                using (var walker = AssignmentExecutionWalker.Borrow(nullCheck, SearchScope.Member, semanticModel, cancellationToken))
+                using var walker = AssignmentExecutionWalker.Borrow(nullCheck, SearchScope.Member, semanticModel, cancellationToken);
+                foreach (var assignment in walker.Assignments)
                 {
-                    foreach (var assignment in walker.Assignments)
+                    if (IsSymbol(assignment.Left) &&
+                        assignment.SpanStart < context.SpanStart)
                     {
-                        if (IsSymbol(assignment.Left) &&
-                            assignment.SpanStart < context.SpanStart)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
 
