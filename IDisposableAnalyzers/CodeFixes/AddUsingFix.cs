@@ -119,7 +119,7 @@
                         diagnostic);
                 }
                 else if (diagnostic.Id == Descriptors.IDISP017PreferUsing.Id &&
-                         syntaxRoot.TryFindNode(diagnostic, out InvocationExpressionSyntax? invocation))
+                         syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is InvocationExpressionSyntax invocation)
                 {
                     context.RegisterCodeFix(
                         "Replace with using.",

@@ -94,13 +94,14 @@
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            var body = (SyntaxNode)node.Body ?? node.ExpressionBody;
-            if (body is null)
+            var walker = node switch
             {
-                return Borrow(() => new FinalizerContextWalker());
-            }
-
-            var walker = BorrowAndVisit(body, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker());
+                { ExpressionBody: { } body }
+                    => BorrowAndVisit(body, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker()),
+                { Body: { } body }
+                    => BorrowAndVisit(body, SearchScope.Type, semanticModel, cancellationToken, () => new FinalizerContextWalker()),
+                _ => Borrow(() => new FinalizerContextWalker()),
+            };
 
             foreach (var target in walker.Targets)
             {
@@ -124,14 +125,14 @@
         private static bool IsAssignedNull(SyntaxNode node)
         {
             if (node.Parent is MemberAccessExpressionSyntax memberAccess &&
-                memberAccess.Expression?.IsKind(SyntaxKind.ThisExpression) == true)
+                memberAccess.Expression.IsKind(SyntaxKind.ThisExpression))
             {
                 return IsAssignedNull(memberAccess);
             }
 
             if (node.Parent is AssignmentExpressionSyntax assignment &&
                 assignment.Left.Contains(node) &&
-                assignment.Right?.IsKind(SyntaxKind.NullLiteralExpression) == true)
+                assignment.Right.IsKind(SyntaxKind.NullLiteralExpression))
             {
                 return true;
             }

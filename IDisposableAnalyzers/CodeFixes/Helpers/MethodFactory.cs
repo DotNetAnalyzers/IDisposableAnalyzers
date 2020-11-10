@@ -219,7 +219,8 @@
 
         internal static MethodDeclarationSyntax Dispose(params StatementSyntax[] statements)
         {
-            if (statements is null || statements.Length == 0)
+            if (statements is null ||
+                statements.Length == 0)
             {
                 return EmptyDispose;
             }

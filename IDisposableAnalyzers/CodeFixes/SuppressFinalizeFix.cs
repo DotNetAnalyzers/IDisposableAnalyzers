@@ -45,7 +45,7 @@
                                 (e, _) => e.ReplaceNode(
                                     disposeMethod,
                                     x => x.AsBlockBody(
-                                        SyntaxFactory.ExpressionStatement(x.ExpressionBody.Expression),
+                                        SyntaxFactory.ExpressionStatement(x.ExpressionBody!.Expression),
                                         IDisposableFactory.GcSuppressFinalizeThis)),
                                 equivalenceKey: nameof(SuppressFinalizeFix),
                                 diagnostic);
