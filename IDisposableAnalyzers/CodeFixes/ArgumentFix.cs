@@ -3,7 +3,9 @@
     using System.Collections.Immutable;
     using System.Composition;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -27,14 +29,14 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode(diagnostic, out ArgumentSyntax? argument))
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ArgumentSyntax { Expression: { } expression })
                 {
                     if (diagnostic.Id == Descriptors.IDISP020SuppressFinalizeThis.Id)
                     {
                         context.RegisterCodeFix(
                             "GC.SuppressFinalize(this)",
-                            (e, _) => e.ReplaceNode(
-                                argument.Expression,
+                            e => e.ReplaceNode(
+                                expression,
                                 SyntaxFactory.ThisExpression()),
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
@@ -43,8 +45,8 @@
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(true)",
-                            (e, _) => e.ReplaceNode(
-                                argument.Expression,
+                            e => e.ReplaceNode(
+                                expression,
                                 SyntaxFactory.LiteralExpression(SyntaxKind.TrueLiteralExpression)),
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);
@@ -53,8 +55,8 @@
                     {
                         context.RegisterCodeFix(
                             "this.Dispose(false)",
-                            (e, _) => e.ReplaceNode(
-                                argument.Expression,
+                            e => e.ReplaceNode(
+                                expression,
                                 SyntaxFactory.LiteralExpression(SyntaxKind.FalseLiteralExpression)),
                             equivalenceKey: nameof(SuppressFinalizeFix),
                             diagnostic);

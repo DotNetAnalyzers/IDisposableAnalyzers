@@ -4,7 +4,9 @@
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -41,7 +43,10 @@
 
         public override void VisitReturnStatement(ReturnStatementSyntax node)
         {
-            this.AddReturnValue(node.Expression);
+            if (node.Expression is { } expression)
+            {
+                this.AddReturnValue(expression);
+            }
         }
 
         public override void VisitArrowExpressionClause(ArrowExpressionClauseSyntax node)
