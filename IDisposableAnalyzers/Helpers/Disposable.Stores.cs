@@ -153,7 +153,7 @@
                     }
 
                     if (method.ReturnsVoid ||
-                        invocation.Parent.Kind() == SyntaxKind.ExpressionStatement)
+                        invocation.Parent.IsKind(SyntaxKind.ExpressionStatement))
                     {
                         return false;
                     }

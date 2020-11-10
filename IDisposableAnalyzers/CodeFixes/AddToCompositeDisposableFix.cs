@@ -127,7 +127,7 @@
                                             editor.RemoveNode(statement);
                                             editor.ReplaceNode(
                                                 argumentList,
-                                                x => x.AddArguments(SyntaxFactory.Argument(expression)));
+                                                x => x.AddArguments(SyntaxFactory.Argument(expression!)));
                                             break;
                                         default:
                                             editor.RemoveNode(statement);

@@ -6,8 +6,10 @@
     using System.Globalization;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -36,7 +38,8 @@
             foreach (var diagnostic in context.Diagnostics)
             {
                 if (IsSupportedDiagnostic(diagnostic) &&
-                    syntaxRoot.TryFindNodeOrAncestor(diagnostic, out TypeDeclarationSyntax? typeDeclaration))
+                    semanticModel is { } &&
+                    syntaxRoot?.FindNode(diagnostic.Location.SourceSpan).FirstAncestorOrSelf<TypeDeclarationSyntax>() is { } typeDeclaration)
                 {
                     if (diagnostic.Id == Descriptors.IDISP009IsIDisposable.Id)
                     {

@@ -27,7 +27,7 @@
             Descriptors.IDISP004DoNotIgnoreCreated.Id,
             Descriptors.IDISP017PreferUsing.Id);
 
-        protected override DocumentEditorFixAllProvider? FixAllProvider() => DocumentEditorFixAllProvider.Solution;
+        protected override DocumentEditorFixAllProvider FixAllProvider() => DocumentEditorFixAllProvider.Solution;
 
         protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
         {
@@ -70,7 +70,8 @@
                                 diagnostic);
                         }
                     }
-                    else if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax? statement))
+                    else if (syntaxRoot is { } &&
+                             syntaxRoot.TryFindNodeOrAncestor(diagnostic, out StatementSyntax? statement))
                     {
                         switch (statement)
                         {
@@ -109,6 +110,7 @@
                     }
                 }
                 else if (diagnostic.Id == Descriptors.IDISP004DoNotIgnoreCreated.Id &&
+                         syntaxRoot is { } &&
                          syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement) &&
                          statement.Parent is BlockSyntax)
                 {

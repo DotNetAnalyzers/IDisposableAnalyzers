@@ -2,7 +2,9 @@
 {
     using System.Linq;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -97,7 +99,7 @@
 
         private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
         {
-            if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax parentExpression } })
+            if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax { Parent: { } } parentExpression } })
             {
                 if (target.Declaration is null)
                 {
@@ -141,7 +143,7 @@
                                 return Ignores(parentExpression, recursion);
                             }
 
-                            if (parentExpression.Parent.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
+                            if (parentExpression.Parent!.IsEither(SyntaxKind.ArrowExpressionClause, SyntaxKind.ReturnStatement))
                             {
                                 return true;
                             }

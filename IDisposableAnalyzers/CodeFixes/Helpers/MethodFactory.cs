@@ -239,7 +239,7 @@
 
         private static MethodDeclarationSyntax InsertBodyStatements(this MethodDeclarationSyntax method, int index, params StatementSyntax[] items)
         {
-            return method.WithBody(method.Body.WithStatements(method.Body.Statements.InsertRange(index, items)));
+            return method.WithBody(method.Body!.WithStatements(method.Body.Statements.InsertRange(index, items)));
         }
 
         private static IfStatementSyntax IfDisposedThrow(ExpressionSyntax disposedField)

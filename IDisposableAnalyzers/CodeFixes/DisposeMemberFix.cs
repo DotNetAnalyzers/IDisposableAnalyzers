@@ -32,7 +32,8 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNode<MemberDeclarationSyntax>(diagnostic, out var member) &&
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is MemberDeclarationSyntax member &&
+                    semanticModel is { } &&
                     semanticModel.TryGetSymbol(member, context.CancellationToken, out ISymbol? symbol) &&
                     FieldOrProperty.TryCreate(symbol, out var disposable))
                 {
