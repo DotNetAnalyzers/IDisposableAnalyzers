@@ -25,8 +25,7 @@
 
         internal static bool IsPotentiallyAssignableFrom(ITypeSymbol type, Compilation compilation)
         {
-            if (type is null ||
-                type is IErrorTypeSymbol)
+            if (type is IErrorTypeSymbol)
             {
                 return false;
             }
@@ -78,7 +77,7 @@
                     {
                         return walker.ReturnValues.TrySingle(out var value) &&
                                semanticModel.TryGetType(value, cancellationToken, out var type) &&
-                               IsNop(type);
+                               IsNopCore(type);
                     }
                 }
 
@@ -86,13 +85,13 @@
                 {
                     return walker.TrySingle(out var value) &&
                            semanticModel.TryGetType(value, cancellationToken, out var type) &&
-                           IsNop(type);
+                           IsNopCore(type);
                 }
             }
 
             return false;
 
-            bool IsNop(ITypeSymbol type)
+            bool IsNopCore(ITypeSymbol type)
             {
                 return type is { IsSealed: true, BaseType: { SpecialType: SpecialType.System_Object } } &&
                        type.TryFindSingleMethod("Dispose", out var disposeMethod) &&

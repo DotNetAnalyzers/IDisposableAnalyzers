@@ -120,7 +120,7 @@
 
                 bool IsIgnored(IdentifierNameSyntax candidate)
                 {
-                    switch (candidate.Parent.Kind())
+                    switch (candidate.Parent?.Kind())
                     {
                         case SyntaxKind.NotEqualsExpression:
                             return true;

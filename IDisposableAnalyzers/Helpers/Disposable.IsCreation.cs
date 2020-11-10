@@ -146,11 +146,6 @@
         /// </summary>
         internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate is null)
-            {
-                return Result.Unknown;
-            }
-
             switch (candidate.Kind())
             {
                 case SyntaxKind.NullLiteralExpression:
@@ -231,15 +226,9 @@
         /// </summary>
         private static Result IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (candidate is null ||
-                candidate.IsMissing)
+            if (candidate.IsMissing)
             {
                 return Result.Unknown;
-            }
-
-            if (!IsPotentiallyAssignableFrom(semanticModel.GetTypeInfoSafe(candidate, cancellationToken).Type, semanticModel.Compilation))
-            {
-                return Result.No;
             }
 
             if (candidate is LiteralExpressionSyntax ||
@@ -255,13 +244,13 @@
                 candidate is ImplicitArrayCreationExpressionSyntax ||
                 candidate is InitializerExpressionSyntax)
             {
-                if (semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
-                    IsAssignableFrom(type, semanticModel.Compilation))
+                switch (semanticModel.GetType(candidate, cancellationToken))
                 {
-                    return Result.Yes;
+                    case { } type:
+                        return IsAssignableFrom(type, semanticModel.Compilation) ? Result.Yes : Result.No;
+                    case null:
+                        return Result.Unknown;
                 }
-
-                return Result.No;
             }
 
             if (semanticModel.TryGetSymbol(candidate, cancellationToken, out var symbol))
@@ -434,7 +423,7 @@
                     IMethodSymbol { ContainingType: { MetadataName: "Task" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "Task`1" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "ValueTask`1" } } => Result.No,
-                    IMethodSymbol method => IsCreationCore(method, semanticModel.Compilation),
+                    IMethodSymbol method => IsMethodCreating(method, semanticModel.Compilation),
                     _ => Result.Unknown,
                 };
 
@@ -472,7 +461,7 @@
                     return Result.AssumeNo;
                 }
 
-                static Result IsCreationCore(IMethodSymbol method, Compilation compilation)
+                static Result IsMethodCreating(IMethodSymbol method, Compilation compilation)
                 {
                     if (method.ReturnType == KnownSymbol.Task)
                     {
@@ -516,7 +505,7 @@
                 }
             }
 
-            return Result.AssumeNo;
+            return Result.Unknown;
         }
     }
 }

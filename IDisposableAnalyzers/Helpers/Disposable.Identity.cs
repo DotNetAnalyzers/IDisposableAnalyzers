@@ -98,7 +98,7 @@
                 using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
                 foreach (var usage in walker.Usages)
                 {
-                    switch (usage.Parent.Kind())
+                    switch (usage.Parent?.Kind())
                     {
                         case SyntaxKind.ReturnStatement:
                         case SyntaxKind.ArrowExpressionClause:
@@ -107,7 +107,7 @@
 
                     if (Identity(usage, recursion) is { } id)
                     {
-                        switch (id.Parent.Kind())
+                        switch (id.Parent?.Kind())
                         {
                             case SyntaxKind.ReturnStatement:
                             case SyntaxKind.ArrowExpressionClause:

@@ -72,24 +72,6 @@
             return false;
         }
 
-        internal static bool DisposesBefore(ILocalSymbol local, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
-            {
-                using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
-                foreach (var usage in walker.Usages)
-                {
-                    if (usage.IsExecutedBefore(location).IsEither(ExecutedBefore.Yes, ExecutedBefore.Maybe) &&
-                        Disposes(usage, recursion))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
         internal static bool Disposes(ILocalSymbol local, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (local.TrySingleDeclaration(cancellationToken, out var declaration))
@@ -102,15 +84,13 @@
                 }
             }
 
-            using (var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken))
+            using var recursion = Recursion.Borrow(local.ContainingType, semanticModel, cancellationToken);
+            using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
+            foreach (var usage in walker.Usages)
             {
-                using var walker = UsagesWalker.Borrow(new LocalOrParameter(local), recursion.SemanticModel, recursion.CancellationToken);
-                foreach (var usage in walker.Usages)
+                if (Disposes(usage, recursion))
                 {
-                    if (Disposes(usage, recursion))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
