@@ -7,8 +7,10 @@
     using System.Linq;
     using System.Threading;
     using System.Threading.Tasks;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.CodeFixExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CodeFixes;
     using Microsoft.CodeAnalysis.CSharp;
@@ -41,11 +43,13 @@
                                                    .ConfigureAwait(false);
             var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken)
                                                       .ConfigureAwait(false);
-            if (semanticModel.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Contains("System.Reactive")))
+            if (semanticModel is { } &&
+                semanticModel.Compilation.ReferencedAssemblyNames.Any(x => x.Name.Contains("System.Reactive")))
             {
                 foreach (var diagnostic in context.Diagnostics)
                 {
-                    if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement) &&
+                    if (syntaxRoot is { } &&
+                        syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ExpressionStatementSyntax? statement) &&
                         statement is { Expression: { } expression })
                     {
                         if (TryGetField(statement, semanticModel, context.CancellationToken, out var field))
@@ -179,7 +183,7 @@
                             context.RegisterCodeFix(
                                 "Add to new CompositeDisposable.",
                                 (editor, cancellationToken) => CreateAndInitializeAsync(editor, cancellationToken),
-                                (string?)null,
+                                null,
                                 diagnostic);
 
                             async Task CreateAndInitializeAsync(DocumentEditor editor, CancellationToken cancellationToken)

@@ -78,7 +78,7 @@
                         disposeCall.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
                         statement.IsExecutedBefore(expression) == ExecutedBefore.Yes &&
                         semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assigned) &&
-                        Equals(assigned, symbol) &&
+                        SymbolComparer.Equal(assigned, symbol) &&
                         IsCreation(assignment.Right, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
                     {
                         return true;

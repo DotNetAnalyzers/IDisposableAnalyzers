@@ -98,7 +98,7 @@
                                         ifDisposing = SyntaxFactory.IfStatement(
                                             SyntaxFactory.IdentifierName(parameters[0].Identifier),
                                             SyntaxFactory.Block(IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)));
-                                        if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is {  Parent: { }  } baseCall)
+                                        if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is { Parent: { } } baseCall)
                                         {
                                             editor.InsertBefore(baseCall.Parent, ifDisposing);
                                         }
@@ -119,7 +119,7 @@
 
                                 void DisposeWhenNoParameter(DocumentEditor editor, CancellationToken cancellationToken)
                                 {
-                                    if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is {  Parent: { } } baseCall)
+                                    if (DisposeMethod.FindBaseCall(method!, editor.SemanticModel, cancellationToken) is { Parent: { } } baseCall)
                                     {
                                         editor.InsertBefore(
                                             baseCall.Parent,

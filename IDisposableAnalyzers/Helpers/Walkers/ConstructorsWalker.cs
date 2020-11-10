@@ -56,7 +56,7 @@
                 typeName.Identifier.ValueText == this.context.Identifier.ValueText)
             {
                 if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                    this.Type.Equals(ctor.ContainingType))
+                    TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
                 {
                     this.objectCreations.Add(node);
                 }
@@ -65,13 +65,13 @@
                      qualifiedName.Right.Identifier.ValueText == this.context.Identifier.ValueText)
             {
                 if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                    this.Type.Equals(ctor.ContainingType))
+                    TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
                 {
                     this.objectCreations.Add(node);
                 }
             }
             else if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                     this.Type.Equals(ctor.ContainingType))
+                     TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
             {
                 this.objectCreations.Add(node);
             }

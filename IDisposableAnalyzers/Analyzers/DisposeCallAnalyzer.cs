@@ -68,7 +68,7 @@
                     if (identifierName.Identifier.ValueText == local.Name &&
                         invocation.IsExecutedBefore(identifierName) == ExecutedBefore.Yes &&
                         context.SemanticModel.TryGetSymbol(identifierName, context.CancellationToken, out ILocalSymbol? candidate) &&
-                        local.Equals(candidate) &&
+                        LocalSymbolComparer.Equal(local, candidate) &&
                         !IsAssigned(identifierName) &&
                         !IsReassigned(identifierName))
                     {

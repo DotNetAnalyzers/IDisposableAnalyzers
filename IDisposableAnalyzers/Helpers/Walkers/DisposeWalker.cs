@@ -96,7 +96,7 @@
             {
                 if (member.Name == identifier.Identifier.ValueText &&
                     this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out var candidate) &&
-                     member.Equals(candidate))
+                    SymbolComparer.Equal(member, candidate))
                 {
                     return Result.AssumeYes;
                 }

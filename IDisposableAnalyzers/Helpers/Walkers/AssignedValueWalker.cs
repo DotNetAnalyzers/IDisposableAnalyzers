@@ -117,7 +117,7 @@
                     MemberPath.TrySingle(node, out var memberIdentifier) &&
                     memberIdentifier.Parent is IdentifierNameSyntax member &&
                     this.semanticModel.TryGetSymbol(member, this.cancellationToken, out var memberSymbol) &&
-                    memberSymbol.Equals(this.CurrentSymbol))
+                    SymbolComparer.Equal(memberSymbol, this.CurrentSymbol))
                 {
                     if (method.Parameters.TrySingle(out var parameter) &&
                         node.TryFindArgument(parameter, out var argument))
@@ -142,7 +142,7 @@
             if (node.Parent is AssignmentExpressionSyntax assignment &&
                 this.context.Node is ElementAccessExpressionSyntax &&
                 this.semanticModel.TryGetSymbol(node.Expression, this.cancellationToken, out var symbol) &&
-                symbol.Equals(this.CurrentSymbol))
+                SymbolComparer.Equal(symbol, this.CurrentSymbol))
             {
                 this.values.Add(assignment.Right);
                 base.VisitElementAccessExpression(node);
@@ -157,8 +157,7 @@
 
         public override void VisitCasePatternSwitchLabel(CasePatternSwitchLabelSyntax node)
         {
-            if (node.Parent is SwitchSectionSyntax switchSection &&
-                switchSection.Parent is SwitchStatementSyntax switchStatement)
+            if (node.Parent is SwitchSectionSyntax { Parent: SwitchStatementSyntax switchStatement })
             {
                 this.HandleAssignedValue(node.Pattern, switchStatement.Expression);
             }
@@ -328,7 +327,7 @@
                     parameter = null;
                     if (this.semanticModel.TryGetSymbol(argument.Expression, this.cancellationToken, out var candidate))
                     {
-                        if (candidate.Equals(this.CurrentSymbol))
+                        if (SymbolComparer.Equal(candidate, this.CurrentSymbol))
                         {
                             return method.TryFindParameter(argument, out parameter);
                         }
@@ -552,8 +551,7 @@
             }
 
             if (this.CurrentSymbol.IsEitherKind(SymbolKind.Local, SymbolKind.Parameter) &&
-                assigned is DeclarationPatternSyntax declarationPattern &&
-                declarationPattern.Designation is SingleVariableDesignationSyntax singleVariableDesignation &&
+                assigned is DeclarationPatternSyntax { Designation: SingleVariableDesignationSyntax singleVariableDesignation } &&
                 singleVariableDesignation.Identifier.ValueText == this.CurrentSymbol.Name)
             {
                 this.values.Add(value);
@@ -848,7 +846,7 @@
             {
                 if (node.Initializer is { } initializer &&
                     this.inner.semanticModel.TryGetSymbol(initializer, this.inner.cancellationToken, out var chained) &&
-                    Equals(chained.ContainingType, this.inner.CurrentSymbol.ContainingType))
+                    TypeSymbolComparer.Equal(chained.ContainingType, this.inner.CurrentSymbol.ContainingType))
                 {
                     this.inner.HandleInvoke(chained, node.Initializer.ArgumentList);
                 }
@@ -857,7 +855,7 @@
             public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
             {
                 if (this.inner.semanticModel.TryGetSymbol(node, this.inner.cancellationToken, out var ctor) &&
-                    Equals(ctor.ContainingType, this.inner.CurrentSymbol.ContainingType))
+                    TypeSymbolComparer.Equal(ctor.ContainingType, this.inner.CurrentSymbol.ContainingType))
                 {
                     this.inner.HandleInvoke(ctor, node.ArgumentList);
                 }
