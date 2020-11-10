@@ -24,11 +24,11 @@
 
             foreach (var diagnostic in context.Diagnostics)
             {
-                if (syntaxRoot.TryFindNodeOrAncestor(diagnostic, out ClassDeclarationSyntax? classDeclaration))
+                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is ClassDeclarationSyntax classDeclaration)
                 {
                     context.RegisterCodeFix(
                         "Seal",
-                        (e, _) => e.Seal(classDeclaration),
+                        e => e.Seal(classDeclaration),
                         equivalenceKey: nameof(SealFix),
                         diagnostic);
                 }
