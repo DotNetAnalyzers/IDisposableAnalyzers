@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
+    using System.Collections.Immutable;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
@@ -273,103 +274,15 @@
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: false } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
-                    IMethodSymbol { ContainingType: { MetadataName: "ArraySegment`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "BindingList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "BlockingCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ChangeAwareList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Collection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConcurrentBag`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConcurrentDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConcurrentQueue`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConcurrentStack`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConditionalWeakTable`2" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
-                    IMethodSymbol { ContainingType: { MetadataName: "DbSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Dictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "EditableBindingList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "EditableList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "EntityCollection`1" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "EnumerableQuery`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "FreezableCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "GenericDictionaryAdapter`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "HashSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "HttpHeaderValueCollection`1" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IAggregateChangeSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IBindingList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IChangeSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IChangeSet`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ICollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IDbSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IDistinctChangeSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IEnumerable`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IExtendedList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IGroupChangeSet`3" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IGrouping`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableGroupChangeSet`3" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableQueue`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IImmutableStack`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IKeyValueCollection`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ILookup`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableArray`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableHashSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableQueue`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableSortedDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableSortedSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ImmutableStack`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IObservableCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IOrderedEnumerable`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IOrderedQueryable`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IProducerConsumerCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IQueryable`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IReadOnlyCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IReadOnlyDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "IReadOnlyList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ISet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "KeyedCollection`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "LinkedList`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "List`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Lookup`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ObservableCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ObservableCollectionExtended`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Queue`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ReadOnlyCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "Dispose" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "Close" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "Flush" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "CreateSubKey" } => Result.Yes,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "DeleteSubKey" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "DeleteSubKeyTree" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "DeleteValue" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "OpenSubKey" } => Result.Yes,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "GetSubKeyNames" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "GetValueNames" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "GetValue" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "GetValueKind" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "SetValue" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "GetAccessControl" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "RegistryKey" }, MetadataName: "SetAccessControl" } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "ResourceManager" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ReadOnlyCollectionBuilder`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ReadOnlyDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ReadOnlyMetadataCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ReadOnlyObservableCollection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "SetProjection`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "SortedDictionary`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "SortedList`2" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "SortedSet`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Stack`1" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "Task" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "Task`1" } } => Result.No,
                     IMethodSymbol { ContainingType: { MetadataName: "ValueTask`1" } } => Result.No,
+                    IMethodSymbol { ReturnType: { MetadataName: "Task" } } => Result.No,
+                    IMethodSymbol { IsExtensionMethod: true, ReturnType: { MetadataName: "ILoggerFactory" } } => Result.No,
                     IMethodSymbol method => IsMethodCreating(method, semanticModel.Compilation),
                     _ => Result.Unknown,
                 };
@@ -410,11 +323,6 @@
 
                 static Result IsMethodCreating(IMethodSymbol method, Compilation compilation)
                 {
-                    if (method.ReturnType == KnownSymbol.Task)
-                    {
-                        return Result.No;
-                    }
-
                     if (method.ReturnType is INamedTypeSymbol { IsGenericType: true } returnType &&
                         method.ReturnType == KnownSymbol.TaskOfT)
                     {
@@ -424,13 +332,19 @@
                             : Result.No;
                     }
 
-                    if (!IsAssignableFrom(method.ReturnType, compilation))
+                    if (method.ContainingType is { IsGenericType: true } &&
+                        AnyMatch(method.ReturnType, method.ContainingType.TypeArguments))
                     {
                         return Result.AssumeNo;
                     }
 
                     if (method.IsGenericMethod &&
-                        TypeSymbolComparer.Equal(method.TypeArguments[0], method.ReturnType))
+                        AnyMatch(method.ReturnType, method.TypeArguments))
+                    {
+                        return Result.AssumeNo;
+                    }
+
+                    if (!IsAssignableFrom(method.ReturnType, compilation))
                     {
                         return Result.AssumeNo;
                     }
@@ -438,17 +352,25 @@
                     if (method.TryGetThisParameter(out var thisParameter) &&
                         TypeSymbolComparer.Equal(thisParameter.Type, method.ReturnType))
                     {
-                        if (method.ReturnType == KnownSymbol.ILoggerFactory)
-                        {
-                            return Result.No;
-                        }
-
                         return Result.AssumeNo;
                     }
 
                     return IsAssignableFrom(method.ReturnType, compilation)
                                ? Result.AssumeYes
                                : Result.No;
+
+                   static bool AnyMatch(ITypeSymbol returnType, ImmutableArray<ITypeSymbol> typeArguments)
+                    {
+                        foreach (var typeArgument in typeArguments)
+                        {
+                            if (TypeSymbolComparer.Equal(returnType, typeArgument))
+                            {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    }
                 }
             }
 

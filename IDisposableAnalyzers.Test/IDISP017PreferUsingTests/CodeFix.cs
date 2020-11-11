@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
+﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -23,7 +23,7 @@ namespace N
     {
         public void M()
         {
-            var stream = File.OpenRead(string.Empty)
+            var stream = File.OpenRead(string.Empty);
             var b = stream.ReadByte();
             ↓stream.Dispose();
         }

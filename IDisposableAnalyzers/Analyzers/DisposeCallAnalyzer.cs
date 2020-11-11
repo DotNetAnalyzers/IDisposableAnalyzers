@@ -131,7 +131,7 @@
             {
                 return localDeclarationStatement!.Parent == expressionStatement!.Parent &&
                        declarator is { Initializer: { Value: { } value } } &&
-                       Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken) == Result.Yes;
+                       Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes);
             }
 
             bool IsTrivialTryFinally()

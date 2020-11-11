@@ -27,10 +27,10 @@ namespace IDisposableAnalyzers.Test.Helpers
             [TestCase("(object) new Disposable()",                           Result.Yes)]
             [TestCase("typeof(IDisposable)",                                 Result.No)]
             [TestCase("(IDisposable)null",                                   Result.No)]
-            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null",       Result.Yes)]
-            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.Yes)]
-            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.Yes)]
-            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.Yes)]
+            [TestCase("System.IO.File.OpenRead(string.Empty) ?? null",       Result.AssumeYes)]
+            [TestCase("null ?? System.IO.File.OpenRead(string.Empty)",       Result.AssumeYes)]
+            [TestCase("true ? null : System.IO.File.OpenRead(string.Empty)", Result.AssumeYes)]
+            [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", Result.AssumeYes)]
             public static void LanguageConstructs(string expression, Result expected)
             {
                 var code = @"
@@ -60,49 +60,6 @@ namespace N
                 var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
                 Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
-                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
-            }
-
-            [TestCase("new List<IDisposable>().Find(x => true)",          Result.No)]
-            [TestCase("ImmutableList<IDisposable>.Empty.Find(x => true)", Result.No)]
-            [TestCase("new Queue<IDisposable>().Peek()",                  Result.No)]
-            [TestCase("ImmutableQueue<IDisposable>.Empty.Peek()",         Result.No)]
-            [TestCase("new List<IDisposable>()[0]",                       Result.No)]
-            [TestCase("Moq.Mock.Of<IDisposable>()",                       Result.AssumeNo)]
-            [TestCase("ImmutableList<IDisposable>.Empty[0]",              Result.No)]
-            public static void Ignored(string expression, Result expected)
-            {
-                var code = @"
-namespace N
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.IO;
-    using System.Linq;
-
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-
-    internal class C
-    {
-        internal C()
-        {
-            var value = new Disposable();
-        }
-    }
-}".AssertReplace("new Disposable()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(expression)
-                                      .Value;
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
@@ -187,7 +144,7 @@ namespace N
             [TestCase("CreateDisposableExpressionBodyReturnTypeObject()", Result.Yes)]
             [TestCase("CreateDisposableInIf(true)",                       Result.Yes)]
             [TestCase("CreateDisposableInElse(true)",                     Result.Yes)]
-            [TestCase("ReturningLocal()",                                 Result.Yes)]
+            [TestCase("ReturningLocal()",                                 Result.AssumeYes)]
             public static void Call(string expression, Result expected)
             {
                 var code = @"
@@ -544,31 +501,42 @@ namespace N
                 Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",          Result.AssumeYes)]
-            [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.AssumeYes)]
-            [TestCase("",                                                                                   "System.IO.File.ReadAllLines(string.Empty)",      Result.AssumeNo)]
-            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.Directory",                             Result.No)]
-            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.OpenRead()",                            Result.AssumeYes)]
-            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.ToString()",                            Result.No)]
-            [TestCase("Microsoft.Win32.RegistryKey key",                                                    "key.CreateSubKey(string.Empty)",                 Result.Yes)]
-            [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                             Result.Yes)]
-            [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                     Result.Yes)]
-            [TestCase("System.Data.Entity.Infrastructure.SqlConnectionFactory factory",                     "factory.CreateConnection(string.Empty)",         Result.Yes)]
-            [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()", Result.No)]
-            [TestCase("System.Collections.Generic.List<IDisposable> xs",                                    "xs.First()",                                     Result.No)]
-            [TestCase("System.Collections.Generic.Dictionary<int, IDisposable> map",                        "map[0]",                                         Result.No)]
-            [TestCase("System.Collections.Generic.IReadOnlyDictionary<int, IDisposable> map",               "map[0]",                                         Result.No)]
-            [TestCase("System.Runtime.CompilerServices.ConditionalWeakTable<IDisposable, IDisposable> map", "map.GetOrCreateValue(this.disposable)",          Result.No)]
-            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null)",                        Result.No)]
-            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null, null)",                  Result.No)]
-            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetResourceSet(null, true, true)",       Result.No)]
-            [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",              Result.No)]
+            [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",                              Result.AssumeYes)]
+            [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",                              Result.AssumeYes)]
+            [TestCase("",                                                                                   "System.IO.File.ReadAllLines(string.Empty)",                          Result.AssumeNo)]
+            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.Directory",                                                 Result.No)]
+            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.OpenRead()",                                                Result.AssumeYes)]
+            [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.ToString()",                                                Result.No)]
+            [TestCase("Microsoft.Win32.RegistryKey registryKey",                                            "registryKey.CreateSubKey(string.Empty)",                             Result.AssumeYes)]
+            [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                                                 Result.Yes)]
+            [TestCase("",                                                                                   "new System.Collections.Generic.List<IDisposable>().Find(x => true)", Result.AssumeNo)]
+            [TestCase("",                                                                                   "ImmutableList<IDisposable>.Empty.Find(x => true)",                   Result.AssumeNo)]
+            [TestCase("",                                                                                   "new Queue<IDisposable>().Peek()",                                    Result.AssumeNo)]
+            [TestCase("",                                                                                   "ImmutableQueue<IDisposable>.Empty.Peek()",                           Result.AssumeNo)]
+            [TestCase("",                                                                                   "new List<IDisposable>()[0]",                                         Result.No)]
+            [TestCase("",                                                                                   "Moq.Mock.Of<IDisposable>()",                                         Result.AssumeNo)]
+            [TestCase("",                                                                                   "ImmutableList<IDisposable>.Empty[0]",                                Result.No)]
+            [TestCase("System.Windows.Controls.PasswordBox passwordBox",                                    "passwordBox.SecurePassword",                                         Result.Yes)]
+            [TestCase("System.Data.Entity.Infrastructure.SqlConnectionFactory factory",                     "factory.CreateConnection(string.Empty)",                             Result.Yes)]
+            [TestCase("System.Collections.Generic.List<int> xs",                                            "((System.Collections.IList)xs).GetEnumerator()",                     Result.No)]
+            [TestCase("System.Collections.Generic.List<IDisposable> xs",                                    "xs.First()",                                                         Result.No)]
+            [TestCase("System.Collections.Generic.Dictionary<int, IDisposable> map",                        "map[0]",                                                             Result.No)]
+            [TestCase("System.Collections.Generic.IReadOnlyDictionary<int, IDisposable> map",               "map[0]",                                                             Result.No)]
+            [TestCase("System.Runtime.CompilerServices.ConditionalWeakTable<IDisposable, IDisposable> map", "map.GetOrCreateValue(this.disposable)",                              Result.No)]
+            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null)",                                            Result.No)]
+            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetStream(null, null)",                                      Result.No)]
+            [TestCase("System.Resources.ResourceManager manager",                                           "manager.GetResourceSet(null, true, true)",                           Result.No)]
+            [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",                                  Result.No)]
             public static void ThirdParty(string parameter, string expression, Result expected)
             {
                 var code = @"
 namespace N
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Collections.Immutable;
+    using System.IO;
     using System.Linq;
 
     internal class C

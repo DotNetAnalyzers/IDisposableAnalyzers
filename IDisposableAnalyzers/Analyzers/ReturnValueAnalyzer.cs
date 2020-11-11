@@ -59,7 +59,7 @@
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) == Result.Yes &&
+            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
                 context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out var returnedSymbol))
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||

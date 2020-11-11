@@ -36,7 +36,7 @@
 
             bool IsCreated(ExpressionSyntax expression)
             {
-                return Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) == Result.Yes;
+                return Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes);
             }
 
             bool IsCachedOrInjected(ExpressionSyntax expression)
