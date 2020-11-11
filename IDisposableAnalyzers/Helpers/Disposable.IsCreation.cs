@@ -287,6 +287,22 @@
                                IsAssignableFrom(typeArg, compilation);
                     }
 
+                    if (!IsAssignableFrom(method.ReturnType, compilation))
+                    {
+                        return false;
+                    }
+
+                    if (method.Name.StartsWith("Open") ||
+                        method.Name.StartsWith("Create"))
+                    {
+                        return true;
+                    }
+
+                    if (TypeSymbolComparer.Equal(method.ContainingType, method.ReturnType))
+                    {
+                        return false;
+                    }
+
                     if (method.ContainingType is { IsGenericType: true } &&
                         AnyMatch(method.ReturnType, method.ContainingType.TypeArguments))
                     {
@@ -295,11 +311,6 @@
 
                     if (method.IsGenericMethod &&
                         AnyMatch(method.ReturnType, method.TypeArguments))
-                    {
-                        return false;
-                    }
-
-                    if (!IsAssignableFrom(method.ReturnType, compilation))
                     {
                         return false;
                     }

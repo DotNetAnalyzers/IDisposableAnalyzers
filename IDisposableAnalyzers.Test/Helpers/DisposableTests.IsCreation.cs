@@ -508,6 +508,7 @@ namespace N
             [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.OpenRead()",                                                true)]
             [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.ToString()",                                                false)]
             [TestCase("Microsoft.Win32.RegistryKey registryKey",                                            "registryKey.CreateSubKey(string.Empty)",                             true)]
+            [TestCase("Microsoft.Win32.RegistryKey registryKey",                                            "registryKey.OpenSubKey(string.Empty)",                               true)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                                                 true)]
             [TestCase("",                                                                                   "new System.Collections.Generic.List<IDisposable>().Find(x => true)", false)]
             [TestCase("",                                                                                   "ImmutableList<IDisposable>.Empty.Find(x => true)",                   false)]
@@ -599,7 +600,7 @@ namespace N
             public static void Dump()
             {
                 var set = new HashSet<string>();
-                foreach (var method in typeof(System.Net.HttpWebResponse).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly).OrderBy(x => x.Name))
+                foreach (var method in typeof(Microsoft.Win32.RegistryKey).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly).OrderBy(x => x.Name))
                 {
                     if (!method.IsSpecialName &&
                         set.Add(method.Name))
@@ -618,14 +619,15 @@ namespace N
                 }
             }
 
-            [TestCase("Factory.StaticDisposableField",     false)]
-            [TestCase("Factory.StaticIDisposableProperty", false)]
-            [TestCase("Factory.StaticCreateIDisposable()", true)]
-            [TestCase("Factory.StaticCreateObject()",      false)]
-            [TestCase("factory.IDisposableProperty",       false)]
-            [TestCase("factory.CreateIDisposable()",       true)]
-            [TestCase("factory.CreateObject()",            false)]
-            public static void Assumptions(string expression, bool expected)
+            [TestCase("",                      "Factory.StaticDisposableField",     false)]
+            [TestCase("",                      "Factory.StaticIDisposableProperty", false)]
+            [TestCase("",                      "Factory.StaticCreateIDisposable()", true)]
+            [TestCase("",                      "Factory.StaticCreateObject()",      false)]
+            [TestCase("Factory factory",       "factory.IDisposableProperty",       false)]
+            [TestCase("Factory factory",       "factory.CreateIDisposable()",       true)]
+            [TestCase("Factory factory",       "factory.CreateObject()",            false)]
+            [TestCase("Disposable disposable", "disposable.ReturnThis()",           false)]
+            public static void Assumptions(string parameter,string expression, bool expected)
             {
                 var binaryReference = BinaryReference.Compile(@"
 namespace BinaryReferencedAssembly
@@ -637,6 +639,8 @@ namespace BinaryReferencedAssembly
         public void Dispose()
         {
         }
+
+        public Disposable ReturnThis() => this;
     }
 
     public class Factory
@@ -667,10 +671,11 @@ namespace N
     {
         static void M(Factory factory)
         {
-            var value = factory.CreateIDisposable();
+            factory.CreateIDisposable();
         }
     }
-}".AssertReplace("factory.CreateIDisposable()", expression));
+}".AssertReplace("Factory factory", parameter)
+  .AssertReplace("factory.CreateIDisposable()", expression));
 
                 var compilation = CSharpCompilation.Create(
                     "test",
