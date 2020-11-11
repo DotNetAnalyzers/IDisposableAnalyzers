@@ -16,9 +16,7 @@ namespace IDisposableAnalyzers.Test.Helpers
 
     public static partial class DisposableTests
     {
-#pragma warning disable GURA07 // Test class should be public static.
         internal static class IsCreation
-#pragma warning restore GURA07 // Test class should be public static.
         {
             [TestCase("1",                                                   false)]
             [TestCase("new string(' ', 1)",                                  false)]
