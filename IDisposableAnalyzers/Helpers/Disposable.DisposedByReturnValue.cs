@@ -167,7 +167,7 @@
                 foreach (var usage in walker.Usages)
                 {
                     if (Assigns(usage, recursion, out var fieldOrProperty) &&
-                        DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, recursion.SemanticModel, recursion.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                        DisposableMember.IsDisposed(fieldOrProperty, target.Symbol.ContainingType, recursion.SemanticModel, recursion.CancellationToken))
                     {
                         return true;
                     }

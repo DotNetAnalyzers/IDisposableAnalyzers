@@ -51,7 +51,7 @@
         {
             using var assignedValues = AssignedValueWalker.Borrow(member.FieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
             using var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken);
-            if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+            if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken))
             {
                 if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var initialize))
                 {
@@ -71,7 +71,7 @@
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
                     }
                 }
-                else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) ||
+                else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken)||
                          IsMutableFromOutside(member.FieldOrProperty))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));
@@ -99,7 +99,7 @@
                                 additionalLocations: dispose.Locations));
                     }
 
-                    if (DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken).IsEither(Result.No, Result.AssumeNo) &&
+                    if (!DisposableMember.IsDisposed(member, context.SemanticModel, context.CancellationToken) &&
                         !IsDisposedInCleanup() &&
                         DisposeMethod.FindFirst(member.FieldOrProperty.ContainingType, context.Compilation, Search.TopLevel) is null)
                     {

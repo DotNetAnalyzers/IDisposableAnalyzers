@@ -31,7 +31,7 @@ namespace N
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -67,7 +67,7 @@ namespace N
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace N
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
             var field = new FieldOrPropertyAndDeclaration(symbol, declaration);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(field, semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, DisposableMember.IsDisposed(field, semanticModel, CancellationToken.None));
         }
 
         [TestCase("this.components.Add(this.stream)")]
@@ -123,7 +123,7 @@ namespace N
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
-            Assert.AreEqual(Result.Yes, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
+            Assert.AreEqual(true, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol, declaration), semanticModel, CancellationToken.None));
         }
     }
 }

@@ -59,7 +59,7 @@
 
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
         {
-            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+            if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) &&
                 context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out var returnedSymbol))
             {
                 if (IsInUsing(returnedSymbol, context.CancellationToken) ||
@@ -92,7 +92,7 @@
                 foreach (var argument in arguments)
                 {
                     if (argument is { Expression: { } expression } &&
-                        Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                        Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) &&
                         context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out var argumentSymbol))
                     {
                         if (IsInUsing(argumentSymbol, context.CancellationToken) ||

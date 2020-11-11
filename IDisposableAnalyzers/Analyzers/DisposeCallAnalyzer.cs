@@ -100,16 +100,14 @@
 
             bool IsReassigned(ExpressionSyntax location)
             {
-                using (var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken))
+                using var walker = MutationWalker.For(local, context.SemanticModel, context.CancellationToken);
+                foreach (var mutation in walker.All())
                 {
-                    foreach (var mutation in walker.All())
+                    if (mutation.TryFirstAncestorOrSelf(out ExpressionSyntax? expression) &&
+                        invocation.IsExecutedBefore(expression) != ExecutedBefore.No &&
+                        expression.IsExecutedBefore(location) != ExecutedBefore.No)
                     {
-                        if (mutation.TryFirstAncestorOrSelf(out ExpressionSyntax? expression) &&
-                            invocation.IsExecutedBefore(expression) != ExecutedBefore.No &&
-                            expression.IsExecutedBefore(location) != ExecutedBefore.No)
-                        {
-                            return true;
-                        }
+                        return true;
                     }
                 }
 
@@ -131,7 +129,7 @@
             {
                 return localDeclarationStatement!.Parent == expressionStatement!.Parent &&
                        declarator is { Initializer: { Value: { } value } } &&
-                       Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                       Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken);
             }
 
             bool IsTrivialTryFinally()

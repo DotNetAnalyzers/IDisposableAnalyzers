@@ -33,7 +33,7 @@
                 context.SemanticModel.TryGetSymbol(left, context.CancellationToken, out var assignedSymbol))
             {
                 if (LocalOrParameter.TryCreate(assignedSymbol, out var localOrParameter) &&
-                    Disposable.IsCreation(right, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                    Disposable.IsCreation(right, context.SemanticModel, context.CancellationToken) &&
                     Disposable.ShouldDispose(localOrParameter, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, assignment.GetLocation()));
@@ -63,7 +63,7 @@
                 return false;
             }
 
-            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol).IsEither(Result.No, Result.AssumeNo, Result.Unknown) ||
+            if (!Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol) ||
                 assignedSymbol is null)
             {
                 return false;

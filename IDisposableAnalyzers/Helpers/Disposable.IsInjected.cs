@@ -25,13 +25,13 @@
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
                         IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent, Parent: ExpressionStatementSyntax _ } } } }
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
-                        _ => IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes),
+                        _ => IsInjectedCore(symbol),
                     };
                 }
 
                 using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                       !IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)&&
+                       !IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
 
             return false;
@@ -41,7 +41,7 @@
         {
             if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
-                if (IsInjectedCore(symbol).IsEither(Result.Yes, Result.AssumeYes))
+                if (IsInjectedCore(symbol))
                 {
                     return true;
                 }
@@ -52,82 +52,60 @@
             return false;
         }
 
-        internal static Result IsAnyCachedOrInjected(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAnyCachedOrInjected(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (values.IsEmpty)
             {
-                return Result.No;
+                return false;
             }
 
-            var result = Result.No;
             values.Reset();
             while (values.MoveNext())
             {
                 if (values.Current is ElementAccessExpressionSyntax elementAccess &&
                     semanticModel.TryGetSymbol(elementAccess.Expression, cancellationToken, out var symbol))
                 {
-                    var isInjected = IsInjectedCore(symbol);
-                    if (isInjected == Result.Yes)
+                    if (IsInjectedCore(symbol))
                     {
-                        return Result.Yes;
-                    }
-
-                    if (isInjected == Result.AssumeYes)
-                    {
-                        result = Result.AssumeYes;
+                        return true;
                     }
 
                     using var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken);
                     using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                    isInjected = IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
-                    if (isInjected == Result.Yes)
+                    if (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken))
                     {
-                        return Result.Yes;
-                    }
-
-                    if (isInjected == Result.AssumeYes)
-                    {
-                        result = Result.AssumeYes;
+                        return true;
                     }
                 }
                 else if (semanticModel.TryGetSymbol(values.Current, cancellationToken, out symbol))
                 {
-                    switch (IsInjectedCore(symbol))
+                    if (IsInjectedCore(symbol))
                     {
-                        case Result.Yes:
-                            return Result.Yes;
-                        case Result.AssumeYes:
-                            result = Result.AssumeYes;
-                            break;
+                        return true;
                     }
                 }
             }
 
-            return result;
+            return false;
         }
 
         internal static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
             using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-            return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+            return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
         }
 
-        private static Result IsInjectedCore(ISymbol symbol)
+        private static bool IsInjectedCore(ISymbol symbol)
         {
-            if (symbol is null)
-            {
-                return Result.Unknown;
-            }
-
             if (symbol is ILocalSymbol)
             {
-                return Result.Unknown;
+                return false;
             }
 
             if (symbol is IParameterSymbol)
             {
-                return Result.Yes;
+                return true;
             }
 
             if (symbol is IFieldSymbol field)
@@ -136,17 +114,15 @@
                     field.IsAbstract ||
                     field.IsVirtual)
                 {
-                    return Result.Yes;
+                    return true;
                 }
 
                 if (field.IsReadOnly)
                 {
-                    return Result.No;
+                    return false;
                 }
 
-                return field.DeclaredAccessibility != Accessibility.Private
-                           ? Result.AssumeYes
-                           : Result.No;
+                return field.DeclaredAccessibility != Accessibility.Private;
             }
 
             if (symbol is IPropertySymbol property)
@@ -155,22 +131,20 @@
                     property.IsVirtual ||
                     property.IsAbstract)
                 {
-                    return Result.Yes;
+                    return true;
                 }
 
                 if (property.IsReadOnly ||
                     property.SetMethod is null)
                 {
-                    return Result.No;
+                    return false;
                 }
 
                 return property.DeclaredAccessibility != Accessibility.Private &&
-                       property.SetMethod.DeclaredAccessibility != Accessibility.Private
-                           ? Result.AssumeYes
-                           : Result.No;
+                       property.SetMethod.DeclaredAccessibility != Accessibility.Private;
             }
 
-            return Result.No;
+            return false;
         }
     }
 }

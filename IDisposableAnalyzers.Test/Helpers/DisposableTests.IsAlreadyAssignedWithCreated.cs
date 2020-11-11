@@ -38,7 +38,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -73,7 +73,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -104,7 +104,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -138,7 +138,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -172,7 +172,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(Result.Yes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -204,7 +204,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.stream = null").Left;
-                Assert.AreEqual(Result.AssumeYes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -236,7 +236,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.Stream = null").Left;
-                Assert.AreEqual(Result.AssumeYes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -266,7 +266,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -297,7 +297,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
-                Assert.AreEqual(Result.AssumeYes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -328,7 +328,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -360,7 +360,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
-                Assert.AreEqual(Result.AssumeYes, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -381,7 +381,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("disposable = File.OpenRead(string.Empty)").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
 
             [Test]
@@ -469,7 +469,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindAssignmentExpression("this.P1 = null;").Left;
-                Assert.AreEqual(Result.No, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
             }
         }
     }

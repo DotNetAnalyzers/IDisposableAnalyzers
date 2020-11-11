@@ -9,29 +9,26 @@
 
     internal static class DisposableMember
     {
-        internal static Result IsDisposed(FieldOrPropertyAndDeclaration member, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposed(FieldOrPropertyAndDeclaration member, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return IsDisposed(member.FieldOrProperty, member.FieldOrProperty.ContainingType, semanticModel, cancellationToken);
         }
 
-        internal static Result IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsDisposed(FieldOrProperty member, INamedTypeSymbol context, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             using var walker = DisposeWalker.Borrow(context, semanticModel, cancellationToken);
-            var isMemberDisposed = walker.IsMemberDisposed(member.Symbol);
-            switch (isMemberDisposed)
+            if (walker.IsMemberDisposed(member.Symbol))
             {
-                case Result.Yes:
-                case Result.AssumeYes:
-                    return isMemberDisposed;
-                default:
-                    if (context.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation) &&
-                        Winform.IsAddedToComponents(member, context, semanticModel, cancellationToken))
-                    {
-                        return Result.Yes;
-                    }
-
-                    return isMemberDisposed;
+                return true;
             }
+
+            if (context.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation) &&
+                Winform.IsAddedToComponents(member, context, semanticModel, cancellationToken))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         internal static bool IsDisposed(FieldOrProperty member, IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)

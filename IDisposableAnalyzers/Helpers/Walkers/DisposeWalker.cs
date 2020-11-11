@@ -76,14 +76,14 @@
             return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
         }
 
-        internal Result IsMemberDisposed(ISymbol member)
+        internal bool IsMemberDisposed(ISymbol member)
         {
             foreach (var invocation in this.invocations)
             {
                 if (DisposeCall.MatchAny(invocation, this.SemanticModel, this.CancellationToken) is { } dispose &&
                     dispose.IsDisposing(member, this.SemanticModel, this.CancellationToken))
                 {
-                    return Result.Yes;
+                    return true;
                 }
             }
 
@@ -98,11 +98,11 @@
                     this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out var candidate) &&
                     SymbolComparer.Equal(member, candidate))
                 {
-                    return Result.AssumeYes;
+                    return true;
                 }
             }
 
-            return Result.No;
+            return false;
         }
 
         protected override void Clear()

@@ -29,7 +29,7 @@
                 {
                     if (declarator.Initializer is { Value: { } value } &&
                         statement.UsingKeyword.IsKind(SyntaxKind.None) &&
-                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken)&&
                         context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
                         Disposable.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
                     {

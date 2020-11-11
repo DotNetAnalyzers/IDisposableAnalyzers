@@ -2,7 +2,9 @@
 {
     using System.Collections.Immutable;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -37,7 +39,7 @@
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, argument.GetLocation()));
                 }
 
-                if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
+                if (Disposable.IsAssignedWithCreated(symbol, invocation, context.SemanticModel, context.CancellationToken) &&
                     !Disposable.IsDisposedBefore(symbol, invocation, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning, argument.GetLocation()));
@@ -54,8 +56,8 @@
             {
                 using var assignedValues = AssignedValueWalker.Borrow(candidate.Expression, semanticModel, cancellationToken);
                 using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes) &&
-                      !Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes);
+                return Disposable.IsAnyCreation(recursive, semanticModel, cancellationToken) &&
+                      !Disposable.IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
             }
 
             return false;

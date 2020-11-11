@@ -27,7 +27,7 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(code);
-                Assert.AreEqual(Result.No, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+                Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
         }
     }

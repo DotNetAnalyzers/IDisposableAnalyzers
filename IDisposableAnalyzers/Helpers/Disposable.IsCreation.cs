@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System;
     using System.Collections.Immutable;
     using System.Threading;
 
@@ -12,25 +11,25 @@
 
     internal static partial class Disposable
     {
-        internal static Result IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol? assignedSymbol)
+        internal static bool IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol? assignedSymbol)
         {
             if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
             {
                 assignedSymbol = null;
-                return Result.No;
+                return false;
             }
 
             if (disposable is { Parent: AssignmentExpressionSyntax { Parent: ArrowExpressionClauseSyntax { Parent: ConstructorDeclarationSyntax _ } } })
             {
                 assignedSymbol = null;
-                return Result.No;
+                return false;
             }
 
             var symbol = semanticModel.GetSymbolSafe(disposable, cancellationToken);
             if (symbol is null)
             {
                 assignedSymbol = null;
-                return Result.No;
+                return false;
             }
 
             if (symbol is IPropertySymbol { SetMethod: { } } property &&
@@ -53,43 +52,24 @@
                     }
                 }
 
-                assignedSymbol = null;
-                var result = Result.No;
                 foreach (var candidate in assignedSymbols)
                 {
-                    switch (IsAssignedWithCreated(candidate, disposable, semanticModel, cancellationToken))
+                    if (IsAssignedWithCreated(candidate, disposable, semanticModel, cancellationToken))
                     {
-                        case Result.Unknown:
-                            if (result == Result.No)
-                            {
-                                assignedSymbol = candidate;
-                                result = Result.Unknown;
-                            }
-
-                            break;
-                        case Result.Yes:
-                            assignedSymbol = candidate;
-                            return Result.Yes;
-                        case Result.AssumeYes:
-                            assignedSymbol = candidate;
-                            result = Result.AssumeYes;
-                            break;
-                        case Result.No:
-                        case Result.AssumeNo:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException(nameof(disposable), disposable, "Unknown result type");
+                        assignedSymbol = candidate;
+                        return true;
                     }
                 }
 
-                return result;
+                assignedSymbol = null;
+                return false;
             }
 
             if (symbol is IParameterSymbol &&
                 disposable.TryFirstAncestor<ArrowExpressionClauseSyntax>(out _))
             {
                 assignedSymbol = null;
-                return Result.No;
+                return false;
             }
 
             using var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken);
@@ -99,7 +79,7 @@
                 binary.IsKind(SyntaxKind.CoalesceExpression))
             {
                 // lazy
-                return Result.No;
+                return false;
             }
 
             if (symbol.IsEither<IParameterSymbol, ILocalSymbol>())
@@ -130,11 +110,11 @@
             }
         }
 
-        internal static Result IsAssignedWithCreated(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAssignedWithCreated(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (symbol.Kind == SymbolKind.Discard)
             {
-                return Result.No;
+                return false;
             }
 
             using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
@@ -145,7 +125,7 @@
         /// <summary>
         /// Check if any path returns a created IDisposable.
         /// </summary>
-        internal static Result IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsCreation(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             switch (candidate.Kind())
             {
@@ -156,80 +136,57 @@
                 case SyntaxKind.FalseLiteralExpression:
                 case SyntaxKind.BaseExpression:
                 case SyntaxKind.ThisExpression:
-                    return Result.No;
+                    return false;
             }
 
             if (!IsPotentiallyAssignableFrom(candidate, semanticModel, cancellationToken))
             {
-                return Result.No;
+                return false;
             }
 
             if (candidate is IdentifierNameSyntax { Identifier: { ValueText: "value" } } &&
                 candidate.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
-                return Result.No;
+                return false;
             }
 
             if (candidate is ObjectCreationExpressionSyntax)
             {
-                return Result.Yes;
+                return true;
             }
 
             using var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken);
             return IsAnyCreation(recursive, semanticModel, cancellationToken);
         }
 
-        internal static Result IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool IsAnyCreation(RecursiveValues values, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (values.IsEmpty)
             {
-                return Result.No;
+                return false;
             }
 
             values.Reset();
-            var result = Result.No;
             while (values.MoveNext())
             {
-                switch (IsCreationCore(values.Current, semanticModel, cancellationToken))
+                if (IsCreationCore(values.Current, semanticModel, cancellationToken))
                 {
-                    case Result.Unknown:
-                        if (result == Result.No)
-                        {
-                            result = Result.Unknown;
-                        }
-
-                        break;
-                    case Result.Yes:
-                        return Result.Yes;
-                    case Result.AssumeYes:
-                        result = Result.AssumeYes;
-                        break;
-                    case Result.No:
-                        break;
-                    case Result.AssumeNo:
-                        if (result == Result.No)
-                        {
-                            result = Result.AssumeNo;
-                        }
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException(nameof(values), values, "Unhandled result type.");
+                    return true;
                 }
             }
 
-            return result;
+            return false;
         }
 
         /// <summary>
         /// Check if any path returns a created IDisposable.
         /// </summary>
-        private static Result IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+        private static bool IsCreationCore(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (candidate.IsMissing)
             {
-                return Result.Unknown;
+                return false;
             }
 
             if (candidate is LiteralExpressionSyntax ||
@@ -238,7 +195,7 @@
                 candidate is InstanceExpressionSyntax ||
                 candidate is ElementAccessExpressionSyntax)
             {
-                return Result.No;
+                return false;
             }
 
             if (candidate is ObjectCreationExpressionSyntax ||
@@ -249,9 +206,9 @@
                 switch (semanticModel.GetType(candidate, cancellationToken))
                 {
                     case { } type:
-                        return IsAssignableFrom(type, semanticModel.Compilation) ? Result.Yes : Result.No;
+                        return IsAssignableFrom(type, semanticModel.Compilation);
                     case null:
-                        return Result.Unknown;
+                        return false;
                 }
             }
 
@@ -259,107 +216,103 @@
             {
                 return symbol switch
                 {
-                    IParameterSymbol _ => Result.No,
-                    ILocalSymbol _ => Result.No,
-                    IFieldSymbol _ => Result.No,
-                    IPropertySymbol { ContainingType: { MetadataName: "PasswordBox" }, MetadataName: "SecurePassword" } => Result.Yes,
-                    IPropertySymbol _ => Result.AssumeNo,
+                    IParameterSymbol _ => false,
+                    ILocalSymbol _ => false,
+                    IFieldSymbol _ => false,
+                    IPropertySymbol { ContainingType: { MetadataName: "PasswordBox" }, MetadataName: "SecurePassword" } => true,
+                    IPropertySymbol _ => false,
                     IMethodSymbol { MetadataName: "CreateConnection" } method => InferFromReturnType(method),
-                    IMethodSymbol { MetadataName: nameof(ToString) } => Result.No,
-                    IMethodSymbol { MetadataName: nameof(GetHashCode) } => Result.No,
-                    IMethodSymbol { MetadataName: nameof(Equals) } => Result.No,
-                    IMethodSymbol { MetadataName: nameof(ReferenceEquals) } => Result.No,
-                    IMethodSymbol { ContainingType: { IsGenericType: true }, MetadataName: "GetEnumerator" } => Result.Yes,
-                    IMethodSymbol { ContainingType: { IsGenericType: false }, MetadataName: "GetEnumerator" } => Result.No,
+                    IMethodSymbol { MetadataName: nameof(ToString) } => false,
+                    IMethodSymbol { MetadataName: nameof(GetHashCode) } => false,
+                    IMethodSymbol { MetadataName: nameof(Equals) } => false,
+                    IMethodSymbol { MetadataName: nameof(ReferenceEquals) } => false,
+                    IMethodSymbol { ContainingType: { IsGenericType: true }, MetadataName: "GetEnumerator" } => true,
+                    IMethodSymbol { ContainingType: { IsGenericType: false }, MetadataName: "GetEnumerator" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: false } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
-                    IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ResourceManager" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Task" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "Task`1" } } => Result.No,
-                    IMethodSymbol { ContainingType: { MetadataName: "ValueTask`1" } } => Result.No,
-                    IMethodSymbol { ReturnType: { MetadataName: "Task" } } => Result.No,
-                    IMethodSymbol { IsExtensionMethod: true, ReturnType: { MetadataName: "ILoggerFactory" } } => Result.No,
+                    IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "ResourceManager" } } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "Task" } } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "Task`1" } } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "ValueTask`1" } } => false,
+                    IMethodSymbol { ReturnType: { MetadataName: "Task" } } => false,
+                    IMethodSymbol { IsExtensionMethod: true, ReturnType: { MetadataName: "ILoggerFactory" } } => false,
                     IMethodSymbol method => IsMethodCreating(method, semanticModel.Compilation),
-                    _ => Result.Unknown,
+                    _ => false,
                 };
 
-                Result InferFromUse()
+                bool InferFromUse()
                 {
                     if (candidate.Parent is CastExpressionSyntax { Type: { } castType } &&
                         semanticModel.TryGetType(castType, cancellationToken, out var type))
                     {
                         if (IsAssignableFrom(type, semanticModel.Compilation))
                         {
-                            return Result.Yes;
+                            return true;
                         }
 
                         if (type.IsSealed)
                         {
-                            return Result.No;
+                            return false;
                         }
                     }
 
-                    return Result.AssumeNo;
+                    return false;
                 }
 
-                Result InferFromReturnType(IMethodSymbol method)
+                bool InferFromReturnType(IMethodSymbol method)
                 {
                     if (IsAssignableFrom(method.ReturnType, semanticModel.Compilation))
                     {
-                        return Result.Yes;
+                        return true;
                     }
 
                     if (method.ReturnType.IsSealed)
                     {
-                        return Result.No;
+                        return false;
                     }
 
-                    return Result.AssumeNo;
+                    return false;
                 }
 
-                static Result IsMethodCreating(IMethodSymbol method, Compilation compilation)
+                static bool IsMethodCreating(IMethodSymbol method, Compilation compilation)
                 {
                     if (method.ReturnType is INamedTypeSymbol { IsGenericType: true } returnType &&
                         method.ReturnType == KnownSymbol.TaskOfT)
                     {
                         return returnType.TypeArguments.TrySingle(out var typeArg) &&
-                               IsAssignableFrom(typeArg, compilation)
-                            ? Result.AssumeYes
-                            : Result.No;
+                               IsAssignableFrom(typeArg, compilation);
                     }
 
                     if (method.ContainingType is { IsGenericType: true } &&
                         AnyMatch(method.ReturnType, method.ContainingType.TypeArguments))
                     {
-                        return Result.AssumeNo;
+                        return false;
                     }
 
                     if (method.IsGenericMethod &&
                         AnyMatch(method.ReturnType, method.TypeArguments))
                     {
-                        return Result.AssumeNo;
+                        return false;
                     }
 
                     if (!IsAssignableFrom(method.ReturnType, compilation))
                     {
-                        return Result.AssumeNo;
+                        return false;
                     }
 
                     if (method.TryGetThisParameter(out var thisParameter) &&
                         TypeSymbolComparer.Equal(thisParameter.Type, method.ReturnType))
                     {
-                        return Result.AssumeNo;
+                        return false;
                     }
 
-                    return IsAssignableFrom(method.ReturnType, compilation)
-                               ? Result.AssumeYes
-                               : Result.No;
+                    return IsAssignableFrom(method.ReturnType, compilation);
 
-                   static bool AnyMatch(ITypeSymbol returnType, ImmutableArray<ITypeSymbol> typeArguments)
+                    static bool AnyMatch(ITypeSymbol returnType, ImmutableArray<ITypeSymbol> typeArguments)
                     {
                         foreach (var typeArgument in typeArguments)
                         {
@@ -374,7 +327,7 @@
                 }
             }
 
-            return Result.Unknown;
+            return false;
         }
     }
 }

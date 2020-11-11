@@ -79,7 +79,7 @@
                         statement.IsExecutedBefore(expression) == ExecutedBefore.Yes &&
                         semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assigned) &&
                         SymbolComparer.Equal(assigned, symbol) &&
-                        IsCreation(assignment.Right, semanticModel, cancellationToken).IsEither(Result.Yes, Result.AssumeYes))
+                        IsCreation(assignment.Right, semanticModel, cancellationToken))
                     {
                         return true;
                     }
