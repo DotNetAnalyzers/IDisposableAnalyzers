@@ -544,9 +544,9 @@ namespace N
                 Assert.AreEqual(Result.AssumeNo, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",          Result.Yes)]
-            [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.Yes)]
-            [TestCase("",                                                                                   "System.IO.File.ReadAllLines(string.Empty)",      Result.No)]
+            [TestCase("",                                                                                   "System.IO.File.OpenText(string.Empty)",          Result.AssumeYes)]
+            [TestCase("",                                                                                   "System.IO.File.OpenRead(string.Empty)",          Result.AssumeYes)]
+            [TestCase("",                                                                                   "System.IO.File.ReadAllLines(string.Empty)",      Result.AssumeNo)]
             [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.Directory",                             Result.No)]
             [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.OpenRead()",                            Result.AssumeYes)]
             [TestCase("System.IO.FileInfo fileInfo",                                                        "fileInfo.ToString()",                            Result.No)]
