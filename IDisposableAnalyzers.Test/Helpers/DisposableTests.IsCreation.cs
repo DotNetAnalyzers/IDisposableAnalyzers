@@ -626,7 +626,8 @@ namespace N
             [TestCase("Factory factory",       "factory.IDisposableProperty",       false)]
             [TestCase("Factory factory",       "factory.CreateIDisposable()",       true)]
             [TestCase("Factory factory",       "factory.CreateObject()",            false)]
-            [TestCase("Disposable disposable", "disposable.ReturnThis()",           false)]
+            [TestCase("Disposable disposable", "disposable.Id()",                   false)]
+            [TestCase("Disposable disposable", "disposable.IdGeneric()",            false)]
             public static void Assumptions(string parameter,string expression, bool expected)
             {
                 var binaryReference = BinaryReference.Compile(@"
@@ -641,6 +642,13 @@ namespace BinaryReferencedAssembly
         }
 
         public Disposable ReturnThis() => this;
+    }
+
+    public static class Ext
+    {
+        public static Disposable Id(this Disposable disposable) => disposable;
+
+        public static T IdGeneric<T>(this T item) => item;
     }
 
     public class Factory
