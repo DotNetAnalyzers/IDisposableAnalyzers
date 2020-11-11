@@ -628,7 +628,7 @@ namespace N
             [TestCase("Factory factory",       "factory.CreateObject()",            false)]
             [TestCase("Disposable disposable", "disposable.Id()",                   false)]
             [TestCase("Disposable disposable", "disposable.IdGeneric()",            false)]
-            public static void Assumptions(string parameter,string expression, bool expected)
+            public static void Assumptions(string parameter, string expression, bool expected)
             {
                 var binaryReference = BinaryReference.Compile(@"
 namespace BinaryReferencedAssembly

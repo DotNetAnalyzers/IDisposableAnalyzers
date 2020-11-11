@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections.Immutable;
     using System.Threading;
 
@@ -292,8 +293,8 @@
                         return false;
                     }
 
-                    if (method.Name.StartsWith("Open") ||
-                        method.Name.StartsWith("Create"))
+                    if (method.Name.StartsWith("Open", StringComparison.Ordinal) ||
+                        method.Name.StartsWith("Create", StringComparison.Ordinal))
                     {
                         return true;
                     }

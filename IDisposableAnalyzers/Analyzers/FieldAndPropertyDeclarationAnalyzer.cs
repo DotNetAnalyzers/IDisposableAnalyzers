@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -71,7 +73,7 @@
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP002DisposeMember, context.Node.GetLocation()));
                     }
                 }
-                else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken)||
+                else if (Disposable.IsAnyCachedOrInjected(recursive, context.SemanticModel, context.CancellationToken) ||
                          IsMutableFromOutside(member.FieldOrProperty))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember, context.Node.GetLocation()));

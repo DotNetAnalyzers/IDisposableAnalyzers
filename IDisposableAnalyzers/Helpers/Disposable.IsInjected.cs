@@ -30,7 +30,7 @@
                 }
 
                 using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
-                return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken)&&
+                return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken) &&
                        !IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
 
