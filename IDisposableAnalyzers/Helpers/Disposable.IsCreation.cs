@@ -262,7 +262,7 @@
                     ILocalSymbol _ => Result.No,
                     IFieldSymbol _ => Result.No,
                     IPropertySymbol { ContainingType: { MetadataName: "PasswordBox" }, MetadataName: "SecurePassword" } => Result.Yes,
-                    IPropertySymbol _ => Result.No,
+                    IPropertySymbol _ => Result.AssumeNo,
                     IMethodSymbol { MetadataName: "CreateConnection" } method => InferFromReturnType(method),
                     IMethodSymbol { MetadataName: nameof(ToString) } => Result.No,
                     IMethodSymbol { MetadataName: nameof(GetHashCode) } => Result.No,

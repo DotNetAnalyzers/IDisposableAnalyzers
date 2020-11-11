@@ -595,7 +595,7 @@ namespace N
             [TestCase("(System.Text.StringBuilder)Activator.CreateInstance(typeof(System.Text.StringBuilder))", Result.No)]
             public static void Reflection(string expression, Result expected)
             {
-                var code = @"
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -615,8 +615,7 @@ namespace N
             var value = Activator.CreateInstance<Disposable>();
         }
     }
-}".AssertReplace("Activator.CreateInstance<Disposable>()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}".AssertReplace("Activator.CreateInstance<Disposable>()", expression));
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -647,6 +646,66 @@ namespace N
                 {
                     Console.WriteLine($"                    IMethodSymbol {{ ContainingType: {{ MetadataName: \"{type.Name}\" }} }} => Result.No,");
                 }
+            }
+
+            [TestCase("Factory.StaticDisposableField",     Result.No)]
+            [TestCase("Factory.StaticIDisposableProperty", Result.AssumeNo)]
+            [TestCase("Factory.StaticCreateIDisposable()", Result.AssumeYes)]
+            [TestCase("factory.IDisposableProperty",       Result.AssumeNo)]
+            [TestCase("factory.CreateIDisposable()",       Result.AssumeYes)]
+            public static void Assumptions(string expression, Result expected)
+            {
+                var binaryReference = BinaryReference.Compile(@"
+namespace BinaryReferencedAssembly
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public class Factory
+    {
+        public static readonly IDisposable StaticDisposableField = new Disposable();
+
+        public static IDisposable StaticIDisposableProperty => StaticDisposableField;
+
+        public IDisposable IDisposableProperty => StaticDisposableField;
+
+        public static IDisposable StaticCreateIDisposable() => new Disposable();
+
+        public IDisposable CreateIDisposable() => new Disposable();
+    }
+}");
+
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    using System;
+    using BinaryReferencedAssembly;
+
+    class C
+    {
+        static void M(Factory factory)
+        {
+            var value = factory.CreateIDisposable();
+        }
+    }
+}".AssertReplace("factory.CreateIDisposable()", expression));
+
+                var compilation = CSharpCompilation.Create(
+                    "test",
+                    new[] { syntaxTree },
+                    MetadataReferences.FromAttributes().Add(binaryReference),
+                    CodeFactory.DllCompilationOptions.WithMetadataImportOptions(MetadataImportOptions.Public));
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression(expression);
+                Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
+                Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
         }
     }

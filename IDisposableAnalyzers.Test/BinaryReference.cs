@@ -11,7 +11,7 @@
         public static MetadataReference Compile(string code)
         {
             var binaryReferencedCompilation = CSharpCompilation.Create(
-                "BinaryReferencedAssembly",
+                CodeReader.Namespace(code),
                 new[] { CSharpSyntaxTree.ParseText(code) },
                 MetadataReferences.FromAttributes(),
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
