@@ -651,8 +651,10 @@ namespace N
             [TestCase("Factory.StaticDisposableField",     Result.No)]
             [TestCase("Factory.StaticIDisposableProperty", Result.AssumeNo)]
             [TestCase("Factory.StaticCreateIDisposable()", Result.AssumeYes)]
+            [TestCase("Factory.StaticCreateObject()",      Result.AssumeNo)]
             [TestCase("factory.IDisposableProperty",       Result.AssumeNo)]
             [TestCase("factory.CreateIDisposable()",       Result.AssumeYes)]
+            [TestCase("factory.CreateObject()",            Result.AssumeNo)]
             public static void Assumptions(string expression, Result expected)
             {
                 var binaryReference = BinaryReference.Compile(@"
@@ -677,7 +679,11 @@ namespace BinaryReferencedAssembly
 
         public static IDisposable StaticCreateIDisposable() => new Disposable();
 
+        public static object StaticCreateObject() => new object();
+
         public IDisposable CreateIDisposable() => new Disposable();
+
+        public object CreateObject() => new object();
     }
 }");
 

@@ -480,7 +480,7 @@
 
                     if (!IsAssignableFrom(method.ReturnType, compilation))
                     {
-                        return Result.No;
+                        return Result.AssumeNo;
                     }
 
                     if (method.IsGenericMethod &&
