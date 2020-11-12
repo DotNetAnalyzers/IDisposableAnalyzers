@@ -201,5 +201,7 @@ csharp_prefer_braces = true:silent
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-dotnet_diagnostic.CS8762.severity = none # Analyzer buggy (Parameter may not have a null value when exiting in some condition.)
+# IDE0079: Remove unnecessary suppression
+dotnet_diagnostic.IDE0079.severity = warning
+
 dotnet_diagnostic.CS8002.severity = none # Referenced assembly '...' does not have a strong name
