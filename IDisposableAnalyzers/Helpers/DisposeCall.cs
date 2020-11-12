@@ -93,7 +93,7 @@
                         when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
                         {
                             using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);
-                            if (walker.ReturnValues.TrySingle(out var returnValue))
+                            if (walker.Values.TrySingle(out var returnValue))
                             {
                                 switch (returnValue)
                                 {
@@ -134,7 +134,7 @@
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
                     using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, semanticModel, cancellationToken);
-                    return walker.ReturnValues.TrySingle(out var returnValue) &&
+                    return walker.Values.TrySingle(out var returnValue) &&
                            MemberPath.TrySingle(returnValue, out var expression) &&
                            semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
                            SymbolComparer.Equal(nested, symbol);

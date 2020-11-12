@@ -27,8 +27,8 @@
                 Disposable.IsAssignableFrom(method.ReturnType, context.Compilation))
             {
                 using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.RecursiveInside, context.SemanticModel, context.CancellationToken);
-                if (walker.ReturnValues.TryFirst(x => IsCreated(x), out _) &&
-                    walker.ReturnValues.TryFirst(x => IsCachedOrInjected(x) && !IsNop(x), out _))
+                if (walker.Values.TryFirst(x => IsCreated(x), out _) &&
+                    walker.Values.TryFirst(x => IsCachedOrInjected(x) && !IsNop(x), out _))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated, methodDeclaration.Identifier.GetLocation()));
                 }

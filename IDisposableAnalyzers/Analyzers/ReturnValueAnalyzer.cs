@@ -161,7 +161,7 @@
                 }
 
                 using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, recursion.SemanticModel, recursion.CancellationToken);
-                foreach (var returnValue in walker.ReturnValues)
+                foreach (var returnValue in walker.Values)
                 {
                     if (returnValue is InvocationExpressionSyntax nestedInvocation)
                     {

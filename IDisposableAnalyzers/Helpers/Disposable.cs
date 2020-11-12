@@ -73,9 +73,9 @@
 
                 using (var walker = ReturnValueWalker.Borrow(candidate, ReturnValueSearch.Recursive, semanticModel, cancellationToken))
                 {
-                    if (walker.ReturnValues.Count > 0)
+                    if (walker.Values.Count > 0)
                     {
-                        return walker.ReturnValues.TrySingle(out var value) &&
+                        return walker.Values.TrySingle(out var value) &&
                                semanticModel.TryGetType(value, cancellationToken, out var type) &&
                                IsNopCore(type);
                     }

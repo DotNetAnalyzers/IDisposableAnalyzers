@@ -82,8 +82,7 @@
 
         private bool AddRecursiveValues(ExpressionSyntax assignedValue)
         {
-            if (assignedValue is null ||
-                assignedValue.IsMissing ||
+            if (assignedValue.IsMissing ||
                 !this.checkedLocations.Add(assignedValue))
             {
                 return false;
@@ -146,7 +145,7 @@
                 case AwaitExpressionSyntax awaitExpression:
                     using (var walker = ReturnValueWalker.Borrow(awaitExpression, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                     {
-                        return this.AddManyRecursively(walker.ReturnValues);
+                        return this.AddManyRecursively(walker.Values);
                     }
 
                 case ConditionalAccessExpressionSyntax { WhenNotNull: { } whenNotNull }:
@@ -183,7 +182,7 @@
 
                         using (var walker = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                         {
-                            return this.AddManyRecursively(walker.ReturnValues);
+                            return this.AddManyRecursively(walker.Values);
                         }
                 }
             }

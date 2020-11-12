@@ -13,7 +13,7 @@
 
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>
     {
-        private readonly SmallSet<ExpressionSyntax> returnValues = new SmallSet<ExpressionSyntax>();
+        private readonly SmallSet<ExpressionSyntax> values = new SmallSet<ExpressionSyntax>();
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private ReturnValueSearch search;
@@ -24,7 +24,7 @@
         {
         }
 
-        internal IReadOnlyList<ExpressionSyntax> ReturnValues => this.returnValues;
+        internal IReadOnlyList<ExpressionSyntax> Values => this.values;
 
         public override void Visit(SyntaxNode node)
         {
@@ -66,7 +66,7 @@
 
         protected override void Clear()
         {
-            this.returnValues.Clear();
+            this.values.Clear();
             this.recursiveWalkers.Clear();
             this.assignedValueWalkers.Clear();
             this.semanticModel = null!;
@@ -125,7 +125,7 @@
                 if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax? baseMethod) &&
                     this.TryGetRecursive(invocation, baseMethod, out var methodWalker))
                 {
-                    foreach (var value in methodWalker.returnValues)
+                    foreach (var value in methodWalker.values)
                     {
                         if (value is IdentifierNameSyntax identifierName &&
                             method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
@@ -139,14 +139,14 @@
                                      parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                      parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                _ = this.returnValues.Add(defaultValue);
+                                _ = this.values.Add(defaultValue);
                             }
                         }
 
                         this.AddReturnValue(value);
                     }
 
-                    this.returnValues.RemoveAll(x => IsParameter(x));
+                    this.values.RemoveAll(x => IsParameter(x));
                     return true;
 
                     bool IsParameter(ExpressionSyntax value)
@@ -159,7 +159,7 @@
                 if (method.TrySingleDeclaration(this.cancellationToken, out LocalFunctionStatementSyntax? localFunction) &&
                     this.TryGetRecursive(invocation, localFunction, out var localFunctionWalker))
                 {
-                    foreach (var value in localFunctionWalker.returnValues)
+                    foreach (var value in localFunctionWalker.values)
                     {
                         if (value is IdentifierNameSyntax identifierName &&
                             method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
@@ -173,14 +173,14 @@
                                      parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                      parameterDeclaration is { Default: { Value: { } defaultValue } })
                             {
-                                _ = this.returnValues.Add(defaultValue);
+                                _ = this.values.Add(defaultValue);
                             }
                         }
 
                         this.AddReturnValue(value);
                     }
 
-                    this.returnValues.RemoveAll(x => IsParameter(x));
+                    this.values.RemoveAll(x => IsParameter(x));
                     return true;
 
                     bool IsParameter(ExpressionSyntax value)
@@ -201,7 +201,7 @@
                 property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
                 this.TryGetRecursive(propertyGet, getter, out var walker))
             {
-                foreach (var returnValue in walker.returnValues)
+                foreach (var returnValue in walker.values)
                 {
                     this.AddReturnValue(returnValue);
                 }
@@ -227,7 +227,7 @@
 
                     if (this.TryGetRecursive(awaitExpression, declaration, out var walker))
                     {
-                        foreach (var value in walker.returnValues)
+                        foreach (var value in walker.values)
                         {
                             AwaitValue(value);
                         }
@@ -238,7 +238,7 @@
                     AwaitValue(invocation);
                 }
 
-                this.returnValues.RemoveAll(x => IsParameter(x));
+                this.values.RemoveAll(x => IsParameter(x));
                 return true;
             }
 
@@ -261,7 +261,7 @@
                                  parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                                  parameterDeclaration is { Default: { Value: { } value } })
                         {
-                            _ = this.returnValues.Add(value);
+                            _ = this.values.Add(value);
                         }
                     }
 
@@ -271,7 +271,7 @@
                 {
                     if (this.TryGetRecursive(awaited, awaited, out var walker))
                     {
-                        foreach (var value in walker.returnValues)
+                        foreach (var value in walker.values)
                         {
                             AwaitValue(value);
                         }
@@ -316,7 +316,7 @@
                             method != null &&
                             method.DeclaringSyntaxReferences.Length == 0)
                         {
-                            _ = this.returnValues.Add(invocation);
+                            _ = this.values.Add(invocation);
                         }
 
                         break;
@@ -337,7 +337,7 @@
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
                         if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
                         {
-                            _ = this.returnValues.Add(value);
+                            _ = this.values.Add(value);
                             return;
                         }
 
@@ -345,7 +345,7 @@
                         this.assignedValueWalkers.Add(identifierName, walker);
                         if (walker.Values.Count == 0)
                         {
-                            _ = this.returnValues.Add(value);
+                            _ = this.values.Add(value);
                         }
                         else
                         {
@@ -362,18 +362,18 @@
                             property != null &&
                             property.DeclaringSyntaxReferences.Length == 0)
                         {
-                            _ = this.returnValues.Add(value);
+                            _ = this.values.Add(value);
                         }
 
                         break;
                     default:
-                        this.returnValues.Add(value);
+                        this.values.Add(value);
                         break;
                 }
             }
             else
             {
-                _ = this.returnValues.Add(value);
+                _ = this.values.Add(value);
             }
         }
 
