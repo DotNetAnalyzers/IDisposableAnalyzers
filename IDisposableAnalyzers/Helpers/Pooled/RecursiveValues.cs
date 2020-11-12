@@ -99,9 +99,9 @@
                     if (targetDeclaration.TryFindParameter(argument, out var parameter) &&
                         this.semanticModel.TryGetSymbol(parameter, this.cancellationToken, out var parameterSymbol))
                     {
-                        using var assignedValues = AssignedValueWalker.Borrow(parameterSymbol, this.semanticModel, this.cancellationToken);
-                        assignedValues.HandleInvoke(target, invocation.ArgumentList);
-                        return this.AddManyRecursively(assignedValues);
+                        using var walker = AssignedValueWalker.Borrow(parameterSymbol, this.semanticModel, this.cancellationToken);
+                        walker.HandleInvoke(target, invocation.ArgumentList);
+                        return this.AddManyRecursively(walker.Values);
                     }
 
                     return false;
@@ -158,16 +158,16 @@
                 switch (symbol)
                 {
                     case ILocalSymbol _:
-                        using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
+                        using (var walker = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
                         {
-                            return this.AddManyRecursively(assignedValues);
+                            return this.AddManyRecursively(walker.Values);
                         }
 
                     case IParameterSymbol _:
                         this.values.Add(assignedValue);
-                        using (var assignedValues = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
+                        using (var walker = AssignedValueWalker.Borrow(assignedValue, this.semanticModel, this.cancellationToken))
                         {
-                            return this.AddManyRecursively(assignedValues);
+                            return this.AddManyRecursively(walker.Values);
                         }
 
                     case IFieldSymbol _:

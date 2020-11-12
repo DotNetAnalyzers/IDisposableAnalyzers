@@ -13,8 +13,8 @@
         {
             if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
-                using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
-                if (assignedValues.Count == 0)
+                using var walker = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+                if (walker.Values.Count == 0)
                 {
                     return value switch
                     {
@@ -29,7 +29,7 @@
                     };
                 }
 
-                using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                using var recursive = RecursiveValues.Borrow(walker.Values, semanticModel, cancellationToken);
                 return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken) &&
                        !IsAnyCreation(recursive, semanticModel, cancellationToken);
             }
@@ -70,8 +70,8 @@
                         return true;
                     }
 
-                    using var assignedValues = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken);
-                    using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+                    using var walker = AssignedValueWalker.Borrow(values.Current, semanticModel, cancellationToken);
+                    using var recursive = RecursiveValues.Borrow(walker.Values, semanticModel, cancellationToken);
                     if (IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken))
                     {
                         return true;
@@ -91,8 +91,8 @@
 
         internal static bool IsAssignedWithInjected(ISymbol symbol, ExpressionSyntax location, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
-            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            using var walker = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(walker.Values, semanticModel, cancellationToken);
             return IsAnyCachedOrInjected(recursive, semanticModel, cancellationToken);
         }
 

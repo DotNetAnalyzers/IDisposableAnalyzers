@@ -75,7 +75,7 @@
 
             using var assignedValues = AssignedValueWalker.Borrow(disposable, semanticModel, cancellationToken);
             assignedSymbol = assignedValues.CurrentSymbol;
-            if (assignedValues.Count == 1 &&
+            if (assignedValues.Values.Count == 1 &&
                 disposable.Parent is AssignmentExpressionSyntax { Parent: ParenthesizedExpressionSyntax { Parent: BinaryExpressionSyntax { } binary } } &&
                 binary.IsKind(SyntaxKind.CoalesceExpression))
             {
@@ -88,7 +88,7 @@
                 assignedValues.RemoveAll(x => IsReturnedBefore(x));
             }
 
-            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(assignedValues.Values, semanticModel, cancellationToken);
             return IsAnyCreation(recursive, semanticModel, cancellationToken);
 
             bool IsReturnedBefore(ExpressionSyntax expression)
@@ -118,8 +118,8 @@
                 return false;
             }
 
-            using var assignedValues = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
-            using var recursive = RecursiveValues.Borrow(assignedValues, semanticModel, cancellationToken);
+            using var walker = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
+            using var recursive = RecursiveValues.Borrow(walker.Values, semanticModel, cancellationToken);
             return IsAnyCreation(recursive, semanticModel, cancellationToken);
         }
 

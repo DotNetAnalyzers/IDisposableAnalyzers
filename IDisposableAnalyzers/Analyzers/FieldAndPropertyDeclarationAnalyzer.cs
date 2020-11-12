@@ -51,8 +51,8 @@
 
         private static void HandleFieldOrProperty(SyntaxNodeAnalysisContext context, FieldOrPropertyAndDeclaration member)
         {
-            using var assignedValues = AssignedValueWalker.Borrow(member.FieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
-            using var recursive = RecursiveValues.Borrow(assignedValues, context.SemanticModel, context.CancellationToken);
+            using var walker = AssignedValueWalker.Borrow(member.FieldOrProperty.Symbol, context.SemanticModel, context.CancellationToken);
+            using var recursive = RecursiveValues.Borrow(walker.Values, context.SemanticModel, context.CancellationToken);
             if (Disposable.IsAnyCreation(recursive, context.SemanticModel, context.CancellationToken))
             {
                 if (InitializeAndCleanup.IsAssignedInInitialize(member, context.SemanticModel, context.CancellationToken, out _, out var initialize))

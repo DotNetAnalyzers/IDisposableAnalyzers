@@ -341,15 +341,15 @@
                             return;
                         }
 
-                        var assignedValues = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken);
-                        this.assignedValueWalkers.Add(identifierName, assignedValues);
-                        if (assignedValues.Count == 0)
+                        var walker = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken);
+                        this.assignedValueWalkers.Add(identifierName, walker);
+                        if (walker.Values.Count == 0)
                         {
                             _ = this.returnValues.Add(value);
                         }
                         else
                         {
-                            foreach (var assignment in assignedValues)
+                            foreach (var assignment in walker.Values)
                             {
                                 this.AddReturnValue(assignment);
                             }

@@ -12,7 +12,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>, IReadOnlyList<ExpressionSyntax>
+    internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>
     {
         private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
         private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
@@ -32,15 +32,9 @@
             this.ctorArgWalker = new CtorArgWalker(this);
         }
 
-        public int Count => this.values.Count;
-
         internal ISymbol CurrentSymbol { get; private set; } = null!;
 
-        public ExpressionSyntax this[int index] => this.values[index];
-
-        public IEnumerator<ExpressionSyntax> GetEnumerator() => this.values.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        internal IReadOnlyList<ExpressionSyntax> Values => this.values;
 
         public override void Visit(SyntaxNode node)
         {

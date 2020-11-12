@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
@@ -9,18 +11,16 @@
     {
         internal static bool IsPotentiallyAssignableFrom(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (candidate)
+            return candidate switch
             {
-                case { IsMissing: true }:
-                case LiteralExpressionSyntax _:
-                    return false;
-                case ObjectCreationExpressionSyntax objectCreation:
-                    return semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
-                           IsAssignableFrom(type, semanticModel.Compilation);
-                default:
-                    return semanticModel.TryGetType(candidate, cancellationToken, out type) &&
-                           IsPotentiallyAssignableFrom(type, semanticModel.Compilation);
-            }
+                { IsMissing: true } => false,
+                LiteralExpressionSyntax _ => false,
+                ObjectCreationExpressionSyntax objectCreation
+                    => semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+                       IsAssignableFrom(type, semanticModel.Compilation),
+                _ => semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
+                     IsPotentiallyAssignableFrom(type, semanticModel.Compilation),
+            };
         }
 
         internal static bool IsPotentiallyAssignableFrom(ITypeSymbol type, Compilation compilation)
@@ -83,7 +83,7 @@
 
                 using (var walker = AssignedValueWalker.Borrow(symbol, semanticModel, cancellationToken))
                 {
-                    return walker.TrySingle(out var value) &&
+                    return walker.Values.TrySingle(out var value) &&
                            semanticModel.TryGetType(value, cancellationToken, out var type) &&
                            IsNopCore(type);
                 }
