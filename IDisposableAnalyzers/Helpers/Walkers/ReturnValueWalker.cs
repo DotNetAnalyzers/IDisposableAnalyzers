@@ -214,7 +214,7 @@
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (AsyncAwait.TryGetAwaitedInvocation(awaitExpression, out var invocation) &&
+            if (AsyncAwait.FindAwaitedInvocation(awaitExpression) is { } invocation &&
                 this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is ISymbol symbol)
             {
                 if (symbol.TrySingleDeclaration(this.cancellationToken, out MemberDeclarationSyntax? declaration) &&

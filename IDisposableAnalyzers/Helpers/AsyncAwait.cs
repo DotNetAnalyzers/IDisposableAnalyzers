@@ -2,26 +2,24 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static class AsyncAwait
     {
-        internal static bool TryGetAwaitedInvocation(AwaitExpressionSyntax awaitExpression, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
+        internal static InvocationExpressionSyntax? FindAwaitedInvocation(AwaitExpressionSyntax awaitExpression)
         {
-            switch (awaitExpression)
+            return awaitExpression switch
             {
-                case { Expression: InvocationExpressionSyntax invocation }
-                    when TryPeelConfigureAwait(invocation, out result):
-                    return true;
-                case { Expression: InvocationExpressionSyntax invocation }:
-                    result = invocation;
-                    return true;
-                default:
-                    result = default;
-                    return false;
-            }
+                { Expression: InvocationExpressionSyntax invocation }
+                    when TryPeelConfigureAwait(invocation) is { } result
+                    => result,
+                { Expression: InvocationExpressionSyntax invocation } => invocation,
+                _ => null,
+            };
         }
 
         internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
@@ -40,7 +38,7 @@
 
         internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            if (TryPeelConfigureAwait(invocation, out var inner))
+            if (TryPeelConfigureAwait(invocation) is { } inner)
             {
                 invocation = inner;
             }
@@ -73,7 +71,7 @@
 
         internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
         {
-            if (TryPeelConfigureAwait(invocation, out var inner))
+            if (TryPeelConfigureAwait(invocation) is { } inner)
             {
                 invocation = inner;
             }
@@ -91,32 +89,26 @@
             return false;
         }
 
-        internal static bool TryPeelConfigureAwait(InvocationExpressionSyntax invocation, [NotNullWhen(true)] out InvocationExpressionSyntax? result)
+        internal static InvocationExpressionSyntax? TryPeelConfigureAwait(InvocationExpressionSyntax invocation)
         {
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
                 invocation.TryGetMethodName(out var name) &&
                 name == KnownSymbol.Task.ConfigureAwait.Name)
             {
-                return TryPeel(invocation.Expression, out result);
+                return TryPeel(invocation.Expression);
 
-                static bool TryPeel(ExpressionSyntax e, out InvocationExpressionSyntax peeled)
+                static InvocationExpressionSyntax? TryPeel(ExpressionSyntax e)
                 {
-                    switch (e)
+                    return e switch
                     {
-                        case InvocationExpressionSyntax inner:
-                            peeled = inner;
-                            return true;
-                        case MemberAccessExpressionSyntax memberAccess:
-                            return TryPeel(memberAccess.Expression, out peeled);
-                        default:
-                            peeled = default!;
-                            return false;
-                    }
+                        InvocationExpressionSyntax inner => inner,
+                        MemberAccessExpressionSyntax memberAccess => TryPeel(memberAccess.Expression),
+                        _ => null,
+                    };
                 }
             }
 
-            result = null;
-            return false;
+            return null;
         }
     }
 }

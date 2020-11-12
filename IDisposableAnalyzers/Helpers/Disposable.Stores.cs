@@ -96,8 +96,7 @@
                             case "AddOrUpdate":
                             case "TryAdd":
                             case "TryUpdate":
-                                _ = recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
-                                return true;
+                                return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
                         }
                     }
 
@@ -136,7 +135,7 @@
                     return true;
                 }
 
-                result = null!;
+                result = null;
                 return false;
             }
         }
