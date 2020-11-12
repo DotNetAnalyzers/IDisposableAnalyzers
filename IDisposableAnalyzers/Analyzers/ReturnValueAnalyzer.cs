@@ -160,8 +160,8 @@
                     return true;
                 }
 
-                using var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(declaration);
-                foreach (var returnValue in walker.ReturnValues)
+                using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var returnValue in walker.Values)
                 {
                     if (returnValue is InvocationExpressionSyntax nestedInvocation)
                     {

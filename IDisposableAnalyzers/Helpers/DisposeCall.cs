@@ -92,8 +92,8 @@
                     case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
                         when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
                         {
-                            using var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(getterOrExpressionBody);
-                            if (walker.ReturnValues.TrySingle(out var returnValue))
+                            using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);
+                            if (walker.Values.TrySingle(out var returnValue))
                             {
                                 switch (returnValue)
                                 {
@@ -133,8 +133,8 @@
                 if (disposedSymbol is IPropertySymbol property &&
                     property.TrySingleDeclaration(cancellationToken, out var declaration))
                 {
-                    using var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(declaration);
-                    return walker.ReturnValues.TrySingle(out var returnValue) &&
+                    using var walker = ReturnValueWalker.Borrow(declaration, ReturnValueSearch.Member, semanticModel, cancellationToken);
+                    return walker.Values.TrySingle(out var returnValue) &&
                            MemberPath.TrySingle(returnValue, out var expression) &&
                            semanticModel.TryGetSymbol(expression, cancellationToken, out ISymbol? nested) &&
                            SymbolComparer.Equal(nested, symbol);
