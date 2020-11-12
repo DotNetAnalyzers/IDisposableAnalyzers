@@ -214,7 +214,7 @@
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (AsyncAwait.FindAwaitedInvocation(awaitExpression) is { } invocation &&
+            if (Await.FindAwaitedInvocation(awaitExpression) is { } invocation &&
                 this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is ISymbol symbol)
             {
                 if (symbol.TrySingleDeclaration(this.cancellationToken, out MemberDeclarationSyntax? declaration) &&
@@ -246,7 +246,7 @@
 
             void AwaitValue(ExpressionSyntax expression)
             {
-                if (AsyncAwait.AwaitTaskFromResult(expression, this.semanticModel, this.cancellationToken) is { } result)
+                if (Await.TaskFromResult(expression, this.semanticModel, this.cancellationToken) is { } result)
                 {
                     if (result is IdentifierNameSyntax identifierName &&
                         symbol is IMethodSymbol method &&
@@ -267,7 +267,7 @@
 
                     this.AddReturnValue(result);
                 }
-                else if (AsyncAwait.AwaitTaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
+                else if (Await.TaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
                 {
                     if (this.Recursive(awaited, awaited) is { } walker)
                     {

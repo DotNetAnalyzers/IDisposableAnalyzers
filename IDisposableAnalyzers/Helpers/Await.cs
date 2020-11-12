@@ -7,37 +7,44 @@
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal static class AsyncAwait
+    internal static class Await
     {
         internal static InvocationExpressionSyntax? FindAwaitedInvocation(AwaitExpressionSyntax awaitExpression)
         {
             return awaitExpression switch
             {
                 { Expression: InvocationExpressionSyntax invocation }
-                    when TryPeelConfigureAwait(invocation) is { } result
+                    when PeelConfigureAwait(invocation) is InvocationExpressionSyntax result
                     => result,
                 { Expression: InvocationExpressionSyntax invocation } => invocation,
                 _ => null,
             };
         }
 
-        internal static ExpressionSyntax? AwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionSyntax? TaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return expression switch
             {
                 InvocationExpressionSyntax invocation
-                    => AwaitTaskFromResult(invocation, semanticModel, cancellationToken),
+                    => TaskFromResult(invocation, semanticModel, cancellationToken),
                 AwaitExpressionSyntax { Expression: { } awaited }
-                    => AwaitTaskFromResult(awaited, semanticModel, cancellationToken),
+                    => TaskFromResult(awaited, semanticModel, cancellationToken),
                 _ => null,
             };
         }
 
-        internal static ExpressionSyntax? AwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionSyntax? TaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (TryPeelConfigureAwait(invocation) is { } inner)
+            if (PeelConfigureAwait(invocation) is { } inner)
             {
-                invocation = inner;
+                if (inner is InvocationExpressionSyntax innerInvocation)
+                {
+                    invocation = innerInvocation;
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } arguments } } &&
@@ -50,23 +57,30 @@
             return null;
         }
 
-        internal static ExpressionSyntax? AwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionSyntax? TaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return expression switch
             {
                 InvocationExpressionSyntax invocation
-                    => AwaitTaskRun(invocation, semanticModel, cancellationToken),
+                    => TaskRun(invocation, semanticModel, cancellationToken),
                 AwaitExpressionSyntax { Expression: { } awaited }
-                    => AwaitTaskRun(awaited, semanticModel, cancellationToken),
+                    => TaskRun(awaited, semanticModel, cancellationToken),
                 _ => null,
             };
         }
 
-        internal static ExpressionSyntax? AwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ExpressionSyntax? TaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (TryPeelConfigureAwait(invocation) is { } inner)
+            if (PeelConfigureAwait(invocation) is { } inner)
             {
-                invocation = inner;
+                if (inner is InvocationExpressionSyntax innerInvocation)
+                {
+                    invocation = innerInvocation;
+                }
+                else
+                {
+                    return null;
+                }
             }
 
             if (invocation is { ArgumentList: { Arguments: { } arguments } } &&
@@ -80,7 +94,7 @@
             return null;
         }
 
-        internal static InvocationExpressionSyntax? TryPeelConfigureAwait(InvocationExpressionSyntax invocation)
+        internal static ExpressionSyntax? PeelConfigureAwait(InvocationExpressionSyntax invocation)
         {
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
                 invocation.TryGetMethodName(out var name) &&
@@ -88,13 +102,12 @@
             {
                 return TryPeel(invocation.Expression);
 
-                static InvocationExpressionSyntax? TryPeel(ExpressionSyntax e)
+                static ExpressionSyntax? TryPeel(ExpressionSyntax e)
                 {
                     return e switch
                     {
-                        InvocationExpressionSyntax inner => inner,
                         MemberAccessExpressionSyntax memberAccess => TryPeel(memberAccess.Expression),
-                        _ => null,
+                        _ => e,
                     };
                 }
             }

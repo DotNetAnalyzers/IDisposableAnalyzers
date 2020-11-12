@@ -9,7 +9,7 @@
 
     using NUnit.Framework;
 
-    public static class AsyncAwaitTests
+    public static class AwaitTests
     {
         [TestCase("Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", null)]
         [TestCase("System.Threading.Tasks.Task.Run(() => new string(' ', 1)).ConfigureAwait(false)", null)]
@@ -35,7 +35,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
-            Assert.AreEqual(expectedCode, AsyncAwait.AwaitTaskFromResult(value, semanticModel, CancellationToken.None)?.ToFullString());
+            Assert.AreEqual(expectedCode, Await.TaskFromResult(value, semanticModel, CancellationToken.None)?.ToFullString());
         }
 
         [TestCase("Task.Run(() => 1)", "() => 1")]
@@ -69,7 +69,7 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
-            Assert.AreEqual(expectedCode, AsyncAwait.AwaitTaskRun(value, semanticModel, CancellationToken.None)?.ToFullString());
+            Assert.AreEqual(expectedCode, Await.TaskRun(value, semanticModel, CancellationToken.None)?.ToFullString());
         }
     }
 }
