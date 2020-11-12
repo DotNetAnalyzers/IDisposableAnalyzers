@@ -14,4 +14,5 @@
     typeof(System.Threading.Tasks.ValueTask),
     typeof(System.Xml.Serialization.XmlSerializer),
     typeof(Moq.Mock<>),
-    typeof(Ninject.KernelConfiguration))]
+    typeof(Ninject.StandardKernel),
+    typeof(Gu.Inject.Kernel))]

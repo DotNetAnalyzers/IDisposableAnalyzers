@@ -1,11 +1,12 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
 
-    class Returned
+    public class Returned
     {
         void Consume()
         {

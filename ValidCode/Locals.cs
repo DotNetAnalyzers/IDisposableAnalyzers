@@ -1,6 +1,8 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode
 {
     using System.IO;
+    using System.Xml.Serialization;
 
     public class Locals
     {
