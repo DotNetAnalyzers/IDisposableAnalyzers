@@ -269,7 +269,7 @@
                 }
                 else if (AsyncAwait.AwaitTaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
                 {
-                    if (this.Recursive(awaited, awaited) is {} walker)
+                    if (this.Recursive(awaited, awaited) is { } walker)
                     {
                         foreach (var value in walker.values)
                         {

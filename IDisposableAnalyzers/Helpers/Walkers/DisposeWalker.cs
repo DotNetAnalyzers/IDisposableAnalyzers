@@ -8,7 +8,7 @@
 
     internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>
     {
-        private readonly List<InvocationExpressionSyntax> invocations = new List<InvocationExpressionSyntax>();
+        private readonly List<DisposeCall> invocations = new List<DisposeCall>();
         private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
 
         private DisposeWalker()
@@ -16,24 +16,18 @@
             this.SearchScope = SearchScope.Instance;
         }
 
-        internal IReadOnlyList<InvocationExpressionSyntax> Invocations => this.invocations;
+        internal IReadOnlyList<DisposeCall> Invocations => this.invocations;
 
         internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
 
         public override void VisitInvocationExpression(InvocationExpressionSyntax node)
         {
-            base.VisitInvocationExpression(node);
-            if (this.SemanticModel.TryGetSymbol(node, KnownSymbol.IDisposable.Dispose, this.CancellationToken, out var dispose) &&
-                dispose.Parameters.Length == 0)
+            if (DisposeCall.MatchAny(node, this.SemanticModel, this.CancellationToken) is { } dispose)
             {
-                this.invocations.Add(node);
+                this.invocations.Add(dispose);
             }
 
-            if (this.SemanticModel.TryGetSymbol(node, KnownSymbol.IAsyncDisposable.DisposeAsync, this.CancellationToken, out var disposeAsync) &&
-                disposeAsync.Parameters.Length == 0)
-            {
-                this.invocations.Add(node);
-            }
+            base.VisitInvocationExpression(node);
         }
 
         public override void VisitIdentifierName(IdentifierNameSyntax node)
@@ -80,8 +74,7 @@
         {
             foreach (var invocation in this.invocations)
             {
-                if (DisposeCall.MatchAny(invocation, this.SemanticModel, this.CancellationToken) is { } dispose &&
-                    dispose.IsDisposing(member, this.SemanticModel, this.CancellationToken))
+                if (invocation.IsDisposing(member, this.SemanticModel, this.CancellationToken))
                 {
                     return true;
                 }

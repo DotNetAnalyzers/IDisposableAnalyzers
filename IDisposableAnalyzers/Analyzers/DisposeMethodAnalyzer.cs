@@ -123,8 +123,7 @@
                 using var disposeWalker = DisposeWalker.Borrow(overridden, context.SemanticModel, context.CancellationToken);
                 foreach (var disposeCall in disposeWalker.Invocations)
                 {
-                    if (DisposeCall.MatchAny(disposeCall, context.SemanticModel, context.CancellationToken) is { } call &&
-                        call.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed &&
+                    if (disposeCall.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed &&
                         context.SemanticModel.TryGetSymbol(disposed, context.CancellationToken, out var disposedSymbol) &&
                         FieldOrProperty.TryCreate(disposedSymbol, out var fieldOrProperty) &&
                         !DisposableMember.IsDisposed(fieldOrProperty, method.Symbol, context.SemanticModel, context.CancellationToken))

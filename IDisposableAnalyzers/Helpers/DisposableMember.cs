@@ -46,10 +46,9 @@
             using var walker = DisposeWalker.Borrow(disposeMethod, semanticModel, cancellationToken);
             if (Disposable.IsAssignableFrom(member.Type, semanticModel.Compilation))
             {
-                foreach (var candidate in walker.Invocations)
+                foreach (var dispose in walker.Invocations)
                 {
-                    if (DisposeCall.MatchAny(candidate, semanticModel, cancellationToken) is { } dispose &&
-                        dispose.IsDisposing(member.Symbol, semanticModel, cancellationToken))
+                    if (dispose.IsDisposing(member.Symbol, semanticModel, cancellationToken))
                     {
                         return true;
                     }
