@@ -1,6 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
@@ -22,21 +21,19 @@
             };
         }
 
-        internal static bool TryAwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
+        internal static ExpressionSyntax? AwaitTaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (expression)
+            return expression switch
             {
-                case InvocationExpressionSyntax invocation:
-                    return TryAwaitTaskFromResult(invocation, semanticModel, cancellationToken, out result);
-                case AwaitExpressionSyntax { Expression: { } awaited }:
-                    return TryAwaitTaskFromResult(awaited, semanticModel, cancellationToken, out result);
-            }
-
-            result = null;
-            return false;
+                InvocationExpressionSyntax invocation
+                    => AwaitTaskFromResult(invocation, semanticModel, cancellationToken),
+                AwaitExpressionSyntax { Expression: { } awaited }
+                    => AwaitTaskFromResult(awaited, semanticModel, cancellationToken),
+                _ => null,
+            };
         }
 
-        internal static bool TryAwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
+        internal static ExpressionSyntax? AwaitTaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (TryPeelConfigureAwait(invocation) is { } inner)
             {
@@ -47,29 +44,25 @@
                 arguments[0].Expression is { } expression &&
                 invocation.IsSymbol(KnownSymbol.Task.FromResult, semanticModel, cancellationToken))
             {
-                result = expression;
-                return true;
+                return expression;
             }
 
-            result = null;
-            return false;
+            return null;
         }
 
-        internal static bool TryAwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
+        internal static ExpressionSyntax? AwaitTaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            switch (expression)
+            return expression switch
             {
-                case InvocationExpressionSyntax invocation:
-                    return TryAwaitTaskRun(invocation, semanticModel, cancellationToken, out result);
-                case AwaitExpressionSyntax { Expression: { } awaited }:
-                    return TryAwaitTaskRun(awaited, semanticModel, cancellationToken, out result);
-            }
-
-            result = null;
-            return false;
+                InvocationExpressionSyntax invocation
+                    => AwaitTaskRun(invocation, semanticModel, cancellationToken),
+                AwaitExpressionSyntax { Expression: { } awaited }
+                    => AwaitTaskRun(awaited, semanticModel, cancellationToken),
+                _ => null,
+            };
         }
 
-        internal static bool TryAwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ExpressionSyntax? result)
+        internal static ExpressionSyntax? AwaitTaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (TryPeelConfigureAwait(invocation) is { } inner)
             {
@@ -81,12 +74,10 @@
                 arguments[0].Expression is { } expression &&
                 invocation.IsSymbol(KnownSymbol.Task.Run, semanticModel, cancellationToken))
             {
-                result = expression;
-                return true;
+                return expression;
             }
 
-            result = null;
-            return false;
+            return null;
         }
 
         internal static InvocationExpressionSyntax? TryPeelConfigureAwait(InvocationExpressionSyntax invocation)

@@ -246,9 +246,9 @@
 
             void AwaitValue(ExpressionSyntax expression)
             {
-                if (AsyncAwait.TryAwaitTaskFromResult(expression, this.semanticModel, this.cancellationToken, out var awaited))
+                if (AsyncAwait.AwaitTaskFromResult(expression, this.semanticModel, this.cancellationToken) is { } result)
                 {
-                    if (awaited is IdentifierNameSyntax identifierName &&
+                    if (result is IdentifierNameSyntax identifierName &&
                         symbol is IMethodSymbol method &&
                         method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                     {
@@ -265,9 +265,9 @@
                         }
                     }
 
-                    this.AddReturnValue(awaited);
+                    this.AddReturnValue(result);
                 }
-                else if (AsyncAwait.TryAwaitTaskRun(expression, this.semanticModel, this.cancellationToken, out awaited))
+                else if (AsyncAwait.AwaitTaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
                 {
                     if (this.TryGetRecursive(awaited, awaited, out var walker))
                     {
