@@ -41,7 +41,7 @@
                     this.nonPrivateCtors.Add(node);
                 }
 
-                if (node.ParameterList?.Parameters.Count == 0)
+                if (node.ParameterList.Parameters.Count == 0)
                 {
                     this.Default = node;
                 }

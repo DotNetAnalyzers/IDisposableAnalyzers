@@ -73,21 +73,21 @@
             this.cancellationToken = CancellationToken.None;
         }
 
-        private bool TryGetRecursive(SyntaxNode location, SyntaxNode scope, [NotNullWhen(true)] out ReturnValueWalker? walker)
+        private ReturnValueWalker? Recursive(SyntaxNode location, SyntaxNode scope)
         {
-            if (this.recursiveWalkers.TryGetValue(location, out walker))
+            if (this.recursiveWalkers.TryGetValue(location, out _))
             {
-                return false;
+                return null;
             }
 
-            walker = Borrow(() => new ReturnValueWalker());
+            var walker = Borrow(() => new ReturnValueWalker());
             this.recursiveWalkers.Add(location, walker);
             walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
             walker.semanticModel = this.semanticModel;
             walker.cancellationToken = this.cancellationToken;
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
             walker.Run(scope);
-            return true;
+            return walker;
         }
 
         private void Run(SyntaxNode node)
@@ -123,7 +123,7 @@
             if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method))
             {
                 if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax? baseMethod) &&
-                    this.TryGetRecursive(invocation, baseMethod, out var methodWalker))
+                    this.Recursive(invocation, baseMethod) is { } methodWalker)
                 {
                     foreach (var value in methodWalker.values)
                     {
@@ -157,7 +157,7 @@
                 }
 
                 if (method.TrySingleDeclaration(this.cancellationToken, out LocalFunctionStatementSyntax? localFunction) &&
-                    this.TryGetRecursive(invocation, localFunction, out var localFunctionWalker))
+                    this.Recursive(invocation, localFunction) is { } localFunctionWalker)
                 {
                     foreach (var value in localFunctionWalker.values)
                     {
@@ -199,9 +199,9 @@
             if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out property) &&
                 property.GetMethod is { } &&
                 property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
-                this.TryGetRecursive(propertyGet, getter, out var walker))
+                this.Recursive(propertyGet, getter) is { } getterWalker)
             {
-                foreach (var returnValue in walker.values)
+                foreach (var returnValue in getterWalker.values)
                 {
                     this.AddReturnValue(returnValue);
                 }
@@ -225,9 +225,9 @@
                         return this.TryHandleInvocation(invocation, out _);
                     }
 
-                    if (this.TryGetRecursive(awaitExpression, declaration, out var walker))
+                    if (this.Recursive(awaitExpression, declaration) is { } awaitWalker)
                     {
-                        foreach (var value in walker.values)
+                        foreach (var value in awaitWalker.values)
                         {
                             AwaitValue(value);
                         }
@@ -269,7 +269,7 @@
                 }
                 else if (AsyncAwait.AwaitTaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
                 {
-                    if (this.TryGetRecursive(awaited, awaited, out var walker))
+                    if (this.Recursive(awaited, awaited) is {} walker)
                     {
                         foreach (var value in walker.values)
                         {

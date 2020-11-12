@@ -1,7 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
@@ -406,11 +405,7 @@
 
         private void Run()
         {
-            if (this.CurrentSymbol is null)
-            {
-                return;
-            }
-
+            System.Diagnostics.Debug.Assert(this.CurrentSymbol is { }, "this.CurrentSymbol is { }");
             if (this.CurrentSymbol is ILocalSymbol local &&
                 local.TrySingleDeclaration(this.cancellationToken, out var declaration) &&
                 Scope(declaration) is { } localScope)
