@@ -51,10 +51,10 @@
             // Note that GetAsync returns a task which resolves into a HttpResponseMessage which is a IDisposable
             // Note that this is not happening in case of Test3 above, which has the same signature as GetAsync
             var responseTask1 = HttpClient.GetAsync("http://example.com"); // Generates IDISP001, suggests using here
-            var response1 = await responseTask1; // IDISP001 should be here
+            using var response1 = await responseTask1; // IDISP001 should be here
 
             using var responseTask2 = HttpClient.GetAsync("http://example.com"); // using in front of this line removes IDISP001
-            var response2 = await responseTask2; // IDISP001 should actually still be here
+            using var response2 = await responseTask2; // IDISP001 should actually still be here
 
             // The correct code is a 'using' in front of the variabele assigned the variabele.
             // In this case the IDISP001 is gone on both lines

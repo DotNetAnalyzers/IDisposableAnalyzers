@@ -642,8 +642,10 @@ namespace N
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
 
-            [Test]
-            public static void HttpClientIssue242Result()
+            [Ignore("Temp")]
+            //[TestCase("task.Result")]
+            //[TestCase("task.GetAwaiter().GetResult()")]
+            public static void HttpClientIssue242Result(string expression)
             {
                 var before = @"
 namespace N
@@ -661,7 +663,7 @@ namespace N
             ↓var response = task.Result;
         }
     }
-}";
+}".AssertReplace("task.Result", expression);
 
                 var after = @"
 namespace N
@@ -679,7 +681,7 @@ namespace N
             using var response = task.Result;
         }
     }
-}";
+}".AssertReplace("task.Result", expression);
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
