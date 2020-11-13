@@ -30,7 +30,7 @@ namespace N
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            //[TestCase("HttpClient.GetAsync(\"http://example.com\")",                             false)]
+            // [TestCase("HttpClient.GetAsync(\"http://example.com\")",                             false)]
             [TestCase("await HttpClient.GetAsync(\"http://example.com\")",                       true)]
             [TestCase("await HttpClient.GetAsync(\"http://example.com\").ConfigureAwait(false)", true)]
             public static void AwaitExpression(string expression, bool expected)
@@ -65,9 +65,10 @@ namespace N
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("await task", true)]
+            [TestCase("await task",                      true)]
             [TestCase("await task.ConfigureAwait(true)", true)]
-            //[TestCase("task.Result", true)]
+            //[TestCase("task.Result",                     true)]
+            //[TestCase("task.GetAwaiter().GetResult()",   true)]
             public static void AwaitTask(string expression, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
