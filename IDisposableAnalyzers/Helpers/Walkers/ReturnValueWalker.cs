@@ -219,16 +219,18 @@
             {
                 if (symbol.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
                 {
-                    if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
-                    {
-                        return this.TryHandleInvocation(invocation, out _);
-                    }
-
                     if (this.Recursive(awaitExpression, methodDeclaration) is { } awaitWalker)
                     {
                         foreach (var value in awaitWalker.values)
                         {
-                            AwaitValue(value);
+                            if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
+                            {
+                                this.AddReturnValue(value);
+                            }
+                            else
+                            {
+                                AwaitValue(value);
+                            }
                         }
                     }
                 }
@@ -254,6 +256,10 @@
             {
                 switch (expression)
                 {
+                    case InvocationExpressionSyntax candidate
+                        when Await.ConfigureAwait(candidate) is { } inner:
+                        AwaitValue(inner);
+                        break;
                     case InvocationExpressionSyntax candidate
                         when Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda:
                         if (this.Recursive(lambda, lambda) is { } walker)

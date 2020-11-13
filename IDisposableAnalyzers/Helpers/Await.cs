@@ -14,7 +14,7 @@
             return awaitExpression switch
             {
                 { Expression: InvocationExpressionSyntax invocation }
-                    when PeelConfigureAwait(invocation) is InvocationExpressionSyntax result
+                    when ConfigureAwait(invocation) is InvocationExpressionSyntax result
                     => result,
                 { Expression: InvocationExpressionSyntax invocation } => invocation,
                 _ => null,
@@ -23,7 +23,7 @@
 
         internal static ExpressionSyntax? TaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (PeelConfigureAwait(invocation) is { } inner)
+            if (ConfigureAwait(invocation) is { } inner)
             {
                 if (inner is InvocationExpressionSyntax innerInvocation)
                 {
@@ -47,7 +47,7 @@
 
         internal static ParenthesizedLambdaExpressionSyntax? TaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (PeelConfigureAwait(invocation) is { } inner)
+            if (ConfigureAwait(invocation) is { } inner)
             {
                 if (inner is InvocationExpressionSyntax innerInvocation)
                 {
@@ -70,7 +70,7 @@
             return null;
         }
 
-        internal static ExpressionSyntax? PeelConfigureAwait(InvocationExpressionSyntax invocation)
+        internal static ExpressionSyntax? ConfigureAwait(InvocationExpressionSyntax invocation)
         {
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
                 invocation.TryGetMethodName(out var name) &&
