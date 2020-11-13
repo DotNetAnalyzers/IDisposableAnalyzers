@@ -17,6 +17,11 @@
                 return false;
             }
 
+            if (localOrParameter.Type.IsAssignableTo(KnownSymbol.Task, semanticModel.Compilation))
+            {
+                return false;
+            }
+
             using var recursion = Recursion.Borrow(localOrParameter.Symbol.ContainingType, semanticModel, cancellationToken);
             using var walker = UsagesWalker.Borrow(localOrParameter, semanticModel, cancellationToken);
             foreach (var usage in walker.Usages)
