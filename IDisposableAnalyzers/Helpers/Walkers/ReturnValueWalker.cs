@@ -182,10 +182,10 @@
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (Await.FindAwaitedInvocation(awaitExpression) is { } invocation &&
-                this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is ISymbol symbol)
+            if (IDisposableAnalyzers.Await.FindAwaitedInvocation(awaitExpression) is { } invocation &&
+                this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is {} method)
             {
-                if (symbol.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
+                if (method.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
                 {
                     if (this.Recursive(awaitExpression, methodDeclaration) is { } awaitWalker)
                     {
@@ -197,14 +197,14 @@
                             }
                             else
                             {
-                                AwaitValue(value);
+                                Await(value);
                             }
                         }
                     }
                 }
                 else
                 {
-                    AwaitValue(invocation);
+                    Await(invocation);
                 }
 
                 this.values.RemoveAll(x => IsParameter(x));
@@ -213,52 +213,34 @@
                 bool IsParameter(ExpressionSyntax value)
                 {
                     return value is IdentifierNameSyntax id &&
-                           symbol is IMethodSymbol method &&
                            method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
                 }
             }
 
             return false;
 
-            void AwaitValue(ExpressionSyntax expression)
+            void Await(ExpressionSyntax expression)
             {
                 switch (expression)
                 {
                     case InvocationExpressionSyntax candidate
-                        when Await.ConfigureAwait(candidate) is { } inner:
-                        AwaitValue(inner);
+                        when IDisposableAnalyzers.Await.ConfigureAwait(candidate) is { } inner:
+                        Await(inner);
                         break;
                     case InvocationExpressionSyntax candidate
-                        when Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda:
+                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda:
                         if (this.Recursive(lambda, lambda) is { } walker)
                         {
                             foreach (var value in walker.values)
                             {
-                                AwaitValue(value);
+                                Await(value);
                             }
                         }
 
                         break;
                     case InvocationExpressionSyntax candidate
-                        when Await.TaskFromResult(candidate, this.semanticModel, this.cancellationToken) is { } result:
-                        if (result is IdentifierNameSyntax identifierName &&
-                            symbol is IMethodSymbol method &&
-                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
-                        {
-                            if (this.search != ReturnValueSearch.RecursiveInside &&
-                                invocation!.TryFindArgument(parameter, out var argument))
-                            {
-                                this.AddReturnValue(argument.Expression);
-                            }
-                            else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                                     parameterDeclaration is { Default: { Value: { } value } })
-                            {
-                                _ = this.values.Add(value);
-                            }
-                        }
-
-                        this.AddReturnValue(result);
+                        when IDisposableAnalyzers.Await.TaskFromResult(candidate, this.semanticModel, this.cancellationToken) is { } result:
+                        this.AddReturnValue(this.ValueOrArgument(result, invocation, method));
                         break;
                     default:
                         this.AddReturnValue(expression);
@@ -365,8 +347,8 @@
                 }
 
                 if (parameter.HasExplicitDefaultValue &&
-                         parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                         parameterDeclaration is { Default: { Value: { } defaultValue } })
+                    parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                    parameterDeclaration is { Default: { Value: { } defaultValue } })
                 {
                     return defaultValue;
                 }
