@@ -174,6 +174,10 @@
                     case IFieldSymbol _:
                         this.values.Add(assignedValue);
                         return true;
+                    case IPropertySymbol property
+                        when property is { ContainingType: { Name: "Task" }, Name: "Result" } &&
+                         assignedValue is MemberAccessExpressionSyntax { Expression: { } expression }:
+                        return this.AddRecursiveValues(expression);
                     case IPropertySymbol _:
                     case IMethodSymbol _:
                         if (symbol.DeclaringSyntaxReferences.Length == 0)
