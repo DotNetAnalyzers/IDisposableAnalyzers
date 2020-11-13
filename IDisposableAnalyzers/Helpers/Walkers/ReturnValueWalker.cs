@@ -361,13 +361,14 @@
                 if (this.search != ReturnValueSearch.RecursiveInside &&
                     invocation.TryFindArgument(parameter, out var argument))
                 {
-                    this.AddReturnValue(argument.Expression);
+                    return argument.Expression;
                 }
-                else if (parameter.HasExplicitDefaultValue &&
+
+                if (parameter.HasExplicitDefaultValue &&
                          parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                          parameterDeclaration is { Default: { Value: { } defaultValue } })
                 {
-                    _ = this.values.Add(defaultValue);
+                    return defaultValue;
                 }
             }
 
