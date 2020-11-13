@@ -239,6 +239,13 @@
 
                 this.values.RemoveAll(x => IsParameter(x));
                 return true;
+
+                bool IsParameter(ExpressionSyntax value)
+                {
+                    return value is IdentifierNameSyntax id &&
+                           symbol is IMethodSymbol method &&
+                           method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
+                }
             }
 
             return false;
@@ -283,14 +290,6 @@
                         this.AddReturnValue(expression);
                         break;
                 }
-
-            }
-
-            bool IsParameter(ExpressionSyntax value)
-            {
-                return value is IdentifierNameSyntax id &&
-                       symbol is IMethodSymbol method &&
-                       method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
             }
         }
 
