@@ -127,23 +127,7 @@
                 {
                     foreach (var value in methodWalker.values)
                     {
-                        if (value is IdentifierNameSyntax identifierName &&
-                            method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
-                        {
-                            if (this.search != ReturnValueSearch.RecursiveInside &&
-                                invocation.TryFindArgument(parameter, out var argument))
-                            {
-                                this.AddReturnValue(argument.Expression);
-                            }
-                            else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                                     parameterDeclaration is { Default: { Value: { } defaultValue } })
-                            {
-                                _ = this.values.Add(defaultValue);
-                            }
-                        }
-
-                        this.AddReturnValue(value);
+                        this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
                     }
 
                     this.values.RemoveAll(x => IsParameter(x));
@@ -152,7 +136,7 @@
                     bool IsParameter(ExpressionSyntax value)
                     {
                         return value is IdentifierNameSyntax id &&
-                               baseMethod!.TryFindParameter(id.Identifier.ValueText, out _);
+                               baseMethod.TryFindParameter(id.Identifier.ValueText, out _);
                     }
                 }
 
@@ -161,23 +145,7 @@
                 {
                     foreach (var value in localFunctionWalker.values)
                     {
-                        if (value is IdentifierNameSyntax identifierName &&
-                            method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
-                        {
-                            if (this.search != ReturnValueSearch.RecursiveInside &&
-                                invocation.TryFindArgument(parameter, out var argument))
-                            {
-                                this.AddReturnValue(argument.Expression);
-                            }
-                            else if (parameter.HasExplicitDefaultValue &&
-                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                                     parameterDeclaration is { Default: { Value: { } defaultValue } })
-                            {
-                                _ = this.values.Add(defaultValue);
-                            }
-                        }
-
-                        this.AddReturnValue(value);
+                        this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
                     }
 
                     this.values.RemoveAll(x => IsParameter(x));
@@ -186,7 +154,7 @@
                     bool IsParameter(ExpressionSyntax value)
                     {
                         return value is IdentifierNameSyntax id &&
-                               localFunction!.ParameterList.TryFind(id.Identifier.ValueText, out _);
+                               localFunction.ParameterList.TryFind(id.Identifier.ValueText, out _);
                     }
                 }
             }
@@ -383,6 +351,27 @@
             {
                 _ = this.values.Add(value);
             }
+        }
+
+        private ExpressionSyntax ValueOrArgument(ExpressionSyntax value, InvocationExpressionSyntax invocation, IMethodSymbol method)
+        {
+            if (value is IdentifierNameSyntax identifierName &&
+                method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
+            {
+                if (this.search != ReturnValueSearch.RecursiveInside &&
+                    invocation.TryFindArgument(parameter, out var argument))
+                {
+                    this.AddReturnValue(argument.Expression);
+                }
+                else if (parameter.HasExplicitDefaultValue &&
+                         parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                         parameterDeclaration is { Default: { Value: { } defaultValue } })
+                {
+                    _ = this.values.Add(defaultValue);
+                }
+            }
+
+            return value;
         }
 
         private class RecursiveWalkers
