@@ -245,41 +245,45 @@
 
             void AwaitValue(ExpressionSyntax expression)
             {
-                if (Await.TaskFromResult(expression, this.semanticModel, this.cancellationToken) is { } result)
+                switch (expression)
                 {
-                    if (result is IdentifierNameSyntax identifierName &&
-                        symbol is IMethodSymbol method &&
-                        method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
-                    {
-                        if (this.search != ReturnValueSearch.RecursiveInside &&
-                            invocation!.TryFindArgument(parameter, out var argument))
+                    case InvocationExpressionSyntax candidate
+                        when Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda:
+                        if (this.Recursive(lambda, lambda) is { } walker)
                         {
-                            this.AddReturnValue(argument.Expression);
+                            foreach (var value in walker.values)
+                            {
+                                AwaitValue(value);
+                            }
                         }
-                        else if (parameter.HasExplicitDefaultValue &&
-                                 parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                                 parameterDeclaration is { Default: { Value: { } value } })
-                        {
-                            _ = this.values.Add(value);
-                        }
-                    }
 
-                    this.AddReturnValue(result);
-                }
-                else if (Await.TaskRun(expression, this.semanticModel, this.cancellationToken) is { } awaited)
-                {
-                    if (this.Recursive(awaited, awaited) is { } walker)
-                    {
-                        foreach (var value in walker.values)
+                        break;
+                    case InvocationExpressionSyntax candidate
+                        when Await.TaskFromResult(candidate, this.semanticModel, this.cancellationToken) is { } result:
+                        if (result is IdentifierNameSyntax identifierName &&
+                            symbol is IMethodSymbol method &&
+                            method.Parameters.TryFirst(x => x.Name == identifierName.Identifier.ValueText, out var parameter))
                         {
-                            AwaitValue(value);
+                            if (this.search != ReturnValueSearch.RecursiveInside &&
+                                invocation!.TryFindArgument(parameter, out var argument))
+                            {
+                                this.AddReturnValue(argument.Expression);
+                            }
+                            else if (parameter.HasExplicitDefaultValue &&
+                                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                                     parameterDeclaration is { Default: { Value: { } value } })
+                            {
+                                _ = this.values.Add(value);
+                            }
                         }
-                    }
+
+                        this.AddReturnValue(result);
+                        break;
+                    default:
+                        this.AddReturnValue(expression);
+                        break;
                 }
-                else
-                {
-                    this.AddReturnValue(expression);
-                }
+
             }
 
             bool IsParameter(ExpressionSyntax value)

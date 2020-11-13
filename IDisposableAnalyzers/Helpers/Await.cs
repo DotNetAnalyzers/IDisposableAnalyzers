@@ -21,18 +21,6 @@
             };
         }
 
-        internal static ExpressionSyntax? TaskFromResult(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return expression switch
-            {
-                InvocationExpressionSyntax invocation
-                    => TaskFromResult(invocation, semanticModel, cancellationToken),
-                AwaitExpressionSyntax { Expression: { } awaited }
-                    => TaskFromResult(awaited, semanticModel, cancellationToken),
-                _ => null,
-            };
-        }
-
         internal static ExpressionSyntax? TaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (PeelConfigureAwait(invocation) is { } inner)
@@ -57,19 +45,7 @@
             return null;
         }
 
-        internal static ExpressionSyntax? TaskRun(ExpressionSyntax expression, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return expression switch
-            {
-                InvocationExpressionSyntax invocation
-                    => TaskRun(invocation, semanticModel, cancellationToken),
-                AwaitExpressionSyntax { Expression: { } awaited }
-                    => TaskRun(awaited, semanticModel, cancellationToken),
-                _ => null,
-            };
-        }
-
-        internal static ExpressionSyntax? TaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static ParenthesizedLambdaExpressionSyntax? TaskRun(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (PeelConfigureAwait(invocation) is { } inner)
             {
@@ -85,10 +61,10 @@
 
             if (invocation is { ArgumentList: { Arguments: { } arguments } } &&
                 arguments.Count > 0 &&
-                arguments[0].Expression is { } expression &&
+                arguments[0].Expression is ParenthesizedLambdaExpressionSyntax lambda &&
                 invocation.IsSymbol(KnownSymbol.Task.Run, semanticModel, cancellationToken))
             {
-                return expression;
+                return lambda;
             }
 
             return null;
