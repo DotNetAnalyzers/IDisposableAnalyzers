@@ -197,8 +197,8 @@
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, [NotNullWhen(true)] out IPropertySymbol? property)
         {
             if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out property) &&
-                property.GetMethod is { } &&
-                property.GetMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
+                property.GetMethod is { } getMethod &&
+                getMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
                 this.Recursive(propertyGet, getter) is { } getterWalker)
             {
                 foreach (var returnValue in getterWalker.values)
@@ -217,15 +217,14 @@
             if (Await.FindAwaitedInvocation(awaitExpression) is { } invocation &&
                 this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is ISymbol symbol)
             {
-                if (symbol.TrySingleDeclaration(this.cancellationToken, out MemberDeclarationSyntax? declaration) &&
-                    declaration is MethodDeclarationSyntax methodDeclaration)
+                if (symbol.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
                 {
                     if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
                     {
                         return this.TryHandleInvocation(invocation, out _);
                     }
 
-                    if (this.Recursive(awaitExpression, declaration) is { } awaitWalker)
+                    if (this.Recursive(awaitExpression, methodDeclaration) is { } awaitWalker)
                     {
                         foreach (var value in awaitWalker.values)
                         {
