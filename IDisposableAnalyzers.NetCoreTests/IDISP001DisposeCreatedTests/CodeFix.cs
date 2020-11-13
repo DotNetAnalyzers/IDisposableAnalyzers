@@ -13,8 +13,8 @@
 
         [TestCase("await task")]
         [TestCase("await task.ConfigureAwait(true)")]
-        //[TestCase("task.Result")]
-        //[TestCase("task.GetAwaiter().GetResult()")]
+        [TestCase("task.Result")]
+        [TestCase("task.GetAwaiter().GetResult()")]
         public static void HttpClientIssue242(string expression)
         {
             var before = @"

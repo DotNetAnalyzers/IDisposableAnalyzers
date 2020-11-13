@@ -175,8 +175,12 @@
                         this.values.Add(assignedValue);
                         return true;
                     case IPropertySymbol property
-                        when property is { ContainingType: { Name: "Task" }, Name: "Result" } &&
+                        when property is { ContainingType: { MetadataName: "Task`1" }, MetadataName: "Result" } &&
                          assignedValue is MemberAccessExpressionSyntax { Expression: { } expression }:
+                        return this.AddRecursiveValues(expression);
+                    case IMethodSymbol method
+                        when method is { ContainingType: { MetadataName: "TaskAwaiter`1" }, MetadataName: "GetResult" } &&
+                             assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "GetAwaiter" } } } } } }:
                         return this.AddRecursiveValues(expression);
                     case IPropertySymbol _:
                     case IMethodSymbol _:

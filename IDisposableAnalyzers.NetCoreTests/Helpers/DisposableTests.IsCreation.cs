@@ -68,7 +68,7 @@ namespace N
             [TestCase("await task",                      true)]
             [TestCase("await task.ConfigureAwait(true)", true)]
             [TestCase("task.Result",                     true)]
-            //[TestCase("task.GetAwaiter().GetResult()",   true)]
+            [TestCase("task.GetAwaiter().GetResult()",   true)]
             public static void AwaitTask(string expression, bool expected)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
