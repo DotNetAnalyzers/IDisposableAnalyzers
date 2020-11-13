@@ -182,45 +182,12 @@
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
         {
-            if (IDisposableAnalyzers.Await.FindAwaitedInvocation(awaitExpression) is { } invocation &&
-                this.semanticModel.GetSymbolSafe(invocation, this.cancellationToken) is { } method)
+            if (awaitExpression.Expression is { } awaited)
             {
-                if (method.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration))
+                foreach (var e in Await(awaited))
                 {
-                    if (this.Recursive(awaitExpression, methodDeclaration) is { } awaitWalker)
-                    {
-                        foreach (var value in awaitWalker.values)
-                        {
-                            if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
-                            {
-                                this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
-                            }
-                            else
-                            {
-                                foreach (var e in Await(value))
-                                {
-                                    this.AddReturnValue(this.ValueOrArgument(e, invocation, method));
-                                }
-                            }
-                        }
-                    }
-
-                    this.values.RemoveAll(x => IsParameter(x));
-                    bool IsParameter(ExpressionSyntax value)
-                    {
-                        return value is IdentifierNameSyntax id &&
-                               method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
-                    }
+                    this.AddReturnValue(e);
                 }
-                else
-                {
-                    foreach (var e in Await(invocation))
-                    {
-                        this.AddReturnValue(e);
-                    }
-                }
-
-                return true;
             }
 
             return false;
@@ -238,22 +205,45 @@
 
                         break;
                     case InvocationExpressionSyntax candidate
-                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda:
-                        if (this.Recursive(lambda, lambda) is { } walker)
+                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda &&
+                             this.Recursive(lambda, lambda) is { } recursive:
+                        foreach (var inner in recursive.values)
                         {
-                            foreach (var inner in walker.values)
-                            {
-                                foreach (var e in Await(inner))
-                                {
-                                    yield return e;
-                                }
-                            }
+                            yield return inner;
                         }
 
                         break;
                     case InvocationExpressionSyntax candidate
                         when IDisposableAnalyzers.Await.TaskFromResult(candidate, this.semanticModel, this.cancellationToken) is { } result:
                         yield return result;
+                        break;
+                    case InvocationExpressionSyntax candidate
+                        when this.semanticModel.GetSymbolSafe(candidate, this.cancellationToken) is { } method &&
+                             method.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration) &&
+                             this.Recursive(awaitExpression, methodDeclaration) is { } recursive:
+                        foreach (var value in recursive.values)
+                        {
+                            if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
+                            {
+                                this.AddReturnValue(this.ValueOrArgument(value, candidate, method));
+                            }
+                            else
+                            {
+                                foreach (var e in Await(value))
+                                {
+                                    this.AddReturnValue(this.ValueOrArgument(e, candidate, method));
+                                }
+                            }
+                        }
+
+                        this.values.RemoveAll(x => IsParameter(x));
+
+                        bool IsParameter(ExpressionSyntax value)
+                        {
+                            return value is IdentifierNameSyntax id &&
+                                   method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
+                        }
+
                         break;
                     default:
                         yield return expression;
