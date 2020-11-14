@@ -131,6 +131,7 @@ namespace N
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("Id(disposable)",                                   false)]
             [TestCase("Id<IDisposable>(null)",                            false)]
             [TestCase("this.Id<IDisposable>(null)",                       false)]
             [TestCase("this.Id<IDisposable>(this.disposable)",            false)]
@@ -164,8 +165,10 @@ namespace N
 
         internal C()
         {
-            // M();
+            Id(disposable);
         }
+
+        internal static IDisposable Id(IDisposable arg) => arg;
 
         internal T Id<T>(T arg) => arg;
 
@@ -216,7 +219,7 @@ namespace N
             return stream;
         }
     }
-}".AssertReplace("// M()", expression);
+}".AssertReplace("Id(disposable)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
                     CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
