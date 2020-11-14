@@ -73,23 +73,6 @@
             this.cancellationToken = CancellationToken.None;
         }
 
-        private ReturnValueWalker? Recursive(SyntaxNode location, SyntaxNode scope)
-        {
-            if (this.recursiveWalkers.TryGetValue(location, out _))
-            {
-                return null;
-            }
-
-            var walker = Borrow(() => new ReturnValueWalker());
-            this.recursiveWalkers.Add(location, walker);
-            walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
-            walker.semanticModel = this.semanticModel;
-            walker.cancellationToken = this.cancellationToken;
-            walker.recursiveWalkers.Parent = this.recursiveWalkers;
-            walker.Run(scope);
-            return walker;
-        }
-
         private void Run(SyntaxNode node)
         {
             switch (node)
@@ -100,15 +83,18 @@
                 case AwaitExpressionSyntax awaitExpression:
                     _ = this.TryHandleAwait(awaitExpression);
                     return;
+                case LambdaExpressionSyntax { Body: ExpressionSyntax expression }:
+                    this.AddReturnValue(expression);
+                    return;
                 case LambdaExpressionSyntax lambda:
-                    _ = this.TryHandleLambda(lambda);
+                    base.Visit(lambda);
                     return;
                 case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
                     this.AddReturnValue(expression);
-                    break;
+                    return;
                 case LocalFunctionStatementSyntax { Body: { } body }:
                     this.Visit(body);
-                    break;
+                    return;
                 case ExpressionSyntax expression:
                     this.TryHandlePropertyGet(expression);
                     return;
@@ -242,20 +228,6 @@
             }
         }
 
-        private bool TryHandleLambda(LambdaExpressionSyntax lambda)
-        {
-            if (lambda.Body is ExpressionSyntax expressionBody)
-            {
-                this.AddReturnValue(expressionBody);
-            }
-            else
-            {
-                base.Visit(lambda);
-            }
-
-            return true;
-        }
-
         private void AddReturnValue(ExpressionSyntax value)
         {
             if (this.search.IsEither(ReturnValueSearch.Recursive, ReturnValueSearch.RecursiveInside))
@@ -343,6 +315,23 @@
             }
 
             return value;
+        }
+
+        private ReturnValueWalker? Recursive(SyntaxNode location, SyntaxNode scope)
+        {
+            if (this.recursiveWalkers.TryGetValue(location, out _))
+            {
+                return null;
+            }
+
+            var walker = Borrow(() => new ReturnValueWalker());
+            this.recursiveWalkers.Add(location, walker);
+            walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
+            walker.semanticModel = this.semanticModel;
+            walker.cancellationToken = this.cancellationToken;
+            walker.recursiveWalkers.Parent = this.recursiveWalkers;
+            walker.Run(scope);
+            return walker;
         }
 
         private class RecursiveWalkers
