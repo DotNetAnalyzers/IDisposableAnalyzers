@@ -110,11 +110,11 @@
             {
                 if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? declaration))
                 {
-                    if (this.Recursive(invocation, declaration) is { } methodWalker)
+                    if (this.Recursive(invocation, declaration) is { } recursive)
                     {
-                        foreach (var value in methodWalker.values)
+                        foreach (var value in recursive.values)
                         {
-                            this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
+                            this.AddReturnValue(value, invocation, method);
                         }
 
                         this.values.RemoveAll(x => IsParameter(x));
@@ -140,11 +140,11 @@
             {
                 if (getMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter))
                 {
-                    if (this.Recursive(propertyGet, getter) is { } getterWalker)
+                    if (this.Recursive(propertyGet, getter) is { } recursive)
                     {
-                        foreach (var returnValue in getterWalker.values)
+                        foreach (var returnValue in recursive.values)
                         {
-                            this.AddReturnValue(returnValue);
+                            _ = this.values.Add(returnValue);
                         }
                     }
                 }
@@ -198,13 +198,13 @@
                         {
                             if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
                             {
-                                this.AddReturnValue(this.ValueOrArgument(value, candidate, method));
+                                this.AddReturnValue(value, candidate, method);
                             }
                             else
                             {
                                 foreach (var e in Await(value))
                                 {
-                                    this.AddReturnValue(this.ValueOrArgument(e, candidate, method));
+                                    this.AddReturnValue(e, candidate, method);
                                 }
                             }
                         }
@@ -292,7 +292,7 @@
             }
         }
 
-        private ExpressionSyntax ValueOrArgument(ExpressionSyntax value, InvocationExpressionSyntax invocation, IMethodSymbol method)
+        private void AddReturnValue(ExpressionSyntax value, InvocationExpressionSyntax invocation, IMethodSymbol method)
         {
             if (value is IdentifierNameSyntax identifierName &&
                 method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
@@ -300,18 +300,20 @@
                 if (this.search != ReturnValueSearch.RecursiveInside &&
                     invocation.TryFindArgument(parameter, out var argument))
                 {
-                    return argument.Expression;
+                    this.AddReturnValue(argument.Expression);
+                    return;
                 }
 
                 if (parameter.HasExplicitDefaultValue &&
                     parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
                     parameterDeclaration is { Default: { Value: { } defaultValue } })
                 {
-                    return defaultValue;
+                    this.AddReturnValue(defaultValue);
+                    return;
                 }
             }
 
-            return value;
+            this.AddReturnValue(value);
         }
 
         private ReturnValueWalker? Recursive(SyntaxNode location, SyntaxNode scope)
