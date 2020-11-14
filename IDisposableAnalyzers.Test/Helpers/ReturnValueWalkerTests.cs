@@ -645,7 +645,7 @@ namespace N
         [Test]
         public static void ChainedExtensionMethod()
         {
-            var code = @"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -679,8 +679,7 @@ namespace N
             this.inner.Dispose();
         }
     }
-}";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
@@ -689,55 +688,53 @@ namespace N
         }
 
         [Test]
-        public static void ReturnTernary()
+        public static void ConditionalExpression()
         {
-            var code = @"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     public class C
     {
-        public C()
+        public C(bool b)
         {
-            var temp = ReturnTernary(true);
+            M(b);
         }
 
-        private static int ReturnTernary(bool b)
+        private static int M(bool b)
         {
             return b ? 1 : 2;
         }
     }
-}";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnTernary(true)").Value;
+            var methodDeclaration = syntaxTree.FindInvocation("M(b)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
             Assert.AreEqual("1, 2", string.Join(", ", walker.Values));
         }
 
         [Test]
-        public static void ReturnNullCoalesce()
+        public static void NullCoalesce()
         {
-            var code = @"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     public class C
     {
         public C()
         {
-            var temp = ReturnNullCoalesce(null);
+            M(null);
         }
 
-        private static string ReturnNullCoalesce(string text)
+        private static string M(string text)
         {
             return text ?? string.Empty;
         }
     }
-}";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var methodDeclaration = syntaxTree.FindEqualsValueClause("var temp = ReturnNullCoalesce(null)").Value;
+            var methodDeclaration = syntaxTree.FindInvocation("M(null)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
             Assert.AreEqual("null, string.Empty", string.Join(", ", walker.Values));
         }
