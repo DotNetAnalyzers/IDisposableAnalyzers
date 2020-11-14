@@ -95,11 +95,7 @@
             switch (node)
             {
                 case InvocationExpressionSyntax invocation:
-                    if (this.HandleInvocation(invocation) is { DeclaringSyntaxReferences: { Length: 0 } })
-                    {
-                        // _ = this.values.Add(invocation);
-                    }
-
+                    this.HandleInvocation(invocation);
                     return;
                 case AwaitExpressionSyntax awaitExpression:
                     _ = this.TryHandleAwait(awaitExpression);
@@ -122,31 +118,33 @@
             }
         }
 
-        private IMethodSymbol? HandleInvocation(InvocationExpressionSyntax invocation)
+        private void HandleInvocation(InvocationExpressionSyntax invocation)
         {
             if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out var method))
             {
-                if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? declaration) &&
-                    this.Recursive(invocation, declaration) is { } methodWalker)
+                if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? declaration))
                 {
-                    foreach (var value in methodWalker.values)
+                    if (this.Recursive(invocation, declaration) is { } methodWalker)
                     {
-                        this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
-                    }
+                        foreach (var value in methodWalker.values)
+                        {
+                            this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
+                        }
 
-                    this.values.RemoveAll(x => IsParameter(x));
+                        this.values.RemoveAll(x => IsParameter(x));
 
-                    bool IsParameter(ExpressionSyntax value)
-                    {
-                        return value is IdentifierNameSyntax id &&
-                               method.TryFindParameter(id.Identifier.ValueText, out _);
+                        bool IsParameter(ExpressionSyntax value)
+                        {
+                            return value is IdentifierNameSyntax id &&
+                                   method.TryFindParameter(id.Identifier.ValueText, out _);
+                        }
                     }
                 }
-
-                return method;
+                else
+                {
+                    _ = this.values.Add(invocation);
+                }
             }
-
-            return null;
         }
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, [NotNullWhen(true)] out IPropertySymbol? property)
@@ -260,11 +258,7 @@
                 switch (value)
                 {
                     case InvocationExpressionSyntax invocation:
-                        if (this.HandleInvocation(invocation) is { DeclaringSyntaxReferences: { Length: 0 } })
-                        {
-                            _ = this.values.Add(invocation);
-                        }
-
+                        this.HandleInvocation(invocation);
                         break;
                     case AwaitExpressionSyntax awaitExpression:
                         this.TryHandleAwait(awaitExpression);
