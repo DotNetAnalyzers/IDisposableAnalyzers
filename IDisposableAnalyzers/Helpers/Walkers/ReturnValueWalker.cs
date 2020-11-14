@@ -17,8 +17,7 @@
         private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private ReturnValueSearch search;
-        private SemanticModel semanticModel = null!;
-        private CancellationToken cancellationToken;
+        private Recursion recursion = null!;
 
         private ReturnValueWalker()
         {
@@ -58,9 +57,13 @@
         {
             var walker = Borrow(() => new ReturnValueWalker());
             walker.search = search;
-            walker.semanticModel = semanticModel;
-            walker.cancellationToken = cancellationToken;
-            walker.Run(node);
+            if (node.FirstAncestorOrSelf<TypeDeclarationSyntax>() is { } typeDeclaration &&
+                semanticModel.GetNamedType(typeDeclaration, cancellationToken) is { } containingType)
+            {
+                walker.recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+                walker.Run(node);
+            }
+
             return walker;
         }
 
@@ -69,8 +72,8 @@
             this.values.Clear();
             this.recursiveWalkers.Clear();
             this.assignedValueWalkers.Clear();
-            this.semanticModel = null!;
-            this.cancellationToken = CancellationToken.None;
+            this.recursion.Dispose();
+            this.recursion = null!;
         }
 
         private void Run(SyntaxNode node)
@@ -106,9 +109,9 @@
 
         private void HandleInvocation(InvocationExpressionSyntax invocation)
         {
-            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out var method))
+            if (this.recursion.SemanticModel.TryGetSymbol(invocation, this.recursion.CancellationToken, out var method))
             {
-                if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? declaration))
+                if (method.TrySingleDeclaration(this.recursion.CancellationToken, out SyntaxNode? declaration))
                 {
                     if (this.Recursive(invocation, declaration) is { } recursive)
                     {
@@ -135,10 +138,10 @@
 
         private void HandlePropertyGet(ExpressionSyntax propertyGet)
         {
-            if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out IPropertySymbol? property) &&
+            if (this.recursion.SemanticModel.TryGetSymbol(propertyGet, this.recursion.CancellationToken, out IPropertySymbol? property) &&
                 property.GetMethod is { } getMethod)
             {
-                if (getMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter))
+                if (getMethod.TrySingleDeclaration(this.recursion.CancellationToken, out SyntaxNode? getter))
                 {
                     if (this.Recursive(propertyGet, getter) is { } recursive)
                     {
@@ -178,7 +181,7 @@
 
                         break;
                     case InvocationExpressionSyntax candidate
-                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.semanticModel, this.cancellationToken) is { } lambda &&
+                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.recursion.SemanticModel, this.recursion.CancellationToken) is { } lambda &&
                              this.Recursive(lambda, lambda) is { } recursive:
                         foreach (var inner in recursive.values)
                         {
@@ -187,12 +190,12 @@
 
                         break;
                     case InvocationExpressionSyntax candidate
-                        when IDisposableAnalyzers.Await.TaskFromResult(candidate, this.semanticModel, this.cancellationToken) is { } result:
+                        when IDisposableAnalyzers.Await.TaskFromResult(candidate, this.recursion.SemanticModel, this.recursion.CancellationToken) is { } result:
                         yield return result;
                         break;
                     case InvocationExpressionSyntax candidate
-                        when this.semanticModel.GetSymbolSafe(candidate, this.cancellationToken) is { } method &&
-                             method.TrySingleDeclaration(this.cancellationToken, out MethodDeclarationSyntax? methodDeclaration) &&
+                        when this.recursion.SemanticModel.GetSymbolSafe(candidate, this.recursion.CancellationToken) is { } method &&
+                             method.TrySingleDeclaration(this.recursion.CancellationToken, out MethodDeclarationSyntax? methodDeclaration) &&
                              this.Recursive(awaitExpression, methodDeclaration) is { } recursive:
                         foreach (var value in recursive.values)
                         {
@@ -254,7 +257,7 @@
 
                         break;
                     case IdentifierNameSyntax identifierName
-                        when this.semanticModel.TryGetSymbol(identifierName, this.cancellationToken, out var candidate) &&
+                        when this.recursion.SemanticModel.TryGetSymbol(identifierName, this.recursion.CancellationToken, out var candidate) &&
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
                         if (this.assignedValueWalkers.TryGetValue(identifierName, out _))
                         {
@@ -262,7 +265,7 @@
                             return;
                         }
 
-                        var walker = AssignedValueWalker.Borrow(value, this.semanticModel, this.cancellationToken);
+                        var walker = AssignedValueWalker.Borrow(value, this.recursion.SemanticModel, this.recursion.CancellationToken);
                         this.assignedValueWalkers.Add(identifierName, walker);
                         if (walker.Values.Count == 0)
                         {
@@ -278,7 +281,7 @@
 
                         break;
                     case { } expression
-                        when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
+                        when this.recursion.SemanticModel.GetSymbolSafe(expression, this.recursion.CancellationToken) is IPropertySymbol:
                         this.HandlePropertyGet(value);
                         break;
                     default:
@@ -305,7 +308,7 @@
                 }
 
                 if (parameter.HasExplicitDefaultValue &&
-                    parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
+                    parameter.TrySingleDeclaration(this.recursion.CancellationToken, out var parameterDeclaration) &&
                     parameterDeclaration is { Default: { Value: { } defaultValue } })
                 {
                     this.AddReturnValue(defaultValue);
@@ -326,8 +329,7 @@
             var walker = Borrow(() => new ReturnValueWalker());
             this.recursiveWalkers.Add(location, walker);
             walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
-            walker.semanticModel = this.semanticModel;
-            walker.cancellationToken = this.cancellationToken;
+            walker.recursion = Recursion.Borrow(this.recursion.ContainingType, this.recursion.SemanticModel, this.recursion.CancellationToken);
             walker.recursiveWalkers.Parent = this.recursiveWalkers;
             walker.Run(scope);
             return walker;
