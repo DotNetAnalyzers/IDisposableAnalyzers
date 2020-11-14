@@ -740,6 +740,37 @@ namespace N
         }
 
         [Test]
+        public static void SwitchExpression()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    public class C
+    {
+        public C(object o)
+        {
+            M(o);
+        }
+
+        private static int M(object obj)
+        {
+            return obj switch
+            {
+                int _ => 1,
+                double _ => 2,
+                _ => 3,
+            };
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindInvocation("M(o)");
+            using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1, 2, 3", string.Join(", ", walker.Values));
+        }
+
+        [Test]
         public static void ValidationErrorToStringConverter()
         {
             var code = @"

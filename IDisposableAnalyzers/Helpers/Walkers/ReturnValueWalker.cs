@@ -277,6 +277,13 @@
                         this.AddReturnValue(coalesce.Left);
                         this.AddReturnValue(coalesce.Right);
                         break;
+                    case SwitchExpressionSyntax { Arms: { } arms }:
+                        foreach (var arm in arms)
+                        {
+                            this.AddReturnValue(arm.Expression);
+                        }
+
+                        break;
                     case IdentifierNameSyntax identifierName
                         when this.semanticModel.TryGetSymbol(identifierName, this.cancellationToken, out var candidate) &&
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
