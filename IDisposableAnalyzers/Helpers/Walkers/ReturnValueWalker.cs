@@ -152,7 +152,6 @@
                 {
                     _ = this.values.Add(propertyGet);
                 }
-
             }
         }
 
