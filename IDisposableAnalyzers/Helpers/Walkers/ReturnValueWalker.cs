@@ -110,7 +110,7 @@
                     this.Visit(body);
                     break;
                 case ExpressionSyntax expression:
-                    _ = this.TryHandlePropertyGet(expression, out _);
+                    this.TryHandlePropertyGet(expression);
                     return;
                 default:
                     this.Visit(node);
@@ -147,22 +147,27 @@
             }
         }
 
-        private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, [NotNullWhen(true)] out IPropertySymbol? property)
+        private void TryHandlePropertyGet(ExpressionSyntax propertyGet)
         {
-            if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out property) &&
-                property.GetMethod is { } getMethod &&
-                getMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter) &&
-                this.Recursive(propertyGet, getter) is { } getterWalker)
+            if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out IPropertySymbol? property) &&
+                property.GetMethod is { } getMethod)
             {
-                foreach (var returnValue in getterWalker.values)
+                if (getMethod.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? getter))
                 {
-                    this.AddReturnValue(returnValue);
+                    if (this.Recursive(propertyGet, getter) is { } getterWalker)
+                    {
+                        foreach (var returnValue in getterWalker.values)
+                        {
+                            this.AddReturnValue(returnValue);
+                        }
+                    }
+                }
+                else
+                {
+                    _ = this.values.Add(propertyGet);
                 }
 
-                return true;
             }
-
-            return false;
         }
 
         private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
@@ -298,13 +303,7 @@
                         break;
                     case { } expression
                         when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
-                        if (!this.TryHandlePropertyGet(value, out var property) &&
-                            property != null &&
-                            property.DeclaringSyntaxReferences.Length == 0)
-                        {
-                            _ = this.values.Add(value);
-                        }
-
+                        this.TryHandlePropertyGet(value);
                         break;
                     default:
                         this.values.Add(value);
