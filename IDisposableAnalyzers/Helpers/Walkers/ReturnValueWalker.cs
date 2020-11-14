@@ -95,7 +95,11 @@
             switch (node)
             {
                 case InvocationExpressionSyntax invocation:
-                    _ = this.TryHandleInvocation(invocation, out _);
+                    if (this.HandleInvocation(invocation) is { DeclaringSyntaxReferences: { Length: 0 } })
+                    {
+                        // _ = this.values.Add(invocation);
+                    }
+
                     return;
                 case AwaitExpressionSyntax awaitExpression:
                     _ = this.TryHandleAwait(awaitExpression);
@@ -118,12 +122,12 @@
             }
         }
 
-        private bool TryHandleInvocation(InvocationExpressionSyntax invocation, [NotNullWhen(true)] out IMethodSymbol? method)
+        private IMethodSymbol? HandleInvocation(InvocationExpressionSyntax invocation)
         {
-            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out method))
+            if (this.semanticModel.TryGetSymbol(invocation, this.cancellationToken, out var method))
             {
-                if (method.TrySingleDeclaration(this.cancellationToken, out BaseMethodDeclarationSyntax? baseMethod) &&
-                    this.Recursive(invocation, baseMethod) is { } methodWalker)
+                if (method.TrySingleDeclaration(this.cancellationToken, out SyntaxNode? declaration) &&
+                    this.Recursive(invocation, declaration) is { } methodWalker)
                 {
                     foreach (var value in methodWalker.values)
                     {
@@ -131,35 +135,18 @@
                     }
 
                     this.values.RemoveAll(x => IsParameter(x));
-                    return true;
 
                     bool IsParameter(ExpressionSyntax value)
                     {
                         return value is IdentifierNameSyntax id &&
-                               baseMethod.TryFindParameter(id.Identifier.ValueText, out _);
+                               method.TryFindParameter(id.Identifier.ValueText, out _);
                     }
                 }
 
-                if (method.TrySingleDeclaration(this.cancellationToken, out LocalFunctionStatementSyntax? localFunction) &&
-                    this.Recursive(invocation, localFunction) is { } localFunctionWalker)
-                {
-                    foreach (var value in localFunctionWalker.values)
-                    {
-                        this.AddReturnValue(this.ValueOrArgument(value, invocation, method));
-                    }
-
-                    this.values.RemoveAll(x => IsParameter(x));
-                    return true;
-
-                    bool IsParameter(ExpressionSyntax value)
-                    {
-                        return value is IdentifierNameSyntax id &&
-                               localFunction.ParameterList.TryFind(id.Identifier.ValueText, out _);
-                    }
-                }
+                return method;
             }
 
-            return false;
+            return null;
         }
 
         private bool TryHandlePropertyGet(ExpressionSyntax propertyGet, [NotNullWhen(true)] out IPropertySymbol? property)
@@ -273,9 +260,7 @@
                 switch (value)
                 {
                     case InvocationExpressionSyntax invocation:
-                        if (!this.TryHandleInvocation(invocation, out var method) &&
-                            method != null &&
-                            method.DeclaringSyntaxReferences.Length == 0)
+                        if (this.HandleInvocation(invocation) is { DeclaringSyntaxReferences: { Length: 0 } })
                         {
                             _ = this.values.Add(invocation);
                         }
