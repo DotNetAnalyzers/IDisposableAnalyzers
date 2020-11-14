@@ -81,7 +81,7 @@
                     this.HandleInvocation(invocation);
                     return;
                 case AwaitExpressionSyntax awaitExpression:
-                    _ = this.TryHandleAwait(awaitExpression);
+                    this.HandleAwait(awaitExpression);
                     return;
                 case LambdaExpressionSyntax { Body: ExpressionSyntax expression }:
                     this.AddReturnValue(expression);
@@ -96,7 +96,7 @@
                     this.Visit(body);
                     return;
                 case ExpressionSyntax expression:
-                    this.TryHandlePropertyGet(expression);
+                    this.HandlePropertyGet(expression);
                     return;
                 default:
                     this.Visit(node);
@@ -133,7 +133,7 @@
             }
         }
 
-        private void TryHandlePropertyGet(ExpressionSyntax propertyGet)
+        private void HandlePropertyGet(ExpressionSyntax propertyGet)
         {
             if (this.semanticModel.TryGetSymbol(propertyGet, this.cancellationToken, out IPropertySymbol? property) &&
                 property.GetMethod is { } getMethod)
@@ -156,7 +156,7 @@
             }
         }
 
-        private bool TryHandleAwait(AwaitExpressionSyntax awaitExpression)
+        private void HandleAwait(AwaitExpressionSyntax awaitExpression)
         {
             if (awaitExpression.Expression is { } awaited)
             {
@@ -165,8 +165,6 @@
                     this.AddReturnValue(e);
                 }
             }
-
-            return false;
 
             IEnumerable<ExpressionSyntax> Await(ExpressionSyntax expression)
             {
@@ -238,7 +236,7 @@
                         this.HandleInvocation(invocation);
                         break;
                     case AwaitExpressionSyntax awaitExpression:
-                        this.TryHandleAwait(awaitExpression);
+                        this.HandleAwait(awaitExpression);
                         break;
                     case ConditionalExpressionSyntax ternary:
                         this.AddReturnValue(ternary.WhenTrue);
@@ -282,7 +280,7 @@
                         break;
                     case { } expression
                         when this.semanticModel.GetSymbolSafe(expression, this.cancellationToken) is IPropertySymbol:
-                        this.TryHandlePropertyGet(value);
+                        this.HandlePropertyGet(value);
                         break;
                     default:
                         this.values.Add(value);
