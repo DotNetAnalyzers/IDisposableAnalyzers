@@ -1,4 +1,9 @@
 #### 
+* FEATURE: Handle switch expression.
+* BUGFIX: Figure out await in more places.
+* BUGFIX: Tweak assumptions about binary symbols.
+
+#### 3.4.4
 * FEATURE: Handle some common uses of reflection.
 
 #### 3.4.3
