@@ -2,7 +2,9 @@
 {
     using System.Collections.Immutable;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -155,7 +157,8 @@
             if (recursion.Target(invocation) is { Symbol: IMethodSymbol method, Declaration: { } declaration } &&
                 method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, recursion.SemanticModel.Compilation))
             {
-                if (YieldStatementWalker.Any(declaration))
+                using var yieldWalker = YieldStatementWalker.Borrow(declaration);
+                if (yieldWalker.YieldStatements.Count > 0)
                 {
                     return true;
                 }
