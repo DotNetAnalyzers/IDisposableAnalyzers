@@ -410,6 +410,34 @@ namespace N
             Assert.AreEqual("disposable", string.Join(", ", walker.Values));
         }
 
+        [Test]
+        public static void RecursiveSwitch()
+        {
+            var code = @"
+namespace N
+{
+    public class C
+    {
+        public static object M(object value)
+        {
+            return value switch
+            {
+                int _ => M(1),
+                double _ => M(2),
+                string _ => 3,
+                _ => value,
+            };
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindMethodDeclaration("M");
+            using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("3, 2, 1, value", string.Join(", ", walker.Values));
+        }
+
         [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Recursive, "1")]
         [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Member, "1")]
         [TestCase("Func<int, int> temp = x => 1", ReturnValueSearch.Recursive, "1")]
