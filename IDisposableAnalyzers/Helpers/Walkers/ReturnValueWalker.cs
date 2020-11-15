@@ -344,7 +344,19 @@
             var walker = Borrow(() => new ReturnValueWalker());
             walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
             walker.recursion = this.recursion;
-            walker.Visit(target.Declaration);
+            switch (target.Declaration)
+            {
+                case LocalFunctionStatementSyntax { ExpressionBody: { } expressionBody }:
+                    walker.Visit(expressionBody);
+                    break;
+                case LocalFunctionStatementSyntax { Body: { } body }:
+                    walker.Visit(body);
+                    break;
+                default:
+                    walker.Visit(target.Declaration);
+                    break;
+            }
+
             walker.recursion = null!;
             return walker;
         }
