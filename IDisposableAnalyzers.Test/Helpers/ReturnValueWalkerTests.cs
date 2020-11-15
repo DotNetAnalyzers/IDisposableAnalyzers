@@ -695,9 +695,9 @@ namespace N
 {
     public class C
     {
-        public C(bool b)
+        public C(bool arg)
         {
-            M(b);
+            M(arg);
         }
 
         private static int M(bool b)
@@ -708,7 +708,7 @@ namespace N
 }");
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var methodDeclaration = syntaxTree.FindInvocation("M(b)");
+            var methodDeclaration = syntaxTree.FindInvocation("M(arg)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
             Assert.AreEqual("1, 2", string.Join(", ", walker.Values));
         }
