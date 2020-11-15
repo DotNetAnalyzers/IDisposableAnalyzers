@@ -57,10 +57,9 @@
         {
             var walker = Borrow(() => new ReturnValueWalker());
             walker.search = search;
-            if (node.FirstAncestorOrSelf<TypeDeclarationSyntax>() is { } typeDeclaration &&
-                semanticModel.GetNamedType(typeDeclaration, cancellationToken) is { } containingType)
+            if (Recursion.Borrow(node, semanticModel, cancellationToken) is { } recursion)
             {
-                walker.recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+                walker.recursion = recursion;
                 walker.Run(node);
             }
 
@@ -109,15 +108,15 @@
 
         private void HandleInvocation(InvocationExpressionSyntax invocation)
         {
-            if (this.recursion.SemanticModel.TryGetSymbol(invocation, this.recursion.CancellationToken, out var method))
+            if (this.recursion.Method(invocation) is { } target)
             {
-                if (method.TrySingleDeclaration(this.recursion.CancellationToken, out SyntaxNode? declaration))
+                if (target is { Declaration: { } declaration })
                 {
                     if (this.Recursive(invocation, declaration) is { } recursive)
                     {
                         foreach (var value in recursive.values)
                         {
-                            this.AddReturnValue(value, invocation, method);
+                            this.AddReturnValue(value, target);
                         }
 
                         this.values.RemoveAll(x => IsParameter(x));
@@ -125,7 +124,7 @@
                         bool IsParameter(ExpressionSyntax value)
                         {
                             return value is IdentifierNameSyntax id &&
-                                   method.TryFindParameter(id.Identifier.ValueText, out _);
+                                   target.Symbol.TryFindParameter(id.Identifier.ValueText, out _);
                         }
                     }
                 }
@@ -194,20 +193,19 @@
                         yield return result;
                         break;
                     case InvocationExpressionSyntax candidate
-                        when this.recursion.SemanticModel.GetSymbolSafe(candidate, this.recursion.CancellationToken) is { } method &&
-                             method.TrySingleDeclaration(this.recursion.CancellationToken, out MethodDeclarationSyntax? methodDeclaration) &&
-                             this.Recursive(awaitExpression, methodDeclaration) is { } recursive:
+                        when this.recursion.Method(candidate) is { Declaration: { } declaration } target &&
+                             this.Recursive(awaitExpression, declaration) is { } recursive:
                         foreach (var value in recursive.values)
                         {
-                            if (methodDeclaration.Modifiers.Any(SyntaxKind.AsyncKeyword))
+                            if (target.Symbol.IsAsync)
                             {
-                                this.AddReturnValue(value, candidate, method);
+                                this.AddReturnValue(value, target);
                             }
                             else
                             {
                                 foreach (var e in Await(value))
                                 {
-                                    this.AddReturnValue(e, candidate, method);
+                                    this.AddReturnValue(e, target);
                                 }
                             }
                         }
@@ -217,7 +215,7 @@
                         bool IsParameter(ExpressionSyntax value)
                         {
                             return value is IdentifierNameSyntax id &&
-                                   method.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
+                                   target.Symbol.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
                         }
 
                         break;
@@ -295,13 +293,13 @@
             }
         }
 
-        private void AddReturnValue(ExpressionSyntax value, InvocationExpressionSyntax invocation, IMethodSymbol method)
+        private void AddReturnValue(ExpressionSyntax value, Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> target)
         {
             if (value is IdentifierNameSyntax identifierName &&
-                method.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
+                target.Symbol.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
             {
                 if (this.search != ReturnValueSearch.RecursiveInside &&
-                    invocation.TryFindArgument(parameter, out var argument))
+                    target.Source.TryFindArgument(parameter, out var argument))
                 {
                     this.AddReturnValue(argument.Expression);
                     return;
@@ -358,7 +356,7 @@
             {
                 foreach (var walker in this.map.Values)
                 {
-                    ((IDisposable)walker)?.Dispose();
+                    walker.Dispose();
                 }
 
                 this.map.Clear();
