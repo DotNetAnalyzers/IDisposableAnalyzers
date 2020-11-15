@@ -137,16 +137,15 @@
 
         private void HandlePropertyGet(ExpressionSyntax propertyGet)
         {
-            if (this.recursion.SemanticModel.TryGetSymbol(propertyGet, this.recursion.CancellationToken, out IPropertySymbol? property) &&
-                property.GetMethod is { } getMethod)
+            if (this.recursion.PropertyGet(propertyGet) is { } target)
             {
-                if (getMethod.TrySingleDeclaration(this.recursion.CancellationToken, out SyntaxNode? getter))
+                if (target is { Declaration: { } declaration })
                 {
-                    if (this.Recursive(propertyGet, getter) is { } recursive)
+                    if (this.Recursive(propertyGet, declaration) is { } recursive)
                     {
-                        foreach (var returnValue in recursive.values)
+                        foreach (var value in recursive.values)
                         {
-                            _ = this.values.Add(returnValue);
+                            this.AddReturnValue(value);
                         }
                     }
                 }
