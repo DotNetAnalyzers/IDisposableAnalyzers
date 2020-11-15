@@ -306,7 +306,7 @@ namespace N
         [TestCase("Flatten(null, null)", ReturnValueSearch.Recursive, "null, new List<IDisposable>()")]
         public static void CallRecursive(string expression, ReturnValueSearch search, string expected)
         {
-            var code = @"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -366,8 +366,7 @@ namespace N
             return result;
         }
     }
-}".AssertReplace("var temp = Recursive()", $"var temp = {expression}");
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}".AssertReplace("var temp = Recursive()", $"var temp = {expression}"));
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
@@ -588,7 +587,7 @@ namespace N
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Member, "RecursiveAsync4(value)")]
         public static void AsyncAwaitRecursive(string expression, ReturnValueSearch search, string expected)
         {
-            var code = @"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -632,9 +631,7 @@ namespace N
             return await RecursiveAsync3(value);
         }
     }
-}".AssertReplace("var value = await RecursiveAsync()", $"var value = {expression}");
-
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}".AssertReplace("var value = await RecursiveAsync()", $"var value = {expression}"));
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
