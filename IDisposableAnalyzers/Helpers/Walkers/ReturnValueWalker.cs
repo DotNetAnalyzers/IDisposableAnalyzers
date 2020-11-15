@@ -112,15 +112,10 @@
                     this.AddReturnValue(value, target);
                 }
 
-                this.values.RemoveAll(x => ShouldRemove(x));
+                this.values.RemoveAll(x => IsParameter(x));
 
-                bool ShouldRemove(ExpressionSyntax x)
+                bool IsParameter(ExpressionSyntax x)
                 {
-                    if (x == target.Source)
-                    {
-                        return true;
-                    }
-
                     return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
                            target.Symbol.TryFindParameter(name, out _);
                 }
@@ -215,15 +210,10 @@
                                 }
                             }
 
-                            this.values.RemoveAll(x => ShouldRemove(x));
+                            this.values.RemoveAll(x => IsParameter(x));
 
-                            bool ShouldRemove(ExpressionSyntax x)
+                            bool IsParameter(ExpressionSyntax x)
                             {
-                                if (x == target.Source)
-                                {
-                                    return true;
-                                }
-
                                 return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
                                        target.Symbol.TryFindParameter(name, out _);
                             }
@@ -308,6 +298,11 @@
 
         private void AddReturnValue(ExpressionSyntax value, Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> target)
         {
+            if (value == target.Source)
+            {
+                return;
+            }
+
             if (value is IdentifierNameSyntax identifierName &&
                 target.Symbol.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
             {
