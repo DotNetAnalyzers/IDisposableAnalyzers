@@ -97,8 +97,9 @@
                 case LocalFunctionStatementSyntax { Body: { } body }:
                     this.Visit(body);
                     return;
-                case ExpressionSyntax expression:
-                    this.HandlePropertyGet(expression);
+                case ExpressionSyntax expression
+                    when this.recursion.PropertyGet(expression) is { } propertyGet:
+                    this.HandlePropertyGet(propertyGet);
                     return;
                 default:
                     this.Visit(node);
@@ -135,24 +136,21 @@
             }
         }
 
-        private void HandlePropertyGet(ExpressionSyntax propertyGet)
+        private void HandlePropertyGet(Target<ExpressionSyntax, IMethodSymbol, SyntaxNode> propertyGet)
         {
-            if (this.recursion.PropertyGet(propertyGet) is { } target)
+            if (propertyGet is { Declaration: { } declaration })
             {
-                if (target is { Declaration: { } declaration })
+                if (this.Recursive(propertyGet.Source, declaration) is { } recursive)
                 {
-                    if (this.Recursive(propertyGet, declaration) is { } recursive)
+                    foreach (var value in recursive.values)
                     {
-                        foreach (var value in recursive.values)
-                        {
-                            this.AddReturnValue(value);
-                        }
+                        this.AddReturnValue(value);
                     }
                 }
-                else
-                {
-                    _ = this.values.Add(propertyGet);
-                }
+            }
+            else
+            {
+                _ = this.values.Add(propertyGet.Source);
             }
         }
 
@@ -253,6 +251,10 @@
                         }
 
                         break;
+                    case { } expression
+                        when this.recursion.PropertyGet(expression) is { } propertyGet:
+                        this.HandlePropertyGet(propertyGet);
+                        break;
                     case IdentifierNameSyntax identifierName
                         when this.recursion.SemanticModel.TryGetSymbol(identifierName, this.recursion.CancellationToken, out var candidate) &&
                              candidate.IsEither<ILocalSymbol, IParameterSymbol>():
@@ -277,10 +279,7 @@
                         }
 
                         break;
-                    case { } expression
-                        when this.recursion.SemanticModel.GetSymbolSafe(expression, this.recursion.CancellationToken) is IPropertySymbol:
-                        this.HandlePropertyGet(value);
-                        break;
+
                     default:
                         this.values.Add(value);
                         break;
