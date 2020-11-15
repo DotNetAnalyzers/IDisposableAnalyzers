@@ -79,8 +79,9 @@
         {
             switch (node)
             {
-                case InvocationExpressionSyntax invocation:
-                    this.HandleInvocation(invocation);
+                case InvocationExpressionSyntax invocation
+                    when this.recursion.Method(invocation) is { } target:
+                    this.HandleInvocation(target);
                     return;
                 case AwaitExpressionSyntax awaitExpression:
                     this.HandleAwait(awaitExpression);
@@ -107,32 +108,29 @@
             }
         }
 
-        private void HandleInvocation(InvocationExpressionSyntax invocation)
+        private void HandleInvocation(Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> invocation)
         {
-            if (this.recursion.Method(invocation) is { } target)
+            if (invocation is { Declaration: { } declaration })
             {
-                if (target is { Declaration: { } declaration })
+                if (this.Recursive(invocation.Source, declaration) is { } recursive)
                 {
-                    if (this.Recursive(invocation, declaration) is { } recursive)
+                    foreach (var value in recursive.values)
                     {
-                        foreach (var value in recursive.values)
-                        {
-                            this.AddReturnValue(value, target);
-                        }
+                        this.AddReturnValue(value, invocation);
+                    }
 
-                        this.values.RemoveAll(x => IsParameter(x));
+                    this.values.RemoveAll(x => IsParameter(x));
 
-                        bool IsParameter(ExpressionSyntax value)
-                        {
-                            return value is IdentifierNameSyntax id &&
-                                   target.Symbol.TryFindParameter(id.Identifier.ValueText, out _);
-                        }
+                    bool IsParameter(ExpressionSyntax value)
+                    {
+                        return value is IdentifierNameSyntax id &&
+                               invocation.Symbol.TryFindParameter(id.Identifier.ValueText, out _);
                     }
                 }
-                else
-                {
-                    _ = this.values.Add(invocation);
-                }
+            }
+            else
+            {
+                _ = this.values.Add(invocation.Source);
             }
         }
 
@@ -229,9 +227,6 @@
             {
                 switch (value)
                 {
-                    case InvocationExpressionSyntax invocation:
-                        this.HandleInvocation(invocation);
-                        break;
                     case AwaitExpressionSyntax awaitExpression:
                         this.HandleAwait(awaitExpression);
                         break;
@@ -250,6 +245,10 @@
                             this.AddReturnValue(arm.Expression);
                         }
 
+                        break;
+                    case InvocationExpressionSyntax invocation
+                        when this.recursion.Method(invocation) is { } target:
+                        this.HandleInvocation(target);
                         break;
                     case { } expression
                         when this.recursion.PropertyGet(expression) is { } propertyGet:
