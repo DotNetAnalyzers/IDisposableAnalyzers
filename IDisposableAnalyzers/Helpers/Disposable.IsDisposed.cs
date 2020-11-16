@@ -23,7 +23,7 @@
 
                     if (DisposeCall.MatchAny(invocation, semanticModel, cancellationToken) is { } dispose &&
                         dispose.IsDisposing(symbol, semanticModel, cancellationToken) &&
-                        !IsReassignedAfter(block, invocation))
+                        !IsReassignedAfter(block, dispose))
                     {
                         return true;
                     }
@@ -40,7 +40,7 @@
                     if (DisposeCall.MatchAny(invocation, semanticModel, cancellationToken) is { } dispose &&
                         (dispose.IsDisposing(symbol, semanticModel, cancellationToken) ||
                          dispose.IsDisposing(property, semanticModel, cancellationToken)) &&
-                        !IsReassignedAfter(setter, invocation))
+                        !IsReassignedAfter(setter, dispose))
                     {
                         return true;
                     }
@@ -69,14 +69,14 @@
                 return null;
             }
 
-            bool IsReassignedAfter(SyntaxNode scope, InvocationExpressionSyntax disposeCall)
+            bool IsReassignedAfter(SyntaxNode scope, DisposeCall disposeCall)
             {
                 using var walker = AssignmentWalker.Borrow(scope);
                 foreach (var assignment in walker.Assignments)
                 {
                     if (assignment.TryFirstAncestor(out StatementSyntax? statement) &&
-                        disposeCall.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
-                        statement.IsExecutedBefore(expression) == ExecutedBefore.Yes &&
+                        disposeCall.Invocation.IsExecutedBefore(statement) == ExecutedBefore.Yes &&
+                        IsExecutedBefore(statement) &&
                         semanticModel.TryGetSymbol(assignment.Left, cancellationToken, out var assigned) &&
                         SymbolComparer.Equal(assigned, symbol) &&
                         IsCreation(assignment.Right, semanticModel, cancellationToken))
@@ -86,6 +86,32 @@
                 }
 
                 return false;
+
+                bool IsExecutedBefore(StatementSyntax assignStatement)
+                {
+                    return assignStatement.IsExecutedBefore(expression) switch
+                    {
+                        ExecutedBefore.Yes => true,
+                        ExecutedBefore.No => false,
+                        _ => WhenMaybe(),
+                    };
+
+                    bool WhenMaybe()
+                    {
+                        if (assignStatement.Contains(expression))
+                        {
+                            return false;
+                        }
+
+                        if (disposeCall.Invocation.FirstAncestor<ExpressionStatementSyntax>() is { } disposeStatement &&
+                            assignStatement.Parent == disposeStatement.Parent)
+                        {
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
             }
         }
     }

@@ -1174,5 +1174,47 @@ namespace N
 ";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void IfDisposeAssignNewIssue239()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    public class C
+    {
+        IDisposable M1(bool b)
+        {
+            IDisposable value = new Foo();
+
+            if (b)
+            {
+                value.Dispose();
+                value = new Bar();
+            }
+
+            return value;
+        }
+
+        sealed class Foo : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+
+        sealed class Bar : IDisposable
+        {
+            public void Dispose()
+            {
+            }
+        }
+    }
+}
+";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
