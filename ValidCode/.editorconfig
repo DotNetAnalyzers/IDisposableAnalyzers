@@ -1,5 +1,5 @@
 [*.cs]
-# IDE0059: Unnecessary assignment of a value
+dotnet_diagnostic.IDE0007.severity = none
 dotnet_diagnostic.IDE0009.severity = none
 dotnet_diagnostic.IDE0051.severity = none
 dotnet_diagnostic.IDE0052.severity = none
@@ -12,5 +12,3 @@ dotnet_diagnostic.CS0169.severity = none
 # CS1717: Assignment made to same variable
 dotnet_diagnostic.CS1717.severity = none
 
-# IDE0063: Use simple 'using' statement
-csharp_prefer_simple_using_statement = true:none

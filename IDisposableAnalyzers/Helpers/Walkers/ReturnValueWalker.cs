@@ -346,7 +346,6 @@
             where TSource : SyntaxNode
             where TSymbol : ISymbol
             where TDeclaration : SyntaxNode
-
         {
             if (target.Declaration is null)
             {
