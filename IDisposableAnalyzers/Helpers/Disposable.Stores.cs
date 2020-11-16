@@ -83,22 +83,31 @@
                 case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                     when recursion.Target(argument) is { Symbol: { } parameter } target:
                     if (target.Declaration is null &&
-                        parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbols.IEnumerable, out _) &&
                         invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
-                        switch (parameter.ContainingSymbol.Name)
+                        if (parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbols.IEnumerable, out _))
                         {
-                            case "Add":
-                            case "AddOrUpdate":
-                            case "Insert":
-                            case "Push":
-                            case "Enqueue":
-                            case "GetOrAdd":
-                            case "RegisterForDispose":
-                            case "RegisterForDisposeAsync":
-                            case "TryAdd":
-                            case "TryUpdate":
-                                return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
+                            switch (parameter.ContainingSymbol.Name)
+                            {
+                                case "Add":
+                                case "AddOrUpdate":
+                                case "Insert":
+                                case "Push":
+                                case "Enqueue":
+                                case "GetOrAdd":
+                                case "TryAdd":
+                                case "TryUpdate":
+                                    return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
+                            }
+                        }
+                        else
+                        {
+                            switch (parameter.ContainingSymbol.Name)
+                            {
+                                case "RegisterForDispose":
+                                case "RegisterForDisposeAsync":
+                                    return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
+                            }
                         }
                     }
 

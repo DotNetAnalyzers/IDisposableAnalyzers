@@ -2,12 +2,32 @@
 namespace IDisposableAnalyzers.NetCoreTests.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
 {
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
         private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+
+        private const string Disposable = @"
+namespace N
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public sealed class Disposable : IDisposable, IAsyncDisposable
+    {
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
 
         [Test]
         public static void AwaitUsing()
@@ -172,6 +192,28 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [TestCase("response.RegisterForDispose(new Disposable())")]
+        [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
+        public static void RegisterForDispose(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using Microsoft.AspNetCore.Http;
+
+    public class C
+    {
+        public void M(HttpResponse response)
+        {
+            response.RegisterForDispose(new Disposable());
+        }
+    }
+}".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
+
+            var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
+            RoslynAssert.Valid(Analyzer, new[] { Disposable, code }, compilationOptions: nullableContextOptions);
         }
     }
 }
