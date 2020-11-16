@@ -1,3 +1,4 @@
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -85,6 +86,19 @@ namespace ValidCode
 
             result = null;
             return false;
+        }
+
+        public static void While(int i)
+        {
+            Stream stream = File.OpenRead(string.Empty);
+            while (i > 0)
+            {
+                stream.Dispose();
+                stream = File.OpenRead(string.Empty);
+                i--;
+            }
+
+            stream.Dispose();
         }
     }
 }
