@@ -59,6 +59,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ValueTaskOfT = new QualifiedType("System.Threading.Tasks.ValueTask`1");
         internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
         internal static readonly QualifiedType CancellationToken = new QualifiedType("System.Threading.CancellationToken");
+        internal static readonly QualifiedType Interlocked = new QualifiedType("System.Threading.Interlocked");
         internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
         internal static readonly QualifiedType HttpMessageHandler = new QualifiedType("System.Net.Http.HttpMessageHandler");

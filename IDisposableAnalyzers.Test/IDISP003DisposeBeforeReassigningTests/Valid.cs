@@ -1710,5 +1710,30 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void InterlockedExchange()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading;
+
+    class C : IDisposable
+    {
+        private IDisposable _disposable = new MemoryStream();
+
+        public void Dispose()
+        {
+            var oldValue = Interlocked.Exchange(ref _disposable, null);
+            oldValue?.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

@@ -51,6 +51,7 @@
         {
             if (candidate.Parent is ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } &&
                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var method) &&
+                method.ContainingType != KnownSymbols.Interlocked &&
                 method.TryFindParameter(candidate, out var parameter) &&
                 Disposable.IsPotentiallyAssignableFrom(parameter.Type, semanticModel.Compilation))
             {
