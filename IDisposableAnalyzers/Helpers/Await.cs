@@ -37,7 +37,7 @@
 
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } arguments } } &&
                 arguments[0].Expression is { } expression &&
-                invocation.IsSymbol(KnownSymbol.Task.FromResult, semanticModel, cancellationToken))
+                invocation.IsSymbol(KnownSymbols.Task.FromResult, semanticModel, cancellationToken))
             {
                 return expression;
             }
@@ -62,7 +62,7 @@
             if (invocation is { ArgumentList: { Arguments: { } arguments } } &&
                 arguments.Count > 0 &&
                 arguments[0].Expression is ParenthesizedLambdaExpressionSyntax lambda &&
-                invocation.IsSymbol(KnownSymbol.Task.Run, semanticModel, cancellationToken))
+                invocation.IsSymbol(KnownSymbols.Task.Run, semanticModel, cancellationToken))
             {
                 return lambda;
             }
@@ -74,7 +74,7 @@
         {
             if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
                 invocation.TryGetMethodName(out var name) &&
-                name == KnownSymbol.Task.ConfigureAwait.Name)
+                name == KnownSymbols.Task.ConfigureAwait.Name)
             {
                 return TryPeel(invocation.Expression);
 

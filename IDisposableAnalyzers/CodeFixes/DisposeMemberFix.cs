@@ -185,7 +185,7 @@
         {
             if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
-                type == KnownSymbol.Boolean)
+                type == KnownSymbols.Boolean)
             {
                 foreach (var statement in body.Statements)
                 {
@@ -206,7 +206,7 @@
         {
             if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
                 parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
-                type == KnownSymbol.Boolean)
+                type == KnownSymbols.Boolean)
             {
                 foreach (var statement in body.Statements)
                 {

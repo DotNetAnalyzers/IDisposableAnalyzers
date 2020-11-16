@@ -73,7 +73,7 @@
                 }
 
                 if (method.Parameters.TrySingle(out var parameter) &&
-                    parameter.Type == KnownSymbol.Boolean)
+                    parameter.Type == KnownSymbols.Boolean)
                 {
                     if (ShouldCallBase(SymbolAndDeclaration.Create(method, methodDeclaration), context))
                     {

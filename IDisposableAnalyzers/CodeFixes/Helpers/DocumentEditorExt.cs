@@ -104,7 +104,7 @@
             {
                 return type switch
                 {
-                    { BaseList: { Types: { } types } } => !types.TryFirst(x => x == KnownSymbol.IDisposable, out _),
+                    { BaseList: { Types: { } types } } => !types.TryFirst(x => x == KnownSymbols.IDisposable, out _),
                     _ => true,
                 };
             }

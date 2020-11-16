@@ -26,7 +26,7 @@
         {
             if (context.Node is ClassDeclarationSyntax classDeclaration &&
                 context.ContainingSymbol is INamedTypeSymbol { IsSealed: false } type &&
-                type.IsAssignableTo(KnownSymbol.IDisposable, context.SemanticModel.Compilation) &&
+                type.IsAssignableTo(KnownSymbols.IDisposable, context.SemanticModel.Compilation) &&
                 DisposeMethod.Find(type, context.Compilation, Search.TopLevel) is { IsVirtual: false, IsAbstract: false, IsOverride: false } disposeMethod &&
                 !HasDisposeDisposing(type))
             {

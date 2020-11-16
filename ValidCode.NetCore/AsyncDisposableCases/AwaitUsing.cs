@@ -1,4 +1,4 @@
-﻿namespace ValidCode.NetCore.AsyncDisposable
+﻿namespace ValidCode.NetCore.AsyncDisposableCases
 {
     using System.Threading.Tasks;
 

@@ -120,7 +120,7 @@
                         this.values.Add(argument.Expression);
                     }
                     else if (method.Parameters.Length == 2 &&
-                             method.ContainingType.IsAssignableTo(KnownSymbol.IDictionary, this.semanticModel.Compilation) &&
+                             method.ContainingType.IsAssignableTo(KnownSymbols.IDictionary, this.semanticModel.Compilation) &&
                              method.TryFindParameter("value", out parameter) &&
                              node.TryFindArgument(parameter, out argument))
                     {

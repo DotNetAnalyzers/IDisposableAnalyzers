@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
 
     internal class IHostedServiceType : QualifiedType

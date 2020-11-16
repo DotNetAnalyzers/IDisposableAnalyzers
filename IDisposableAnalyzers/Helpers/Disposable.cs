@@ -54,7 +54,7 @@
                 { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task" } => false,
                 INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
                 => IsAssignableFrom(arguments[0], compilation),
-                _ => type.IsAssignableTo(KnownSymbol.IDisposable, compilation),
+                _ => type.IsAssignableTo(KnownSymbols.IDisposable, compilation),
             };
         }
 
@@ -65,8 +65,8 @@
                 fieldOrProperty.IsStatic &&
                 IsAssignableFrom(fieldOrProperty.Type, semanticModel.Compilation))
             {
-                if (fieldOrProperty.Type == KnownSymbol.Task ||
-                    symbol == KnownSymbol.RxDisposable.Empty)
+                if (fieldOrProperty.Type == KnownSymbols.Task ||
+                    symbol == KnownSymbols.RxDisposable.Empty)
                 {
                     return true;
                 }

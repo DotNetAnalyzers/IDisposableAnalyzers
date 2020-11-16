@@ -3,7 +3,7 @@ namespace IDisposableAnalyzers
 {
     using Gu.Roslyn.AnalyzerExtensions;
 
-    internal static class KnownSymbol
+    internal static class KnownSymbols
     {
         internal static readonly QualifiedType Void = Create("System.Void", "void");
         internal static readonly QualifiedType Object = Create("System.Object", "object");
@@ -62,6 +62,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
         internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
         internal static readonly QualifiedType HttpMessageHandler = new QualifiedType("System.Net.Http.HttpMessageHandler");
+        internal static readonly HttpResponseType HttpResponse = new HttpResponseType();
         internal static readonly HttpResponseMessageType HttpResponseMessage = new HttpResponseMessageType();
 
         internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();

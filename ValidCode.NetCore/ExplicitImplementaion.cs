@@ -1,8 +1,9 @@
-﻿namespace ValidCode.NetCore
+﻿// ReSharper disable All
+namespace ValidCode.NetCore
 {
     using System;
 
-    public sealed class ExplictImplementaion : IDisposable
+    public sealed class ExplicitImplementaion : IDisposable
     {
         private Disposable? disposable = new Disposable();
 

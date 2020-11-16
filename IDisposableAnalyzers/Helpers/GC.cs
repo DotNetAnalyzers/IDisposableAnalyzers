@@ -25,7 +25,7 @@
                 if (candidate.ArgumentList is { Arguments: { Count: 1 } } &&
                     candidate.TryGetMethodName(out var name) &&
                     name == "SuppressFinalize" &&
-                    semanticModel.TryGetSymbol(candidate, KnownSymbol.GC.SuppressFinalize, cancellationToken, out _))
+                    semanticModel.TryGetSymbol(candidate, KnownSymbols.GC.SuppressFinalize, cancellationToken, out _))
                 {
                     return new SuppressFinalize(candidate);
                 }

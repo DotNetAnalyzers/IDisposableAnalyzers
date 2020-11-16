@@ -34,7 +34,7 @@
 
                 if (context.Node is ObjectCreationExpressionSyntax objectCreation &&
                     context.SemanticModel.TryGetType(objectCreation, context.CancellationToken, out var type) &&
-                    type.IsAssignableTo(KnownSymbol.HttpClient, context.Compilation) &&
+                    type.IsAssignableTo(KnownSymbols.HttpClient, context.Compilation) &&
                     !IsStaticFieldInitializer(objectCreation) &&
                     !IsStaticPropertyInitializer(objectCreation) &&
                     !IsStaticCtor(context.ContainingSymbol))
@@ -50,7 +50,7 @@
             {
                 InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: { Identifier: { ValueText: "Schedule" } } } }
                 when context.SemanticModel.TryGetNamedType(expression, context.CancellationToken, out var type) &&
-                     type.IsAssignableTo(KnownSymbol.RxIScheduler, context.SemanticModel.Compilation)
+                     type.IsAssignableTo(KnownSymbols.RxIScheduler, context.SemanticModel.Compilation)
                 => null,
                 InvocationExpressionSyntax invocation
                 => invocation,

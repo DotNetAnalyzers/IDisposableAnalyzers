@@ -232,7 +232,7 @@
                 {
                     if (member is FieldDeclarationSyntax { Declaration: { Type: { } type, Variables: { Count: 1 } variables } } &&
                         semanticModel.TryGetType(type, cancellationToken, out var typeSymbol) &&
-                        typeSymbol == KnownSymbol.CompositeDisposable)
+                        typeSymbol == KnownSymbols.CompositeDisposable)
                     {
                         field = variables[0];
                         return true;

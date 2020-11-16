@@ -25,7 +25,7 @@
         internal static DisposeCall? MatchDispose(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
-                   candidate.IsSymbol(KnownSymbol.IDisposable.Dispose, semanticModel, cancellationToken)
+                   candidate.IsSymbol(KnownSymbols.IDisposable.Dispose, semanticModel, cancellationToken)
              ? new DisposeCall(candidate)
              : (DisposeCall?)null;
         }
@@ -33,7 +33,7 @@
         internal static DisposeCall? MatchDisposeAsync(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
-                   candidate.IsSymbol(KnownSymbol.IAsyncDisposable.DisposeAsync, semanticModel, cancellationToken)
+                   candidate.IsSymbol(KnownSymbols.IAsyncDisposable.DisposeAsync, semanticModel, cancellationToken)
                 ? new DisposeCall(candidate)
                 : (DisposeCall?)null;
         }

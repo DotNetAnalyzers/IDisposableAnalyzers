@@ -1,8 +1,10 @@
 ﻿namespace IDisposableAnalyzers.NetCoreTests.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
+
     using NUnit.Framework;
 
     [TestFixture(typeof(LocalDeclarationAnalyzer))]
@@ -12,6 +14,25 @@
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly DiagnosticAnalyzer Analyzer = new T();
+
+        private const string Disposable = @"
+namespace N
+{
+    using System;
+    using System.Threading.Tasks;
+
+    public sealed class Disposable : IDisposable, IAsyncDisposable
+    {
+        public void Dispose()
+        {
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            throw new NotImplementedException();
+        }
+    }
+}";
 
         [Test]
         public static void LocalDisposeAsync()
@@ -103,6 +124,28 @@ namespace N
 
             var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
             RoslynAssert.Valid(Analyzer, code, compilationOptions: nullableContextOptions);
+        }
+
+        [TestCase("response.RegisterForDispose(new Disposable())")]
+        [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
+        public static void RegisterForDispose(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using Microsoft.AspNetCore.Http;
+
+    public class C
+    {
+        public void M(HttpResponse response)
+        {
+            response.RegisterForDispose(new Disposable());
+        }
+    }
+}".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
+
+            var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
+            RoslynAssert.Valid(Analyzer, new[] { Disposable, code }, compilationOptions: nullableContextOptions);
         }
     }
 }

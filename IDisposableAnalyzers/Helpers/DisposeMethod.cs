@@ -11,7 +11,7 @@
     {
         internal static IMethodSymbol? Find(ITypeSymbol type, Compilation compilation, Search search)
         {
-            if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
+            if (!type.IsAssignableTo(KnownSymbols.IDisposable, compilation))
             {
                 return null;
             }
@@ -44,7 +44,7 @@
 
         internal static IMethodSymbol? FindVirtual(ITypeSymbol type, Compilation compilation, Search search)
         {
-            if (!type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
+            if (!type.IsAssignableTo(KnownSymbols.IDisposable, compilation))
             {
                 return null;
             }
@@ -76,7 +76,7 @@
             }
 
             while (type is { } &&
-                   type.IsAssignableTo(KnownSymbol.IDisposable, compilation))
+                   type.IsAssignableTo(KnownSymbols.IDisposable, compilation))
             {
                 if (FindFirst(type, compilation, Search.TopLevel) is { } disposeMethod)
                 {
@@ -93,7 +93,7 @@
 
         internal static IMethodSymbol? FindDisposeAsync(ITypeSymbol type, Compilation compilation, Search search)
         {
-            if (!type.IsAssignableTo(KnownSymbol.IAsyncDisposable, compilation))
+            if (!type.IsAssignableTo(KnownSymbols.IAsyncDisposable, compilation))
             {
                 return null;
             }
@@ -172,7 +172,7 @@
         {
             if (type.TypeKind == TypeKind.Interface)
             {
-                return type.IsAssignableTo(KnownSymbol.IDisposable, compilation);
+                return type.IsAssignableTo(KnownSymbols.IDisposable, compilation);
             }
 
             return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };

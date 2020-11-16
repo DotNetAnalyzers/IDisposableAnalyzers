@@ -22,7 +22,7 @@
                 return true;
             }
 
-            if (context.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation) &&
+            if (context.IsAssignableTo(KnownSymbols.SystemWindowsFormsForm, semanticModel.Compilation) &&
                 Winform.IsAddedToComponents(member, context, semanticModel, cancellationToken))
             {
                 return true;

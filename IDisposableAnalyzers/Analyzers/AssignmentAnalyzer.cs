@@ -69,8 +69,8 @@
                 return false;
             }
 
-            if (assignedSymbol == KnownSymbol.SerialDisposable.Disposable ||
-                assignedSymbol == KnownSymbol.SingleAssignmentDisposable.Disposable ||
+            if (assignedSymbol == KnownSymbols.SerialDisposable.Disposable ||
+                assignedSymbol == KnownSymbols.SingleAssignmentDisposable.Disposable ||
                 assignedSymbol is IDiscardSymbol)
             {
                 return false;

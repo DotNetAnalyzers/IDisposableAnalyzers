@@ -117,7 +117,7 @@
 
         private static bool IsPreferUsing(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context)
         {
-            return invocation.IsSymbol(KnownSymbol.IDisposable.Dispose, context.SemanticModel, context.CancellationToken) &&
+            return invocation.IsSymbol(KnownSymbols.IDisposable.Dispose, context.SemanticModel, context.CancellationToken) &&
                    local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
                    declaration is VariableDeclaratorSyntax declarator &&
                    declaration.TryFirstAncestor(out LocalDeclarationStatementSyntax? localDeclarationStatement) &&

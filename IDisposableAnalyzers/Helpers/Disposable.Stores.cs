@@ -52,7 +52,7 @@
             switch (candidate)
             {
                 case { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 1 } arguments } } invocation } }
-                    when invocation.IsSymbol(KnownSymbol.DisposableMixins.DisposeWith, recursion.SemanticModel, recursion.CancellationToken) &&
+                    when invocation.IsSymbol(KnownSymbols.DisposableMixins.DisposeWith, recursion.SemanticModel, recursion.CancellationToken) &&
                          recursion.SemanticModel.TryGetSymbol(arguments[0].Expression, recursion.CancellationToken, out container):
                     return true;
                 case { Parent: InitializerExpressionSyntax { Parent: ImplicitArrayCreationExpressionSyntax arrayCreation } }:
@@ -83,17 +83,19 @@
                 case { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                     when recursion.Target(argument) is { Symbol: { } parameter } target:
                     if (target.Declaration is null &&
-                        parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbol.IEnumerable, out _) &&
+                        parameter.ContainingType.AllInterfaces.TryFirst(x => x == KnownSymbols.IEnumerable, out _) &&
                         invocation.Expression is MemberAccessExpressionSyntax memberAccess)
                     {
                         switch (parameter.ContainingSymbol.Name)
                         {
                             case "Add":
+                            case "AddOrUpdate":
                             case "Insert":
                             case "Push":
                             case "Enqueue":
                             case "GetOrAdd":
-                            case "AddOrUpdate":
+                            case "RegisterForDispose":
+                            case "RegisterForDisposeAsync":
                             case "TryAdd":
                             case "TryUpdate":
                                 return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
@@ -148,7 +150,7 @@
                     creation = invocation;
                     if (method.DeclaringSyntaxReferences.IsEmpty)
                     {
-                        return method == KnownSymbol.Tuple.Create;
+                        return method == KnownSymbols.Tuple.Create;
                     }
 
                     if (method.ReturnsVoid ||

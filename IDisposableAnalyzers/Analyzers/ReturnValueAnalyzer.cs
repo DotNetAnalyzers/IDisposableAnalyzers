@@ -139,9 +139,9 @@
             return returnValue switch
             {
                 InvocationExpressionSyntax invocation
-                => !invocation.IsSymbol(KnownSymbol.Task.FromResult, context.SemanticModel, context.CancellationToken),
+                => !invocation.IsSymbol(KnownSymbols.Task.FromResult, context.SemanticModel, context.CancellationToken),
                 MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess
-                => !memberAccess.IsSymbol(KnownSymbol.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
+                => !memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
                 _ => true,
             };
         }
@@ -155,7 +155,7 @@
         private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, Recursion recursion)
         {
             if (recursion.Target(invocation) is { Symbol: IMethodSymbol method, Declaration: { } declaration } &&
-                method.ReturnType.IsAssignableTo(KnownSymbol.IEnumerable, recursion.SemanticModel.Compilation))
+                method.ReturnType.IsAssignableTo(KnownSymbols.IEnumerable, recursion.SemanticModel.Compilation))
             {
                 using var yieldWalker = YieldStatementWalker.Borrow(declaration);
                 if (yieldWalker.YieldStatements.Count > 0)
@@ -182,7 +182,7 @@
         private static bool IsDisposableReturnTypeOrIgnored(ITypeSymbol? type, Compilation compilation)
         {
             if (type is null ||
-                type == KnownSymbol.Void)
+                type == KnownSymbols.Void)
             {
                 return true;
             }
@@ -192,29 +192,29 @@
                 return true;
             }
 
-            if (type == KnownSymbol.IAsyncDisposable)
+            if (type == KnownSymbols.IAsyncDisposable)
             {
                 return true;
             }
 
-            if (type == KnownSymbol.IEnumerator)
+            if (type == KnownSymbols.IEnumerator)
             {
                 return true;
             }
 
-            if (type == KnownSymbol.Task)
+            if (type == KnownSymbols.Task)
             {
                 return type is INamedTypeSymbol { IsGenericType: true } namedType &&
                        Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
             }
 
-            if (type == KnownSymbol.ValueTaskOfT)
+            if (type == KnownSymbols.ValueTaskOfT)
             {
                 return type is INamedTypeSymbol { IsGenericType: true } namedType &&
                        Disposable.IsAssignableFrom(namedType.TypeArguments[0], compilation);
             }
 
-            if (type == KnownSymbol.Func)
+            if (type == KnownSymbols.Func)
             {
                 return type is INamedTypeSymbol { IsGenericType: true } namedType &&
                        Disposable.IsAssignableFrom(namedType.TypeArguments[namedType.TypeArguments.Length - 1], compilation);
@@ -227,7 +227,7 @@
         {
             if (symbol is IMethodSymbol method)
             {
-                return method == KnownSymbol.IEnumerable.GetEnumerator;
+                return method == KnownSymbols.IEnumerable.GetEnumerator;
             }
 
             return false;

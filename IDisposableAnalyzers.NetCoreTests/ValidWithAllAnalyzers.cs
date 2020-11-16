@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.NetCoreTests
 
     public static class ValidWithAllAnalyzers
     {
-        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol)
+        private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols)
             .Assembly
             .GetTypes()
             .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)

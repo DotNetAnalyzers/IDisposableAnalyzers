@@ -93,7 +93,7 @@
 
             ExpressionSyntax Normalize(ExpressionSyntax e)
             {
-                if (KnownSymbol.IDisposable.GetTypeSymbol(semanticModel.Compilation) is { } disposableType &&
+                if (KnownSymbols.IDisposable.GetTypeSymbol(semanticModel.Compilation) is { } disposableType &&
                     semanticModel.ClassifyConversion(e, disposableType).IsImplicit)
                 {
                     if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
@@ -116,7 +116,7 @@
             switch (MemberAccessContext.Create(disposable, method, semanticModel, cancellationToken))
             {
                 case { NotNull: { } notNull }:
-                    if (disposable.Type.IsAssignableTo(KnownSymbol.IAsyncDisposable, semanticModel.Compilation) &&
+                    if (disposable.Type.IsAssignableTo(KnownSymbols.IAsyncDisposable, semanticModel.Compilation) &&
                         DisposeMethod.FindDisposeAsync(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
                     {
                         return AsyncDisposeStatement(notNull.WithoutTrivia()).WithLeadingElasticLineFeed();
@@ -158,7 +158,7 @@
             switch (MemberAccessContext.Create(disposable, method, semanticModel, cancellationToken))
             {
                 case { NotNull: { } neverNull }:
-                    if (disposable.Type.IsAssignableTo(KnownSymbol.IDisposable, semanticModel.Compilation) &&
+                    if (disposable.Type.IsAssignableTo(KnownSymbols.IDisposable, semanticModel.Compilation) &&
                         DisposeMethod.Find(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
                     {
                         return DisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();

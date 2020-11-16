@@ -1,4 +1,4 @@
-﻿namespace ValidCode.NetCore.AsyncDisposable
+﻿namespace ValidCode.NetCore.AsyncDisposableCases
 {
     using System;
     using System.Threading;
@@ -10,10 +10,10 @@
 
         public async Task ResetTimerAsync()
         {
-            if (_timer != null)
+            if (this._timer != null)
             {
-                await _timer.DisposeAsync();
-                _timer = null; // Warns with IDISP003: Dispose previous before re-assigning.
+                await this._timer.DisposeAsync();
+                this._timer = null; // Warns with IDISP003: Dispose previous before re-assigning.
             }
         }
 
@@ -21,7 +21,7 @@
         {
             if (this._timer is { })
             {
-                await _timer.DisposeAsync().ConfigureAwait(false);
+                await this._timer.DisposeAsync().ConfigureAwait(false);
             }
         }
     }

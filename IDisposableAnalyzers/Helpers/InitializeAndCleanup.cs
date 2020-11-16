@@ -16,10 +16,10 @@
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
-                var cleanup = FindCleanup(KnownSymbol.NUnitSetUpAttribute, KnownSymbol.NUnitTearDownAttribute) ??
-                              FindCleanup(KnownSymbol.NUnitOneTimeSetUpAttribute, KnownSymbol.NUnitOneTimeTearDownAttribute) ??
-                              FindCleanup(KnownSymbol.TestInitializeAttribute, KnownSymbol.TestCleanupAttribute) ??
-                              FindCleanup(KnownSymbol.ClassInitializeAttribute, KnownSymbol.ClassCleanupAttribute) ??
+                var cleanup = FindCleanup(KnownSymbols.NUnitSetUpAttribute, KnownSymbols.NUnitTearDownAttribute) ??
+                              FindCleanup(KnownSymbols.NUnitOneTimeSetUpAttribute, KnownSymbols.NUnitOneTimeTearDownAttribute) ??
+                              FindCleanup(KnownSymbols.TestInitializeAttribute, KnownSymbols.TestCleanupAttribute) ??
+                              FindCleanup(KnownSymbols.ClassInitializeAttribute, KnownSymbols.ClassCleanupAttribute) ??
                     FindStopAsync();
                 return cleanup is { } &&
                        DisposableMember.IsDisposed(fieldOrProperty, cleanup, semanticModel, cancellationToken);
@@ -43,7 +43,7 @@
             IMethodSymbol? FindStopAsync()
             {
                 return IsStartAsync(methodDeclaration, semanticModel, cancellationToken) &&
-                       fieldOrProperty.ContainingType.TryFindFirstMethod("StopAsync", x => x == KnownSymbol.IHostedService.StopAsync, out var stopAsync)
+                       fieldOrProperty.ContainingType.TryFindFirstMethod("StopAsync", x => x == KnownSymbols.IHostedService.StopAsync, out var stopAsync)
                     ? stopAsync
                     : null;
             }
@@ -63,10 +63,10 @@
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 initialize = methodDeclaration;
-                return Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitSetUpAttribute, semanticModel, cancellationToken, out _) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.TestInitializeAttribute, semanticModel, cancellationToken, out _) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbol.ClassInitializeAttribute, semanticModel, cancellationToken, out _) ||
+                return Attribute.TryFind(methodDeclaration, KnownSymbols.NUnitSetUpAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbols.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbols.TestInitializeAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbols.ClassInitializeAttribute, semanticModel, cancellationToken, out _) ||
                        IsStartAsync(methodDeclaration, semanticModel, cancellationToken);
             }
 
@@ -120,24 +120,24 @@
                     return null;
                 }
 
-                if (initializeAttribute == KnownSymbol.NUnitSetUpAttribute)
+                if (initializeAttribute == KnownSymbols.NUnitSetUpAttribute)
                 {
-                    return KnownSymbol.NUnitTearDownAttribute;
+                    return KnownSymbols.NUnitTearDownAttribute;
                 }
 
-                if (initializeAttribute == KnownSymbol.NUnitOneTimeSetUpAttribute)
+                if (initializeAttribute == KnownSymbols.NUnitOneTimeSetUpAttribute)
                 {
-                    return KnownSymbol.NUnitOneTimeTearDownAttribute;
+                    return KnownSymbols.NUnitOneTimeTearDownAttribute;
                 }
 
-                if (initializeAttribute == KnownSymbol.TestInitializeAttribute)
+                if (initializeAttribute == KnownSymbols.TestInitializeAttribute)
                 {
-                    return KnownSymbol.TestCleanupAttribute;
+                    return KnownSymbols.TestCleanupAttribute;
                 }
 
-                if (initializeAttribute == KnownSymbol.ClassInitializeAttribute)
+                if (initializeAttribute == KnownSymbols.ClassInitializeAttribute)
                 {
-                    return KnownSymbol.ClassCleanupAttribute;
+                    return KnownSymbols.ClassCleanupAttribute;
                 }
 
                 return null;
@@ -147,17 +147,17 @@
         internal static bool IsStopAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return methodDeclaration is { Identifier: { ValueText: "StopAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
-                   parameters[0].Type == KnownSymbol.CancellationToken &&
+                   parameters[0].Type == KnownSymbols.CancellationToken &&
                    semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
-                   method == KnownSymbol.IHostedService.StopAsync;
+                   method == KnownSymbols.IHostedService.StopAsync;
         }
 
         private static bool IsStartAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             return methodDeclaration is { Identifier: { ValueText: "StartAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
-                   parameters[0].Type == KnownSymbol.CancellationToken &&
+                   parameters[0].Type == KnownSymbols.CancellationToken &&
                    semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
-                   method == KnownSymbol.IHostedService.StartAsync;
+                   method == KnownSymbols.IHostedService.StartAsync;
         }
     }
 }

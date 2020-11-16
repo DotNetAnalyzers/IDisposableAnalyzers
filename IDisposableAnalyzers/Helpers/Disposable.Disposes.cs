@@ -17,7 +17,7 @@
                 return false;
             }
 
-            if (localOrParameter.Type.IsAssignableTo(KnownSymbol.Task, semanticModel.Compilation))
+            if (localOrParameter.Type.IsAssignableTo(KnownSymbols.Task, semanticModel.Compilation))
             {
                 return false;
             }
@@ -139,13 +139,13 @@
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbol.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken)
+                when invocation.IsSymbol(KnownSymbols.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken)
                 => true, // disposed by form.Close()
                 { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "Run" } }, Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbol.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
+                when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
                 => true,
                 { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "RunAsync" } }, Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbol.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
+                when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
                 => true,
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                 => IsDisposeOrReturnValueDisposed(invocation),

@@ -24,7 +24,7 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
             MetadataReference.CreateFromFile(typeof(Compilation).Assembly.Location),
         };
 
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbol).Assembly
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols).Assembly
                                                                                                     .GetTypes()
                                                                                                     .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
                                                                                                     .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))

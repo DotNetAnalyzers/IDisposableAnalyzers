@@ -34,7 +34,7 @@
                     return DisposedByReturnValue(target, recursion, out creation);
                 case { Parent: InitializerExpressionSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }
                     when recursion.SemanticModel.TryGetType(objectCreation, recursion.CancellationToken, out var type) &&
-                         type == KnownSymbol.CompositeDisposable:
+                         type == KnownSymbols.CompositeDisposable:
                     creation = objectCreation;
                     return true;
                 case { Parent: ConditionalAccessExpressionSyntax conditional }
@@ -62,9 +62,9 @@
             switch (target)
             {
                 case { Symbol: { ContainingSymbol: IMethodSymbol constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } } }:
-                    if (type == KnownSymbol.SingleAssignmentDisposable ||
-                        type == KnownSymbol.RxDisposable ||
-                        type == KnownSymbol.CompositeDisposable)
+                    if (type == KnownSymbols.SingleAssignmentDisposable ||
+                        type == KnownSymbols.RxDisposable ||
+                        type == KnownSymbols.CompositeDisposable)
                     {
                         creation = objectCreation;
                         return true;
@@ -72,15 +72,15 @@
 
                     if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation))
                     {
-                        if (constructor.ContainingType == KnownSymbol.BinaryReader ||
-                            constructor.ContainingType == KnownSymbol.BinaryWriter ||
-                            constructor.ContainingType == KnownSymbol.StreamReader ||
-                            constructor.ContainingType == KnownSymbol.StreamWriter ||
-                            constructor.ContainingType == KnownSymbol.CryptoStream ||
-                            constructor.ContainingType == KnownSymbol.DeflateStream ||
-                            constructor.ContainingType == KnownSymbol.Attachment ||
-                            constructor.ContainingType == KnownSymbol.GZipStream ||
-                            constructor.ContainingType == KnownSymbol.StreamMemoryBlockProvider)
+                        if (constructor.ContainingType == KnownSymbols.BinaryReader ||
+                            constructor.ContainingType == KnownSymbols.BinaryWriter ||
+                            constructor.ContainingType == KnownSymbols.StreamReader ||
+                            constructor.ContainingType == KnownSymbols.StreamWriter ||
+                            constructor.ContainingType == KnownSymbols.CryptoStream ||
+                            constructor.ContainingType == KnownSymbols.DeflateStream ||
+                            constructor.ContainingType == KnownSymbols.Attachment ||
+                            constructor.ContainingType == KnownSymbols.GZipStream ||
+                            constructor.ContainingType == KnownSymbols.StreamMemoryBlockProvider)
                         {
                             if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
                                 objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
@@ -95,8 +95,8 @@
                             return true;
                         }
 
-                        if (parameter.Type.IsAssignableTo(KnownSymbol.HttpMessageHandler, recursion.SemanticModel.Compilation) &&
-                            constructor.ContainingType.IsAssignableTo(KnownSymbol.HttpClient, recursion.SemanticModel.Compilation))
+                        if (parameter.Type.IsAssignableTo(KnownSymbols.HttpMessageHandler, recursion.SemanticModel.Compilation) &&
+                            constructor.ContainingType.IsAssignableTo(KnownSymbols.HttpClient, recursion.SemanticModel.Compilation))
                         {
                             if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
                                 objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
@@ -120,7 +120,7 @@
 
                     break;
                 case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
-                    if (method == KnownSymbol.Task.FromResult)
+                    if (method == KnownSymbols.Task.FromResult)
                     {
                         creation = invocation;
                         return true;

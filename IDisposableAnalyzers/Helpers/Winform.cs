@@ -22,7 +22,7 @@
             {
                 return invocation.TryFirstAncestor(out ClassDeclarationSyntax? containingClass) &&
                        semanticModel.TryGetNamedType(containingClass, cancellationToken, out var containingType) &&
-                       containingType.IsAssignableTo(KnownSymbol.SystemWindowsFormsForm, semanticModel.Compilation);
+                       containingType.IsAssignableTo(KnownSymbols.SystemWindowsFormsForm, semanticModel.Compilation);
             }
         }
 

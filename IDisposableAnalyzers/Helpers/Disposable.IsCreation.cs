@@ -282,7 +282,7 @@
                 static bool IsMethodCreating(IMethodSymbol method, Compilation compilation)
                 {
                     if (method.ReturnType is INamedTypeSymbol { IsGenericType: true } returnType &&
-                        method.ReturnType == KnownSymbol.TaskOfT)
+                        method.ReturnType == KnownSymbols.TaskOfT)
                     {
                         return returnType.TypeArguments.TrySingle(out var typeArg) &&
                                IsAssignableFrom(typeArg, compilation);
