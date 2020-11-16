@@ -1,7 +1,8 @@
-#### 
+#### 3.4.5
 * FEATURE: Handle switch expression.
 * BUGFIX: Figure out await in more places.
 * BUGFIX: Tweak assumptions about binary symbols.
+* BUGFIX: Handle Interlocked.Exchange
 
 #### 3.4.4
 * FEATURE: Handle some common uses of reflection.

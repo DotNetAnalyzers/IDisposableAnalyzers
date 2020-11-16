@@ -20,12 +20,23 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.3</Version>
+    <Version>3.4.5</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.4.5
+      FEATURE: Handle switch expression.
+      BUGFIX: Figure out await in more places.
+      BUGFIX: Tweak assumptions about binary symbols.
+      BUGFIX: Handle Interlocked.Exchange
+      3.4.4
+      FEATURE: Handle some common uses of reflection.
+      3.4.3
+      Special case ConnectionFactory.CreateConnection
+      BUGFIX: Handle chained calls
+      BUGFIX: Cast and dispose correctly.
       3.4.2
       Handle some regressions in Roslyn 3.7
       3.4.1
