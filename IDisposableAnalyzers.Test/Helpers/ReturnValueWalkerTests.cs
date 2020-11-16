@@ -11,34 +11,6 @@ namespace IDisposableAnalyzers.Test.Helpers
     internal static class ReturnValueWalkerTests
 #pragma warning restore GURA07 // Test class should be public static.
     {
-        [TestCase(ReturnValueSearch.Recursive, "")]
-        [TestCase(ReturnValueSearch.Member, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
-        public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
-        {
-            var code = @"
-using System.Threading.Tasks;
-
-internal class C
-{
-    internal static async Task M()
-    {
-        var text = await CreateAsync().ConfigureAwait(false);
-    }
-
-    internal static async Task<string> CreateAsync()
-    {
-        await Task.Delay(0);
-        return await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false);
-    }
-}";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
-            using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
-            Assert.AreEqual(expected, string.Join(", ", walker.Values));
-        }
-
         [TestCase("this.CalculatedExpressionBody", ReturnValueSearch.Recursive, "1")]
         [TestCase("this.CalculatedExpressionBody", ReturnValueSearch.Member, "1")]
         [TestCase("this.CalculatedStatementBody", ReturnValueSearch.Recursive, "1")]
@@ -605,6 +577,34 @@ namespace N
             Assert.AreEqual(expected, string.Join(", ", walker.Values));
         }
 
+        [TestCase(ReturnValueSearch.Recursive, "")]
+        [TestCase(ReturnValueSearch.Member,    "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
+        public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
+        {
+            var code = @"
+using System.Threading.Tasks;
+
+internal class C
+{
+    internal static async Task M()
+    {
+        var text = await CreateAsync().ConfigureAwait(false);
+    }
+
+    internal static async Task<string> CreateAsync()
+    {
+        await Task.Delay(0);
+        return await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false);
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
+            using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", walker.Values));
+        }
+
         [TestCase("await RecursiveAsync()", ReturnValueSearch.Recursive, "")]
         [TestCase("await RecursiveAsync()", ReturnValueSearch.Member, "")]
         [TestCase("await RecursiveAsync(1)", ReturnValueSearch.Recursive, "")]
@@ -811,6 +811,33 @@ namespace N
             var methodDeclaration = syntaxTree.FindInvocation("M(null)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
             Assert.AreEqual("null, string.Empty", string.Join(", ", walker.Values));
+        }
+
+        [TestCase("(IDisposable)o")]
+        [TestCase("o as IDisposable")]
+        public static void Cast(string cast)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    public class C
+    {
+        public C()
+        {
+            M(null);
+        }
+
+        private static IDisposable M(object o)
+        {
+            return (IDisposable)o;
+        }
+    }
+}".AssertReplace("(IDisposable)o", cast));
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindInvocation("M(null)");
+            using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("null", string.Join(", ", walker.Values));
         }
 
         [Test]

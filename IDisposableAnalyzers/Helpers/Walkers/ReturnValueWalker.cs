@@ -240,10 +240,15 @@
                         this.AddReturnValue(ternary.WhenTrue);
                         this.AddReturnValue(ternary.WhenFalse);
                         break;
-                    case BinaryExpressionSyntax coalesce
-                        when coalesce.IsKind(SyntaxKind.CoalesceExpression):
+                    case BinaryExpressionSyntax { OperatorToken: { ValueText: "??" } } coalesce:
                         this.AddReturnValue(coalesce.Left);
                         this.AddReturnValue(coalesce.Right);
+                        break;
+                    case BinaryExpressionSyntax { OperatorToken: { ValueText: "as" } } coalesce:
+                        this.AddReturnValue(coalesce.Left);
+                        break;
+                    case CastExpressionSyntax cast:
+                        this.AddReturnValue(cast.Expression);
                         break;
                     case SwitchExpressionSyntax { Arms: { } arms }:
                         foreach (var arm in arms)
