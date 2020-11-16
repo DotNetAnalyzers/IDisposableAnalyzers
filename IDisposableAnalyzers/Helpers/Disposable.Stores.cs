@@ -3,7 +3,9 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -102,10 +104,11 @@
                         }
                         else
                         {
-                            switch (parameter.ContainingSymbol.Name)
+                            switch (parameter.ContainingSymbol)
                             {
-                                case "RegisterForDispose":
-                                case "RegisterForDisposeAsync":
+                                case { ContainingType: { MetadataName: "Interlocked" }, MetadataName: "Exchange" }:
+                                case { MetadataName: "RegisterForDispose" }:
+                                case { MetadataName: "RegisterForDisposeAsync" }:
                                     return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
                             }
                         }

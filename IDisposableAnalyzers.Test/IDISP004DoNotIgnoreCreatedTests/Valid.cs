@@ -838,5 +838,34 @@ namespace N
 }".AssertReplace("this.components.Add(this.stream)", expression);
             RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
+
+        [Test]
+        public static void InterlockedExchange()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Threading;
+
+    sealed class C : IDisposable
+    {
+        private IDisposable _disposable = new Disposable();
+
+        public void Update()
+        {
+            var oldValue = Interlocked.Exchange(ref _disposable, new Disposable());
+            oldValue?.Dispose();
+        }
+
+        public void Dispose()
+        {
+            var oldValue = Interlocked.Exchange(ref _disposable, null);
+            oldValue?.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
     }
 }
