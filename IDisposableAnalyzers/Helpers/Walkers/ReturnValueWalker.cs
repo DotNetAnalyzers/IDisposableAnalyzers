@@ -14,7 +14,6 @@
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>
     {
         private readonly SmallSet<ExpressionSyntax> values = new SmallSet<ExpressionSyntax>();
-        private readonly RecursiveWalkers recursiveWalkers = new RecursiveWalkers();
         private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
         private ReturnValueSearch search;
         private Recursion recursion = null!;
@@ -60,7 +59,35 @@
             if (Recursion.Borrow(node, semanticModel, cancellationToken) is { } recursion)
             {
                 walker.recursion = recursion;
-                walker.Run(node);
+                switch (node)
+                {
+                    case InvocationExpressionSyntax invocation
+                        when walker.recursion.Method(invocation) is { } target:
+                        walker.HandleInvocation(target);
+                        break;
+                    case AwaitExpressionSyntax awaitExpression:
+                        walker.HandleAwait(awaitExpression);
+                        break;
+                    case LambdaExpressionSyntax { Body: ExpressionSyntax expression }:
+                        walker.AddReturnValue(expression);
+                        break;
+                    case LambdaExpressionSyntax { Body: { } body }:
+                        walker.Visit(body);
+                        break;
+                    case ExpressionSyntax expression
+                        when walker.recursion.PropertyGet(expression) is { } propertyGet:
+                        walker.HandlePropertyGet(propertyGet);
+                        break;
+                    case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
+                        walker.AddReturnValue(expression);
+                        break;
+                    case LocalFunctionStatementSyntax { Body: { } body }:
+                        walker.Visit(body);
+                        break;
+                    default:
+                        walker.Visit(node);
+                        break;
+                }
             }
 
             return walker;
@@ -69,86 +96,56 @@
         protected override void Clear()
         {
             this.values.Clear();
-            this.recursiveWalkers.Clear();
             this.assignedValueWalkers.Clear();
-            this.recursion.Dispose();
+            //// ReSharper disable once ConstantConditionalAccessQualifier can be null due to hack
+            this.recursion?.Dispose();
             this.recursion = null!;
         }
 
-        private void Run(SyntaxNode node)
+        private void HandleInvocation(Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> target)
         {
-            switch (node)
+            if (target is { Declaration: { } })
             {
-                case InvocationExpressionSyntax invocation
-                    when this.recursion.Method(invocation) is { } target:
-                    this.HandleInvocation(target);
-                    return;
-                case AwaitExpressionSyntax awaitExpression:
-                    this.HandleAwait(awaitExpression);
-                    return;
-                case LambdaExpressionSyntax { Body: ExpressionSyntax expression }:
-                    this.AddReturnValue(expression);
-                    return;
-                case LambdaExpressionSyntax lambda:
-                    base.Visit(lambda);
-                    return;
-                case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
-                    this.AddReturnValue(expression);
-                    return;
-                case LocalFunctionStatementSyntax { Body: { } body }:
-                    this.Visit(body);
-                    return;
-                case ExpressionSyntax expression
-                    when this.recursion.PropertyGet(expression) is { } propertyGet:
-                    this.HandlePropertyGet(propertyGet);
-                    return;
-                default:
-                    this.Visit(node);
-                    break;
-            }
-        }
-
-        private void HandleInvocation(Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> invocation)
-        {
-            if (invocation is { Declaration: { } declaration })
-            {
-                if (this.Recursive(invocation.Source, declaration) is { } recursive)
+                using var recursive = this.Recursive(target);
+                foreach (var value in recursive.values)
                 {
-                    foreach (var value in recursive.values)
-                    {
-                        this.AddReturnValue(value, invocation);
-                    }
+                    this.AddReturnValue(value, target);
+                }
 
-                    this.values.RemoveAll(x => IsParameter(x));
+                this.values.RemoveAll(x => IsParameter(x));
 
-                    bool IsParameter(ExpressionSyntax value)
-                    {
-                        return value is IdentifierNameSyntax id &&
-                               invocation.Symbol.TryFindParameter(id.Identifier.ValueText, out _);
-                    }
+                bool IsParameter(ExpressionSyntax x)
+                {
+                    return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
+                           target.Symbol.TryFindParameter(name, out _);
                 }
             }
             else
             {
-                _ = this.values.Add(invocation.Source);
+                _ = this.values.Add(target.Source);
             }
         }
 
-        private void HandlePropertyGet(Target<ExpressionSyntax, IMethodSymbol, SyntaxNode> propertyGet)
+        private void HandlePropertyGet(Target<ExpressionSyntax, IMethodSymbol, SyntaxNode> target)
         {
-            if (propertyGet is { Declaration: { } declaration })
+            if (target is { Declaration: { } })
             {
-                if (this.Recursive(propertyGet.Source, declaration) is { } recursive)
+                using var recursive = this.Recursive(target);
+                foreach (var value in recursive.values)
                 {
-                    foreach (var value in recursive.values)
-                    {
-                        this.AddReturnValue(value);
-                    }
+                    this.AddReturnValue(value);
+                }
+
+                this.values.RemoveAll(x => ShouldRemove(x));
+
+                bool ShouldRemove(ExpressionSyntax x)
+                {
+                    return x == target.Source;
                 }
             }
             else
             {
-                _ = this.values.Add(propertyGet.Source);
+                _ = this.values.Add(target.Source);
             }
         }
 
@@ -175,11 +172,18 @@
 
                         break;
                     case InvocationExpressionSyntax candidate
-                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.recursion.SemanticModel, this.recursion.CancellationToken) is { } lambda &&
-                             this.Recursive(lambda, lambda) is { } recursive:
-                        foreach (var inner in recursive.values)
+                        when IDisposableAnalyzers.Await.TaskRun(candidate, this.recursion.SemanticModel, this.recursion.CancellationToken) is { } lambda:
+                        if (lambda is { ExpressionBody: { } expressionBody })
                         {
-                            yield return inner;
+                            yield return expressionBody;
+                        }
+                        else
+                        {
+                            using var recursive = this.Recursive(new Target<LambdaExpressionSyntax, ISymbol, SyntaxNode>(lambda, null!, lambda.Body));
+                            foreach (var inner in recursive.values)
+                            {
+                                yield return inner;
+                            }
                         }
 
                         break;
@@ -188,29 +192,31 @@
                         yield return result;
                         break;
                     case InvocationExpressionSyntax candidate
-                        when this.recursion.Method(candidate) is { Declaration: { } declaration } target &&
-                             this.Recursive(awaitExpression, declaration) is { } recursive:
-                        foreach (var value in recursive.values)
+                        when this.recursion.Method(candidate) is { Declaration: { } } target:
                         {
-                            if (target.Symbol.IsAsync)
+                            using var recursive = this.Recursive(target);
+                            foreach (var value in recursive.values)
                             {
-                                this.AddReturnValue(value, target);
-                            }
-                            else
-                            {
-                                foreach (var e in Await(value))
+                                if (target.Symbol.IsAsync)
                                 {
-                                    this.AddReturnValue(e, target);
+                                    this.AddReturnValue(value, target);
+                                }
+                                else
+                                {
+                                    foreach (var e in Await(value))
+                                    {
+                                        this.AddReturnValue(e, target);
+                                    }
                                 }
                             }
-                        }
 
-                        this.values.RemoveAll(x => IsParameter(x));
+                            this.values.RemoveAll(x => IsParameter(x));
 
-                        bool IsParameter(ExpressionSyntax value)
-                        {
-                            return value is IdentifierNameSyntax id &&
-                                   target.Symbol.Parameters.TryFirst(x => x.Name == id.Identifier.ValueText, out _);
+                            bool IsParameter(ExpressionSyntax x)
+                            {
+                                return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
+                                       target.Symbol.TryFindParameter(name, out _);
+                            }
                         }
 
                         break;
@@ -246,9 +252,21 @@
                         }
 
                         break;
-                    case InvocationExpressionSyntax invocation
-                        when this.recursion.Method(invocation) is { } target:
-                        this.HandleInvocation(target);
+                    case InvocationExpressionSyntax invocation:
+                        switch (this.recursion.Method(invocation))
+                        {
+                            case { Declaration: { } } target:
+                                this.HandleInvocation(target);
+                                break;
+                            case { }:
+                                _ = this.values.Add(invocation);
+                                break;
+                            case null
+                                when this.recursion.SemanticModel.GetSymbolSafe(invocation, this.recursion.CancellationToken) is { DeclaringSyntaxReferences: { Length: 0 } }:
+                                _ = this.values.Add(invocation);
+                                break;
+                        }
+
                         break;
                     case { } expression
                         when this.recursion.PropertyGet(expression) is { } propertyGet:
@@ -292,6 +310,11 @@
 
         private void AddReturnValue(ExpressionSyntax value, Target<InvocationExpressionSyntax, IMethodSymbol, SyntaxNode> target)
         {
+            if (value == target.Source)
+            {
+                return;
+            }
+
             if (value is IdentifierNameSyntax identifierName &&
                 target.Symbol.TryFindParameter(identifierName.Identifier.ValueText, out var parameter))
             {
@@ -314,51 +337,35 @@
             this.AddReturnValue(value);
         }
 
-        private ReturnValueWalker? Recursive(SyntaxNode location, SyntaxNode scope)
+        private ReturnValueWalker Recursive<TSource, TSymbol, TDeclaration>(Target<TSource, TSymbol, TDeclaration> target)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TDeclaration : SyntaxNode
+
         {
-            if (this.recursiveWalkers.TryGetValue(location, out _))
+            if (target.Declaration is null)
             {
-                return null;
+                throw new InvalidOperationException("Only call this when symbol has declaration.");
             }
 
             var walker = Borrow(() => new ReturnValueWalker());
-            this.recursiveWalkers.Add(location, walker);
             walker.search = this.search == ReturnValueSearch.RecursiveInside ? ReturnValueSearch.Recursive : this.search;
-            walker.recursion = Recursion.Borrow(this.recursion.ContainingType, this.recursion.SemanticModel, this.recursion.CancellationToken);
-            walker.recursiveWalkers.Parent = this.recursiveWalkers;
-            walker.Run(scope);
+            walker.recursion = this.recursion;
+            switch (target.Declaration)
+            {
+                case LocalFunctionStatementSyntax { ExpressionBody: { } expressionBody }:
+                    walker.Visit(expressionBody);
+                    break;
+                case LocalFunctionStatementSyntax { Body: { } body }:
+                    walker.Visit(body);
+                    break;
+                default:
+                    walker.Visit(target.Declaration);
+                    break;
+            }
+
+            walker.recursion = null!;
             return walker;
-        }
-
-        private class RecursiveWalkers
-        {
-            private readonly Dictionary<SyntaxNode, ReturnValueWalker> map = new Dictionary<SyntaxNode, ReturnValueWalker>();
-
-            internal RecursiveWalkers? Parent { get; set; }
-
-            private Dictionary<SyntaxNode, ReturnValueWalker> Map => this.Parent?.Map ??
-                                                                     this.map;
-
-            internal void Add(SyntaxNode member, ReturnValueWalker walker)
-            {
-                this.Map.Add(member, walker);
-            }
-
-            internal bool TryGetValue(SyntaxNode member, [NotNullWhen(true)] out ReturnValueWalker? walker)
-            {
-                return this.Map.TryGetValue(member, out walker);
-            }
-
-            internal void Clear()
-            {
-                foreach (var walker in this.map.Values)
-                {
-                    walker.Dispose();
-                }
-
-                this.map.Clear();
-                this.Parent = null;
-            }
         }
 
         private class AssignedValueWalkers

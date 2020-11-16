@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.Helpers
     internal static class ReturnValueWalkerTests
 #pragma warning restore GURA07 // Test class should be public static.
     {
-        [TestCase(ReturnValueSearch.Recursive, "Task.SyntaxError(() => new string(' ', 1))")]
+        [TestCase(ReturnValueSearch.Recursive, "")]
         [TestCase(ReturnValueSearch.Member, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
         {
@@ -410,6 +410,34 @@ namespace N
             Assert.AreEqual("disposable", string.Join(", ", walker.Values));
         }
 
+        [Test]
+        public static void RecursiveSwitch()
+        {
+            var code = @"
+namespace N
+{
+    public class C
+    {
+        public static object M(object value)
+        {
+            return value switch
+            {
+                int _ => M(1),
+                double _ => M(2),
+                string _ => 3,
+                _ => value,
+            };
+        }
+    }
+}";
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var methodDeclaration = syntaxTree.FindMethodDeclaration("M");
+            using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("3, 2, 1, value", string.Join(", ", walker.Values));
+        }
+
         [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Recursive, "1")]
         [TestCase("Func<int> temp = () => 1", ReturnValueSearch.Member, "1")]
         [TestCase("Func<int, int> temp = x => 1", ReturnValueSearch.Recursive, "1")]
@@ -578,13 +606,13 @@ namespace N
         }
 
         [TestCase("await RecursiveAsync()", ReturnValueSearch.Recursive, "")]
-        [TestCase("await RecursiveAsync()", ReturnValueSearch.Member, "RecursiveAsync()")]
+        [TestCase("await RecursiveAsync()", ReturnValueSearch.Member, "")]
         [TestCase("await RecursiveAsync(1)", ReturnValueSearch.Recursive, "")]
-        [TestCase("await RecursiveAsync(1)", ReturnValueSearch.Member, "RecursiveAsync(arg)")]
+        [TestCase("await RecursiveAsync(1)", ReturnValueSearch.Member, "")]
         [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.Recursive, "")]
         [TestCase("await RecursiveAsync1(1)", ReturnValueSearch.Member, "await RecursiveAsync2(value)")]
         [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Recursive, "")]
-        [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Member, "RecursiveAsync4(value)")]
+        [TestCase("await RecursiveAsync3(1)", ReturnValueSearch.Member, "await RecursiveAsync3(value)")]
         public static void AsyncAwaitRecursive(string expression, ReturnValueSearch search, string expected)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -685,6 +713,55 @@ namespace N
         }
 
         [Test]
+        public static void LocalFunctionStatementBody()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    public class C
+    {
+        public void M()
+        {
+            Local();
+
+            int Local()
+            {
+                return 1;
+            }
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var invocation = syntaxTree.FindInvocation("Local()");
+            using var walker = ReturnValueWalker.Borrow(invocation, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", walker.Values.Single().ToString());
+        }
+
+        [Test]
+        public static void LocalFunctionExpressionBody()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    public class C
+    {
+        public void M()
+        {
+            Local();
+
+            int Local() => 1;
+        }
+    }
+}");
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var invocation = syntaxTree.FindInvocation("Local()");
+            using var walker = ReturnValueWalker.Borrow(invocation, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", walker.Values.Single().ToString());
+        }
+
+        [Test]
         public static void ConditionalExpression()
         {
             var syntaxTree = CSharpSyntaxTree.ParseText(@"
@@ -773,7 +850,7 @@ namespace N
             var code = @"
 namespace N
 {
-     using System;
+    using System;
     using System.Globalization;
     using System.Windows.Controls;
     using System.Windows.Data;
