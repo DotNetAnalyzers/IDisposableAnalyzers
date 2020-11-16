@@ -182,6 +182,15 @@
                         when method is { ContainingType: { MetadataName: "TaskAwaiter`1" }, MetadataName: "GetResult" } &&
                              assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "GetAwaiter" } } } } } }:
                         return this.AddRecursiveValues(expression);
+                    case IMethodSymbol method
+                        when method is { ContainingType: { MetadataName: "Interlocked" }, MetadataName: "Exchange" } &&
+                             assignedValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 2 } arguments } }:
+                        using (var walker = AssignedValueWalker.Borrow(arguments[0].Expression, this.semanticModel, this.cancellationToken))
+                        {
+                            return this.AddManyRecursively(walker.Values) &&
+                                   this.AddRecursiveValues(arguments[1].Expression);
+                        }
+
                     case IPropertySymbol _:
                     case IMethodSymbol _:
                         if (symbol.DeclaringSyntaxReferences.Length == 0)

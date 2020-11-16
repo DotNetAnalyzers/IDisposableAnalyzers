@@ -697,6 +697,34 @@ namespace N
                 Assert.IsNotInstanceOf<IErrorTypeSymbol>(type);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
+
+            [TestCase("Interlocked.Exchange(ref _disposable, new MemoryStream())")]
+            [TestCase("Interlocked.Exchange(ref _disposable, null)")]
+            public static void InterlockedExchange(string expression)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading;
+
+    sealed class C : IDisposable
+    {
+        private IDisposable _disposable = new MemoryStream();
+
+        public void Update()
+        {
+            var oldValue = Interlocked.Exchange(ref _disposable, new MemoryStream());
+        }
+    }
+}".AssertReplace("Interlocked.Exchange(ref _disposable, new MemoryStream())", expression));
+
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation(expression);
+                Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }
