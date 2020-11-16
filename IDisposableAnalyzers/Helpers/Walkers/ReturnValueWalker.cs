@@ -252,9 +252,21 @@
                         }
 
                         break;
-                    case InvocationExpressionSyntax invocation
-                        when this.recursion.Method(invocation) is { } target:
-                        this.HandleInvocation(target);
+                    case InvocationExpressionSyntax invocation:
+                        switch (this.recursion.Method(invocation))
+                        {
+                            case { Declaration: { } } target:
+                                this.HandleInvocation(target);
+                                break;
+                            case { }:
+                                _ = this.values.Add(invocation);
+                                break;
+                            case null
+                                when this.recursion.SemanticModel.GetSymbolSafe(invocation, this.recursion.CancellationToken) is { DeclaringSyntaxReferences: { Length: 0 } }:
+                                _ = this.values.Add(invocation);
+                                break;
+                        }
+
                         break;
                     case { } expression
                         when this.recursion.PropertyGet(expression) is { } propertyGet:

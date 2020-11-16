@@ -11,7 +11,7 @@ namespace IDisposableAnalyzers.Test.Helpers
     internal static class ReturnValueWalkerTests
 #pragma warning restore GURA07 // Test class should be public static.
     {
-        [TestCase(ReturnValueSearch.Recursive, "Task.SyntaxError(() => new string(' ', 1))")]
+        [TestCase(ReturnValueSearch.Recursive, "")]
         [TestCase(ReturnValueSearch.Member, "await Task.SyntaxError(() => new string(' ', 1)).ConfigureAwait(false)")]
         public static void AwaitSyntaxError(ReturnValueSearch search, string expected)
         {
