@@ -8,7 +8,7 @@
 
     internal sealed class UsagesWalker : PooledWalker<UsagesWalker>
     {
-        private readonly List<IdentifierNameSyntax> usages = new();
+        private readonly List<IdentifierNameSyntax> usages = new List<IdentifierNameSyntax>();
         private ISymbol symbol = null!;
         private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;
