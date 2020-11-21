@@ -15,4 +15,5 @@
     typeof(System.Xml.Serialization.XmlSerializer),
     typeof(Moq.Mock<>),
     typeof(Ninject.StandardKernel),
-    typeof(Gu.Inject.Kernel))]
+    typeof(Gu.Inject.Kernel),
+    typeof(Gu.Reactive.SerialDisposable<>))]
