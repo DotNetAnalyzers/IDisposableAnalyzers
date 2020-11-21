@@ -18,6 +18,7 @@
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Gu.Inject" Version="0.2.1-dev" />
+    <PackageReference Include="Gu.Reactive" Version="4.2.0" />
     <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />

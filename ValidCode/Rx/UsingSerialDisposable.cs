@@ -18,8 +18,8 @@ namespace ValidCode
 
         public void Dispose()
         {
-            this._serial1?.Dispose();
-            this._serial2?.Dispose();
+            _serial1?.Dispose();
+            _serial2?.Dispose();
         }
     }
 }
