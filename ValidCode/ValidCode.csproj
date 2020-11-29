@@ -21,6 +21,7 @@
     <PackageReference Include="Gu.Reactive" Version="4.2.0" />
     <PackageReference Include="Moq" Version="4.14.7" />
     <PackageReference Include="Ninject" Version="3.3.4" />
+    <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />
     <PackageReference Include="reactiveui" Version="12.1.1" />
   </ItemGroup>
