@@ -19,5 +19,11 @@ namespace ValidCode
         {
             _container.Dispose();
         }
+
+        [Test]
+        public void M()
+        {
+            Assert.AreSame(_container, _container);
+        }
     }
 }

@@ -597,29 +597,6 @@ namespace N
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public static void Dump()
-            {
-                var set = new HashSet<string>();
-                foreach (var method in typeof(Microsoft.Win32.RegistryKey).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly).OrderBy(x => x.Name))
-                {
-                    if (!method.IsSpecialName &&
-                        set.Add(method.Name))
-                    {
-                        Console.WriteLine($"                    IMethodSymbol {{ ContainingType: {{ MetadataName: \"{method.DeclaringType.Name}\" }}, MetadataName: \"{method.Name}\" }} => Result.{(typeof(IDisposable).IsAssignableFrom(method.ReturnType) ? "Yes" : "No")},");
-                    }
-                }
-            }
-
-            [Test]
-            public static void DumpEnumerable()
-            {
-                foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(t => t.IsPublic && t.IsGenericType && typeof(System.Collections.IEnumerable).IsAssignableFrom(t))).OrderBy(x => x.Name))
-                {
-                    Console.WriteLine($"                    IMethodSymbol {{ ContainingType: {{ MetadataName: \"{type.Name}\" }} }} => false,");
-                }
-            }
-
             [TestCase("",                      "Factory.StaticDisposableField",     false)]
             [TestCase("",                      "Factory.StaticIDisposableProperty", false)]
             [TestCase("",                      "Factory.StaticCreateIDisposable()", true)]
@@ -724,6 +701,31 @@ namespace N
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
+            [Ignore("Script")]
+            [Test]
+            public static void Dump()
+            {
+                var set = new HashSet<string>();
+                foreach (var method in typeof(Microsoft.Win32.RegistryKey).GetMethods(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.DeclaredOnly).OrderBy(x => x.Name))
+                {
+                    if (!method.IsSpecialName &&
+                        set.Add(method.Name))
+                    {
+                        Console.WriteLine($"                    IMethodSymbol {{ ContainingType: {{ MetadataName: \"{method.DeclaringType.Name}\" }}, MetadataName: \"{method.Name}\" }} => Result.{(typeof(IDisposable).IsAssignableFrom(method.ReturnType) ? "Yes" : "No")},");
+                    }
+                }
+            }
+
+            [Ignore("Script")]
+            [Test]
+            public static void DumpEnumerable()
+            {
+                foreach (var type in AppDomain.CurrentDomain.GetAssemblies().SelectMany(a => a.GetTypes().Where(t => t.IsPublic && t.IsGenericType && typeof(System.Collections.IEnumerable).IsAssignableFrom(t))).OrderBy(x => x.Name))
+                {
+                    Console.WriteLine($"                    IMethodSymbol {{ ContainingType: {{ MetadataName: \"{type.Name}\" }} }} => false,");
+                }
             }
         }
     }
