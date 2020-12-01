@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
+
     using NUnit.Framework;
 
     public static partial class Valid
@@ -525,6 +526,64 @@ namespace N
         public static IDisposable M()
         {
             return new Disposable().M();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+
+        [Test]
+        public static void FactoryChainedReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M()
+        {
+            var kernel = Create()
+                .BindDisposable();
+            return kernel;
+        }
+
+        private static Kernel BindDisposable(this Kernel container)
+        {
+            container.Bind<IDisposable, Disposable>();
+            return container;
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            container.Creating += OnResolving;
+            container.Created += OnResolved;
+            return container;
+        }
+
+        private static void OnResolved(object sender, object e)
+        {
+        }
+
+        private static void OnResolving(object sender, Type e)
+        {
         }
     }
 }";
