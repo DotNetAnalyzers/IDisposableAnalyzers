@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -6,7 +6,7 @@ namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 
     public static partial class Diagnostics
     {
-        public static class Using
+        public static class UsingStatement
         {
             private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");

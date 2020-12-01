@@ -13,7 +13,8 @@
     internal class LocalDeclarationAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get; } = ImmutableArray.Create(
-            Descriptors.IDISP001DisposeCreated);
+            Descriptors.IDISP001DisposeCreated,
+            Descriptors.IDISP007DoNotDisposeInjected);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -27,15 +28,28 @@
             if (!context.IsExcludedFromAnalysis() &&
                 context.Node is LocalDeclarationStatementSyntax { Declaration: { Variables: { } variables } localDeclaration } statement)
             {
-                foreach (var declarator in variables)
+                if (statement.UsingKeyword.IsKind(SyntaxKind.None))
                 {
-                    if (declarator.Initializer is { Value: { } value } &&
-                        statement.UsingKeyword.IsKind(SyntaxKind.None) &&
-                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken) &&
-                        context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
-                        Disposable.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
+                    foreach (var declarator in variables)
                     {
-                        context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, localDeclaration.GetLocation()));
+                        if (declarator.Initializer is { Value: { } value } &&
+                            Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken) &&
+                            context.SemanticModel.TryGetSymbol(declarator, context.CancellationToken, out ILocalSymbol? local) &&
+                            Disposable.ShouldDispose(new LocalOrParameter(local), context.SemanticModel, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP001DisposeCreated, localDeclaration.GetLocation()));
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var declarator in variables)
+                    {
+                        if (declarator is { Initializer: { Value: { } value } } &&
+                            Disposable.IsCachedOrInjectedOnly(value, value, context.SemanticModel, context.CancellationToken))
+                        {
+                            context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, value.GetLocation()));
+                        }
                     }
                 }
             }
