@@ -8,6 +8,7 @@
 | Enabled  | True
 | Category | IDisposableAnalyzers.Correctness
 | Code     | [DisposeCallAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/DisposeCallAnalyzer.cs)
+|          | [LocalDeclarationAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/LocalDeclarationAnalyzer.cs)
 |          | [UsingStatementAnalyzer](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/IDisposableAnalyzers/Analyzers/UsingStatementAnalyzer.cs)
 
 ## Description

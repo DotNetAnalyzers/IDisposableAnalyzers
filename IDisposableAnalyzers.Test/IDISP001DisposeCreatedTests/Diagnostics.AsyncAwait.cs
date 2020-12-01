@@ -61,7 +61,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
@@ -86,7 +86,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
@@ -111,7 +111,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, Disposable, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
             }
 
             [Test]
@@ -144,7 +144,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, code);
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
         }
     }
