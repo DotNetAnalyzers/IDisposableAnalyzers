@@ -5,9 +5,13 @@
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static partial class Valid
+    [TestFixture(typeof(DisposeCallAnalyzer))]
+    [TestFixture(typeof(LocalDeclarationAnalyzer))]
+    [TestFixture(typeof(UsingStatementAnalyzer))]
+    public static partial class Valid<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+        private static readonly T Analyzer = new T();
 
         private const string DisposableCode = @"
 namespace N
@@ -659,6 +663,7 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
+        [Ignore("Dunno about this.")]
         [TestCase("action(stream)")]
         [TestCase("action.Invoke(stream)")]
         public static void IgnoreLambdaUsageOnLocal(string invokeCode)

@@ -1,20 +1,33 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis.Diagnostics;
+
     using NUnit.Framework;
 
-    public partial class Valid
+    public class ValidUsing
     {
-        public static class Using
-        {
-            // ReSharper disable once MemberHidesStaticFromOuterClass
-            private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
+        private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
 
-            [Test]
-            public static void FileOpenRead()
-            {
-                var code = @"
+
+        private const string DisposableCode = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+        [Test]
+        public static void FileOpenRead()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -29,13 +42,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void FileOpenReadVariable()
-            {
-                var code = @"
+        [Test]
+        public static void FileOpenReadVariable()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -50,13 +63,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void AwaitedStream()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitedStream()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -85,13 +98,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void AwaitedStreamVariable()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitedStreamVariable()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -121,13 +134,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void InjectedIEnumerableOfTGetEnumerator()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedIEnumerableOfTGetEnumerator()
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -146,13 +159,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedConcreteFactory()
-            {
-                var factoryCode = @"
+        [Test]
+        public static void CreatedUsingInjectedConcreteFactory()
+        {
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -165,7 +178,7 @@ namespace N
         }
     }
 }";
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -178,7 +191,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -191,13 +204,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryCode, disposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, factoryCode, disposableCode, code);
+        }
 
-            [Test]
-            public static void InjectedPasswordBoxSecurePassword()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedPasswordBoxSecurePassword()
+        {
+            var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -215,13 +228,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedInterfaceFactory()
-            {
-                var iFactoryCode = @"
+        [Test]
+        public static void CreatedUsingInjectedInterfaceFactory()
+        {
+            var iFactoryCode = @"
 namespace N
 {
     using System;
@@ -231,7 +244,7 @@ namespace N
         IDisposable Create();
     }
 }";
-                var factoryCode = @"
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -244,7 +257,7 @@ namespace N
         }
     }
 }";
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -257,7 +270,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -270,13 +283,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, iFactoryCode, factoryCode, disposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, iFactoryCode, factoryCode, disposableCode, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedAbstractFactoryWIthImplementation()
-            {
-                var factoryBase = @"
+        [Test]
+        public static void CreatedUsingInjectedAbstractFactoryWIthImplementation()
+        {
+            var factoryBase = @"
 namespace N
 {
     using System;
@@ -286,7 +299,7 @@ namespace N
         public abstract IDisposable Create();
     }
 }";
-                var factoryCode = @"
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -299,7 +312,7 @@ namespace N
         }
     }
 }";
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -312,7 +325,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -325,13 +338,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryBase, factoryCode, disposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, factoryBase, factoryCode, disposableCode, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
-            {
-                var factoryBaseOfT = @"
+        [Test]
+        public static void CreatedUsingInjectedGenericAbstractFactoryWithImplementation()
+        {
+            var factoryBaseOfT = @"
 namespace N
 {
     using System;
@@ -341,7 +354,7 @@ namespace N
         public abstract IDisposable Create();
     }
 }";
-                var factoryCode = @"
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -355,7 +368,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -368,13 +381,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryBaseOfT, factoryCode, DisposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, factoryBaseOfT, factoryCode, DisposableCode, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedAbstractFactoryNoImplementation()
-            {
-                var factoryBase = @"
+        [Test]
+        public static void CreatedUsingInjectedAbstractFactoryNoImplementation()
+        {
+            var factoryBase = @"
 namespace N
 {
     using System;
@@ -385,7 +398,7 @@ namespace N
     }
 }";
 
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -398,7 +411,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -411,13 +424,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryBase, disposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, factoryBase, disposableCode, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
-            {
-                var factoryBaseOfT = @"
+        [Test]
+        public static void CreatedUsingInjectedGenericAbstractFactoryNoImplementation()
+        {
+            var factoryBaseOfT = @"
 namespace N
 {
     using System;
@@ -428,7 +441,7 @@ namespace N
     }
 }";
 
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -441,7 +454,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -454,13 +467,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, factoryBaseOfT, disposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, factoryBaseOfT, disposableCode, code);
+        }
 
-            [Test]
-            public static void CreatedUsingInjectedVirtualFactory()
-            {
-                var factoryBase = @"
+        [Test]
+        public static void CreatedUsingInjectedVirtualFactory()
+        {
+            var factoryBase = @"
 namespace N
 {
     using System;
@@ -470,7 +483,7 @@ namespace N
         public virtual IDisposable Create() => new Disposable();
     }
 }";
-                var factoryCode = @"
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -483,7 +496,7 @@ namespace N
         }
     }
 }";
-                var disposableCode = @"
+            var disposableCode = @"
 namespace N
 {
     using System;
@@ -496,7 +509,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -509,13 +522,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, new[] { factoryBase, factoryCode, disposableCode, code });
-            }
+            RoslynAssert.Valid(Analyzer, new[] { factoryBase, factoryCode, disposableCode, code });
+        }
 
-            [Test]
-            public static void IgnoresRecursiveProperty()
-            {
-                var code = @"
+        [Test]
+        public static void IgnoresRecursiveProperty()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -538,13 +551,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void IgnoresRecursiveMethod()
-            {
-                var code = @"
+        [Test]
+        public static void IgnoresRecursiveMethod()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -567,13 +580,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void ReassignedParameter()
-            {
-                var code = @"
+        [Test]
+        public static void ReassignedParameter()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -589,13 +602,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void ReassignedParameterViaOut()
-            {
-                var code = @"
+        [Test]
+        public static void ReassignedParameterViaOut()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -620,13 +633,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void ReassignedParameterViaOutAnd()
-            {
-                var code = @"
+        [Test]
+        public static void ReassignedParameterViaOutAnd()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -652,8 +665,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

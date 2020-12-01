@@ -1,16 +1,23 @@
-namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
+
+    using Microsoft.CodeAnalysis.Diagnostics;
+
     using NUnit.Framework;
 
-    public partial class Valid
+    [TestFixture(typeof(DisposeCallAnalyzer))]
+    [TestFixture(typeof(LocalDeclarationAnalyzer))]
+    [TestFixture(typeof(UsingStatementAnalyzer))]
+    public class ValidReactive<T>
+        where T : DiagnosticAnalyzer, new()
     {
-        public static class Rx
+        private static readonly T Analyzer = new T();
+
+        [Test]
+        public static void InjectedSubscribe()
         {
-            [Test]
-            public static void InjectedSubscribe()
-            {
-                var code = @"
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -32,13 +39,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void ChainedCtorInjectedSubscribe()
-            {
-                var code = @"
+        [Test]
+        public static void ChainedCtorInjectedSubscribe()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -71,13 +78,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void InjectedConditionalSubscribe()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedConditionalSubscribe()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -99,13 +106,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SingleAssignmentDisposable()
-            {
-                var code = @"
+        [Test]
+        public static void SingleAssignmentDisposable()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -127,13 +134,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
-            {
-                var code = @"
+        [Test]
+        public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -155,13 +162,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SingleAssignmentDisposableAssignedInAction()
-            {
-                var code = @"
+        [Test]
+        public static void SingleAssignmentDisposableAssignedInAction()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -191,8 +198,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }
