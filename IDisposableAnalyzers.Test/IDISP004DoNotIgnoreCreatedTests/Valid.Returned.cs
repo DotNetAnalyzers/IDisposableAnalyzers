@@ -532,7 +532,6 @@ namespace N
             RoslynAssert.Valid(Analyzer, disposable, code);
         }
 
-
         [Test]
         public static void FactoryChainedReturned()
         {
@@ -584,6 +583,220 @@ namespace N
 
         private static void OnResolving(object sender, Type e)
         {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
+        public static void FactoryChainedManyReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M()
+        {
+            var kernel = Create()
+                .BindDisposable()
+                .BindDisposable()
+                .BindDisposable()
+                .BindDisposable()
+                .BindDisposable();
+            return kernel;
+        }
+
+        private static Kernel BindDisposable(this Kernel container)
+        {
+            container.Bind<IDisposable, Disposable>();
+            return container;
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            container.Creating += OnResolving;
+            container.Created += OnResolved;
+            return container;
+        }
+
+        private static void OnResolved(object sender, object e)
+        {
+        }
+
+        private static void OnResolving(object sender, Type e)
+        {
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
+        public static void FactoryChainedBinaryReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M()
+        {
+            return Create().Rebind<IDisposable, Disposable>();
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            return container;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
+        public static void FactoryChainedManyBinaryReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M()
+        {
+            return Create()
+                .Rebind<IDisposable, Disposable>()
+                .Rebind<IDisposable, Disposable>()
+                .Rebind<IDisposable, Disposable>()
+                .Rebind<IDisposable, Disposable>()
+                .Rebind<IDisposable, Disposable>();
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            return container;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
+        public static void ExtensionMethodBindReturn()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M(this Kernel kernel)
+        {
+            kernel.Bind<IDisposable, Disposable>();
+            return kernel;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
+        public static void ExtensionMethodReturnBindMany()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static Kernel M(this Kernel kernel)
+        {
+            return kernel.Bind<IDisposable, Disposable>()
+                .Bind<IDisposable, Disposable>()
+                .Bind<IDisposable, Disposable>()
+                .Bind<IDisposable, Disposable>();
         }
     }
 }";

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -289,6 +289,36 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
+
+        [Ignore("Temp")]
+        [Test]
+        public static void LocalAssignedWithFileOpenReadDisposeWith()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+
+    class C : IDisposable
+    {
+        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+        public C()
+        {
+            var disposable = File.OpenRead(string.Empty).DisposeWith(this.compositeDisposable);
+        }
+
+        public void Dispose()
+        {
+            this.compositeDisposable.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

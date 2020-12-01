@@ -278,5 +278,39 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
         }
+
+        [Test]
+        public static void NewKernelBindStatement()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static void NewKernelBind()
+        {
+            using var kernel = new Kernel();
+            kernel.Bind<IDisposable, Disposable>();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
     }
 }

@@ -191,14 +191,25 @@
                                    this.AddRecursiveValues(arguments[1].Expression);
                         }
 
-                    case IPropertySymbol _:
-                    case IMethodSymbol _:
-                        if (symbol.DeclaringSyntaxReferences.Length == 0)
+                    case IMethodSymbol { DeclaringSyntaxReferences: { Length: 0 } } method:
+                        if (assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } parent } } &&
+                            !parent.IsKind(SyntaxKind.IdentifierName) &&
+                            !parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
+                            Disposable.AssumeIsIdentity(method))
+                        {
+                            return this.AddRecursiveValues(parent);
+                        }
+                        else
                         {
                             this.values.Add(assignedValue);
                             return true;
                         }
 
+                    case IPropertySymbol { DeclaringSyntaxReferences: { Length: 0 } }:
+                        this.values.Add(assignedValue);
+                        return true;
+                    case IPropertySymbol _:
+                    case IMethodSymbol _:
                         using (var walker = ReturnValueWalker.Borrow(assignedValue, ReturnValueSearch.RecursiveInside, this.semanticModel, this.cancellationToken))
                         {
                             return this.AddManyRecursively(walker.Values);

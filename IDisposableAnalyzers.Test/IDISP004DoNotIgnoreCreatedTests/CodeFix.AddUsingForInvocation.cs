@@ -2,13 +2,15 @@
 {
     using Gu.Roslyn.Asserts;
 
+    using Microsoft.CodeAnalysis.CodeFixes;
+
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class AddUsingForInvocation
         {
-            private static readonly AddUsingFix Fix = new AddUsingFix();
+            private static readonly CodeFixProvider Fix = new AddUsingFix();
 
             [Test]
             public static void AddUsingForIgnoredFileOpenRead()

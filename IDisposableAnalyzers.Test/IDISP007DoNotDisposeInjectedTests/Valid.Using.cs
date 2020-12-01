@@ -6,10 +6,9 @@
 
     using NUnit.Framework;
 
-    public class ValidUsing
+    public static class ValidUsing
     {
         private static readonly DiagnosticAnalyzer Analyzer = new UsingStatementAnalyzer();
-
 
         private const string DisposableCode = @"
 namespace N

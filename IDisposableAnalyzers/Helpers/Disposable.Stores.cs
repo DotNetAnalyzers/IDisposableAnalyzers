@@ -28,24 +28,18 @@
             return false;
         }
 
-        private static bool Stores<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion, [NotNullWhen(true)] out ISymbol? container)
-            where TSource : SyntaxNode
-            where TSymbol : ISymbol
-            where TNode : SyntaxNode
+        internal static bool StoresAny(RecursiveValues recursive, INamedTypeSymbol containingType, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (target.Declaration is { })
+            using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
+            recursive.Reset();
+            while (recursive.MoveNext())
             {
-                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
-                foreach (var usage in walker.Usages)
+                if (Stores(recursive.Current, recursion, out _))
                 {
-                    if (Stores(usage, recursion, out container))
-                    {
-                        return true;
-                    }
+                    return true;
                 }
             }
 
-            container = null;
             return false;
         }
 
@@ -152,6 +146,27 @@
                 result = null;
                 return false;
             }
+        }
+
+        private static bool Stores<TSource, TSymbol, TNode>(Target<TSource, TSymbol, TNode> target, Recursion recursion, [NotNullWhen(true)] out ISymbol? container)
+            where TSource : SyntaxNode
+            where TSymbol : ISymbol
+            where TNode : SyntaxNode
+        {
+            if (target.Declaration is { })
+            {
+                using var walker = UsagesWalker.Borrow(target.Symbol, target.Declaration, recursion.SemanticModel, recursion.CancellationToken);
+                foreach (var usage in walker.Usages)
+                {
+                    if (Stores(usage, recursion, out container))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            container = null;
+            return false;
         }
 
         private static bool AccessibleInReturnValue(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion, [NotNullWhen(true)] out ExpressionSyntax? creation)

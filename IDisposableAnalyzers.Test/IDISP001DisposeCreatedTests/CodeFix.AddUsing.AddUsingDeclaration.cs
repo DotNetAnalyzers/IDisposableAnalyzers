@@ -598,6 +598,68 @@ namespace N
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
                 RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
             }
+
+            [Test]
+            public static void FactoryChainedBinary()
+            {
+                var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+                var before = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static void M()
+        {
+            ↓var kernel = Create().Rebind<IDisposable, Disposable>();
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            return container;
+        }
+    }
+}";
+
+                var after = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class C
+    {
+        public static void M()
+        {
+            using var kernel = Create().Rebind<IDisposable, Disposable>();
+        }
+
+        private static Kernel Create()
+        {
+            var container = new Kernel();
+            return container;
+        }
+    }
+}";
+
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
+            }
         }
     }
 }

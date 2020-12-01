@@ -597,15 +597,21 @@ namespace N
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
-            [TestCase("",                      "Factory.StaticDisposableField",     false)]
-            [TestCase("",                      "Factory.StaticIDisposableProperty", false)]
-            [TestCase("",                      "Factory.StaticCreateIDisposable()", true)]
-            [TestCase("",                      "Factory.StaticCreateObject()",      false)]
-            [TestCase("Factory factory",       "factory.IDisposableProperty",       false)]
-            [TestCase("Factory factory",       "factory.CreateIDisposable()",       true)]
-            [TestCase("Factory factory",       "factory.CreateObject()",            false)]
-            [TestCase("Disposable disposable", "disposable.Id()",                   false)]
-            [TestCase("Disposable disposable", "disposable.IdGeneric()",            false)]
+            [TestCase("",                      "Factory.StaticDisposableField",                  false)]
+            [TestCase("",                      "Factory.StaticIDisposableProperty",              false)]
+            [TestCase("",                      "Factory.StaticCreateIDisposable()",              true)]
+            [TestCase("",                      "Factory.StaticCreateIDisposable().Id()",         true)]
+            [TestCase("",                      "Factory.StaticCreateIDisposable().ReturnThis()", true)]
+            [TestCase("",                      "Factory.StaticCreateIDisposable().IdGeneric()",  true)]
+            [TestCase("",                      "Factory.StaticCreateObject()",                   false)]
+            [TestCase("Factory factory",       "factory.IDisposableProperty",                    false)]
+            [TestCase("Factory factory",       "factory.CreateIDisposable()",                    true)]
+            [TestCase("Factory factory",       "factory.CreateIDisposable().Id()",               true)]
+            [TestCase("Factory factory",       "factory.CreateIDisposable().Id().Id()",          true)]
+            [TestCase("Factory factory",       "factory.CreateIDisposable().IdGeneric()",        true)]
+            [TestCase("Factory factory",       "factory.CreateObject()",                         false)]
+            [TestCase("Disposable disposable", "disposable.Id()",                                false)]
+            [TestCase("Disposable disposable", "disposable.IdGeneric()",                         false)]
             public static void Assumptions(string parameter, string expression, bool expected)
             {
                 var binaryReference = BinaryReference.Compile(@"
@@ -624,24 +630,24 @@ namespace BinaryReferencedAssembly
 
     public static class Ext
     {
-        public static Disposable Id(this Disposable disposable) => disposable;
+        public static IDisposable Id(this IDisposable disposable) => disposable;
 
         public static T IdGeneric<T>(this T item) => item;
     }
 
     public class Factory
     {
-        public static readonly IDisposable StaticDisposableField = new Disposable();
+        public static readonly Disposable StaticDisposableField = new Disposable();
 
         public static IDisposable StaticIDisposableProperty => StaticDisposableField;
 
         public IDisposable IDisposableProperty => StaticDisposableField;
 
-        public static IDisposable StaticCreateIDisposable() => new Disposable();
+        public static Disposable StaticCreateIDisposable() => new Disposable();
 
         public static object StaticCreateObject() => new object();
 
-        public IDisposable CreateIDisposable() => new Disposable();
+        public Disposable CreateIDisposable() => new Disposable();
 
         public object CreateObject() => new object();
     }
@@ -655,9 +661,9 @@ namespace N
 
     class C
     {
-        static void M(Factory factory)
+        static object M(Factory factory)
         {
-            factory.CreateIDisposable();
+            return factory.CreateIDisposable();
         }
     }
 }".AssertReplace("Factory factory", parameter)
@@ -668,6 +674,7 @@ namespace N
                     new[] { syntaxTree },
                     MetadataReferences.FromAttributes().Add(binaryReference),
                     CodeFactory.DllCompilationOptions.WithMetadataImportOptions(MetadataImportOptions.Public));
+                CollectionAssert.IsEmpty(compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error));
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));

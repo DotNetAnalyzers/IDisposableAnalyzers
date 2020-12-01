@@ -8,6 +8,22 @@
 
     internal static partial class Disposable
     {
+        internal static bool AssumeIsIdentity(IMethodSymbol method)
+        {
+            return method switch
+            {
+                { DeclaringSyntaxReferences: { Length: 0 }, IsExtensionMethod: true }
+                    when method.TryGetThisParameter(out var parameter) &&
+                         parameter.ContainingSymbol is IMethodSymbol extensionMethod
+                    => SymbolEqualityComparer.Default.Equals(extensionMethod.ReturnType, parameter.Type),
+                { DeclaringSyntaxReferences: { Length: 0 }, IsStatic: false }
+                    => !method.MetadataName.Contains("Open") &&
+                       !method.MetadataName.Contains("Create") &&
+                       SymbolEqualityComparer.Default.Equals(method.ReturnType, method.ContainingType),
+                _ => false,
+            };
+        }
+
         private static ExpressionSyntax? Identity(ExpressionSyntax candidate, Recursion recursion)
         {
             return candidate switch
@@ -48,7 +64,7 @@
                      type.IsAssignableTo(KnownSymbols.Task, recursion.SemanticModel.Compilation)
                 => Recursive(memberAccess, recursion),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                when recursion.Target(invocation) is { } target &&
+                when recursion.Method(invocation) is { } target &&
                      IsIdentity(target, recursion)
                 => Recursive(invocation, recursion),
                 { Parent: ReturnStatementSyntax returnStatement }
@@ -71,9 +87,26 @@
         {
             switch (target.Symbol)
             {
-                case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
-                     when reducedFrom.Parameters.TryFirst(out var parameter):
-                    return IsIdentity(Target.Create(target.Source, parameter, target.Declaration), recursion);
+                case IMethodSymbol { DeclaringSyntaxReferences: { Length: 0 } } method
+                     when AssumeIsIdentity(method):
+                    return true;
+                case IMethodSymbol { MethodKind: MethodKind.ReducedExtension, ReducedFrom: { Parameters: { } parameters } }
+                    when target.Declaration is MethodDeclarationSyntax methodDeclaration &&
+                         parameters.TryFirst(out var parameter):
+                    using (var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(methodDeclaration))
+                    {
+                        foreach (var returnValue in walker.ReturnValues)
+                        {
+                            if (returnValue is IdentifierNameSyntax identifierName &&
+                                identifierName.IsSymbol(parameter, recursion.SemanticModel, recursion.CancellationToken))
+                            {
+                                return true;
+                            }
+                        }
+                    }
+
+                    break;
+
                 case IMethodSymbol { IsStatic: false }
                     when target.Declaration is MethodDeclarationSyntax methodDeclaration:
                     using (var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(methodDeclaration))

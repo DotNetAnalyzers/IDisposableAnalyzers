@@ -27,6 +27,7 @@
     <PackageReference Include="EntityFramework" Version="6.4.4" />
     <PackageReference Include="Gu.Analyzers" Version="1.8.3" PrivateAssets="all" />
     <PackageReference Include="Gu.Inject" Version="0.2.1-dev" />
+    <PackageReference Include="Gu.Inject.Rebind" Version="0.2.1-dev" />
     <PackageReference Include="Gu.Reactive" Version="4.2.0" />
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.1" />
     <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.3.1" PrivateAssets="all" />

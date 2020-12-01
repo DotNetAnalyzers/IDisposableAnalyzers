@@ -9,7 +9,7 @@
     [TestFixture(typeof(DisposeCallAnalyzer))]
     [TestFixture(typeof(LocalDeclarationAnalyzer))]
     [TestFixture(typeof(UsingStatementAnalyzer))]
-    public class ValidReactive<T>
+    public static class ValidReactive<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();

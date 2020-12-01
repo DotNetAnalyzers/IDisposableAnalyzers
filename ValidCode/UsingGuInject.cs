@@ -4,7 +4,7 @@ namespace ValidCode
     using System;
     using Gu.Inject;
 
-    public class UsingGuInject
+    public static class UsingGuInject
     {
         public static void NewkernelBind()
         {
@@ -19,8 +19,15 @@ namespace ValidCode
         public static Kernel CreateKernelReturn()
         {
             var kernel = Create()
-                .Bind<IDisposable, Disposable>();
+                .BindDisposable()
+                .Rebind<IDisposable, Disposable>();
             return kernel;
+        }
+
+        private static Kernel BindDisposable(this Kernel container)
+        {
+            container.Bind<IDisposable, Disposable>();
+            return container;
         }
 
         private static Kernel Create()

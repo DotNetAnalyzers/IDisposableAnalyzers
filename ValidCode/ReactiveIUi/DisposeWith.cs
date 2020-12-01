@@ -1,4 +1,5 @@
-﻿namespace ValidCode.ReactiveIUi
+﻿// ReSharper disable All
+namespace ValidCode.ReactiveIUi
 {
     using System;
     using System.IO;
