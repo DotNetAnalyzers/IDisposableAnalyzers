@@ -4,11 +4,11 @@ namespace ValidCode.Collections
     using System;
     using System.Collections.Generic;
 
-    internal sealed class ListOfObject : IDisposable
+    internal sealed class WithListOfDisposable : IDisposable
     {
-        private readonly List<object> disposables = new List<object>();
+        private readonly List<IDisposable> disposables = new List<IDisposable> { new Disposable(), };
 
-        public ListOfObject()
+        public WithListOfDisposable()
         {
             this.disposables.Add(new Disposable());
         }
@@ -17,7 +17,7 @@ namespace ValidCode.Collections
         {
             foreach (var disposable in this.disposables)
             {
-                (disposable as IDisposable)?.Dispose();
+                disposable.Dispose();
             }
         }
     }

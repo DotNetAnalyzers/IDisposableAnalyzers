@@ -1,3 +1,4 @@
+﻿// ReSharper disable All
 namespace ValidCode.Collections
 {
     using System.Collections.Generic;
