@@ -1,3 +1,7 @@
+#### 3.4.6
+* BUGFIX: IDSP007 when using declaration.
+* BUGFIX: Figure out chained calls.
+
 #### 3.4.5
 * FEATURE: Handle switch expression.
 * BUGFIX: Figure out await in more places.
