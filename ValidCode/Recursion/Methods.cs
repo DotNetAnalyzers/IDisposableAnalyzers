@@ -6,8 +6,8 @@ namespace ValidCode.Recursion
 
     public class Methods
     {
-        private IDisposable bar1;
-        private IDisposable bar2;
+        private readonly IDisposable bar1;
+        private readonly IDisposable bar2;
 
         public Methods()
         {

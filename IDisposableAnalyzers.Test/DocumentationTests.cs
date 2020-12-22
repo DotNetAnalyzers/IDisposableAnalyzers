@@ -226,7 +226,7 @@ namespace IDisposableAnalyzers.Test
 | Topic    | Value
 | :--      | :--
 | Id       | {descriptor.Id}
-| Severity | {descriptor.DefaultSeverity.ToString()}
+| Severity | {descriptor.DefaultSeverity}
 | Enabled  | {(descriptor.IsEnabledByDefault ? "True" : "False")}
 | Category | {descriptor.Category}
 | Code     | [<TYPENAME>](<URL>)

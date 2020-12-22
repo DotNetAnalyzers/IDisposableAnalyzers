@@ -6,7 +6,7 @@ namespace ValidCode
 
     sealed class Issue221 : IDisposable
     {
-        private IDisposable subscription;
+        private readonly IDisposable subscription;
         private bool disposed;
 
         public Issue221(IObservable<object> observable = null)

@@ -14,10 +14,10 @@ namespace ValidCode
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
         private readonly Lazy<IDisposable> lazyDisposable;
 
-        private IDisposable meh1;
-        private IDisposable meh2;
+        private readonly IDisposable meh1;
+        private readonly IDisposable meh2;
+        private readonly IDisposable disposable;
         private bool isDirty;
-        private IDisposable disposable;
 
         public Misc(IDisposable disposable)
         {
