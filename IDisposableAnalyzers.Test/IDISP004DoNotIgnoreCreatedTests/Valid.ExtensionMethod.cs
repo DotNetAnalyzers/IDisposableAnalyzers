@@ -279,5 +279,37 @@ namespace Gu.Inject.Tests
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void KernelBinaryExtensionMethod()
+        {
+            var binaryReference = BinaryReference.Compile(@"
+namespace BinaryReferencedAssembly
+{
+    using Gu.Inject;
+
+    public static class Ext
+    {
+        public static Kernel BindEntities(this Kernel item) => item;
+    }
+}");
+
+            var code = @"
+namespace N
+{
+    using Gu.Inject;
+    using BinaryReferencedAssembly;
+
+    static class C
+    {
+        public static Kernel M()
+        {
+            return new Kernel()
+                .BindEntities();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code, metadataReferences: MetadataReferences.FromAttributes().Add(binaryReference));
+        }
     }
 }

@@ -31,6 +31,12 @@ namespace ValidCode
             kernel.Rebind<IDisposable, Disposable>();
             return kernel;
         }
+
+        public static Kernel M(IDisposable disposable)
+        {
+            return Create()
+                .Rebind(disposable);
+        }
         
         private static Kernel BindDisposable(this Kernel container)
         {
