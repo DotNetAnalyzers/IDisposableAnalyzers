@@ -1,5 +1,4 @@
-﻿#pragma warning disable GURA04, GURA06 // Name of class should match asserts.
-namespace IDisposableAnalyzers.Test
+﻿namespace IDisposableAnalyzers.Test
 {
     using System;
     using System.Collections.Generic;

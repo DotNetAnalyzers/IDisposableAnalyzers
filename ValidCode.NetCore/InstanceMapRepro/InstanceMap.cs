@@ -1,4 +1,5 @@
-﻿namespace ValidCode.NetCore.InstanceMapRepro
+﻿// ReSharper disable All
+namespace ValidCode.NetCore.InstanceMapRepro
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -11,9 +12,7 @@
     {
         private readonly Dictionary<Maybe<TKey>, TValue> inner = new Dictionary<Maybe<TKey>, TValue>(KeyComparer.Default);
 
-#pragma warning disable INPC017 // Backing field name must match.
         internal object Gate => this.inner;
-#pragma warning restore INPC017 // Backing field name must match.
 
         internal IEnumerable<TKey> Keys => this.inner.Keys.Select(x => x.GetValueOrDefault());
 

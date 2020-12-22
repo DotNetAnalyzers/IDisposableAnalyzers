@@ -18,12 +18,10 @@
             this.value = value;
         }
 
-#pragma warning disable CA1000 // Do not declare static members on generic types
         /// <summary>
         /// The default instance when value is missing.
         /// </summary>
         public static Maybe<T> None { get; } = new Maybe<T>(hasValue: false, value: default!);
-#pragma warning restore CA1000 // Do not declare static members on generic types
 
         /// <inheritdoc />
         public bool HasValue { get; }
@@ -61,12 +59,10 @@
             return !left.Equals(right);
         }
 
-#pragma warning disable CA1000 // Do not declare static members on generic types
         /// <summary>
         /// Create an instance with a value.
         /// </summary>
         public static Maybe<T> Some([MaybeNull] T value) => new Maybe<T>(hasValue: true, value: value);
-#pragma warning restore CA1000 // Do not declare static members on generic types
 
         /// <inheritdoc />
         public bool Equals(Maybe<T> other)

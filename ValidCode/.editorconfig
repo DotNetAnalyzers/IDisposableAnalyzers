@@ -12,3 +12,6 @@ dotnet_diagnostic.CS0169.severity = none
 # CS1717: Assignment made to same variable
 dotnet_diagnostic.CS1717.severity = none
 
+
+# IDE0079: Remove unnecessary suppression
+dotnet_diagnostic.IDE0079.severity = none
