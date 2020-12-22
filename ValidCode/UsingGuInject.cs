@@ -16,7 +16,7 @@ namespace ValidCode
             var o = kernel.Get(typeof(Disposable));
         }
 
-        public static Kernel CreateKernelReturn()
+        public static Kernel CreateKernelReturnExpression()
         {
             var kernel = Create()
                 .BindDisposable()
@@ -24,6 +24,14 @@ namespace ValidCode
             return kernel;
         }
 
+        public static Kernel CreateKernelReturnStatements()
+        {
+            var kernel = Create()
+                         .BindDisposable();
+            kernel.Rebind<IDisposable, Disposable>();
+            return kernel;
+        }
+        
         private static Kernel BindDisposable(this Kernel container)
         {
             container.Bind<IDisposable, Disposable>();
