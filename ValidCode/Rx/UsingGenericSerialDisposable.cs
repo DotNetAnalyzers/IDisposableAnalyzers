@@ -1,4 +1,5 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode.Rx
 {
     using System;
     using Gu.Reactive;

@@ -52,8 +52,6 @@ namespace ValidCode
         public IDisposable CreateDisposableProperty => new Disposable();
 #pragma warning restore IDISP012 // Property should not return created disposable.
 
-        public string Text => this.AddAndReturnToString();
-
         public bool IsDirty
         {
             get
@@ -115,12 +113,6 @@ namespace ValidCode
         {
             File.Create(fileName).Dispose();
             File.Create(fileName)?.Dispose();
-        }
-
-        internal string AddAndReturnToString()
-        {
-            return this.compositeDisposable.AddAndReturn(new Disposable()).ToString() +
-                   this.compositeDisposable.AddAndReturn(File.OpenRead(string.Empty)).ToString();
         }
 
         private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
