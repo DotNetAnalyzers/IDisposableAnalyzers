@@ -1,4 +1,7 @@
-﻿using Gu.Roslyn.Asserts;
+﻿using System;
+using Gu.Roslyn.Asserts;
+
+[assembly: CLSCompliant(false)]
 
 [assembly: TransitiveMetadataReferences(typeof(IDisposableAnalyzers.Test.ValidWithAllAnalyzers))]
 [assembly: TransitiveMetadataReferences(typeof(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute))]

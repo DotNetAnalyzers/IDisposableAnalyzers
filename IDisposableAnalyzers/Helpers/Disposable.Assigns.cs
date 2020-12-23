@@ -16,6 +16,7 @@
                 return Assigns(new Target<SyntaxNode, ISymbol, SyntaxNode>(null!, localOrParameter.Symbol, scope), recursion, out first);
             }
 
+            first = default;
             return false;
         }
 
@@ -28,6 +29,7 @@
                 return Assigns(candidate, recursion, out first);
             }
 
+            first = default;
             return false;
         }
 
@@ -48,11 +50,13 @@
                 }
             }
 
+            fieldOrProperty = default;
             return false;
         }
 
         private static bool Assigns(ExpressionSyntax candidate, Recursion recursion, out FieldOrProperty fieldOrProperty)
         {
+            fieldOrProperty = default;
             return candidate switch
             {
                 { }
