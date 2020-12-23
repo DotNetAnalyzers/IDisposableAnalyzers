@@ -17,13 +17,13 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="Gu.Inject" Version="0.2.1-dev" />
-    <PackageReference Include="Gu.Inject.Rebind" Version="0.2.1-dev" />
-    <PackageReference Include="Gu.Reactive" Version="4.2.0" />
-    <PackageReference Include="Moq" Version="4.14.7" />
+    <PackageReference Include="Gu.Inject" Version="0.3.9" />
+    <PackageReference Include="Gu.Inject.Rebind" Version="0.3.9" />
+    <PackageReference Include="Gu.Reactive" Version="4.3.0" />
+    <PackageReference Include="Moq" Version="4.15.2" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="NUnit" Version="3.12.0" />
     <PackageReference Include="System.Reactive.Linq" Version="4.4.1" />
-    <PackageReference Include="reactiveui" Version="12.1.1" />
+    <PackageReference Include="reactiveui" Version="13.0.27" />
   </ItemGroup>
 </Project>
