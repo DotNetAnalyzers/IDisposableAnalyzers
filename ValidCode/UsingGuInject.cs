@@ -47,16 +47,16 @@ namespace ValidCode
         private static Kernel Create()
         {
             var container = new Kernel();
-            container.Creating += OnResolving;
-            container.Created += OnResolved;
+            container.Creating += OnCreating;
+            container.Created += OnCreated;
             return container;
         }
 
-        private static void OnResolved(object sender, object e)
+        private static void OnCreated(object sender, CreatedEventArgs e)
         {
         }
 
-        private static void OnResolving(object sender, Type e)
+        private static void OnCreating(object sender, CreatingEventArgs creatingEventArgs)
         {
         }
     }

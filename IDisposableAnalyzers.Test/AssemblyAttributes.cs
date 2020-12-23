@@ -16,5 +16,5 @@
     typeof(Moq.Mock<>),
     typeof(Ninject.StandardKernel),
     typeof(Gu.Inject.Kernel),
-    typeof(Gu.Inject.KernelExtensions),
+    typeof(Gu.Inject.RebindExtensions),
     typeof(Gu.Reactive.SerialDisposable<>))]
