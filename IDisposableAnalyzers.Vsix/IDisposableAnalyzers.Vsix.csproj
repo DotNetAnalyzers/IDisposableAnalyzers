@@ -3,7 +3,7 @@
   <Import Sdk="Microsoft.NET.Sdk" Project="Sdk.props" />
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>IDisposableAnalyzers</RootNamespace>
     <TargetName>IDisposableAnalyzers</TargetName>
     <NoWarn>NU1605</NoWarn>
