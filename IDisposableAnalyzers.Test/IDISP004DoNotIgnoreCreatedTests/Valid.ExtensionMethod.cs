@@ -311,5 +311,37 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code, metadataReferences: MetadataReferences.FromAttributes().Add(binaryReference));
         }
+
+        [Test]
+        public static void KernelExtensionMethodInOtherProject()
+        {
+            var ext = @"
+namespace A
+{
+    using Gu.Inject;
+
+    public static class Ext
+    {
+        public static Kernel BindEntities(this Kernel item) => item;
+    }
+}";
+
+            var code = @"
+namespace B
+{
+    using Gu.Inject;
+    using A;
+
+    static class C
+    {
+        public static Kernel M()
+        {
+            return new Kernel()
+                .BindEntities();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, ext, code);
+        }
     }
 }
