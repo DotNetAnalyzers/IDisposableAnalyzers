@@ -1,3 +1,6 @@
+#### 3.4.7
+* Can't repro issues, thinking maybe the 3.4.6 release used wrong binaries.
+
 #### 3.4.6
 * BUGFIX: IDSP007 when using declaration.
 * BUGFIX: Figure out chained calls.
