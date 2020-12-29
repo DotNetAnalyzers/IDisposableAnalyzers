@@ -24,16 +24,9 @@
     <CopyBuildOutputToOutputDirectory>false</CopyBuildOutputToOutputDirectory>
     <CopyOutputSymbolsToOutputDirectory>false</CopyOutputSymbolsToOutputDirectory>
     <VSSDKTargetPlatformRegRootSuffix>Roslyn</VSSDKTargetPlatformRegRootSuffix>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' != 'true'">
     <!-- This property disables extension deployment for command line builds; required for AppVeyor and the build script -->
-    <DeployExtension>False</DeployExtension>
+    <DeployExtension>$(BuildingInsideVisualStudio)</DeployExtension>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Include="source.extension.vsixmanifest" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="16.8.3038" PrivateAssets="all" />
@@ -41,15 +34,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\IDisposableAnalyzers\IDisposableAnalyzers.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="source.extension.vsixmanifest">
-      <SubType>Designer</SubType>
-    </None>
-  </ItemGroup>
-
-  <ItemGroup>
     <!-- https://github.com/dotnet/sdk/issues/433 -->
     <ProjectReference Update="@(ProjectReference)" AdditionalProperties="TargetFramework=netstandard1.3" />
     <!-- https://github.com/Microsoft/extendvs/issues/57 -->

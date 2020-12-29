@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="IDisposableAnalyzers.Vsix.416b84e3-1209-4931-b87f-23a070f39c2d" Version="3.4.6" Language="en-US" Publisher="Johan Larsson"/>
+    <Identity Id="IDisposableAnalyzers.Vsix.416b84e3-1209-4931-b87f-23a070f39c2d" Version="3.4.7" Language="en-US" Publisher="Johan Larsson"/>
     <DisplayName>IDisposableAnalyzers</DisplayName>
     <Description xml:space="preserve">Roslyn analyzers for the use of types implementing IDisposable</Description>
   </Metadata>
