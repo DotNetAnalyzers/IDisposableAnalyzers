@@ -1,2 +1,2 @@
 ﻿For resetting the experimental instance:
-%comspec% /C "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VSSDK\VisualStudioIntegration\Tools\Bin\CreateExpInstance.exe" /Reset /VSInstance=15.0_d26d11b9 /RootSuffix=Roslyn
+%comspec% /C "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VSSDK\VisualStudioIntegration\Tools\Bin\CreateExpInstance.exe" /Reset /VSInstance=16.0_e01562bd /RootSuffix=Roslyn
