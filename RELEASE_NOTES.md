@@ -1,3 +1,6 @@
+#### 3.4.8
+* BUGFIX: Don't use Roslyn's SymbolEqualityComparer
+
 #### 3.4.7
 * Can't repro issues, thinking maybe the 3.4.6 release used wrong binaries.
 
