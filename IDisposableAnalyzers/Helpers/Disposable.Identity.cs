@@ -15,11 +15,11 @@
                 { DeclaringSyntaxReferences: { Length: 0 }, IsExtensionMethod: true }
                     when method.TryGetThisParameter(out var parameter) &&
                          parameter.ContainingSymbol is IMethodSymbol extensionMethod
-                    => SymbolEqualityComparer.Default.Equals(extensionMethod.ReturnType, parameter.Type),
+                    => TypeSymbolComparer.Equal(extensionMethod.ReturnType, parameter.Type),
                 { DeclaringSyntaxReferences: { Length: 0 }, IsStatic: false }
                     => !method.MetadataName.Contains("Open") &&
                        !method.MetadataName.Contains("Create") &&
-                       SymbolEqualityComparer.Default.Equals(method.ReturnType, method.ContainingType),
+                       TypeSymbolComparer.Equal(method.ReturnType, method.ContainingType),
                 _ => false,
             };
         }
