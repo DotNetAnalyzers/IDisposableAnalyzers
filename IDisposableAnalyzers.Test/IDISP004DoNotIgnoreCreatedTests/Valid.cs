@@ -867,5 +867,63 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, DisposableCode, code);
         }
+
+        [Test]
+        public static void PositionNotWithinSyntaxTree()
+        {
+            var target = @"
+using System;
+namespace N
+{
+    public static partial class Foo
+    {
+        public static void MethodWithLotsOfCharactersToIncreaseSpans()
+        {
+            const string lorem = @""Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+Auctor urna nunc id cursus metus. Etiam erat velit scelerisque in dictum non consectetur a erat.
+Nibh venenatis cras sed felis eget velit aliquet. Convallis aenean et tortor at risus viverra.
+Magna eget est lorem ipsum dolor sit. Morbi blandit cursus risus at ultrices mi tempus imperdiet.
+Orci a scelerisque purus semper eget duis at. Posuere ac ut consequat semper. Aliquet enim tortor at auctor urna.
+Sit amet luctus venenatis lectus magna fringilla. Faucibus in ornare quam viverra orci sagittis eu volutpat odio.
+Mauris ultrices eros in cursus turpis massa. Laoreet sit amet cursus sit amet dictum.
+Enim diam vulputate ut pharetra sit amet. Eu volutpat odio facilisis mauris. Faucibus in ornare quam viverra.
+Sit amet justo donec enim diam vulputate ut."";
+        }
+
+        public static void UseLogger(Logger logger)
+            => new Configuration(logger);
+    }
+
+    public sealed class Logger : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+
+    public sealed class Configuration
+    {
+        private readonly Logger? _logger;
+
+        public Configuration(Logger? logger = null) => _logger = logger;
+    }
+}";
+            var cause = @"
+namespace N
+{
+    public static partial class Foo
+    {
+        public static void UseDefaultLogger()
+            => UseLogger(CreateDefaultLogger());
+
+        private static Logger CreateDefaultLogger() => new Logger();
+    }
+}";
+            RoslynAssert.Valid(Analyzer, cause, target);
+        }
     }
 }
