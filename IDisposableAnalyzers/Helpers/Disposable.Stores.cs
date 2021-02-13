@@ -217,14 +217,14 @@
                         {
                             if (Stores(usage, recursion, out var container) &&
                                 FieldOrProperty.TryCreate(container, out var containerMember) &&
-                                recursion.SemanticModel.IsAccessible(target.Source.SpanStart, containerMember.Symbol))
+                                recursion.SemanticModel.SemanticModelFor(target.Source)?.IsAccessible(target.Source.SpanStart, containerMember.Symbol) == true)
                             {
                                 creation = objectCreation;
                                 return true;
                             }
 
                             if (Assigns(usage, recursion, out var fieldOrProperty) &&
-                                recursion.SemanticModel.IsAccessible(target.Source.SpanStart, fieldOrProperty.Symbol))
+                                recursion.SemanticModel.SemanticModelFor(target.Source)?.IsAccessible(target.Source.SpanStart, fieldOrProperty.Symbol) == true)
                             {
                                 creation = objectCreation;
                                 return true;

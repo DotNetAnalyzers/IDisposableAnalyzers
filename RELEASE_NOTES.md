@@ -1,5 +1,6 @@
-#### 
+#### 3.4.9
 * BUGFIX: IDISP023 Allow touching static reference types.
+* BUGFIX: AD0001: Analyzer 'IDisposableAnalyzers.LocalDeclarationAnalyzer
 
 #### 3.4.8
 * BUGFIX: Don't use Roslyn's SymbolEqualityComparer

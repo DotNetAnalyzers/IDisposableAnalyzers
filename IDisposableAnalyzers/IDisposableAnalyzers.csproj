@@ -33,6 +33,7 @@
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
       BUGFIX: IDISP023 Allow touching static reference types.
+      BUGFIX: AD0001: Analyzer 'IDisposableAnalyzers.LocalDeclarationAnalyzer
       3.4.8
       BUGFIX: Don't use Roslyn's SymbolEqualityComparer
       3.4.7
