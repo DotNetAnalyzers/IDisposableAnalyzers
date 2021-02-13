@@ -32,6 +32,7 @@
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.4.9
       BUGFIX: IDISP023 Allow touching static reference types.
       BUGFIX: AD0001: Analyzer 'IDisposableAnalyzers.LocalDeclarationAnalyzer
       3.4.8
