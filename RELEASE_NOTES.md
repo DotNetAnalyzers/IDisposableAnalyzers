@@ -1,3 +1,6 @@
+#### 
+* BUGFIX: IDISP023 Allow touching static reference types.
+
 #### 3.4.8
 * BUGFIX: Don't use Roslyn's SymbolEqualityComparer
 

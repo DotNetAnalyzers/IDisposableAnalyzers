@@ -82,14 +82,26 @@
         {
             if (!this.returned &&
                 !IsAssignedNull(node) &&
-                this.SemanticModel.TryGetType(node, this.CancellationToken, out var type) &&
-                type.IsReferenceType &&
-                type.TypeKind != TypeKind.Error)
+                TypeSymbol() is { IsReferenceType: true, TypeKind: not TypeKind.Error })
             {
                 this.usedReferenceTypes.Add(node);
             }
 
             base.VisitIdentifierName(node);
+
+            ITypeSymbol? TypeSymbol()
+            {
+                return this.SemanticModel.GetSymbolSafe(node, this.CancellationToken) switch
+                {
+                    IFieldSymbol symbol => symbol.Type,
+                    IPropertySymbol symbol => symbol.Type,
+                    ILocalSymbol symbol => symbol.Type,
+                    IParameterSymbol symbol => symbol.Type,
+                    ITypeSymbol => null,
+                    // Defaulting to returning the type for unhandled cases. This means we risk warning too much.
+                    _ => this.SemanticModel.GetType(node, this.CancellationToken),
+                };
+            }
         }
 
         internal static FinalizerContextWalker Borrow(BaseMethodDeclarationSyntax node, SemanticModel semanticModel, CancellationToken cancellationToken)

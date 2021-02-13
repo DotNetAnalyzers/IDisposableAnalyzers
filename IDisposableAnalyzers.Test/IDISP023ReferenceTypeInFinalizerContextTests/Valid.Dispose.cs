@@ -443,6 +443,53 @@ namespace N
 
                 RoslynAssert.Valid(Analyzer, DisposableCode, code);
             }
+
+            [Test]
+            public static void UsingStaticMember()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        private bool disposedValue;
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                }
+
+                // free unmanaged resources
+                if (File.Exists(""abc""))
+                {
+                    File.Delete(""abc"");
+                }
+
+                disposedValue = true;
+            }
+        }
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+    }
+}";
+
+                RoslynAssert.Valid(Analyzer, DisposableCode, code);
+            }
         }
     }
 }
