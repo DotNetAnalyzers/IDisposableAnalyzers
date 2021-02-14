@@ -98,7 +98,7 @@
                     ILocalSymbol symbol => symbol.Type,
                     IParameterSymbol symbol => symbol.Type,
                     ITypeSymbol => null,
-                    // Defaulting to returning the type for unhandled cases. This means we risk warning too much.
+                    //// Defaulting to returning the type for unhandled cases. This means we risk warning too much.
                     _ => this.SemanticModel.GetType(node, this.CancellationToken),
                 };
             }
