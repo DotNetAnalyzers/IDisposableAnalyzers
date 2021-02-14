@@ -63,6 +63,11 @@
                 return false;
             }
 
+            if (assignment.Parent is UsingStatementSyntax)
+            {
+                return false;
+            }
+
             if (!Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol) ||
                 assignedSymbol is null)
             {

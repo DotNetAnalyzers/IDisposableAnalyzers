@@ -1735,5 +1735,32 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void UsingInsideLoop()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public class C
+    {
+        void M()
+        {
+            Stream stream;
+            while (true)
+            {
+                using (stream = new MemoryStream())
+                {
+                    // Do work.
+                }
+            }
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
