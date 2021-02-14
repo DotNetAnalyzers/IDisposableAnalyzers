@@ -336,6 +336,60 @@ namespace N
 }";
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
+
+            [Test]
+            public static void ReturningIfTrueItemReturnNullAfter()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            ↓var item = new MemoryStream();
+            if (condition)
+            {
+                return item;
+            }
+
+            return null;
+        }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+            }
+
+            [Test]
+            public static void ReturningIfTrueItemElseNull()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            ↓var item = new MemoryStream();
+            if (condition)
+            {
+                return item;
+            }
+            else
+            {
+                return null;
+            }
+        }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+            }
         }
     }
 }

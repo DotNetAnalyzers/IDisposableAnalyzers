@@ -1,4 +1,4 @@
-// ReSharper disable All
+﻿// ReSharper disable All
 namespace ValidCode
 {
     using System;
@@ -20,12 +20,20 @@ namespace ValidCode
                 {
                 }
             }
+            else
+            {
+                stream1?.Dispose();
+            }
 
             if (TryGetStreamCore(out var stream2))
             {
                 using (stream2)
                 {
                 }
+            }
+            else
+            {
+                stream2?.Dispose();
             }
         }
 
@@ -63,6 +71,10 @@ namespace ValidCode
                 {
                 }
             }
+            else
+            {
+                stream?.Dispose();
+            }
         }
 
         public static bool TryId<T>(T item, out T result)
@@ -78,6 +90,10 @@ namespace ValidCode
                 using (disposable)
                 {
                 }
+            }
+            else
+            {
+                disposable?.Dispose();
             }
         }
 

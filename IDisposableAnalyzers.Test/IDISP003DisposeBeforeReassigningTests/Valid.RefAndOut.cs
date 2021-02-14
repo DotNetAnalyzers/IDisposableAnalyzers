@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -200,7 +200,10 @@ namespace N
                 stream.Dispose();
                 return true;
             }
-
+            else
+            {
+                stream.Dispose();
+            }
             return false;
         }
 
@@ -453,6 +456,10 @@ namespace N
         public C()
         {
             if (TryGetStream(out var stream))
+            {
+                stream.Dispose();
+            }
+            else
             {
                 stream.Dispose();
             }

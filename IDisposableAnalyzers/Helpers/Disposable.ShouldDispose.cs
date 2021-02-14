@@ -1,15 +1,17 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
+    using Microsoft.CodeAnalysis.CSharp.Syntax;
 
     internal static partial class Disposable
     {
         internal static bool ShouldDispose(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            if (localOrParameter.Symbol is IParameterSymbol parameter &&
-                parameter.RefKind != RefKind.None)
+            if (localOrParameter.Symbol is IParameterSymbol { RefKind: not RefKind.None })
             {
                 return false;
             }
@@ -23,33 +25,61 @@
             using var walker = UsagesWalker.Borrow(localOrParameter, semanticModel, cancellationToken);
             foreach (var usage in walker.Usages)
             {
-                if (Returns(usage, recursion))
+                if (ShouldNotDispose(usage, recursion))
                 {
-                    return false;
-                }
+                    if (usage.FirstAncestor<IfStatementSyntax>() is { Statement: { } statement } &&
+                        usage.FirstAncestor<MemberDeclarationSyntax>() is { } member &&
+                        statement.Contains(usage))
+                    {
+                        // check that other branch is handled.
+                        foreach (var other in walker.Usages)
+                        {
+                            if (member.Contains(other) &&
+                                other.SpanStart > statement.Span.End &&
+                                ShouldNotDispose(other, recursion))
+                            {
+                                return false;
+                            }
+                        }
 
-                if (Assigns(usage, recursion, out _))
-                {
-                    return false;
-                }
+                        return true;
+                    }
 
-                if (Stores(usage, recursion, out _))
-                {
-                    return false;
-                }
-
-                if (Disposes(usage, recursion))
-                {
-                    return false;
-                }
-
-                if (DisposedByReturnValue(usage, recursion, out _))
-                {
                     return false;
                 }
             }
 
             return true;
+
+            static bool ShouldNotDispose(IdentifierNameSyntax usage, Recursion recursion)
+            {
+                if (Returns(usage, recursion))
+                {
+                    return true;
+                }
+
+                if (Assigns(usage, recursion, out _))
+                {
+                    return true;
+                }
+
+                if (Stores(usage, recursion, out _))
+                {
+                    return true;
+                }
+
+                if (Disposes(usage, recursion))
+                {
+                    return true;
+                }
+
+                if (DisposedByReturnValue(usage, recursion, out _))
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }

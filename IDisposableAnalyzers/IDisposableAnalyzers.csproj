@@ -26,12 +26,14 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.9</Version>
+    <Version>3.4.10</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      3.4.10
+      BUGFIX: Handle using in loop
       3.4.9
       BUGFIX: IDISP023 Allow touching static reference types.
       BUGFIX: AD0001: Analyzer 'IDisposableAnalyzers.LocalDeclarationAnalyzer

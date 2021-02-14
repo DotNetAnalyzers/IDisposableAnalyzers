@@ -423,6 +423,8 @@ namespace N
                 {
                 }
             }
+
+            stream?.Dispose();
         }
 
         private static bool TryGetStream(out Stream stream)
@@ -452,6 +454,10 @@ namespace N
                 using (stream)
                 {
                 }
+            }
+            else
+            {
+                stream?.Dispose();
             }
         }
 
@@ -674,6 +680,62 @@ namespace N
 }".AssertReplace("Activator.CreateInstance<StringBuilder>()", expression);
 
             RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
+
+        [Test]
+        public static void ReturningIfTrueItemReturnNullAfter()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            var item = new MemoryStream();
+            if (condition)
+            {
+                return item;
+            }
+
+            item.Dispose();
+            return null;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ReturningIfTrueItemElseNull()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            var item = new MemoryStream();
+            if (condition)
+            {
+                return item;
+            }
+            else
+            {
+                item.Dispose();
+                return null;
+            }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

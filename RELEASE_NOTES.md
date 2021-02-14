@@ -1,3 +1,6 @@
+#### 3.4.10
+* BUGFIX: Handle using in loop
+
 #### 3.4.9
 * BUGFIX: IDISP023 Allow touching static reference types.
 * BUGFIX: AD0001: Analyzer 'IDisposableAnalyzers.LocalDeclarationAnalyzer
