@@ -28,21 +28,38 @@
                 if (ShouldNotDispose(usage, recursion))
                 {
                     if (usage.FirstAncestor<IfStatementSyntax>() is { Statement: { } statement } &&
-                        usage.FirstAncestor<MemberDeclarationSyntax>() is { } member &&
-                        statement.Contains(usage))
+                        usage.FirstAncestor<MemberDeclarationSyntax>() is { } member)
                     {
-                        // check that other branch is handled.
-                        foreach (var other in walker.Usages)
+                        if (statement.Contains(usage))
                         {
-                            if (member.Contains(other) &&
-                                other.SpanStart > statement.Span.End &&
-                                ShouldNotDispose(other, recursion))
+                            // check that other branch is handled.
+                            foreach (var other in walker.Usages)
                             {
-                                return false;
+                                if (member.Contains(other) &&
+                                    other.SpanStart > statement.Span.End &&
+                                    ShouldNotDispose(other, recursion))
+                                {
+                                    return false;
+                                }
                             }
+
+                            return true;
                         }
 
-                        return true;
+                        if (!statement.Contains(usage))
+                        {
+                            // check that other branch is handled.
+                            foreach (var other in walker.Usages)
+                            {
+                                if (statement.Contains(other) &&
+                                    ShouldNotDispose(other, recursion))
+                                {
+                                    return false;
+                                }
+                            }
+
+                            return true;
+                        }
                     }
 
                     return false;

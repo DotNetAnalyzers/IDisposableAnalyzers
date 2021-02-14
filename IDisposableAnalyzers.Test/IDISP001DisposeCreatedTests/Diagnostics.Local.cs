@@ -390,6 +390,34 @@ namespace N
 }";
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
+
+            [Test]
+            public static void ReturningIfTrueReturnNullElseReturnItem()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            ↓var item = new MemoryStream();
+            if (condition)
+            {
+                return null;
+            }
+            else
+            {
+                return item;
+            }
+        }
+    }
+}";
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+            }
         }
     }
 }

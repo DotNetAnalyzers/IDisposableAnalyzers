@@ -737,5 +737,60 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void ReturningIfTrueReturnNullReturnItemAfter()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            var item = new MemoryStream();
+            if (condition)
+            {
+                item.Dispose();
+                return null;                
+            }
+
+            return item;
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ReturningIfTrueReturnNullElseReturItem()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    sealed class C
+    {
+        MemoryStream M(bool condition)
+        {
+            var item = new MemoryStream();
+            if (condition)
+            {
+                item.Dispose();
+                return null;
+            }
+            else
+            {
+                return item;
+            }
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
