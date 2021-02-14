@@ -34,7 +34,7 @@
     <PackageReference Include="Gu.Analyzers" Version="1.8.4" PrivateAssets="all" />
     <PackageReference Include="Gu.Inject" Version="0.3.9" />
     <PackageReference Include="Gu.Inject.Rebind" Version="0.3.9" />
-    <PackageReference Include="Gu.Reactive" Version="4.3.0" />
+    <PackageReference Include="Gu.Wpf.Reactive" Version="4.3.0" />
     <PackageReference Include="Gu.Roslyn.Asserts" Version="3.3.2" />
     <PackageReference Include="Gu.Roslyn.Asserts.Analyzers" Version="3.3.1" PrivateAssets="all" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="3.7.0" />

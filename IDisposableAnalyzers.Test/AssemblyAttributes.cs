@@ -10,6 +10,7 @@ using Gu.Roslyn.Asserts;
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Linq.Observable))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Disposables.DisposableMixins))]
 [assembly: TransitiveMetadataReferences(typeof(System.Data.Entity.DbContext))]
+[assembly: TransitiveMetadataReferences(typeof(Gu.Wpf.Reactive.ConditionRelayCommand))]
 [assembly: MetadataReferences(
     typeof(System.Net.WebClient),
     typeof(System.Net.Mail.Attachment),
@@ -19,5 +20,4 @@ using Gu.Roslyn.Asserts;
     typeof(Moq.Mock<>),
     typeof(Ninject.StandardKernel),
     typeof(Gu.Inject.Kernel),
-    typeof(Gu.Inject.RebindExtensions),
-    typeof(Gu.Reactive.SerialDisposable<>))]
+    typeof(Gu.Inject.RebindExtensions))]
