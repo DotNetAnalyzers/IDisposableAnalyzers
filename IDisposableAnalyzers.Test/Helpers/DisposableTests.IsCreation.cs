@@ -374,6 +374,35 @@ namespace N
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
             }
 
+            [TestCase("Control.FromHandle(IntPtr.Zero)",      false)]
+            [TestCase("Control.FromChildHandle(IntPtr.Zero)", false)]
+            [TestCase("form.FindForm()",                   false)]
+            public static void Winforms(string expression, bool expected)
+            {
+                var code = @"
+namespace ValidCode
+{
+    using System;
+    using System.Windows.Forms;
+
+    public class C
+    {
+        public void M(Form form)
+        {
+            var a = Control.FromHandle(IntPtr.Zero);
+        }
+    }
+}".AssertReplace("Control.FromHandle(IntPtr.Zero)", expression);
+
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation =
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindEqualsValueClause(expression)
+                                      .Value;
+                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+            }
+
             [Test]
             public static void CompositeDisposableExtAddAndReturn()
             {

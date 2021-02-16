@@ -232,6 +232,8 @@
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: false } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
+                    IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromHandle" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromChildHandle" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => false,
@@ -297,6 +299,11 @@
                         method.Name.StartsWith("Create", StringComparison.Ordinal))
                     {
                         return true;
+                    }
+
+                    if (method.Name.StartsWith("Find",   StringComparison.Ordinal))
+                    {
+                        return false;
                     }
 
                     if (TypeSymbolComparer.Equal(method.ContainingType, method.ReturnType))
