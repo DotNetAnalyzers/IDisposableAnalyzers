@@ -1,4 +1,5 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode
 {
     using System;
 
@@ -18,9 +19,14 @@
             this.disposable = new Disposable();
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            this.disposable.Dispose();
+            if (disposing)
+            {
+                this.disposable.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
