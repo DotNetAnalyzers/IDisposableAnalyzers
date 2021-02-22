@@ -1,3 +1,6 @@
+* BUGFIX IDISP001 when if statement.
+* BUGFIX IDISP004 when chained leave open.
+
 #### 3.4.10
 * BUGFIX: Handle using in loop
 
