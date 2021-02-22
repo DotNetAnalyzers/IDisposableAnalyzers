@@ -2,7 +2,9 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -147,6 +149,12 @@
         {
             switch (target.Symbol)
             {
+                case IParameterSymbol { ContainingSymbol: IMethodSymbol method }
+                    when method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                         target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
+                         parent.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
+                         leaveOpenArgument.Expression is LiteralExpressionSyntax literal:
+                    return !literal.IsKind(SyntaxKind.TrueLiteralExpression);
                 case IMethodSymbol { ReturnsVoid: true }:
                 case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
                     return false;

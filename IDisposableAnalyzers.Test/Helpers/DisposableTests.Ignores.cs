@@ -821,6 +821,44 @@ namespace N
                 var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
+
+            [TestCase("leaveOpen: false", false)]
+            [TestCase("leaveOpen: true", true)]
+            public static void AsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using Gu.Reactive;
+
+    public static class C
+    {
+        public static ReadOnlyFilteredView<T> M<T>(
+            this IObservable<IEnumerable<T>> source,
+            Func<T, bool> filter)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (filter is null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            return source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
+        }
+    }
+}".AssertReplace("leaveOpen: false", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+                Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

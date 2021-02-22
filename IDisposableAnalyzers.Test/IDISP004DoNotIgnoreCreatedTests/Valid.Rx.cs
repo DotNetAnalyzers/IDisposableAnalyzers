@@ -329,7 +329,7 @@ namespace N
         public static void ObservableElvisSubscribeIssue221()
         {
             var code = @"
-namespace ValidCode
+namespace N
 {
     using System;
     using System.Reactive.Linq;
@@ -362,6 +362,41 @@ namespace ValidCode
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void AsReadOnlyViewAsReadOnlyFilteredView()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using Gu.Reactive;
+
+    public static class C
+    {
+        public static ReadOnlyFilteredView<T> M<T>(
+            this IObservable<IEnumerable<T>> source,
+            Func<T, bool> filter)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (filter is null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            return source.AsReadOnlyView()
+                         .AsReadOnlyFilteredView(filter, leaveOpen: false);
         }
     }
 }";
