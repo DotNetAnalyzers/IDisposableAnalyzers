@@ -67,5 +67,30 @@ namespace ValidCode.Rx
                     }
                 });
         }
+
+        public static IObservable<EventArgs> ObservableCreateCompositeDisposable(bool b)
+        {
+            if (b)
+            {
+                return Observable.Create<EventArgs>(
+                    o =>
+                    {
+                        var tracker = new ValidCode.Disposable();
+                        Console.CancelKeyPress += Handler;
+                        return new CompositeDisposable(2)
+                        {
+                            tracker,
+                            Disposable.Create(() => Console.CancelKeyPress -= Handler),
+                        };
+
+                        void Handler(object sender, EventArgs e)
+                        {
+                            o.OnNext(e);
+                        }
+                    });
+            }
+
+            return Observable.Empty<EventArgs>();
+        }
     }
 }

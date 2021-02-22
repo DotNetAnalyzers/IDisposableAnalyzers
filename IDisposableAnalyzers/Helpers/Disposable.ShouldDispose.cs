@@ -27,15 +27,16 @@
             {
                 if (ShouldNotDispose(usage, recursion))
                 {
-                    if (usage.FirstAncestor<IfStatementSyntax>() is { Statement: { } statement } &&
-                        usage.FirstAncestor<MemberDeclarationSyntax>() is { } member)
+                    if (Scope() is { } scope &&
+                        usage.FirstAncestor<IfStatementSyntax>() is { Statement: { } statement } ifStatement &&
+                        scope.Contains(ifStatement))
                     {
                         if (statement.Contains(usage))
                         {
                             // check that other branch is handled.
                             foreach (var other in walker.Usages)
                             {
-                                if (member.Contains(other) &&
+                                if (scope.Contains(other) &&
                                     other.SpanStart > statement.Span.End &&
                                     ShouldNotDispose(other, recursion))
                                 {
@@ -67,6 +68,17 @@
             }
 
             return true;
+
+            SyntaxNode? Scope()
+            {
+                return localOrParameter.Symbol switch
+                {
+                    IParameterSymbol { ContainingSymbol: { DeclaringSyntaxReferences: { Length: 1 } references } }
+                        => references[0].GetSyntax(cancellationToken),
+                    ILocalSymbol { DeclaringSyntaxReferences: { Length: 1 } references }
+                        => references[0].GetSyntax(cancellationToken).FirstAncestor<BlockSyntax>(),
+                };
+            }
 
             static bool ShouldNotDispose(IdentifierNameSyntax usage, Recursion recursion)
             {

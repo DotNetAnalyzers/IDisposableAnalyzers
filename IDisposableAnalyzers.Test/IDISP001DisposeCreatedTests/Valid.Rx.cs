@@ -320,5 +320,47 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void ObservableCreateReturnsCompositeDisposable()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Reactive.Disposables;
+    using System.Reactive.Linq;
+
+    public static class C
+    {
+        public static IObservable<EventArgs> M(bool b)
+        {
+            if (b)
+            {
+                return Observable.Create<EventArgs>(
+                    o =>
+                    {
+                        var tracker = new MemoryStream();
+                        Console.CancelKeyPress += Handler;
+                        return new CompositeDisposable(2)
+                        {
+                            tracker,
+                            Disposable.Create(() => Console.CancelKeyPress -= Handler),
+                        };
+
+                        void Handler(object sender, EventArgs e)
+                        {
+                            o.OnNext(e);
+                        }
+                    });
+            }
+
+            return Observable.Empty<EventArgs>();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
