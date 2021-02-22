@@ -824,7 +824,7 @@ namespace N
 
             [TestCase("leaveOpen: false", false)]
             [TestCase("leaveOpen: true", true)]
-            public static void AsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
+            public static void ReturnAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
             {
                 var code = @"
 namespace N
@@ -839,17 +839,66 @@ namespace N
             this IObservable<IEnumerable<T>> source,
             Func<T, bool> filter)
         {
-            if (source is null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (filter is null)
-            {
-                throw new ArgumentNullException(nameof(filter));
-            }
-
             return source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
+        }
+    }
+}".AssertReplace("leaveOpen: false", expression);
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+                Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public static void UsingAsReadOnlyViewAsReadOnlyFilteredView()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using Gu.Reactive;
+
+    public static class C
+    {
+        public static void M<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
+        {
+            using var view = source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("leaveOpen: false", false)]
+            [TestCase("leaveOpen: true",  true)]
+            public static void AssignAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using Gu.Reactive;
+
+    public sealed class UsingGuReactive : IDisposable
+    {
+        private readonly IReadOnlyView<int> view;
+
+        public UsingGuReactive(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+        {
+          this.view = source.AsReadOnlyView()
+                            .AsReadOnlyFilteredView(filter, leaveOpen: false);
+        }
+
+        public void Dispose()
+        {
+            this.view.Dispose();
         }
     }
 }".AssertReplace("leaveOpen: false", expression);

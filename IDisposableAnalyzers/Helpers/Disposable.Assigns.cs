@@ -71,6 +71,9 @@
                 => recursion.Target(argument) is { } target &&
                    Assigns(target, recursion, out fieldOrProperty) &&
                    recursion.ContainingType.IsAssignableTo(fieldOrProperty.Symbol.ContainingType, recursion.SemanticModel.Compilation),
+                { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
+                    when DisposedByReturnValue(invocation, recursion, out _)
+                    => Assigns(invocation, recursion, out fieldOrProperty),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                 => recursion.Target(variableDeclarator) is { } target &&
                    Assigns(target, recursion, out fieldOrProperty),
