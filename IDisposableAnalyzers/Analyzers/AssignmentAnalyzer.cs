@@ -68,69 +68,68 @@
                 return false;
             }
 
-            if (!Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol) ||
-                assignedSymbol is null)
+            if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol))
             {
-                return false;
-            }
-
-            if (assignedSymbol == KnownSymbols.SerialDisposable.Disposable ||
-                assignedSymbol == KnownSymbols.SingleAssignmentDisposable.Disposable ||
-                assignedSymbol is IDiscardSymbol)
-            {
-                return false;
-            }
-
-            if (Disposable.IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
-            {
-                return false;
-            }
-
-            if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty))
-            {
-                if (context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
-                    InitializeAndCleanup.IsAssignedAndDisposed(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
+                if (assignedSymbol == KnownSymbols.SerialDisposable.Disposable ||
+                    assignedSymbol == KnownSymbols.SingleAssignmentDisposable.Disposable ||
+                    assignedSymbol is IDiscardSymbol)
                 {
                     return false;
                 }
 
-                if (Disposable.IsAssignedWithInjected(fieldOrProperty.Symbol, assignment, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
                 {
                     return false;
                 }
-            }
 
-            if (IsNullChecked(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
-            {
-                return false;
-            }
-
-            if (AssignedLocal() is { } local &&
-                Disposable.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
-            {
-                return false;
-            }
-
-            return true;
-
-            ILocalSymbol? AssignedLocal()
-            {
-                if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
+                if (FieldOrProperty.TryCreate(assignedSymbol, out var fieldOrProperty))
                 {
-                    using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
-                    return walker.VariableDeclarators.TrySingle(
-                                x => x is { Initializer: { Value: { } value } } &&
-                                                      context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
-                                                      SymbolComparer.Equal(symbol, assignedSymbol),
-                                out var match) &&
-                            match.Initializer?.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
-                            context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out ILocalSymbol? result)
-                            ? result
-                            : null;
+                    if (context.Node.FirstAncestor<TypeDeclarationSyntax>() is { } containingType &&
+                        InitializeAndCleanup.IsAssignedAndDisposed(fieldOrProperty, containingType, context.SemanticModel, context.CancellationToken))
+                    {
+                        return false;
+                    }
+
+                    if (Disposable.IsAssignedWithInjected(fieldOrProperty.Symbol, assignment, context.SemanticModel, context.CancellationToken))
+                    {
+                        return false;
+                    }
                 }
 
-                return null;
+                if (IsNullChecked(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
+                {
+                    return false;
+                }
+
+                if (AssignedLocal() is { } local &&
+                    Disposable.DisposesAfter(local, assignment, context.SemanticModel, context.CancellationToken))
+                {
+                    return false;
+                }
+
+                return true;
+
+                ILocalSymbol? AssignedLocal()
+                {
+                    if (assignment.TryFirstAncestor(out MemberDeclarationSyntax? memberDeclaration))
+                    {
+                        using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
+                        return walker.VariableDeclarators.TrySingle(
+                                    x => x is { Initializer: { Value: { } value } } &&
+                                                          context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
+                                                          SymbolComparer.Equal(symbol, assignedSymbol),
+                                    out var match) &&
+                                match.Initializer?.Value.IsExecutedBefore(assignment) == ExecutedBefore.Yes &&
+                                context.SemanticModel.TryGetSymbol(match, context.CancellationToken, out ILocalSymbol? result)
+                                ? result
+                                : null;
+                    }
+
+                    return null;
+                }
             }
+
+            return false;
         }
 
         private static bool IsNullChecked(ISymbol symbol, SyntaxNode context, SemanticModel semanticModel, CancellationToken cancellationToken)

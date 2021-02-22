@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Immutable;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
@@ -12,7 +13,7 @@
 
     internal static partial class Disposable
     {
-        internal static bool IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, out ISymbol? assignedSymbol)
+        internal static bool IsAlreadyAssignedWithCreated(ExpressionSyntax disposable, SemanticModel semanticModel, CancellationToken cancellationToken, [NotNullWhen(true)] out ISymbol? assignedSymbol)
         {
             if (!IsPotentiallyAssignableFrom(disposable, semanticModel, cancellationToken))
             {
@@ -301,7 +302,7 @@
                         return true;
                     }
 
-                    if (method.Name.StartsWith("Find",   StringComparison.Ordinal))
+                    if (method.Name.StartsWith("Find", StringComparison.Ordinal))
                     {
                         return false;
                     }
