@@ -26,12 +26,13 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.10</Version>
+    <Version>3.4.11</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      BUGFIX IDISP023 handle trivial and.
       BUGFIX IDISP023 when chained constructors
       BUGFIX IDISP001 when if statement.
       BUGFIX IDISP004 when chained leave open.
