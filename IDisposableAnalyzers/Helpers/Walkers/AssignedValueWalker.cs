@@ -482,8 +482,8 @@
                     }
                 }
 
-                if ((this.CurrentSymbol is IFieldSymbol { IsReadOnly: false }) ||
-                    (this.CurrentSymbol is IPropertySymbol { IsReadOnly: false }))
+                if (this.CurrentSymbol is IFieldSymbol { IsReadOnly: false } ||
+                    this.CurrentSymbol is IPropertySymbol { IsReadOnly: false })
                 {
                     if (Scope(this.context.Node) is { } scope &&
                         !(scope is ConstructorDeclarationSyntax))
