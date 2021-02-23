@@ -24,7 +24,49 @@ namespace N
 }";
 
             [Test]
-            public static void TouchingReferenceTypeInIfBlock()
+            public static void TouchingInstanceReferenceTypeInIfBlock()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Text;
+
+    public sealed class C : IDisposable
+    {
+        private readonly StringBuilder builder = new StringBuilder();
+
+        private bool isDisposed = false;
+
+        ~C()
+        {
+            this.Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            this.Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (!this.isDisposed)
+            {
+                this.isDisposed = true;
+                if (disposing)
+                {
+                    this.builder.Clear();
+                }
+            }
+        }
+    }
+}";
+                RoslynAssert.Valid(Analyzer, code);
+            }
+
+            [Test]
+            public static void TouchingStaticReferenceTypeInIfBlock()
             {
                 var code = @"
 namespace N
@@ -56,7 +98,7 @@ namespace N
                 this.isDisposed = true;
                 if (disposing)
                 {
-                    Builder.Append(1);
+                    Builder.Clear();
                 }
             }
         }
