@@ -9,18 +9,6 @@
 
     internal static class Await
     {
-        internal static InvocationExpressionSyntax? FindAwaitedInvocation(AwaitExpressionSyntax awaitExpression)
-        {
-            return awaitExpression switch
-            {
-                { Expression: InvocationExpressionSyntax invocation }
-                    when ConfigureAwait(invocation) is InvocationExpressionSyntax result
-                    => result,
-                { Expression: InvocationExpressionSyntax invocation } => invocation,
-                _ => null,
-            };
-        }
-
         internal static ExpressionSyntax? TaskFromResult(InvocationExpressionSyntax invocation, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
             if (ConfigureAwait(invocation) is { } inner)
