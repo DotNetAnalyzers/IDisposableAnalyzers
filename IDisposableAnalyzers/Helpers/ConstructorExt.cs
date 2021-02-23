@@ -1,7 +1,5 @@
 ﻿namespace IDisposableAnalyzers
 {
-    using System.Threading;
-
     using Gu.Roslyn.AnalyzerExtensions;
 
     using Microsoft.CodeAnalysis;
@@ -9,20 +7,19 @@
 
     internal static class ConstructorExt
     {
-        internal static bool Initializes(this ConstructorDeclarationSyntax candidate, IMethodSymbol target, SemanticModel semanticModel, CancellationToken cancellationToken)
+        internal static bool Initializes(this ConstructorDeclarationSyntax candidate, IMethodSymbol target, Recursion recursion)
         {
             if (candidate.Initializer is { } initializer &&
-                semanticModel.TryGetSymbol(initializer, cancellationToken, out var initialized))
+                recursion.Target(initializer) is { Symbol: { } initialized, Declaration: { } recursive })
             {
                 if (MethodSymbolComparer.Equal(initialized, target))
                 {
                     return true;
                 }
 
-                if (initialized.ContainingType.IsAssignableTo(target.ContainingType, semanticModel.Compilation) &&
-                    initialized.TrySingleDeclaration<ConstructorDeclarationSyntax>(cancellationToken, out var recursive))
+                if (initialized.ContainingType.IsAssignableTo(target.ContainingType, recursion.SemanticModel.Compilation))
                 {
-                    return Initializes(recursive, target, semanticModel, cancellationToken);
+                    return Initializes(recursive, target, recursion);
                 }
             }
 

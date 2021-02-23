@@ -423,8 +423,8 @@
                 this.Visit(parameterScope);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
-                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? containingType) &&
-                     this.semanticModel.TryGetSymbol(containingType, this.cancellationToken, out var type))
+                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? containingTypeDeclaration) &&
+                     this.semanticModel.GetNamedType(containingTypeDeclaration, this.cancellationToken) is { } containingType)
             {
                 if (this.CurrentSymbol is IFieldSymbol &&
                     this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax? fieldDeclarationSyntax))
@@ -444,15 +444,16 @@
                     if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList &&
                         this.semanticModel.TryGetSymbol(contextCtor, this.cancellationToken, out var contextCtorSymbol))
                     {
-                        using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
+                        using var ctorWalker = ConstructorsWalker.Borrow(containingTypeDeclaration, this.semanticModel, this.cancellationToken);
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
                             this.ctorArgWalker.Visit(creation);
                         }
 
+                        using var recursion = Recursion.Borrow(containingType, this.semanticModel, this.cancellationToken);
                         foreach (var ctor in ctorWalker.NonPrivateCtors)
                         {
-                            if (ctor.Initializes(contextCtorSymbol, this.semanticModel, this.cancellationToken))
+                            if (ctor.Initializes(contextCtorSymbol, recursion))
                             {
                                 this.ctorArgWalker.Visit(ctor);
                             }
@@ -470,7 +471,7 @@
                 }
                 else
                 {
-                    using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
+                    using var ctorWalker = ConstructorsWalker.Borrow(containingTypeDeclaration, this.semanticModel, this.cancellationToken);
                     foreach (var creation in ctorWalker.ObjectCreations)
                     {
                         if (this.semanticModel.GetSymbolSafe(creation, this.cancellationToken) is { } method)
@@ -493,15 +494,15 @@
                     if (Scope(this.context.Node) is { } scope &&
                         !(scope is ConstructorDeclarationSyntax))
                     {
-                        while (type != null &&
-                               type.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
+                        while (containingType != null &&
+                               containingType.IsAssignableTo(this.CurrentSymbol.ContainingType, this.semanticModel.Compilation))
                         {
-                            foreach (var reference in type.DeclaringSyntaxReferences)
+                            foreach (var reference in containingType.DeclaringSyntaxReferences)
                             {
                                 this.publicMemberWalker.Visit((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken));
                             }
 
-                            type = type.BaseType;
+                            containingType = containingType.BaseType;
                         }
                     }
                 }
