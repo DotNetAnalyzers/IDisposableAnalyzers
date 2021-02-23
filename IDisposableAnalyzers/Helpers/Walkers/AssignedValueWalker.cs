@@ -441,7 +441,8 @@
                 if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                 {
                     this.Visit(contextCtor);
-                    if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList)
+                    if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList &&
+                        this.semanticModel.TryGetSymbol(contextCtor, this.cancellationToken, out var contextCtorSymbol))
                     {
                         using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
                         foreach (var creation in ctorWalker.ObjectCreations)
@@ -451,7 +452,10 @@
 
                         foreach (var ctor in ctorWalker.NonPrivateCtors)
                         {
-                            this.ctorArgWalker.Visit(ctor);
+                            if (ctor.Initializes(contextCtorSymbol, this.semanticModel, this.cancellationToken))
+                            {
+                                this.ctorArgWalker.Visit(ctor);
+                            }
                         }
 
                         if (contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
@@ -469,11 +473,12 @@
                     using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
                     foreach (var creation in ctorWalker.ObjectCreations)
                     {
-                        this.VisitObjectCreationExpression(creation);
                         if (this.semanticModel.GetSymbolSafe(creation, this.cancellationToken) is { } method)
                         {
                             this.HandleInvoke(method, creation.ArgumentList);
                         }
+
+                        this.VisitObjectCreationExpression(creation);
                     }
 
                     foreach (var ctor in ctorWalker.NonPrivateCtors)

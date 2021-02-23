@@ -1,3 +1,4 @@
+* BUGFIX IDISP023 when chained constructors
 * BUGFIX IDISP001 when if statement.
 * BUGFIX IDISP004 when chained leave open.
 

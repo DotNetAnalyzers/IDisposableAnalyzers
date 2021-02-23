@@ -1639,6 +1639,43 @@ namespace N
         }
 
         [Test]
+        public static void ThreeChainedConstructors()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+
+    public sealed class C : IDisposable
+    {
+        private readonly Disposable disposable;
+
+        public C(int x, int y)
+            : this(x + y)
+        {
+        }
+
+        public C(int x)
+        {
+            this.disposable = new Disposable();
+        }
+
+        public C(string x)
+        {
+            this.disposable = new Disposable();
+        }
+
+        public void Dispose()
+        {
+            this.disposable.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
+
+        [Test]
         public static void TwoChainedBaseConstructors()
         {
             var baseClass = @"

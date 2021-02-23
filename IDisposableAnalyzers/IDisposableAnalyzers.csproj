@@ -32,6 +32,7 @@
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      BUGFIX IDISP023 when chained constructors
       BUGFIX IDISP001 when if statement.
       BUGFIX IDISP004 when chained leave open.
       3.4.10
