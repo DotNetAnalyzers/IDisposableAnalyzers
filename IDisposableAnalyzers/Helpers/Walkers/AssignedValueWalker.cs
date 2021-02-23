@@ -423,8 +423,8 @@
                 this.Visit(parameterScope);
             }
             else if (this.CurrentSymbol.IsEitherKind(SymbolKind.Field, SymbolKind.Property) &&
-                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? typeDeclaration) &&
-                     this.semanticModel.TryGetSymbol(typeDeclaration, this.cancellationToken, out var type))
+                     this.context.Node.TryFirstAncestorOrSelf(out TypeDeclarationSyntax? containingType) &&
+                     this.semanticModel.TryGetSymbol(containingType, this.cancellationToken, out var type))
             {
                 if (this.CurrentSymbol is IFieldSymbol &&
                     this.CurrentSymbol.TrySingleDeclaration(this.cancellationToken, out FieldDeclarationSyntax? fieldDeclarationSyntax))
@@ -438,50 +438,47 @@
                     this.values.Add(propertyDeclaration.Initializer.Value);
                 }
 
-                foreach (var reference in type.DeclaringSyntaxReferences)
+                if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                 {
-                    if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
+                    this.Visit(contextCtor);
+                    if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList)
                     {
-                        this.Visit(contextCtor);
-                        if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList)
-                        {
-                            using var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken);
-                            foreach (var creation in ctorWalker.ObjectCreations)
-                            {
-                                this.ctorArgWalker.Visit(creation);
-                            }
-
-                            foreach (var ctor in ctorWalker.NonPrivateCtors)
-                            {
-                                this.ctorArgWalker.Visit(ctor);
-                            }
-
-                            if (contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                            {
-                                this.values.RemoveAll(
-                                    x => x is IdentifierNameSyntax identifierName &&
-                                         x.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var ctor) &&
-                                         ctor == contextCtor &&
-                                         parameterList.TryFind(identifierName.Identifier.ValueText, out _));
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken);
+                        using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
-                            this.VisitObjectCreationExpression(creation);
-                            if (this.semanticModel.GetSymbolSafe(creation, this.cancellationToken) is { } method)
-                            {
-                                this.HandleInvoke(method, creation.ArgumentList);
-                            }
+                            this.ctorArgWalker.Visit(creation);
                         }
 
                         foreach (var ctor in ctorWalker.NonPrivateCtors)
                         {
-                            this.Visit(ctor);
+                            this.ctorArgWalker.Visit(ctor);
                         }
+
+                        if (contextCtor.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                        {
+                            this.values.RemoveAll(
+                                x => x is IdentifierNameSyntax identifierName &&
+                                     x.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var ctor) &&
+                                     ctor == contextCtor &&
+                                     parameterList.TryFind(identifierName.Identifier.ValueText, out _));
+                        }
+                    }
+                }
+                else
+                {
+                    using var ctorWalker = ConstructorsWalker.Borrow(containingType, this.semanticModel, this.cancellationToken);
+                    foreach (var creation in ctorWalker.ObjectCreations)
+                    {
+                        this.VisitObjectCreationExpression(creation);
+                        if (this.semanticModel.GetSymbolSafe(creation, this.cancellationToken) is { } method)
+                        {
+                            this.HandleInvoke(method, creation.ArgumentList);
+                        }
+                    }
+
+                    foreach (var ctor in ctorWalker.NonPrivateCtors)
+                    {
+                        this.Visit(ctor);
                     }
                 }
 
