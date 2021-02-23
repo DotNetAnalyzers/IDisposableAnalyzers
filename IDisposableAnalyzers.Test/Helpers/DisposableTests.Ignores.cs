@@ -908,6 +908,32 @@ namespace N
                 var value = syntaxTree.FindInvocation("AsReadOnlyView()");
                 Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
+
+            [Test]
+            public static void ReturnAsReadOnlyFilteredViewwAsMappingView()
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using Gu.Reactive;
+
+    public static class C
+    {
+        public static IReadOnlyView<IDisposable> M2(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+        {
+            return source.AsReadOnlyFilteredView(filter).AsMappingView(x => new MemoryStream(), onRemove:x => x.Dispose());
+        }
+    }
+}";
+                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindInvocation("AsReadOnlyFilteredView(filter)");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

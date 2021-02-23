@@ -403,5 +403,38 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void AsReadOnlyFilteredViewAsMappingView()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using Gu.Reactive;
+
+    public static class C
+    {
+        public static IReadOnlyView<IDisposable> M2(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+        {
+            if (source is null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (filter is null)
+            {
+                throw new ArgumentNullException(nameof(filter));
+            }
+
+            return source.AsReadOnlyFilteredView(filter).AsMappingView(x => new MemoryStream(), onRemove:x => x.Dispose());
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

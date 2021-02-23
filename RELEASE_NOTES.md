@@ -1,3 +1,4 @@
+* BUGFIX: When leaveOpen has default value
 #### 3.4.11
 * BUGFIX IDISP023 handle trivial and.
 * BUGFIX IDISP023 when chained constructors

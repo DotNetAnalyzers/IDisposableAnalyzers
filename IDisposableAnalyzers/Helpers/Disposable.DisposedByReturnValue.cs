@@ -150,11 +150,8 @@
             switch (target.Symbol)
             {
                 case IParameterSymbol { ContainingSymbol: IMethodSymbol method }
-                    when method.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                         target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
-                         parent.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                         leaveOpenArgument.Expression is LiteralExpressionSyntax literal:
-                    return !literal.IsKind(SyntaxKind.TrueLiteralExpression);
+                    when method.TryFindParameter("leaveOpen", out var leaveOpenParameter):
+                    return !LeavesOpen(leaveOpenParameter);
                 case IMethodSymbol { ReturnsVoid: true }:
                 case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
                     return false;
@@ -191,6 +188,18 @@
             }
 
             return false;
+
+            bool LeavesOpen(IParameterSymbol parameter)
+            {
+                if (target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
+                    parent.TryFindArgument(parameter, out var leaveOpenArgument))
+                {
+                    return leaveOpenArgument.Expression is LiteralExpressionSyntax { Token: { ValueText: "true" } };
+                }
+
+                return parameter.HasExplicitDefaultValue &&
+                       parameter.ExplicitDefaultValue is true;
+            }
         }
     }
 }
