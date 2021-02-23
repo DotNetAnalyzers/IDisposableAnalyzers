@@ -440,13 +440,12 @@
 
                 foreach (var reference in type.DeclaringSyntaxReferences)
                 {
-                    using var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken);
                     if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                     {
                         this.Visit(contextCtor);
-                        if (contextCtor.ParameterList is { Parameters: { } parameters } parameterList &&
-                            parameters.Any())
+                        if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList)
                         {
+                            using var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken);
                             foreach (var creation in ctorWalker.ObjectCreations)
                             {
                                 this.ctorArgWalker.Visit(creation);
@@ -469,6 +468,7 @@
                     }
                     else
                     {
+                        using var ctorWalker = ConstructorsWalker.Borrow((TypeDeclarationSyntax)reference.GetSyntax(this.cancellationToken), this.semanticModel, this.cancellationToken);
                         foreach (var creation in ctorWalker.ObjectCreations)
                         {
                             this.VisitObjectCreationExpression(creation);
