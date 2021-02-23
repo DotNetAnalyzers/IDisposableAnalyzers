@@ -22,7 +22,7 @@
 
         public override void VisitIfStatement(IfStatementSyntax node)
         {
-            if (IsParameter(node.Condition as IdentifierNameSyntax))
+            if (IsParameter(node.Condition))
             {
                 this.Visit(node.Else);
             }
@@ -54,11 +54,17 @@
                 base.VisitIfStatement(node);
             }
 
-            bool IsParameter(IdentifierNameSyntax? id)
+            bool IsParameter(ExpressionSyntax? expression)
             {
-                return id is { } &&
-                       node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
-                       methodDeclaration.TryFindParameter(id.Identifier.Text, out _);
+                return expression switch
+                {
+                    IdentifierNameSyntax { Identifier: { ValueText: { } name } }
+                        => node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
+                           methodDeclaration.TryFindParameter(name, out _),
+                    BinaryExpressionSyntax { Left: { } left, OperatorToken: { ValueText: "&&" }, Right: { } right }
+                        => IsParameter(left) || IsParameter(right),
+                    _ => false,
+                };
             }
         }
 
