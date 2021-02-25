@@ -16,18 +16,20 @@ namespace ValidCode
             var o = kernel.Get(typeof(Disposable));
         }
 
-        public static Kernel CreateKernelReturnExpression()
+        public static Kernel CreateKernelReturnExpression(bool useFiles = false)
         {
             var kernel = Create()
-                .BindDisposable()
+                .BindDisposable1()
+                .BindDisposable2(useFiles)
                 .Rebind<IDisposable, Disposable>();
             return kernel;
         }
 
-        public static Kernel CreateKernelReturnStatements()
+        public static Kernel CreateKernelReturnStatements(bool useFiles = false)
         {
             var kernel = Create()
-                         .BindDisposable();
+                         .BindDisposable1()
+                         .BindDisposable2(useFiles);
             kernel.Rebind<IDisposable, Disposable>();
             return kernel;
         }
@@ -38,7 +40,13 @@ namespace ValidCode
                 .Rebind(disposable);
         }
         
-        private static Kernel BindDisposable(this Kernel container)
+        private static Kernel BindDisposable1(this Kernel container)
+        {
+            container.Bind<IDisposable, Disposable>();
+            return container;
+        }
+
+        private static Kernel BindDisposable2(this Kernel container, bool useFiles = false)
         {
             container.Bind<IDisposable, Disposable>();
             return container;
