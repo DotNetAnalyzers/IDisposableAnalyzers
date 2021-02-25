@@ -3,12 +3,19 @@ namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
-
+    using System.IO;
     using Gu.Reactive;
 
     public sealed class UsingGuReactive : IDisposable
     {
+        private readonly IDisposable disposable;
         private readonly IReadOnlyView<int> view;
+        private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
+
+        public UsingGuReactive(IObservable<int> observable)
+        {
+            this.disposable = observable.Subscribe(x => this.serialDisposable.Disposable = new MemoryStream());
+        }
 
         public UsingGuReactive(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
         {
@@ -54,7 +61,9 @@ namespace ValidCode
 
         public void Dispose()
         {
+            this.disposable?.Dispose();
             this.view.Dispose();
+            this.serialDisposable.Dispose();
         }
     }
 }

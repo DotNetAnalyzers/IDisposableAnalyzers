@@ -436,5 +436,36 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void AssigningGenericSerialDisposable()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    using Gu.Reactive;
+
+    public sealed class C : IDisposable
+    {
+        private readonly IDisposable disposable;
+        private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
+
+        public C(IObservable<int> observable)
+        {
+            this.disposable = observable.Subscribe(x => this.serialDisposable.Disposable = new MemoryStream());
+        }
+
+        public void Dispose()
+        {
+            this.serialDisposable.Dispose();
+        }
+    }
+}";
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

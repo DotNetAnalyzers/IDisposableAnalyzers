@@ -912,7 +912,7 @@ namespace N
             [Test]
             public static void ReturnAsReadOnlyFilteredViewwAsMappingView()
             {
-                var code = @"
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -927,11 +927,42 @@ namespace N
             return source.AsReadOnlyFilteredView(filter).AsMappingView(x => new MemoryStream(), onRemove:x => x.Dispose());
         }
     }
-}";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
+}");
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("AsReadOnlyFilteredView(filter)");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
+            [Test]
+            public static void AssigningGenericSerialDisposable()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    using Gu.Reactive;
+
+    public sealed class C : IDisposable
+    {
+        private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
+
+        public C(IObservable<int> observable)
+        {
+            observable.Subscribe(x => this.serialDisposable.Disposable = new MemoryStream());
+        }
+
+        public void Dispose()
+        {
+            this.serialDisposable.Dispose();
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("new MemoryStream()");
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
         }

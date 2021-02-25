@@ -70,11 +70,13 @@
 
             if (Disposable.IsAlreadyAssignedWithCreated(assignment.Left, context.SemanticModel, context.CancellationToken, out var assignedSymbol))
             {
-                if (assignedSymbol == KnownSymbols.SerialDisposable.Disposable ||
-                    assignedSymbol == KnownSymbols.SingleAssignmentDisposable.Disposable ||
-                    assignedSymbol is IDiscardSymbol)
+                switch (assignedSymbol)
                 {
-                    return false;
+                    case IPropertySymbol { ContainingType: { MetadataName: "SerialDisposable`1" }, MetadataName: "Disposable" }:
+                    case IPropertySymbol { ContainingType: { MetadataName: "SerialDisposable" }, MetadataName: "Disposable" }:
+                    case IPropertySymbol { ContainingType: { MetadataName: "SingleAssignmentDisposable" }, MetadataName: "Disposable" }:
+                    case IDiscardSymbol:
+                        return false;
                 }
 
                 if (Disposable.IsDisposedBefore(assignedSymbol, assignment, context.SemanticModel, context.CancellationToken))
