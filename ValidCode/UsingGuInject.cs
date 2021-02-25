@@ -19,8 +19,8 @@ namespace ValidCode
         public static Kernel CreateKernelReturnExpression(bool useFiles = false)
         {
             var kernel = Create()
-                .BindDisposable1()
-                .BindDisposable2(useFiles)
+                .BindDisposable()
+                .BindLazy(useFiles)
                 .Rebind<IDisposable, Disposable>();
             return kernel;
         }
@@ -28,8 +28,8 @@ namespace ValidCode
         public static Kernel CreateKernelReturnStatements(bool useFiles = false)
         {
             var kernel = Create()
-                         .BindDisposable1()
-                         .BindDisposable2(useFiles);
+                         .BindDisposable()
+                         .BindLazy(useFiles);
             kernel.Rebind<IDisposable, Disposable>();
             return kernel;
         }
@@ -40,15 +40,15 @@ namespace ValidCode
                 .Rebind(disposable);
         }
         
-        private static Kernel BindDisposable1(this Kernel container)
+        private static Kernel BindDisposable(this Kernel container)
         {
             container.Bind<IDisposable, Disposable>();
             return container;
         }
 
-        private static Kernel BindDisposable2(this Kernel container, bool useFiles = false)
+        private static Kernel BindLazy(this Kernel container, bool useFiles = false)
         {
-            container.Bind<IDisposable, Disposable>();
+            container.Bind<Lazy>(c => new Lazy(c.Get<IDisposable>()));
             return container;
         }
 
