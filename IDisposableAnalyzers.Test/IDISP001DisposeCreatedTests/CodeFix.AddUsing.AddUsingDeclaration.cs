@@ -600,7 +600,7 @@ namespace N
             }
 
             [Test]
-            public static void FactoryChainedBinary()
+            public static void CreateRebind()
             {
                 var disposable = @"
 namespace N
