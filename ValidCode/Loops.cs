@@ -2,10 +2,24 @@
 namespace ValidCode
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
 
-    public class Loops
+    public sealed class Loops : IDisposable
     {
+        private readonly List<Disposable> disposables = new List<Disposable>();
+
+        public void Update()
+        {
+            foreach (var disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
+
+            this.disposables.Clear();
+            this.disposables.Add(new Disposable());
+        }
+
         public Stream DisposeBefore(string[] fileNames)
         {
             Stream stream = null;
@@ -99,6 +113,14 @@ namespace ValidCode
             }
 
             stream.Dispose();
+        }
+
+        public void Dispose()
+        {
+            foreach (var disposable in this.disposables)
+            {
+                disposable.Dispose();
+            }
         }
     }
 }
