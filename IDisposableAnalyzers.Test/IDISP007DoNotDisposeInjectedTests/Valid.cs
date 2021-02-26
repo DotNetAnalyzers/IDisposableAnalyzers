@@ -8,7 +8,7 @@
     [TestFixture(typeof(DisposeCallAnalyzer))]
     [TestFixture(typeof(LocalDeclarationAnalyzer))]
     [TestFixture(typeof(UsingStatementAnalyzer))]
-    public static partial class Valid<T>
+    public static class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
         private static readonly T Analyzer = new T();
@@ -812,6 +812,85 @@ namespace N
                 MetadataReferences.FromAttributes().Add(binaryReference));
 
             RoslynAssert.Valid(Analyzer, solution);
+        }
+
+        [Test]
+        public static void FactoryChainedReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var factory = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class Factory
+    {
+        public static Kernel CreateKernel()
+        {
+            return Create().BindDisposable();
+        }
+
+        private static Kernel BindDisposable(this Kernel kernel1)
+        {
+            return kernel1.Bind<IDisposable, Disposable>();
+        }
+
+        private static Kernel Create()
+        {
+            var kernel2 = new Kernel();
+            kernel2.Creating += OnCreating;
+            kernel2.Created += OnCreated;
+            return kernel2;
+        }
+
+        private static void OnCreating(object sender, CreatingEventArgs e)
+        {
+        }
+
+        private static void OnCreated(object sender, CreatedEventArgs e)
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Gu.Inject;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class FixtureStackTests
+    {
+        private Kernel _container;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _container = Factory.CreateKernel();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _container.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, factory, code);
         }
     }
 }
