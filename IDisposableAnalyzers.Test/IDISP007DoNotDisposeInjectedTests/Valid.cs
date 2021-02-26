@@ -873,6 +873,182 @@ namespace N
     using NUnit.Framework;
 
     [TestFixture]
+    public class Tests
+    {
+        private Kernel _container;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _container = Factory.CreateKernel();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _container.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, disposable, factory, code);
+        }
+
+        [Test]
+        public static void NewChainedReturned()
+        {
+            var factory = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class Factory
+    {
+        public static Kernel CreateKernel()
+        {
+            return new Kernel().Id();
+        }
+
+        private static Kernel Id(this Kernel kernel) => kernel;
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Gu.Inject;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class Tests
+    {
+        private Kernel _container;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _container = Factory.CreateKernel();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _container.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, factory, code);
+        }
+
+        [Test]
+        public static void NewChainedLocalReturned()
+        {
+            var factory = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class Factory
+    {
+        public static Kernel CreateKernel()
+        {
+            var kernel = new Kernel().Id();
+            return kernel;
+        }
+
+        private static Kernel Id(this Kernel k) => k;
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Gu.Inject;
+    using NUnit.Framework;
+
+    [TestFixture]
+    public class Tests
+    {
+        private Kernel _container;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _container = Factory.CreateKernel();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            _container.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, factory, code);
+        }
+
+        [Test]
+        public static void FactoryChainedLocalReturned()
+        {
+            var disposable = @"
+namespace N
+{
+    using System;
+
+    public class Disposable : IDisposable
+    {
+        public void Dispose()
+        {
+        }
+    }
+}";
+
+            var factory = @"
+namespace N
+{
+    using System;
+    using Gu.Inject;
+
+    public static class Factory
+    {
+        public static Kernel CreateKernel()
+        {
+            var kernel = Create().BindDisposable();
+            return kernel;
+        }
+
+        private static Kernel BindDisposable(this Kernel kernel1)
+        {
+            kernel1.Bind<IDisposable, Disposable>();
+            return kernel1;
+        }
+
+        private static Kernel Create()
+        {
+            var kernel2 = new Kernel();
+            kernel2.Creating += OnCreating;
+            kernel2.Created += OnCreated;
+            return kernel2;
+        }
+
+        private static void OnCreating(object sender, CreatingEventArgs e)
+        {
+        }
+
+        private static void OnCreated(object sender, CreatedEventArgs e)
+        {
+        }
+    }
+}";
+
+            var code = @"
+namespace N
+{
+    using Gu.Inject;
+    using NUnit.Framework;
+
+    [TestFixture]
     public class FixtureStackTests
     {
         private Kernel _container;
