@@ -205,8 +205,8 @@
 
                 return method switch
                 {
-                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } } => true,
-                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Wpf", ContainingNamespace: { MetadataName: "Gu" } } } } } => true,
+                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } } => false,
+                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Wpf", ContainingNamespace: { MetadataName: "Gu" } } } } } => false,
                     _ => null,
                 };
             }
