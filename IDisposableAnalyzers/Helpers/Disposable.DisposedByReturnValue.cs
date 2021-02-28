@@ -203,12 +203,12 @@
                            leaveOpenParameter.ExplicitDefaultValue is true;
                 }
 
-                if (method is { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } })
+                return method switch
                 {
-                    return false;
-                }
-
-                return null;
+                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } } => true,
+                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Wpf", ContainingNamespace: { MetadataName: "Gu" } } } } } => true,
+                    _ => null,
+                };
             }
         }
     }
