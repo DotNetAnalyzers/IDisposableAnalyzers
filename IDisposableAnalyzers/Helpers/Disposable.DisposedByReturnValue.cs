@@ -150,8 +150,8 @@
             switch (target.Symbol)
             {
                 case IParameterSymbol { ContainingSymbol: IMethodSymbol method }
-                    when method.TryFindParameter("leaveOpen", out var leaveOpenParameter):
-                    return !LeavesOpen(leaveOpenParameter);
+                    when LeavesOpen(method) is { } leavesOpen:
+                    return !leavesOpen;
                 case IMethodSymbol { ReturnsVoid: true }:
                 case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
                     return false;
@@ -189,16 +189,26 @@
 
             return false;
 
-            bool LeavesOpen(IParameterSymbol parameter)
+            bool? LeavesOpen(IMethodSymbol method)
             {
-                if (target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
-                    parent.TryFindArgument(parameter, out var leaveOpenArgument))
+                if (method.TryFindParameter("leaveOpen", out var leaveOpenParameter))
                 {
-                    return leaveOpenArgument.Expression is LiteralExpressionSyntax { Token: { ValueText: "true" } };
+                    if (target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
+                        parent.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument))
+                    {
+                        return leaveOpenArgument.Expression is LiteralExpressionSyntax { Token: { ValueText: "true" } };
+                    }
+
+                    return leaveOpenParameter.HasExplicitDefaultValue &&
+                           leaveOpenParameter.ExplicitDefaultValue is true;
                 }
 
-                return parameter.HasExplicitDefaultValue &&
-                       parameter.ExplicitDefaultValue is true;
+                if (method is { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } })
+                {
+                    return false;
+                }
+
+                return null;
             }
         }
     }

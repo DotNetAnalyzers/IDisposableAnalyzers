@@ -3,6 +3,8 @@ namespace ValidCode
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Globalization;
     using System.IO;
     using Gu.Reactive;
 
@@ -57,6 +59,30 @@ namespace ValidCode
         public static void M2<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
         {
             using var view = source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
+        }
+
+        public static void AsReadOnlyFilteredViewAsMappingView()
+        {
+            var source = new ObservableCollection<int>();
+            using (source.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
+            {
+            }
+
+            using (source.AsReadOnlyFilteredView(x => true)
+                         .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
+            {
+            }
+
+
+            var readonlyInts = new ReadOnlyObservableCollection<int>(source);
+            using (readonlyInts.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
+            {
+            }
+
+            using (readonlyInts.AsReadOnlyFilteredView(x => true)
+                               .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
+            {
+            }
         }
 
         public void Dispose()
