@@ -32,7 +32,7 @@
 
   <ItemGroup>
     <PackageReference Include="EntityFramework" Version="6.4.4" />
-    <PackageReference Include="Gu.Analyzers" Version="1.8.4" PrivateAssets="all" />
+    <PackageReference Include="Gu.Analyzers" Version="1.8.5" PrivateAssets="all" />
     <PackageReference Include="Gu.Inject" Version="0.3.9" />
     <PackageReference Include="Gu.Inject.Rebind" Version="0.3.9" />
     <PackageReference Include="Gu.Wpf.Reactive" Version="4.3.0" />
