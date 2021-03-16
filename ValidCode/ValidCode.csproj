@@ -21,7 +21,6 @@
     <PackageReference Include="Gu.Inject" Version="0.3.9" />
     <PackageReference Include="Gu.Inject.Rebind" Version="0.3.9" />
     <PackageReference Include="Gu.Wpf.Reactive" Version="5.0.1" />
-    <PackageReference Include="Gu.Reactive.Analyzers" Version="5.0.0" PrivateAssets="all"/>
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="NUnit" Version="3.13.1" />
