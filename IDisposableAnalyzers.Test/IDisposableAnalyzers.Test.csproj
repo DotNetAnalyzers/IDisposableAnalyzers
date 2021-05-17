@@ -47,6 +47,6 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.0.0-alpha.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.321" PrivateAssets="all" />
     <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
-    <PackageReference Include="reactiveui" Version="13.2.18" />
+    <PackageReference Include="reactiveui" Version="13.3.2" />
   </ItemGroup>
 </Project>
