@@ -22,7 +22,7 @@ namespace IDisposableAnalyzers.NetCoreTests
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.NetCore.csproj"),
-            AllAnalyzers,
+            CodeFactory.DefaultCompilationOptions(AllAnalyzers, null).WithAllowUnsafe(enabled: true),
             MetadataReferences.FromAttributes());
 
         private static IDisposable? cacheTransaction;
