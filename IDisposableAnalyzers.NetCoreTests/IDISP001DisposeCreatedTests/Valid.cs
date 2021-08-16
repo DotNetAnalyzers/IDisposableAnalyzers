@@ -147,5 +147,27 @@ namespace N
             var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
             RoslynAssert.Valid(Analyzer, new[] { Disposable, code }, compilationOptions: nullableContextOptions);
         }
+
+        [TestCase("serviceProvider.GetService<Disposable>()")]
+        [TestCase("serviceProvider.GetRequiredService<Disposable>()")]
+        public static void Issue293(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+
+    public static class Issue293
+    {
+        public static void M1(IServiceProvider serviceProvider)
+        {
+            var disposable = serviceProvider.GetService<Disposable>();
+        }
+    }
+}".AssertReplace("serviceProvider.GetService<Disposable>()", expression);
+
+            RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
     }
 }

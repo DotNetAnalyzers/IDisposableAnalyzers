@@ -235,6 +235,8 @@
                     IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromHandle" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromChildHandle" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "ServiceProviderExtensions" }, MetadataName: "GetService" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "ServiceProviderExtensions" }, MetadataName: "GetRequiredService" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => false,
