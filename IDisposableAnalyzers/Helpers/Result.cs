@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers
 {
     internal enum Result
     {

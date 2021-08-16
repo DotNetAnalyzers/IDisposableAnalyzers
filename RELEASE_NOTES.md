@@ -1,5 +1,6 @@
 #### 3.4.14
-* IDISP005 should not warn in Assert.Throws.
+* BUGFIX: IDISP005 should not warn in Assert.Throws.
+* BUGFIX: Handle function pointer.
 
 #### 3.4.13
 * BUGFIX: Specialcase Gu.Reactive extension methods.

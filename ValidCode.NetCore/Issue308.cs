@@ -1,19 +1,40 @@
 ﻿namespace ValidCode.NetCore
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Threading.Tasks;
 
     public static class Issue308
     {
+        private static readonly ConcurrentDictionary<int, object> Queue = new();
+
         public static unsafe void M1(ReadOnlySpan<byte> bytes)
         {
-            _ = M2<int>(bytes, &M3);
+            M2<int>(1, bytes, &M3);
         }
 
-        private static unsafe T M2<T>(ReadOnlySpan<byte> bytes, delegate*<ReadOnlySpan<byte>, T> read)
+        private static unsafe void M2<T>(int x, ReadOnlySpan<byte> bytes, delegate*<ReadOnlySpan<byte>, T> read)
         {
-            return read(bytes);
+            if (Queue.TryRemove(1, out var tcs))
+            {
+                if (tcs is TaskCompletionSource<T> typed)
+                {
+                    try
+                    {
+                        typed.SetResult(read(bytes));
+                    }
+                    catch (Exception e)
+                    {
+                        typed.SetException(e);
+                    }
+                }
+                else
+                {
+                    throw new InvalidOperationException("The response type does not match.");
+                }
+            }
         }
 
-        private static int M3(this ReadOnlySpan<byte> bytes) => 1;
+        private static int M3(ReadOnlySpan<byte> bytes) => 1;
     }
 }
