@@ -82,7 +82,8 @@
                             constructor.ContainingType == KnownSymbols.DeflateStream ||
                             constructor.ContainingType == KnownSymbols.Attachment ||
                             constructor.ContainingType == KnownSymbols.GZipStream ||
-                            constructor.ContainingType == KnownSymbols.StreamMemoryBlockProvider)
+                            constructor.ContainingType == KnownSymbols.StreamMemoryBlockProvider ||
+                            constructor.ContainingType == KnownSymbols.ECDsaCng)
                         {
                             if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
                                 objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
