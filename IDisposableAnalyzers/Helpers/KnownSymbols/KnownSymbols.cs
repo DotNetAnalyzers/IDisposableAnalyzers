@@ -14,8 +14,8 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType BinaryWriter = Create("System.IO.BinaryWriter");
         internal static readonly QualifiedType StreamReader = Create("System.IO.StreamReader");
         internal static readonly QualifiedType StreamWriter = Create("System.IO.StreamWriter");
-        internal static readonly QualifiedType File = new QualifiedType("System.IO.File");
-        internal static readonly QualifiedType FileInfo = new QualifiedType("System.IO.FileInfo");
+        internal static readonly QualifiedType File = new("System.IO.File");
+        internal static readonly QualifiedType FileInfo = new("System.IO.FileInfo");
         internal static readonly QualifiedType CryptoStream = Create("System.Security.Cryptography.CryptoStream");
         internal static readonly QualifiedType DeflateStream = Create("System.IO.Compression.DeflateStream");
         internal static readonly QualifiedType GZipStream = Create("System.IO.Compression.GZipStream");
@@ -23,10 +23,10 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ConstructorInfo = Create("System.Reflection.ConstructorInfo");
         internal static readonly QualifiedType Attachment = Create("System.Net.Mail.Attachment");
 
-        internal static readonly TupleType Tuple = new TupleType();
-        internal static readonly IDisposableType IDisposable = new IDisposableType();
-        internal static readonly IAsyncDisposableType IAsyncDisposable = new IAsyncDisposableType();
-        internal static readonly GCType GC = new GCType();
+        internal static readonly TupleType Tuple = new();
+        internal static readonly IDisposableType IDisposable = new();
+        internal static readonly IAsyncDisposableType IAsyncDisposable = new();
+        internal static readonly GCType GC = new();
         internal static readonly QualifiedType IDictionary = Create("System.Collections.IDictionary");
 
         internal static readonly QualifiedType ListOfT = Create("System.Collections.Generic.List`1");
@@ -48,52 +48,57 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType ImmutableDictionaryOfTKeyTValue = Create("System.Collections.Immutable.ImmutableDictionary`2");
         internal static readonly QualifiedType ImmutableSortedDictionaryOfTKeyTValue = Create("System.Collections.Immutable.ImmutableSortedDictionary`2");
 
-        internal static readonly ResourceManagerType ResourceManager = new ResourceManagerType();
-        internal static readonly QualifiedType RegistryKey = new QualifiedType("Microsoft.Win32.RegistryKey");
-        internal static readonly IEnumerableType IEnumerable = new IEnumerableType();
-        internal static readonly IEnumerableOfTType IEnumerableOfT = new IEnumerableOfTType();
-        internal static readonly QualifiedType IEnumerator = new QualifiedType("System.Collections.IEnumerator");
-        internal static readonly EnumerableType Enumerable = new EnumerableType();
+        internal static readonly ResourceManagerType ResourceManager = new();
+        internal static readonly QualifiedType RegistryKey = new("Microsoft.Win32.RegistryKey");
+        internal static readonly IEnumerableType IEnumerable = new();
+        internal static readonly IEnumerableOfTType IEnumerableOfT = new();
+        internal static readonly QualifiedType IEnumerator = new("System.Collections.IEnumerator");
+        internal static readonly EnumerableType Enumerable = new();
         internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
-        internal static readonly TaskType Task = new TaskType();
-        internal static readonly QualifiedType ValueTaskOfT = new QualifiedType("System.Threading.Tasks.ValueTask`1");
-        internal static readonly QualifiedType TaskOfT = new QualifiedType("System.Threading.Tasks.Task`1");
-        internal static readonly QualifiedType CancellationToken = new QualifiedType("System.Threading.CancellationToken");
-        internal static readonly QualifiedType Interlocked = new QualifiedType("System.Threading.Interlocked");
-        internal static readonly QualifiedType INotifyCompletion = new QualifiedType("System.Runtime.CompilerServices.INotifyCompletion");
-        internal static readonly QualifiedType HttpClient = new QualifiedType("System.Net.Http.HttpClient");
-        internal static readonly QualifiedType HttpMessageHandler = new QualifiedType("System.Net.Http.HttpMessageHandler");
-        internal static readonly HttpResponseType HttpResponse = new HttpResponseType();
-        internal static readonly HttpResponseMessageType HttpResponseMessage = new HttpResponseMessageType();
+        internal static readonly TaskType Task = new();
+        internal static readonly QualifiedType ValueTaskOfT = new("System.Threading.Tasks.ValueTask`1");
+        internal static readonly QualifiedType TaskOfT = new("System.Threading.Tasks.Task`1");
+        internal static readonly QualifiedType CancellationToken = new("System.Threading.CancellationToken");
+        internal static readonly QualifiedType Interlocked = new("System.Threading.Interlocked");
+        internal static readonly QualifiedType INotifyCompletion = new("System.Runtime.CompilerServices.INotifyCompletion");
+        internal static readonly QualifiedType HttpClient = new("System.Net.Http.HttpClient");
+        internal static readonly QualifiedType HttpMessageHandler = new("System.Net.Http.HttpMessageHandler");
+        internal static readonly HttpResponseType HttpResponse = new();
+        internal static readonly HttpResponseMessageType HttpResponseMessage = new();
 
-        internal static readonly SerialDisposableType SerialDisposable = new SerialDisposableType();
-        internal static readonly RxDisposableType RxDisposable = new RxDisposableType();
-        internal static readonly QualifiedType RxIScheduler = new QualifiedType("System.Reactive.Concurrency.IScheduler");
-        internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new SingleAssignmentDisposableType();
-        internal static readonly CompositeDisposableType CompositeDisposable = new CompositeDisposableType();
+        internal static readonly SerialDisposableType SerialDisposable = new();
+        internal static readonly RxDisposableType RxDisposable = new();
+        internal static readonly QualifiedType RxIScheduler = new("System.Reactive.Concurrency.IScheduler");
+        internal static readonly SingleAssignmentDisposableType SingleAssignmentDisposable = new();
+        internal static readonly CompositeDisposableType CompositeDisposable = new();
 
-        internal static readonly PasswordBoxType PasswordBox = new PasswordBoxType();
-        internal static readonly QualifiedType SystemWindowsFormsForm = new QualifiedType("System.Windows.Forms.Form");
-        internal static readonly WinformsControlType SystemWindowsFormsControl = new WinformsControlType();
-        internal static readonly HostingAbstractionsHostExtensionsType HostingAbstractionsHostExtensions = new HostingAbstractionsHostExtensionsType();
-        internal static readonly QualifiedType NUnitSetUpAttribute = new QualifiedType("NUnit.Framework.SetUpAttribute");
-        internal static readonly QualifiedType NUnitTearDownAttribute = new QualifiedType("NUnit.Framework.TearDownAttribute");
-        internal static readonly QualifiedType NUnitOneTimeSetUpAttribute = new QualifiedType("NUnit.Framework.OneTimeSetUpAttribute");
-        internal static readonly QualifiedType NUnitOneTimeTearDownAttribute = new QualifiedType("NUnit.Framework.OneTimeTearDownAttribute");
+        internal static readonly PasswordBoxType PasswordBox = new();
+        internal static readonly QualifiedType SystemWindowsFormsForm = new("System.Windows.Forms.Form");
+        internal static readonly WinformsControlType SystemWindowsFormsControl = new();
+        internal static readonly HostingAbstractionsHostExtensionsType HostingAbstractionsHostExtensions = new();
 
-        internal static readonly QualifiedType TestInitializeAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute");
-        internal static readonly QualifiedType ClassInitializeAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute");
-        internal static readonly QualifiedType TestCleanupAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute");
-        internal static readonly QualifiedType ClassCleanupAttribute = new QualifiedType("Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute");
+        internal static readonly QualifiedType TestInitializeAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute");
+        internal static readonly QualifiedType ClassInitializeAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute");
+        internal static readonly QualifiedType TestCleanupAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute");
+        internal static readonly QualifiedType ClassCleanupAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute");
 
-        internal static readonly QualifiedType NinjectStandardKernel = new QualifiedType("Ninject.StandardKernel");
-        internal static readonly QualifiedType ILoggerFactory = new QualifiedType("Microsoft.Extensions.Logging.ILoggerFactory");
-        internal static readonly IHostedServiceType IHostedService = new IHostedServiceType();
-        internal static readonly DisposableMixins DisposableMixins = new DisposableMixins();
+        internal static readonly QualifiedType NinjectStandardKernel = new("Ninject.StandardKernel");
+        internal static readonly QualifiedType ILoggerFactory = new("Microsoft.Extensions.Logging.ILoggerFactory");
+        internal static readonly IHostedServiceType IHostedService = new();
+        internal static readonly DisposableMixins DisposableMixins = new();
 
         private static QualifiedType Create(string qualifiedName, string? alias = null)
         {
-            return new QualifiedType(qualifiedName, alias);
+            return new(qualifiedName, alias);
+        }
+
+        internal static class NUnit
+        {
+            internal static readonly QualifiedType Assert = new("NUnit.Framework.Assert");
+            internal static readonly QualifiedType SetUpAttribute = new("NUnit.Framework.SetUpAttribute");
+            internal static readonly QualifiedType TearDownAttribute = new("NUnit.Framework.TearDownAttribute");
+            internal static readonly QualifiedType OneTimeSetUpAttribute = new("NUnit.Framework.OneTimeSetUpAttribute");
+            internal static readonly QualifiedType OneTimeTearDownAttribute = new("NUnit.Framework.OneTimeTearDownAttribute");
         }
     }
 }

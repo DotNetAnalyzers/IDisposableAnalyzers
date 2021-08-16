@@ -16,8 +16,8 @@
             if (AssignmentExecutionWalker.SingleFor(fieldOrProperty.Symbol, scope, SearchScope.Member, semanticModel, cancellationToken, out var assignment) &&
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
-                var cleanup = FindCleanup(KnownSymbols.NUnitSetUpAttribute, KnownSymbols.NUnitTearDownAttribute) ??
-                              FindCleanup(KnownSymbols.NUnitOneTimeSetUpAttribute, KnownSymbols.NUnitOneTimeTearDownAttribute) ??
+                var cleanup = FindCleanup(KnownSymbols.NUnit.SetUpAttribute, KnownSymbols.NUnit.TearDownAttribute) ??
+                              FindCleanup(KnownSymbols.NUnit.OneTimeSetUpAttribute, KnownSymbols.NUnit.OneTimeTearDownAttribute) ??
                               FindCleanup(KnownSymbols.TestInitializeAttribute, KnownSymbols.TestCleanupAttribute) ??
                               FindCleanup(KnownSymbols.ClassInitializeAttribute, KnownSymbols.ClassCleanupAttribute) ??
                     FindStopAsync();
@@ -63,8 +63,8 @@
                 assignment.FirstAncestor<MethodDeclarationSyntax>() is { } methodDeclaration)
             {
                 initialize = methodDeclaration;
-                return Attribute.TryFind(methodDeclaration, KnownSymbols.NUnitSetUpAttribute, semanticModel, cancellationToken, out _) ||
-                       Attribute.TryFind(methodDeclaration, KnownSymbols.NUnitOneTimeSetUpAttribute, semanticModel, cancellationToken, out _) ||
+                return Attribute.TryFind(methodDeclaration, KnownSymbols.NUnit.SetUpAttribute, semanticModel, cancellationToken, out _) ||
+                       Attribute.TryFind(methodDeclaration, KnownSymbols.NUnit.OneTimeSetUpAttribute, semanticModel, cancellationToken, out _) ||
                        Attribute.TryFind(methodDeclaration, KnownSymbols.TestInitializeAttribute, semanticModel, cancellationToken, out _) ||
                        Attribute.TryFind(methodDeclaration, KnownSymbols.ClassInitializeAttribute, semanticModel, cancellationToken, out _) ||
                        IsStartAsync(methodDeclaration, semanticModel, cancellationToken);
@@ -120,14 +120,14 @@
                     return null;
                 }
 
-                if (initializeAttribute == KnownSymbols.NUnitSetUpAttribute)
+                if (initializeAttribute == KnownSymbols.NUnit.SetUpAttribute)
                 {
-                    return KnownSymbols.NUnitTearDownAttribute;
+                    return KnownSymbols.NUnit.TearDownAttribute;
                 }
 
-                if (initializeAttribute == KnownSymbols.NUnitOneTimeSetUpAttribute)
+                if (initializeAttribute == KnownSymbols.NUnit.OneTimeSetUpAttribute)
                 {
-                    return KnownSymbols.NUnitOneTimeTearDownAttribute;
+                    return KnownSymbols.NUnit.OneTimeTearDownAttribute;
                 }
 
                 if (initializeAttribute == KnownSymbols.TestInitializeAttribute)

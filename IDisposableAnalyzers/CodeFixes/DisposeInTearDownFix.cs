@@ -16,8 +16,8 @@
     [Shared]
     internal class DisposeInTearDownFix : DocumentEditorCodeFixProvider
     {
-        private static readonly MethodDeclarationSyntax TearDownMethod = CreateTearDownMethod(KnownSymbols.NUnitTearDownAttribute);
-        private static readonly MethodDeclarationSyntax OneTimeTearDownMethod = CreateTearDownMethod(KnownSymbols.NUnitOneTimeTearDownAttribute);
+        private static readonly MethodDeclarationSyntax TearDownMethod = CreateTearDownMethod(KnownSymbols.NUnit.TearDownAttribute);
+        private static readonly MethodDeclarationSyntax OneTimeTearDownMethod = CreateTearDownMethod(KnownSymbols.NUnit.OneTimeTearDownAttribute);
 
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
             Descriptors.IDISP002DisposeMember.Id,
@@ -82,12 +82,12 @@
 
                     MethodDeclarationSyntax? TearDown()
                     {
-                        if (Attribute.TryFind(initialize!, KnownSymbols.NUnitSetUpAttribute, semanticModel, context.CancellationToken, out _))
+                        if (Attribute.TryFind(initialize!, KnownSymbols.NUnit.SetUpAttribute, semanticModel, context.CancellationToken, out _))
                         {
                             return AdjustStatic(TearDownMethod);
                         }
 
-                        if (Attribute.TryFind(initialize!, KnownSymbols.NUnitOneTimeSetUpAttribute, semanticModel, context.CancellationToken, out _))
+                        if (Attribute.TryFind(initialize!, KnownSymbols.NUnit.OneTimeSetUpAttribute, semanticModel, context.CancellationToken, out _))
                         {
                             return AdjustStatic(OneTimeTearDownMethod);
                         }

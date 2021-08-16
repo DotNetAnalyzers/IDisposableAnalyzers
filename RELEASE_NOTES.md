@@ -1,3 +1,6 @@
+#### 3.4.14
+* IDISP005 should not warn in Assert.Throws.
+
 #### 3.4.13
 * BUGFIX: Specialcase Gu.Reactive extension methods.
 

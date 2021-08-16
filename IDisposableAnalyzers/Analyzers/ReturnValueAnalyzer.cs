@@ -53,9 +53,24 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 !IsIgnored(context.ContainingSymbol) &&
-                context.Node is LambdaExpressionSyntax { Body: ExpressionSyntax expression })
+                context.Node is LambdaExpressionSyntax { Body: ExpressionSyntax expression } lambda &&
+                !IsAssert(lambda))
             {
                 HandleReturnValue(context, expression);
+            }
+
+            static bool IsAssert(LambdaExpressionSyntax lambda)
+            {
+                if (lambda is { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } })
+                {
+                    return invocation switch
+                    {
+                        { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { Identifier: { ValueText: "Throws" or "ThrowsAsync" } } } } => true,
+                        _ => false,
+                    };
+                }
+
+                return false;
             }
         }
 
