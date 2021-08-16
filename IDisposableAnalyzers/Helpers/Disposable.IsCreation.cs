@@ -191,19 +191,12 @@
                 return false;
             }
 
-            if (candidate is LiteralExpressionSyntax ||
-                candidate is DefaultExpressionSyntax ||
-                candidate is TypeOfExpressionSyntax ||
-                candidate is InstanceExpressionSyntax ||
-                candidate is ElementAccessExpressionSyntax)
+            if (candidate is LiteralExpressionSyntax or DefaultExpressionSyntax or TypeOfExpressionSyntax or InstanceExpressionSyntax or ElementAccessExpressionSyntax)
             {
                 return false;
             }
 
-            if (candidate is ObjectCreationExpressionSyntax ||
-                candidate is ArrayCreationExpressionSyntax ||
-                candidate is ImplicitArrayCreationExpressionSyntax ||
-                candidate is InitializerExpressionSyntax)
+            if (candidate is ObjectCreationExpressionSyntax or ArrayCreationExpressionSyntax or ImplicitArrayCreationExpressionSyntax or InitializerExpressionSyntax)
             {
                 switch (semanticModel.GetType(candidate, cancellationToken))
                 {
@@ -237,6 +230,7 @@
                     IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromChildHandle" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "ServiceProviderExtensions" }, MetadataName: "GetService" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "ServiceProviderExtensions" }, MetadataName: "GetRequiredService" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "CancellationTokenSource" }, MetadataName: "Register" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
                     IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => false,

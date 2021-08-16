@@ -3,6 +3,7 @@ namespace ValidCode
 {
     using System;
     using System.IO;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public class Async
@@ -126,6 +127,12 @@ namespace ValidCode
         {
             await Task.Delay(0).ConfigureAwait(false);
             return new Disposable();
+        }
+
+        private static void M()
+        {
+            using var ct = new CancellationTokenSource();
+            _ = ct.Token.Register(() => { }, useSynchronizationContext: false);
         }
     }
 }
