@@ -910,7 +910,7 @@ namespace N
             }
 
             [Test]
-            public static void ReturnAsReadOnlyFilteredViewwAsMappingView()
+            public static void ReturnAsReadOnlyFilteredViewAsMappingView()
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
@@ -963,6 +963,63 @@ namespace N
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression("new MemoryStream()");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
+
+            [TestCase("Create(true)")]
+            [TestCase("Create(!false)")]
+            [TestCase("CreateAsync(true)")]
+            [TestCase("CreateAsync(!false)")]
+            public static void AssertThrows(string expressionText)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace ValidCode
+{
+    using System;
+    using System.Threading.Tasks;
+    using NUnit.Framework;
+
+    public static class Tests
+    {
+        [Test]
+        public static void Throws()
+        {
+            Assert.Throws<InvalidOperationException>(() => Create(true));
+            Assert.AreEqual(
+                ""Expected"",
+                Assert.Throws<InvalidOperationException>(() => Create(!false)).Message);
+
+            Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true));
+            Assert.AreEqual(
+                ""Expected"",
+                Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(!false)).Message);
+        }
+
+        private static Disposable Create(bool b)
+        {
+            if (b)
+            {
+                throw new InvalidOperationException(""Expected"");
+            }
+
+            return new Disposable();
+        }
+
+        private static async Task<Disposable> CreateAsync(bool b)
+        {
+            if (b)
+            {
+                throw new InvalidOperationException(""Expected"");
+            }
+
+            await Task.Delay(1);
+            return new Disposable();
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression(expressionText);
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
         }
