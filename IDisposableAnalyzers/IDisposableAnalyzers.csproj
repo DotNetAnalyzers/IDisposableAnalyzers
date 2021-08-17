@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.13</Version>
+    <Version>3.4.14</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
