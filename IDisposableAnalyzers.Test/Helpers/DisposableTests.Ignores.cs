@@ -1022,6 +1022,41 @@ namespace ValidCode
                 var value = syntaxTree.FindExpression(expressionText);
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
+
+            [TestCase("x1 => new Disposable()")]
+            [TestCase("x2 => new Disposable()")]
+            [TestCase("x3 => new Disposable()")]
+            [TestCase("x4 => new Disposable()")]
+            public static void ServiceCollection(string expressionText)
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+namespace ValidCode
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+
+    public static class Issue231
+    {
+        public static ServiceCollection M1(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped(x1 => new Disposable());
+            serviceCollection.AddSingleton(typeof(IDisposable), x2 => new Disposable());
+            return serviceCollection;
+        }
+
+        public static IServiceCollection M2(IServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped(x3 => new Disposable());
+            serviceCollection.AddSingleton(typeof(IDisposable), x4 => new Disposable());
+            return serviceCollection;
+        }
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression(expressionText);
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

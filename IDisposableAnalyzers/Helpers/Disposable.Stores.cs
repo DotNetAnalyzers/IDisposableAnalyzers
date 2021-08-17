@@ -101,6 +101,9 @@
                             switch (parameter.ContainingSymbol)
                             {
                                 case { ContainingType: { MetadataName: "Interlocked" }, MetadataName: "Exchange" }:
+                                case { ContainingType: { MetadataName: "ServiceCollection" } }:
+                                case { ContainingType: { MetadataName: "IServiceCollection" } }:
+                                case { ContainingType: { MetadataName: "ServiceCollectionServiceExtensions" } }:
                                 case { MetadataName: "RegisterForDispose" }:
                                 case { MetadataName: "RegisterForDisposeAsync" }:
                                     return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);

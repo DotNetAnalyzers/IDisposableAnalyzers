@@ -54,23 +54,18 @@
             if (!context.IsExcludedFromAnalysis() &&
                 !IsIgnored(context.ContainingSymbol) &&
                 context.Node is LambdaExpressionSyntax { Body: ExpressionSyntax expression } lambda &&
-                !IsAssert(lambda))
+                ShouldHandle())
             {
                 HandleReturnValue(context, expression);
             }
 
-            static bool IsAssert(LambdaExpressionSyntax lambda)
+            bool ShouldHandle()
             {
-                if (lambda is { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } })
+                return lambda switch
                 {
-                    return invocation switch
-                    {
-                        { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "Assert" } }, Name: { Identifier: { ValueText: "Throws" or "ThrowsAsync" } } } } => true,
-                        _ => false,
-                    };
-                }
-
-                return false;
+                    { Parent: ArgumentSyntax } => Disposable.Ignores(lambda, context.SemanticModel, context.CancellationToken),
+                    _ => true,
+                };
             }
         }
 

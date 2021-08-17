@@ -99,6 +99,11 @@
 
         private static bool Ignores(Target<ArgumentSyntax, IParameterSymbol, BaseMethodDeclarationSyntax> target, Recursion recursion)
         {
+            if (target.Symbol.Type.MetadataName is "TestDelegate" or "AsyncTestDelegate")
+            {
+                return false;
+            }
+
             if (target.Source is { Parent: ArgumentListSyntax { Parent: ExpressionSyntax { Parent: { } } parentExpression } })
             {
                 if (target.Declaration is null)

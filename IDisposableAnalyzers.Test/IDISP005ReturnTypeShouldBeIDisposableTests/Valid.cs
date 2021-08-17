@@ -1102,5 +1102,28 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
         }
+
+        [TestCase("serviceCollection.AddScoped(x => new Disposable())")]
+        [TestCase("serviceCollection.AddSingleton(typeof(IDisposable), x => new Disposable())")]
+        public static void ServiceCollection(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+
+    public static class Issue231
+    {
+        public static ServiceCollection M1(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddScoped(x => new Disposable());
+            return serviceCollection;
+        }
+    }
+}".AssertReplace("serviceCollection.AddScoped(x => new Disposable())", expression);
+
+            RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
+        }
     }
 }

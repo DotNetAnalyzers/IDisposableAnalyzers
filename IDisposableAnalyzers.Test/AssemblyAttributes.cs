@@ -18,6 +18,7 @@ using Gu.Roslyn.Asserts;
     typeof(System.Threading.Tasks.ValueTask),
     typeof(System.Xml.Serialization.XmlSerializer),
     typeof(Moq.Mock<>),
+    typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection),
     typeof(Ninject.StandardKernel),
     typeof(Gu.Inject.Kernel),
     typeof(Gu.Inject.RebindExtensions))]

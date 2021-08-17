@@ -1,3 +1,6 @@
+#### 3.4.15
+* BUGFIX: IDISP005 with ServiceDescriptor
+
 #### 3.4.14
 * BUGFIX: IDISP005 should not warn in Assert.Throws.
 * BUGFIX: Handle function pointer.
