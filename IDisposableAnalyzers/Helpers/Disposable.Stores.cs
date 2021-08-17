@@ -128,6 +128,9 @@
                 case { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                     when recursion.Target(variableDeclarator) is { } target:
                     return Stores(target, recursion, out container);
+                case InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "DisposeWith" } } }, ArgumentList: { Arguments: { Count: 1 } arguments } }:
+                    container = recursion.SemanticModel.GetSymbolSafe(arguments[0].Expression, recursion.CancellationToken);
+                    return container != null;
                 default:
                     container = null;
                     return false;

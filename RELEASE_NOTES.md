@@ -1,5 +1,6 @@
 #### 3.4.15
 * BUGFIX: IDISP005 with ServiceDescriptor
+* BUGFIX: IDISP004 when DisposeWith
 
 #### 3.4.14
 * BUGFIX: IDISP005 should not warn in Assert.Throws.
