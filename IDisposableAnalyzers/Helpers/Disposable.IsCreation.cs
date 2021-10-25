@@ -158,6 +158,11 @@
                 return true;
             }
 
+            if (candidate.Parent is ArgumentSyntax arg && semanticModel.GetSymbolInfo(arg.Expression).Symbol is IMethodSymbol methodSymbol && methodSymbol.IsAbstract && IsAssignableFrom(methodSymbol.ReturnType, semanticModel.Compilation))
+            {
+                return true;
+            }
+
             using var recursive = RecursiveValues.Borrow(new[] { candidate }, semanticModel, cancellationToken);
             return IsAnyCreation(recursive, semanticModel, cancellationToken);
         }
