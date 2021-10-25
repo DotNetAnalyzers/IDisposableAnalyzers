@@ -158,7 +158,7 @@
                 return true;
             }
 
-            if (candidate.Parent is ArgumentSyntax arg && semanticModel.GetSymbolInfo(arg.Expression).Symbol is IMethodSymbol methodSymbol && methodSymbol.IsAbstract && IsAssignableFrom(methodSymbol.ReturnType, semanticModel.Compilation))
+            if (candidate.Parent is ArgumentSyntax arg && semanticModel.GetSymbolInfo(arg.Expression, cancellationToken).Symbol is IMethodSymbol { IsAbstract: true } methodSymbol && IsAssignableFrom(methodSymbol.ReturnType, semanticModel.Compilation))
             {
                 return true;
             }
