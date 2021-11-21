@@ -18,20 +18,24 @@
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
+  <!-- Specific to packing an analyzer -->
   <PropertyGroup>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <AppendTargetFrameworkToOutputDirectory>false</AppendTargetFrameworkToOutputDirectory>
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>3.4.15</Version>
+    <Version>4.0.0</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      4.0.0
+      BREAKING: For VS2022+ now.
+      BUGFIX: AD0001 -> Could not load file or assembly
       3.4.15
       BUGFIX: IDISP005 with ServiceDescriptor
       BUGFIX: IDISP004 when DisposeWith
