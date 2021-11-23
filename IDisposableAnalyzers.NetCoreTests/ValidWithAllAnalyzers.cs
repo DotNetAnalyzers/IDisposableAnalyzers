@@ -15,7 +15,7 @@ namespace IDisposableAnalyzers.NetCoreTests
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols)
             .Assembly
             .GetTypes()
-            .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
+            .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t)!)
             .ToImmutableArray();
 
