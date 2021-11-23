@@ -74,7 +74,7 @@ namespace N
         private Disposable disposable;
 
         [TestInitialize]
-        public void OnClassInitialize(TestContext testContext)
+        public void OnClassInitialize()
         {
             this.disposable = new Disposable();
         }

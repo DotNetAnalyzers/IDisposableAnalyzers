@@ -462,22 +462,6 @@ namespace N
         }
 
         [Test]
-        public static void WhenImplementingIHttpModule()
-        {
-            var code = @"
-namespace System.Web
-{
-  public interface IHttpModule
-  {
-    void Init(HttpApplication context);
-    void Dispose();
-  }
-}";
-
-            RoslynAssert.Valid(Analyzer, code);
-        }
-
-        [Test]
         public static void WhenSubclassingAndImplementingTwoInterfaces()
         {
             var code = @"

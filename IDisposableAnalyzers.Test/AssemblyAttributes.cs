@@ -5,6 +5,7 @@ using Gu.Roslyn.Asserts;
 
 [assembly: TransitiveMetadataReferences(typeof(IDisposableAnalyzers.Test.ValidWithAllAnalyzers))]
 [assembly: TransitiveMetadataReferences(typeof(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute))]
+[assembly: TransitiveMetadataReferences(typeof(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext))]
 [assembly: TransitiveMetadataReferences(typeof(System.Windows.Forms.Form))]
 [assembly: TransitiveMetadataReferences(typeof(System.Windows.Controls.Control))]
 [assembly: TransitiveMetadataReferences(typeof(System.Reactive.Linq.Observable))]
