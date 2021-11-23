@@ -9,12 +9,13 @@
 
     public static class Recursion
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers = typeof(AnalyzerCategory)
-                                                                                 .Assembly
-                                                                                 .GetTypes()
-                                                                                 .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                 .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                                                                 .ToArray();
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
+            typeof(AnalyzerCategory)
+                .Assembly
+                .GetTypes()
+                .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                .ToArray();
 
         [Test]
         public static void NotEmpty()

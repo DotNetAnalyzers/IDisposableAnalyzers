@@ -15,10 +15,12 @@
     {
         // ReSharper disable once UnusedMember.Local
         private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(KnownSymbols).Assembly.GetTypes()
-                               .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                               .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                               .ToArray();
+            typeof(KnownSymbols)
+                .Assembly
+                .GetTypes()
+                .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                .ToArray();
 
         private static readonly Solution Solution = CodeFactory.CreateSolution(
             new FileInfo("C:\\Git\\_GuOrg\\Gu.Reactive\\Gu.Reactive.sln"),
