@@ -17,13 +17,14 @@ namespace IDisposableAnalyzers.Test
 
     public static class DocumentationTests
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers = typeof(AnalyzerCategory)
-                                                                              .Assembly
-                                                                              .GetTypes()
-                                                                              .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-                                                                              .OrderBy(x => x.Name)
-                                                                              .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                                                              .ToArray();
+        private static readonly IReadOnlyList<DiagnosticAnalyzer> Analyzers =
+            typeof(AnalyzerCategory)
+                .Assembly
+                .GetTypes()
+                .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                .OrderBy(x => x.Name)
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                .ToArray();
 
         private static readonly IReadOnlyList<DescriptorInfo> DescriptorInfos = Analyzers
                                                                                 .SelectMany(DescriptorInfo.Create)
