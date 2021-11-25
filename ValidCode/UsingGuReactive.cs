@@ -12,7 +12,7 @@ namespace ValidCode
     {
         private readonly IDisposable disposable;
         private readonly IReadOnlyView<int> view;
-        private readonly SerialDisposable<MemoryStream> serialDisposable = new();
+        private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
 
         public UsingGuReactive(IObservable<int> observable)
         {

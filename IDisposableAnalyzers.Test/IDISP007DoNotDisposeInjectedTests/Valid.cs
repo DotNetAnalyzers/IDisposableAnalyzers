@@ -11,7 +11,7 @@
     public static class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
-        private static readonly T Analyzer = new();
+        private static readonly T Analyzer = new T();
 
         private const string DisposableCode = @"
 namespace N

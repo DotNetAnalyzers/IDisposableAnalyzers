@@ -7,7 +7,7 @@ namespace ValidCode.Collections
 
     public sealed class WithListOfValueTuples : IDisposable
     {
-        private readonly List<(FileStream, FileStream)> xs = new();
+        private readonly List<(FileStream, FileStream)> xs = new List<(FileStream, FileStream)>();
 
         public void M(string file1, string file2)
         {

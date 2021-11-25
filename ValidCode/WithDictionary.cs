@@ -6,7 +6,7 @@ namespace ValidCode
 
     public sealed class WithDictionary : IDisposable
     {
-        private readonly Dictionary<string, Disposable> map = new();
+        private readonly Dictionary<string, Disposable> map = new Dictionary<string, Disposable>();
 
         public void M(string key)
         {

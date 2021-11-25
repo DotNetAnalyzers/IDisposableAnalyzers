@@ -5,7 +5,7 @@ namespace IDisposableAnalyzers.Test.IDISP008DoNontMixInjectedAndCreatedForMember
 
     public static partial class Diagnostics
     {
-        private static readonly AssignmentAnalyzer Analyzer = new();
+        private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
 
         private const string Disposable = @"

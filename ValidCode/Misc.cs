@@ -9,9 +9,9 @@ namespace ValidCode
 
     public sealed class Misc : IDisposable
     {
-        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new(nameof(IsDirty));
-        private readonly SingleAssignmentDisposable subscription = new();
-        private readonly CompositeDisposable compositeDisposable = new();
+        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+        private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
+        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
         private readonly Lazy<IDisposable> lazyDisposable;
 
         private readonly IDisposable meh1;

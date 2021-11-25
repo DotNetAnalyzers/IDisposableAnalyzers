@@ -7,7 +7,7 @@
     public static partial class CodeFix
     {
         private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
-        private static readonly DisposeBeforeAssignFix Fix = new();
+        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning);
 
         private const string Disposable = @"

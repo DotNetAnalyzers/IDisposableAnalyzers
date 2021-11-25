@@ -6,7 +6,7 @@ namespace ValidCode
 
     public class Issue254
     {
-        private static readonly XmlSerializer Serializer = new(typeof(Issue254));
+        private static readonly XmlSerializer Serializer = new XmlSerializer(typeof(Issue254));
 
         public static void Save(string fileName, Issue254 item)
         {

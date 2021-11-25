@@ -9,9 +9,9 @@
 
     internal sealed class ConstructorsWalker : PooledWalker<ConstructorsWalker>
     {
-        private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new();
-        private readonly List<ObjectCreationExpressionSyntax> objectCreations = new();
-        private readonly List<ConstructorInitializerSyntax> initializers = new();
+        private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new List<ConstructorDeclarationSyntax>();
+        private readonly List<ObjectCreationExpressionSyntax> objectCreations = new List<ObjectCreationExpressionSyntax>();
+        private readonly List<ConstructorInitializerSyntax> initializers = new List<ConstructorInitializerSyntax>();
 
         private SemanticModel semanticModel = null!;
         private CancellationToken cancellationToken;

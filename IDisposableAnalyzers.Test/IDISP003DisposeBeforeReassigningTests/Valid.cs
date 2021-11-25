@@ -10,7 +10,7 @@
     public static partial class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
-        private static readonly T Analyzer = new();
+        private static readonly T Analyzer = new T();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP003DisposeBeforeReassigning;
 
         private const string DisposableCode = @"

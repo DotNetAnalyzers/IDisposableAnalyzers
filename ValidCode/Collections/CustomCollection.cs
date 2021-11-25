@@ -6,7 +6,7 @@ namespace ValidCode.Collections
 
     internal class CustomCollection<T> : IList<T>
     {
-        private readonly List<T> inner = new();
+        private readonly List<T> inner = new List<T>();
 
         public int Count => this.inner.Count;
 

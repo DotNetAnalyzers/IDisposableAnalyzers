@@ -8,7 +8,7 @@
     internal class InstanceMap<TKey, TValue> : IEnumerable<KeyValuePair<TKey, TValue>>
         where TKey : class
     {
-        private readonly Dictionary<Maybe<TKey>, TValue> inner = new(KeyComparer.Default);
+        private readonly Dictionary<Maybe<TKey>, TValue> inner = new Dictionary<Maybe<TKey>, TValue>(KeyComparer.Default);
 
 #pragma warning disable INPC017 // Backing field name must match.
         internal object Gate => this.inner;
@@ -57,7 +57,7 @@
 
         private sealed class KeyComparer : IEqualityComparer<Maybe<TKey>>
         {
-            internal static readonly KeyComparer Default = new();
+            internal static readonly KeyComparer Default = new KeyComparer();
 
             private KeyComparer()
             {

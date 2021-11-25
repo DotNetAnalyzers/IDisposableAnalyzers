@@ -4,7 +4,7 @@
 
     public sealed class ExplictImplementaion : IDisposable
     {
-        private readonly Disposable disposable = new();
+        private readonly Disposable disposable = new Disposable();
 
         void IDisposable.Dispose()
         {

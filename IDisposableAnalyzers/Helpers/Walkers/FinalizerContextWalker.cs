@@ -11,7 +11,7 @@
 
     internal sealed class FinalizerContextWalker : RecursiveWalker<FinalizerContextWalker>
     {
-        private readonly List<SyntaxNode> usedReferenceTypes = new();
+        private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
         private bool returned;
 
         private FinalizerContextWalker()
@@ -160,7 +160,7 @@
 
         private sealed class TargetWalker : ExecutionWalker<TargetWalker>
         {
-            private readonly List<SyntaxNode> usedReferenceTypes = new();
+            private readonly List<SyntaxNode> usedReferenceTypes = new List<SyntaxNode>();
 
             private TargetWalker()
             {

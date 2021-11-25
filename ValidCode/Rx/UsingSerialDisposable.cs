@@ -6,8 +6,8 @@ namespace ValidCode
 
     public sealed class UsingSerialDisposable : IDisposable
     {
-        private readonly SerialDisposable _serial1 = new();
-        private readonly SerialDisposable _serial2 = new();
+        private readonly SerialDisposable _serial1 = new SerialDisposable();
+        private readonly SerialDisposable _serial2 = new SerialDisposable();
 
         public void Update(IObservable<object> observable)
         {

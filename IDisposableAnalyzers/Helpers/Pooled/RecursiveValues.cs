@@ -13,9 +13,9 @@
 
     internal class RecursiveValues : IEnumerator<ExpressionSyntax>
     {
-        private static readonly ConcurrentQueue<RecursiveValues> Cache = new();
-        private readonly List<ExpressionSyntax> values = new();
-        private readonly HashSet<SyntaxNode> checkedLocations = new();
+        private static readonly ConcurrentQueue<RecursiveValues> Cache = new ConcurrentQueue<RecursiveValues>();
+        private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
+        private readonly HashSet<SyntaxNode> checkedLocations = new HashSet<SyntaxNode>();
 
         private int rawIndex = -1;
         private int recursiveIndex = -1;

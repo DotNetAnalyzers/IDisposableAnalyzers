@@ -9,7 +9,7 @@
     [DebuggerDisplay("Count = {this.Count}")]
     internal class SmallSet<T> : IReadOnlyList<T>
     {
-        private readonly List<T> inner = new();
+        private readonly List<T> inner = new List<T>();
 
         public int Count => this.inner.Count;
 

@@ -12,7 +12,7 @@
     public static class ValidReactive<T>
         where T : DiagnosticAnalyzer, new()
     {
-        private static readonly T Analyzer = new();
+        private static readonly T Analyzer = new T();
 
         [Test]
         public static void InjectedSubscribe()
