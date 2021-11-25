@@ -73,7 +73,7 @@ namespace IDisposableAnalyzers.Test
             var actual = descriptorInfo.DocumentationFile.AllLines
                                        .Skip(1)
                                        .First()
-                                       .Replace("`", string.Empty);
+                                       .Replace("`", string.Empty, StringComparison.InvariantCulture);
             Assert.AreEqual(expected, actual);
         }
 
@@ -89,7 +89,7 @@ namespace IDisposableAnalyzers.Test
                                        .SkipWhile(l => !l.StartsWith("## Description", StringComparison.OrdinalIgnoreCase))
                                        .Skip(1)
                                        .FirstOrDefault(l => !string.IsNullOrWhiteSpace(l))
-                                       ?.Replace("`", string.Empty);
+                                       ?.Replace("`", string.Empty, StringComparison.InvariantCulture);
 
             DumpIfDebug(expected);
             DumpIfDebug(actual);
@@ -281,8 +281,8 @@ Or put this at the top of the file to disable all instances.
                 }
 
                 var text = builder.Return();
-                return stub.Replace("| Code     | [<TYPENAME>](<URL>)\r\n", text)
-                           .Replace("| Code     | [<TYPENAME>](<URL>)\n", text);
+                return stub.Replace("| Code     | [<TYPENAME>](<URL>)\r\n", text, StringComparison.InvariantCulture)
+                           .Replace("| Code     | [<TYPENAME>](<URL>)\n", text, StringComparison.InvariantCulture);
             }
         }
 
@@ -319,7 +319,7 @@ Or put this at the top of the file to disable all instances.
             public string Name { get; }
 
             public string Uri => "https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master" + this.Name.Substring(SolutionDirectory.FullName.Length)
-                                                                                                             .Replace("\\", "/");
+                                                                                                             .Replace("\\", "/", StringComparison.InvariantCulture);
 
             public static CodeFile Find(Type type)
             {
