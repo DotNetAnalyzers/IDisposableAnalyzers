@@ -35,9 +35,10 @@
 
         internal IReadOnlyList<ExpressionSyntax> Values => this.values;
 
-        public override void Visit(SyntaxNode node)
+        public override void Visit(SyntaxNode? node)
         {
-            if (this.context.ShouldVisit(node))
+            if (node is { } &&
+                this.context.ShouldVisit(node))
             {
                 base.Visit(node);
             }

@@ -24,8 +24,13 @@
 
         internal IReadOnlyList<ExpressionSyntax> Values => this.values;
 
-        public override void Visit(SyntaxNode node)
+        public override void Visit(SyntaxNode? node)
         {
+            if (node is null)
+            {
+                return;
+            }
+
             switch (node.Kind())
             {
                 case SyntaxKind.SimpleLambdaExpression:

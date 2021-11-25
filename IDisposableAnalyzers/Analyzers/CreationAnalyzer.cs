@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -24,6 +26,7 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is { } &&
                 ShouldCheck(context) is { } expression)
             {
                 if (Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) &&
@@ -49,21 +52,21 @@
             return context.Node switch
             {
                 InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: { Identifier: { ValueText: "Schedule" } } } }
-                when context.SemanticModel.TryGetNamedType(expression, context.CancellationToken, out var type) &&
-                     type.IsAssignableTo(KnownSymbols.RxIScheduler, context.SemanticModel.Compilation)
-                => null,
+                    when context.SemanticModel.TryGetNamedType(expression, context.CancellationToken, out var type) &&
+                         type.IsAssignableTo(KnownSymbols.RxIScheduler, context.SemanticModel.Compilation)
+                    => null,
                 InvocationExpressionSyntax invocation
-                => invocation,
+                    => invocation,
                 ObjectCreationExpressionSyntax objectCreation
-                => objectCreation,
+                    => objectCreation,
                 MemberAccessExpressionSyntax { Expression: { } expression }
                     when context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out IPropertySymbol? property) &&
                          Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation)
-                => expression,
+                    => expression,
                 ConditionalAccessExpressionSyntax { Expression: { } expression }
                     when context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out IPropertySymbol? property) &&
                          Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation)
-                => expression,
+                    => expression,
                 _ => null,
             };
         }

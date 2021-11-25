@@ -319,7 +319,7 @@ Or put this at the top of the file to disable all instances.
 
             public string Name { get; }
 
-            public string Uri => "https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master" + this.Name.Substring(SolutionDirectory.FullName.Length)
+            public string Uri => "https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master" + this.Name[SolutionDirectory.FullName.Length..]
                                                                                                              .Replace("\\", "/", StringComparison.InvariantCulture);
 
             public static CodeFile Find(Type type)

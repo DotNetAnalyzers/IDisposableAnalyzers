@@ -49,7 +49,7 @@
                             semanticModel.GetSymbolSafe(left, cancellationToken) is { } candidate &&
                             candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
                         {
-                            assignedSymbols.Add(candidate);
+                            _ = assignedSymbols.Add(candidate);
                         }
                     }
                 }

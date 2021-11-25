@@ -32,6 +32,7 @@
         private static void HandleReturnValue(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is { } &&
                 !IsIgnored(context.ContainingSymbol) &&
                 context.Node is ReturnStatementSyntax { Expression: { } expression })
             {
@@ -42,6 +43,7 @@
         private static void HandleArrow(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is { } &&
                 !IsIgnored(context.ContainingSymbol) &&
                 context.Node is ArrowExpressionClauseSyntax { Expression: { } expression })
             {
@@ -52,6 +54,7 @@
         private static void HandleLambda(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
+                context.ContainingSymbol is { } &&
                 !IsIgnored(context.ContainingSymbol) &&
                 context.Node is LambdaExpressionSyntax { Body: ExpressionSyntax expression } lambda &&
                 ShouldHandle())

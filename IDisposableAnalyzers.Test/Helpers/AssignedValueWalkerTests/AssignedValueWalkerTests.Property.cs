@@ -488,7 +488,7 @@ namespace N
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var fieldDeclaration = syntaxTree.FindFieldDeclaration("c1");
             var field = semanticModel.GetDeclaredSymbolSafe(fieldDeclaration, CancellationToken.None);
-            using var walker = AssignedValueWalker.Borrow(field, semanticModel, CancellationToken.None);
+            using var walker = AssignedValueWalker.Borrow(field!, semanticModel, CancellationToken.None);
             var actual = string.Join(", ", walker.Values);
             Assert.AreEqual("null, value", actual);
         }
