@@ -176,7 +176,7 @@ namespace ValidCode.Recursion
 
         public void Dispose()
         {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             this.withBackingField1.Dispose();
             this.withBackingField2.Dispose();
             this.StatementBody.Dispose();
@@ -192,7 +192,7 @@ namespace ValidCode.Recursion
             this.ExpressionBodyCycle3.Dispose();
             this.WithBackingField1.Dispose();
             this.WithBackingField2.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
 
         public void SameAsInCtor()
@@ -238,7 +238,7 @@ namespace ValidCode.Recursion
             {
             }
 
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             using (var item = this.StatementBodyRecursiveAccessors)
             {
             }
@@ -302,7 +302,7 @@ namespace ValidCode.Recursion
             using (this.withBackingField2)
             {
             }
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
     }
 }

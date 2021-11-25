@@ -50,9 +50,9 @@ namespace N
 
         public void Dispose()
         {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             this.inner.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
     }
 }";
@@ -104,9 +104,9 @@ namespace N
 
         public void Dispose()
         {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             this.inner.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
     }
 }";
@@ -158,9 +158,9 @@ namespace N
 
         public void Dispose()
         {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             this.inner.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
     }
 }";
@@ -214,9 +214,9 @@ namespace N
 
         public void Dispose()
         {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
             this.inner.Dispose();
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
         }
     }
 }";

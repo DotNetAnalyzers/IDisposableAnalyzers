@@ -11,7 +11,7 @@
 
 ## Description
 
-Call base.Dispose(disposing)
+Call base.Dispose(disposing).
 
 ## Motivation
 

@@ -55,7 +55,7 @@ namespace ValidCode.Tuples
 
             public void Dispose()
             {
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
                 this.item1.Dispose();
                 (this.item2 as IDisposable)?.Dispose();
 #pragma warning restore IDISP007

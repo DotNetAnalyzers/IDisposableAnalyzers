@@ -21,7 +21,7 @@ Roslyn analyzers for IDisposable
 | [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore created IDisposable.
 | [IDISP005](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP005.md)| Return type should indicate that the value should be disposed.
 | [IDISP006](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP006.md)| Implement IDisposable.
-| [IDISP007](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP007.md)| Don't dispose injected.
+| [IDISP007](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP007.md)| Don't dispose injected
 | [IDISP008](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP008.md)| Don't assign member with injected and created disposables.
 | [IDISP009](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP009.md)| Add IDisposable interface.
 | [IDISP010](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP010.md)| Call base.Dispose(disposing)

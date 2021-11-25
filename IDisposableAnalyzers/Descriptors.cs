@@ -60,8 +60,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP007DoNotDisposeInjected = Create(
             id: "IDISP007",
-            title: "Don't dispose injected.",
-            messageFormat: "Don't dispose injected.",
+            title: "Don't dispose injected",
+            messageFormat: "Don't dispose injected",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -92,7 +92,7 @@
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Call base.Dispose(disposing)");
+            description: "Call base.Dispose(disposing).");
 
         internal static readonly DiagnosticDescriptor IDISP011DontReturnDisposed = Create(
             id: "IDISP011",

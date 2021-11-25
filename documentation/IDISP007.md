@@ -1,5 +1,5 @@
 # IDISP007
-## Don't dispose injected.
+## Don't dispose injected
 
 | Topic    | Value
 | :--      | :--
@@ -32,21 +32,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
 Code violating the rule here
-#pragma warning restore IDISP007 // Don't dispose injected.
+#pragma warning restore IDISP007 // Don't dispose injected
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP007 // Don't dispose injected.
+#pragma warning disable IDISP007 // Don't dispose injected
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP007:Don't dispose injected.", 
+    "IDISP007:Don't dispose injected", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->
