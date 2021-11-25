@@ -1,3 +1,7 @@
+#### 4.0.0
+* BREAKING: For VS2022+ now.
+* BUGFIX: AD0001 -> Could not load file or assembly
+
 #### 3.4.15
 * BUGFIX: IDISP005 with ServiceDescriptor
 * BUGFIX: IDISP004 when DisposeWith
