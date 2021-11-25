@@ -1,5 +1,5 @@
 # IDISP025
-## Class with no virtual dispose method should be sealed.
+## Class with no virtual dispose method should be sealed
 
 | Topic    | Value
 | :--      | :--
@@ -31,21 +31,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP025 // Class with no virtual dispose method should be sealed.
+#pragma warning disable IDISP025 // Class with no virtual dispose method should be sealed
 Code violating the rule here
-#pragma warning restore IDISP025 // Class with no virtual dispose method should be sealed.
+#pragma warning restore IDISP025 // Class with no virtual dispose method should be sealed
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP025 // Class with no virtual dispose method should be sealed.
+#pragma warning disable IDISP025 // Class with no virtual dispose method should be sealed
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP025:Class with no virtual dispose method should be sealed.", 
+    "IDISP025:Class with no virtual dispose method should be sealed", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

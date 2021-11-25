@@ -204,8 +204,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP023ReferenceTypeInFinalizerContext = Create(
             id: "IDISP023",
-            title: "Don't use reference types in finalizer context.",
-            messageFormat: "Don't use reference types in finalizer context.",
+            title: "Don't use reference types in finalizer context",
+            messageFormat: "Don't use reference types in finalizer context",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -213,8 +213,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP024DoNotCallSuppressFinalize = Create(
             id: "IDISP024",
-            title: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
-            messageFormat: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.",
+            title: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer",
+            messageFormat: "Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -222,8 +222,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP025SealDisposable = Create(
             id: "IDISP025",
-            title: "Class with no virtual dispose method should be sealed.",
-            messageFormat: "Class with no virtual dispose method should be sealed.",
+            title: "Class with no virtual dispose method should be sealed",
+            messageFormat: "Class with no virtual dispose method should be sealed",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,

@@ -37,9 +37,9 @@ Roslyn analyzers for IDisposable
 | [IDISP020](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP020.md)| Call SuppressFinalize(this)
 | [IDISP021](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP021.md)| Call this.Dispose(true)
 | [IDISP022](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md)| Call this.Dispose(false)
-| [IDISP023](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP023.md)| Don't use reference types in finalizer context.
-| [IDISP024](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP024.md)| Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
-| [IDISP025](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP025.md)| Class with no virtual dispose method should be sealed.
+| [IDISP023](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP023.md)| Don't use reference types in finalizer context
+| [IDISP024](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP024.md)| Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer
+| [IDISP025](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP025.md)| Class with no virtual dispose method should be sealed
 | [SyntaxTreeCacheAnalyzer]()| Controls caching of for example semantic models for syntax trees
 
 ## Using IDisposableAnalyzers

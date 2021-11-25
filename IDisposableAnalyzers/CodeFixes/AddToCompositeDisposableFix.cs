@@ -123,7 +123,7 @@
 
                                             break;
                                         case { ArgumentList: { } argumentList }
-                                            when argumentList.Arguments.TryFirst(x => !(x.Expression is LiteralExpressionSyntax), out _):
+                                            when argumentList.Arguments.TryFirst(x => x.Expression is not LiteralExpressionSyntax, out _):
                                             editor.RemoveNode(statement);
                                             editor.ReplaceNode(
                                                 argumentList,

@@ -1,5 +1,5 @@
 # IDISP024
-## Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
+## Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer
 
 | Topic    | Value
 | :--      | :--
@@ -31,21 +31,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
+#pragma warning disable IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer
 Code violating the rule here
-#pragma warning restore IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
+#pragma warning restore IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
+#pragma warning disable IDISP024 // Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP024:Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.", 
+    "IDISP024:Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->
