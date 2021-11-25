@@ -130,7 +130,7 @@
                                         dotToken: SyntaxFactory.Token(SyntaxKind.DotToken),
                                         right: SyntaxFactory.IdentifierName("Framework")),
                                     dotToken: SyntaxFactory.Token(SyntaxKind.DotToken),
-                                    right: SyntaxFactory.IdentifierName(tearDownType.Type))
+                                    right: SyntaxFactory.IdentifierName(tearDownType.Alias!))
                                                    .WithSimplifiedNames(),
                                 argumentList: default)),
                         closeBracketToken: SyntaxFactory.Token(SyntaxKind.CloseBracketToken))),
@@ -139,7 +139,7 @@
                 returnType: SyntaxFactory.PredefinedType(
                     keyword: SyntaxFactory.Token(SyntaxKind.VoidKeyword)),
                 explicitInterfaceSpecifier: default,
-                identifier: SyntaxFactory.Identifier(tearDownType.Alias),
+                identifier: SyntaxFactory.Identifier(tearDownType.Alias!),
                 typeParameterList: default,
                 parameterList: SyntaxFactory.ParameterList(),
                 constraintClauses: default,

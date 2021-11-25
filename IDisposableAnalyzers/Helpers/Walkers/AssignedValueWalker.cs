@@ -16,8 +16,10 @@
         private readonly List<ExpressionSyntax> values = new();
         private readonly List<ExpressionSyntax> outValues = new();
         private readonly MemberWalkers memberWalkers = new();
+#pragma warning disable RS1024 // Compare symbols correctly
         private readonly HashSet<IParameterSymbol> refParameters = new(ParameterSymbolComparer.Default);
         private readonly HashSet<IParameterSymbol> outParameters = new(ParameterSymbolComparer.Default);
+#pragma warning restore RS1024 // Compare symbols correctly
         private readonly PublicMemberWalker publicMemberWalker;
         private readonly CtorArgWalker ctorArgWalker;
 

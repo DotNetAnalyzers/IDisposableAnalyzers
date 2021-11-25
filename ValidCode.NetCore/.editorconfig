@@ -21,3 +21,6 @@ dotnet_diagnostic.CS8618.severity = none
 # IDE0051: Remove unused private members
 dotnet_diagnostic.IDE0051.severity = none
 
+
+# RS1024: Compare symbols correctly
+dotnet_diagnostic.RS1024.severity = none
