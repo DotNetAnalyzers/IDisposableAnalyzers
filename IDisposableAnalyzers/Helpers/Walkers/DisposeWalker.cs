@@ -8,8 +8,8 @@
 
     internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>
     {
-        private readonly List<DisposeCall> invocations = new List<DisposeCall>();
-        private readonly List<IdentifierNameSyntax> identifiers = new List<IdentifierNameSyntax>();
+        private readonly List<DisposeCall> invocations = new();
+        private readonly List<IdentifierNameSyntax> identifiers = new();
 
         private DisposeWalker()
         {

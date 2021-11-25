@@ -6,7 +6,7 @@ namespace ValidCode.Tuples
 
     public sealed class ListOfTupleOfFileStreams : IDisposable
     {
-        private readonly List<Tuple<FileStream, FileStream>> xs = new List<Tuple<FileStream, FileStream>>();
+        private readonly List<Tuple<FileStream, FileStream>> xs = new();
 
         public void M(string file1, string file2)
         {

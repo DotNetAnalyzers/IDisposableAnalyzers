@@ -6,7 +6,7 @@ namespace ValidCode.Collections
 
     internal sealed class WithListOfDisposable : IDisposable
     {
-        private readonly List<IDisposable> disposables = new List<IDisposable> { new Disposable(), };
+        private readonly List<IDisposable> disposables = new() { new Disposable(), };
 
         public WithListOfDisposable()
         {

@@ -6,8 +6,8 @@ namespace ValidCode.Rx
 
     public sealed class UsingGenericSerialDisposable : IDisposable
     {
-        private readonly SerialDisposable<IDisposable> serial1 = new SerialDisposable<IDisposable>();
-        private readonly SerialDisposable<IDisposable> serial2 = new SerialDisposable<IDisposable>();
+        private readonly SerialDisposable<IDisposable> serial1 = new();
+        private readonly SerialDisposable<IDisposable> serial2 = new();
 
         public void Update(IObservable<object> observable)
         {

@@ -39,7 +39,7 @@ namespace ValidCode.Tuples
 
         public static class Pair
         {
-            public static Pair<T> Create<T>(T item1, T item2) => new Pair<T>(item1, item2);
+            public static Pair<T> Create<T>(T item1, T item2) => new(item1, item2);
         }
 
         public class Pair<T>

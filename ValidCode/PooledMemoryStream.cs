@@ -6,7 +6,7 @@
 
     internal class PooledMemoryStream : Stream
     {
-        private static readonly ConcurrentQueue<MemoryStream> Pool = new ConcurrentQueue<MemoryStream>();
+        private static readonly ConcurrentQueue<MemoryStream> Pool = new();
         private readonly MemoryStream inner;
 
         private bool disposed;

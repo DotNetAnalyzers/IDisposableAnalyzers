@@ -7,7 +7,7 @@ namespace ValidCode
 
     public sealed class Loops : IDisposable
     {
-        private readonly List<Disposable> disposables = new List<Disposable>();
+        private readonly List<Disposable> disposables = new();
 
         public void Update()
         {

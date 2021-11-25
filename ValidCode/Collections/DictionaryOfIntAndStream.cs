@@ -6,7 +6,7 @@ namespace ValidCode.Collections
 
     public class DictionaryOfIntAndStream
     {
-        private readonly Dictionary<int, Stream> streams = new Dictionary<int, Stream>();
+        private readonly Dictionary<int, Stream> streams = new();
 
         public DictionaryOfIntAndStream()
         {

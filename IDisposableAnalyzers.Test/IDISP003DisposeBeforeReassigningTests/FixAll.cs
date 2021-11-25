@@ -5,9 +5,9 @@
 
     public static class FixAll
     {
-        private static readonly AssignmentAnalyzer Analyzer = new AssignmentAnalyzer();
+        private static readonly AssignmentAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
-        private static readonly DisposeBeforeAssignFix Fix = new DisposeBeforeAssignFix();
+        private static readonly DisposeBeforeAssignFix Fix = new();
 
         [Test]
         public static void NotDisposingVariable()

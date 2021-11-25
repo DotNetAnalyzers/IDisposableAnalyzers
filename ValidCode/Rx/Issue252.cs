@@ -8,7 +8,7 @@ namespace ValidCode.Rx
 
     public sealed class Issue252 : IDisposable
     {
-        private readonly CompositeDisposable _disposable = new CompositeDisposable();
+        private readonly CompositeDisposable _disposable = new();
 
         public Issue252(ICondition c1, ICondition c2)
         {

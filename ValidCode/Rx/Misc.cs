@@ -10,8 +10,8 @@ namespace ValidCode.Rx
     {
         private readonly IDisposable subscription1;
         private readonly IDisposable subscription2;
-        private readonly SingleAssignmentDisposable singleAssignmentDisposable = new SingleAssignmentDisposable();
-        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+        private readonly SingleAssignmentDisposable singleAssignmentDisposable = new();
+        private readonly CompositeDisposable compositeDisposable = new();
 
         public Misc(int no)
             : this(Create(no))

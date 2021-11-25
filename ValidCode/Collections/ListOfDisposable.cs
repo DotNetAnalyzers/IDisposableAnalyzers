@@ -7,7 +7,7 @@ namespace ValidCode.Collections
 
     internal sealed class ListOfDisposable : IDisposable
     {
-        private readonly List<Stream> _streams = new List<Stream> { null };
+        private readonly List<Stream> _streams = new() { null };
 
         public ListOfDisposable()
         {

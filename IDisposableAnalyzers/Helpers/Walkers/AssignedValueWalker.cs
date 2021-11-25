@@ -13,11 +13,11 @@
 
     internal sealed class AssignedValueWalker : PooledWalker<AssignedValueWalker>
     {
-        private readonly List<ExpressionSyntax> values = new List<ExpressionSyntax>();
-        private readonly List<ExpressionSyntax> outValues = new List<ExpressionSyntax>();
-        private readonly MemberWalkers memberWalkers = new MemberWalkers();
-        private readonly HashSet<IParameterSymbol> refParameters = new HashSet<IParameterSymbol>(ParameterSymbolComparer.Default);
-        private readonly HashSet<IParameterSymbol> outParameters = new HashSet<IParameterSymbol>(ParameterSymbolComparer.Default);
+        private readonly List<ExpressionSyntax> values = new();
+        private readonly List<ExpressionSyntax> outValues = new();
+        private readonly MemberWalkers memberWalkers = new();
+        private readonly HashSet<IParameterSymbol> refParameters = new(ParameterSymbolComparer.Default);
+        private readonly HashSet<IParameterSymbol> outParameters = new(ParameterSymbolComparer.Default);
         private readonly PublicMemberWalker publicMemberWalker;
         private readonly CtorArgWalker ctorArgWalker;
 
@@ -845,7 +845,7 @@
 
         private class MemberWalkers
         {
-            private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new Dictionary<SyntaxNode, AssignedValueWalker>();
+            private readonly Dictionary<SyntaxNode, AssignedValueWalker> map = new();
 
             internal MemberWalkers? Parent { get; set; }
 

@@ -13,8 +13,8 @@
 
     internal sealed class ReturnValueWalker : PooledWalker<ReturnValueWalker>
     {
-        private readonly SmallSet<ExpressionSyntax> values = new SmallSet<ExpressionSyntax>();
-        private readonly AssignedValueWalkers assignedValueWalkers = new AssignedValueWalkers();
+        private readonly SmallSet<ExpressionSyntax> values = new();
+        private readonly AssignedValueWalkers assignedValueWalkers = new();
         private ReturnValueSearch search;
         private Recursion recursion = null!;
 
@@ -374,7 +374,7 @@
 
         private class AssignedValueWalkers
         {
-            private readonly Dictionary<IdentifierNameSyntax, AssignedValueWalker> map = new Dictionary<IdentifierNameSyntax, AssignedValueWalker>();
+            private readonly Dictionary<IdentifierNameSyntax, AssignedValueWalker> map = new();
 
             internal void Add(IdentifierNameSyntax location, AssignedValueWalker walker)
             {
