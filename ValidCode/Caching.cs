@@ -1,12 +1,12 @@
-namespace ValidCode
+﻿namespace ValidCode
 {
     using System.Collections.Concurrent;
     using System.IO;
 
     internal class Caching
     {
-        private static readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
-        private readonly ConcurrentDictionary<int, Stream> cache = new ConcurrentDictionary<int, Stream>();
+        private static readonly ConcurrentDictionary<int, Stream> Cache = new();
+        private readonly ConcurrentDictionary<int, Stream> cache = new();
 
         public static long Bar()
         {

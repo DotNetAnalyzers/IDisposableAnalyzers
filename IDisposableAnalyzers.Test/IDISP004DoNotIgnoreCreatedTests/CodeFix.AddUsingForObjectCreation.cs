@@ -7,7 +7,7 @@
     {
         public static class AddUsingForObjectCreation
         {
-            private static readonly AddUsingFix Fix = new AddUsingFix();
+            private static readonly AddUsingFix Fix = new();
 
             [Test]
             public static void AddUsingForIgnoredFileOpenRead()

@@ -309,7 +309,7 @@ Or put this at the top of the file to disable all instances.
 
         public class CodeFile
         {
-            private static readonly ConcurrentDictionary<Type, CodeFile> Cache = new ConcurrentDictionary<Type, CodeFile>();
+            private static readonly ConcurrentDictionary<Type, CodeFile> Cache = new();
 
             public CodeFile(string name)
             {

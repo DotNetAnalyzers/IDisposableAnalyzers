@@ -9,7 +9,7 @@
     public static partial class Valid<T>
         where T : DiagnosticAnalyzer, new()
     {
-        private static readonly T Analyzer = new T();
+        private static readonly T Analyzer = new();
 
         [TestCase("private Stream Stream")]
         [TestCase("protected Stream Stream")]
