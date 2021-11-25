@@ -1,5 +1,5 @@
 # IDISP015
-## Member should not return created and cached instance.
+## Member should not return created and cached instance
 
 | Topic    | Value
 | :--      | :--
@@ -43,21 +43,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP015 // Member should not return created and cached instance.
+#pragma warning disable IDISP015 // Member should not return created and cached instance
 Code violating the rule here
-#pragma warning restore IDISP015 // Member should not return created and cached instance.
+#pragma warning restore IDISP015 // Member should not return created and cached instance
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP015 // Member should not return created and cached instance.
+#pragma warning disable IDISP015 // Member should not return created and cached instance
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP015:Member should not return created and cached instance.", 
+    "IDISP015:Member should not return created and cached instance", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

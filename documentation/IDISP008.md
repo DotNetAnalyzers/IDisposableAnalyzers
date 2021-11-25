@@ -1,5 +1,5 @@
 # IDISP008
-## Don't assign member with injected and created disposables.
+## Don't assign member with injected and created disposables
 
 | Topic    | Value
 | :--      | :--
@@ -12,7 +12,7 @@
 
 ## Description
 
-Don't assign member with injected and created disposables. It creates a confusing ownership situation.
+Don't assign member with injected and created disposables It creates a confusing ownership situation.
 
 ## Motivation
 
@@ -82,21 +82,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP008 // Don't assign member with injected and created disposables.
+#pragma warning disable IDISP008 // Don't assign member with injected and created disposables
 Code violating the rule here
-#pragma warning restore IDISP008 // Don't assign member with injected and created disposables.
+#pragma warning restore IDISP008 // Don't assign member with injected and created disposables
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP008 // Don't assign member with injected and created disposables.
+#pragma warning disable IDISP008 // Don't assign member with injected and created disposables
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP008:Don't assign member with injected and created disposables.", 
+    "IDISP008:Don't assign member with injected and created disposables", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

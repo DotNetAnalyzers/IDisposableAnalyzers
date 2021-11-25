@@ -51,8 +51,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
-                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable");
+                RoslynAssert.FixAll(Fix, CS0535, before, after, fixTitle: "Implement IDisposable");
             }
 
             [Test]
@@ -321,7 +321,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable.");
+                RoslynAssert.CodeFix(Fix, CS0535, before, after, fixTitle: "Implement IDisposable");
             }
 
             [Test]

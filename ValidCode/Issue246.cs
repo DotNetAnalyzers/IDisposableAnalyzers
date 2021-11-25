@@ -23,7 +23,7 @@ namespace ValidCode
             }
 
             process.Start();
-            return process;  // IDISP011	Don't return disposed instance.
+            return process;  // IDISP011	Don't return disposed instance
         }
     }
 }

@@ -48,9 +48,9 @@ namespace ValidCode
 
         public IDisposable Disposable => this.subscription.Disposable;
 
-#pragma warning disable IDISP012 // Property should not return created disposable.
+#pragma warning disable IDISP012 // Property should not return created disposable
         public IDisposable CreateDisposableProperty => new Disposable();
-#pragma warning restore IDISP012 // Property should not return created disposable.
+#pragma warning restore IDISP012 // Property should not return created disposable
 
         public bool IsDirty
         {

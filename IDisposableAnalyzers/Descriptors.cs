@@ -51,8 +51,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP006ImplementIDisposable = Create(
             id: "IDISP006",
-            title: "Implement IDisposable.",
-            messageFormat: "Implement IDisposable.",
+            title: "Implement IDisposable",
+            messageFormat: "Implement IDisposable",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -69,17 +69,17 @@
 
         internal static readonly DiagnosticDescriptor IDISP008DoNotMixInjectedAndCreatedForMember = Create(
             id: "IDISP008",
-            title: "Don't assign member with injected and created disposables.",
-            messageFormat: "Don't assign member with injected and created disposables.",
+            title: "Don't assign member with injected and created disposables",
+            messageFormat: "Don't assign member with injected and created disposables",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
-            description: "Don't assign member with injected and created disposables. It creates a confusing ownership situation.");
+            description: "Don't assign member with injected and created disposables It creates a confusing ownership situation.");
 
         internal static readonly DiagnosticDescriptor IDISP009IsIDisposable = Create(
             id: "IDISP009",
-            title: "Add IDisposable interface.",
-            messageFormat: "Add IDisposable interface.",
+            title: "Add IDisposable interface",
+            messageFormat: "Add IDisposable interface",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -96,8 +96,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP011DontReturnDisposed = Create(
             id: "IDISP011",
-            title: "Don't return disposed instance.",
-            messageFormat: "Don't return disposed instance.",
+            title: "Don't return disposed instance",
+            messageFormat: "Don't return disposed instance",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -105,8 +105,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP012PropertyShouldNotReturnCreated = Create(
             id: "IDISP012",
-            title: "Property should not return created disposable.",
-            messageFormat: "Property should not return created disposable.",
+            title: "Property should not return created disposable",
+            messageFormat: "Property should not return created disposable",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -114,8 +114,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP013AwaitInUsing = Create(
             id: "IDISP013",
-            title: "Await in using.",
-            messageFormat: "Await in using.",
+            title: "Await in using",
+            messageFormat: "Await in using",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -123,8 +123,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP014UseSingleInstanceOfHttpClient = Create(
             id: "IDISP014",
-            title: "Use a single instance of HttpClient.",
-            messageFormat: "Use a single instance of HttpClient.",
+            title: "Use a single instance of HttpClient",
+            messageFormat: "Use a single instance of HttpClient",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Info,
             isEnabledByDefault: true,
@@ -132,8 +132,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP015DoNotReturnCachedAndCreated = Create(
             id: "IDISP015",
-            title: "Member should not return created and cached instance.",
-            messageFormat: "Member should not return created and cached instance.",
+            title: "Member should not return created and cached instance",
+            messageFormat: "Member should not return created and cached instance",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -141,8 +141,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP016DoNotUseDisposedInstance = Create(
             id: "IDISP016",
-            title: "Don't use disposed instance.",
-            messageFormat: "Don't use disposed instance.",
+            title: "Don't use disposed instance",
+            messageFormat: "Don't use disposed instance",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -150,8 +150,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP017PreferUsing = Create(
             id: "IDISP017",
-            title: "Prefer using.",
-            messageFormat: "Prefer using.",
+            title: "Prefer using",
+            messageFormat: "Prefer using",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -159,8 +159,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP018CallSuppressFinalizeSealed = Create(
             id: "IDISP018",
-            title: "Call SuppressFinalize.",
-            messageFormat: "Call SuppressFinalize(this).",
+            title: "Call SuppressFinalize",
+            messageFormat: "Call SuppressFinalize(this)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -168,8 +168,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP019CallSuppressFinalizeVirtual = Create(
             id: "IDISP019",
-            title: "Call SuppressFinalize.",
-            messageFormat: "Call SuppressFinalize(this).",
+            title: "Call SuppressFinalize",
+            messageFormat: "Call SuppressFinalize(this)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -177,8 +177,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP020SuppressFinalizeThis = Create(
             id: "IDISP020",
-            title: "Call SuppressFinalize with this.",
-            messageFormat: "Call SuppressFinalize(this).",
+            title: "Call SuppressFinalize(this)",
+            messageFormat: "Call SuppressFinalize(this)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,

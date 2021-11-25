@@ -1,5 +1,5 @@
 # IDISP014
-## Use a single instance of HttpClient.
+## Use a single instance of HttpClient
 
 | Topic    | Value
 | :--      | :--
@@ -36,21 +36,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP014 // Use a single instance of HttpClient.
+#pragma warning disable IDISP014 // Use a single instance of HttpClient
 Code violating the rule here
-#pragma warning restore IDISP014 // Use a single instance of HttpClient.
+#pragma warning restore IDISP014 // Use a single instance of HttpClient
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP014 // Use a single instance of HttpClient.
+#pragma warning disable IDISP014 // Use a single instance of HttpClient
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP014:Use a single instance of HttpClient.", 
+    "IDISP014:Use a single instance of HttpClient", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

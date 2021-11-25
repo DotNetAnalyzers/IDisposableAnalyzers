@@ -1,5 +1,5 @@
 # IDISP017
-## Prefer using.
+## Prefer using
 
 | Topic    | Value
 | :--      | :--
@@ -63,21 +63,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP017 // Prefer using.
+#pragma warning disable IDISP017 // Prefer using
 Code violating the rule here
-#pragma warning restore IDISP017 // Prefer using.
+#pragma warning restore IDISP017 // Prefer using
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP017 // Prefer using.
+#pragma warning disable IDISP017 // Prefer using
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP017:Prefer using.", 
+    "IDISP017:Prefer using", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

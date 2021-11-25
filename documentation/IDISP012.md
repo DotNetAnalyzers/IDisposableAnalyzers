@@ -1,5 +1,5 @@
 # IDISP012
-## Property should not return created disposable.
+## Property should not return created disposable
 
 | Topic    | Value
 | :--      | :--
@@ -30,21 +30,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP012 // Property should not return created disposable.
+#pragma warning disable IDISP012 // Property should not return created disposable
 Code violating the rule here
-#pragma warning restore IDISP012 // Property should not return created disposable.
+#pragma warning restore IDISP012 // Property should not return created disposable
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP012 // Property should not return created disposable.
+#pragma warning disable IDISP012 // Property should not return created disposable
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP012:Property should not return created disposable.", 
+    "IDISP012:Property should not return created disposable", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

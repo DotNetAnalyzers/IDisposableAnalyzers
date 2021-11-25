@@ -1,5 +1,5 @@
 # IDISP020
-## Call SuppressFinalize with this.
+## Call SuppressFinalize(this)
 
 | Topic    | Value
 | :--      | :--
@@ -42,21 +42,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP020 // Call SuppressFinalize with this.
+#pragma warning disable IDISP020 // Call SuppressFinalize(this)
 Code violating the rule here
-#pragma warning restore IDISP020 // Call SuppressFinalize with this.
+#pragma warning restore IDISP020 // Call SuppressFinalize(this)
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP020 // Call SuppressFinalize with this.
+#pragma warning disable IDISP020 // Call SuppressFinalize(this)
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP020:Call SuppressFinalize with this.", 
+    "IDISP020:Call SuppressFinalize(this)", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

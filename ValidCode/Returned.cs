@@ -15,9 +15,9 @@ namespace ValidCode
             using var yieldReturnFileOpenRead = this.YieldReturnFileOpenRead().Single();
         }
 
-#pragma warning disable IDISP012 // Property should not return created disposable.
+#pragma warning disable IDISP012 // Property should not return created disposable
         IDisposable FileOpenReadProperty => File.OpenRead(string.Empty);
-#pragma warning restore IDISP012 // Property should not return created disposable.
+#pragma warning restore IDISP012 // Property should not return created disposable
 
         IDisposable FileOpenRead() => File.OpenRead(string.Empty);
 

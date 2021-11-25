@@ -149,8 +149,8 @@
 * BUGFIX: Generate correct code for disposing explicit disposable.
 * BUGFIX: IDISP004 nag on chained invocation.
 * BUGFIX: IDISP004 default warning.
-* FEATURE: IDISP0011 don't return disposed instance.
-* FEATURE: IDISP0011 property should not return created disposable.
+* FEATURE: IDISP0011 Don't return disposed instance
+* FEATURE: IDISP0011 Property should not return created disposable
 
 #### 0.1.3.1
 * BUGFIX: Don't nag about implementing IDisposable if disposing in teardown

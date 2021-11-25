@@ -1,5 +1,5 @@
 # IDISP009
-## Add IDisposable interface.
+## Add IDisposable interface
 
 | Topic    | Value
 | :--      | :--
@@ -30,21 +30,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP009 // Add IDisposable interface.
+#pragma warning disable IDISP009 // Add IDisposable interface
 Code violating the rule here
-#pragma warning restore IDISP009 // Add IDisposable interface.
+#pragma warning restore IDISP009 // Add IDisposable interface
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP009 // Add IDisposable interface.
+#pragma warning disable IDISP009 // Add IDisposable interface
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP009:Add IDisposable interface.", 
+    "IDISP009:Add IDisposable interface", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

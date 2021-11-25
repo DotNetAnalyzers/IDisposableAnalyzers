@@ -20,21 +20,21 @@ Roslyn analyzers for IDisposable
 | [IDISP003](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP003.md)| Dispose previous before re-assigning.
 | [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore created IDisposable.
 | [IDISP005](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP005.md)| Return type should indicate that the value should be disposed.
-| [IDISP006](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP006.md)| Implement IDisposable.
+| [IDISP006](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP006.md)| Implement IDisposable
 | [IDISP007](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP007.md)| Don't dispose injected
-| [IDISP008](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP008.md)| Don't assign member with injected and created disposables.
-| [IDISP009](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP009.md)| Add IDisposable interface.
+| [IDISP008](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP008.md)| Don't assign member with injected and created disposables
+| [IDISP009](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP009.md)| Add IDisposable interface
 | [IDISP010](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP010.md)| Call base.Dispose(disposing)
-| [IDISP011](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP011.md)| Don't return disposed instance.
-| [IDISP012](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP012.md)| Property should not return created disposable.
-| [IDISP013](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP013.md)| Await in using.
-| [IDISP014](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP014.md)| Use a single instance of HttpClient.
-| [IDISP015](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP015.md)| Member should not return created and cached instance.
-| [IDISP016](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP016.md)| Don't use disposed instance.
-| [IDISP017](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP017.md)| Prefer using.
-| [IDISP018](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP018.md)| Call SuppressFinalize.
-| [IDISP019](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP019.md)| Call SuppressFinalize.
-| [IDISP020](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP020.md)| Call SuppressFinalize with this.
+| [IDISP011](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP011.md)| Don't return disposed instance
+| [IDISP012](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP012.md)| Property should not return created disposable
+| [IDISP013](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP013.md)| Await in using
+| [IDISP014](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP014.md)| Use a single instance of HttpClient
+| [IDISP015](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP015.md)| Member should not return created and cached instance
+| [IDISP016](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP016.md)| Don't use disposed instance
+| [IDISP017](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP017.md)| Prefer using
+| [IDISP018](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP018.md)| Call SuppressFinalize
+| [IDISP019](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP019.md)| Call SuppressFinalize
+| [IDISP020](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP020.md)| Call SuppressFinalize(this)
 | [IDISP021](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP021.md)| Call this.Dispose(true).
 | [IDISP022](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md)| Call this.Dispose(false).
 | [IDISP023](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP023.md)| Don't use reference types in finalizer context.

@@ -1,5 +1,5 @@
 # IDISP016
-## Don't use disposed instance.
+## Don't use disposed instance
 
 | Topic    | Value
 | :--      | :--
@@ -47,21 +47,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP016 // Don't use disposed instance.
+#pragma warning disable IDISP016 // Don't use disposed instance
 Code violating the rule here
-#pragma warning restore IDISP016 // Don't use disposed instance.
+#pragma warning restore IDISP016 // Don't use disposed instance
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP016 // Don't use disposed instance.
+#pragma warning disable IDISP016 // Don't use disposed instance
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP016:Don't use disposed instance.", 
+    "IDISP016:Don't use disposed instance", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

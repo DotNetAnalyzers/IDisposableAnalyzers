@@ -52,7 +52,7 @@
                     else if (typeDeclaration is StructDeclarationSyntax structDeclaration)
                     {
                         context.RegisterCodeFix(
-                            "Implement IDisposable.",
+                            "Implement IDisposable",
                             (editor, _) => editor.AddMethod(structDeclaration, MethodFactory.Dispose()),
                             "Struct",
                             diagnostic);
@@ -89,7 +89,7 @@
                             {
                                 case { IsSealed: true }:
                                     context.RegisterCodeFix(
-                                        "Implement IDisposable.",
+                                        "Implement IDisposable",
                                         (editor, cancellationToken) =>
                                             SealedAsync(editor, cancellationToken),
                                         nameof(SealedAsync),
@@ -97,7 +97,7 @@
                                     break;
                                 case { IsAbstract: true }:
                                     context.RegisterCodeFix(
-                                        "Implement IDisposable.",
+                                        "Implement IDisposable",
                                         (editor, cancellationToken) => VanillaAsync(editor, cancellationToken),
                                         nameof(VanillaAsync),
                                         diagnostic);
@@ -116,7 +116,7 @@
                                         diagnostic);
 
                                     context.RegisterCodeFix(
-                                        "Implement IDisposable.",
+                                        "Implement IDisposable",
                                         (editor, cancellationToken) => VanillaAsync(editor, cancellationToken),
                                         nameof(VanillaAsync),
                                         diagnostic);
