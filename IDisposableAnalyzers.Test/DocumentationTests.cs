@@ -123,7 +123,7 @@ namespace IDisposableAnalyzers.Test
             {
                 var start = doc.IndexOf(startToken, StringComparison.Ordinal);
                 var end = doc.IndexOf(endToken, StringComparison.Ordinal) + endToken.Length;
-                return doc.Substring(start, end - start);
+                return doc[start..end];
             }
         }
 

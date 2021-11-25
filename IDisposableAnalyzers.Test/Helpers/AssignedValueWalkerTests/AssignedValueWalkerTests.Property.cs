@@ -191,7 +191,6 @@ namespace N
             var value = syntaxTree.FindEqualsValueClause("var temp = this.p").Value;
             using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
             var actual = string.Join(", ", walker.Values);
-#pragma warning disable GU0006 // Use nameof.
             Assert.AreEqual("value", actual);
         }
 
