@@ -13,7 +13,7 @@
             if (this._timer != null)
             {
                 await this._timer.DisposeAsync();
-                this._timer = null; // Warns with IDISP003: Dispose previous before re-assigning.
+                this._timer = null; // Warns with IDISP003: Dispose previous before re-assigning
             }
         }
 

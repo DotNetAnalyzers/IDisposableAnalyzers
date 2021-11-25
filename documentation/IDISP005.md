@@ -1,5 +1,5 @@
 # IDISP005
-## Return type should indicate that the value should be disposed.
+## Return type should indicate that the value should be disposed
 
 | Topic    | Value
 | :--      | :--
@@ -52,21 +52,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP005 // Return type should indicate that the value should be disposed.
+#pragma warning disable IDISP005 // Return type should indicate that the value should be disposed
 Code violating the rule here
-#pragma warning restore IDISP005 // Return type should indicate that the value should be disposed.
+#pragma warning restore IDISP005 // Return type should indicate that the value should be disposed
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP005 // Return type should indicate that the value should be disposed.
+#pragma warning disable IDISP005 // Return type should indicate that the value should be disposed
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP005:Return type should indicate that the value should be disposed.", 
+    "IDISP005:Return type should indicate that the value should be disposed", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

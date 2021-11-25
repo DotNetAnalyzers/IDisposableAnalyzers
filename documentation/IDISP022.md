@@ -1,5 +1,5 @@
 ﻿# IDISP022
-## Call this.Dispose(false).
+## Call this.Dispose(false)
 
 | Topic    | Value
 | :--      | :--
@@ -48,21 +48,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP022 // Call this.Dispose(false).
+#pragma warning disable IDISP022 // Call this.Dispose(false)
 Code violating the rule here
-#pragma warning restore IDISP022 // Call this.Dispose(false).
+#pragma warning restore IDISP022 // Call this.Dispose(false)
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP022 // Call this.Dispose(false).
+#pragma warning disable IDISP022 // Call this.Dispose(false)
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP022:Call this.Dispose(false).", 
+    "IDISP022:Call this.Dispose(false)", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

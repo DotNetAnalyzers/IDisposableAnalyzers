@@ -72,7 +72,7 @@
                     else if (TearDown() is { } tearDown)
                     {
                         context.RegisterCodeFix(
-                            $"Create {tearDown.Identifier.ValueText} method and dispose member.",
+                            $"Create {tearDown.Identifier.ValueText} method and Dispose member",
                             (editor, cancellationToken) => editor.InsertAfter(
                                 initialize,
                                 tearDown.AddBodyStatements(IDisposableFactory.DisposeStatement(left, editor.SemanticModel, cancellationToken))),

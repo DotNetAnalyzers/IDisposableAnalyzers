@@ -15,11 +15,11 @@ Roslyn analyzers for IDisposable
 
 | Id       | Title
 | :--      | :--
-| [IDISP001](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP001.md)| Dispose created.
-| [IDISP002](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP002.md)| Dispose member.
-| [IDISP003](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP003.md)| Dispose previous before re-assigning.
-| [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore created IDisposable.
-| [IDISP005](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP005.md)| Return type should indicate that the value should be disposed.
+| [IDISP001](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP001.md)| Dispose created
+| [IDISP002](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP002.md)| Dispose member
+| [IDISP003](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP003.md)| Dispose previous before re-assigning
+| [IDISP004](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP004.md)| Don't ignore created IDisposable
+| [IDISP005](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP005.md)| Return type should indicate that the value should be disposed
 | [IDISP006](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP006.md)| Implement IDisposable
 | [IDISP007](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP007.md)| Don't dispose injected
 | [IDISP008](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP008.md)| Don't assign member with injected and created disposables
@@ -35,8 +35,8 @@ Roslyn analyzers for IDisposable
 | [IDISP018](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP018.md)| Call SuppressFinalize
 | [IDISP019](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP019.md)| Call SuppressFinalize
 | [IDISP020](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP020.md)| Call SuppressFinalize(this)
-| [IDISP021](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP021.md)| Call this.Dispose(true).
-| [IDISP022](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md)| Call this.Dispose(false).
+| [IDISP021](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP021.md)| Call this.Dispose(true)
+| [IDISP022](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP022.md)| Call this.Dispose(false)
 | [IDISP023](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP023.md)| Don't use reference types in finalizer context.
 | [IDISP024](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP024.md)| Don't call GC.SuppressFinalize(this) when the type is sealed and has no finalizer.
 | [IDISP025](https://github.com/DotNetAnalyzers/IDisposableAnalyzers/blob/master/documentation/IDISP025.md)| Class with no virtual dispose method should be sealed.

@@ -74,7 +74,7 @@
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, token) => DisposeInVirtual(editor, token),
-                                    "Dispose member.",
+                                    "Dispose member",
                                     diagnostic);
 
                                 void DisposeInVirtual(DocumentEditor editor, CancellationToken cancellationToken)
@@ -115,7 +115,7 @@
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, cancellationToken) => DisposeWhenNoParameter(editor, cancellationToken),
-                                    "Dispose member.",
+                                    "Dispose member",
                                     diagnostic);
 
                                 void DisposeWhenNoParameter(DocumentEditor editor, CancellationToken cancellationToken)
@@ -144,7 +144,7 @@
                                         x => x.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
                                             IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken))),
-                                    "Dispose member.",
+                                    "Dispose member",
                                     diagnostic);
                                 break;
                             case { Identifier: { ValueText: "Dispose" } }:

@@ -1,5 +1,5 @@
 # IDISP002
-## Dispose member.
+## Dispose member
 
 | Topic    | Value
 | :--      | :--
@@ -49,21 +49,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP002 // Dispose member.
+#pragma warning disable IDISP002 // Dispose member
 Code violating the rule here
-#pragma warning restore IDISP002 // Dispose member.
+#pragma warning restore IDISP002 // Dispose member
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP002 // Dispose member.
+#pragma warning disable IDISP002 // Dispose member
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP002:Dispose member.", 
+    "IDISP002:Dispose member", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

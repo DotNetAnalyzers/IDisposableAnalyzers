@@ -27,7 +27,7 @@ namespace N
             if (_timer != null)
             {
                 await _timer.DisposeAsync();
-                _timer = null; // Warns with IDISP003: Dispose previous before re-assigning.
+                _timer = null; // Warns with IDISP003: Dispose previous before re-assigning
             }
         }
 

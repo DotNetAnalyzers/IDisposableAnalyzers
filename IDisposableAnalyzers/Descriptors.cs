@@ -6,8 +6,8 @@
     {
         internal static readonly DiagnosticDescriptor IDISP001DisposeCreated = Create(
             id: "IDISP001",
-            title: "Dispose created.",
-            messageFormat: "Dispose created.",
+            title: "Dispose created",
+            messageFormat: "Dispose created",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -15,8 +15,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP002DisposeMember = Create(
             id: "IDISP002",
-            title: "Dispose member.",
-            messageFormat: "Dispose member.",
+            title: "Dispose member",
+            messageFormat: "Dispose member",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -24,8 +24,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP003DisposeBeforeReassigning = Create(
             id: "IDISP003",
-            title: "Dispose previous before re-assigning.",
-            messageFormat: "Dispose previous before re-assigning.",
+            title: "Dispose previous before re-assigning",
+            messageFormat: "Dispose previous before re-assigning",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -33,8 +33,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP004DoNotIgnoreCreated = Create(
             id: "IDISP004",
-            title: "Don't ignore created IDisposable.",
-            messageFormat: "Don't ignore created IDisposable.",
+            title: "Don't ignore created IDisposable",
+            messageFormat: "Don't ignore created IDisposable",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -42,8 +42,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP005ReturnTypeShouldBeIDisposable = Create(
             id: "IDISP005",
-            title: "Return type should indicate that the value should be disposed.",
-            messageFormat: "Return type should indicate that the value should be disposed.",
+            title: "Return type should indicate that the value should be disposed",
+            messageFormat: "Return type should indicate that the value should be disposed",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -186,8 +186,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP021DisposeTrue = Create(
             id: "IDISP021",
-            title: "Call this.Dispose(true).",
-            messageFormat: "Call this.Dispose(true).",
+            title: "Call this.Dispose(true)",
+            messageFormat: "Call this.Dispose(true)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,
@@ -195,8 +195,8 @@
 
         internal static readonly DiagnosticDescriptor IDISP022DisposeFalse = Create(
             id: "IDISP022",
-            title: "Call this.Dispose(false).",
-            messageFormat: "Call this.Dispose(false).",
+            title: "Call this.Dispose(false)",
+            messageFormat: "Call this.Dispose(false)",
             category: AnalyzerCategory.Correctness,
             defaultSeverity: DiagnosticSeverity.Warning,
             isEnabledByDefault: true,

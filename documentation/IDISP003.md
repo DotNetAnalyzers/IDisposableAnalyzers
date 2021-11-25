@@ -1,5 +1,5 @@
 # IDISP003
-## Dispose previous before re-assigning.
+## Dispose previous before re-assigning
 
 | Topic    | Value
 | :--      | :--
@@ -66,21 +66,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+#pragma warning disable IDISP003 // Dispose previous before re-assigning
 Code violating the rule here
-#pragma warning restore IDISP003 // Dispose previous before re-assigning.
+#pragma warning restore IDISP003 // Dispose previous before re-assigning
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP003 // Dispose previous before re-assigning.
+#pragma warning disable IDISP003 // Dispose previous before re-assigning
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP003:Dispose previous before re-assigning.", 
+    "IDISP003:Dispose previous before re-assigning", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->

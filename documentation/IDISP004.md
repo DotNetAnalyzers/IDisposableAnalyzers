@@ -1,5 +1,5 @@
 # IDISP004
-## Don't ignore created IDisposable.
+## Don't ignore created IDisposable
 
 | Topic    | Value
 | :--      | :--
@@ -56,21 +56,21 @@ Configure the severity per project, for more info see [MSDN](https://msdn.micros
 
 ### Via #pragma directive.
 ```C#
-#pragma warning disable IDISP004 // Don't ignore created IDisposable.
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
 Code violating the rule here
-#pragma warning restore IDISP004 // Don't ignore created IDisposable.
+#pragma warning restore IDISP004 // Don't ignore created IDisposable
 ```
 
 Or put this at the top of the file to disable all instances.
 ```C#
-#pragma warning disable IDISP004 // Don't ignore created IDisposable.
+#pragma warning disable IDISP004 // Don't ignore created IDisposable
 ```
 
 ### Via attribute `[SuppressMessage]`.
 
 ```C#
 [System.Diagnostics.CodeAnalysis.SuppressMessage("IDisposableAnalyzers.Correctness", 
-    "IDISP004:Don't ignore created IDisposable.", 
+    "IDISP004:Don't ignore created IDisposable", 
     Justification = "Reason...")]
 ```
 <!-- end generated config severity -->
