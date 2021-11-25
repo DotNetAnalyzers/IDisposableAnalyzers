@@ -4,13 +4,13 @@ pool:
 steps:
 
 - task: VSBuild@1
-  displayName: Build
+  displayName: build
   inputs:
     configuration: 'Release'
     msbuildArgs: '/restore'
 
 - task: DotNetCoreCLI@2
-  displayName: Test
+  displayName: test
   inputs:
     command: 'test'
     nobuild: true
