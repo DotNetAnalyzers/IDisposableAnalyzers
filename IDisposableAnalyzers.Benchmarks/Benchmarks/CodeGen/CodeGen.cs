@@ -1,4 +1,5 @@
-﻿namespace IDisposableAnalyzers.Benchmarks.Benchmarks
+﻿#pragma warning disable CA1305 // Specify IFormatProvider
+namespace IDisposableAnalyzers.Benchmarks.Benchmarks
 {
     using System;
     using System.Collections.Generic;

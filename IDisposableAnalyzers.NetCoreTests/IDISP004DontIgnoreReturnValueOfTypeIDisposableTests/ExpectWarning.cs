@@ -30,6 +30,7 @@ InterfaceOrImplementationHere
         }
     }
 }";
+
         [Test]
         public void IDisposableReturnedFromImplementedFactory()
         {

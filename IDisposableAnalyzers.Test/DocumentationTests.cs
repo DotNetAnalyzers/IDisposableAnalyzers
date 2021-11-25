@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CA1056 // Uri properties should not be strings
+#pragma warning disable CA1305 // Specify IFormatProvider
 namespace IDisposableAnalyzers.Test
 {
     using System;
