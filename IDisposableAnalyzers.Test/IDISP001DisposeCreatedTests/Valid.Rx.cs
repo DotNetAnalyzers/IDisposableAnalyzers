@@ -349,7 +349,7 @@ namespace N
                             Disposable.Create(() => Console.CancelKeyPress -= Handler),
                         };
 
-                        void Handler(object sender, EventArgs e)
+                        void Handler(object? sender, EventArgs e)
                         {
                             o.OnNext(e);
                         }

@@ -143,7 +143,7 @@ namespace N
             value = WithOptionalParameter(value);
         }
 
-        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable>? values = null)
         {
             if (values == null)
             {

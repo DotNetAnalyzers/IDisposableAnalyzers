@@ -147,8 +147,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.IO;
-
     public static class C
     {
         public static long M()
@@ -611,8 +609,6 @@ namespace N
             var c = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public void M()
@@ -658,7 +654,8 @@ namespace N
         }
 
         [TestCase("System.Activator.CreateInstance<StringBuilder>()")]
-        [TestCase("(StringBuilder)System.Activator.CreateInstance(typeof(StringBuilder))")]
+        [TestCase("(StringBuilder)System.Activator.CreateInstance(typeof(StringBuilder))!")]
+        [TestCase("(StringBuilder?)System.Activator.CreateInstance(typeof(StringBuilder))")]
         [TestCase("System.Activator.CreateInstance(typeof(StringBuilder))")]
         [TestCase("(StringBuilder)constructorInfo.Invoke(null)")]
         public static void Reflection(string expression)
@@ -687,12 +684,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             var item = new MemoryStream();
             if (condition)
@@ -714,12 +710,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             var item = new MemoryStream();
             if (condition)
@@ -743,12 +738,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             var item = new MemoryStream();
             if (condition)
@@ -774,7 +768,7 @@ namespace N
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             var item = new MemoryStream();
             if (condition)
