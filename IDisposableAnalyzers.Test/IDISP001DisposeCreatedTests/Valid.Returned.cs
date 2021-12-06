@@ -187,10 +187,10 @@ namespace N
 
     public static class C
     {
-        public static Stream M()
+        public static Stream M(bool b)
         {
             var stream = File.OpenRead(string.Empty);
-            if (true)
+            if (b)
             {
                 return stream;
             }

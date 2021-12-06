@@ -213,7 +213,7 @@ namespace N
 
     public sealed class C
     {
-        public C(string file1, string file2)
+        public C(String file1, string file2)
         {
             var pair = Pair.Create(File.OpenRead(file1), File.OpenRead(file2));
             pair.Item1.Dispose();

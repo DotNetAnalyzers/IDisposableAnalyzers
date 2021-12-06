@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -22,7 +22,7 @@ namespace N
     {
         public void M()
         {
-            var stream = File.OpenRead(string.Empty);
+            var stream = File.OpenRead(String.Empty);
             stream.Dispose();
         }
     }

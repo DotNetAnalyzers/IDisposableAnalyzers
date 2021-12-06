@@ -166,11 +166,13 @@ namespace N
     public sealed class C
     {
         public T M<T>(out T t)
+            where T : struct
         {
             return M(0, out t);
         }
 
         public T M<T>(int _, out T t)
+            where T : struct
         {
             t = default;
             return default;

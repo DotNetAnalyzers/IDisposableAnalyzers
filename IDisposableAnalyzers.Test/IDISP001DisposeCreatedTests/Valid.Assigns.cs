@@ -38,7 +38,7 @@ namespace N
 
     public class C
     {
-        private readonly Stream stream;
+        private readonly Stream? stream;
 
         public C(bool flag)
         {
@@ -62,11 +62,11 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
     }
@@ -84,7 +84,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {

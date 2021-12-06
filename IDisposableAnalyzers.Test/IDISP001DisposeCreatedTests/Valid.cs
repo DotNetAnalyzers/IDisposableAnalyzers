@@ -39,7 +39,7 @@ namespace N
         [TestCase("1")]
         [TestCase("new string(' ', 1)")]
         [TestCase("typeof(IDisposable)")]
-        [TestCase("(IDisposable)null")]
+        [TestCase("(IDisposable?)null")]
         [TestCase("await Task.FromResult(1)")]
         [TestCase("await Task.Run(() => 1)")]
         [TestCase("await Task.Run(() => new object())")]
@@ -48,6 +48,7 @@ namespace N
         public static void LanguageConstructs(string expression)
         {
             var code = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -56,8 +57,9 @@ namespace N
 
     internal class C
     {
-        internal async void M()
+        internal async void M(Object o, FileInfo f)
         {
+            await Task.Delay(1);
             var value = new string(' ', 1);
         }
     }
@@ -501,20 +503,19 @@ namespace N
 namespace N
 {
     using System.IO;
-    using System.Threading.Tasks;
 
     public class C
     {
         public void M()
         {
-            FileStream currentStream = null;
+            FileStream? currentStream = null;
             try
             {
                 currentStream = File.OpenRead(string.Empty);
             }
             finally
             {
-                currentStream.Dispose();
+                currentStream?.Dispose();
             }
         }
     }
@@ -528,7 +529,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -644,8 +644,6 @@ namespace N
             var c = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public void M(Factory factory)
