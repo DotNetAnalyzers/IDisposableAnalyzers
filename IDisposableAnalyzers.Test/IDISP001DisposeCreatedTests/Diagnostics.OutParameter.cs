@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -80,13 +80,14 @@ namespace N
             [TestCase("out _")]
             [TestCase("out var temp")]
             [TestCase("out var _")]
-            [TestCase("out FileStream temp")]
+            [TestCase("out FileStream? temp")]
             [TestCase("out FileStream _")]
             public static void DiscardedFileOpenReadStatementBody(string expression)
             {
                 var code = @"
 namespace N
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     public static class C
@@ -96,7 +97,7 @@ namespace N
             return TryM(fileName, ↓out _);
         }
 
-        private static bool TryM(string fileName, out FileStream stream)
+        private static bool TryM(string fileName, [NotNullWhen(true)] out FileStream? stream)
         {
             if (File.Exists(fileName))
             {
@@ -116,20 +117,21 @@ namespace N
             [TestCase("out _")]
             [TestCase("out var temp")]
             [TestCase("out var _")]
-            [TestCase("out FileStream temp")]
+            [TestCase("out FileStream? temp")]
             [TestCase("out FileStream _")]
             public static void DiscardedFileOpenReadExpressionBody(string expression)
             {
                 var code = @"
 namespace N
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     public static class C
     {
         public static bool M(string fileName) => TryM(fileName, ↓out _);
 
-        private static bool TryM(string fileName, out FileStream stream)
+        private static bool TryM(string fileName, [NotNullWhen(true)] out FileStream? stream)
         {
             if (File.Exists(fileName))
             {

@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -9,7 +9,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         [TestCase("out _")]
         [TestCase("out var stream")]
         [TestCase("out var _")]
-        [TestCase("out FileStream stream")]
+        [TestCase("out FileStream? stream")]
         [TestCase("out FileStream _")]
         public static void DictionaryTryGetValue(string expression)
         {
@@ -32,7 +32,7 @@ namespace N
         [TestCase("out _")]
         [TestCase("out var temp")]
         [TestCase("out var _")]
-        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream? temp")]
         [TestCase("out FileStream _")]
         public static void DiscardCachedOutParameter(string expression)
         {
@@ -40,6 +40,7 @@ namespace N
 namespace N
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     public static class C
@@ -48,7 +49,7 @@ namespace N
 
         public static bool M(int i) => TryGet(i, out _);
 
-        private static bool TryGet(int i, out FileStream stream)
+        private static bool TryGet(int i, [NotNullWhen(true)] out FileStream? stream)
         {
             if (Map.TryGetValue(i, out stream))
             {
@@ -125,7 +126,7 @@ namespace N
 
         public static long M()
         {
-            Stream stream;
+            Stream? stream;
             if (Cache.TryGetValue(1, out stream))
             {
                 return stream.Length;
@@ -180,7 +181,7 @@ namespace N
 
         public static long M()
         {
-            Stream stream;
+            Stream? stream;
             if (Cache.TryGetValue(""1"", out stream))
             {
                 return stream.Length;
@@ -228,6 +229,7 @@ namespace N
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     internal sealed class C : IDisposable
     {
@@ -242,7 +244,7 @@ namespace N
             this.cache.Clear();
         }
 
-        public string M(int location)
+        public string? M(int location)
         {
             if (this.cache.TryGetValue(location, out var foo))
             {
@@ -256,7 +258,7 @@ namespace N
         {
             private readonly Dictionary<int, C> map = new Dictionary<int, C>();
 
-            public bool TryGetValue(int location, out C walker)
+            public bool TryGetValue(int location, [NotNullWhen(true)] out C? walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }

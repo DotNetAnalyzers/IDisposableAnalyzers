@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -10,6 +10,7 @@ namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
         public static void AssignLocalWithInt()
         {
             var code = @"
+#pragma warning disable CS0219
 namespace N
 {
     public class C
@@ -94,7 +95,7 @@ namespace N
 {
     public class C
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C()
         {
@@ -252,6 +253,7 @@ namespace N
             var code = @"
 namespace N
 {
+    using System;
     using System.IO;
 
     public class C
@@ -261,7 +263,7 @@ namespace N
         public C()
         {
             var temp = File.OpenRead(string.Empty);
-            this.stream = temp ?? temp;
+            this.stream = temp ?? temp ?? throw new Exception();
         }
     }
 }";

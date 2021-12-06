@@ -30,7 +30,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.Threading.Tasks;
 
     internal static class C
@@ -50,7 +49,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.Threading.Tasks;
 
     internal static class C
@@ -82,6 +80,7 @@ namespace N
 
         internal static async Task<IDisposable> CreateAsync()
         {
+            await Task.Delay(10);
             return new Disposable();
         }
     }
@@ -95,7 +94,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.Threading.Tasks;
 
     internal static class C

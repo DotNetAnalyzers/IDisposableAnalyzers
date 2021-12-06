@@ -203,7 +203,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.IO;
     using System.Threading.Tasks;
   
     internal static class C
@@ -215,6 +214,7 @@ namespace N
 
         internal static async Task<string> ReadAsync(string text)
         {
+            await Task.Delay(10);
             return text;
         }
     }
@@ -227,6 +227,7 @@ namespace N
         public static void AwaitDownloadDataTask()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;

@@ -44,7 +44,7 @@ namespace N
 
     class C
     {
-        void M(object o)
+        void M(Object o, FileInfo notUsed)
         {
             ↓var value = new Disposable();
         }
@@ -60,12 +60,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     internal class C
     {
-        internal C()
+        internal C(FileInfo unused)
         {
             ↓var value = new System.IO.BinaryReader(System.IO.File.OpenRead(string.Empty));
         }
@@ -320,7 +319,7 @@ namespace N
 
     sealed class C : IDisposable
     {
-        private IDisposable _disposable = new MemoryStream();
+        private IDisposable? _disposable = new MemoryStream();
 
         public void Update()
         {
@@ -343,12 +342,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             ↓var item = new MemoryStream();
             if (condition)
@@ -369,12 +367,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             ↓var item = new MemoryStream();
             if (condition)
@@ -397,12 +394,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     sealed class C
     {
-        MemoryStream M(bool condition)
+        MemoryStream? M(bool condition)
         {
             ↓var item = new MemoryStream();
             if (condition)

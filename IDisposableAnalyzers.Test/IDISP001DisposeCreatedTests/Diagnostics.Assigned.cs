@@ -24,14 +24,14 @@ namespace N
     {
         static void M()
         {
-            IDisposable diposable = null;
+            IDisposable? disposable = null;
             try
             {
-                ↓diposable = new MemoryStream();
+                ↓disposable = new MemoryStream();
             }
             catch
             {
-                diposable.Dispose();
+                disposable?.Dispose();
             }
         }
     }
