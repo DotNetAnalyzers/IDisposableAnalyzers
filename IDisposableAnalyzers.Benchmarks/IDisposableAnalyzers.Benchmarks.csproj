@@ -14,6 +14,7 @@
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IDisposableAnalyzers.snk</AssemblyOriginatorKeyFile>
+    <StartupObject>IDisposableAnalyzers.Benchmarks.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
     <PackageReference Include="Gu.Analyzers" Version="2.0.0" PrivateAssets="all" />
     <PackageReference Include="Gu.Roslyn.Asserts" Version="4.0.2" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.354" PrivateAssets="all" />

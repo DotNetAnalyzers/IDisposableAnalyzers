@@ -13,11 +13,12 @@ namespace IDisposableAnalyzers.Benchmarks.Benchmarks
     [Explicit("Script")]
     public class CodeGen
     {
-        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } = typeof(KnownSymbols).Assembly
-                                                                                                    .GetTypes()
-                                                                                                    .Where(typeof(DiagnosticAnalyzer).IsAssignableFrom)
-                                                                                                    .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                                                                                                    .ToArray();
+        private static IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers { get; } =
+            typeof(KnownSymbols).Assembly
+                .GetTypes()
+                .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+                .ToArray();
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public void AnalyzersBenchmark(DiagnosticAnalyzer analyzer)
