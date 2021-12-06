@@ -27,7 +27,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -61,7 +61,7 @@ namespace N
 }".AssertReplace("bool", type)
   .AssertReplace("Equals(disposable, null)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -90,7 +90,7 @@ namespace N
     }
 }".AssertReplace("Add(disposable)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -125,7 +125,7 @@ namespace N
     }
 }".AssertReplace("this.Initialize(disposable)", call);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -160,7 +160,7 @@ namespace N
     }
 }".AssertReplace("this.Initialize(this.disposables, disposable)", call);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -194,7 +194,7 @@ namespace N
     }
 }".AssertReplace("this.Initialize(disposables, disposable)", call);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -224,7 +224,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -253,7 +253,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -283,7 +283,7 @@ namespace N
     }
 }".AssertReplace("new Disposable[] { disposable }", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -312,7 +312,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -343,7 +343,7 @@ namespace N
     }
 }".AssertReplace("private Queue<IDisposable> disposables = new Queue<IDisposable>()", declaration);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -375,7 +375,7 @@ namespace N
     }
 }".AssertReplace("private Dictionary<int, IDisposable> disposables = new Dictionary<int, IDisposable>()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -405,7 +405,7 @@ namespace N
     }
 }".AssertReplace("TryAdd(1, disposable)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -433,7 +433,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -463,7 +463,7 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(disposable, 1)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -492,7 +492,7 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(disposable, 1)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("IDisposable disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -534,7 +534,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -578,7 +578,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -626,7 +626,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -676,7 +676,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter(parameter);
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -729,7 +729,7 @@ namespace N
     }
 }".AssertReplace("new BinaryReader(stream)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("stream");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -763,7 +763,7 @@ namespace N
     }
 }".AssertReplace("new HttpClient(handler)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("handler");
                 Assert.AreEqual(true,   semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -800,7 +800,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -834,7 +834,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindArgument("File.OpenRead(string.Empty)");
                 Assert.AreEqual(true, Disposable.DisposedByReturnValue(value, semanticModel, CancellationToken.None, out _));
@@ -859,7 +859,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -909,7 +909,7 @@ namespace N
 }".AssertReplace("disposable.AddAndReturn(stream)", expression);
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
@@ -945,7 +945,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindParameter("Stream stream");
                 Assert.AreEqual(true,  semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));

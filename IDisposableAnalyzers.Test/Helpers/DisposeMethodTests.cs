@@ -40,7 +40,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
@@ -80,7 +80,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
@@ -127,7 +127,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual("N.C.Dispose(bool)", DisposeMethod.FindVirtual(method, compilation, search).ToString());
@@ -174,7 +174,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
             Assert.AreEqual("N.C.Dispose()", DisposeMethod.FindFirst(method, compilation, search).ToString());

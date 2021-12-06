@@ -21,15 +21,11 @@ namespace IDisposableAnalyzers.Test
             .ToImmutableArray();
 
         private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("IDisposableAnalyzers.csproj"),
-            AllAnalyzers,
-            MetadataReferences.FromAttributes());
+            ProjectFile.Find("IDisposableAnalyzers.csproj"));
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("ValidCode.csproj"),
-            AllAnalyzers,
-            MetadataReferences.FromAttributes());
+            ProjectFile.Find("ValidCode.csproj"));
 
         private static IDisposable cacheTransaction;
 
@@ -97,8 +93,7 @@ namespace N
         }
     }
 }";
-            var solution = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
-            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
         }
     }
 }

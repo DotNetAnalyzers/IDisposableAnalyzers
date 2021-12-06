@@ -43,7 +43,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -84,7 +84,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -125,7 +125,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);

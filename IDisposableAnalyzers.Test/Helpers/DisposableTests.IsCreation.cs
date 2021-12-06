@@ -53,7 +53,7 @@ namespace N
 }".AssertReplace("new Disposable()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
@@ -125,7 +125,7 @@ namespace N
 }".AssertReplace("// M()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -222,7 +222,7 @@ namespace N
 }".AssertReplace("Id(disposable)", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -277,7 +277,7 @@ namespace N
 }".AssertReplace("// M()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -313,7 +313,7 @@ namespace N
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("WithOptionalParameter(value)");
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -367,7 +367,7 @@ namespace N
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(expression)
                                       .Value;
@@ -396,7 +396,7 @@ namespace ValidCode
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(expression)
                                       .Value;
@@ -444,7 +444,7 @@ namespace N
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation("disposable.AddAndReturn(File.OpenRead(string.Empty))");
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -455,20 +455,6 @@ namespace N
             [TestCase("other ?? disposable.AsCustom()")]
             public static void AssumeYesForExtensionMethodReturningDifferentTypeThanThisParameter(string expression)
             {
-                var binary = @"
-namespace BinaryReference
-{
-    using System;
-
-    public static class Extensions
-    {
-        public static ICustomDisposable AsCustom(this IDisposable disposable) => default(ICustomDisposable);
-    }
-
-    public interface ICustomDisposable : IDisposable
-    {
-    }
-}";
                 var code = @"
 namespace N
 {
@@ -484,9 +470,21 @@ namespace N
     }
 }".AssertReplace("disposable.AsCustom()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var references = MetadataReferences.FromAttributes()
-                                                   .Concat(new[] { MetadataReferences.CreateBinary(binary) });
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
+                var binary = MetadataReferences.CreateBinary(@"
+namespace BinaryReference
+{
+    using System;
+
+    public static class Extensions
+    {
+        public static ICustomDisposable? AsCustom(this IDisposable disposable) => default(ICustomDisposable);
+    }
+
+    public interface ICustomDisposable : IDisposable
+    {
+    }
+}");
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences.Append(binary));
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -523,7 +521,7 @@ namespace N
     }
 }".AssertReplace("disposable.Fluent()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var references = MetadataReferences.FromAttributes()
+                var references = Settings.Default.MetadataReferences
                                                    .Concat(new[] { MetadataReferences.CreateBinary(binary) });
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -581,7 +579,7 @@ namespace N
   .AssertReplace("value", expression);
 
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
@@ -618,7 +616,7 @@ namespace N
     }
 }".AssertReplace("Activator.CreateInstance<Disposable>()", expression));
                 var compilation =
-                    CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                    CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(expression).Value;
                 Assert.AreEqual(true, semanticModel.TryGetType(value, CancellationToken.None, out var type));
@@ -701,7 +699,7 @@ namespace N
                 var compilation = CSharpCompilation.Create(
                     "test",
                     new[] { syntaxTree },
-                    MetadataReferences.FromAttributes().Add(binaryReference),
+                    Settings.Default.MetadataReferences.Append(binaryReference),
                     CodeFactory.DllCompilationOptions.WithMetadataImportOptions(MetadataImportOptions.Public));
                 CollectionAssert.IsEmpty(compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error));
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -733,7 +731,7 @@ namespace N
     }
 }".AssertReplace("Interlocked.Exchange(ref _disposable, new MemoryStream())", expression));
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindInvocation(expression);
                 Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));

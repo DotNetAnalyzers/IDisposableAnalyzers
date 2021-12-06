@@ -114,11 +114,7 @@ namespace ProjectX.Commands
     }
 }";
 
-                var solution = CodeFactory.CreateSolution(
-                    new[] { viewModelBaseCode, popupViewModelCode, closePopupCommandCode },
-                    CodeFactory.DefaultCompilationOptions(Analyzer),
-                    MetadataReferences.FromAttributes());
-                RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(Analyzer, solution));
+                RoslynAssert.NoAnalyzerDiagnostics(Analyzer, viewModelBaseCode, popupViewModelCode, closePopupCommandCode);
             }
 
             public static void Issue150()

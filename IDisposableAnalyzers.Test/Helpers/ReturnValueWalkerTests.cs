@@ -57,7 +57,7 @@ namespace N
     }
 }".AssertReplace("var temp = CalculatedExpressionBody", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -110,7 +110,7 @@ namespace N
     }
 }".AssertReplace("var temp = StaticRecursiveExpressionBody", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -249,7 +249,7 @@ namespace N
     }
 }".AssertReplace("var temp = StaticCreateIntStatementBody()", $"var temp = {expression}");
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -337,7 +337,7 @@ namespace N
         }
     }
 }".AssertReplace("var temp = Recursive()", $"var temp = {expression}"));
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -373,7 +373,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindInvocation("WithOptionalParameter(local)");
             using var walker = ReturnValueWalker.Borrow(value, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -401,7 +401,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindMethodDeclaration("M");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -445,7 +445,7 @@ namespace N
     }
 }".AssertReplace("Func<int> temp = () => 1", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -568,7 +568,7 @@ namespace N
 }".AssertReplace("var value = await CreateStringAsync()", $"var value = {expression}");
 
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -596,7 +596,7 @@ internal class C
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindExpression("await CreateAsync().ConfigureAwait(false)");
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -658,7 +658,7 @@ namespace N
         }
     }
 }".AssertReplace("var value = await RecursiveAsync()", $"var value = {expression}"));
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value;
             using var walker = ReturnValueWalker.Borrow(value, search, semanticModel, CancellationToken.None);
@@ -703,7 +703,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindEqualsValueClause("var value = i.AsDisposable().AsDisposable()").Value;
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -729,7 +729,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var invocation = syntaxTree.FindInvocation("Local()");
             using var walker = ReturnValueWalker.Borrow(invocation, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -752,7 +752,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var invocation = syntaxTree.FindInvocation("Local()");
             using var walker = ReturnValueWalker.Borrow(invocation, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -778,7 +778,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindInvocation("M(arg)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -804,7 +804,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindInvocation("M(null)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -831,7 +831,7 @@ namespace N
         }
     }
 }".AssertReplace("(IDisposable)o", cast));
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindInvocation("M(null)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -862,7 +862,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindInvocation("M(o)");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);
@@ -914,7 +914,7 @@ namespace N
     }
 }";
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var methodDeclaration = syntaxTree.FindMethodDeclaration("Convert");
             using var walker = ReturnValueWalker.Borrow(methodDeclaration, ReturnValueSearch.Recursive, semanticModel, CancellationToken.None);

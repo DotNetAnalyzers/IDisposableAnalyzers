@@ -184,6 +184,7 @@ namespace N
             public static void LocalOneStatementAfterToUsingDeclaration()
             {
                 var before = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -200,6 +201,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -215,13 +217,13 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
 
             [Test]
             public static void LocalOneStatementAfter()
             {
                 var before = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -238,6 +240,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -255,7 +258,6 @@ namespace N
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
             }
 
             [Test]
@@ -269,7 +271,7 @@ namespace N
 
     public sealed class C
     {
-        public void M()
+        public int M()
         {
             ↓var stream = File.OpenRead(string.Empty);
             var a = 1;
@@ -277,7 +279,10 @@ namespace N
             if (a == b)
             {
                 var c = 2;
+                return a + b + c;
             }
+
+            return a + b;
         }
     }
 }";
@@ -290,7 +295,7 @@ namespace N
 
     public sealed class C
     {
-        public void M()
+        public int M()
         {
             using var stream = File.OpenRead(string.Empty);
             var a = 1;
@@ -298,12 +303,14 @@ namespace N
             if (a == b)
             {
                 var c = 2;
+                return a + b + c;
             }
+
+            return a + b;
         }
     }
 }";
                 RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
             }
 
             [Test]
@@ -403,7 +410,7 @@ namespace N
 
     public sealed class C
     {
-        public void M()
+        public int M()
         {
             ↓var stream = File.OpenRead(string.Empty);
             var a = 1;
@@ -411,7 +418,10 @@ namespace N
             if (a == b)
             {
                 var c = 2;
+                return a + b + c;
             }
+
+            return a + b;
         }
     }
 }";
@@ -424,7 +434,7 @@ namespace N
 
     public sealed class C
     {
-        public void M()
+        public int M()
         {
             using (var stream = File.OpenRead(string.Empty))
             {
@@ -433,7 +443,10 @@ namespace N
                 if (a == b)
                 {
                     var c = 2;
+                    return a + b + c;
                 }
+
+                return a + b;
             }
         }
     }
@@ -564,7 +577,8 @@ namespace N
             }
 
             [TestCase("System.Activator.CreateInstance<Disposable>()")]
-            [TestCase("(Disposable)System.Activator.CreateInstance(typeof(Disposable))")]
+            [TestCase("(Disposable)System.Activator.CreateInstance(typeof(Disposable))!")]
+            [TestCase("(Disposable?)System.Activator.CreateInstance(typeof(Disposable))")]
             [TestCase("(Disposable)constructorInfo.Invoke(null)")]
             public static void Reflection(string expression)
             {

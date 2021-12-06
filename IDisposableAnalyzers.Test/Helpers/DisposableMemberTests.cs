@@ -27,7 +27,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
@@ -63,7 +63,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
@@ -89,7 +89,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
@@ -119,7 +119,7 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(this.stream)", expression));
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("stream");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);

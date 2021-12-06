@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
+    using System.Linq;
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
@@ -807,9 +808,9 @@ namespace N
 
             var solution = CodeFactory.CreateSolution(
                 code,
-                CodeFactory.DefaultCompilationOptions(new[] { Analyzer })
-                           .WithMetadataImportOptions(MetadataImportOptions.Public),
-                MetadataReferences.FromAttributes().Add(binaryReference));
+                Settings.Default
+                        .WithCompilationOptions(x => x.WithMetadataImportOptions(MetadataImportOptions.Public))
+                        .WithMetadataReferences(x => x.Append(binaryReference)));
 
             RoslynAssert.Valid(Analyzer, solution);
         }

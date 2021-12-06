@@ -1,6 +1,8 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
+    using System.Linq;
     using Gu.Roslyn.Asserts;
+    using Microsoft.CodeAnalysis;
     using NUnit.Framework;
 
     public static partial class Valid
@@ -309,7 +311,10 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, metadataReferences: MetadataReferences.FromAttributes().Add(binaryReference));
+            var settings = Settings.Default
+               .WithCompilationOptions(x => x.WithMetadataImportOptions(MetadataImportOptions.Public))
+               .WithMetadataReferences(x => x.Append(binaryReference));
+            RoslynAssert.Valid(Analyzer, code, settings: settings);
         }
 
         [Test]

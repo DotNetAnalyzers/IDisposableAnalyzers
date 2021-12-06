@@ -32,7 +32,7 @@ namespace N
     }
 }".AssertReplace("// Meh()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
             Assert.AreEqual(expectedCode, Await.TaskFromResult(value, semanticModel, CancellationToken.None)?.ToFullString());
@@ -66,7 +66,7 @@ namespace N
     }
 }".AssertReplace("// Meh()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindEqualsValueClause(expression).Value as InvocationExpressionSyntax;
             Assert.AreEqual(expectedCode, Await.TaskRun(value, semanticModel, CancellationToken.None)?.ToFullString());

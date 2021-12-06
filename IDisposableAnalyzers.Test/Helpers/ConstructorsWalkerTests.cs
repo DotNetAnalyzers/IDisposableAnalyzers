@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.Helpers
+﻿namespace IDisposableAnalyzers.Test.Helpers
 {
     using System;
     using System.Linq;
@@ -28,7 +28,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.FindTypeDeclaration("C");
             using var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None);
@@ -55,7 +55,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.FindTypeDeclaration("C");
             using var pooled = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None);
@@ -82,7 +82,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var type = syntaxTree.FindTypeDeclaration("C");
             using var walker = ConstructorsWalker.Borrow(type, semanticModel, CancellationToken.None);

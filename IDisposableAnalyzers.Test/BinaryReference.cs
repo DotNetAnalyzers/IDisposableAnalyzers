@@ -13,7 +13,7 @@
             var binaryReferencedCompilation = CSharpCompilation.Create(
                 CodeReader.Namespace(code),
                 new[] { CSharpSyntaxTree.ParseText(code) },
-                MetadataReferences.FromAttributes(),
+                Settings.Default.MetadataReferences,
                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
             using var binaryReferencedContent = new MemoryStream();

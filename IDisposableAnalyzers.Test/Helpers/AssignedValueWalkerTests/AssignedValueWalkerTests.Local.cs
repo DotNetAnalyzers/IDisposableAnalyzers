@@ -36,7 +36,7 @@ namespace N
     }
 }".AssertReplace("1", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -58,7 +58,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -84,7 +84,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -115,7 +115,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(statement).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -146,7 +146,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -179,7 +179,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -202,7 +202,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -225,7 +225,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var value = @operator").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -247,7 +247,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -270,7 +270,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var value = temp").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
@@ -317,7 +317,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause("var temp = toDispose;").Value;
                 using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);

@@ -65,8 +65,7 @@ namespace N
         public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
-            var solution = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
-            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
@@ -98,8 +97,7 @@ namespace N
         }
     }
 }";
-            var solution = CodeFactory.CreateSolution(code, CodeFactory.DefaultCompilationOptions(analyzer), MetadataReferences.FromAttributes());
-            RoslynAssert.NoDiagnostics(Analyze.GetDiagnostics(analyzer, solution));
+            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
         }
     }
 }

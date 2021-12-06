@@ -29,7 +29,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -58,7 +58,7 @@ namespace N
     }
 }".AssertReplace("disposable.Dispose()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -85,7 +85,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -110,7 +110,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -138,7 +138,7 @@ namespace N
     }
 }";
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("disposable = File.OpenRead(fileName)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -164,7 +164,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("stream = File.OpenRead(string.Empty)");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
@@ -188,7 +188,7 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindVariableDeclaration("var form = new Winform()");
                 Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out ILocalSymbol symbol));
