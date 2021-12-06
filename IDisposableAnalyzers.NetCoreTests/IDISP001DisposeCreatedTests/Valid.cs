@@ -2,7 +2,6 @@
 {
     using Gu.Roslyn.Asserts;
 
-    using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
 
     using NUnit.Framework;
@@ -122,8 +121,7 @@ namespace N
     }
 }";
 
-            var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
-            RoslynAssert.Valid(Analyzer, code, compilationOptions: nullableContextOptions);
+            RoslynAssert.Valid(Analyzer, code);
         }
 
         [TestCase("response.RegisterForDispose(new Disposable())")]
@@ -144,8 +142,7 @@ namespace N
     }
 }".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
 
-            var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
-            RoslynAssert.Valid(Analyzer, new[] { Disposable, code }, compilationOptions: nullableContextOptions);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
 
         [TestCase("serviceProvider.GetService<Disposable>()")]

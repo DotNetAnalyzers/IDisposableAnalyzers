@@ -55,7 +55,7 @@ namespace N
 
         public Task StopAsync(CancellationToken token)
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
             return Task.CompletedTask;
         }
     }

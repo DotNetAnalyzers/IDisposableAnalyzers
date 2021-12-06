@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.NetCoreTests.Helpers
+﻿namespace IDisposableAnalyzers.NetCoreTests.Helpers
 {
     using System.Threading;
     using Gu.Roslyn.Asserts;
@@ -27,7 +27,7 @@ namespace N
     }
 }".AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindEqualsValueClause(code).Value;
                 Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, semanticModel, CancellationToken.None));

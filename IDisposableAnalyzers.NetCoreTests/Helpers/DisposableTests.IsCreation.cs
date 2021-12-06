@@ -24,7 +24,7 @@ namespace N
     }
 }".AssertReplace("PLACEHOLDER", code);
                 var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(code);
                 Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -59,7 +59,7 @@ namespace N
         }
     }
 }".AssertReplace("await HttpClient.GetAsync(\"http://example.com\")", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -89,7 +89,7 @@ namespace N
         }
     }
 }".AssertReplace("await task", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));

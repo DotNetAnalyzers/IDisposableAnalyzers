@@ -20,7 +20,7 @@ namespace N
 
     public class C : IAsyncDisposable
     {
-        private Timer _timer;
+        private Timer? _timer;
 
         public async Task ResetTimerAsync()
         {
@@ -33,7 +33,10 @@ namespace N
 
         public async ValueTask DisposeAsync()
         {
-            await _timer.DisposeAsync();
+            if (_timer is { } timer)
+            {
+                await timer.DisposeAsync();
+            }
         }
     }
 }";
@@ -87,7 +90,7 @@ namespace N
 
         public Task StopAsync(CancellationToken token)
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
             return Task.CompletedTask;
         }
     }

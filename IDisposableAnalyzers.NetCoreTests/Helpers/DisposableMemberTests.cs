@@ -28,7 +28,7 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, MetadataReferences.FromAttributes());
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var declaration = syntaxTree.FindFieldDeclaration("disposable");
             var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);

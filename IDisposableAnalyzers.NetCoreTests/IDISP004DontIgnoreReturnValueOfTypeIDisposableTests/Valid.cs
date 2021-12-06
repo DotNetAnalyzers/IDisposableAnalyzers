@@ -87,13 +87,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.Warnings));
         }
 
         [TestCase("var disposable = serviceProvider.GetRequiredService<Disposable>();")]
         [TestCase("_ = serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("var loggerFactory = serviceProvider.GetRequiredService<ILoggerFactory>();")]
-        [TestCase("_ = serviceProvider.GetRequiredService<ILoggerFactory>();")]
+        [TestCase("var loggerFactory = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+        [TestCase("_ = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
         public static void IServiceProviderGetRequiredService(string statement)
         {
             var code = @"
@@ -101,7 +101,6 @@ namespace N
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
 
     public class C
     {
@@ -123,8 +122,8 @@ namespace N
 
         [TestCase("var disposable = this.serviceProvider.GetRequiredService<Disposable>();")]
         [TestCase("_ = this.serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("var loggerFactory = this.serviceProvider.GetRequiredService<ILoggerFactory>();")]
-        [TestCase("_ = this.serviceProvider.GetRequiredService<ILoggerFactory>();")]
+        [TestCase("var loggerFactory = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+        [TestCase("_ = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
         public static void IServiceProviderGetRequiredServiceField(string statement)
         {
             var code = @"
@@ -132,7 +131,6 @@ namespace N
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.Logging;
 
     public class C
     {
@@ -212,8 +210,7 @@ namespace N
     }
 }".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
 
-            var nullableContextOptions = CodeFactory.DefaultCompilationOptions(Analyzer, null).WithNullableContextOptions(NullableContextOptions.Enable);
-            RoslynAssert.Valid(Analyzer, new[] { Disposable, code }, compilationOptions: nullableContextOptions);
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
     }
 }
