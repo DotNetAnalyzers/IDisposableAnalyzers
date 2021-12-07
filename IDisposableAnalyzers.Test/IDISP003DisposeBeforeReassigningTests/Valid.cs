@@ -32,7 +32,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -53,7 +52,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -183,7 +181,7 @@ namespace N
     {
         public void M()
         {
-            Stream stream = null;
+            Stream? stream = null;
             stream = File.OpenRead(string.Empty);
             stream.Dispose();
         }
@@ -200,6 +198,7 @@ namespace N
         public static void NotDisposingVariableOfTypeObject(string disposeCode)
         {
             var code = @"
+#pragma warning disable CS8602
 namespace N
 {
     using System;
@@ -359,7 +358,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -381,7 +379,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -406,17 +403,16 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private readonly Stream stream;
+        private readonly Stream? stream;
 
         public C()
         {
             this.stream = File.OpenRead(string.Empty);
-            this.stream.Dispose();
+            this.stream?.Dispose();
             this.stream = null;
             this.stream = File.OpenRead(string.Empty);
         }
@@ -439,7 +435,7 @@ namespace N
     {
         private readonly Dictionary<int, Stream> Cache = new Dictionary<int, Stream>();
 
-        private Stream current;
+        private Stream? current;
 
         public void SetCurrent(int number)
         {
@@ -599,26 +595,27 @@ namespace N
         }
 
         [TestCase("Stream stream;")]
+        [TestCase("Stream? stream;")]
         [TestCase("Stream stream = null;")]
         [TestCase("var stream = (Stream)null;")]
         public static void VariableSplitDeclarationAndAssignment(string declaration)
         {
             var code = @"
+#pragma warning disable CS8600
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
         public void M()
         {
-            Stream stream;
+            Stream? stream;
             stream = File.OpenRead(string.Empty);
-            stream.Dispose();
+            stream?.Dispose();
         }
     }
-}".AssertReplace("Stream stream;", declaration);
+}".AssertReplace("Stream? stream;", declaration);
             RoslynAssert.Valid(Analyzer, code);
         }
 
@@ -661,18 +658,17 @@ namespace N
 namespace N
 {
     using System;
-    using System.Collections.Generic;
 
     public class C
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
-        public C(IDisposable disposable)
+        public C(IDisposable? disposable)
         {
             this.disposable = M(disposable);
         }
 
-        private static IDisposable M(IDisposable disposable)
+        private static IDisposable? M(IDisposable? disposable)
         {
             if (disposable == null)
             {
@@ -682,7 +678,7 @@ namespace N
             return disposable;
         }
 
-        private static IDisposable M(IDisposable disposable, IDisposable[] list)
+        private static IDisposable? M(IDisposable? disposable, IDisposable?[] list)
         {
             return disposable;
         }
@@ -701,9 +697,9 @@ namespace N
 
     public class C
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
-        public C(IDisposable disposable)
+        public C(IDisposable? disposable)
         {
             this.disposable = Helper.M(disposable);
         }
@@ -714,11 +710,10 @@ namespace N
 namespace N
 {
     using System;
-    using System.Collections.Generic;
 
     public static class Helper
     {
-        public static IDisposable M(IDisposable disposable)
+        public static IDisposable? M(IDisposable? disposable)
         {
             if (disposable == null)
             {
@@ -728,7 +723,7 @@ namespace N
             return disposable;
         }
 
-        public static IDisposable M(IDisposable disposable, IDisposable[] list)
+        public static IDisposable? M(IDisposable? disposable, IDisposable?[] list)
         {
             return disposable;
         }
@@ -862,12 +857,11 @@ namespace TaxonomyWpf
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
@@ -875,7 +869,7 @@ namespace N
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             private set 
@@ -899,7 +893,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
         private bool disposed;
 
         public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
@@ -1105,7 +1099,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -1130,7 +1123,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -1253,7 +1245,7 @@ namespace N
     {
         public void DisposeAfter(string[] fileNames)
         {
-            Stream stream = null;
+            Stream? stream = null;
             foreach (var name in fileNames)
             {
                 stream = File.OpenRead(name);
@@ -1282,7 +1274,6 @@ namespace N
             {
                 IDisposable result;
                 result = File.OpenRead(string.Empty);
-
                 result.Dispose();
             }
         }
@@ -1302,7 +1293,7 @@ namespace N
 
     public class C
     {
-        private readonly IDisposable disposable;
+        private readonly IDisposable? disposable;
 
         public C(IDisposable disposable)
              : this(1)
@@ -1331,7 +1322,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private CancellationTokenSource cts;
+        private CancellationTokenSource? cts;
 
         public void M()
         {
@@ -1363,7 +1354,7 @@ namespace N
     public abstract class C : IDisposable
     {
         private bool _disposed;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public void M()
         {
@@ -1471,7 +1462,7 @@ namespace N
 
     public class C
     {
-        C1 _c1;
+        C1? _c1;
 
         public C() { }
 
@@ -1480,7 +1471,7 @@ namespace N
             _c1 = c1;
         }
 
-        public C1 M1() => _c1;
+        public C1? M1() => _c1;
 
         public C1 M2() => _c1 = new C1();
 
@@ -1728,7 +1719,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -1756,7 +1746,7 @@ namespace N
 
     class C : IDisposable
     {
-        private IDisposable _disposable = new MemoryStream();
+        private IDisposable? _disposable = new MemoryStream();
 
         public void Dispose()
         {

@@ -12,7 +12,6 @@
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -43,7 +42,7 @@ namespace N
     {
         public void M(bool b)
         {
-            Stream stream = File.OpenRead(string.Empty);
+            Stream? stream = File.OpenRead(string.Empty);
             if (b)
             {
                 stream.Dispose();
@@ -75,7 +74,7 @@ namespace N
     {
         public void M(bool b)
         {
-            Stream stream = File.OpenRead(string.Empty);
+            Stream? stream = File.OpenRead(string.Empty);
             stream.Dispose();
             if (b)
             {
@@ -98,18 +97,19 @@ namespace N
         public static void DisposeFieldBeforeIfElseReassigning(string dispose)
         {
             var code = @"
+#pragma warning disable CS8602
 namespace N
 {
     using System.IO;
 
     public class C
     {
-        private Stream stream = File.OpenRead(string.Empty);
+        private Stream? stream = File.OpenRead(string.Empty);
 
-        public void M()
+        public void M(bool b)
         {
             this.stream.Dispose();
-            if (true)
+            if (b)
             {
                 this.stream = null;
             }
@@ -129,7 +129,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -152,12 +151,12 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
         private readonly Stream stream = File.OpenRead(string.Empty);
+
         public C()
         {
             stream.Dispose();
@@ -174,16 +173,15 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
             this.stream = File.OpenRead(string.Empty);
         }
     }
@@ -197,12 +195,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {
@@ -220,12 +217,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream _stream;
+        private Stream? _stream;
 
         public void M()
         {
@@ -243,16 +239,15 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream _stream;
+        private Stream? _stream;
 
         public void M()
         {
-            _stream.Dispose();
+            _stream?.Dispose();
             _stream = File.OpenRead(string.Empty);
         }
     }
@@ -410,13 +405,13 @@ namespace N
 
     class C : IDisposable
     {
-        private Disposable current;
+        private Disposable? current;
 
         public void Test()
         {
             var old = current;
             current = new Disposable();
-            if (old != current) old.Dispose();
+            if (old != current) old?.Dispose();
         }
 
         public void Dispose()

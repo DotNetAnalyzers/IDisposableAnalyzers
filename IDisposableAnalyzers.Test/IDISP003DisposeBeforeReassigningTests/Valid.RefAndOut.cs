@@ -31,7 +31,7 @@ namespace N
         [TestCase("out _")]
         [TestCase("out var temp")]
         [TestCase("out var _")]
-        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream? temp")]
         [TestCase("out FileStream _")]
         public static void DictionaryTryGetValue(string expression)
         {
@@ -54,14 +54,13 @@ namespace N
         [TestCase("out _")]
         [TestCase("out var temp")]
         [TestCase("out var _")]
-        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream? temp")]
         [TestCase("out FileStream _")]
         public static void CallWithOutParameter(string expression)
         {
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
     using System.IO;
 
     public static class C
@@ -92,7 +91,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
     using System.IO;
 
     public static class C
@@ -113,7 +111,7 @@ namespace N
         [TestCase("out _")]
         [TestCase("out var temp")]
         [TestCase("out var _")]
-        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream? temp")]
         [TestCase("out FileStream _")]
         public static void DiscardedCachedOutParameter(string expression)
         {
@@ -129,7 +127,7 @@ namespace N
 
         public static bool M(int i) => TryGet(i, out _);
 
-        private static bool TryGet(int i, out FileStream stream)
+        private static bool TryGet(int i, out FileStream? stream)
         {
             if (Map.TryGetValue(i, out stream))
             {
@@ -153,6 +151,7 @@ namespace N
 namespace N
 {
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     public static class C
@@ -161,11 +160,11 @@ namespace N
 
         public static bool M(int i)
         {
-            FileStream stream;
+            FileStream? stream;
             return TryGet(i, out stream);
         }
 
-        private static bool TryGet(int i, out FileStream stream)
+        private static bool TryGet(int i, [NotNullWhen(true)] out FileStream? stream)
         {
             if (Map.TryGetValue(i, out stream))
             {
@@ -358,7 +357,7 @@ namespace N
             stream.Dispose();
         }
 
-        private void Assign(ref Stream result)
+        private void Assign(ref FileStream result)
         {
             result = File.OpenRead(string.Empty);
         }
@@ -373,21 +372,21 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
         public void M()
         {
-            Stream stream = null;
+            var stream = File.OpenRead(string.Empty);
+            stream.Dispose();
             Assign(ref stream);
-            stream?.Dispose();
+            stream.Dispose();
             Assign(ref stream);
             stream.Dispose();
         }
 
-        private void Assign(ref Stream result)
+        private void Assign(ref FileStream result)
         {
             result = File.OpenRead(string.Empty);
         }

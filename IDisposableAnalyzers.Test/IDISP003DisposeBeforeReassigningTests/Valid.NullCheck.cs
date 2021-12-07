@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -23,7 +23,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void Update(string file)
         {

@@ -15,12 +15,12 @@
                     typeof(System.Reactive.Disposables.DisposableMixins),
                     typeof(System.Windows.Controls.Control),
                     typeof(System.Windows.Forms.Control),
-                    typeof(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute),
                     typeof(Microsoft.Extensions.DependencyInjection.ServiceCollection),
-                    typeof(Moq.Mock<>),
-                    typeof(Ninject.StandardKernel),
+                    typeof(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext),
                     typeof(Gu.Wpf.Reactive.ConditionRelayCommand),
-                    typeof(Gu.Inject.RebindExtensions)));
+                    typeof(Gu.Inject.RebindExtensions),
+                    typeof(Moq.Mock<>),
+                    typeof(Ninject.StandardKernel)));
         }
     }
 }
