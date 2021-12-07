@@ -175,8 +175,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-
     public class C
     {
         public void M(int i)

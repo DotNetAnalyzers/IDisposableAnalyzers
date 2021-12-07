@@ -24,8 +24,8 @@ namespace N
     }
 }";
 
-            [TestCase("")]
-            [TestCase("_ = ")]
+            [TestCase("↓")]
+            [TestCase("_ = ↓")]
             public static void DiscardFileOpenRead(string discard)
             {
                 var code = @"
@@ -40,7 +40,7 @@ namespace N
             ↓File.OpenRead(string.Empty);
         }
     }
-}".AssertReplace("↓", discard + "↓");
+}".AssertReplace("↓", discard);
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
@@ -339,7 +339,7 @@ namespace N
             ↓M(disposable);
         }
 
-        private static IDisposable M(IDisposable disposable, List<IDisposable> list = null)
+        private static IDisposable M(IDisposable disposable, List<IDisposable>? list = null)
         {
             if (list == null)
             {
@@ -365,7 +365,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C

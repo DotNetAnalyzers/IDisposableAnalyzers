@@ -109,6 +109,7 @@ namespace N
         public static void AwaitWeirdCase()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;

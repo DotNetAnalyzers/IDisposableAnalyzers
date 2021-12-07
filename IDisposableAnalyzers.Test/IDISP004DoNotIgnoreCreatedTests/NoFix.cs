@@ -23,12 +23,12 @@ namespace N
 
     public class C
     {
-        internal static string M()
+        internal static string? M()
         {
             return Meh(↓File.OpenRead(string.Empty));
         }
 
-        private static string Meh(Stream stream) => stream.ToString();
+        private static string? Meh(Stream stream) => stream.ToString();
     }
 }";
 

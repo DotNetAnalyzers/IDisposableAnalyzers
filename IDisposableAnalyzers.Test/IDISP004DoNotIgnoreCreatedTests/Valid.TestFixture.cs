@@ -15,7 +15,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -26,7 +26,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -43,7 +43,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -54,7 +54,7 @@ namespace N
         [OneTimeTearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -71,7 +71,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [TestInitialize]
         public void OnClassInitialize()
@@ -82,7 +82,7 @@ namespace N
         [TestCleanup]
         public void OnClassCleanup()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -99,7 +99,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [ClassInitialize]
         public void OnClassInitialize(TestContext testContext)
@@ -110,7 +110,7 @@ namespace N
         [ClassCleanup]
         public void OnClassCleanup()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";

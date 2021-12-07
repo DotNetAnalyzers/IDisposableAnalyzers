@@ -182,7 +182,7 @@ namespace N
 {
     public class C
     {
-        public static string M()
+        public static string? M()
         {
             return ↓new Disposable().ToString();
         }

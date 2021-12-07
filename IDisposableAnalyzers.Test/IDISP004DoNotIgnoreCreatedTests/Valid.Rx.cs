@@ -1,6 +1,7 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
+
     using NUnit.Framework;
 
     public static partial class Valid
@@ -207,7 +208,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]
@@ -221,7 +222,7 @@ namespace N
 
     public static class CompositeDisposableExt
     {
-        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+        public static T? AddAndReturn<T>(this CompositeDisposable disposable, T item)
             where T : IDisposable
         {
             if (item != null)
@@ -248,7 +249,7 @@ namespace N
             this.disposable.Dispose();
         }
 
-        internal object AddAndReturn()
+        internal object? AddAndReturn()
         {
             return disposable.AddAndReturn(new Disposable());
         }
@@ -268,7 +269,7 @@ namespace N
 
     public static class CompositeDisposableExt
     {
-        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+        public static T? AddAndReturn<T>(this CompositeDisposable disposable, T item)
             where T : IDisposable
         {
             if (item != null)
@@ -295,9 +296,9 @@ namespace N
             this.disposable.Dispose();
         }
 
-        internal string AddAndReturnToString()
+        internal string? AddAndReturnToString()
         {
-            return disposable.AddAndReturn(new Disposable()).ToString();
+            return disposable.AddAndReturn(new Disposable())?.ToString();
         }
     }
 }";
@@ -401,7 +402,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]
@@ -434,7 +435,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]
@@ -465,7 +466,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]

@@ -35,6 +35,7 @@ namespace N
         public static void AssigningLocal(string expression)
         {
             var code = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System;
@@ -43,7 +44,7 @@ namespace N
 
     public sealed class C
     {
-        public C(string fileName)
+        public C(string fileName, List<Object> notUsed1, FileInfo notUsed2)
         {
             var disposable = new Disposable();
         }
@@ -76,7 +77,7 @@ namespace N
     {
         private readonly object disposable;
 
-        public C(string fileName)
+        public C(string fileName, List<Object> notUsed1, FileInfo notUsed2)
         {
             this.disposable = new Disposable();
         }
@@ -443,7 +444,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 
@@ -548,7 +548,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public static class C
@@ -755,7 +754,7 @@ namespace N
 
     sealed class C : IDisposable
     {
-        private Stream stream;
+        private Stream? stream;
 
         async Task M(string fileName)
         {

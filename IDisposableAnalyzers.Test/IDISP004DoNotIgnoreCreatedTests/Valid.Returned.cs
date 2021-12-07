@@ -577,11 +577,11 @@ namespace N
             return container;
         }
 
-        private static void OnCreating(object sender, CreatingEventArgs e)
+        private static void OnCreating(object? sender, CreatingEventArgs e)
         {
         }
 
-        private static void OnCreated(object sender, CreatedEventArgs e)
+        private static void OnCreated(object? sender, CreatedEventArgs e)
         {
         }
     }
@@ -638,11 +638,11 @@ namespace N
             return container;
         }
 
-        private static void OnCreating(object sender, CreatingEventArgs e)
+        private static void OnCreating(object? sender, CreatingEventArgs e)
         {
         }
 
-        private static void OnCreated(object sender, CreatedEventArgs e)
+        private static void OnCreated(object? sender, CreatedEventArgs e)
         {
         }
     }

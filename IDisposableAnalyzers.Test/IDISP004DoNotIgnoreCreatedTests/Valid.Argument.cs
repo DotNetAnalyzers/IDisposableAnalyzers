@@ -53,7 +53,7 @@ namespace N
 
         private C(IDisposable disposable)
         {
-            this.Disposable = disposable ?? disposable;
+            this.Disposable = disposable ?? disposable ?? throw new Exception();
         }
 
         public IDisposable Disposable { get; }
