@@ -271,7 +271,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -285,7 +285,7 @@ namespace N
         public void Dispose()
         {
             this.disposable?.Dispose();
-            this.subscription?.Dispose();
+            this.subscription.Dispose();
         }
     }
 }";
@@ -303,7 +303,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -314,7 +314,7 @@ namespace N
             });
         }
 
-        public IDisposable Disposable
+        public IDisposable? Disposable
         {
             get { return this.disposable; }
             private set { this.disposable = value; }
@@ -323,7 +323,7 @@ namespace N
         public void Dispose()
         {
             this.disposable?.Dispose();
-            this.subscription?.Dispose();
+            this.subscription.Dispose();
         }
     }
 }";

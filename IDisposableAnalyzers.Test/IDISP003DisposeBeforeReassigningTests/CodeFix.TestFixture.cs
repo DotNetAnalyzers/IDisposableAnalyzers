@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -21,7 +21,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -43,7 +43,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -71,6 +71,7 @@ namespace N
             public static void AssigningFieldInSetUpCreatesTearDownAndDisposesExplicitDisposable()
             {
                 var before = @"
+#pragma warning disable CS8618
 namespace N
 {
     using NUnit.Framework;
@@ -93,6 +94,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8618
 namespace N
 {
     using NUnit.Framework;
@@ -133,7 +135,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -160,7 +162,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -188,6 +190,7 @@ namespace N
             public static void AssigningFieldInSetUpdDisposesInTearDownExplicitDisposable()
             {
                 var before = @"
+#pragma warning disable CS8618
 namespace N
 {
     using NUnit.Framework;
@@ -215,6 +218,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8618
 namespace N
 {
     using NUnit.Framework;
@@ -255,7 +259,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -277,7 +281,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -311,7 +315,7 @@ namespace N
 
     public static class Tests
     {
-        private static Disposable disposable;
+        private static Disposable? disposable;
 
         [OneTimeSetUp]
         public static void SetUp()
@@ -333,7 +337,7 @@ namespace N
 
     public static class Tests
     {
-        private static Disposable disposable;
+        private static Disposable? disposable;
 
         [OneTimeSetUp]
         public static void SetUp()
@@ -367,7 +371,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -394,7 +398,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()

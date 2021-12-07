@@ -578,12 +578,11 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
