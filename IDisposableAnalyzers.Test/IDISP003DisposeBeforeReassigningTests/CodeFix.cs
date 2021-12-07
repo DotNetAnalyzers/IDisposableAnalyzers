@@ -161,7 +161,7 @@ namespace N
     {
         public void M()
         {
-            Stream stream = null;
+            Stream? stream = null;
             if (stream == null)
             {
                 stream = File.OpenRead(string.Empty);
@@ -180,7 +180,7 @@ namespace N
     {
         public void M()
         {
-            Stream stream = null;
+            Stream? stream = null;
             if (stream == null)
             {
                 stream = File.OpenRead(string.Empty);
@@ -198,6 +198,7 @@ namespace N
         public static void LocalAssignedInElse()
         {
             var before = @"
+#pragma warning disable CS0162
 namespace N
 {
     using System.IO;
@@ -221,6 +222,7 @@ namespace N
 }";
 
             var after = @"
+#pragma warning disable CS0162
 namespace N
 {
     using System.IO;
@@ -316,7 +318,7 @@ namespace N
     {
         public C()
         {
-            Disposable disposable = null;
+            Disposable? disposable = null;
             Console.CancelKeyPress += (_, __) =>
             {
                 ↓disposable = new Disposable();
@@ -334,7 +336,7 @@ namespace N
     {
         public C()
         {
-            Disposable disposable = null;
+            Disposable? disposable = null;
             Console.CancelKeyPress += (_, __) =>
             {
                 disposable?.Dispose();
@@ -407,14 +409,14 @@ namespace N
     {
         public C(int i)
         {
-            Stream stream = null;
+            Stream? stream = null;
             while (i > 0)
             {
                 ↓stream = File.OpenRead(string.Empty);
                 i--;
             }
 
-            stream.Dispose();
+            stream?.Dispose();
         }
     }
 }";
@@ -428,7 +430,7 @@ namespace N
     {
         public C(int i)
         {
-            Stream stream = null;
+            Stream? stream = null;
             while (i > 0)
             {
                 stream?.Dispose();
@@ -436,7 +438,7 @@ namespace N
                 i--;
             }
 
-            stream.Dispose();
+            stream?.Dispose();
         }
     }
 }";
@@ -664,12 +666,11 @@ namespace N
             var before = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
@@ -677,7 +678,7 @@ namespace N
             ↓this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             private set { this.stream = value; }
@@ -688,12 +689,11 @@ namespace N
             var after = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
@@ -702,7 +702,7 @@ namespace N
             this.Stream = File.OpenRead(string.Empty);
         }
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             private set { this.stream = value; }
@@ -724,7 +724,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {
@@ -741,7 +741,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void M()
         {
@@ -765,7 +765,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable M()
         {
@@ -782,7 +782,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable M()
         {
@@ -806,7 +806,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable M() => ↓this.stream = File.OpenRead(string.Empty);
     }
@@ -820,7 +820,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable M()
         {
@@ -837,6 +837,7 @@ namespace N
         public static void FieldAssignedInLambda()
         {
             var before = @"
+#pragma warning disable CS0067
 namespace N
 {
     using System;
@@ -844,18 +845,19 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
-            this.M += (o, e) => ↓this.stream = File.OpenRead(string.Empty);
+            this.E += (o, e) => ↓this.stream = File.OpenRead(string.Empty);
         }
 
-        public event EventHandler M;
+        public event EventHandler? E;
     }
 }";
 
             var after = @"
+#pragma warning disable CS0067
 namespace N
 {
     using System;
@@ -863,18 +865,18 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public C()
         {
-            this.M += (o, e) =>
+            this.E += (o, e) =>
             {
                 this.stream?.Dispose();
                 this.stream = File.OpenRead(string.Empty);
             };
         }
 
-        public event EventHandler M;
+        public event EventHandler? E;
     }
 }";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
@@ -892,7 +894,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -918,7 +920,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -951,7 +953,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable P
         {
@@ -971,7 +973,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable P
         {
@@ -998,7 +1000,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable P => ↓this.stream = File.OpenRead(string.Empty);
     }
@@ -1012,7 +1014,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public IDisposable P
         {
@@ -1039,7 +1041,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -1062,7 +1064,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private Disposable disposable;
+        private Disposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -1095,7 +1097,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -1105,7 +1107,7 @@ namespace N
             });
         }
 
-        public IDisposable Disposable
+        public IDisposable? Disposable
         {
             get { return this.disposable; }
             private set { this.disposable = value; }
@@ -1126,7 +1128,7 @@ namespace N
     public sealed class C : IDisposable
     {
         private readonly IDisposable subscription;
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -1137,7 +1139,7 @@ namespace N
             });
         }
 
-        public IDisposable Disposable
+        public IDisposable? Disposable
         {
             get { return this.disposable; }
             private set { this.disposable = value; }
