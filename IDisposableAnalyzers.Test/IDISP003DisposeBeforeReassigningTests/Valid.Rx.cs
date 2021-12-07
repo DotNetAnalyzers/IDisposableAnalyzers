@@ -19,7 +19,7 @@ namespace N
     {
         private int p;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int P
         {
@@ -34,7 +34,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -68,7 +68,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, notifyPropertyChanged, code);
+            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace N
     {
         private int p;
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public int P
         {
@@ -99,7 +99,7 @@ namespace N
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
@@ -110,7 +110,6 @@ namespace N
 {
     using System;
     using System.IO;
-    using System.Reactive.Disposables;
     using Gu.Reactive;
 
     public sealed class C : IDisposable
@@ -133,7 +132,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, notifyPropertyChanged, code);
+            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
         }
 
         [Test]

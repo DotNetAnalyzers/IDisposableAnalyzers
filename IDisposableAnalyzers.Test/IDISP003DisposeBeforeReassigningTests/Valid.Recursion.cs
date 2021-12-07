@@ -133,7 +133,7 @@ namespace N
 
     public abstract class C
     {
-        public static bool RecursiveOut(double foo, out IDisposable value)
+        public static bool RecursiveOut(double foo, out IDisposable? value)
         {
             value = null;
             return RecursiveOut(3.0, out value);
@@ -141,7 +141,7 @@ namespace N
 
         public void M()
         {
-            IDisposable value;
+            IDisposable? value;
             RecursiveOut(1.0, out value);
         }
     }

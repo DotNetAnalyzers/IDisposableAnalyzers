@@ -74,7 +74,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -103,9 +102,9 @@ namespace N
 
     public static class C
     {
-        public static IDisposable M(int i)
+        public static IDisposable? M(int i)
         {
-            IDisposable result;
+            IDisposable? result;
             switch (i)
             {
                 case 1:
@@ -138,9 +137,9 @@ namespace N
 
     public static class C
     {
-        public static IDisposable M(int i)
+        public static IDisposable? M(int i)
         {
-            IDisposable result;
+            IDisposable? result;
             if (i == 0)
             {
                 result = null;
@@ -481,6 +480,7 @@ namespace N
     using System.Collections.Generic;
 
     public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+        where TKey : notnull
     {
         public void Dispose()
         {
@@ -491,7 +491,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
     using System.IO;
 
     public class C
@@ -523,9 +522,9 @@ namespace N
 
         public void SetCurrent(int number)
         {
-            Stream current = this.Cache[number];
+            Stream? current = this.Cache[number];
             this.Cache.TryGetValue(1, out current);
-            Stream temp;
+            Stream? temp;
             this.Cache.TryGetValue(2, out temp);
             current = temp;
             current = this.Cache[number + 1];
@@ -630,14 +629,14 @@ namespace N
 
     public class C
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
-        public C(IDisposable disposable)
+        public C(IDisposable? disposable)
         {
             this.disposable = M(disposable);
         }
 
-        private static IDisposable M(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        private static IDisposable? M(IDisposable? disposable, IEnumerable<IDisposable?>? disposables = null)
         {
             if (disposables == null)
             {
@@ -736,14 +735,13 @@ namespace N
         public static void ReproIssue71()
         {
             var code = @"
+#nullable disable
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TaxonomyWpf
 {
@@ -1077,7 +1075,7 @@ namespace N
 
     public class C
     {
-        private static bool TryGetStream(string fileName, out Stream stream)
+        private static bool TryGetStream(string fileName, out Stream? stream)
         {
             if (File.Exists(fileName))
             {
@@ -1151,7 +1149,7 @@ namespace N
 
     public class C
     {
-        public static bool TryGetStream(string[] fileNames, out Stream result)
+        public static bool TryGetStream(string[] fileNames, out Stream? result)
         {
             foreach (var name in fileNames)
             {
@@ -1180,7 +1178,7 @@ namespace N
 
     public class C
     {
-        public static bool TryGetStreamFor(string[] fileNames, out Stream result)
+        public static bool TryGetStreamFor(string[] fileNames, out Stream? result)
         {
             for (int i = 0; i < fileNames.Length; i++)
             {
@@ -1210,7 +1208,7 @@ namespace N
 
     public class C
     {
-        public static bool TryGetStreamWhile(string[] fileNames, out Stream result)
+        public static bool TryGetStreamWhile(string[] fileNames, out Stream? result)
         {
             var i = 0;
             while (i < fileNames.Length)
@@ -1590,7 +1588,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable disposable;
+        private readonly IDisposable? disposable;
         private bool disposed;
 
         public C()
