@@ -58,8 +58,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Threading;
     using System.Threading.Tasks;
 
     class C
@@ -89,8 +87,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
-    using System.Threading;
     using System.Threading.Tasks;
 
     class C

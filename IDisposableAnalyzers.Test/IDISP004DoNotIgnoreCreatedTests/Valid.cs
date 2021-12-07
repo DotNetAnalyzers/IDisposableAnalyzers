@@ -90,6 +90,7 @@ namespace N
         public static void RealisticExtensionMethodClass()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -246,7 +247,7 @@ namespace N
 
     public static class C
     {
-        public static async Task<string> MAsync()
+        public static async Task<string?> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -287,7 +288,7 @@ namespace N
 
     public static class C
     {
-        public static async Task<string> MAsync()
+        public static async Task<string?> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -849,7 +850,7 @@ namespace N
 
     sealed class C : IDisposable
     {
-        private IDisposable _disposable = new Disposable();
+        private IDisposable? _disposable = new Disposable();
 
         public void Update()
         {
@@ -871,6 +872,7 @@ namespace N
         public static void PositionNotWithinSyntaxTree()
         {
             var target = @"
+#nullable disable
 using System;
 namespace N
 {

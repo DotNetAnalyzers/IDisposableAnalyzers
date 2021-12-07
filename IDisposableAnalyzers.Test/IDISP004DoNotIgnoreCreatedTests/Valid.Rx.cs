@@ -337,11 +337,11 @@ namespace N
 
     sealed class C : IDisposable
     {
-        private readonly IDisposable subscription;
+        private readonly IDisposable? subscription;
 
         private bool disposed;
 
-        public C(IObservable<object> observable = null)
+        public C(IObservable<object>? observable = null)
         {
             this.subscription = observable?.Subscribe(_ => { });
         }

@@ -333,7 +333,7 @@ namespace N
 
     public class C
     {
-        public string M()
+        public string? M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {
@@ -361,7 +361,7 @@ namespace N
 
     public class C
     {
-        public string M()
+        public string? M()
         {
             using (var reader = GetReader(File.OpenRead(string.Empty)))
             {
@@ -683,7 +683,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
