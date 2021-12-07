@@ -99,7 +99,7 @@ namespace N
 
     class C : IDisposable
     {
-        ↓IDisposable _disposable;
+        ↓IDisposable? _disposable;
 
         public void M() => _disposable = new Disposable();
 
@@ -116,7 +116,7 @@ namespace N
 
     class C : IDisposable
     {
-        IDisposable _disposable;
+        IDisposable? _disposable;
 
         public void M() => _disposable = new Disposable();
 
@@ -141,11 +141,11 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private Stream stream = File.OpenRead(string.Empty);
+        ↓private Stream? stream = File.OpenRead(string.Empty);
 
         public void M()
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
             this.stream = null;
         }
 
@@ -163,11 +163,11 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private Stream stream = File.OpenRead(string.Empty);
+        private Stream? stream = File.OpenRead(string.Empty);
 
         public void M()
         {
-            this.stream.Dispose();
+            this.stream?.Dispose();
             this.stream = null;
         }
 
@@ -290,7 +290,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly Stream stream;
+        ↓private readonly Stream? stream;
 
         public C(bool condition)
         {
@@ -314,7 +314,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly Stream stream;
+        private readonly Stream? stream;
 
         public C(bool condition)
         {
@@ -394,7 +394,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly Stream stream;
+        ↓private readonly Stream? stream;
 
         public C(bool value)
         {
@@ -415,51 +415,12 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly Stream stream;
+        private readonly Stream? stream;
 
         public C(bool value)
         {
             this.stream = value ? null : File.OpenRead(string.Empty);
         }
-
-        public void Dispose()
-        {
-            this.stream?.Dispose();
-        }
-    }
-}";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
-
-            [Test]
-            public static void ProtectedSealedInitialized()
-            {
-                var before = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public sealed class C : IDisposable
-    {
-        ↓protected Stream stream = File.OpenRead(string.Empty);
-
-        public void Dispose()
-        {
-        }
-    }
-}";
-
-                var after = @"
-namespace N
-{
-    using System;
-    using System.IO;
-
-    public sealed class C : IDisposable
-    {
-        protected Stream stream = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -597,6 +558,7 @@ namespace N
             public static void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
             {
                 var before = @"
+#pragma warning disable CS8618
 namespace N
 {
     using System;
@@ -624,6 +586,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8618
 namespace N
 {
     using System;
@@ -1045,7 +1008,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private IDisposable disposable;
+        ↓private IDisposable? disposable;
         private bool disposed;
 
         public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
@@ -1069,7 +1032,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
         private bool disposed;
 
         public IDisposable Disposable => this.disposable ?? (this.disposable = new Disposable());
@@ -1100,7 +1063,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly IDisposable created;
+        ↓private readonly IDisposable? created;
         private bool disposed;
 
         public C(IDisposable injected)
@@ -1129,7 +1092,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable created;
+        private readonly IDisposable? created;
         private bool disposed;
 
         public C(IDisposable injected)

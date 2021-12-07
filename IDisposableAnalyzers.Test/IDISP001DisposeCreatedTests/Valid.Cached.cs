@@ -408,6 +408,7 @@ namespace N
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
     internal sealed class C : IDisposable
     {
@@ -426,7 +427,7 @@ namespace N
             return this.TryGetRecursive(location, out var walker);
         }
 
-        private bool TryGetRecursive(int location, out C walker)
+        private bool TryGetRecursive(int location, [NotNullWhen(true)] out C? walker)
         {
             if (this.recursiveCs.TryGetValue(location, out walker))
             {
@@ -447,7 +448,7 @@ namespace N
                 this.map.Add(location, walker);
             }
 
-            public bool TryGetValue(int location, out C walker)
+            public bool TryGetValue(int location, [NotNullWhen(true)] out C? walker)
             {
                 return this.map.TryGetValue(location, out walker);
             }
