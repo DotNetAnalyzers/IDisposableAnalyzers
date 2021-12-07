@@ -352,7 +352,7 @@ namespace N
             });
         }
 
-        public IDisposable Disposable
+        public IDisposable? Disposable
         {
             get { return this.disposable.Disposable; }
             private set { this.disposable.Disposable = value; }

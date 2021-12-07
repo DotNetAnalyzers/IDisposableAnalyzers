@@ -507,11 +507,12 @@ namespace N
             var code = @"
 namespace N
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     class C
     {
-        private static bool TryGetStream(string fileName, out Stream result)
+        private static bool TryGetStream(string fileName, [NotNullWhen(true)] out Stream? result)
         {
             if (File.Exists(fileName))
             {

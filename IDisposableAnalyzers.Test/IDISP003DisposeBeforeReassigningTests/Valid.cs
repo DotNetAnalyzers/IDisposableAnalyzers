@@ -329,7 +329,7 @@ namespace N
         public static void AssigningPropertyWithBackingFieldInCtor()
         {
             var code = @"
-#pragma warning disable CS8118
+#pragma warning disable CS8618
 namespace N
 {
     using System.IO;
