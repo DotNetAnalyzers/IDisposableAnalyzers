@@ -175,7 +175,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void Update()
         {
@@ -198,7 +198,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void Update()
         {
@@ -228,7 +228,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void Update()
         {
@@ -251,7 +251,7 @@ namespace N
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public void Update()
         {
@@ -281,7 +281,7 @@ namespace N
 
     public class C
     {
-        private object stream;
+        private object? stream;
 
         public void Update()
         {
@@ -304,7 +304,7 @@ namespace N
 
     public class C
     {
-        private object stream;
+        private object? stream;
 
         public void Update()
         {
@@ -327,6 +327,7 @@ namespace N
             public static void FieldPrivateMethodRef()
             {
                 var before = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -354,6 +355,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -388,6 +390,7 @@ namespace N
             public static void FieldPrivateMethodRefTwice()
             {
                 var before = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -416,6 +419,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -451,6 +455,7 @@ namespace N
             public static void FieldPrivateMethodRefTwiceDifferentMethods()
             {
                 var before = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -484,6 +489,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -524,6 +530,7 @@ namespace N
             public static void FieldPublicMethodRef()
             {
                 var before = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -551,6 +558,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -585,6 +593,7 @@ namespace N
             public static void FieldPublicMethodRefExpressionBody()
             {
                 var before = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
@@ -609,6 +618,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS8601
 namespace N
 {
     using System;
