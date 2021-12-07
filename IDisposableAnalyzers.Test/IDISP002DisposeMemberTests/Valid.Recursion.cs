@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -153,12 +153,11 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
     {
-        private readonly Stream stream;
+        private Stream? stream;
 
         public C()
         {
@@ -167,7 +166,7 @@ namespace N
             }
         }
 
-        public bool TryGetStream(out Stream outValue)
+        public bool TryGetStream(out Stream? outValue)
         {
             outValue = null;
             return this.TryGetStream(out outValue);

@@ -66,7 +66,6 @@ namespace N
                 var c1 = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C1
@@ -131,8 +130,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System.IO;
-
     public class C
     {
         public void M()
@@ -165,13 +162,14 @@ namespace N
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
-            [TestCase("this.Stream().ReadAsync(null, 0, 0)")]
-            [TestCase("this.Stream()?.ReadAsync(null, 0, 0)")]
-            [TestCase("Stream().ReadAsync(null, 0, 0)")]
-            [TestCase("Stream()?.ReadAsync(null, 0, 0)")]
+            [TestCase("this.Stream().ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("this.Stream()?.ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("Stream().ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("Stream()?.ReadAsync(new byte[64], 0, 0)")]
             public static void MethodCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var code = @"
+#pragma warning disable CS8602
 namespace N
 {
     using System.IO;
@@ -181,9 +179,9 @@ namespace N
     {
         public Stream Stream() => File.OpenRead(string.Empty);
 
-        public async Task<int> M() => await ↓Stream().ReadAsync(null, 0, 0);
+        public async Task<int> M() => await ↓Stream().ReadAsync(new byte[64], 0, 0);
     }
-}".AssertReplace("Stream().ReadAsync(null, 0, 0)", expression);
+}".AssertReplace("Stream().ReadAsync(new byte[64], 0, 0)", expression);
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
@@ -210,13 +208,14 @@ namespace N
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
-            [TestCase("this.Stream.ReadAsync(null, 0, 0)")]
-            [TestCase("this.Stream?.ReadAsync(null, 0, 0)")]
-            [TestCase("Stream.ReadAsync(null, 0, 0)")]
-            [TestCase("Stream?.ReadAsync(null, 0, 0)")]
+            [TestCase("this.Stream.ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("this.Stream?.ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("Stream.ReadAsync(new byte[64], 0, 0)")]
+            [TestCase("Stream?.ReadAsync(new byte[64], 0, 0)")]
             public static void PropertyCreatingDisposableExpressionBodyAsync(string expression)
             {
                 var code = @"
+#pragma warning disable CS8602
 namespace N
 {
     using System.IO;
@@ -226,9 +225,9 @@ namespace N
     {
         public Stream Stream => File.OpenRead(string.Empty);
 
-        public async Task<int> M() => await ↓Stream.ReadAsync(null, 0, 0);
+        public async Task<int> M() => await ↓Stream.ReadAsync(new byte[64], 0, 0);
     }
-}".AssertReplace("Stream.ReadAsync(null, 0, 0)", expression);
+}".AssertReplace("Stream.ReadAsync(new byte[64], 0, 0)", expression);
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
@@ -262,12 +261,12 @@ namespace N
 
     public class C
     {
-        internal static string M1()
+        internal static string? M1()
         {
             return M2(↓File.OpenRead(string.Empty));
         }
 
-        private static string M2(Stream stream) => stream.ToString();
+        private static string? M2(Stream stream) => stream.ToString();
     }
 }";
 

@@ -13,6 +13,7 @@
             public static void AddUsingForIgnoredFileOpenRead()
             {
                 var before = @"
+#pragma warning disable CS0219
 namespace N
 {
     public sealed class C
@@ -26,6 +27,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0219
 namespace N
 {
     public sealed class C
@@ -83,10 +85,9 @@ namespace N
             public static void AddUsingForIgnoredReturnManyStatements()
             {
                 var before = @"
+#pragma warning disable CS0219
 namespace N
 {
-    using System;
-
     public sealed class C
     {
         public void M()
@@ -105,10 +106,9 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0219
 namespace N
 {
-    using System;
-
     public sealed class C
     {
         public void M()

@@ -100,6 +100,7 @@ namespace N
             public static void CreateNewCompositeDisposableWhenUsingsAndFields()
             {
                 var before = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
@@ -123,6 +124,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
@@ -155,6 +157,7 @@ namespace N
             public static void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
             {
                 var before = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
@@ -178,6 +181,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
@@ -707,6 +711,7 @@ namespace N
             public static void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
             {
                 var before = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System.IO;
@@ -726,6 +731,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0219
 namespace N
 {
     using System.IO;

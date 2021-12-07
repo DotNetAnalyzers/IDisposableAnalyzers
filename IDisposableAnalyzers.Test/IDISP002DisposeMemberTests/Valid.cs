@@ -171,7 +171,9 @@ namespace N
 namespace N
 {
     using System;
-    class Disposable : IDisposable {
+
+    class Disposable : IDisposable
+    {
         public void Dispose() { }
     }
 }";
@@ -180,10 +182,14 @@ namespace N
 namespace N
 {
     using System;
-    class Goof : IDisposable {
-        IDisposable _disposable;
-        public void Create()  => _disposable = new Disposable();
-        public void Dispose() => _disposable.Dispose();
+
+    class C : IDisposable
+    {
+        IDisposable? _disposable;
+
+        public void M()  => _disposable = new Disposable();
+
+        public void Dispose() => _disposable?.Dispose();
     }
 }";
             RoslynAssert.Valid(Analyzer, disposableCode, code);
@@ -353,7 +359,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C : BaseClass
@@ -452,14 +457,14 @@ namespace N
         public static void IgnoredWhenNotAssigned()
         {
             var code = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
-    using System.IO;
 
     public sealed class C
     {
-        private readonly IDisposable bar;
+        private readonly IDisposable? f;
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -475,9 +480,9 @@ namespace N
 
     public sealed class C
     {
-        private Stream stream;
+        private Stream? stream;
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             set { this.stream = value; }
@@ -497,9 +502,9 @@ namespace N
 
     public sealed class C
     {
-        private Stream stream;
+        private Stream? stream;
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             set { this.stream = value; }
@@ -630,7 +635,7 @@ namespace N
 {
     public sealed class C
     {
-        private int[] ints;
+        private int[]? ints;
 
         public int[] Ints
         {
@@ -678,7 +683,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -700,7 +704,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C<T>
@@ -760,6 +763,7 @@ namespace N
 }";
 
             var barCode = @"
+#pragma warning disable CS8618
 namespace N
 {
     using System.IO;
@@ -831,7 +835,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -842,7 +846,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -859,7 +863,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -870,7 +874,7 @@ namespace N
         [OneTimeTearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -902,9 +906,9 @@ namespace N
 
         public bool Exists => File.Exists(this.Name);
 
-        public string AllText { get; }
+        public string? AllText { get; }
 
-        public IReadOnlyList<string> AllLines { get; }
+        public IReadOnlyList<string>? AllLines { get; }
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
@@ -1032,7 +1036,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     abstract class BaseClass : IDisposable
     {
@@ -1048,7 +1051,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     class C : BaseClass
