@@ -352,7 +352,8 @@ namespace N
     {
         public void M()
         {
-            Stream stream = null;
+            var stream = File.OpenRead(string.Empty);
+            stream.Dispose();
             this.Assign(ref stream);
             stream.Dispose();
         }
