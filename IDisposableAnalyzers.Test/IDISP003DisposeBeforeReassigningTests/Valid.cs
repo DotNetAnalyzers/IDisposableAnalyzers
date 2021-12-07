@@ -225,7 +225,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -273,7 +272,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -331,9 +329,9 @@ namespace N
         public static void AssigningPropertyWithBackingFieldInCtor()
         {
             var code = @"
+#pragma warning disable CS8118
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
@@ -1433,11 +1431,10 @@ namespace N
 namespace N
 {
     using System;
-    using System.Threading;
 
     public class C
     {
-        private IDisposable disposable;
+        private IDisposable? disposable;
 
         public static C M(IDisposable d)
         {

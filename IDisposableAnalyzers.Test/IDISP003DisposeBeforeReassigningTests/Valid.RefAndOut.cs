@@ -276,7 +276,7 @@ namespace N
     {
         private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-        private Stream current;
+        private Stream? current;
 
         public bool Update(int number)
         {
@@ -300,12 +300,12 @@ namespace N
     {
         private readonly ConcurrentDictionary<int, Stream> Cache = new ConcurrentDictionary<int, Stream>();
 
-        private Stream current;
+        private Stream? current;
 
         public bool Update(int number)
         {
-            return this.Cache.TryGetValue(number, out this.current);
-            return this.Cache.TryGetValue(number + 1, out this.current);
+            return this.Cache.TryGetValue(number, out this.current) &&
+                   this.Cache.TryGetValue(number + 1, out this.current);
         }
     }
 }";
@@ -318,19 +318,18 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C
     {
-        private Stream stream;
+        private Stream? stream;
 
         public bool Update()
         {
-            return TryGetStream(out stream);
+            return TryGetStream(out this.stream);
         }
 
-        public bool TryGetStream(out Stream result)
+        public bool TryGetStream(out Stream? result)
         {
             result = this.stream;
             return true;
@@ -481,11 +480,12 @@ namespace N
             var code = @"
 namespace N
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
 
     class C
     {
-        private static bool TryGetStream(string fileName, out Stream result)
+        private static bool TryGetStream(string fileName, [NotNullWhen(true)] out Stream? result)
         {
             if (File.Exists(fileName))
             {
