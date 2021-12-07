@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
@@ -91,7 +91,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly Stream stream;
+        ↓private readonly Stream? stream;
 
         public C()
         {
@@ -100,7 +100,7 @@ namespace N
             }
         }
 
-        public bool TryGetStream(ref Stream outValue)
+        public bool TryGetStream(ref Stream? outValue)
         {
             outValue = File.OpenRead(string.Empty);
             return true;
@@ -121,7 +121,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly Stream stream;
+        private readonly Stream? stream;
 
         public C()
         {
@@ -130,7 +130,7 @@ namespace N
             }
         }
 
-        public bool TryGetStream(ref Stream outValue)
+        public bool TryGetStream(ref Stream? outValue)
         {
             outValue = File.OpenRead(string.Empty);
             return true;

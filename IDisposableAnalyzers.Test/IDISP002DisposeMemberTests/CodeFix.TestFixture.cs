@@ -23,7 +23,7 @@ namespace N
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        ↓private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -45,7 +45,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -79,7 +79,7 @@ namespace N
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        ↓private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -101,7 +101,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -135,7 +135,7 @@ namespace N
 
     public class Tests
     {
-        ↓private Disposable disposable;
+        ↓private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -162,7 +162,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()

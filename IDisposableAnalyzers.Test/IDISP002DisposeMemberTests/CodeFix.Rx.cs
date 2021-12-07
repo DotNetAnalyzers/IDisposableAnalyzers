@@ -121,7 +121,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        ↓private readonly IDisposable disposable;
+        ↓private readonly IDisposable? disposable;
 
         public C(IObservable<object> observable)
         {
@@ -141,7 +141,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable disposable;
+        private readonly IDisposable? disposable;
 
         public C(IObservable<object> observable)
         {
