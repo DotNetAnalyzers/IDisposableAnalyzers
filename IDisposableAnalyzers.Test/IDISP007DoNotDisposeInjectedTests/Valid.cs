@@ -31,13 +31,14 @@ namespace N
         public static void DisposingArrayItem()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable[] disposables;
+        private readonly IDisposable[] disposables = new IDisposable[1];
 
         public void M()
         {
@@ -164,12 +165,12 @@ namespace N
         {
         }
 
-        public BaseClass(object p)
+        public BaseClass(object? p)
         {
             this.P = p;
         }
 
-        public object P { get; }
+        public object? P { get; }
 
         public void Dispose()
         {
@@ -588,7 +589,7 @@ namespace N
         {
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public bool IsDirty
         {

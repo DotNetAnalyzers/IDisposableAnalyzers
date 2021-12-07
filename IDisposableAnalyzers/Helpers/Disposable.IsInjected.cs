@@ -13,6 +13,13 @@
         {
             if (semanticModel.TryGetSymbol(value, cancellationToken, out var symbol))
             {
+                switch (symbol)
+                {
+                    case IFieldSymbol { IsStatic: true }:
+                    case IPropertySymbol { IsStatic: true }:
+                        return true;
+                }
+
                 using var walker = AssignedValueWalker.Borrow(symbol, location, semanticModel, cancellationToken);
                 if (walker.Values.Count == 0)
                 {

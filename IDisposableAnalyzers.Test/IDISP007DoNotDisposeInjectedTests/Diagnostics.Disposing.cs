@@ -109,10 +109,11 @@ namespace N
 namespace N
 {
     using System;
+    using System.IO;
 
     public sealed class C : IDisposable
     {
-        private static readonly IDisposable Disposable;
+        private static readonly IDisposable Disposable = File.OpenRead(string.Empty);
 
         public void Dispose()
         {
@@ -127,13 +128,14 @@ namespace N
             public static void DisposingPublicFieldOutsideOfLock()
             {
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;
 
     public class C : IDisposable
     {
-        private readonly object gate;
+        private readonly object gate = new();
 
         public IDisposable disposable;
         private bool disposed;
@@ -202,6 +204,7 @@ namespace N
             public static void DisposingAbstractOrVirtualProperty(string property)
             {
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -396,6 +399,7 @@ namespace N
             public static void DisposingMutableProperty(string disposeCall)
             {
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -529,6 +533,7 @@ namespace N
             public static void InjectedViaMethod(string expression)
             {
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -614,6 +619,7 @@ namespace N
             public static void InjectedSingleAssignmentDisposable(string dispose)
             {
                 var code = @"
+#nullable disable
 namespace Gu.Reactive
 {
     using System;
