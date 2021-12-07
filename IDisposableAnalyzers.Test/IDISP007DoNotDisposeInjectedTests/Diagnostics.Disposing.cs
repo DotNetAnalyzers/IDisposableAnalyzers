@@ -471,12 +471,12 @@ namespace N
         {
         }
 
-        public BaseClass(object o)
+        public BaseClass(object? o)
         {
             this.P = o;
         }
 
-        public object P { get; }
+        public object? P { get; }
 
         public void Dispose()
         {

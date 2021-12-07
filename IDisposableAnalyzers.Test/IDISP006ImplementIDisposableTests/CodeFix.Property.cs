@@ -289,6 +289,7 @@ namespace N
             public static void ImplementIDisposableSealedClassUnderscoreWithConst()
             {
                 var before = @"
+#pragma warning disable CS0414
 namespace N
 {
     using System.IO;
@@ -303,6 +304,7 @@ namespace N
 }";
 
                 var after = @"
+#pragma warning disable CS0414
 namespace N
 {
     using System;

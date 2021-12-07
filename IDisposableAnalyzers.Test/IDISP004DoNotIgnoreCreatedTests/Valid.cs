@@ -872,7 +872,7 @@ namespace N
         public static void PositionNotWithinSyntaxTree()
         {
             var target = @"
-#nullable disable
+#pragma warning disable CS0219
 using System;
 namespace N
 {

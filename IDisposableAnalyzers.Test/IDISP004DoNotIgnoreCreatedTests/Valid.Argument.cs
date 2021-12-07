@@ -290,7 +290,7 @@ namespace N
 
     public class C
     {
-        public string M()
+        public string? M()
         {
             using (var reader = new StreamReader(File.OpenRead(string.Empty)))
             {

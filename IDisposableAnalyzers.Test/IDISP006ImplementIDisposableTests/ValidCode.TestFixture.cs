@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -17,7 +17,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -28,7 +28,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -45,7 +45,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -56,7 +56,7 @@ namespace N
         [OneTimeTearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";

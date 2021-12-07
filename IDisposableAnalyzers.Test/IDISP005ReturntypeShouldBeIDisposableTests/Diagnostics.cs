@@ -15,7 +15,6 @@
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -35,7 +34,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -124,7 +122,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -141,7 +138,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -165,9 +161,9 @@ namespace N
         internal static void M()
         {
             Func<object> f = () =>
-                {
-                    return ↓System.IO.File.OpenRead(null);
-                };
+            {
+                return ↓System.IO.File.OpenRead(string.Empty);
+            };
         }
     }
 }";
@@ -187,7 +183,7 @@ namespace N
     {
         internal static void M()
         {
-            Func<object> f = () => ↓System.IO.File.OpenRead(null);
+            Func<object> f = () => ↓System.IO.File.OpenRead(string.Empty);
         }
     }
 }";
@@ -207,7 +203,7 @@ namespace N
     {
         internal static void M()
         {
-            Func<int,object> f = x => ↓System.IO.File.OpenRead(null);
+            Func<int,object> f = x => ↓System.IO.File.OpenRead(string.Empty);
         }
     }
 }";

@@ -28,6 +28,7 @@ namespace N
         public static void RealisticExtensionMethodClass()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -216,6 +217,7 @@ namespace N
         public static void GenericClassMethodReturningDynamicSubtract()
         {
             var code = @"
+#pragma warning disable CS8600, CS8618, CS0649
 namespace N
 {
     public class C<T>
@@ -233,6 +235,7 @@ namespace N
         public static void GenericClassPropertyReturningDynamicSubtract()
         {
             var code = @"
+#pragma warning disable CS8600, CS8618, CS0649
 namespace N
 {
     public class C<T>
@@ -598,6 +601,7 @@ namespace N
         public static void MethodReturningValueTaskOfDisposableAsync()
         {
             var code = @"
+#pragma warning disable CS4014
 namespace N
 {
     using System;
@@ -734,7 +738,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -756,7 +759,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -878,7 +880,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
     using System.Threading.Tasks;
 
@@ -909,7 +910,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     internal static class C
     {
@@ -917,7 +917,7 @@ namespace N
         {
             Func<IDisposable> f = () =>
             {
-                var file = System.IO.File.OpenRead(null);
+                var file = System.IO.File.OpenRead(string.Empty);
                 return file;
             };
         }
@@ -995,7 +995,7 @@ namespace N
         public void ThrowsIfPrerequisiteIsNull()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => new Disposable());
-            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception.Message);
+            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception?.Message);
         }
     }
 }";
@@ -1034,13 +1034,14 @@ namespace N
 
     public class C
     {
-        public static object M()
+        public static object? M()
         {
             using (var disposable = Create())
             {
             }
 
             return null;
+
             IDisposable Create()
             {
                 return new Disposable();
@@ -1070,12 +1071,12 @@ namespace N
             Assert.Throws<InvalidOperationException>(() => Create(true));
             Assert.AreEqual(
                 ""Expected"",
-            Assert.Throws<InvalidOperationException>(() => Create(true)).Message);
+                Assert.Throws<InvalidOperationException>(() => Create(true))?.Message);
 
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true));
             Assert.AreEqual(
                 ""Expected"",
-                Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true)).Message);
+                Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true))?.Message);
         }
 
         private static Disposable Create(bool b)
@@ -1090,6 +1091,7 @@ namespace N
 
         private static async Task<Disposable> CreateAsync(bool b)
         {
+            await Task.Delay(10);
             if (b)
             {
                 throw new InvalidOperationException(""Expected"");
@@ -1104,13 +1106,12 @@ namespace N
         }
 
         [TestCase("serviceCollection.AddScoped(x => new Disposable())")]
-        [TestCase("serviceCollection.AddSingleton(typeof(IDisposable), x => new Disposable())")]
+        [TestCase("serviceCollection.AddSingleton(typeof(System.IDisposable), x => new Disposable())")]
         public static void ServiceCollection(string expression)
         {
             var code = @"
 namespace N
 {
-    using System;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class Issue231

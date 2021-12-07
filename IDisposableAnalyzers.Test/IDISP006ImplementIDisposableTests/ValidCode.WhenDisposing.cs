@@ -131,9 +131,9 @@ namespace N
     using System;
 
     class Goof : IDisposable {
-        IDisposable _disposable;
+        IDisposable? _disposable;
         public void Create()  => _disposable = new Disposable();
-        public void Dispose() => _disposable.Dispose();
+        public void Dispose() => _disposable?.Dispose();
     }
 }";
                 RoslynAssert.Valid(Analyzer, Disposable, code);
@@ -374,14 +374,14 @@ namespace N
             public static void IgnoredWhenNotAssigned()
             {
                 var code = @"
+#pragma warning disable CS0169
 namespace N
 {
     using System;
-    using System.IO;
 
     public sealed class C
     {
-        private readonly IDisposable disposable;
+        private readonly IDisposable? disposable;
     }
 }";
                 RoslynAssert.Valid(Analyzer, code);
@@ -397,9 +397,9 @@ namespace N
 
     public sealed class C
     {
-        private Stream stream;
+        private Stream? stream;
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             set { this.stream = value; }
@@ -523,7 +523,7 @@ namespace N
 {
     public sealed class C
     {
-        private int[] ints;
+        private int[]? ints;
 
         public int[] Ints
         {

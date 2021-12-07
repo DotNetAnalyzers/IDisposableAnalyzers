@@ -49,7 +49,6 @@ namespace N
     public class C : BaseClass
     {
         private readonly IDisposable disposable = new Disposable();
-        private bool disposed;
 
         protected override void Dispose(bool disposing)
         {
@@ -162,7 +161,6 @@ namespace N
     public class C : BaseClass
     {
         private readonly IDisposable disposable = new Disposable();
-        private bool disposed;
 
         protected override void Dispose(bool disposing)
         {
@@ -181,7 +179,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     abstract class BaseClass : IDisposable
     {
@@ -197,7 +194,6 @@ namespace N
                 var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     class C : BaseClass
