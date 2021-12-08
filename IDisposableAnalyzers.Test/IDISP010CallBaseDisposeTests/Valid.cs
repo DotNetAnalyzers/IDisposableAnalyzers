@@ -377,6 +377,7 @@ namespace N
 namespace N
 {
     using System;
+
     class Disposable : IDisposable {
         public void Dispose() { }
     }
@@ -386,10 +387,11 @@ namespace N
 namespace N
 {
     using System;
-    class Goof : IDisposable {
-        IDisposable _disposable;
+
+    class C : IDisposable {
+        IDisposable? _disposable;
         public void Create()  => _disposable = new Disposable();
-        public void Dispose() => _disposable.Dispose();
+        public void Dispose() => _disposable?.Dispose();
     }
 }";
             RoslynAssert.Valid(Analyzer, disposableCode, code);
@@ -559,7 +561,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C : BaseClass
@@ -934,7 +935,7 @@ namespace N
 
     public class C1 : IDisposable
     {
-        public virtual Stream Stream { get; } = File.OpenRead(string.Empty);
+        public virtual Stream? Stream { get; } = File.OpenRead(string.Empty);
 
         private bool disposed;
 
@@ -954,7 +955,7 @@ namespace N
         {
             if (disposing)
             {
-                this.Stream.Dispose();
+                this.Stream?.Dispose();
             }
         }
 
@@ -975,7 +976,7 @@ namespace N
 
     public class C : C1
     {
-        public override Stream Stream { get; }
+        public override Stream? Stream { get; }
     }
 }";
             RoslynAssert.Valid(Analyzer, c1, code);
@@ -991,7 +992,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [SetUp]
         public void SetUp()
@@ -1002,7 +1003,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";
@@ -1019,7 +1020,7 @@ namespace N
 
     public class Tests
     {
-        private Disposable disposable;
+        private Disposable? disposable;
 
         [OneTimeSetUp]
         public void SetUp()
@@ -1030,7 +1031,7 @@ namespace N
         [OneTimeTearDown]
         public void TearDown()
         {
-            this.disposable.Dispose();
+            this.disposable?.Dispose();
         }
     }
 }";

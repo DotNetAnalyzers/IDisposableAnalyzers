@@ -136,7 +136,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C
+    public class C
     {
         public C(Stream stream)
         {
@@ -155,7 +155,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -177,7 +176,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C<T>
@@ -293,7 +291,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C
+    public class C
     {
         private static readonly Stream StaticStream = File.OpenRead(string.Empty);
         private Stream stream;
@@ -320,6 +318,7 @@ namespace N
         public static void GenericTypeWithPropertyAndIndexer()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System.Collections.Generic;
@@ -363,6 +362,7 @@ namespace N
     using System.Collections.Generic;
 
     public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+        where TKey : notnull
     {
         public void Dispose()
         {
@@ -373,14 +373,13 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
     using System.IO;
 
     public class C
     {
         private readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
 
-        private Stream current;
+        private Stream? current;
 
         public void SetCurrent(int number)
         {

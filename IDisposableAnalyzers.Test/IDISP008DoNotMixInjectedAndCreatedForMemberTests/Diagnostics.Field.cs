@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DoNontMixInjectedAndCreatedForMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.Diagnostics;
