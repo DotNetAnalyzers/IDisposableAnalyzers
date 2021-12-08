@@ -13,6 +13,7 @@ namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
         public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -43,7 +44,7 @@ namespace N
 
     public class C
     {
-        public static async Task<string> MAsync()
+        public static async Task<string?> MAsync()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {
@@ -230,6 +231,7 @@ namespace N
         public static void ReturnNullAfterAwaitIssue89()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -237,7 +239,7 @@ namespace N
 
     public class C
     {
-        public async Task<string> M()
+        public async Task<string?> M()
         {
             using (var client = new WebClient())
             {
@@ -254,6 +256,7 @@ namespace N
         public static void ReturnNullIssue89()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -261,7 +264,7 @@ namespace N
 
     public class C
     {
-        public Task<string> M()
+        public Task<string>? M()
         {
             using (var client = new WebClient())
             {
@@ -286,7 +289,7 @@ namespace N
 
     public class C
     {
-        private async Task<string> Retrieve(HttpClient client, Uri location)
+        private async Task<string?> Retrieve(HttpClient client, Uri location)
         {
             using (HttpResponseMessage response = await client.GetAsync(location))
             {

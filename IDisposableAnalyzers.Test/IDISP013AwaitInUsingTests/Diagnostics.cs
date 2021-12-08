@@ -13,6 +13,7 @@
         public static void WebClientDownloadStringTaskAsync()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -64,6 +65,7 @@ namespace N
         public static void LocalTask()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -88,6 +90,7 @@ namespace N
         public static void TaskCompletionSourceTask()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;

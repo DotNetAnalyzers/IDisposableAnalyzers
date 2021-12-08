@@ -26,6 +26,7 @@ namespace N
         public static void RealisticExtensionMethodClass()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System;
@@ -214,6 +215,7 @@ namespace N
         public static void GenericClassMethodReturningDynamicSubtract()
         {
             var code = @"
+#pragma warning disable CS8600, CS8618, CS0649
 namespace N
 {
     public class C<T>
@@ -231,6 +233,7 @@ namespace N
         public static void GenericClassPropertyReturningDynamicSubtract()
         {
             var code = @"
+#pragma warning disable CS8600, CS8618, CS0649
 namespace N
 {
     public class C<T>
@@ -681,7 +684,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -703,7 +705,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public sealed class C
@@ -825,7 +826,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
     using System.Threading.Tasks;
 
@@ -864,7 +864,7 @@ namespace N
         {
             Func<IDisposable> f = () =>
             {
-                var file = System.IO.File.OpenRead(null);
+                var file = File.OpenRead(string.Empty);
                 return file;
             };
         }
@@ -942,7 +942,7 @@ namespace N
         public void ThrowsIfPrerequisiteIsNull()
         {
             var exception = Assert.Throws<ArgumentNullException>(() => new Disposable());
-            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception.Message);
+            Assert.AreEqual(""Value cannot be null.\r\nParameter name: condition2"", exception?.Message);
         }
     }
 }";
@@ -965,7 +965,7 @@ namespace N
         {
             using(var reader = File.OpenText(string.Empty))
             {
-                string line;
+                string? line;
                 while((line = reader.ReadLine()) != null)
                 {
                     yield return line;
@@ -999,7 +999,7 @@ namespace N
         IEnumerable<string> Use(TextReader reader)
         {
             List<string> lines = new List<string>();
-            string line;
+            string? line;
             while((line = reader.ReadLine()) != null)
             {
                 lines.Add(line);
@@ -1016,6 +1016,7 @@ namespace N
         public static void AwaitingInUsing()
         {
             var code = @"
+#pragma warning disable SYSLIB0014
 namespace N
 {
     using System.Net;
@@ -1092,9 +1093,9 @@ namespace N
 
     public class C
     {
-        public Stream DisposeBefore(string[] fileNames)
+        public Stream? DisposeBefore(string[] fileNames)
         {
-            Stream stream = null;
+            Stream? stream = null;
             foreach (var name in fileNames)
             {
                 stream?.Dispose();
@@ -1143,6 +1144,7 @@ namespace N
         public static void ReturnProcessIssue246()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System.Diagnostics;

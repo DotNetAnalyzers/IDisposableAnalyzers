@@ -84,7 +84,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
     using System.IO;
 

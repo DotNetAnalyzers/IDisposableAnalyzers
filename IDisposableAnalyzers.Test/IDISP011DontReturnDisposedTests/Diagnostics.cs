@@ -71,7 +71,7 @@ namespace N
 
         IEnumerable<string> Use(TextReader reader)
         {
-            string line;
+            string? line;
             while((line = reader.ReadLine()) != null)
             {
                 yield return line;
@@ -112,7 +112,7 @@ namespace N
 
         private IEnumerable<string> UseCore(TextReader reader)
         {
-            string line;
+            string? line;
             while ((line = reader.ReadLine()) != null)
             {
                 yield return line;

@@ -660,10 +660,10 @@ namespace N
         public static void IgnoredWhenNotAssigned()
         {
             var code = @"
+#pragma warning disable CS0169, CS8618
 namespace N
 {
     using System;
-    using System.IO;
 
     public sealed class C
     {
@@ -683,9 +683,9 @@ namespace N
 
     public sealed class C
     {
-        private Stream stream;
+        private Stream? stream;
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             set { this.stream = value; }
@@ -705,9 +705,9 @@ namespace N
 
     public sealed class C
     {
-        private Stream stream;
+        private Stream? stream;
 
-        public Stream Stream
+        public Stream? Stream
         {
             get { return this.stream; }
             set { this.stream = value; }
@@ -838,7 +838,7 @@ namespace N
 {
     public sealed class C
     {
-        private int[] ints;
+        private int[]? ints;
 
         public int[] Ints
         {
@@ -886,7 +886,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -908,7 +907,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C<T>

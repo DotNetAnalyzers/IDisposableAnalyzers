@@ -38,7 +38,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     public sealed class C
     {
@@ -62,7 +61,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     public sealed class C
     {
