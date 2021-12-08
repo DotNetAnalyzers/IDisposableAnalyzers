@@ -358,7 +358,7 @@ namespace N
             this.reader = new StreamReader(stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
         }
 
-        public string ReadLine() => this.reader.ReadLine();
+        public string? ReadLine() => this.reader.ReadLine();
  
         public int ReadByte() => this.stream.ReadByte();
 

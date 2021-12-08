@@ -48,7 +48,7 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private readonly IDisposable[] disposables;
+        private readonly IDisposable[] disposables = new IDisposable[1];
 
         public void M()
         {

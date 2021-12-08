@@ -277,7 +277,7 @@ namespace N
 
     public class C : IDisposable
     {
-        private static StringBuilder Builder = new StringBuilder();
+        private static StringBuilder? Builder = new StringBuilder();
         private bool isDisposed = false;
 
         ~C()
@@ -320,7 +320,7 @@ namespace N
 
     public class C : IDisposable
     {
-        private StringBuilder Builder = new StringBuilder();
+        private StringBuilder? Builder = new StringBuilder();
         private bool isDisposed = false;
 
         ~C()

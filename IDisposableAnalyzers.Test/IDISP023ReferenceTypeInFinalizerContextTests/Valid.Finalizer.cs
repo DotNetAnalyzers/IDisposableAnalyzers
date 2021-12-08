@@ -124,7 +124,7 @@ namespace N
 
     public class C
     {
-        private static StringBuilder Builder = new StringBuilder();
+        private static StringBuilder? Builder = new StringBuilder();
 
         ~C()
         {
@@ -146,7 +146,7 @@ namespace N
 
     public class C
     {
-        private StringBuilder Builder = new StringBuilder();
+        private StringBuilder? Builder = new StringBuilder();
 
         ~C()
         {
