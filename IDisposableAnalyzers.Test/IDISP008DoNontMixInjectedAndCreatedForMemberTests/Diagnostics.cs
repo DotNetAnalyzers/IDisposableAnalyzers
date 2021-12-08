@@ -1,4 +1,4 @@
-namespace IDisposableAnalyzers.Test.IDISP008DoNontMixInjectedAndCreatedForMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNontMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -27,7 +27,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C

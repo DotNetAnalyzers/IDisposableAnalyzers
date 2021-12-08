@@ -753,6 +753,7 @@ namespace N
             public static void Cast(string cast)
             {
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;

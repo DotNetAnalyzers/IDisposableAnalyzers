@@ -13,7 +13,7 @@
 
         [TestCase("private Stream Stream")]
         [TestCase("protected Stream Stream")]
-        public static void MutableFieldInSealed(string property)
+        public static void MutableFieldInInternal(string property)
         {
             var code = @"
 namespace N
@@ -21,7 +21,7 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class C : IDisposable
+    internal class C : IDisposable
     {
         private Stream Stream = File.OpenRead(string.Empty);
 
@@ -37,7 +37,7 @@ namespace N
         [TestCase("public Stream Stream { get; protected set; }")]
         [TestCase("public Stream Stream { get; private set; }")]
         [TestCase("protected Stream Stream { get; set; }")]
-        public static void MutablePropertyInSealed(string property)
+        public static void MutablePropertyInInternal(string property)
         {
             var code = @"
 namespace N
@@ -45,7 +45,7 @@ namespace N
     using System;
     using System.IO;
 
-    public sealed class C : IDisposable
+    internal class C : IDisposable
     {
         public Stream Stream { get; set; } = File.OpenRead(string.Empty);
 
@@ -224,7 +224,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C
+    public class C
     {
         public C(Stream stream)
         {
@@ -243,7 +243,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C
@@ -265,7 +264,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.Collections.Generic;
 
     public class C<T>
@@ -381,7 +379,7 @@ namespace N
 {
     using System.IO;
 
-    public sealed class C
+    public class C
     {
         private static readonly Stream StaticStream = File.OpenRead(string.Empty);
         private Stream stream;
@@ -408,6 +406,7 @@ namespace N
         public static void GenericTypeWithPropertyAndIndexer()
         {
             var code = @"
+#nullable disable
 namespace N
 {
     using System.Collections.Generic;
@@ -451,6 +450,7 @@ namespace N
     using System.Collections.Generic;
 
     public class DisposableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IDisposable
+        where TKey : notnull
     {
         public void Dispose()
         {
@@ -461,14 +461,13 @@ namespace N
             var code = @"
 namespace N
 {
-    using System.Collections.Generic;
     using System.IO;
 
     public class C
     {
         private static readonly DisposableDictionary<int, Stream> Cache = new DisposableDictionary<int, Stream>();
 
-        private Stream current;
+        private Stream? current;
 
         public void SetCurrent(int number)
         {

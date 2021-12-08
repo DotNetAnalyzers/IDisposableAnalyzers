@@ -120,7 +120,6 @@ namespace N
             var code = @"
 namespace N
 {
-    using System;
     using System.IO;
 
     public class C : BaseClass
@@ -231,7 +230,7 @@ namespace N
 
     public class BaseClass : IDisposable
     {
-        private readonly object p;
+        private readonly object? p;
         private bool disposed = false;
 
         public BaseClass()
@@ -239,12 +238,12 @@ namespace N
         {
         }
 
-        public BaseClass(object p)
+        public BaseClass(object? p)
         {
             this.p = p;
         }
 
-        public object P => this.p;
+        public object? P => this.p;
 
         public void Dispose()
         {
@@ -462,9 +461,9 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private object f;
+        private object? f;
 
-        public C(object f)
+        public C(object? f)
         {
             this.f = f;
         }
@@ -485,7 +484,6 @@ namespace N
 namespace N
 {
     using System;
-    using System.IO;
 
     public class C : IDisposable
     {
@@ -628,8 +626,6 @@ namespace N
 
     public sealed class C : IDisposable
     {
-        private bool isDirty;
-
         public C()
         {
         }
@@ -701,10 +697,10 @@ namespace N
     {
         public C()
         {
-            M(x => x.Dispose());
+            M(x => x?.Dispose());
         }
 
-        public static void M(Action<IDisposable> action)
+        public static void M(Action<IDisposable?> action)
         {
             action(null);
         }
@@ -858,11 +854,11 @@ namespace N
             return kernel2;
         }
 
-        private static void OnCreating(object sender, CreatingEventArgs e)
+        private static void OnCreating(object? sender, CreatingEventArgs e)
         {
         }
 
-        private static void OnCreated(object sender, CreatedEventArgs e)
+        private static void OnCreated(object? sender, CreatedEventArgs e)
         {
         }
     }
@@ -877,7 +873,7 @@ namespace N
     [TestFixture]
     public class Tests
     {
-        private Kernel _container;
+        private Kernel? _container;
 
         [SetUp]
         public void SetUp()
@@ -888,7 +884,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            _container.Dispose();
+            _container?.Dispose();
         }
     }
 }";
@@ -901,7 +897,6 @@ namespace N
             var factory = @"
 namespace N
 {
-    using System;
     using Gu.Inject;
 
     public static class Factory
@@ -924,7 +919,7 @@ namespace N
     [TestFixture]
     public class Tests
     {
-        private Kernel _container;
+        private Kernel? _container;
 
         [SetUp]
         public void SetUp()
@@ -935,7 +930,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            _container.Dispose();
+            _container?.Dispose();
         }
     }
 }";
@@ -948,7 +943,6 @@ namespace N
             var factory = @"
 namespace N
 {
-    using System;
     using Gu.Inject;
 
     public static class Factory
@@ -972,7 +966,7 @@ namespace N
     [TestFixture]
     public class Tests
     {
-        private Kernel _container;
+        private Kernel? _container;
 
         [SetUp]
         public void SetUp()
@@ -983,7 +977,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            _container.Dispose();
+            _container?.Dispose();
         }
     }
 }";
@@ -1034,11 +1028,11 @@ namespace N
             return kernel2;
         }
 
-        private static void OnCreating(object sender, CreatingEventArgs e)
+        private static void OnCreating(object? sender, CreatingEventArgs e)
         {
         }
 
-        private static void OnCreated(object sender, CreatedEventArgs e)
+        private static void OnCreated(object? sender, CreatedEventArgs e)
         {
         }
     }
@@ -1053,7 +1047,7 @@ namespace N
     [TestFixture]
     public class FixtureStackTests
     {
-        private Kernel _container;
+        private Kernel? _container;
 
         [SetUp]
         public void SetUp()
@@ -1064,7 +1058,7 @@ namespace N
         [TearDown]
         public void TearDown()
         {
-            _container.Dispose();
+            _container?.Dispose();
         }
     }
 }";

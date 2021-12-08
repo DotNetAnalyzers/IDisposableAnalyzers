@@ -21,8 +21,6 @@
 namespace Gu.Reactive
 {
     using System;
-    using System.IO;
-    using System.Reactive.Disposables;
 
     public abstract class C : IDisposable
     {
@@ -49,8 +47,6 @@ namespace Gu.Reactive
 namespace Gu.Reactive
 {
     using System;
-    using System.IO;
-    using System.Reactive.Disposables;
     using System.Reactive.Linq;
 
     public abstract class C : IDisposable
@@ -88,8 +84,6 @@ namespace Gu.Reactive
 namespace Gu.Reactive
 {
     using System;
-    using System.IO;
-    using System.Reactive.Disposables;
 
     public abstract class C : IDisposable
     {
@@ -97,7 +91,7 @@ namespace Gu.Reactive
 
         public C(IObservable<object> observable)
         {
-            this.subscription = observable?.Subscribe(_ => { });
+            this.subscription = observable.Subscribe(_ => { });
         }
 
         public void Dispose()
@@ -144,7 +138,6 @@ namespace Gu.Reactive
 namespace Gu.Reactive
 {
     using System;
-    using System.IO;
     using System.Reactive.Disposables;
 
     public abstract class C : IDisposable
@@ -194,6 +187,12 @@ namespace Gu.Reactive
 
         public void Dispose()
         {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
             this.subscription.Dispose();
         }
      }

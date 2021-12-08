@@ -152,7 +152,7 @@ namespace N
             {
                 while (e.MoveNext())
                 {
-                    yield return default(T);
+                    yield return e.Current;
                 }
             }
         }
@@ -657,7 +657,7 @@ namespace N
             }
         }
 
-        private static bool TryReassign(IDisposable old, out IDisposable result)
+        private static bool TryReassign(IDisposable? old, out IDisposable result)
         {
             result = File.OpenRead(string.Empty);
             return true;

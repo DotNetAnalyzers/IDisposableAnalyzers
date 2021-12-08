@@ -219,6 +219,7 @@ namespace N
     }
 }";
                 var code = @"
+#nullable disable
 namespace N
 {
     using System;
