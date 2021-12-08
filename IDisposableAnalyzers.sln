@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29009.5
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".sln", ".sln", "{A1A96555-15B1-4A0C-ADC1-059CEAA3F788}"
 	ProjectSection(SolutionItems) = preProject
@@ -52,11 +52,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Vsix",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers", "IDisposableAnalyzers\IDisposableAnalyzers.csproj", "{18EB2A1B-98EA-4DCF-A97C-D9E8A5DA747B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.NetCoreTests", "IDisposableAnalyzers.NetCoreTests\IDisposableAnalyzers.NetCoreTests.csproj", "{8534B151-C831-4A31-B05B-7B2DAEA94033}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IDisposableAnalyzers.Tests.Web", "IDisposableAnalyzers.Tests.Web\IDisposableAnalyzers.Tests.Web.csproj", "{8534B151-C831-4A31-B05B-7B2DAEA94033}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode", "ValidCode\ValidCode.csproj", "{C6A235B1-A780-43D5-BA1F-E31861C019F5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode.NetCore", "ValidCode.NetCore\ValidCode.NetCore.csproj", "{2E2A331D-D45F-49E9-A4B7-FDF64367E2A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidCode.Web", "ValidCode.Web\ValidCode.Web.csproj", "{2E2A331D-D45F-49E9-A4B7-FDF64367E2A5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
