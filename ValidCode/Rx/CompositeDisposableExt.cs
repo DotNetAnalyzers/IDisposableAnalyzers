@@ -6,7 +6,7 @@ namespace ValidCode.Rx
 
     public static class CompositeDisposableExt
     {
-        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+        public static T? AddAndReturn<T>(this CompositeDisposable disposable, T item)
             where T : IDisposable
         {
             if (item != null)

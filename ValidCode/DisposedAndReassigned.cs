@@ -8,7 +8,7 @@ namespace ValidCode
     public abstract class DisposedAndReassigned : IDisposable
     {
         private bool _disposed;
-        private CancellationTokenSource _cancellationTokenSource;
+        private CancellationTokenSource? _cancellationTokenSource;
 
         public static IDisposable DisposedAndReassignedThenReturned(string fileName)
         {

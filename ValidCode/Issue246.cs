@@ -15,11 +15,11 @@ namespace ValidCode
             if (isNetCoreApp)
             {
                 process.StartInfo.FileName = "dotnet";
-                process.StartInfo.Arguments = Assembly.GetEntryAssembly().Location;
+                process.StartInfo.Arguments = Assembly.GetEntryAssembly()?.Location;
             }
             else
             {
-                process.StartInfo.FileName = Assembly.GetEntryAssembly().Location;
+                process.StartInfo.FileName = Assembly.GetEntryAssembly()?.Location;
             }
 
             process.Start();

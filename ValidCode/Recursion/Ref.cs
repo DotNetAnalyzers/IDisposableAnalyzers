@@ -7,25 +7,25 @@ namespace ValidCode.Recursion
     {
         public Ref()
         {
-            IDisposable value = null;
+            IDisposable? value = null;
             RefStatementBody(ref value);
         }
 
-        public static bool RefStatementBody(ref IDisposable value)
+        public static bool RefStatementBody(ref IDisposable? value)
         {
             return RefStatementBody(ref value);
         }
 
         public void Dispose()
         {
-            IDisposable value = null;
+            IDisposable? value = null;
             RefStatementBody(ref value);
-            value.Dispose();
+            value?.Dispose();
         }
 
         public void SameAsCtor()
         {
-            IDisposable value = null;
+            IDisposable? value = null;
             RefStatementBody(ref value);
         }
     }

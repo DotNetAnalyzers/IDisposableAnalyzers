@@ -1,4 +1,4 @@
-﻿// ReSharper disable All
+﻿#nullable disable
 namespace ValidCode
 {
     using System;

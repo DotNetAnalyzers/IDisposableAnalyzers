@@ -45,7 +45,7 @@ namespace ValidCode
             return true;
         }
 
-        private static bool TryGetStream(string fileName, out Stream result)
+        private static bool TryGetStream(string fileName, out Stream? result)
         {
             if (File.Exists(fileName))
             {

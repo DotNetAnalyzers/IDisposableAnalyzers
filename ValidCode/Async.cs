@@ -82,7 +82,7 @@ namespace ValidCode
             await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
         }
 
-        public static async Task<string> Bar1Async()
+        public static async Task<string?> Bar1Async()
         {
             using (var stream = await ReadAsync(string.Empty))
             {
@@ -93,7 +93,7 @@ namespace ValidCode
             }
         }
 
-        public static async Task<string> Bar2Async()
+        public static async Task<string?> Bar2Async()
         {
             using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
             {

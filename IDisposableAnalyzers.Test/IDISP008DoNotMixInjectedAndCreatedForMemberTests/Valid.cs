@@ -12,7 +12,6 @@
         private static readonly T Analyzer = new();
 
         [TestCase("private Stream Stream")]
-        //[TestCase("protected Stream Stream")]
         public static void MutableFieldInInternal(string property)
         {
             var code = @"
@@ -34,9 +33,7 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        //[TestCase("public Stream Stream { get; protected set; }")]
         [TestCase("public Stream Stream { get; private set; }")]
-        //[TestCase("protected Stream Stream { get; set; }")]
         public static void MutablePropertyInInternal(string property)
         {
             var code = @"

@@ -12,7 +12,7 @@ namespace ValidCode
             kernel.Bind<IDisposable, Disposable>();
             var disposable1 = kernel.Get<Disposable>();
             var disposable2 = kernel.Get<IDisposable>();
-            var disposable3 = (IDisposable)kernel.Get(typeof(Disposable));
+            var disposable3 = (IDisposable?)kernel.Get(typeof(Disposable));
             var o = kernel.Get(typeof(Disposable));
         }
 
@@ -60,11 +60,11 @@ namespace ValidCode
             return container;
         }
 
-        private static void OnCreated(object sender, CreatedEventArgs e)
+        private static void OnCreated(object? sender, CreatedEventArgs e)
         {
         }
 
-        private static void OnCreating(object sender, CreatingEventArgs creatingEventArgs)
+        private static void OnCreating(object? sender, CreatingEventArgs creatingEventArgs)
         {
         }
     }

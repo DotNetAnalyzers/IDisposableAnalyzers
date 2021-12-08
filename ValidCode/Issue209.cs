@@ -6,7 +6,7 @@ namespace ValidCode
 
     sealed class Issue209 : IDisposable
     {
-        private IDisposable _disposable = new Disposable();
+        private IDisposable? _disposable = new Disposable();
 
         public void Update()
         {

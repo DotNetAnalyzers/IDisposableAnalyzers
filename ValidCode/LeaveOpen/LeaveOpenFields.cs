@@ -1,4 +1,5 @@
-﻿namespace ValidCode.LeaveOpen
+﻿// ReSharper disable All
+namespace ValidCode.LeaveOpen
 {
     using System;
     using System.IO;
@@ -15,7 +16,7 @@
             this.reader = new StreamReader(this.stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
         }
 
-        public string ReadLine() => this.reader.ReadLine();
+        public string? ReadLine() => this.reader.ReadLine();
 
         public int ReadByte() => this.stream.ReadByte();
 

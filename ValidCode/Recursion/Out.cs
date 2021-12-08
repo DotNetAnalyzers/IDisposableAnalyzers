@@ -13,23 +13,23 @@ namespace ValidCode.Recursion
             StatementBody(string.Empty, out value);
         }
 
-        public static bool StatementBody(out IDisposable value)
+        public static bool StatementBody(out IDisposable? value)
         {
             return StatementBody(out value);
         }
 
-        public static bool StatementBody(int foo, out IDisposable value)
+        public static bool StatementBody(int foo, out IDisposable? value)
         {
             return StatementBody(2, out value);
         }
 
-        public static bool StatementBody(double foo, out IDisposable value)
+        public static bool StatementBody(double foo, out IDisposable? value)
         {
             value = null;
             return StatementBody(3.0, out value);
         }
 
-        public static bool StatementBody(string foo, out IDisposable value)
+        public static bool StatementBody(string foo, out IDisposable? value)
         {
             if (foo == null)
             {
@@ -43,25 +43,25 @@ namespace ValidCode.Recursion
         public void DispoeAndReassign()
         {
             StatementBody(out var value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(1, out value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(1.0, out value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(string.Empty, out value);
-            value.Dispose();
+            value?.Dispose();
         }
 
         public void Dispose()
         {
             StatementBody(out var value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(1, out value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(1.0, out value);
-            value.Dispose();
+            value?.Dispose();
             StatementBody(string.Empty, out value);
-            value.Dispose();
+            value?.Dispose();
         }
 
         public void SameAsCtor()

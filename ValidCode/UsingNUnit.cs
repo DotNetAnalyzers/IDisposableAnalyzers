@@ -6,7 +6,7 @@ namespace ValidCode
 
     public class UsingNUnit
     {
-        private IDisposable _container;
+        private IDisposable? _container;
 
         [OneTimeSetUp]
         public void OneTimeSetUp()
@@ -17,7 +17,7 @@ namespace ValidCode
         [OneTimeTearDown]
         public void OneTimeTearDown()
         {
-            _container.Dispose();
+            _container?.Dispose();
         }
 
         [Test]

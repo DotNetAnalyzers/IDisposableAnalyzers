@@ -14,7 +14,7 @@ namespace ValidCode.Rx
         {
             AbortCommand = new ConditionRelayCommand(
                 () => { },
-                _disposable.AddAndReturn(new OrCondition(c1, c2)));
+                _disposable.AddAndReturn(new OrCondition(c1, c2))!);
         }
 
         public ConditionRelayCommand AbortCommand { get; }

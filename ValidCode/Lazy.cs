@@ -1,15 +1,16 @@
-﻿namespace ValidCode
+﻿// ReSharper disable All
+namespace ValidCode
 {
     using System;
 
     public sealed class Lazy : IDisposable
     {
-        private readonly IDisposable created;
+        private readonly IDisposable? created;
         private bool disposed;
-        private IDisposable lazyDisposable;
-        private IDisposable compoundLazyDisposable;
+        private IDisposable? lazyDisposable;
+        private IDisposable? compoundLazyDisposable;
 
-        public Lazy(IDisposable injected)
+        public Lazy(IDisposable? injected)
         {
             this.Disposable = injected ?? (this.created = new Disposable());
         }

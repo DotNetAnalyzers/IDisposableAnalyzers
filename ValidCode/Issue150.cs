@@ -1,4 +1,4 @@
-namespace ValidCode
+﻿namespace ValidCode
 {
     using System.Collections.Generic;
     using System.IO;
@@ -19,8 +19,8 @@ namespace ValidCode
 
         public bool Exists => File.Exists(this.Name);
 
-        public string AllText { get; }
+        public string? AllText { get; }
 
-        public IReadOnlyList<string> AllLines { get; }
+        public IReadOnlyList<string>? AllLines { get; }
     }
 }

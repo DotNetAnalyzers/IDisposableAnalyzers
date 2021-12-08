@@ -5,8 +5,8 @@ namespace ValidCode.Recursion
 
     public sealed class Properties : IDisposable
     {
-        private IDisposable withBackingField1;
-        private IDisposable withBackingField2;
+        private IDisposable? withBackingField1;
+        private IDisposable? withBackingField2;
 
         public Properties()
         {
@@ -128,7 +128,7 @@ namespace ValidCode.Recursion
 
         public IDisposable ExpressionBodyCycle3 => this.ExpressionBodyCycle1;
 
-        public IDisposable WithBackingField1
+        public IDisposable? WithBackingField1
         {
             get
             {
@@ -151,7 +151,7 @@ namespace ValidCode.Recursion
             }
         }
 
-        public IDisposable WithBackingField2
+        public IDisposable? WithBackingField2
         {
             get
             {
@@ -177,8 +177,8 @@ namespace ValidCode.Recursion
         public void Dispose()
         {
 #pragma warning disable IDISP007 // Don't dispose injected
-            this.withBackingField1.Dispose();
-            this.withBackingField2.Dispose();
+            this.withBackingField1?.Dispose();
+            this.withBackingField2?.Dispose();
             this.StatementBody.Dispose();
             this.ExpressionBody.Dispose();
             this.ExpressionBodyGetter.Dispose();
@@ -190,8 +190,8 @@ namespace ValidCode.Recursion
             this.ExpressionBodyCycle1.Dispose();
             this.ExpressionBodyCycle2.Dispose();
             this.ExpressionBodyCycle3.Dispose();
-            this.WithBackingField1.Dispose();
-            this.WithBackingField2.Dispose();
+            this.WithBackingField1?.Dispose();
+            this.WithBackingField2?.Dispose();
 #pragma warning restore IDISP007 // Don't dispose injected
         }
 

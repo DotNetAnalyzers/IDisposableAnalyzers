@@ -4,7 +4,7 @@
 
     public class Chained
     {
-        private readonly IDisposable disposable;
+        private readonly IDisposable? disposable;
 
         public Chained(IDisposable disposable)
              : this(1)

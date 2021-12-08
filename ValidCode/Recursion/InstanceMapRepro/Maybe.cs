@@ -73,7 +73,7 @@
         }
 
         /// <inheritdoc />
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return obj is Maybe<T> maybe &&
                    this.Equals(maybe);
@@ -83,7 +83,7 @@
         public override int GetHashCode()
         {
             return this.HasValue
-                ? EqualityComparer<T>.Default.GetHashCode(this.value)
+                ? EqualityComparer<T>.Default.GetHashCode(this.value!)
                 : 0;
         }
 

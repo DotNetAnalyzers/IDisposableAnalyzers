@@ -12,12 +12,12 @@
             Assert.Throws<InvalidOperationException>(() => Create(true));
             Assert.AreEqual(
                 "Expected",
-                Assert.Throws<InvalidOperationException>(() => Create(true)).Message);
+                Assert.Throws<InvalidOperationException>(() => Create(true))?.Message);
 
             Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true));
             Assert.AreEqual(
                 "Expected",
-                Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true)).Message);
+                Assert.ThrowsAsync<InvalidOperationException>(() => CreateAsync(true))?.Message);
         }
 
         private static Disposable Create(bool b)

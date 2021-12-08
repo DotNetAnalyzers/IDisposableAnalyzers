@@ -7,7 +7,7 @@ namespace ValidCode.Collections
 
     internal sealed class ListOfDisposable : IDisposable
     {
-        private readonly List<Stream> _streams = new List<Stream> { null };
+        private readonly List<Stream?> _streams = new List<Stream?> { null };
 
         public ListOfDisposable()
         {
@@ -16,7 +16,7 @@ namespace ValidCode.Collections
 
         public void Meh()
         {
-            this._streams[0].Dispose();
+            this._streams[0]?.Dispose();
             this._streams[0] = File.OpenRead(string.Empty);
         }
 

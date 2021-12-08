@@ -6,8 +6,8 @@ namespace ValidCode.Recursion
 
     public class Methods
     {
-        private readonly IDisposable bar1;
-        private readonly IDisposable bar2;
+        private readonly IDisposable? bar1;
+        private readonly IDisposable? bar2;
 
         public Methods()
         {
@@ -33,7 +33,7 @@ namespace ValidCode.Recursion
             return this.StatementBody(value);
         }
 
-        private static IDisposable StatementBodyWithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+        private static IDisposable StatementBodyWithOptionalParameter(IDisposable value, IEnumerable<IDisposable>? values = null)
         {
             if (values == null)
             {

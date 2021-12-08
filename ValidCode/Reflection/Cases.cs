@@ -1,4 +1,5 @@
-﻿namespace ValidCode.Reflection
+﻿// ReSharper disable All
+namespace ValidCode.Reflection
 {
     using System;
     using System.Reflection;
@@ -14,9 +15,9 @@
 
         public static void ActivatorCreateInstance()
         {
-            using var disposable = (IDisposable)Activator.CreateInstance(typeof(Disposable));
+            using var disposable = (IDisposable?)Activator.CreateInstance(typeof(Disposable));
             var builder1 = Activator.CreateInstance(typeof(StringBuilder));
-            var builder2 = (StringBuilder)Activator.CreateInstance(typeof(StringBuilder));
+            var builder2 = (StringBuilder)Activator.CreateInstance(typeof(StringBuilder))!;
         }
 
         public static void ConstructorInfoInvoke(ConstructorInfo constructorInfo)

@@ -14,8 +14,8 @@ namespace ValidCode
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
         private readonly Lazy<IDisposable> lazyDisposable;
 
-        private readonly IDisposable meh1;
-        private readonly IDisposable meh2;
+        private readonly IDisposable? meh1;
+        private readonly IDisposable? meh2;
         private readonly IDisposable disposable;
         private bool isDirty;
 
@@ -38,15 +38,15 @@ namespace ValidCode
             });
         }
 
-        public event PropertyChangedEventHandler PropertyChanged
+        public event PropertyChangedEventHandler? PropertyChanged
         {
             add { this.PropertyChangedCore += value; }
             remove { this.PropertyChangedCore -= value; }
         }
 
-        private event PropertyChangedEventHandler PropertyChangedCore;
+        private event PropertyChangedEventHandler? PropertyChangedCore;
 
-        public IDisposable Disposable => this.subscription.Disposable;
+        public IDisposable? Disposable => this.subscription.Disposable;
 
 #pragma warning disable IDISP012 // Property should not return created disposable
         public IDisposable CreateDisposableProperty => new Disposable();
@@ -71,9 +71,9 @@ namespace ValidCode
             }
         }
 
-        public static IDisposable AssignLocalInSwitch(int i)
+        public static IDisposable? AssignLocalInSwitch(int i)
         {
-            IDisposable result;
+            IDisposable? result;
             if (i == 0)
             {
                 result = null;
@@ -115,7 +115,7 @@ namespace ValidCode
             File.Create(fileName)?.Dispose();
         }
 
-        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable> disposables = null)
+        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable>? disposables = null)
         {
             if (disposables == null)
             {

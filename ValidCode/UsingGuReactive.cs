@@ -10,8 +10,8 @@ namespace ValidCode
 
     public sealed class UsingGuReactive : IDisposable
     {
-        private readonly IDisposable disposable;
-        private readonly IReadOnlyView<int> view;
+        private readonly IDisposable? disposable;
+        private readonly IReadOnlyView<int>? view;
         private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
 
         public UsingGuReactive(IObservable<int> observable)
@@ -88,7 +88,7 @@ namespace ValidCode
         public void Dispose()
         {
             this.disposable?.Dispose();
-            this.view.Dispose();
+            this.view?.Dispose();
             this.serialDisposable.Dispose();
         }
     }

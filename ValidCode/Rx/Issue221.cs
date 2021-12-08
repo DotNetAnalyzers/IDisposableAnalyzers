@@ -6,10 +6,10 @@ namespace ValidCode
 
     sealed class Issue221 : IDisposable
     {
-        private readonly IDisposable subscription;
+        private readonly IDisposable? subscription;
         private bool disposed;
 
-        public Issue221(IObservable<object> observable = null)
+        public Issue221(IObservable<object>? observable = null)
         {
             this.subscription = observable?.Subscribe(_ => { });
         }

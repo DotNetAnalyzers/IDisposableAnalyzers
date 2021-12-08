@@ -20,9 +20,9 @@ namespace ValidCode
             this.disposables.Add(new Disposable());
         }
 
-        public Stream DisposeBefore(string[] fileNames)
+        public Stream? DisposeBefore(string[] fileNames)
         {
-            Stream stream = null;
+            Stream? stream = null;
             foreach (var name in fileNames)
             {
                 stream?.Dispose();
@@ -34,7 +34,7 @@ namespace ValidCode
 
         public void DisposeAfter(string[] fileNames)
         {
-            Stream stream = null;
+            Stream? stream = null;
             foreach (var name in fileNames)
             {
                 stream = File.OpenRead(name);
@@ -52,7 +52,7 @@ namespace ValidCode
             }
         }
 
-        public static bool TryGetStreamForEach(string[] fileNames, out Stream result)
+        public static bool TryGetStreamForEach(string[] fileNames, out Stream? result)
         {
             foreach (var name in fileNames)
             {
@@ -67,7 +67,7 @@ namespace ValidCode
             return false;
         }
 
-        public static bool TryGetStreamFor(string[] fileNames, out Stream result)
+        public static bool TryGetStreamFor(string[] fileNames, out Stream? result)
         {
             for (int i = 0; i < fileNames.Length; i++)
             {
@@ -83,7 +83,7 @@ namespace ValidCode
             return false;
         }
 
-        public static bool TryGetStreamWhile(string[] fileNames, out Stream result)
+        public static bool TryGetStreamWhile(string[] fileNames, out Stream? result)
         {
             var i = 0;
             while (i < fileNames.Length)
