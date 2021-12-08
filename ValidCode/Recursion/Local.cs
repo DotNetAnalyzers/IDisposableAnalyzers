@@ -7,6 +7,7 @@
         public Local(IDisposable disposable)
         {
             var value = disposable;
+#pragma warning disable CS1717
             value = value;
         }
     }

@@ -9,6 +9,7 @@ namespace ValidCode
 
     public sealed class Misc : IDisposable
     {
+#pragma warning disable CS0169
         private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
         private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
         private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();

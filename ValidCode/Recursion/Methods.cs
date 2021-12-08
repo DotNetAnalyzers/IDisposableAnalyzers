@@ -6,6 +6,7 @@ namespace ValidCode.Recursion
 
     public class Methods
     {
+#pragma warning disable CS0169
         private readonly IDisposable? bar1;
         private readonly IDisposable? bar2;
 
@@ -20,6 +21,7 @@ namespace ValidCode.Recursion
             value = this.ExpressionBody(1);
             value = this.Cycle1();
             value = this.Cycle2();
+#pragma warning disable CS1717
             value = value;
         }
 
@@ -97,9 +99,9 @@ namespace ValidCode.Recursion
             value = value;
         }
 
-        public IDisposable Return(IDisposable p)
+        public IDisposable Return(IDisposable p, bool b)
         {
-            if (true)
+            if (b)
             {
                 var temp = p;
                 return p;
