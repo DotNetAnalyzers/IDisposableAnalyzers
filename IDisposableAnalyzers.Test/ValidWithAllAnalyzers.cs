@@ -21,11 +21,13 @@ namespace IDisposableAnalyzers.Test
             .ToImmutableArray();
 
         private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("IDisposableAnalyzers.csproj"));
+            ProjectFile.Find("IDisposableAnalyzers.csproj"),
+            settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("ValidCode.csproj"));
+            ProjectFile.Find("ValidCode.csproj"),
+            settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
 
         private static IDisposable cacheTransaction;
 
@@ -49,7 +51,6 @@ namespace IDisposableAnalyzers.Test
             CollectionAssert.IsNotEmpty(AllAnalyzers);
         }
 
-        [Ignore("Does not see nullable attributes from RAA")]
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void AnalyzersProject(DiagnosticAnalyzer analyzer)
         {

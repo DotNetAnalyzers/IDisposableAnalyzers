@@ -11,7 +11,7 @@
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-    internal class RecursiveValues : IEnumerator<ExpressionSyntax>
+    internal sealed class RecursiveValues : IEnumerator<ExpressionSyntax>
     {
         private static readonly ConcurrentQueue<RecursiveValues> Cache = new();
         private readonly List<ExpressionSyntax> values = new();
