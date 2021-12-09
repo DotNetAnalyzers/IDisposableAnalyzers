@@ -1,12 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
+        private static readonly ReturnValueAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP013");
 
         [Test]

@@ -1,7 +1,6 @@
 namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
@@ -9,7 +8,7 @@ namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
         public static class RefAndOut
         {
             // ReSharper disable once MemberHidesStaticFromOuterClass
-            private static readonly DiagnosticAnalyzer Analyzer = new ArgumentAnalyzer();
+            private static readonly ArgumentAnalyzer Analyzer = new();
 
             [Test]
             public static void LocalViaObjectCreationThenOutParameter()

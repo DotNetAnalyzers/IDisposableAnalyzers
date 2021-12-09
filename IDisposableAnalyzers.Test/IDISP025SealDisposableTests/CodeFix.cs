@@ -1,14 +1,12 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP025SealDisposableTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ClassDeclarationAnalyzer();
-        private static readonly CodeFixProvider Fix = new SealFix();
+        private static readonly ClassDeclarationAnalyzer Analyzer = new();
+        private static readonly SealFix Fix = new();
 
         [Test]
         public static void Simple()

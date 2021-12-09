@@ -2,12 +2,11 @@
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class NoFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+        private static readonly CreationAnalyzer Analyzer = new();
         private static readonly CodeFixProvider AddUsingFix = new AddUsingFix();
         private static readonly CodeFixProvider CreateAndAssignFieldFix = new CreateAndAssignFieldFix();
         private static readonly CodeFixProvider AddToCompositeDisposableFix = new AddToCompositeDisposableFix();

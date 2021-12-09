@@ -1,17 +1,15 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class AddUsingAssignment
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
+            private static readonly AssignmentAnalyzer Analyzer = new();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
-            private static readonly CodeFixProvider Fix = new AddUsingFix();
+            private static readonly AddUsingFix Fix = new();
 
             private const string Disposable = @"
 namespace N

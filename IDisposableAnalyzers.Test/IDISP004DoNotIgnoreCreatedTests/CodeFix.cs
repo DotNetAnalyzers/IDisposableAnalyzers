@@ -1,11 +1,10 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
 
     public static partial class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+        private static readonly CreationAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
         private const string Disposable = @"

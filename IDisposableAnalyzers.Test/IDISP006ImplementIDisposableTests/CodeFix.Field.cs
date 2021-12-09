@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class Field
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
 
             [Test]
             public static void SimpleImplementIDisposableAndMakeSealed()

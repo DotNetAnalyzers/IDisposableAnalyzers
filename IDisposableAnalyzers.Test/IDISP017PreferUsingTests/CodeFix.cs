@@ -1,15 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+        private static readonly DisposeCallAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP017PreferUsing);
-        private static readonly CodeFixProvider Fix = new AddUsingFix();
+        private static readonly AddUsingFix Fix = new();
 
         [Test]
         public static void Local()

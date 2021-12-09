@@ -2,12 +2,11 @@
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
+        private static readonly MethodReturnValuesAnalyzer Analyzer = new();
         private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP015DoNotReturnCachedAndCreated;
 
         private const string DisposableCode = @"

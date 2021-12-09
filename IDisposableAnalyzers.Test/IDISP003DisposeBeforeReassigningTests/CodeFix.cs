@@ -1,12 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
+        private static readonly AssignmentAnalyzer Analyzer = new();
         private static readonly DisposeBeforeAssignFix Fix = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning);
 

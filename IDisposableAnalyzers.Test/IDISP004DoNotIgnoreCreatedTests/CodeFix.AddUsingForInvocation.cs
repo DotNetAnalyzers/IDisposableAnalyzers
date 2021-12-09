@@ -1,16 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
-
-    using Microsoft.CodeAnalysis.CodeFixes;
-
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class AddUsingForInvocation
         {
-            private static readonly CodeFixProvider Fix = new AddUsingFix();
+            private static readonly AddUsingFix Fix = new();
 
             [Test]
             public static void AddUsingForIgnoredFileOpenRead()

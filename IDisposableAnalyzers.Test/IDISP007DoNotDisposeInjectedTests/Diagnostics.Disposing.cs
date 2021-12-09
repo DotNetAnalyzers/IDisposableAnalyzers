@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Diagnostics
     {
         public static class Disposing
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+            private static readonly DisposeCallAnalyzer Analyzer = new();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
 
             [TestCase("(object) stream")]

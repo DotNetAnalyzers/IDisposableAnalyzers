@@ -2,14 +2,13 @@
 {
     using Gu.Roslyn.Asserts;
     using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
         public static class DisposeCall
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+            private static readonly DisposeCallAnalyzer Analyzer = new();
             private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP016DoNotUseDisposedInstance;
 
             [Test]

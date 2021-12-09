@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class AddToCompositeDisposable
         {
-            private static readonly CodeFixProvider Fix = new AddToCompositeDisposableFix();
+            private static readonly AddToCompositeDisposableFix Fix = new();
 
             [Test]
             public static void CreateNewCompositeDisposable()

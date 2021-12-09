@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
     using NUnit.Framework;
 
     public static partial class CodeFix
     {
         public static class CreateAndAssignField
         {
-            private static readonly CodeFixProvider Fix = new CreateAndAssignFieldFix();
+            private static readonly CreateAndAssignFieldFix Fix = new();
 
             [Test]
             public static void AssignIgnoredReturnValueToFieldInCtorWhenEmpty()

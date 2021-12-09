@@ -2,12 +2,11 @@
 namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
+        private static readonly ReturnValueAnalyzer Analyzer = new();
 
         [Test]
         public static void AwaitWebClientDownloadStringTaskAsyncInUsing()

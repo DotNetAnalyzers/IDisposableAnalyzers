@@ -1,12 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+        private static readonly CreationAnalyzer Analyzer = new();
 
         private const string DisposableCode = @"
 namespace N

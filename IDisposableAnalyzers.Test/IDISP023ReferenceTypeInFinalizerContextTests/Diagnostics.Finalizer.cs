@@ -1,14 +1,13 @@
 namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Diagnostics
     {
         public static class Finalizer
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
+            private static readonly FinalizerAnalyzer Analyzer = new();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
             [TestCase("↓Builder.Append(1)")]

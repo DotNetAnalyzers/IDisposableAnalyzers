@@ -1,14 +1,13 @@
 namespace IDisposableAnalyzers.Test.IDISP016DoNotUseDisposedInstanceTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Diagnostics
     {
         public static class DisposeCall
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
+            private static readonly DisposeCallAnalyzer Analyzer = new();
             private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP016DoNotUseDisposedInstance);
 
             [Test]

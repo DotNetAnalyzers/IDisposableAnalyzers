@@ -1,12 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP015DoNotReturnCachedAndCreatedTest
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Diagnostics
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new MethodReturnValuesAnalyzer();
+        private static readonly MethodReturnValuesAnalyzer Analyzer = new();
         private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated);
 
         private const string DisposableCode = @"

@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Valid
     {
         public static class Finalizer
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
+            private static readonly FinalizerAnalyzer Analyzer = new();
 
             [Test]
             public static void SealedWithFinalizerStatementBody()

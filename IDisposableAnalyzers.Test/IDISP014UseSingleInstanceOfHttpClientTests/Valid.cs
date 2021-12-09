@@ -2,12 +2,11 @@
 namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
+        private static readonly CreationAnalyzer Analyzer = new();
 
         [Test]
         public static void StaticFieldAssignedInInitializer()

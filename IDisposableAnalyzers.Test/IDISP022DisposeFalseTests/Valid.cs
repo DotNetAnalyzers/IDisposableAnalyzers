@@ -1,12 +1,11 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class Valid
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FinalizerAnalyzer();
+        private static readonly FinalizerAnalyzer Analyzer = new();
 
         [Test]
         public static void SealedWithFinalizer()

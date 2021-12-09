@@ -1,14 +1,12 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static class CodeFix
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new SuppressFinalizeAnalyzer();
-        private static readonly CodeFixProvider Fix = new RemoveCallFix();
+        private static readonly SuppressFinalizeAnalyzer Analyzer = new();
+        private static readonly RemoveCallFix Fix = new();
 
         [Test]
         public static void SealedSimple()

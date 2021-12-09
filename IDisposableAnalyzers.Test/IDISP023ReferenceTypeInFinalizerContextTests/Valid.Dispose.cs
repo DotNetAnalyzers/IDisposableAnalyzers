@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Valid
     {
         public static class Dispose
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new DisposeMethodAnalyzer();
+            private static readonly DisposeMethodAnalyzer Analyzer = new();
 
             private const string DisposableCode = @"
 namespace N

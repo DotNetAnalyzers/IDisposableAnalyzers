@@ -1,14 +1,13 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
     public static partial class Diagnostics
     {
         public static class Field
         {
-            private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
 
             [TestCase("arg ?? File.OpenRead(string.Empty)")]
             [TestCase("File.OpenRead(string.Empty) ?? arg")]
