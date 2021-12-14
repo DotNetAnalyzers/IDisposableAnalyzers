@@ -71,9 +71,12 @@ namespace N
 
             this.Disposables1.Clear();
 
-            foreach (var disposable in this.Disposables2)
+            if (this.Disposables2.Count > 0)
             {
-                disposable.Dispose();
+                foreach (var disposable in this.Disposables2)
+                {
+                    _ = disposable.ToString();
+                }
             }
 
             this.Disposables2.Clear();

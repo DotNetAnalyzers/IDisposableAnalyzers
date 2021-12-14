@@ -9,7 +9,7 @@
 
         public ObservableCollection<Disposable> Disposables1 { get; } = new();
 
-        public ObservableCollection<Disposable> Disposables2 { get; } = new();
+        public ObservableCollection<Disposable> Disposables2 { get; }
 
         public void M()
         {
@@ -36,8 +36,12 @@
 
             this.Disposables1.Clear();
 
-            foreach (var disposable in this.Disposables2)
+            if (this.Disposables2.Count > 0)
             {
+                foreach (var disposable in this.Disposables2)
+                {
+                    _ = disposable.ToString();
+                }
             }
         }
     }
