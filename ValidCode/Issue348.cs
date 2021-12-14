@@ -9,7 +9,7 @@
 
         public ObservableCollection<Disposable> Disposables1 { get; } = new();
 
-        public ObservableCollection<Disposable> Disposables2 { get; }
+        public ObservableCollection<Disposable> Disposables2 { get; } = new();
 
         public void M()
         {
