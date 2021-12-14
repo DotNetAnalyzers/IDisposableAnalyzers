@@ -484,7 +484,7 @@ namespace BinaryReference
     {
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences.Append(binary));
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences!.Append(binary));
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);
                 Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
@@ -521,7 +521,7 @@ namespace N
     }
 }".AssertReplace("disposable.Fluent()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var references = Settings.Default.MetadataReferences
+                var references = Settings.Default.MetadataReferences!
                                                    .Append(BinaryReference.Compile(binary));
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
