@@ -19,6 +19,14 @@
             }
 
             this.Disposables1.Clear();
+
+            if (this.Disposables2.Count > 0)
+            {
+                foreach (var disposable in this.Disposables2)
+                {
+                    _ = new Wrapper(disposable);
+                }
+            }
         }
 
         public void Dispose()
@@ -42,6 +50,16 @@
                 {
                     _ = disposable.ToString();
                 }
+            }
+        }
+
+        private class Wrapper
+        {
+            private readonly Disposable disposable;
+
+            public Wrapper(Disposable disposable)
+            {
+                this.disposable = disposable;
             }
         }
     }
