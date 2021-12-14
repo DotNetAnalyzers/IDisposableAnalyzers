@@ -8,7 +8,7 @@
         public static class Disposing
         {
             private static readonly DisposeCallAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected);
 
             [TestCase("(object) stream")]
             [TestCase("(object) Stream")]

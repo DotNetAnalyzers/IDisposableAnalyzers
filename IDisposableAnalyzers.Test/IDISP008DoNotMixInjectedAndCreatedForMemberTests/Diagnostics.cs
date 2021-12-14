@@ -6,7 +6,7 @@
     public static partial class Diagnostics
     {
         private static readonly AssignmentAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP008");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember);
 
         private const string Disposable = @"
 namespace N

@@ -470,7 +470,7 @@ namespace N
     }
 }".AssertReplace("disposable.AsCustom()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var binary = MetadataReferences.CreateBinary(@"
+                var binary = BinaryReference.Compile(@"
 namespace BinaryReference
 {
     using System;
@@ -522,7 +522,7 @@ namespace N
 }".AssertReplace("disposable.Fluent()", expression);
                 var syntaxTree = CSharpSyntaxTree.ParseText(code);
                 var references = Settings.Default.MetadataReferences
-                                                   .Concat(new[] { MetadataReferences.CreateBinary(binary) });
+                                                   .Append(BinaryReference.Compile(binary));
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, references);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
                 var value = syntaxTree.FindExpression(expression);

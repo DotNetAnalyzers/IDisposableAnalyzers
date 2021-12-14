@@ -7,7 +7,7 @@
     {
         private static readonly DisposeMethodAnalyzer Analyzer = new();
         private static readonly ImplementIDisposableFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP009");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP009IsIDisposable);
 
         [Test]
         public static void AddInterfaceSimple()
