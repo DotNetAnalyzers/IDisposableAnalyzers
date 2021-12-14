@@ -4,6 +4,7 @@
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
 
@@ -58,8 +59,7 @@
 
         private static bool IsUsedAfter(ILocalSymbol local, InvocationExpressionSyntax invocation, SyntaxNodeAnalysisContext context, [NotNullWhen(true)] out IReadOnlyList<Location>? locations)
         {
-            if (local.TrySingleDeclaration(context.CancellationToken, out var declaration) &&
-                declaration.TryFirstAncestor(out BlockSyntax? block))
+            if (Scope(local, context.CancellationToken) is { } block)
             {
                 List<Location>? temp = null;
                 using var walker = IdentifierNameWalker.Borrow(block);
@@ -87,6 +87,20 @@
 
             locations = null;
             return false;
+
+            static SyntaxNode? Scope(ILocalSymbol local, CancellationToken cancellationToken)
+            {
+                if (local.TrySingleDeclaration(cancellationToken, out var declaration))
+                {
+                    return declaration switch
+                    {
+                        ForEachStatementSyntax x => x.Statement,
+                        _ => declaration.FirstAncestorOrSelf<BlockSyntax>(),
+                    };
+                }
+
+                return null;
+            }
 
             static bool IsAssigned(IdentifierNameSyntax identifier)
             {

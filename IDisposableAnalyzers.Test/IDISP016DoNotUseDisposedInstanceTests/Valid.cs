@@ -29,15 +29,16 @@ namespace N
 namespace N
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public sealed class C : IDisposable
     {
         private bool disposed;
 
-        public ObservableCollection<Disposable> Disposables1 { get; } = new();
+        public List<IDisposable> Disposables1 { get; } = new();
 
-        public ObservableCollection<Disposable> Disposables2 { get; } = new();
+        public List<Disposable> Disposables2 { get; } = new();
 
         public void M()
         {
@@ -48,12 +49,13 @@ namespace N
 
             this.Disposables1.Clear();
 
-            foreach (var disposable in this.Disposables2)
+            if (this.Disposables2.Count > 0)
             {
-                disposable.Dispose();
+                foreach (var disposable in this.Disposables2)
+                {
+                    this.Disposables1.AddRange(new []{disposable}.Select(x => new Wrapper(disposable)));
+                }
             }
-
-            this.Disposables2.Clear();
         }
 
         public void Dispose()
@@ -70,16 +72,20 @@ namespace N
             }
 
             this.Disposables1.Clear();
+        }
 
-            if (this.Disposables2.Count > 0)
+        private sealed class Wrapper : IDisposable
+        {
+            private readonly Disposable disposable;
+
+            public Wrapper(Disposable disposable)
             {
-                foreach (var disposable in this.Disposables2)
-                {
-                    _ = disposable.ToString();
-                }
+                this.disposable = disposable;
             }
 
-            this.Disposables2.Clear();
+            public void Dispose()
+            {
+            }
         }
     }
 }";

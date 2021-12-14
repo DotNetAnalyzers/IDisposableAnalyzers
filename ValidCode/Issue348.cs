@@ -1,15 +1,16 @@
 ﻿namespace ValidCode
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Collections.Generic;
+    using System.Linq;
 
     public sealed class Issue348 : IDisposable
     {
         private bool disposed;
 
-        public ObservableCollection<Disposable> Disposables1 { get; } = new();
+        public List<IDisposable> Disposables1 { get; } = new();
 
-        public ObservableCollection<Disposable> Disposables2 { get; } = new();
+        public List<Disposable> Disposables2 { get; } = new();
 
         public void M()
         {
@@ -24,7 +25,7 @@
             {
                 foreach (var disposable in this.Disposables2)
                 {
-                    _ = new Wrapper(disposable);
+                    this.Disposables1.AddRange(new []{disposable}.Select(x => new Wrapper(disposable)));
                 }
             }
         }
@@ -43,23 +44,19 @@
             }
 
             this.Disposables1.Clear();
-
-            if (this.Disposables2.Count > 0)
-            {
-                foreach (var disposable in this.Disposables2)
-                {
-                    _ = disposable.ToString();
-                }
-            }
         }
 
-        private class Wrapper
+        private sealed class Wrapper : IDisposable
         {
             private readonly Disposable disposable;
 
             public Wrapper(Disposable disposable)
             {
                 this.disposable = disposable;
+            }
+
+            public void Dispose()
+            {
             }
         }
     }
