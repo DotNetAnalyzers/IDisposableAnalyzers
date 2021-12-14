@@ -23,7 +23,12 @@ dotnet_diagnostic.CS0162.severity = none
 dotnet_diagnostic.CS0169.severity = none
 # CS1717: Assignment made to same variable
 dotnet_diagnostic.CS1717.severity = none
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
 
 
 # RS1024: Compare symbols correctly
 dotnet_diagnostic.RS1024.severity = none
+
+# CA2011: Avoid infinite recursion
+dotnet_diagnostic.CA2011.severity = none

@@ -65,7 +65,7 @@ namespace ValidCode.NetCore.InstanceMapRepro
             }
 
             public bool Equals(Maybe<TKey> x, Maybe<TKey> y) => x.HasValue == y.HasValue &&
-                                                                                 ReferenceEquals(x.Value, y.Value);
+                                                                ReferenceEquals(x.Value, y.Value);
 
             public int GetHashCode(Maybe<TKey> obj)
             {

@@ -15,11 +15,14 @@ dotnet_diagnostic.CS0660.severity = none
 dotnet_diagnostic.CS0661.severity = none
 # CA1816: Dispose methods should call SuppressFinalize
 dotnet_diagnostic.CA1816.severity = none
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
 # CS8618: Non-nullable field is uninitialized. Consider declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
 
 # IDE0051: Remove unused private members
 dotnet_diagnostic.IDE0051.severity = none
+
 
 
 # RS1024: Compare symbols correctly
