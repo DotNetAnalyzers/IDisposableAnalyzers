@@ -11,9 +11,9 @@
 
         public void M()
         {
-            foreach (var conversion in this.Disposables)
+            foreach (var disposable in this.Disposables)
             {
-                conversion.Dispose();
+                disposable.Dispose();
             }
 
             this.Disposables.Clear();
@@ -27,9 +27,9 @@
             }
 
             this.disposed = true;
-            foreach (var conversion in this.Disposables)
+            foreach (var disposable in this.Disposables)
             {
-                conversion.Dispose();
+                disposable.Dispose();
             }
 
             this.Disposables.Clear();

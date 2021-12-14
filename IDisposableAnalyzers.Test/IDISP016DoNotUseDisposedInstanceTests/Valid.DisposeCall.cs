@@ -4,13 +4,10 @@
     using Microsoft.CodeAnalysis;
     using NUnit.Framework;
 
-    public static class Valid
+    public static partial class Valid
     {
         public static class DisposeCall
         {
-            private static readonly DisposeCallAnalyzer Analyzer = new();
-            private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP016DoNotUseDisposedInstance;
-
             [Test]
             public static void CreateTouchDispose()
             {
