@@ -18,14 +18,16 @@ dotnet_diagnostic.IDE0074.severity = none
 dotnet_diagnostic.IDE0079.severity = none
 dotnet_diagnostic.IDE1006.severity = none
 
+# CA1822: Mark members as static
+dotnet_diagnostic.CA1822.severity = none
+
 # CS0162: Unreachable code detected
 dotnet_diagnostic.CS0162.severity = none
 dotnet_diagnostic.CS0169.severity = none
 # CS1717: Assignment made to same variable
 dotnet_diagnostic.CS1717.severity = none
-# CA1822: Mark members as static
-dotnet_diagnostic.CA1822.severity = none
-
+# CS8002: Referenced assembly 'ReactiveUI, Version=16.3.0.0, Culture=neutral, PublicKeyToken=null' does not have a strong name.
+dotnet_diagnostic.CS8002.severity = none
 
 # RS1024: Compare symbols correctly
 dotnet_diagnostic.RS1024.severity = none
