@@ -7,16 +7,18 @@
     {
         private bool disposed;
 
-        public ObservableCollection<Disposable> Disposables { get; } = new();
+        public ObservableCollection<Disposable> Disposables1 { get; } = new();
+
+        public ObservableCollection<Disposable> Disposables2 { get; } = new();
 
         public void M()
         {
-            foreach (var disposable in this.Disposables)
+            foreach (var disposable in this.Disposables1)
             {
                 disposable.Dispose();
             }
 
-            this.Disposables.Clear();
+            this.Disposables1.Clear();
         }
 
         public void Dispose()
@@ -27,12 +29,16 @@
             }
 
             this.disposed = true;
-            foreach (var disposable in this.Disposables)
+            foreach (var disposable in this.Disposables1)
             {
                 disposable.Dispose();
             }
 
-            this.Disposables.Clear();
+            this.Disposables1.Clear();
+
+            foreach (var disposable in this.Disposables2)
+            {
+            }
         }
     }
 }
