@@ -68,7 +68,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -163,7 +163,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
     }
 }

@@ -58,8 +58,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
             }
 
             [Test]
@@ -105,8 +105,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
             }
 
             [Test]
@@ -152,8 +152,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
             }
         }
     }
