@@ -199,5 +199,47 @@ namespace Gu.Reactive
 }";
             RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
+
+        [Test]
+        public static void Issue385()
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.Collections.ObjectModel;
+
+    using Gu.Reactive;
+
+    public sealed class C : IDisposable
+    {
+        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
+        private bool disposed;
+
+        private C()
+        {
+            this.disposable = new System.Reactive.Disposables.CompositeDisposable
+            {
+                this.Xs.ObserveCollectionChangedSlim(signalInitial: false)
+                       .Subscribe(_ => { }),
+            };
+        }
+
+        public ObservableCollection<int> Xs { get; } = new();
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+        }
     }
 }

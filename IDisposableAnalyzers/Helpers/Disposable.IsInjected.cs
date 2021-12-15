@@ -26,7 +26,8 @@
                     return value switch
                     {
                         IdentifierNameSyntax { Parent: MemberAccessExpressionSyntax { Expression: { } parent, Name: { } name } }
-                            when value == name
+                            when value == name &&
+                                 parent is not InstanceExpressionSyntax
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
                         IdentifierNameSyntax { Parent: MemberBindingExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { Parent: ConditionalAccessExpressionSyntax { Expression: { } parent, Parent: ExpressionStatementSyntax _ } } } } }
                             => IsCachedOrInjectedOnly(parent, location, semanticModel, cancellationToken),
