@@ -4,10 +4,13 @@ namespace IDisposableAnalyzers.Tests.Web
     using System;
     using System.Collections.Immutable;
     using System.Linq;
+
     using Gu.Roslyn.AnalyzerExtensions;
     using Gu.Roslyn.Asserts;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.Diagnostics;
+
     using NUnit.Framework;
 
     public static class ValidWithAllAnalyzers
@@ -21,7 +24,8 @@ namespace IDisposableAnalyzers.Tests.Web
 
         // ReSharper disable once InconsistentNaming
         private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
-            ProjectFile.Find("ValidCode.Web.csproj"));
+            ProjectFile.Find("ValidCode.Web.csproj"),
+            settings: WebSettings.Exe);
 
         private static IDisposable? cacheTransaction;
 

@@ -77,6 +77,7 @@ namespace IDisposableAnalyzers
         internal static readonly QualifiedType SystemWindowsFormsForm = new("System.Windows.Forms.Form");
         internal static readonly WinformsControlType SystemWindowsFormsControl = new();
         internal static readonly HostingAbstractionsHostExtensionsType HostingAbstractionsHostExtensions = new();
+        internal static readonly WebApplication WebApplication = new();
 
         internal static readonly QualifiedType TestInitializeAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute");
         internal static readonly QualifiedType ClassInitializeAttribute = new("Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute");

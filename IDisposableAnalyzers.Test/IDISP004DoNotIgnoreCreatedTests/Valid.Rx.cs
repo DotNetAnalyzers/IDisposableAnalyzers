@@ -302,7 +302,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new []{ DisposableCode, compositeDisposableExtCode, code}, settings: LibrarySettings.Reactive);
+            RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
         }
 
         [Test]

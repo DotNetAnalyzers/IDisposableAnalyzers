@@ -81,47 +81,49 @@
             return candidate switch
             {
                 { Parent: UsingStatementSyntax _ }
-                => true,
+                    => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } } } }
-                => true,
+                    => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
-                => true,
+                    => true,
                 { }
-                when Identity(candidate, recursion) is { } id &&
-                     Disposes(id, recursion)
-                => true,
+                    when Identity(candidate, recursion) is { } id &&
+                         Disposes(id, recursion)
+                    => true,
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
-                => IsDisposeOrReturnValueDisposed(invocation),
+                    => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbols.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken)
-                => true, // disposed by form.Close()
+                    when invocation.IsSymbol(KnownSymbols.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.WebApplication.Run,             recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.WebApplication.RunAsync,             recursion.SemanticModel, recursion.CancellationToken)
+                    => true, // disposed by form.Close()
                 { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "Run" } }, Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
-                => true,
+                    when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
+                    => true,
                 { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "RunAsync" } }, Parent: InvocationExpressionSyntax invocation } }
-                when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
-                => true,
+                    when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
+                    => true,
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                => IsDisposeOrReturnValueDisposed(invocation),
+                    => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: ConditionalAccessExpressionSyntax parent }
-                => DisposedByReturnValue(parent, recursion, out var creation) &&
+                        => DisposedByReturnValue(parent, recursion, out var creation) &&
                    Disposes(creation, recursion),
                 { Parent: MemberAccessExpressionSyntax parent }
-                => DisposedByReturnValue(parent, recursion, out var creation) &&
+                    => DisposedByReturnValue(parent, recursion, out var creation) &&
                    Disposes(creation, recursion),
                 { Parent: AssignmentExpressionSyntax { Left: { } left } assignment }
-                when left == candidate
-                => Disposes(assignment, recursion),
+                    when left == candidate
+                    => Disposes(assignment, recursion),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
-                when recursion.Target(variableDeclarator) is { } target
-                => Disposes(target, recursion),
+                    when recursion.Target(variableDeclarator) is { } target
+                    => Disposes(target, recursion),
                 { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }
-                when Winform.IsComponentsAdd(invocation, recursion.SemanticModel, recursion.CancellationToken)
-                => true,
+                    when Winform.IsComponentsAdd(invocation, recursion.SemanticModel, recursion.CancellationToken)
+                    => true,
                 { Parent: ArgumentSyntax argument }
-                when recursion.Target(argument) is { } target
-                => DisposedByReturnValue(target, recursion, out var wrapper) &&
-                   Disposes(wrapper, recursion),
+                    when recursion.Target(argument) is { } target
+                    => DisposedByReturnValue(target, recursion, out var wrapper) &&
+                       Disposes(wrapper, recursion),
                 _ => false,
             };
 
