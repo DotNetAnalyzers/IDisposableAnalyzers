@@ -37,7 +37,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -128,7 +128,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -155,7 +155,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -197,7 +197,7 @@ namespace Gu.Reactive
         }
      }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
     }
 }

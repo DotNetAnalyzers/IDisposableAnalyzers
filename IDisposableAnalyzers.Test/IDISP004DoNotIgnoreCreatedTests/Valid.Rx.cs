@@ -32,7 +32,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -94,7 +94,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -125,7 +125,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -179,7 +179,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -208,7 +208,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -255,7 +255,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, code);
+            RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -302,7 +302,7 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, compositeDisposableExtCode, code);
+            RoslynAssert.Valid(Analyzer, new []{ DisposableCode, compositeDisposableExtCode, code}, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -323,7 +323,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -367,7 +367,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -402,7 +402,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -435,7 +435,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -466,7 +466,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
 
         [Test]
@@ -495,7 +495,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
     }
 }
