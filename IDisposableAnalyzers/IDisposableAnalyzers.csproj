@@ -35,7 +35,7 @@
     <PackageReleaseNotes>
       4.0.0
       BREAKING: For VS2022+ now.
-      BUGFIX: AD0001 -> Could not load file or assembly
+      BUGFIX: AD0001 -&gt; Could not load file or assembly
       3.4.15
       BUGFIX: IDISP005 with ServiceDescriptor
       BUGFIX: IDISP004 when DisposeWith
@@ -118,9 +118,9 @@
 
   <ItemGroup>
     <PackageReference Include="Gu.Analyzers" Version="2.0.0" PrivateAssets="all" />
-    <PackageReference Include="Gu.Roslyn.Extensions.Source" Version="0.16.2" />
+    <PackageReference Include="Gu.Roslyn.Extensions.Source" Version="0.16.3" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.354" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.376" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
