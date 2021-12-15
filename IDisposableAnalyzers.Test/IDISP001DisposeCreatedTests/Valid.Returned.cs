@@ -476,5 +476,25 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void ReturnedInTupleIssue320()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public class Issue320
+    {
+        public (MemoryStream Stream, int N) M()
+        {
+            var stream = new MemoryStream();
+            return (stream, 1);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }

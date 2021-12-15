@@ -1,7 +1,9 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Threading;
+
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -47,25 +49,27 @@
         {
             return candidate switch
             {
+                { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax parent } }
+                    => Returns(parent, recursion),
                 { Parent: ReturnStatementSyntax _ }
-                => true,
+                    => true,
                 { Parent: YieldStatementSyntax _ }
-                => true,
+                    => true,
                 { Parent: ArrowExpressionClauseSyntax { Parent: { } parent } }
-                => !parent.IsKind(SyntaxKind.ConstructorDeclaration),
+                    => !parent.IsKind(SyntaxKind.ConstructorDeclaration),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                => DisposedByReturnValue(invocation, recursion, out _) &&
-                   Returns(invocation, recursion),
+                    => DisposedByReturnValue(invocation, recursion, out _) &&
+                       Returns(invocation, recursion),
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } conditionalAccess }
-                => DisposedByReturnValue(invocation, recursion, out _) &&
-                   Returns(conditionalAccess, recursion),
+                    => DisposedByReturnValue(invocation, recursion, out _) &&
+                       Returns(conditionalAccess, recursion),
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
-                => recursion.Target(variableDeclarator) is { } target &&
-                   Returns(target, recursion),
+                    => recursion.Target(variableDeclarator) is { } target &&
+                       Returns(target, recursion),
                 { }
-                when Identity(candidate, recursion) is { } id &&
-                     Returns(id, recursion)
-                => true,
+                    when Identity(candidate, recursion) is { } id &&
+                         Returns(id, recursion)
+                    => true,
                 _ => false,
             };
         }
