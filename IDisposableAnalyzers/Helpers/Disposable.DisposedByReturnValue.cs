@@ -74,6 +74,14 @@
 
                     if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation))
                     {
+                        if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
+                            objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
+                            leaveOpenArgument.Expression is LiteralExpressionSyntax { RawKind: (int)SyntaxKind.TrueLiteralExpression })
+                        {
+                            creation = null;
+                            return false;
+                        }
+
                         if (constructor.ContainingType == KnownSymbols.BinaryReader ||
                             constructor.ContainingType == KnownSymbols.BinaryWriter ||
                             constructor.ContainingType == KnownSymbols.StreamReader ||
@@ -85,15 +93,6 @@
                             constructor.ContainingType == KnownSymbols.StreamMemoryBlockProvider ||
                             constructor.ContainingType == KnownSymbols.ECDsaCng)
                         {
-                            if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                                objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
-                                literal.IsKind(SyntaxKind.TrueLiteralExpression))
-                            {
-                                creation = null;
-                                return false;
-                            }
-
                             creation = objectCreation;
                             return true;
                         }
@@ -101,9 +100,9 @@
                         if (parameter.Type.IsAssignableTo(KnownSymbols.HttpMessageHandler, recursion.SemanticModel.Compilation) &&
                             constructor.ContainingType.IsAssignableTo(KnownSymbols.HttpClient, recursion.SemanticModel.Compilation))
                         {
-                            if (constructor.TryFindParameter("disposeHandler", out var leaveOpenParameter) &&
-                                objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                                leaveOpenArgument.Expression is LiteralExpressionSyntax literal &&
+                            if (constructor.TryFindParameter("disposeHandler", out var disposeHandlerParameter) &&
+                                objectCreation.TryFindArgument(disposeHandlerParameter, out var disposeHandlerArgument) &&
+                                disposeHandlerArgument.Expression is LiteralExpressionSyntax literal &&
                                 literal.IsKind(SyntaxKind.FalseLiteralExpression))
                             {
                                 creation = null;
