@@ -53,7 +53,7 @@
                 //// https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
                 { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task" } => false,
                 INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
-                => IsAssignableFrom(arguments[0], compilation),
+                    => IsAssignableFrom(arguments[0], compilation),
                 _ => type.IsAssignableTo(KnownSymbols.IDisposable, compilation),
             };
         }

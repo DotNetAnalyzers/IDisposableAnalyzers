@@ -72,7 +72,8 @@
                         return true;
                     }
 
-                    if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation))
+                    if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation) ||
+                        target.Symbol.ContainingType.IsAssignableTo(KnownSymbols.IAsyncDisposable, recursion.SemanticModel.Compilation))
                     {
                         if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
                             objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
@@ -97,18 +98,18 @@
                             return true;
                         }
 
+                        if (constructor.TryFindParameter("disposeHandler", out var disposeHandlerParameter) &&
+                            objectCreation.TryFindArgument(disposeHandlerParameter, out var disposeHandlerArgument) &&
+                            disposeHandlerArgument.Expression is LiteralExpressionSyntax literal &&
+                            literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                        {
+                            creation = null;
+                            return false;
+                        }
+
                         if (parameter.Type.IsAssignableTo(KnownSymbols.HttpMessageHandler, recursion.SemanticModel.Compilation) &&
                             constructor.ContainingType.IsAssignableTo(KnownSymbols.HttpClient, recursion.SemanticModel.Compilation))
                         {
-                            if (constructor.TryFindParameter("disposeHandler", out var disposeHandlerParameter) &&
-                                objectCreation.TryFindArgument(disposeHandlerParameter, out var disposeHandlerArgument) &&
-                                disposeHandlerArgument.Expression is LiteralExpressionSyntax literal &&
-                                literal.IsKind(SyntaxKind.FalseLiteralExpression))
-                            {
-                                creation = null;
-                                return false;
-                            }
-
                             creation = objectCreation;
                             return true;
                         }

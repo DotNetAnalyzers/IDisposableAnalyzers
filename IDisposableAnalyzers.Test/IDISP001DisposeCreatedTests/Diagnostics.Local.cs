@@ -453,6 +453,50 @@ namespace N
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
+
+            [TestCase("new C(stream)")]
+            [TestCase("new C(stream, true)")]
+            public static void LeaveOpenWhenDisposeAsync(string expression)
+            {
+                var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class C : IAsyncDisposable
+    {
+        private readonly Stream stream;
+        private readonly bool leaveOpen;
+
+        public C(Stream stream, bool leaveOpen = true)
+        {
+            this.stream = stream;
+            this.leaveOpen = leaveOpen;
+        }
+
+        public static async Task M(string fileName)
+        {
+            ↓var stream = File.OpenRead(fileName);
+            await using var reader = new C(stream);
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            if (!this.leaveOpen)
+            {
+                return this.stream.DisposeAsync();
+            }
+
+            return ValueTask.CompletedTask;
+        }
+    }
+}
+".AssertReplace("new C(stream)", expression);
+
+                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+            }
         }
     }
 }
