@@ -13,7 +13,7 @@ namespace IDisposableAnalyzers.Tests.Web
 
     using NUnit.Framework;
 
-    public static class ValidWithAllAnalyzers
+    public static class AllAnalyzersValid
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers = typeof(KnownSymbols)
             .Assembly
@@ -23,7 +23,7 @@ namespace IDisposableAnalyzers.Tests.Web
             .ToImmutableArray();
 
         // ReSharper disable once InconsistentNaming
-        private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
+        private static readonly Solution ValidCode = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.Web.csproj"),
             settings: WebSettings.Exe);
 
@@ -52,7 +52,7 @@ namespace IDisposableAnalyzers.Tests.Web
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
-            RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
+            RoslynAssert.Valid(analyzer, ValidCode);
         }
     }
 }

@@ -53,5 +53,45 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
+
+        [TestCase("new C(stream)")]
+        [TestCase("new C(stream, false)")]
+        public static void LeaveOpen(string expression)
+        {
+            var code = @"
+namespace N
+{
+    using System;
+    using System.IO;
+
+    public class C : IDisposable
+    {
+        private readonly Stream stream;
+        private readonly bool leaveOpen;
+
+        public C(Stream stream, bool leaveOpen = false)
+        {
+            this.stream = stream;
+            this.leaveOpen = leaveOpen;
+        }
+
+        public static void M(string fileName)
+        {
+            var stream = File.OpenRead(fileName);
+            using var reader = new C(stream);
+        }
+
+        public void Dispose()
+        {
+            if (!this.leaveOpen)
+            {
+                this.stream.Dispose();
+            }
+        }
+    }
+}".AssertReplace("new C(stream)", expression);
+
+            RoslynAssert.Valid(Analyzer, Descriptor, code);
+        }
     }
 }

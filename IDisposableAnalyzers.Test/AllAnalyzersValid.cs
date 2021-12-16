@@ -10,7 +10,7 @@ namespace IDisposableAnalyzers.Test
     using Microsoft.CodeAnalysis.Diagnostics;
     using NUnit.Framework;
 
-    public static class ValidWithAllAnalyzers
+    public static class AllAnalyzersValid
     {
         private static readonly ImmutableArray<DiagnosticAnalyzer> AllAnalyzers =
             typeof(KnownSymbols)
@@ -20,12 +20,12 @@ namespace IDisposableAnalyzers.Test
             .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
             .ToImmutableArray();
 
-        private static readonly Solution AnalyzersProjectSln = CodeFactory.CreateSolution(
+        private static readonly Solution AnalyzersCode = CodeFactory.CreateSolution(
             ProjectFile.Find("IDisposableAnalyzers.csproj"),
             settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
 
         // ReSharper disable once InconsistentNaming
-        private static readonly Solution ValidCodeProjectSln = CodeFactory.CreateSolution(
+        private static readonly Solution ValidCode = CodeFactory.CreateSolution(
             ProjectFile.Find("ValidCode.csproj"),
             settings: Settings.Default.WithCompilationOptions(x => x.WithSuppressedDiagnostics("CS1701")));
 
@@ -54,13 +54,13 @@ namespace IDisposableAnalyzers.Test
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void AnalyzersProject(DiagnosticAnalyzer analyzer)
         {
-            RoslynAssert.Valid(analyzer, AnalyzersProjectSln);
+            RoslynAssert.Valid(analyzer, AnalyzersCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
         public static void ValidCodeProject(DiagnosticAnalyzer analyzer)
         {
-            RoslynAssert.Valid(analyzer, ValidCodeProjectSln);
+            RoslynAssert.Valid(analyzer, ValidCode);
         }
 
         [TestCaseSource(nameof(AllAnalyzers))]
