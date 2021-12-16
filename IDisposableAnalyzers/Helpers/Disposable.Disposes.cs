@@ -118,8 +118,9 @@
                     => true,
                 { Parent: ArgumentSyntax argument }
                     when recursion.Target(argument) is { } target
-                    => DisposedByReturnValue(target, recursion, out var wrapper) &&
-                       Disposes(wrapper, recursion),
+                    => (DisposedByReturnValue(target, recursion, out var wrapper) &&
+                        Disposes(wrapper, recursion)) ||
+                       Disposes(target, recursion),
                 _ => false,
             };
 
