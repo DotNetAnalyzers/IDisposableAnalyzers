@@ -1,5 +1,6 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System;
     using System.Collections.Generic;
     using System.Collections.Immutable;
     using System.Diagnostics.CodeAnalysis;
@@ -36,7 +37,8 @@
                 !invocation.TryFirstAncestorOrSelf<AnonymousFunctionExpressionSyntax>(out _) &&
                 call.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed)
             {
-                if (Disposable.IsCachedOrInjectedOnly(disposed, invocation, context.SemanticModel, context.CancellationToken))
+                if (Disposable.IsCachedOrInjectedOnly(disposed, invocation, context.SemanticModel, context.CancellationToken) &&
+                    NotLeaveOpen())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
                 }
@@ -53,6 +55,33 @@
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP017PreferUsing, invocation.GetLocation()));
                     }
+                }
+
+                bool NotLeaveOpen()
+                {
+                    if (invocation.FirstAncestor<IfStatementSyntax>() is { Condition: { } condition } ifStatement)
+                    {
+                        return condition switch
+                        {
+                            PrefixUnaryExpressionSyntax { OperatorToken: { RawKind: (int)SyntaxKind.ExclamationToken }, Operand: { } operand }
+                                when Field(operand)?.EndsWith("leaveOpen", StringComparison.OrdinalIgnoreCase) is true &&
+                                     ifStatement.Statement.Contains(invocation)
+                                => false,
+                            _ => true,
+                        };
+
+                        static string? Field(ExpressionSyntax candidate)
+                        {
+                            return candidate switch
+                            {
+                                IdentifierNameSyntax identifierName => identifierName.Identifier.ValueText,
+                                MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax, Name: IdentifierNameSyntax { } identifierName } => identifierName.Identifier.ValueText,
+                                _ => null,
+                            };
+                        }
+                    }
+
+                    return true;
                 }
             }
         }
