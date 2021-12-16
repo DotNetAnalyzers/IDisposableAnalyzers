@@ -925,5 +925,25 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, cause, target);
         }
+
+        [Test]
+        public static void UsingOuterTaskIssue299()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    sealed class C
+    {
+        async Task M()
+        {
+            using var task = await Task.FromResult(new MemoryStream());
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
