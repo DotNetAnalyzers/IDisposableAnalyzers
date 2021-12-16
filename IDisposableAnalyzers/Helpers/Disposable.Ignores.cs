@@ -60,28 +60,28 @@
             return candidate switch
             {
                 { Parent: AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } } }
-                => true,
+                    => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier: { ValueText: "_" } } } }
-                => true,
+                    => true,
                 { Parent: AnonymousFunctionExpressionSyntax _ }
-                => false,
+                    => false,
                 { Parent: StatementSyntax _ }
-                => true,
+                    => true,
                 { }
-                when Identity(candidate, recursion) is { } id &&
-                     !Ignores(id, recursion)
-                => false,
+                    when Identity(candidate, recursion) is { } id &&
+                         !Ignores(id, recursion)
+                    => false,
                 { Parent: ArgumentSyntax { Parent: TupleExpressionSyntax tuple } }
-                => Ignores(tuple, recursion),
+                    => Ignores(tuple, recursion),
                 { Parent: ArgumentSyntax argument }
-                when recursion.Target(argument) is { } target
-                => Ignores(target, recursion),
+                    when recursion.Target(argument) is { } target
+                    => Ignores(target, recursion),
                 { Parent: MemberAccessExpressionSyntax _ }
-                => WrappedAndIgnored(),
+                    => WrappedAndIgnored(),
                 { Parent: ConditionalAccessExpressionSyntax _ }
-                => WrappedAndIgnored(),
+                    => WrappedAndIgnored(),
                 { Parent: InitializerExpressionSyntax { Parent: ExpressionSyntax creation } }
-                => Ignores(creation, recursion),
+                    => Ignores(creation, recursion),
                 _ => false,
             };
 
