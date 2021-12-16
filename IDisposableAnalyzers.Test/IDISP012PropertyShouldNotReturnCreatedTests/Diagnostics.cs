@@ -6,7 +6,7 @@
     public static class Diagnostics
     {
         private static readonly ReturnValueAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP012");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated);
 
         [Test]
         public static void ReturnFileOpenReadGetBody()

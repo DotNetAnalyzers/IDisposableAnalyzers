@@ -7,7 +7,7 @@
     {
         private static readonly DisposeMethodAnalyzer Analyzer = new();
         private static readonly AddBaseCallFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP010");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP010CallBaseDispose);
 
         private const string DisposableCode = @"
 namespace N

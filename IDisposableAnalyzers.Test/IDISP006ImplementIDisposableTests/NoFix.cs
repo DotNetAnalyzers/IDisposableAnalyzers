@@ -7,7 +7,7 @@
     {
         private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
         private static readonly ImplementIDisposableFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP006");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
 
         [Test]
         public static void FieldWhenInterfaceIsMissing()

@@ -8,7 +8,7 @@
         public static class ObjectCreation
         {
             private static readonly CreationAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP004");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
             private const string DisposableCode = @"
 namespace N

@@ -6,7 +6,7 @@
     public static class Diagnostics
     {
         private static readonly ReturnValueAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP013");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP013AwaitInUsing);
 
         [Test]
         public static void WebClientDownloadStringTaskAsync()

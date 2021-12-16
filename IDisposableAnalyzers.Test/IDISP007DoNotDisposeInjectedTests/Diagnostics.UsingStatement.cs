@@ -8,7 +8,7 @@
         public static class UsingStatement
         {
             private static readonly UsingStatementAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP007");
+            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected);
 
             [Test]
             public static void UsingField1()

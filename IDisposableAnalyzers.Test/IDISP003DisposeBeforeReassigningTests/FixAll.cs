@@ -6,7 +6,7 @@
     public static class FixAll
     {
         private static readonly AssignmentAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP003");
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP003DisposeBeforeReassigning);
         private static readonly DisposeBeforeAssignFix Fix = new();
 
         [Test]
