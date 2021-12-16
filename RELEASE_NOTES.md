@@ -1,3 +1,9 @@
+#### 4.0.1
+* BUGFIX: IDISP007 false warning when using Rx
+* BUGFIX: IDISP016 false warning when foreach
+* BUGFIX: Handle leaveOpen when AsyncDisposable
+* BUGIX: Handle top level statements.
+
 #### 4.0.0
 * BREAKING: For VS2022+ now.
 * BUGFIX: AD0001 -> Could not load file or assembly

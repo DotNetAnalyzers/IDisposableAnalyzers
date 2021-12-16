@@ -27,12 +27,17 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>4.0.0</Version>
+    <Version>4.0.1</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      4.0.1
+      BUGFIX: IDISP007 false warning when using Rx
+      BUGFIX: IDISP016 false warning when foreach
+      BUGFIX: Handle leaveOpen when AsyncDisposable
+      BUGIX: Handle top level statements.
       4.0.0
       BREAKING: For VS2022+ now.
       BUGFIX: AD0001 -&gt; Could not load file or assembly
