@@ -82,7 +82,7 @@
             {
                 { Parent: UsingStatementSyntax _ }
                     => true,
-                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } } } }
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax } } } }
                     => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
                     => true,
@@ -93,15 +93,11 @@
                 { Parent: ConditionalAccessExpressionSyntax { WhenNotNull: InvocationExpressionSyntax invocation } }
                     => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
-                    when invocation.IsSymbol(KnownSymbols.SystemWindowsFormsControl.Show, recursion.SemanticModel, recursion.CancellationToken) ||
-                         invocation.IsSymbol(KnownSymbols.WebApplication.Run,             recursion.SemanticModel, recursion.CancellationToken) ||
-                         invocation.IsSymbol(KnownSymbols.WebApplication.RunAsync,             recursion.SemanticModel, recursion.CancellationToken)
-                    => true, // disposed by form.Close()
-                { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "Run" } }, Parent: InvocationExpressionSyntax invocation } }
-                    when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.Run, recursion.SemanticModel, recursion.CancellationToken)
-                    => true,
-                { Parent: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "RunAsync" } }, Parent: InvocationExpressionSyntax invocation } }
-                    when invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
+                    when invocation.IsSymbol(KnownSymbols.SystemWindowsFormsControl.Show,             recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.WebApplication.Run,                         recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.WebApplication.RunAsync,                    recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.Run,      recursion.SemanticModel, recursion.CancellationToken) ||
+                         invocation.IsSymbol(KnownSymbols.HostingAbstractionsHostExtensions.RunAsync, recursion.SemanticModel, recursion.CancellationToken)
                     => true,
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                     => IsDisposeOrReturnValueDisposed(invocation),
