@@ -414,8 +414,9 @@ namespace N
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
-            [TestCase("new C(stream)")]
-            [TestCase("new C(stream, true)")]
+            [TestCase("new DefaultFalse(stream, true)")]
+            [TestCase("new DefaultTrue(stream)")]
+            [TestCase("new DefaultTrue(stream, true)")]
             public static void LeaveOpen(string expression)
             {
                 var code = @"
@@ -424,38 +425,62 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : IDisposable
+    public class C
     {
-        private readonly Stream stream;
-        private readonly bool leaveOpen;
-
-        public C(Stream stream, bool leaveOpen = true)
-        {
-            this.stream = stream;
-            this.leaveOpen = leaveOpen;
-        }
-
         public static void M(string fileName)
         {
             ↓var stream = File.OpenRead(fileName);
-            using var reader = new C(stream);
+            using var reader = new DefaultTrue(stream);
         }
 
-        public void Dispose()
+        private sealed class DefaultTrue : IDisposable
         {
-            if (!this.leaveOpen)
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultTrue(Stream stream, bool leaveOpen = true)
             {
-                this.stream.Dispose();
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
+            }
+
+            public void Dispose()
+            {
+                if (!this.leaveOpen)
+                {
+                    this.stream.Dispose();
+                }
+            }
+        }
+
+        private sealed class DefaultFalse : IDisposable
+        {
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultFalse(Stream stream, bool leaveOpen = false)
+            {
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
+            }
+
+            public void Dispose()
+            {
+                if (!this.leaveOpen)
+                {
+                    this.stream.Dispose();
+                }
             }
         }
     }
-}".AssertReplace("new C(stream)", expression);
+}".AssertReplace("new DefaultTrue(stream)", expression);
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }
 
-            [TestCase("new C(stream)")]
-            [TestCase("new C(stream, true)")]
+            [TestCase("new DefaultFalse(stream, true)")]
+            [TestCase("new DefaultTrue(stream)")]
+            [TestCase("new DefaultTrue(stream, true)")]
             public static void LeaveOpenWhenDisposeAsync(string expression)
             {
                 var code = @"
@@ -465,35 +490,60 @@ namespace N
     using System.IO;
     using System.Threading.Tasks;
 
-    public class C : IAsyncDisposable
+    public class C
     {
-        private readonly Stream stream;
-        private readonly bool leaveOpen;
-
-        public C(Stream stream, bool leaveOpen = true)
-        {
-            this.stream = stream;
-            this.leaveOpen = leaveOpen;
-        }
-
         public static async Task M(string fileName)
         {
             ↓var stream = File.OpenRead(fileName);
-            await using var reader = new C(stream);
+            await using var reader =new DefaultTrue(stream);
         }
 
-        public ValueTask DisposeAsync()
+        private sealed class DefaultTrue : IAsyncDisposable
         {
-            if (!this.leaveOpen)
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultTrue(Stream stream, bool leaveOpen = true)
             {
-                return this.stream.DisposeAsync();
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
             }
 
-            return ValueTask.CompletedTask;
+            public ValueTask DisposeAsync()
+            {
+                if (!this.leaveOpen)
+                {
+                    return this.stream.DisposeAsync();
+                }
+
+                return ValueTask.CompletedTask;
+            }
+        }
+
+        private sealed class DefaultFalse : IAsyncDisposable
+        {
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultFalse(Stream stream, bool leaveOpen = false)
+            {
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
+            }
+
+            public ValueTask DisposeAsync()
+            {
+                if (!this.leaveOpen)
+                {
+                    return this.stream.DisposeAsync();
+                }
+
+                return ValueTask.CompletedTask;
+            }
         }
     }
 }
-".AssertReplace("new C(stream)", expression);
+".AssertReplace("new DefaultTrue(stream)", expression);
 
                 RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
             }

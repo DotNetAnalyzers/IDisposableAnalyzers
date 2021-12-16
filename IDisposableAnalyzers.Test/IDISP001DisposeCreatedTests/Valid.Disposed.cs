@@ -54,9 +54,10 @@ namespace N
             RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
 
-        [TestCase("new C(stream)")]
-        [TestCase("new C(stream, false)")]
-        public static void LeaveOpenDefaultFalse(string expression)
+        [TestCase("new DefaultFalse(stream)")]
+        [TestCase("new DefaultFalse(stream, false)")]
+        [TestCase("new DefaultTrue(stream, false)")]
+        public static void LeaveOpenDispose(string expression)
         {
             var code = @"
 namespace N
@@ -64,32 +65,55 @@ namespace N
     using System;
     using System.IO;
 
-    public class C : IDisposable
+    public class C
     {
-        private readonly Stream stream;
-        private readonly bool leaveOpen;
-
-        public C(Stream stream, bool leaveOpen = false)
-        {
-            this.stream = stream;
-            this.leaveOpen = leaveOpen;
-        }
-
         public static void M(string fileName)
         {
             var stream = File.OpenRead(fileName);
-            using var reader = new C(stream);
+            using var reader = new DefaultFalse(stream);
         }
 
-        public void Dispose()
+        private sealed class DefaultTrue : IDisposable
         {
-            if (!this.leaveOpen)
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultTrue(Stream stream, bool leaveOpen = true)
             {
-                this.stream.Dispose();
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
+            }
+
+            public void Dispose()
+            {
+                if (!this.leaveOpen)
+                {
+                    this.stream.Dispose();
+                }
+            }
+        }
+
+        private sealed class DefaultFalse : IDisposable
+        {
+            private readonly Stream stream;
+            private readonly bool leaveOpen;
+
+            public DefaultFalse(Stream stream, bool leaveOpen = false)
+            {
+                this.stream = stream;
+                this.leaveOpen = leaveOpen;
+            }
+
+            public void Dispose()
+            {
+                if (!this.leaveOpen)
+                {
+                    this.stream.Dispose();
+                }
             }
         }
     }
-}".AssertReplace("new C(stream)", expression);
+}".AssertReplace("new DefaultFalse(stream)", expression);
 
             RoslynAssert.Valid(Analyzer, Descriptor, code);
         }
