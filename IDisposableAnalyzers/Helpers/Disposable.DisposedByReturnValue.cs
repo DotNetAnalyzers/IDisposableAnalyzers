@@ -75,10 +75,14 @@
                     if (Disposable.IsAssignableFrom(target.Symbol.ContainingType, recursion.SemanticModel.Compilation) ||
                         target.Symbol.ContainingType.IsAssignableTo(KnownSymbols.IAsyncDisposable, recursion.SemanticModel.Compilation))
                     {
-                        if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter) &&
-                            objectCreation.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument) &&
-                            leaveOpenArgument.Expression is LiteralExpressionSyntax { RawKind: (int)SyntaxKind.TrueLiteralExpression })
+                        if (constructor.TryFindParameter("leaveOpen", out var leaveOpenParameter))
                         {
+                            if (EffectiveValue(objectCreation, leaveOpenParameter) is false)
+                            {
+                                creation = objectCreation;
+                                return true;
+                            }
+
                             creation = null;
                             return false;
                         }
@@ -98,11 +102,14 @@
                             return true;
                         }
 
-                        if (constructor.TryFindParameter("disposeHandler", out var disposeHandlerParameter) &&
-                            objectCreation.TryFindArgument(disposeHandlerParameter, out var disposeHandlerArgument) &&
-                            disposeHandlerArgument.Expression is LiteralExpressionSyntax literal &&
-                            literal.IsKind(SyntaxKind.FalseLiteralExpression))
+                        if (constructor.TryFindParameter("disposeHandler", out var disposeHandlerParameter))
                         {
+                            if (EffectiveValue(objectCreation, disposeHandlerParameter) is true)
+                            {
+                                creation = objectCreation;
+                                return true;
+                            }
+
                             creation = null;
                             return false;
                         }
@@ -118,6 +125,21 @@
                         {
                             creation = objectCreation;
                             return true;
+                        }
+
+                        static bool? EffectiveValue(ObjectCreationExpressionSyntax objectCreation, IParameterSymbol parameter)
+                        {
+                            if (objectCreation.TryFindArgument(parameter, out var leaveOpenArgument))
+                            {
+                                return leaveOpenArgument.Expression switch
+                                {
+                                    LiteralExpressionSyntax { RawKind: (int)SyntaxKind.FalseLiteralExpression } => false,
+                                    LiteralExpressionSyntax { RawKind: (int)SyntaxKind.TrueLiteralExpression } => true,
+                                    _ => null,
+                                };
+                            }
+
+                            return parameter.ExplicitDefaultValue as bool?;
                         }
                     }
 
