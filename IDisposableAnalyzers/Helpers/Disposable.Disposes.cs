@@ -102,7 +102,7 @@
                 { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax invocation } }
                     => IsDisposeOrReturnValueDisposed(invocation),
                 { Parent: ConditionalAccessExpressionSyntax parent }
-                        => DisposedByReturnValue(parent, recursion, out var creation) &&
+                    => DisposedByReturnValue(parent, recursion, out var creation) &&
                    Disposes(creation, recursion),
                 { Parent: MemberAccessExpressionSyntax parent }
                     => DisposedByReturnValue(parent, recursion, out var creation) &&
