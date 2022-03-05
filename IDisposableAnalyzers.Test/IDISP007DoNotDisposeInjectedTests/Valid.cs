@@ -1198,5 +1198,27 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void ReassignStatic()
+        {
+            var code = @"
+namespace N;
+
+using System;
+using System.IO;
+
+public static class C
+{
+    private static IDisposable? disposable;
+
+    public static void M(string fileName)
+    {
+        disposable?.Dispose();
+        disposable = File.OpenRead(fileName);
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
