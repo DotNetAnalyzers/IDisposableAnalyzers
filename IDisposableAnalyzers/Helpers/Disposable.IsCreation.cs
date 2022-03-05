@@ -233,6 +233,7 @@
                     IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
                     IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromHandle" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromChildHandle" } => false,
+                    IMethodSymbol { ContainingType: { MetadataName: "Process" }, MetadataName: "Start" } => true,
                     IMethodSymbol { MetadataName: "GetService" } => false,
                     IMethodSymbol { MetadataName: "GetRequiredService" } => false,
                     IMethodSymbol { ContainingType: { MetadataName: "CancellationToken" }, MetadataName: "Register" } => false,

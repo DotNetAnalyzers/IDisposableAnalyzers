@@ -538,6 +538,7 @@ namespace N
             [TestCase("Microsoft.Win32.RegistryKey registryKey",                                            "registryKey.CreateSubKey(string.Empty)",                             true)]
             [TestCase("Microsoft.Win32.RegistryKey registryKey",                                            "registryKey.OpenSubKey(string.Empty)",                               true)]
             [TestCase("System.Collections.Generic.List<int> xs",                                            "xs.GetEnumerator()",                                                 true)]
+            [TestCase("",                                                                                   "System.Diagnostics.Process.Start(string.Empty)",                     true)]
             [TestCase("",                                                                                   "new System.Collections.Generic.List<IDisposable>().Find(x => true)", false)]
             [TestCase("",                                                                                   "ImmutableList<IDisposable>.Empty.Find(x => true)",                   false)]
             [TestCase("",                                                                                   "new Queue<IDisposable>().Peek()",                                    false)]
