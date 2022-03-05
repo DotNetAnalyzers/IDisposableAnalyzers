@@ -1199,14 +1199,14 @@ namespace N
             RoslynAssert.Valid(Analyzer, code);
         }
 
-        [Test]
-        public static void ReassignStatic()
+        [TestCase("System.IO.File.OpenRead(fileName)")]
+        [TestCase("System.Diagnostics.Process.Start(fileName)")]
+        public static void ReassignStatic(string expression)
         {
             var code = @"
 namespace N;
 
 using System;
-using System.IO;
 
 public static class C
 {
@@ -1217,7 +1217,7 @@ public static class C
         disposable?.Dispose();
         disposable = File.OpenRead(fileName);
     }
-}";
+}".AssertReplace("File.OpenRead(fileName)", expression);
             RoslynAssert.Valid(Analyzer, code);
         }
     }
