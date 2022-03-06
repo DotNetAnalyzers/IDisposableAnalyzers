@@ -1,3 +1,6 @@
+#### 4.0.2
+* BUGFIX: IDISP007 when disposing static member in static context
+
 #### 4.0.1
 * BUGFIX: IDISP007 false warning when using Rx
 * BUGFIX: IDISP016 false warning when foreach
