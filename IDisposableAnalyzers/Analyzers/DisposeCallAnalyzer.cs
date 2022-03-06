@@ -38,6 +38,7 @@
                 call.FindDisposed(context.SemanticModel, context.CancellationToken) is { } disposed)
             {
                 if (Disposable.IsCachedOrInjectedOnly(disposed, invocation, context.SemanticModel, context.CancellationToken) &&
+                    !StaticMemberInStaticContext(disposed, context) &&
                     NotLeaveOpen())
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, invocation.FirstAncestorOrSelf<StatementSyntax>()?.GetLocation() ?? invocation.GetLocation()));
@@ -55,6 +56,14 @@
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP017PreferUsing, invocation.GetLocation()));
                     }
+                }
+
+                bool StaticMemberInStaticContext(IdentifierNameSyntax disposed, SyntaxNodeAnalysisContext context)
+                {
+                    return context.ContainingSymbol is { IsStatic: true } &&
+                           context.SemanticModel.GetSymbolSafe(disposed, context.CancellationToken) is { } symbol &&
+                           FieldOrProperty.TryCreate(symbol, out var fieldOrProperty) &&
+                           fieldOrProperty.IsStatic;
                 }
 
                 bool NotLeaveOpen()
