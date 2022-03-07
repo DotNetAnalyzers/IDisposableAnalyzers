@@ -43,7 +43,7 @@
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="NUnit" Version="3.13.2" />
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.406" PrivateAssets="all" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.66" PrivateAssets="all" />
     <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
     <PackageReference Include="reactiveui" Version="17.1.50" />
   </ItemGroup>
