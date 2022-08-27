@@ -4,7 +4,7 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class Issue199 : IAsyncDisposable
+    public sealed class Issue199 : IAsyncDisposable
     {
         private Timer? _timer;
 
