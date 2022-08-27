@@ -4,7 +4,7 @@
     using System.IO;
     using System.Threading.Tasks;
 
-    public class Issue222 : IAsyncDisposable
+    public sealed class Issue222 : IAsyncDisposable
     {
         private readonly Stream disposable = File.OpenRead(string.Empty);
 

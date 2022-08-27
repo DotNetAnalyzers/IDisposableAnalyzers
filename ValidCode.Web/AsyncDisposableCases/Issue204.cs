@@ -20,7 +20,7 @@
             }
         }
 
-        public class C : IAsyncDisposable
+        public sealed class C : IAsyncDisposable
         {
             private readonly IAsyncDisposable disposable = File.OpenRead(string.Empty);
 
