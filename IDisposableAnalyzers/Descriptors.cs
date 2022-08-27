@@ -229,6 +229,15 @@
             isEnabledByDefault: true,
             description: "Class with no virtual dispose method should be sealed.");
 
+        internal static readonly DiagnosticDescriptor IDISP026SealAsyncDisposable = Create(
+            id: "IDISP026",
+            title: "Class with no virtual DisposeAsyncCore method should be sealed",
+            messageFormat: "Class with no virtual DisposeAsyncCore method should be sealed",
+            category: AnalyzerCategory.Correctness,
+            defaultSeverity: DiagnosticSeverity.Warning,
+            isEnabledByDefault: true,
+            description: "Class with no virtual DisposeAsyncCore method should be sealed.");
+
         /// <summary>
         /// Create a DiagnosticDescriptor, which provides description about a <see cref="Diagnostic" />.
         /// </summary>

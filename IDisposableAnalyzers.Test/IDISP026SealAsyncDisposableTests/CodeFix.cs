@@ -1,4 +1,4 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP025SealDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP026SealAsyncDisposableTests
 {
     using Gu.Roslyn.Asserts;
     using NUnit.Framework;
@@ -7,7 +7,7 @@
     {
         private static readonly ClassDeclarationAnalyzer Analyzer = new();
         private static readonly SealFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP025SealDisposable);
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP026SealAsyncDisposable);
 
         [Test]
         public static void Simple()
@@ -16,11 +16,13 @@
 namespace N
 {
     using System;
+    using System.Threading.Tasks;
 
-    public class ↓C : IDisposable
+    public class ↓C : IAsyncDisposable
     {
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
+            return ValueTask.CompletedTask;
         }
     }
 }";
@@ -29,14 +31,16 @@ namespace N
 namespace N
 {
     using System;
+    using System.Threading.Tasks;
 
-    public sealed class C : IDisposable
+    public sealed class C : IAsyncDisposable
     {
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
+            return ValueTask.CompletedTask;
         }
     }
-}";
+}"; ;
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
