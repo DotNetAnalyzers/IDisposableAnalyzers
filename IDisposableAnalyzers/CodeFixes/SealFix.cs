@@ -13,7 +13,7 @@
     internal class SealFix : DocumentEditorCodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.IDISP025SealDisposable.Id);
+            Descriptors.IDISP025SealDisposable.Id, Descriptors.IDISP026SealAsyncDisposable.Id);
 
         protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
 
