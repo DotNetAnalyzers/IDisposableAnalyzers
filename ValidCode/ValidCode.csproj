@@ -23,7 +23,7 @@
     <PackageReference Include="Gu.Inject.Rebind" Version="0.3.9" />
     <PackageReference Include="Gu.Wpf.Reactive" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Moq" Version="4.18.3" />
+    <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="System.Reactive.Linq" Version="5.0.0" />
