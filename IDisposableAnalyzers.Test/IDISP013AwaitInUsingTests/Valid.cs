@@ -33,6 +33,28 @@ namespace N
         }
 
         [Test]
+        public static void AwaitWebClientDownloadStringTaskAsyncInUsingDeclaration()
+        {
+            var code = @"
+#pragma warning disable SYSLIB0014
+namespace N
+{
+    using System.Net;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public Task<string> M()
+        {
+            var client = new WebClient();
+            return client.DownloadStringTaskAsync(string.Empty);
+        }
+    }
+}";
+            RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
         public static void UsingAwaited()
         {
             var code = @"
