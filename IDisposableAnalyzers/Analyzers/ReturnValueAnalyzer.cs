@@ -1,10 +1,12 @@
 ﻿namespace IDisposableAnalyzers
 {
+    using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
-
+    using Gu.Roslyn.CodeFixExtensions;
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -123,15 +125,46 @@
             }
 
             if (ReturnType(context)?.IsAwaitable() == true &&
-                returnValue.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
-                usingStatement.Statement.Contains(returnValue) &&
+                IsInUsingScope(returnValue) &&
                 !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
-                context.SemanticModel.TryGetType(returnValue, context.CancellationToken, out var returnValueType) &&
-                returnValueType.IsAwaitable() &&
+                context.SemanticModel.TryGetType(returnValue, context.CancellationToken, out var returnValueType2) &&
+                returnValueType2.IsAwaitable() &&
                 ShouldAwait(context, returnValue))
             {
                 context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP013AwaitInUsing, returnValue.GetLocation()));
             }
+        }
+
+        private static bool IsInUsingScope(SyntaxNode node)
+        {
+            return IsInUsingStatement(node) || HasPrecedingUsingDeclaration(node);
+        }
+
+        private static bool IsInUsingStatement(SyntaxNode node)
+        {
+            return node.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
+                   usingStatement.Statement.Contains(node);
+        }
+
+        private static bool HasPrecedingUsingDeclaration(SyntaxNode node)
+        {
+            if (node.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
+                usingStatement.Statement.Contains(node))
+            {
+                return true;
+            }
+
+            if (node.Parent?.ChildNodes().TakeWhile(x => x != node).OfType<LocalDeclarationStatementSyntax>().Any(x => x.UsingKeyword.Text == "using") ?? false)
+            {
+                return true;
+            }
+
+            if (node.Parent is { } parent)
+            {
+                return HasPrecedingUsingDeclaration(parent);
+            }
+
+            return false;
         }
 
         private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
