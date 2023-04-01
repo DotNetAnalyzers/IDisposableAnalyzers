@@ -1,3 +1,6 @@
+####  4.0.3
+* BUGFIX: Handle recursive builder
+
 #### 4.0.2
 * BUGFIX: IDISP007 when disposing static member in static context
 
