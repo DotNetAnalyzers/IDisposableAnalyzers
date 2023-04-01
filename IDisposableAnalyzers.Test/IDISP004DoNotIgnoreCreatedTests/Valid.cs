@@ -958,7 +958,12 @@ namespace N
                 {
                     public S Append(int value)
                     {
-                        return this;
+                        if (value > 3)
+                        {
+                            return this;
+                        }
+
+                        throw new Exception();
                     }
 
                     public void Dispose() { }
