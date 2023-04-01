@@ -40,7 +40,7 @@ namespace N
             return ValueTask.CompletedTask;
         }
     }
-}"; ;
+}";
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
