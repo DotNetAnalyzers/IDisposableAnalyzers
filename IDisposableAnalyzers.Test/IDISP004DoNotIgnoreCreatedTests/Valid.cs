@@ -945,5 +945,37 @@ namespace N
 }";
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void StructBuilder()
+        {
+            var structCode = """
+                namespace N;
+
+                using System;
+
+                public record struct S : IDisposable
+                {
+                    public S Append(int value)
+                    {
+                        return this;
+                    }
+
+                    public void Dispose() { }
+                }
+                """;
+            var code = """
+                namespace N;
+
+                sealed class C
+                {
+                    void M()
+                    {
+                        using var s = new S().Append(1);
+                    }
+                }
+                """;
+            RoslynAssert.Valid(Analyzer, structCode, code);
+        }
     }
 }
