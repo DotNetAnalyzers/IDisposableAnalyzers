@@ -966,6 +966,8 @@ namespace N
                         throw new Exception();
                     }
 
+                    internal S Append(bool value) => this.Append(1);
+
                     public void Dispose() { }
                 }
                 """;
@@ -976,7 +978,7 @@ namespace N
                 {
                     void M()
                     {
-                        using var s = new S().Append(1);
+                        using var s = new S().Append(true);
                     }
                 }
                 """;

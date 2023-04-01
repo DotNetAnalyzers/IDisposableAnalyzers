@@ -8,7 +8,7 @@ using System.Diagnostics;
 using System.Threading;
 
 [DebuggerDisplay("{ToString(),nq}")]
-public record struct Request : IDisposable
+public struct Request : IDisposable
 {
     private static int id;
 

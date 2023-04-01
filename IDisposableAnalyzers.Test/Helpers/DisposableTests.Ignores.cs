@@ -1089,6 +1089,43 @@ namespace N
                 var value = syntaxTree.FindExpression(expressionText);
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
+
+            [Test]
+            public static void Builder()
+            {
+                var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N;
+
+                using System;
+
+                public record struct S : IDisposable
+                {
+                    public S Append(int value)
+                    {
+                        if (value > 3)
+                        {
+                            return this;
+                        }
+                
+                        throw new Exception();
+                    }
+                
+                    internal S Append(bool value) => this.Append(1);
+
+                    public void Dispose() { }
+
+                    public void M()
+                    {
+                        using var s = new S().Append(true);
+                    }
+                }
+                """);
+
+                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+                var semanticModel = compilation.GetSemanticModel(syntaxTree);
+                var value = syntaxTree.FindExpression("new S()");
+                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+            }
         }
     }
 }

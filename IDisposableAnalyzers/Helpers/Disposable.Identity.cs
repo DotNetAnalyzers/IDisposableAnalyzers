@@ -113,9 +113,14 @@
                     {
                         foreach (var returnValue in walker.ReturnValues)
                         {
-                            if (returnValue is ThisExpressionSyntax)
+                            switch (returnValue)
                             {
-                                return true;
+                                case ThisExpressionSyntax:
+                                    return true;
+                                case InvocationExpressionSyntax invocation
+                                    when recursion.Target(invocation) is { Symbol: { IsStatic: false } } next &&
+                                         next.Symbol.ContainingType.IsAssignableTo(target.Symbol.ContainingType, recursion.SemanticModel.Compilation):
+                                    return IsIdentity(next, recursion);
                             }
                         }
                     }
