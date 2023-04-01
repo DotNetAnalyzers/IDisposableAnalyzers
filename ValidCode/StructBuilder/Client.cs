@@ -13,14 +13,17 @@ internal sealed class Client : IDisposable
 
     private bool disposed;
 
-    public async Task<int> M()
+    public async Task<int> M(bool rth)
     {
         this.ThrowIfDisposed();
         var id = Request.GetNextValidId();
         using var request = new Request()
-                            .Append(6,    "message")
-                            .Append(2,    "version")
-                            .Append(true, "subscribe");
+            .Append(6,             "message")
+            .Append(2,             "version")
+            .Append(true,          "subscribe")
+            .Append(rth,           "useRTH")
+            .Append("abc",         "text")
+            .Append((string?)null, "empty");
         await this.socket.SendAsync(request.LengthPrefixed(), SocketFlags.None, CancellationToken.None).ConfigureAwait(false);
         return id;
     }

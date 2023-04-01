@@ -118,7 +118,7 @@
                                 case ThisExpressionSyntax:
                                     return true;
                                 case InvocationExpressionSyntax invocation
-                                    when recursion.Target(invocation) is { Symbol: { IsStatic: false } } next &&
+                                    when recursion.Target(invocation) is { Symbol.IsStatic: false } next &&
                                          next.Symbol.ContainingType.IsAssignableTo(target.Symbol.ContainingType, recursion.SemanticModel.Compilation):
                                     return IsIdentity(next, recursion);
                             }
