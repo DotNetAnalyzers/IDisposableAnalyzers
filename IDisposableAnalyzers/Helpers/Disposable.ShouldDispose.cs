@@ -74,7 +74,7 @@
             {
                 return localOrParameter.Symbol switch
                 {
-                    IParameterSymbol { ContainingSymbol: { DeclaringSyntaxReferences: { Length: 1 } references } }
+                    IParameterSymbol { ContainingSymbol.DeclaringSyntaxReferences: { Length: 1 } references }
                         => references[0].GetSyntax(cancellationToken),
                     ILocalSymbol { DeclaringSyntaxReferences: { Length: 1 } references }
                         => references[0].GetSyntax(cancellationToken).FirstAncestor<BlockSyntax>(),

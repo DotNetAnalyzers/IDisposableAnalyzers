@@ -23,7 +23,7 @@
                 }
             }
 
-            if (invocation is { ArgumentList: { Arguments: { Count: 1 } arguments } } &&
+            if (invocation is { ArgumentList.Arguments: { Count: 1 } arguments } &&
                 arguments[0].Expression is { } expression &&
                 invocation.IsSymbol(KnownSymbols.Task.FromResult, semanticModel, cancellationToken))
             {
@@ -47,7 +47,7 @@
                 }
             }
 
-            if (invocation is { ArgumentList: { Arguments: { } arguments } } &&
+            if (invocation is { ArgumentList.Arguments: { } arguments } &&
                 arguments.Count > 0 &&
                 arguments[0].Expression is ParenthesizedLambdaExpressionSyntax lambda &&
                 invocation.IsSymbol(KnownSymbols.Task.Run, semanticModel, cancellationToken))
@@ -60,7 +60,7 @@
 
         internal static ExpressionSyntax? ConfigureAwait(InvocationExpressionSyntax invocation)
         {
-            if (invocation is { ArgumentList: { Arguments: { Count: 1 } } } &
+            if (invocation is { ArgumentList.Arguments.Count: 1 } &
                 invocation.TryGetMethodName(out var name) &&
                 name == KnownSymbols.Task.ConfigureAwait.Name)
             {

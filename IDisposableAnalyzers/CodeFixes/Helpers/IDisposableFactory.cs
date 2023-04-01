@@ -77,9 +77,9 @@
                         {
                             switch (getter)
                             {
-                                case { ExpressionBody: { Expression: { } expression } }:
+                                case { ExpressionBody.Expression: { } expression }:
                                     return expression;
-                                case { Body: { Statements: { Count: 1 } statements } }
+                                case { Body.Statements: { Count: 1 } statements }
                                     when statements[0] is ReturnStatementSyntax { Expression: { } expression }:
                                     return expression;
                             }
@@ -97,7 +97,7 @@
                     semanticModel.ClassifyConversion(e, disposableType).IsImplicit)
                 {
                     if (semanticModel.TryGetType(e, cancellationToken, out var type) &&
-                        DisposeMethod.Find(type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
+                        DisposeMethod.Find(type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations.IsEmpty: true })
                     {
                         return e.WithoutTrivia()
                                 .WithLeadingElasticLineFeed();
@@ -117,7 +117,7 @@
             {
                 case { NotNull: { } notNull }:
                     if (disposable.Type.IsAssignableTo(KnownSymbols.IAsyncDisposable, semanticModel.Compilation) &&
-                        DisposeMethod.FindDisposeAsync(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
+                        DisposeMethod.FindDisposeAsync(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations.IsEmpty: true })
                     {
                         return AsyncDisposeStatement(notNull.WithoutTrivia()).WithLeadingElasticLineFeed();
                     }
@@ -159,7 +159,7 @@
             {
                 case { NotNull: { } neverNull }:
                     if (disposable.Type.IsAssignableTo(KnownSymbols.IDisposable, semanticModel.Compilation) &&
-                        DisposeMethod.Find(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } })
+                        DisposeMethod.Find(disposable.Type, semanticModel.Compilation, Search.Recursive) is { ExplicitInterfaceImplementations.IsEmpty: true })
                     {
                         return DisposeStatement(neverNull.WithoutTrivia()).WithLeadingElasticLineFeed();
                     }
@@ -353,7 +353,7 @@
                             return method switch
                             {
                                 { Body: { } body } => body.SpanStart,
-                                { ExpressionBody: { Expression: { } body } } => body.SpanStart,
+                                { ExpressionBody.Expression: { } body } => body.SpanStart,
                                 _ => method.SpanStart,
                             };
                         }

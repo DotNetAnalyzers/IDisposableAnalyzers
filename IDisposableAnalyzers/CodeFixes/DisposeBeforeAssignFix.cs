@@ -71,7 +71,7 @@
                 case ArgumentListSyntax { Parent: InvocationExpressionSyntax { Parent: ArrowExpressionClauseSyntax _ } invocation }:
                     DisposeBefore(editor, disposable, invocation, cancellationToken);
                     break;
-                case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword: { ValueText: "void" } } } method }:
+                case ArrowExpressionClauseSyntax { Parent: MethodDeclarationSyntax { ReturnType: PredefinedTypeSyntax { Keyword.ValueText: "void" } } method }:
                     editor.ReplaceNode(
                         method,
                         x => x.WithExpressionBody(null)

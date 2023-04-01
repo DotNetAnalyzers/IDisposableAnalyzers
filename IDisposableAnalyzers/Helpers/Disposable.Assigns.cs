@@ -10,7 +10,7 @@
         internal static bool Assigns(LocalOrParameter localOrParameter, SemanticModel semanticModel, CancellationToken cancellationToken, out FieldOrProperty first)
         {
             if (localOrParameter.TryGetScope(cancellationToken, out var scope) &&
-                localOrParameter is { ContainingSymbol: { ContainingType: { } containingType } })
+                localOrParameter is { ContainingSymbol.ContainingType: { } containingType })
             {
                 using var recursion = Recursion.Borrow(containingType, semanticModel, cancellationToken);
                 return Assigns(new Target<SyntaxNode, ISymbol, SyntaxNode>(null!, localOrParameter.Symbol, scope), recursion, out first);

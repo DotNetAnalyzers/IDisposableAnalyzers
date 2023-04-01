@@ -146,7 +146,7 @@
 
         internal static bool IsStopAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return methodDeclaration is { Identifier: { ValueText: "StopAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+            return methodDeclaration is { Identifier.ValueText: "StopAsync", ParameterList.Parameters: { Count: 1 } parameters } &&
                    parameters[0].Type == KnownSymbols.CancellationToken &&
                    semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
                    method == KnownSymbols.IHostedService.StopAsync;
@@ -154,7 +154,7 @@
 
         private static bool IsStartAsync(MethodDeclarationSyntax methodDeclaration, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return methodDeclaration is { Identifier: { ValueText: "StartAsync" }, ParameterList: { Parameters: { Count: 1 } parameters } } &&
+            return methodDeclaration is { Identifier.ValueText: "StartAsync", ParameterList.Parameters: { Count: 1 } parameters } &&
                    parameters[0].Type == KnownSymbols.CancellationToken &&
                    semanticModel.TryGetSymbol(methodDeclaration, cancellationToken, out var method) &&
                    method == KnownSymbols.IHostedService.StartAsync;

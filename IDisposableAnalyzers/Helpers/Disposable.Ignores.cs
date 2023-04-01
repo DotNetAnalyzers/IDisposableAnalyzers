@@ -59,9 +59,9 @@
 
             return candidate switch
             {
-                { Parent: AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier: { ValueText: "_" } } } }
+                { Parent: AssignmentExpressionSyntax { Left: IdentifierNameSyntax { Identifier.ValueText: "_" } } }
                     => true,
-                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier: { ValueText: "_" } } } }
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier.ValueText: "_" } } }
                     => true,
                 { Parent: AnonymousFunctionExpressionSyntax _ }
                     => false,

@@ -26,7 +26,7 @@
             {
                 this.Visit(node.Else);
             }
-            else if (node.Condition is PrefixUnaryExpressionSyntax { Operand: IdentifierNameSyntax identifierName, OperatorToken: { ValueText: "!" } } &&
+            else if (node.Condition is PrefixUnaryExpressionSyntax { Operand: IdentifierNameSyntax identifierName, OperatorToken.ValueText: "!" } &&
                      IsParameter(identifierName))
             {
                 switch (node.Statement)
@@ -58,10 +58,10 @@
             {
                 return expression switch
                 {
-                    IdentifierNameSyntax { Identifier: { ValueText: { } name } }
+                    IdentifierNameSyntax { Identifier.ValueText: { } name }
                         => node.TryFirstAncestor(out MethodDeclarationSyntax? methodDeclaration) &&
                            methodDeclaration.TryFindParameter(name, out _),
-                    BinaryExpressionSyntax { Left: { } left, OperatorToken: { ValueText: "&&" }, Right: { } right }
+                    BinaryExpressionSyntax { Left: { } left, OperatorToken.ValueText: "&&", Right: { } right }
                         => IsParameter(left) || IsParameter(right),
                     _ => false,
                 };

@@ -38,7 +38,7 @@
 
             static bool IsMatch(IMethodSymbol candidate)
             {
-                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } };
+                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters.Length: 0 };
             }
         }
 
@@ -111,7 +111,7 @@
 
             static bool IsMatch(IMethodSymbol candidate)
             {
-                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: false, Name: "DisposeAsync", Parameters: { Length: 0 } };
+                return candidate is { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: false, Name: "DisposeAsync", Parameters.Length: 0 };
             }
         }
 
@@ -119,7 +119,7 @@
         {
             switch (virtualDispose)
             {
-                case { ParameterList: { Parameters: { Count: 0 } } }:
+                case { ParameterList.Parameters.Count: 0 }:
                     {
                         using var walker = InvocationWalker.Borrow(virtualDispose);
                         foreach (var invocation in walker.Invocations)
@@ -127,7 +127,7 @@
                             if (invocation is { Expression: MemberAccessExpressionSyntax { Expression: BaseExpressionSyntax _ } } &&
                                 invocation.TryGetMethodName(out var name) &&
                                 name == virtualDispose.Identifier.ValueText &&
-                                invocation.ArgumentList is { Arguments: { Count: 0 } } &&
+                                invocation.ArgumentList is { Arguments.Count: 0 } &&
                                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
                                 semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
                                 method is { IsOverride: true, OverriddenMethod: { } overridden } &&
@@ -140,7 +140,7 @@
                         break;
                     }
 
-                case { ParameterList: { Parameters: { Count: 1 } parameters } }
+                case { ParameterList.Parameters: { Count: 1 } parameters }
                     when parameters.TrySingle(out var parameter):
                     {
                         using var walker = InvocationWalker.Borrow(virtualDispose);
@@ -150,7 +150,7 @@
                                 invocation.TryGetMethodName(out var name) &&
                                 name == virtualDispose.Identifier.ValueText &&
                                 invocation.ArgumentList is { Arguments: { Count: 1 } arguments } &&
-                                arguments[0] is { Expression: IdentifierNameSyntax { Identifier: { ValueText: { } argument } } } &&
+                                arguments[0] is { Expression: IdentifierNameSyntax { Identifier.ValueText: { } argument } } &&
                                 argument == parameter.Identifier.ValueText &&
                                 semanticModel.TryGetSymbol(invocation, cancellationToken, out var target) &&
                                 semanticModel.TryGetSymbol(virtualDispose, cancellationToken, out var method) &&
@@ -175,7 +175,7 @@
                 return type.IsAssignableTo(KnownSymbols.IDisposable, compilation);
             }
 
-            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations: { IsEmpty: true } };
+            return Find(type, compilation, Search.Recursive) is { ExplicitInterfaceImplementations.IsEmpty: true };
         }
 
         internal static bool IsOverrideDispose(IMethodSymbol candidate)

@@ -27,7 +27,7 @@
             {
                 if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax { Body: { } body } disposeMethod)
                 {
-                    if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters } } &&
+                    if (disposeMethod is { ParameterList.Parameters: { Count: 1 } parameters } &&
                         parameters.TrySingle(out var parameter))
                     {
                         context.RegisterCodeFix(
@@ -47,7 +47,7 @@
                             "base.Dispose()",
                             diagnostic);
                     }
-                    else if (disposeMethod is { ParameterList: { Parameters: { Count: 0 } } })
+                    else if (disposeMethod is { ParameterList.Parameters.Count: 0 })
                     {
                         context.RegisterCodeFix(
                             "base.Dispose()",

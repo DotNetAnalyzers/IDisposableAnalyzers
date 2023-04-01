@@ -42,7 +42,7 @@
                     {
                         switch (method)
                         {
-                            case { Identifier: { ValueText: "DisposeAsync" } }
+                            case { Identifier.ValueText: "DisposeAsync" }
                                 when IDisposableFactory.MemberAccessContext.Create(disposable, method, semanticModel, context.CancellationToken) is { NotNull: { } }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.DisposeAsync() in {method}",
@@ -56,7 +56,7 @@
                                 {
                                     return old switch
                                     {
-                                        { ExpressionBody: { Expression: { } expression } }
+                                        { ExpressionBody.Expression: { } expression }
                                         => old.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
                                             IDisposableFactory.DisposeAsyncStatement(disposable, method!, editor.SemanticModel, cancellationToken))
@@ -70,7 +70,7 @@
                                 }
 
                                 break;
-                            case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body }:
+                            case { Identifier.ValueText: "Dispose", ParameterList.Parameters: { Count: 1 } parameters, Body: { } body }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, token) => DisposeInVirtual(editor, token),
@@ -111,7 +111,7 @@
                                 }
 
                                 break;
-                            case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 0 } }, Body: { } body }:
+                            case { Identifier.ValueText: "Dispose", ParameterList.Parameters.Count: 0, Body: { } body }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, cancellationToken) => DisposeWhenNoParameter(editor, cancellationToken),
@@ -136,7 +136,7 @@
 
                                 break;
 
-                            case { Identifier: { ValueText: "Dispose" }, ParameterList: { Parameters: { Count: 0 } }, ExpressionBody: { Expression: { } expression } }:
+                            case { Identifier.ValueText: "Dispose", ParameterList.Parameters.Count: 0, ExpressionBody.Expression: { } expression }:
                                 context.RegisterCodeFix(
                                     $"{symbol.Name}.Dispose() in {method}",
                                     (editor, cancellationToken) => editor.ReplaceNode(
@@ -147,8 +147,8 @@
                                     "Dispose member",
                                     diagnostic);
                                 break;
-                            case { Identifier: { ValueText: "Dispose" } }:
-                            case { Identifier: { ValueText: "DisposeAsync" } }:
+                            case { Identifier.ValueText: "Dispose" }:
+                            case { Identifier.ValueText: "DisposeAsync" }:
                                 break;
                             default:
                                 context.RegisterCodeFix(
@@ -163,7 +163,7 @@
                                 {
                                     return old switch
                                     {
-                                        { ExpressionBody: { Expression: { } expression } }
+                                        { ExpressionBody.Expression: { } expression }
                                         => old.AsBlockBody(
                                             SyntaxFactory.ExpressionStatement(expression),
                                             IDisposableFactory.DisposeStatement(disposable, method!, editor.SemanticModel, cancellationToken)),
@@ -183,8 +183,8 @@
 
         private static bool TryFindIfDisposing(MethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out IfStatementSyntax? result)
         {
-            if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
-                parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
+            if (disposeMethod is { ParameterList.Parameters: { Count: 1 } parameters, Body: { } body } &&
+                parameters[0] is { Type: { } type, Identifier.ValueText: { } valueText } &&
                 type == KnownSymbols.Boolean)
             {
                 foreach (var statement in body.Statements)
@@ -204,8 +204,8 @@
 
         private static bool TryFindIfNotDisposingReturn(MethodDeclarationSyntax disposeMethod, [NotNullWhen(true)] out IfStatementSyntax? result)
         {
-            if (disposeMethod is { ParameterList: { Parameters: { Count: 1 } parameters }, Body: { } body } &&
-                parameters[0] is { Type: { } type, Identifier: { ValueText: { } valueText } } &&
+            if (disposeMethod is { ParameterList.Parameters: { Count: 1 } parameters, Body: { } body } &&
+                parameters[0] is { Type: { } type, Identifier.ValueText: { } valueText } &&
                 type == KnownSymbols.Boolean)
             {
                 foreach (var statement in body.Statements)

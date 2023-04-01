@@ -24,7 +24,7 @@
 
         internal static DisposeCall? MatchDispose(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
+            return candidate.ArgumentList is { Arguments.Count: 0 } &&
                    candidate.IsSymbol(KnownSymbols.IDisposable.Dispose, semanticModel, cancellationToken)
              ? new DisposeCall(candidate)
              : (DisposeCall?)null;
@@ -32,7 +32,7 @@
 
         internal static DisposeCall? MatchDisposeAsync(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
         {
-            return candidate.ArgumentList is { Arguments: { Count: 0 } } &&
+            return candidate.ArgumentList is { Arguments.Count: 0 } &&
                    candidate.IsSymbol(KnownSymbols.IAsyncDisposable.DisposeAsync, semanticModel, cancellationToken)
                 ? new DisposeCall(candidate)
                 : (DisposeCall?)null;
@@ -59,9 +59,9 @@
                         return TryGetName(expression, out name);
                     case CastExpressionSyntax { Expression: { } expression }:
                         return TryGetName(expression, out name);
-                    case PostfixUnaryExpressionSyntax { Operand: { } expression, OperatorToken: { ValueText: "!" } }:
+                    case PostfixUnaryExpressionSyntax { Operand: { } expression, OperatorToken.ValueText: "!" }:
                         return TryGetName(expression, out name);
-                    case BinaryExpressionSyntax { Left: { } expression, OperatorToken: { ValueText: "as" } }:
+                    case BinaryExpressionSyntax { Left: { } expression, OperatorToken.ValueText: "as" }:
                         return TryGetName(expression, out name);
                     case IdentifierNameSyntax identifierName:
                         name = identifierName;
@@ -89,7 +89,7 @@
                         when property.IsAbstract || property.IsAutoProperty():
                         root = expression;
                         return true;
-                    case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences: { Length: 1 } } getMethod }
+                    case IPropertySymbol { GetMethod: { DeclaringSyntaxReferences.Length: 1 } getMethod }
                         when getMethod.TrySingleDeclaration(cancellationToken, out SyntaxNode? getterOrExpressionBody):
                         {
                             using var walker = ReturnValueWalker.Borrow(getterOrExpressionBody, ReturnValueSearch.Member, semanticModel, cancellationToken);

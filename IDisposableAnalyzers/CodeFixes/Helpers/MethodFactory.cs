@@ -130,10 +130,10 @@
         {
             return toOverride switch
             {
-                { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 0 } }
+                { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters.Length: 0 }
                     => DefaultPublicOverrideDispose.InsertBodyStatements(0, IfDisposedReturn(), DisposedTrue()),
                 { DeclaredAccessibility: Accessibility.Protected, IsVirtual: true, Parameters: { Length: 1 } parameters }
-                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter
+                    when parameters[0] is { Type.SpecialType: SpecialType.System_Boolean } parameter
                     => SyntaxFactory.MethodDeclaration(
                         attributeLists: default,
                         modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.ProtectedKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),
@@ -147,7 +147,7 @@
                         expressionBody: default,
                         semicolonToken: default),
                 { DeclaredAccessibility: Accessibility.Public, IsVirtual: true, Parameters: { Length: 1 } parameters }
-                    when parameters[0] is { Type: { SpecialType: SpecialType.System_Boolean } } parameter
+                    when parameters[0] is { Type.SpecialType: SpecialType.System_Boolean } parameter
                     => SyntaxFactory.MethodDeclaration(
                         attributeLists: default,
                         modifiers: SyntaxFactory.TokenList(SyntaxFactory.Token(SyntaxKind.PublicKeyword), SyntaxFactory.Token(SyntaxKind.OverrideKeyword)),

@@ -56,7 +56,7 @@
                                     $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     diagnostic);
                                 break;
-                            case { ExpressionBody: { Expression: { } expression } }:
+                            case { ExpressionBody.Expression: { } expression }:
                                 context.RegisterCodeFix(
                                     $"Dispose member in {cleanup.Identifier.ValueText}.",
                                     (editor, cancellationToken) => editor.ReplaceNode(

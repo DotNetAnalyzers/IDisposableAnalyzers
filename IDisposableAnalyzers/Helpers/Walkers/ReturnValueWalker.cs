@@ -83,7 +83,7 @@
                         when walker.recursion.PropertyGet(expression) is { } propertyGet:
                         walker.HandlePropertyGet(propertyGet);
                         break;
-                    case LocalFunctionStatementSyntax { ExpressionBody: { Expression: { } expression } }:
+                    case LocalFunctionStatementSyntax { ExpressionBody.Expression: { } expression }:
                         walker.AddReturnValue(expression);
                         break;
                     case LocalFunctionStatementSyntax { Body: { } body }:
@@ -121,7 +121,7 @@
 
                 bool IsParameter(ExpressionSyntax x)
                 {
-                    return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
+                    return x is IdentifierNameSyntax { Identifier.ValueText: { } name } &&
                            target.Symbol.TryFindParameter(name, out _);
                 }
             }
@@ -219,7 +219,7 @@
 
                             bool IsParameter(ExpressionSyntax x)
                             {
-                                return x is IdentifierNameSyntax { Identifier: { ValueText: { } name } } &&
+                                return x is IdentifierNameSyntax { Identifier.ValueText: { } name } &&
                                        target.Symbol.TryFindParameter(name, out _);
                             }
                         }
@@ -245,11 +245,11 @@
                         this.AddReturnValue(ternary.WhenTrue);
                         this.AddReturnValue(ternary.WhenFalse);
                         break;
-                    case BinaryExpressionSyntax { OperatorToken: { ValueText: "??" } } coalesce:
+                    case BinaryExpressionSyntax { OperatorToken.ValueText: "??" } coalesce:
                         this.AddReturnValue(coalesce.Left);
                         this.AddReturnValue(coalesce.Right);
                         break;
-                    case BinaryExpressionSyntax { OperatorToken: { ValueText: "as" } } coalesce:
+                    case BinaryExpressionSyntax { OperatorToken.ValueText: "as" } coalesce:
                         this.AddReturnValue(coalesce.Left);
                         break;
                     case CastExpressionSyntax cast:
@@ -272,7 +272,7 @@
                                 _ = this.values.Add(invocation);
                                 break;
                             case null
-                                when this.recursion.SemanticModel.GetSymbolSafe(invocation, this.recursion.CancellationToken) is { DeclaringSyntaxReferences: { Length: 0 } }:
+                                when this.recursion.SemanticModel.GetSymbolSafe(invocation, this.recursion.CancellationToken) is { DeclaringSyntaxReferences.Length: 0 }:
                                 _ = this.values.Add(invocation);
                                 break;
                         }
@@ -337,7 +337,7 @@
 
                 if (parameter.HasExplicitDefaultValue &&
                     parameter.TrySingleDeclaration(this.recursion.CancellationToken, out var parameterDeclaration) &&
-                    parameterDeclaration is { Default: { Value: { } defaultValue } })
+                    parameterDeclaration is { Default.Value: { } defaultValue })
                 {
                     this.AddReturnValue(defaultValue);
                     return;

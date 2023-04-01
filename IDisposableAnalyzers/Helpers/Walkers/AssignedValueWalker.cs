@@ -53,7 +53,7 @@
 
         public override void VisitVariableDeclarator(VariableDeclaratorSyntax node)
         {
-            if (node is { Initializer: { Value: { } value } })
+            if (node is { Initializer.Value: { } value })
             {
                 this.HandleAssignedValue(node, value);
             }
@@ -366,7 +366,7 @@
 
                     if (parameter.HasExplicitDefaultValue &&
                         parameter.TrySingleDeclaration(this.cancellationToken, out var parameterDeclaration) &&
-                        parameterDeclaration is { Default: { Value: { } defaultValue } })
+                        parameterDeclaration is { Default.Value: { } defaultValue })
                     {
                         return defaultValue;
                     }
@@ -444,7 +444,7 @@
                 if (this.context.Node.TryFirstAncestorOrSelf<ConstructorDeclarationSyntax>(out var contextCtor))
                 {
                     this.Visit(contextCtor);
-                    if (contextCtor.ParameterList is { Parameters: { Count: > 0 } } parameterList &&
+                    if (contextCtor.ParameterList is { Parameters.Count: > 0 } parameterList &&
                         this.semanticModel.TryGetSymbol(contextCtor, this.cancellationToken, out var contextCtorSymbol))
                     {
                         using var ctorWalker = ConstructorsWalker.Borrow(containingTypeDeclaration, this.semanticModel, this.cancellationToken);

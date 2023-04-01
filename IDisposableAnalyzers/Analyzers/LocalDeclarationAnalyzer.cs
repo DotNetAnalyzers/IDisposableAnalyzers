@@ -45,7 +45,7 @@
                 {
                     foreach (var declarator in variables)
                     {
-                        if (declarator is { Initializer: { Value: { } value } } &&
+                        if (declarator is { Initializer.Value: { } value } &&
                             Disposable.IsCachedOrInjectedOnly(value, value, context.SemanticModel, context.CancellationToken))
                         {
                             context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP007DoNotDisposeInjected, value.GetLocation()));

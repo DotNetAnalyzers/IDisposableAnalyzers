@@ -22,7 +22,7 @@
 
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
-            if (context.Node is InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 1 } arguments } } invocation &&
+            if (context.Node is InvocationExpressionSyntax { ArgumentList.Arguments: { Count: 1 } arguments } invocation &&
                 invocation.IsSymbol(KnownSymbols.GC.SuppressFinalize, context.SemanticModel, context.CancellationToken) &&
                 context.SemanticModel.TryGetNamedType(arguments[0].Expression, context.CancellationToken, out var type) &&
                 type.IsSealed &&

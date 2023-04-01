@@ -35,7 +35,7 @@
                 context.ContainingSymbol is IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method &&
                 context.Node is MethodDeclarationSyntax methodDeclaration)
             {
-                if (method is { DeclaredAccessibility: Accessibility.Public, Parameters: { Length: 0 } } &&
+                if (method is { DeclaredAccessibility: Accessibility.Public, Parameters.Length: 0 } &&
                     method.GetAttributes().Length == 0)
                 {
                     if (!method.ExplicitInterfaceImplementations.Any() &&
@@ -100,7 +100,7 @@
             {
                 foreach (var member in @interface.GetMembers())
                 {
-                    if (member is IMethodSymbol { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters: { Length: 0 } })
+                    if (member is IMethodSymbol { DeclaredAccessibility: Accessibility.Public, ReturnsVoid: true, Name: "Dispose", Parameters.Length: 0 })
                     {
                         return true;
                     }

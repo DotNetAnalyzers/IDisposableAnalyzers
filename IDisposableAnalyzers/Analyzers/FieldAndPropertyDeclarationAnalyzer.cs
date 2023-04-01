@@ -41,7 +41,7 @@
         {
             if (!context.IsExcludedFromAnalysis() &&
                 context.ContainingSymbol is IPropertySymbol { IsStatic: false, IsIndexer: false } property &&
-                context.Node is PropertyDeclarationSyntax { AccessorList: { Accessors: { } accessors } } declaration &&
+                context.Node is PropertyDeclarationSyntax { AccessorList.Accessors: { } accessors } declaration &&
                 accessors.FirstOrDefault() is { Body: null, ExpressionBody: null } &&
                 Disposable.IsPotentiallyAssignableFrom(property.Type, context.Compilation))
             {

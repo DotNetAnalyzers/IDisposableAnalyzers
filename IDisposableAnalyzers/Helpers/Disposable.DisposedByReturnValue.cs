@@ -63,7 +63,7 @@
         {
             switch (target)
             {
-                case { Symbol: { ContainingSymbol: IMethodSymbol constructor } parameter, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } } }:
+                case { Symbol: { ContainingSymbol: IMethodSymbol constructor } parameter, Source.Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { Type: { } type } objectCreation } }:
                     if (type == KnownSymbols.SingleAssignmentDisposable ||
                         type == KnownSymbols.RxDisposable ||
                         type == KnownSymbols.CompositeDisposable)
@@ -144,7 +144,7 @@
                     }
 
                     break;
-                case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                case { Symbol.ContainingSymbol: IMethodSymbol method, Source.Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
                     if (method == KnownSymbols.Task.FromResult)
                     {
                         creation = invocation;
@@ -176,9 +176,9 @@
                     when LeavesOpen(method) is { } leavesOpen:
                     return !leavesOpen;
                 case IMethodSymbol { ReturnsVoid: true }:
-                case IMethodSymbol { ReturnType: { MetadataName: "Task" } }:
+                case IMethodSymbol { ReturnType.MetadataName: "Task" }:
                     return false;
-                case IMethodSymbol { ReturnType: { } returnType, DeclaringSyntaxReferences: { Length: 0 } }:
+                case IMethodSymbol { ReturnType: { } returnType, DeclaringSyntaxReferences.Length: 0 }:
                     // we assume here, not sure it is the best assumption.
                     return Disposable.IsAssignableFrom(returnType, recursion.SemanticModel.Compilation);
                 case IMethodSymbol { IsExtensionMethod: true, ReducedFrom: { } reducedFrom }
@@ -219,7 +219,7 @@
                     if (target.Source is InvocationExpressionSyntax { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax parent } } &&
                         parent.TryFindArgument(leaveOpenParameter, out var leaveOpenArgument))
                     {
-                        return leaveOpenArgument.Expression is LiteralExpressionSyntax { Token: { ValueText: "true" } };
+                        return leaveOpenArgument.Expression is LiteralExpressionSyntax { Token.ValueText: "true" };
                     }
 
                     return leaveOpenParameter.HasExplicitDefaultValue &&
@@ -228,8 +228,8 @@
 
                 return method switch
                 {
-                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Gu" } } } } => false,
-                    { IsExtensionMethod: true, ContainingType: { ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Wpf", ContainingNamespace: { MetadataName: "Gu" } } } } } => false,
+                    { IsExtensionMethod: true, ContainingType.ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace.MetadataName: "Gu" } } => false,
+                    { IsExtensionMethod: true, ContainingType.ContainingNamespace: { MetadataName: "Reactive", ContainingNamespace: { MetadataName: "Wpf", ContainingNamespace.MetadataName: "Gu" } } } => false,
                     _ => null,
                 };
             }

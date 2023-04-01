@@ -22,7 +22,7 @@
 
             internal static SuppressFinalize? Match(InvocationExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
             {
-                if (candidate.ArgumentList is { Arguments: { Count: 1 } } &&
+                if (candidate.ArgumentList is { Arguments.Count: 1 } &&
                     candidate.TryGetMethodName(out var name) &&
                     name == "SuppressFinalize" &&
                     semanticModel.TryGetSymbol(candidate, KnownSymbols.GC.SuppressFinalize, cancellationToken, out _))

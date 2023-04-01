@@ -12,11 +12,11 @@
         {
             return method switch
             {
-                { DeclaringSyntaxReferences: { Length: 0 }, IsExtensionMethod: true }
+                { DeclaringSyntaxReferences.Length: 0, IsExtensionMethod: true }
                     when method.TryGetThisParameter(out var parameter) &&
                          parameter.ContainingSymbol is IMethodSymbol extensionMethod
                     => TypeSymbolComparer.Equal(extensionMethod.ReturnType, parameter.Type),
-                { DeclaringSyntaxReferences: { Length: 0 }, IsStatic: false }
+                { DeclaringSyntaxReferences.Length: 0, IsStatic: false }
                     => !method.MetadataName.Contains("Open") &&
                        !method.MetadataName.Contains("Create") &&
                        TypeSymbolComparer.Equal(method.ReturnType, method.ContainingType),
@@ -28,7 +28,7 @@
         {
             return candidate switch
             {
-                { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier: { ValueText: "FromResult" } } } } invocation } } }
+                { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: "FromResult" } } } invocation } } }
                     when invocation.IsSymbol(KnownSymbols.Task.FromResult, recursion.SemanticModel, recursion.CancellationToken)
                     => Recursive(invocation, recursion),
                 { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
@@ -37,9 +37,9 @@
                     => Recursive(invocation, recursion),
                 { Parent: AwaitExpressionSyntax parent }
                     => Recursive(parent, recursion),
-                { Parent: BinaryExpressionSyntax { OperatorToken: { ValueText: "as" } } parent }
+                { Parent: BinaryExpressionSyntax { OperatorToken.ValueText: "as" } parent }
                     => Recursive(parent, recursion),
-                { Parent: BinaryExpressionSyntax { OperatorToken: { ValueText: "??" } } parent }
+                { Parent: BinaryExpressionSyntax { OperatorToken.ValueText: "??" } parent }
                     => Recursive(parent, recursion),
                 { Parent: CastExpressionSyntax parent }
                     => Recursive(parent, recursion),
@@ -51,15 +51,15 @@
                 { Parent: LambdaExpressionSyntax { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } } }
                     when invocation.IsSymbol(KnownSymbols.Task.Run, recursion.SemanticModel, recursion.CancellationToken)
                     => Recursive(invocation, recursion),
-                { Parent: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier: { ValueText: "ConfigureAwait" } }, Parent: InvocationExpressionSyntax invocation } }
+                { Parent: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: "ConfigureAwait" }, Parent: InvocationExpressionSyntax invocation } }
                     => Recursive(invocation, recursion),
-                { Parent: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier: { ValueText: "GetAwaiter" } }, Parent: InvocationExpressionSyntax invocation } }
+                { Parent: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: "GetAwaiter" }, Parent: InvocationExpressionSyntax invocation } }
                     => Recursive(invocation, recursion),
-                { Parent: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "GetResult" } }, Parent: InvocationExpressionSyntax invocation } }
+                { Parent: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier.ValueText: "GetResult" }, Parent: InvocationExpressionSyntax invocation } }
                     when recursion.SemanticModel.TryGetNamedType(expression, recursion.CancellationToken, out var type) &&
                          type.IsAssignableTo(KnownSymbols.INotifyCompletion, recursion.SemanticModel.Compilation)
                     => Recursive(invocation, recursion),
-                { Parent: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "Result" } } } memberAccess }
+                { Parent: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier.ValueText: "Result" } } memberAccess }
                     when recursion.SemanticModel.TryGetNamedType(expression, recursion.CancellationToken, out var type) &&
                          type.IsAssignableTo(KnownSymbols.Task, recursion.SemanticModel.Compilation)
                     => Recursive(memberAccess, recursion),
@@ -87,10 +87,10 @@
         {
             switch (target.Symbol)
             {
-                case IMethodSymbol { DeclaringSyntaxReferences: { Length: 0 } } method
+                case IMethodSymbol { DeclaringSyntaxReferences.Length: 0 } method
                      when AssumeIsIdentity(method):
                     return true;
-                case IMethodSymbol { MethodKind: MethodKind.ReducedExtension, ReducedFrom: { Parameters: { } parameters } }
+                case IMethodSymbol { MethodKind: MethodKind.ReducedExtension, ReducedFrom.Parameters: { } parameters }
                     when target.Declaration is MethodDeclarationSyntax methodDeclaration &&
                          parameters.TryFirst(out var parameter):
                     using (var walker = Gu.Roslyn.AnalyzerExtensions.ReturnValueWalker.Borrow(methodDeclaration))

@@ -101,7 +101,7 @@
                     }
                 }
             }
-            else if (returnValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { } arguments } } invocation &&
+            else if (returnValue is InvocationExpressionSyntax { ArgumentList.Arguments: { } arguments } invocation &&
                      context.ContainingSymbol is { ContainingType: { } containingType })
             {
                 foreach (var argument in arguments)
@@ -153,7 +153,7 @@
             {
                 InvocationExpressionSyntax invocation
                 => !invocation.IsSymbol(KnownSymbols.Task.FromResult, context.SemanticModel, context.CancellationToken),
-                MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "CompletedTask" } } } memberAccess
+                MemberAccessExpressionSyntax { Name.Identifier.ValueText: "CompletedTask" } memberAccess
                 => !memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
                 _ => true,
             };

@@ -72,7 +72,7 @@
                     {
                         return condition switch
                         {
-                            PrefixUnaryExpressionSyntax { OperatorToken: { RawKind: (int)SyntaxKind.ExclamationToken }, Operand: { } operand }
+                            PrefixUnaryExpressionSyntax { OperatorToken.RawKind: (int)SyntaxKind.ExclamationToken, Operand: { } operand }
                                 when Field(operand)?.EndsWith("leaveOpen", StringComparison.OrdinalIgnoreCase) is true &&
                                      ifStatement.Statement.Contains(invocation)
                                 => false,
@@ -180,13 +180,13 @@
             bool DeclarationIsAssignment()
             {
                 return localDeclarationStatement!.Parent == expressionStatement!.Parent &&
-                       declarator is { Initializer: { Value: { } value } } &&
+                       declarator is { Initializer.Value: { } value } &&
                        Disposable.IsCreation(value, context.SemanticModel, context.CancellationToken);
             }
 
             bool IsTrivialTryFinally()
             {
-                return expressionStatement!.Parent is BlockSyntax { Statements: { Count: 1 }, Parent: FinallyClauseSyntax { Parent: TryStatementSyntax tryStatement } } &&
+                return expressionStatement!.Parent is BlockSyntax { Statements.Count: 1, Parent: FinallyClauseSyntax { Parent: TryStatementSyntax tryStatement } } &&
                        !tryStatement.Catches.Any();
             }
 

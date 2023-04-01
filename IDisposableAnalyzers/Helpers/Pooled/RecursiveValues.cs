@@ -124,9 +124,9 @@
                 case TypeOfExpressionSyntax _:
                     this.values.Add(assignedValue);
                     return true;
-                case BinaryExpressionSyntax { Left: { }, OperatorToken: { ValueText: "as" } } binary:
+                case BinaryExpressionSyntax { Left: { }, OperatorToken.ValueText: "as" } binary:
                     return this.AddRecursiveValues(binary.Left);
-                case BinaryExpressionSyntax { Left: { }, OperatorToken: { ValueText: "??" }, Right: { } } binary:
+                case BinaryExpressionSyntax { Left: { }, OperatorToken.ValueText: "??", Right: { } } binary:
                     var left = this.AddRecursiveValues(binary.Left);
                     var right = this.AddRecursiveValues(binary.Right);
                     return left || right;
@@ -175,23 +175,23 @@
                         this.values.Add(assignedValue);
                         return true;
                     case IPropertySymbol property
-                        when property is { ContainingType: { MetadataName: "Task`1" }, MetadataName: "Result" } &&
+                        when property is { ContainingType.MetadataName: "Task`1", MetadataName: "Result" } &&
                          assignedValue is MemberAccessExpressionSyntax { Expression: { } expression }:
                         return this.AddRecursiveValues(expression);
                     case IMethodSymbol method
-                        when method is { ContainingType: { MetadataName: "TaskAwaiter`1" }, MetadataName: "GetResult" } &&
-                             assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier: { ValueText: "GetAwaiter" } } } } } }:
+                        when method is { ContainingType.MetadataName: "TaskAwaiter`1", MetadataName: "GetResult" } &&
+                             assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } expression, Name: IdentifierNameSyntax { Identifier.ValueText: "GetAwaiter" } } } } }:
                         return this.AddRecursiveValues(expression);
                     case IMethodSymbol method
-                        when method is { ContainingType: { MetadataName: "Interlocked" }, MetadataName: "Exchange" } &&
-                             assignedValue is InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 2 } arguments } }:
+                        when method is { ContainingType.MetadataName: "Interlocked", MetadataName: "Exchange" } &&
+                             assignedValue is InvocationExpressionSyntax { ArgumentList.Arguments: { Count: 2 } arguments }:
                         using (var walker = AssignedValueWalker.Borrow(arguments[0].Expression, this.semanticModel, this.cancellationToken))
                         {
                             return this.AddManyRecursively(walker.Values) &&
                                    this.AddRecursiveValues(arguments[1].Expression);
                         }
 
-                    case IMethodSymbol { DeclaringSyntaxReferences: { Length: 0 } } method:
+                    case IMethodSymbol { DeclaringSyntaxReferences.Length: 0 } method:
                         if (assignedValue is InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: { } parent } } &&
                             !parent.IsKind(SyntaxKind.IdentifierName) &&
                             !parent.IsKind(SyntaxKind.SimpleMemberAccessExpression) &&
@@ -205,7 +205,7 @@
                             return true;
                         }
 
-                    case IPropertySymbol { DeclaringSyntaxReferences: { Length: 0 } }:
+                    case IPropertySymbol { DeclaringSyntaxReferences.Length: 0 }:
                         this.values.Add(assignedValue);
                         return true;
                     case IPropertySymbol _:

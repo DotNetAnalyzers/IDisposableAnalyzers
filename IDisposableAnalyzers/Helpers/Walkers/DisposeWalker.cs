@@ -46,7 +46,7 @@
             }
 
             if (type.IsAssignableTo(KnownSymbols.IAsyncDisposable, semanticModel.Compilation) &&
-                type.TryFindFirstMethod(x => x is { Parameters: { Length: 0 } } && x == KnownSymbols.IAsyncDisposable.DisposeAsync, out var disposeAsync) &&
+                type.TryFindFirstMethod(x => x is { Parameters.Length: 0 } && x == KnownSymbols.IAsyncDisposable.DisposeAsync, out var disposeAsync) &&
                 disposeAsync.TrySingleDeclaration(cancellationToken, out declaration))
             {
                 return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);

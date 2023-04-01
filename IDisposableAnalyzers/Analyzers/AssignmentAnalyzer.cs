@@ -56,7 +56,7 @@
 
         private static bool IsReassignedWithCreated(AssignmentExpressionSyntax assignment, SyntaxNodeAnalysisContext context)
         {
-            if (assignment.Right is IdentifierNameSyntax { Identifier: { ValueText: "value" } } &&
+            if (assignment.Right is IdentifierNameSyntax { Identifier.ValueText: "value" } &&
                 assignment.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
@@ -72,9 +72,9 @@
             {
                 switch (assignedSymbol)
                 {
-                    case IPropertySymbol { ContainingType: { MetadataName: "SerialDisposable`1" }, MetadataName: "Disposable" }:
-                    case IPropertySymbol { ContainingType: { MetadataName: "SerialDisposable" }, MetadataName: "Disposable" }:
-                    case IPropertySymbol { ContainingType: { MetadataName: "SingleAssignmentDisposable" }, MetadataName: "Disposable" }:
+                    case IPropertySymbol { ContainingType.MetadataName: "SerialDisposable`1", MetadataName: "Disposable" }:
+                    case IPropertySymbol { ContainingType.MetadataName: "SerialDisposable", MetadataName: "Disposable" }:
+                    case IPropertySymbol { ContainingType.MetadataName: "SingleAssignmentDisposable", MetadataName: "Disposable" }:
                     case IDiscardSymbol:
                         return false;
                 }
@@ -117,7 +117,7 @@
                     {
                         using var walker = VariableDeclaratorWalker.Borrow(memberDeclaration);
                         return walker.VariableDeclarators.TrySingle(
-                                    x => x is { Initializer: { Value: { } value } } &&
+                                    x => x is { Initializer.Value: { } value } &&
                                                           context.SemanticModel.TryGetSymbol(value, context.CancellationToken, out var symbol) &&
                                                           SymbolComparer.Equal(symbol, assignedSymbol),
                                     out var match) &&

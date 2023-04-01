@@ -51,8 +51,8 @@
             {
                 null => false,
                 //// https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
-                { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task" } => false,
-                INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace: { MetadataName: "System" } } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
+                { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task" } => false,
+                INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
                     => IsAssignableFrom(arguments[0], compilation),
                 _ => type.IsAssignableTo(KnownSymbols.IDisposable, compilation),
             };
@@ -93,11 +93,11 @@
 
             bool IsNopCore(ITypeSymbol type)
             {
-                return type is { IsSealed: true, BaseType: { SpecialType: SpecialType.System_Object } } &&
+                return type is { IsSealed: true, BaseType.SpecialType: SpecialType.System_Object } &&
                        type.TryFindSingleMethod("Dispose", out var disposeMethod) &&
                        disposeMethod.Parameters.Length == 0 &&
                        disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration) &&
-                       declaration is { Body: { Statements: { Count: 0 } }, ExpressionBody: null };
+                       declaration is { Body.Statements.Count: 0, ExpressionBody: null };
             }
         }
     }

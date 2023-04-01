@@ -44,7 +44,7 @@
                 {
                     foreach (var assigned in pooledAssigned.Assignments)
                     {
-                        if (assigned is { Left: { } left, Right: IdentifierNameSyntax { Identifier: { ValueText: "value" } } } &&
+                        if (assigned is { Left: { } left, Right: IdentifierNameSyntax { Identifier.ValueText: "value" } } &&
                             IsPotentiallyAssignableFrom(left, semanticModel, cancellationToken) &&
                             semanticModel.GetSymbolSafe(left, cancellationToken) is { } candidate &&
                             candidate.IsEitherKind(SymbolKind.Field, SymbolKind.Property))
@@ -146,7 +146,7 @@
                 return false;
             }
 
-            if (candidate is IdentifierNameSyntax { Identifier: { ValueText: "value" } } &&
+            if (candidate is IdentifierNameSyntax { Identifier.ValueText: "value" } &&
                 candidate.FirstAncestor<AccessorDeclarationSyntax>() is { } accessor &&
                 accessor.IsKind(SyntaxKind.SetAccessorDeclaration))
             {
@@ -219,33 +219,33 @@
                     IParameterSymbol _ => false,
                     ILocalSymbol _ => false,
                     IFieldSymbol _ => false,
-                    IPropertySymbol { ContainingType: { MetadataName: "PasswordBox" }, MetadataName: "SecurePassword" } => true,
+                    IPropertySymbol { ContainingType.MetadataName: "PasswordBox", MetadataName: "SecurePassword" } => true,
                     IPropertySymbol _ => false,
                     IMethodSymbol { MetadataName: "CreateConnection" } method => InferFromReturnType(method),
                     IMethodSymbol { MetadataName: nameof(ToString) } => false,
                     IMethodSymbol { MetadataName: nameof(GetHashCode) } => false,
                     IMethodSymbol { MetadataName: nameof(Equals) } => false,
                     IMethodSymbol { MetadataName: nameof(ReferenceEquals) } => false,
-                    IMethodSymbol { ContainingType: { IsGenericType: true }, MetadataName: "GetEnumerator" } => true,
-                    IMethodSymbol { ContainingType: { IsGenericType: false }, MetadataName: "GetEnumerator" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: false } => InferFromUse(),
-                    IMethodSymbol { ContainingType: { MetadataName: "Activator" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
-                    IMethodSymbol { ContainingType: { MetadataName: "ActivatorUtilities" }, MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
-                    IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromHandle" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "Control" }, MetadataName: "FromChildHandle" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "Process" }, MetadataName: "Start" } => true,
+                    IMethodSymbol { ContainingType.IsGenericType: true, MetadataName: "GetEnumerator" } => true,
+                    IMethodSymbol { ContainingType.IsGenericType: false, MetadataName: "GetEnumerator" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "Activator", MetadataName: "CreateInstance", IsGenericMethod: false } => InferFromUse(),
+                    IMethodSymbol { ContainingType.MetadataName: "Activator", MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
+                    IMethodSymbol { ContainingType.MetadataName: "ActivatorUtilities", MetadataName: "CreateInstance", IsGenericMethod: true } method => InferFromReturnType(method),
+                    IMethodSymbol { ContainingType.MetadataName: "Control", MetadataName: "FromHandle" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "Control", MetadataName: "FromChildHandle" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "Process", MetadataName: "Start" } => true,
                     IMethodSymbol { MetadataName: "GetService" } => false,
                     IMethodSymbol { MetadataName: "GetRequiredService" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "CancellationToken" }, MetadataName: "Register" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "ConstructorInfo" }, MetadataName: "Invoke" } => InferFromUse(),
-                    IMethodSymbol { ContainingType: { MetadataName: "Enumerable" } } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "HttpResponseMessage" }, MetadataName: "EnsureSuccessStatusCode" } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "ResourceManager" } } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "Task" } } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "Task`1" } } => false,
-                    IMethodSymbol { ContainingType: { MetadataName: "ValueTask`1" } } => false,
-                    IMethodSymbol { ReturnType: { MetadataName: "Task" } } => false,
-                    IMethodSymbol { IsExtensionMethod: true, ReturnType: { MetadataName: "ILoggerFactory" } } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "CancellationToken", MetadataName: "Register" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "ConstructorInfo", MetadataName: "Invoke" } => InferFromUse(),
+                    IMethodSymbol { ContainingType.MetadataName: "Enumerable" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "HttpResponseMessage", MetadataName: "EnsureSuccessStatusCode" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "ResourceManager" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "Task" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "Task`1" } => false,
+                    IMethodSymbol { ContainingType.MetadataName: "ValueTask`1" } => false,
+                    IMethodSymbol { ReturnType.MetadataName: "Task" } => false,
+                    IMethodSymbol { IsExtensionMethod: true, ReturnType.MetadataName: "ILoggerFactory" } => false,
                     IMethodSymbol method => IsMethodCreating(method, semanticModel.Compilation),
                     _ => false,
                 };

@@ -38,7 +38,7 @@
                 switch (declaration)
                 {
                     case { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax _ } }:
-                    case { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } }:
+                    case { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword.ValueText: "using" } } }:
                         return true;
                 }
             }
@@ -84,7 +84,7 @@
                     => true,
                 { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: UsingStatementSyntax } } } }
                     => true,
-                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword: { ValueText: "using" } } } } } }
+                { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Parent: VariableDeclarationSyntax { Parent: LocalDeclarationStatementSyntax { UsingKeyword.ValueText: "using" } } } } }
                     => true,
                 { }
                     when Identity(candidate, recursion) is { } id &&

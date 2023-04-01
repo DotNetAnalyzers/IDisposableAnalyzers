@@ -47,7 +47,7 @@
         {
             switch (candidate)
             {
-                case { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { ArgumentList: { Arguments: { Count: 1 } arguments } } invocation } }
+                case { Parent: MemberAccessExpressionSyntax { Parent: InvocationExpressionSyntax { ArgumentList.Arguments: { Count: 1 } arguments } invocation } }
                     when invocation.IsSymbol(KnownSymbols.DisposableMixins.DisposeWith, recursion.SemanticModel, recursion.CancellationToken) &&
                          recursion.SemanticModel.TryGetSymbol(arguments[0].Expression, recursion.CancellationToken, out container):
                     return true;
@@ -100,10 +100,10 @@
                         {
                             switch (parameter.ContainingSymbol)
                             {
-                                case { ContainingType: { MetadataName: "Interlocked" }, MetadataName: "Exchange" }:
-                                case { ContainingType: { MetadataName: "ServiceCollection" } }:
-                                case { ContainingType: { MetadataName: "IServiceCollection" } }:
-                                case { ContainingType: { MetadataName: "ServiceCollectionServiceExtensions" } }:
+                                case { ContainingType.MetadataName: "Interlocked", MetadataName: "Exchange" }:
+                                case { ContainingType.MetadataName: "ServiceCollection" }:
+                                case { ContainingType.MetadataName: "IServiceCollection" }:
+                                case { ContainingType.MetadataName: "ServiceCollectionServiceExtensions" }:
                                 case { MetadataName: "RegisterForDispose" }:
                                 case { MetadataName: "RegisterForDisposeAsync" }:
                                     return recursion.SemanticModel.TryGetSymbol(memberAccess.Expression, recursion.CancellationToken, out container);
@@ -128,7 +128,7 @@
                 case { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax variableDeclarator } }
                     when recursion.Target(variableDeclarator) is { } target:
                     return Stores(target, recursion, out container);
-                case InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: { Identifier: { ValueText: "DisposeWith" } } }, ArgumentList: { Arguments: { Count: 1 } arguments } }:
+                case InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name.Identifier.ValueText: "DisposeWith" }, ArgumentList.Arguments: { Count: 1 } arguments }:
                     container = recursion.SemanticModel.GetSymbolSafe(arguments[0].Expression, recursion.CancellationToken);
                     return container != null;
                 default:
@@ -179,7 +179,7 @@
         {
             switch (target)
             {
-                case { Symbol: { ContainingSymbol: IMethodSymbol method }, Source: { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } }:
+                case { Symbol.ContainingSymbol: IMethodSymbol method, Source.Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } }:
                     creation = invocation;
                     if (method.DeclaringSyntaxReferences.IsEmpty)
                     {
@@ -209,7 +209,7 @@
 
                     return false;
 
-                case { Symbol: { ContainingSymbol: { } constructor }, Source: { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } } }:
+                case { Symbol.ContainingSymbol: { } constructor, Source.Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax objectCreation } }:
                     if (constructor.ContainingType.MetadataName.StartsWith("Tuple`", StringComparison.Ordinal))
                     {
                         creation = objectCreation;

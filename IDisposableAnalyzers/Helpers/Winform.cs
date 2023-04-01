@@ -11,9 +11,9 @@
         {
             return invocation switch
             {
-                { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier: { ValueText: "components" } }, Name: { Identifier: { ValueText: "Add" } } }, ArgumentList: { Arguments: { Count: 1 } } }
+                { Expression: MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax { Identifier.ValueText: "components" }, Name.Identifier.ValueText: "Add" }, ArgumentList.Arguments.Count: 1 }
                 => IsInWinForm(),
-                { Expression: MemberAccessExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InstanceExpressionSyntax _, Name: { Identifier: { ValueText: "components" } } }, Name: { Identifier: { ValueText: "Add" } } }, ArgumentList: { Arguments: { Count: 1 } } }
+                { Expression: MemberAccessExpressionSyntax { Expression: MemberAccessExpressionSyntax { Expression: InstanceExpressionSyntax _, Name.Identifier.ValueText: "components" }, Name.Identifier.ValueText: "Add" }, ArgumentList.Arguments.Count: 1 }
                 => IsInWinForm(),
                 _ => false,
             };

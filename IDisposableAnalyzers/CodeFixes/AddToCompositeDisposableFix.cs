@@ -131,7 +131,7 @@
                                             break;
                                         default:
                                             editor.RemoveNode(statement);
-                                            if (objectCreation.ArgumentList is { Arguments: { Count: 0 } } empty)
+                                            if (objectCreation.ArgumentList is { Arguments.Count: 0 } empty)
                                             {
                                                 editor.RemoveNode(empty);
                                             }
