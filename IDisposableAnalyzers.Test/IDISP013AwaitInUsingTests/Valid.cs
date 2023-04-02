@@ -44,10 +44,10 @@ namespace N
 
     public class C
     {
-        public Task<string> M()
+        public async Task<string> M()
         {
-            var client = new WebClient();
-            return client.DownloadStringTaskAsync(string.Empty);
+            using var client = new WebClient();
+            return await client.DownloadStringTaskAsync(string.Empty);
         }
     }
 }";
@@ -325,6 +325,42 @@ namespace N
     }
 }";
             RoslynAssert.Valid(Analyzer, code);
+        }
+
+        [Test]
+        public static void ReturnInValueTask()
+        {
+            var disposable = """
+
+                namespace N;
+
+                using System;
+
+                public class Disposable : IDisposable
+                {
+                    public void Dispose()
+                    {
+                    }
+                }
+                """;
+
+            var code = """
+
+                namespace N;
+
+                using System;
+                using System.Threading.Tasks;
+
+                public class C
+                {
+                    public ValueTask<IDisposable> M()
+                    {
+                        var disposable = new Disposable();
+                        return new ValueTask<IDisposable>(disposable);
+                    }
+                }
+                """;
+            RoslynAssert.Valid(Analyzer, disposable, code);
         }
     }
 }

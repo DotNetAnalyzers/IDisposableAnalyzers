@@ -1,10 +1,10 @@
 ﻿namespace IDisposableAnalyzers
 {
     using System.Collections.Immutable;
-    using System.Linq;
     using System.Threading;
 
     using Gu.Roslyn.AnalyzerExtensions;
+
     using Microsoft.CodeAnalysis;
     using Microsoft.CodeAnalysis.CSharp;
     using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -77,7 +77,7 @@
             if (Disposable.IsCreation(returnValue, context.SemanticModel, context.CancellationToken) &&
                 context.SemanticModel.TryGetSymbol(returnValue, context.CancellationToken, out var returnedSymbol))
             {
-                if (IsInUsing(returnedSymbol, context.CancellationToken) ||
+                if (IsUsing(returnedSymbol, context.CancellationToken) ||
                     Disposable.IsDisposedBefore(returnedSymbol, returnValue, context.SemanticModel, context.CancellationToken))
                 {
                     context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP011DontReturnDisposed, returnValue.GetLocation()));
@@ -110,7 +110,7 @@
                         Disposable.IsCreation(expression, context.SemanticModel, context.CancellationToken) &&
                         context.SemanticModel.TryGetSymbol(expression, context.CancellationToken, out var argumentSymbol))
                     {
-                        if (IsInUsing(argumentSymbol, context.CancellationToken) ||
+                        if (IsUsing(argumentSymbol, context.CancellationToken) ||
                             Disposable.IsDisposedBefore(argumentSymbol, expression, context.SemanticModel, context.CancellationToken))
                         {
                             if (IsLazyEnumerable(invocation, containingType, context.SemanticModel, context.CancellationToken))
@@ -123,7 +123,7 @@
             }
 
             if (ReturnType(context)?.IsAwaitable() == true &&
-                IsInUsingScope(returnValue) &&
+                IsInUsing(returnValue) &&
                 !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
                 context.SemanticModel.TryGetType(returnValue, context.CancellationToken, out var returnValueType2) &&
                 returnValueType2.IsAwaitable() &&
@@ -133,42 +133,45 @@
             }
         }
 
-        private static bool IsInUsingScope(SyntaxNode node)
+        private static bool IsInUsing(SyntaxNode node)
         {
-            return IsInUsingStatement(node) || HasPrecedingUsingDeclaration(node);
-        }
-
-        private static bool IsInUsingStatement(SyntaxNode node)
-        {
-            return node.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
-                   usingStatement.Statement.Contains(node);
-        }
-
-        private static bool HasPrecedingUsingDeclaration(SyntaxNode node)
-        {
-            if (node.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement) &&
-                usingStatement.Statement.Contains(node))
+            if (node.TryFirstAncestor<UsingStatementSyntax>(out var usingStatement))
             {
-                return true;
+                return usingStatement.Statement.Contains(node);
             }
 
-            if (node.Parent?.ChildNodes().TakeWhile(x => x != node).OfType<LocalDeclarationStatementSyntax>().Any(x => x.UsingKeyword.Text == "using") ?? false)
+            if (node.TryFirstAncestor<BlockSyntax>(out var block))
             {
-                return true;
-            }
+                foreach (var statement in block.Statements)
+                {
+                    if (statement.SpanStart >= node.SpanStart)
+                    {
+                        return false;
+                    }
 
-            if (node.Parent is { } parent)
-            {
-                return HasPrecedingUsingDeclaration(parent);
+                    if (statement is LocalDeclarationStatementSyntax { UsingKeyword.ValueText: "using" })
+                    {
+                        return true;
+                    }
+                }
             }
 
             return false;
         }
 
-        private static bool IsInUsing(ISymbol symbol, CancellationToken cancellationToken)
+        private static bool IsUsing(ISymbol symbol, CancellationToken cancellationToken)
         {
-            return symbol.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration) &&
-                   declaration.Parent?.Parent is UsingStatementSyntax;
+            if (symbol.TrySingleDeclaration<SyntaxNode>(cancellationToken, out var declaration))
+            {
+                return declaration switch
+                {
+                    { Parent.Parent: UsingStatementSyntax } => true,
+                    { Parent.Parent: LocalDeclarationStatementSyntax { UsingKeyword.ValueText: "using" } } => true,
+                    _ => false,
+                };
+            }
+
+            return false;
         }
 
         private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)

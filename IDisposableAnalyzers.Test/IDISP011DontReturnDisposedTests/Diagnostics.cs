@@ -31,6 +31,26 @@ namespace N
         }
 
         [Test]
+        public static void ReturnFileOpenReadFromUsingDeclaration()
+        {
+            var code = @"
+namespace N
+{
+    using System.IO;
+
+    public sealed class C
+    {
+        public object M()
+        {
+            using var stream = File.OpenRead(string.Empty);
+            return ↓stream;
+        }
+    }
+}";
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
+
+        [Test]
         public static void ReturnFileOpenReadDisposed()
         {
             var code = @"

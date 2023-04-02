@@ -94,6 +94,12 @@ namespace ValidCode
             return new ValueTask<IDisposable>(disposable);
         }
 
+        public static async void UseValueTask()
+        {
+            var disposable = await ValueTask();
+            disposable.Dispose();
+        }
+
         public static async Task<string?> Bar1Async()
         {
             using (var stream = await ReadAsync(string.Empty))
