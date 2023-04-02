@@ -32,13 +32,13 @@
         private static void Handle(SyntaxNodeAnalysisContext context)
         {
             if (!context.IsExcludedFromAnalysis() &&
-                context.ContainingSymbol is IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method &&
-                context.Node is MethodDeclarationSyntax methodDeclaration)
+                context is { ContainingSymbol: IMethodSymbol { IsStatic: false, ReturnsVoid: true, Name: "Dispose" } method, Node: MethodDeclarationSyntax methodDeclaration })
             {
                 if (method is { DeclaredAccessibility: Accessibility.Public, Parameters.Length: 0 } &&
                     method.GetAttributes().Length == 0)
                 {
                     if (!method.ExplicitInterfaceImplementations.Any() &&
+                        method.ContainingType is { IsRefLikeType: false } &&
                         !IsInterfaceImplementation(method))
                     {
                         context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP009IsIDisposable, methodDeclaration.Identifier.GetLocation()));

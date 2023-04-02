@@ -482,5 +482,21 @@ namespace N
 
             RoslynAssert.Valid(Analyzer, code);
         }
+
+        [Test]
+        public static void RefStruct()
+        {
+            var code = """
+
+                namespace N;
+
+                public ref struct S
+                {
+                    public void Dispose() { }
+                }
+                """;
+
+            RoslynAssert.Valid(Analyzer, code);
+        }
     }
 }
