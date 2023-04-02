@@ -16,7 +16,8 @@ Don't use reference types in finalizer context.
 
 ## Motivation
 
-Any use of reference types from a finalizer is hazardous. When that finalizer was invoked as part of AppDomain shutdown, the CLR makes no guarantee regarding order of finalization or GC for a typical finalizer, and thus any access to a reference type (other than strictly this) could AV and crash the process. The only safe activity from a finalizer is accessing value types and calling p/invoke methods, which limits safe activity to calling into native code to release resources. Even accessing SafeHandles is unsafe, which is why these types have their own finalizers rather than relying on their owners to dispose of them during finalization.
+Any use of reference types from a finalizer is hazardous.
+When that finalizer was invoked as part of AppDomain shutdown, the CLR makes no guarantee regarding order of finalization or GC for a typical finalizer, and thus any access to a reference type (other than strictly this) could access violation and crash the process. The only safe activity from a finalizer is accessing value types and calling p/invoke methods, which limits safe activity to calling into native code to release resources. Even accessing SafeHandles is unsafe, which is why these types have their own finalizers rather than relying on their owners to dispose of them during finalization.
 
 ## How to fix violations
 
