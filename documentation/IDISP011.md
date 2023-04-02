@@ -15,11 +15,26 @@ Don't return disposed instance.
 
 ## Motivation
 
-ADD MOTIVATION HERE
+In the below example the `FileStream` is disposed and not usable
+
+```cs
+public FileStream M(string fileName)
+{
+    using var stream = File.OpenRead(fileName);
+    return stream;
+}
+```
 
 ## How to fix violations
 
-ADD HOW TO FIX VIOLATIONS HERE
+Don't dispose an instance that is returned. Caller is responsible for disposing.
+
+```cs
+public FileStream M(string fileName)
+{
+    return File.OpenRead(fileName);
+}
+```
 
 <!-- start generated config severity -->
 ## Configure severity
