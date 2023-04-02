@@ -82,6 +82,18 @@ namespace ValidCode
             await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
         }
 
+        public static Task<IDisposable> TaskFromResult()
+        {
+            var disposable = new Disposable();
+            return Task.FromResult<IDisposable>(disposable);
+        }
+
+        public static ValueTask<IDisposable> ValueTask()
+        {
+            var disposable = new Disposable();
+            return new ValueTask<IDisposable>(disposable);
+        }
+
         public static async Task<string?> Bar1Async()
         {
             using (var stream = await ReadAsync(string.Empty))
