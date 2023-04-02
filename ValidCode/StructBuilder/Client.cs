@@ -22,9 +22,10 @@ internal sealed class Client : IDisposable
             .Append(2,             "version")
             .Append(true,          "subscribe")
             .Append(rth,           "useRTH")
-            //.Append(!rth,           "not")
+            .Append(!rth,           "not")
             .Append("abc",         "text")
             .Append((string?)null, "empty");
+
         await this.socket.SendAsync(request.LengthPrefixed(), SocketFlags.None, CancellationToken.None).ConfigureAwait(false);
         return id;
     }

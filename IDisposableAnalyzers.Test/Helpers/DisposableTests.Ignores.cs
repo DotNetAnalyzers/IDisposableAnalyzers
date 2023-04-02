@@ -1095,6 +1095,7 @@ namespace N
             [TestCase(".Append((string?)null)")]
             [TestCase(".Append(condition, string.Empty)")]
             [TestCase(".Append(!condition, string.Empty)")]
+            [TestCase(".Append(true).Append(condition).Append(!condition)")]
             public static void Builder(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText("""
@@ -1136,7 +1137,7 @@ namespace N
 
                     public void M(bool condition)
                     {
-                        using var s = new S().Append(1, string.Empty).Append(true);
+                        using var s = new S().Append(true);
                     }
                 }
                 """.AssertReplace(".Append(true)", expression));

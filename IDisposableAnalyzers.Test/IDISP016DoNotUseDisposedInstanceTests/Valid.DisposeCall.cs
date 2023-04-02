@@ -1,7 +1,6 @@
 ﻿namespace IDisposableAnalyzers.Test.IDISP016DoNotUseDisposedInstanceTests
 {
     using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
     using NUnit.Framework;
 
     public static partial class Valid
