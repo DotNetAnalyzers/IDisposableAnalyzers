@@ -31,6 +31,9 @@
                 { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax { Expression: MemberAccessExpressionSyntax { Name: IdentifierNameSyntax { Identifier.ValueText: "FromResult" } } } invocation } } }
                     when invocation.IsSymbol(KnownSymbols.Task.FromResult, recursion.SemanticModel, recursion.CancellationToken)
                     => Recursive(invocation, recursion),
+                { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { } objectCreation } } }
+                    when objectCreation.IsType(KnownSymbols.ValueTaskOfT, recursion.SemanticModel, recursion.CancellationToken)
+                    => Recursive(objectCreation, recursion),
                 { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                     when recursion.Target(argument) is { } target &&
                          IsIdentity(target, recursion)

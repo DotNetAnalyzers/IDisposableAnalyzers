@@ -405,6 +405,42 @@ namespace N
         }
 
         [Test]
+        public static void ReturnInValueTask()
+        {
+            var disposable = """
+
+                namespace N;
+
+                using System;
+
+                public class Disposable : IDisposable
+                {
+                    public void Dispose()
+                    {
+                    }
+                }
+                """;
+
+            var code = """
+
+                namespace N;
+
+                using System;
+                using System.Threading.Tasks;
+
+                public class C
+                {
+                    public ValueTask<IDisposable> M()
+                    {
+                        var disposable = new Disposable();
+                        return new ValueTask<IDisposable>(disposable);
+                    }
+                }
+                """;
+            RoslynAssert.Valid(Analyzer, disposable, code);
+        }
+
+        [Test]
         public static void LocalFunctionStatementBody()
         {
             var code = @"
