@@ -126,7 +126,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gu.Analyzers" Version="2.0.2" PrivateAssets="all" />
+    <PackageReference Include="Gu.Analyzers" Version="2.0.3" PrivateAssets="all" />
     <PackageReference Include="Gu.Roslyn.Extensions.Source" Version="0.16.6" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.0.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.2.0-beta.435" PrivateAssets="all" />
