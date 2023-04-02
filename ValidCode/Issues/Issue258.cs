@@ -1,40 +1,39 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.IO;
+
+public class Issue258 : IDisposable
 {
-    using System;
-    using System.IO;
+    private bool disposedValue;
 
-    public class Issue258 : IDisposable
+    protected virtual void Dispose(bool disposing)
     {
-        private bool disposedValue;
-
-        protected virtual void Dispose(bool disposing)
+        if (!disposedValue)
         {
-            if (!disposedValue)
+            if (disposing)
             {
-                if (disposing)
-                {
-                }
-
-                // free unmanaged resources
-                if (File.Exists("abc"))
-                {
-                    File.Delete("abc");
-                }
-
-                disposedValue = true;
             }
-        }
 
-        ~Issue258()
-        {
-            this.Dispose(false);
-        }
+            // free unmanaged resources
+            if (File.Exists("abc"))
+            {
+                File.Delete("abc");
+            }
 
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
+            disposedValue = true;
         }
+    }
+
+    ~Issue258()
+    {
+        this.Dispose(false);
+    }
+
+    public void Dispose()
+    {
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP005ReturnTypeShouldBeIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ReturnValueAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP005ReturnTypeShouldBeIDisposable);
 
-    public static class Diagnostics
+    [Test]
+    public static void ReturnFileOpenReadAsObject()
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP005ReturnTypeShouldBeIDisposable);
-
-        [Test]
-        public static void ReturnFileOpenReadAsObject()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -24,13 +24,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadAsDynamic()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadAsDynamic()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -43,13 +43,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnStaticFieldPasswordBoxSecurePasswordAsObject()
+    {
+        var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -64,13 +64,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFieldPasswordBoxSecurePasswordAsObject()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFieldPasswordBoxSecurePasswordAsObject()
+    {
+        var code = @"
 namespace N
 {
     using System.Windows.Controls;
@@ -85,13 +85,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void IndexerReturningObject()
-        {
-            var code = @"
+    [Test]
+    public static void IndexerReturningObject()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -112,13 +112,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadAsObjectExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadAsObjectExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -128,13 +128,13 @@ namespace N
         public object M() => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void PropertyReturnFileOpenReadAsObjectExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturnFileOpenReadAsObjectExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -144,13 +144,13 @@ namespace N
         public object P => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void StatementLambda()
-        {
-            var code = @"
+    [Test]
+    public static void StatementLambda()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -167,13 +167,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ParenthesizedLambdaExpression()
-        {
-            var code = @"
+    [Test]
+    public static void ParenthesizedLambdaExpression()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -187,13 +187,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void SimpleLambdaExpression()
-        {
-            var code = @"
+    [Test]
+    public static void SimpleLambdaExpression()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -207,7 +207,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

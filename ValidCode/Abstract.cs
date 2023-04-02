@@ -1,9 +1,8 @@
-﻿namespace ValidCode
-{
-    using System;
+﻿namespace ValidCode;
 
-    public abstract class Abstract : IDisposable
-    {
-        public abstract void Dispose();
-    }
+using System;
+
+public abstract class Abstract : IDisposable
+{
+    public abstract void Dispose();
 }

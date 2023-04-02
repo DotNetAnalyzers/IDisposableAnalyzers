@@ -1,32 +1,32 @@
-﻿namespace IDisposableAnalyzers.Test
+﻿namespace IDisposableAnalyzers.Test;
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Recursion
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
+        typeof(AnalyzerCategory)
+            .Assembly
+            .GetTypes()
+            .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
+            .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
+            .ToArray();
 
-    public static class Recursion
+    [Test]
+    public static void NotEmpty()
     {
-        private static readonly IReadOnlyList<DiagnosticAnalyzer> AllAnalyzers =
-            typeof(AnalyzerCategory)
-                .Assembly
-                .GetTypes()
-                .Where(t => !t.IsAbstract && typeof(DiagnosticAnalyzer).IsAssignableFrom(t))
-                .Select(t => (DiagnosticAnalyzer)Activator.CreateInstance(t))
-                .ToArray();
+        CollectionAssert.IsNotEmpty(AllAnalyzers);
+    }
 
-        [Test]
-        public static void NotEmpty()
-        {
-            CollectionAssert.IsNotEmpty(AllAnalyzers);
-        }
-
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
-        {
-            var code = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void ConstructorCallingSelf(DiagnosticAnalyzer analyzer)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -65,13 +65,13 @@ namespace N
         public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
+    }
 
-        [TestCaseSource(nameof(AllAnalyzers))]
-        public static void ConstructorCycle(DiagnosticAnalyzer analyzer)
-        {
-            var code = @"
+    [TestCaseSource(nameof(AllAnalyzers))]
+    public static void ConstructorCycle(DiagnosticAnalyzer analyzer)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -97,7 +97,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(analyzer, code);
     }
 }

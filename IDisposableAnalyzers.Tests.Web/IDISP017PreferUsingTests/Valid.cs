@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP017PreferUsingTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP017PreferUsingTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
 
-    public static class Valid
+    [TestCase("c.DisposeAsync()")]
+    [TestCase("c.DisposeAsync().ConfigureAwait(false)")]
+    public static void DisposeAsync(string expression)
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new DisposeCallAnalyzer();
-
-        [TestCase("c.DisposeAsync()")]
-        [TestCase("c.DisposeAsync().ConfigureAwait(false)")]
-        public static void DisposeAsync(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -45,7 +45,6 @@ namespace N
         }
     }
 }".AssertReplace("c.DisposeAsync().ConfigureAwait(false)", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

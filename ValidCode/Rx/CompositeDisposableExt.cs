@@ -1,20 +1,19 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Rx
+namespace ValidCode.Rx;
+
+using System;
+using System.Reactive.Disposables;
+
+public static class CompositeDisposableExt
 {
-    using System;
-    using System.Reactive.Disposables;
-
-    public static class CompositeDisposableExt
+    public static T? AddAndReturn<T>(this CompositeDisposable disposable, T item)
+        where T : IDisposable
     {
-        public static T? AddAndReturn<T>(this CompositeDisposable disposable, T item)
-            where T : IDisposable
+        if (item != null)
         {
-            if (item != null)
-            {
-                disposable.Add(item);
-            }
-
-            return item;
+            disposable.Add(item);
         }
+
+        return item;
     }
 }

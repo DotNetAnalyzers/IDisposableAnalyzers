@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class Repro
     {
-        public static class Repro
+        [Test]
+        public static void Issue63()
         {
-            [Test]
-            public static void Issue63()
-            {
-                var viewModelBaseCode = @"
+            var viewModelBaseCode = @"
 namespace MVVM
 {
     using System;
@@ -58,7 +58,7 @@ namespace MVVM
         }
     }
 }";
-                var popupViewModelCode = @"
+            var popupViewModelCode = @"
 namespace ProjectX.ViewModel
 {
     using System;
@@ -82,7 +82,7 @@ namespace ProjectX.ViewModel
     }
 }";
 
-                var closePopupCommandCode = @"
+            var closePopupCommandCode = @"
 namespace ProjectX.Commands
 {
     using System;
@@ -114,12 +114,12 @@ namespace ProjectX.Commands
     }
 }";
 
-                RoslynAssert.NoAnalyzerDiagnostics(Analyzer, viewModelBaseCode, popupViewModelCode, closePopupCommandCode);
-            }
+            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, viewModelBaseCode, popupViewModelCode, closePopupCommandCode);
+        }
 
-            public static void Issue150()
-            {
-                var code = @"
+        public static void Issue150()
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -146,8 +146,7 @@ namespace N
         public IReadOnlyList<string> AllLines { get; }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

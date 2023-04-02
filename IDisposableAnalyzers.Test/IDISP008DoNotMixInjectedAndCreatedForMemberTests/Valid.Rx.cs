@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public partial class Valid<T>
+{
+    public static class Rx
     {
-        public static class Rx
+        [Test]
+        public static void SingleAssignmentDisposable()
         {
-            [Test]
-            public static void SingleAssignmentDisposable()
-            {
-                var code = @"
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -33,13 +33,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
-            {
-                var code = @"
+        [Test]
+        public static void SingleAssignmentDisposableAssignedWithObservableSubscribe()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -61,13 +61,13 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SingleAssignmentDisposableAssignedInAction()
-            {
-                var code = @"
+        [Test]
+        public static void SingleAssignmentDisposableAssignedInAction()
+        {
+            var code = @"
 namespace Gu.Reactive
 {
     using System;
@@ -97,8 +97,7 @@ namespace Gu.Reactive
         }
      }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

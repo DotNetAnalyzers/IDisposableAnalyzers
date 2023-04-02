@@ -1,29 +1,28 @@
 ﻿// ReSharper disable All
-namespace ValidCode.LeaveOpen
+namespace ValidCode.LeaveOpen;
+
+using System;
+using System.IO;
+using System.Text;
+
+public sealed class LeaveOpenFields : IDisposable
 {
-    using System;
-    using System.IO;
-    using System.Text;
+    private readonly FileStream stream;
+    private readonly StreamReader reader;
 
-    public sealed class LeaveOpenFields : IDisposable
+    public LeaveOpenFields(string fileName)
     {
-        private readonly FileStream stream;
-        private readonly StreamReader reader;
+        this.stream = File.OpenRead(fileName);
+        this.reader = new StreamReader(this.stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
+    }
 
-        public LeaveOpenFields(string fileName)
-        {
-            this.stream = File.OpenRead(fileName);
-            this.reader = new StreamReader(this.stream, new UTF8Encoding(), true, 1024, leaveOpen: true);
-        }
+    public string? ReadLine() => this.reader.ReadLine();
 
-        public string? ReadLine() => this.reader.ReadLine();
+    public int ReadByte() => this.stream.ReadByte();
 
-        public int ReadByte() => this.stream.ReadByte();
-
-        public void Dispose()
-        {
-            this.stream.Dispose();
-            this.reader.Dispose();
-        }
+    public void Dispose()
+    {
+        this.stream.Dispose();
+        this.reader.Dispose();
     }
 }

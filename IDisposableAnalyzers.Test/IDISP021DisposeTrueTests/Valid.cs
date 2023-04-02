@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP021DisposeTrueTests
+﻿namespace IDisposableAnalyzers.Test.IDISP021DisposeTrueTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DisposeMethodAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void SealedWithFinalizer()
     {
-        private static readonly DisposeMethodAnalyzer Analyzer = new();
-
-        [Test]
-        public static void SealedWithFinalizer()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -39,13 +39,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Abstract()
-        {
-            var code = @"
+    [Test]
+    public static void Abstract()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -55,13 +55,13 @@ namespace N
         public abstract void Dispose();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ProtectedAbstract()
-        {
-            var code = @"
+    [Test]
+    public static void ProtectedAbstract()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -77,7 +77,6 @@ namespace N
         protected abstract void Dispose(bool disposing);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

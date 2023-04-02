@@ -1,156 +1,155 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+
+public class Async
 {
-    using System;
-    using System.IO;
-    using System.Threading;
-    using System.Threading.Tasks;
-
-    public class Async
+    public async Task Calls()
     {
-        public async Task Calls()
+        var text = await Bar1Async();
+        using (await CreateDisposableAsync())
         {
-            var text = await Bar1Async();
-            using (await CreateDisposableAsync())
-            {
-            }
-
-            using (var disposable = await CreateDisposableAsync())
-            {
-            }
-
-            using (await CreateDisposableValueAsync())
-            {
-            }
-
-            using (var disposable = await CreateDisposableValueAsync())
-            {
-            }
-
-            using (await Task.FromResult(new Disposable()))
-            {
-            }
-
-            using (await Task.FromResult(new Disposable()).ConfigureAwait(false))
-            {
-            }
-
-            using (await Task.Run(() => new Disposable()))
-            {
-            }
-
-            using (await Task.Run(() => new Disposable()).ConfigureAwait(false))
-            {
-            }
-
-            using (var disposable = await Task.FromResult(new Disposable()))
-            {
-            }
-
-            using (var disposable = await Task.FromResult(new Disposable()).ConfigureAwait(false))
-            {
-            }
-
-            using (var disposable = await Task.Run(() => new Disposable()))
-            {
-            }
-
-            using (var disposable = await Task.Run(() => new Disposable()).ConfigureAwait(false))
-            {
-            }
-
-            using (Task.FromResult(new Disposable()).GetAwaiter().GetResult())
-            {
-            }
-
-            using (var disposable = Task.FromResult(new Disposable()).GetAwaiter().GetResult())
-            {
-            }
-
-            using var disposable1 = Task.FromResult(new Disposable()).GetAwaiter().GetResult();
-
-            using (Task.FromResult(new Disposable()).Result)
-            {
-            }
-
-            using (var disposable = Task.FromResult(new Disposable()).Result)
-            {
-            }
-
-            using var disposable2 = Task.FromResult(new Disposable()).Result;
-
-            await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
         }
 
-        public static Task<IDisposable> TaskFromResult()
+        using (var disposable = await CreateDisposableAsync())
         {
-            var disposable = new Disposable();
-            return Task.FromResult<IDisposable>(disposable);
         }
 
-        public static ValueTask<IDisposable> ValueTask()
+        using (await CreateDisposableValueAsync())
         {
-            var disposable = new Disposable();
-            return new ValueTask<IDisposable>(disposable);
         }
 
-        public static async void UseValueTask()
+        using (var disposable = await CreateDisposableValueAsync())
         {
-            var disposable = await ValueTask();
-            disposable.Dispose();
         }
 
-        public static async Task<string?> Bar1Async()
+        using (await Task.FromResult(new Disposable()))
         {
-            using (var stream = await ReadAsync(string.Empty))
+        }
+
+        using (await Task.FromResult(new Disposable()).ConfigureAwait(false))
+        {
+        }
+
+        using (await Task.Run(() => new Disposable()))
+        {
+        }
+
+        using (await Task.Run(() => new Disposable()).ConfigureAwait(false))
+        {
+        }
+
+        using (var disposable = await Task.FromResult(new Disposable()))
+        {
+        }
+
+        using (var disposable = await Task.FromResult(new Disposable()).ConfigureAwait(false))
+        {
+        }
+
+        using (var disposable = await Task.Run(() => new Disposable()))
+        {
+        }
+
+        using (var disposable = await Task.Run(() => new Disposable()).ConfigureAwait(false))
+        {
+        }
+
+        using (Task.FromResult(new Disposable()).GetAwaiter().GetResult())
+        {
+        }
+
+        using (var disposable = Task.FromResult(new Disposable()).GetAwaiter().GetResult())
+        {
+        }
+
+        using var disposable1 = Task.FromResult(new Disposable()).GetAwaiter().GetResult();
+
+        using (Task.FromResult(new Disposable()).Result)
+        {
+        }
+
+        using (var disposable = Task.FromResult(new Disposable()).Result)
+        {
+        }
+
+        using var disposable2 = Task.FromResult(new Disposable()).Result;
+
+        await System.Windows.Threading.Dispatcher.CurrentDispatcher.Invoke(() => Task.FromResult(42)).ConfigureAwait(false);
+    }
+
+    public static Task<IDisposable> TaskFromResult()
+    {
+        var disposable = new Disposable();
+        return Task.FromResult<IDisposable>(disposable);
+    }
+
+    public static ValueTask<IDisposable> ValueTask()
+    {
+        var disposable = new Disposable();
+        return new ValueTask<IDisposable>(disposable);
+    }
+
+    public static async void UseValueTask()
+    {
+        var disposable = await ValueTask();
+        disposable.Dispose();
+    }
+
+    public static async Task<string?> Bar1Async()
+    {
+        using (var stream = await ReadAsync(string.Empty))
+        {
+            using (var reader = new StreamReader(stream))
             {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadLine();
-                }
+                return reader.ReadLine();
             }
         }
+    }
 
-        public static async Task<string?> Bar2Async()
+    public static async Task<string?> Bar2Async()
+    {
+        using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
         {
-            using (var stream = await ReadAsync(string.Empty).ConfigureAwait(false))
+            using (var reader = new StreamReader(stream))
             {
-                using (var reader = new StreamReader(stream))
-                {
-                    return reader.ReadLine();
-                }
+                return reader.ReadLine();
             }
         }
+    }
 
-        private static async Task<Stream> ReadAsync(string fileName)
+    private static async Task<Stream> ReadAsync(string fileName)
+    {
+        var stream = new MemoryStream();
+        using (var fileStream = File.OpenRead(fileName))
         {
-            var stream = new MemoryStream();
-            using (var fileStream = File.OpenRead(fileName))
-            {
-                await fileStream.CopyToAsync(stream)
-                                .ConfigureAwait(false);
-            }
-
-            stream.Position = 0;
-            return stream;
+            await fileStream.CopyToAsync(stream)
+                            .ConfigureAwait(false);
         }
 
-        private static async Task<IDisposable> CreateDisposableAsync()
-        {
-            await Task.Delay(0).ConfigureAwait(false);
-            return new Disposable();
-        }
+        stream.Position = 0;
+        return stream;
+    }
 
-        private static async ValueTask<IDisposable> CreateDisposableValueAsync()
-        {
-            await Task.Delay(0).ConfigureAwait(false);
-            return new Disposable();
-        }
+    private static async Task<IDisposable> CreateDisposableAsync()
+    {
+        await Task.Delay(0).ConfigureAwait(false);
+        return new Disposable();
+    }
 
-        private static void M()
-        {
-            using var ct = new CancellationTokenSource();
-            _ = ct.Token.Register(() => { }, useSynchronizationContext: false);
-        }
+    private static async ValueTask<IDisposable> CreateDisposableValueAsync()
+    {
+        await Task.Delay(0).ConfigureAwait(false);
+        return new Disposable();
+    }
+
+    private static void M()
+    {
+        using var ct = new CancellationTokenSource();
+        _ = ct.Token.Register(() => { }, useSynchronizationContext: false);
     }
 }

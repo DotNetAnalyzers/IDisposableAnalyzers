@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class NoFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+    private static readonly ImplementIDisposableFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
 
-    public static class NoFix
+    [Test]
+    public static void FieldWhenInterfaceIsMissing()
     {
-        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-        private static readonly ImplementIDisposableFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
-
-        [Test]
-        public static void FieldWhenInterfaceIsMissing()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -27,13 +27,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void PropertyWhenInterfaceIsMissing()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyWhenInterfaceIsMissing()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -48,7 +48,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
     }
 }

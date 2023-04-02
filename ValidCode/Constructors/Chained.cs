@@ -1,20 +1,19 @@
-﻿namespace ValidCode.Constructors
+﻿namespace ValidCode.Constructors;
+
+using System;
+
+public class Chained
 {
-    using System;
+    private readonly IDisposable? disposable;
 
-    public class Chained
+    public Chained(IDisposable disposable)
+         : this(1)
     {
-        private readonly IDisposable? disposable;
+        this.disposable = disposable;
+    }
 
-        public Chained(IDisposable disposable)
-             : this(1)
-        {
-            this.disposable = disposable;
-        }
-
-        public Chained(int n)
-        {
-            this.disposable = null;
-        }
+    public Chained(int n)
+    {
+        this.disposable = null;
     }
 }

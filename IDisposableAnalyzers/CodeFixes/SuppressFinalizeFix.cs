@@ -1,56 +1,55 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using System.Collections.Immutable;
+using System.Composition;
+using System.Threading.Tasks;
+using Gu.Roslyn.CodeFixExtensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressFinalizeFix))]
+[Shared]
+internal class SuppressFinalizeFix : DocumentEditorCodeFixProvider
 {
-    using System.Collections.Immutable;
-    using System.Composition;
-    using System.Threading.Tasks;
-    using Gu.Roslyn.CodeFixExtensions;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
+        Descriptors.IDISP018CallSuppressFinalizeSealed.Id,
+        Descriptors.IDISP019CallSuppressFinalizeVirtual.Id);
 
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(SuppressFinalizeFix))]
-    [Shared]
-    internal class SuppressFinalizeFix : DocumentEditorCodeFixProvider
+    protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
+
+    protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
     {
-        public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-            Descriptors.IDISP018CallSuppressFinalizeSealed.Id,
-            Descriptors.IDISP019CallSuppressFinalizeVirtual.Id);
+        var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
+                                               .ConfigureAwait(false);
 
-        protected override DocumentEditorFixAllProvider? FixAllProvider() => null;
-
-        protected override async Task RegisterCodeFixesAsync(DocumentEditorCodeFixContext context)
+        foreach (var diagnostic in context.Diagnostics)
         {
-            var syntaxRoot = await context.Document.GetSyntaxRootAsync(context.CancellationToken)
-                                                   .ConfigureAwait(false);
-
-            foreach (var diagnostic in context.Diagnostics)
+            if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax disposeMethod)
             {
-                if (syntaxRoot?.FindNode(diagnostic.Location.SourceSpan) is MethodDeclarationSyntax disposeMethod)
+                switch (disposeMethod)
                 {
-                    switch (disposeMethod)
-                    {
-                        case { Body: { } body }:
-                            context.RegisterCodeFix(
-                                "GC.SuppressFinalize(this)",
-                                (e, _) => e.ReplaceNode(
-                                    body,
-                                    x => x.AddStatements(IDisposableFactory.GcSuppressFinalizeThis)),
-                                equivalenceKey: nameof(SuppressFinalizeFix),
-                                diagnostic);
-                            break;
-                        case { ExpressionBody: { } }:
-                            context.RegisterCodeFix(
-                                "GC.SuppressFinalize(this)",
-                                (e, _) => e.ReplaceNode(
-                                    disposeMethod,
-                                    x => x.AsBlockBody(
-                                        SyntaxFactory.ExpressionStatement(x.ExpressionBody!.Expression),
-                                        IDisposableFactory.GcSuppressFinalizeThis)),
-                                equivalenceKey: nameof(SuppressFinalizeFix),
-                                diagnostic);
-                            break;
-                    }
+                    case { Body: { } body }:
+                        context.RegisterCodeFix(
+                            "GC.SuppressFinalize(this)",
+                            (e, _) => e.ReplaceNode(
+                                body,
+                                x => x.AddStatements(IDisposableFactory.GcSuppressFinalizeThis)),
+                            equivalenceKey: nameof(SuppressFinalizeFix),
+                            diagnostic);
+                        break;
+                    case { ExpressionBody: { } }:
+                        context.RegisterCodeFix(
+                            "GC.SuppressFinalize(this)",
+                            (e, _) => e.ReplaceNode(
+                                disposeMethod,
+                                x => x.AsBlockBody(
+                                    SyntaxFactory.ExpressionStatement(x.ExpressionBody!.Expression),
+                                    IDisposableFactory.GcSuppressFinalizeThis)),
+                            equivalenceKey: nameof(SuppressFinalizeFix),
+                            diagnostic);
+                        break;
                 }
             }
         }

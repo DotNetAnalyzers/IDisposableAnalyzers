@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests;
 
-    public static partial class AssignedValueWalkerTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class AssignedValueWalkerTests
+{
+    [TestCase("var temp1 = this.value;", "")]
+    [TestCase("var temp2 = this.value;", "1")]
+    [TestCase("var temp3 = this.value;", "1")]
+    public static void LambdaInCtor(string code, string expected)
     {
-        [TestCase("var temp1 = this.value;", "")]
-        [TestCase("var temp2 = this.value;", "1")]
-        [TestCase("var temp3 = this.value;", "1")]
-        public static void LambdaInCtor(string code, string expected)
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -36,18 +36,18 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var value = syntaxTree.FindEqualsValueClause(code).Value;
-            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-            var actual = string.Join(", ", walker.Values);
-            Assert.AreEqual(expected, actual);
-        }
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var value = syntaxTree.FindEqualsValueClause(code).Value;
+        using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+        var actual = string.Join(", ", walker.Values);
+        Assert.AreEqual(expected, actual);
+    }
 
-        [Test]
-        public static void GenericOut()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+    [Test]
+    public static void GenericOut()
+    {
+        var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     public sealed class C
@@ -64,12 +64,11 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var argument = syntaxTree.FindArgument("t1");
-            using var walker = AssignedValueWalker.Borrow(argument.Expression, semanticModel, CancellationToken.None);
-            var actual = string.Join(", ", walker.Values);
-            Assert.AreEqual("default", actual);
-        }
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var argument = syntaxTree.FindArgument("t1");
+        using var walker = AssignedValueWalker.Borrow(argument.Expression, semanticModel, CancellationToken.None);
+        var actual = string.Join(", ", walker.Values);
+        Assert.AreEqual("default", actual);
     }
 }

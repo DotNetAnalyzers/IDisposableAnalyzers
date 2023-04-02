@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
+﻿namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Valid
+    public static class Finalizer
     {
-        public static class Finalizer
-        {
-            private static readonly FinalizerAnalyzer Analyzer = new();
+        private static readonly FinalizerAnalyzer Analyzer = new();
 
-            [Test]
-            public static void SealedWithFinalizerStatementBody()
-            {
-                var code = @"
+        [Test]
+        public static void SealedWithFinalizerStatementBody()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -41,13 +41,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SealedWithFinalizerExpressionBody()
-            {
-                var code = @"
+        [Test]
+        public static void SealedWithFinalizerExpressionBody()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -73,14 +73,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [TestCase("isDisposed.Equals(false)")]
-            [TestCase("isDisposed.Equals(this)")]
-            public static void TouchingStruct(string expression)
-            {
-                var code = @"
+        [TestCase("isDisposed.Equals(false)")]
+        [TestCase("isDisposed.Equals(this)")]
+        public static void TouchingStruct(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -110,13 +110,13 @@ namespace N
         }
     }
 }".AssertReplace("isDisposed.Equals(false)", expression);
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SettingStaticToNull()
-            {
-                var code = @"
+        [Test]
+        public static void SettingStaticToNull()
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -132,13 +132,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SettingInstanceToNull()
-            {
-                var code = @"
+        [Test]
+        public static void SettingInstanceToNull()
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -154,13 +154,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void AttributedFinalizer()
-            {
-                var code = @"
+        [Test]
+        public static void AttributedFinalizer()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -182,8 +182,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

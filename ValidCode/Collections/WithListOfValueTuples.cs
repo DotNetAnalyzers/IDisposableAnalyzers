@@ -1,27 +1,26 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Collections
+namespace ValidCode.Collections;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+public sealed class WithListOfValueTuples : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
+    private readonly List<(FileStream, FileStream)> xs = new List<(FileStream, FileStream)>();
 
-    public sealed class WithListOfValueTuples : IDisposable
+    public void M(string file1, string file2)
     {
-        private readonly List<(FileStream, FileStream)> xs = new List<(FileStream, FileStream)>();
+        var tuple = (File.OpenRead(file1), File.OpenRead(file2));
+        this.xs.Add(tuple);
+    }
 
-        public void M(string file1, string file2)
+    public void Dispose()
+    {
+        foreach (var tuple in this.xs)
         {
-            var tuple = (File.OpenRead(file1), File.OpenRead(file2));
-            this.xs.Add(tuple);
-        }
-
-        public void Dispose()
-        {
-            foreach (var tuple in this.xs)
-            {
-                tuple.Item1.Dispose();
-                tuple.Item2.Dispose();
-            }
+            tuple.Item1.Dispose();
+            tuple.Item2.Dispose();
         }
     }
 }

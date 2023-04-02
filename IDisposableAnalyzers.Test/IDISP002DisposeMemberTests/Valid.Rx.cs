@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class Rx
     {
-        public static class Rx
+        [Test]
+        public static void SerialDisposable()
         {
-            [Test]
-            public static void SerialDisposable()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -33,13 +33,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-            }
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+        }
 
-            [Test]
-            public static void FieldAssignedWithFileOpenReadDisposeWith()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAssignedWithFileOpenReadDisposeWith()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -63,8 +63,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-            }
+            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
         }
     }
 }

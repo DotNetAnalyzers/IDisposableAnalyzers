@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid<T>
+{
+    [TestCase("this.components.Add(stream)")]
+    [TestCase("components.Add(stream)")]
+    public static void LocalAddedToFormComponents(string expression)
     {
-        [TestCase("this.components.Add(stream)")]
-        [TestCase("components.Add(stream)")]
-        public static void LocalAddedToFormComponents(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -25,14 +25,14 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(stream)", expression);
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+    }
 
-        [TestCase("this.components.Add(this.stream)")]
-        [TestCase("components.Add(stream)")]
-        public static void FieldAddedToFormComponents(string expression)
-        {
-            var code = @"
+    [TestCase("this.components.Add(this.stream)")]
+    [TestCase("components.Add(stream)")]
+    public static void FieldAddedToFormComponents(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -50,13 +50,13 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(this.stream)", expression);
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoreNewFormShow()
-        {
-            var winForm = @"
+    [Test]
+    public static void IgnoreNewFormShow()
+    {
+        var winForm = @"
 namespace N
 {
     using System.Windows.Forms;
@@ -66,7 +66,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -78,7 +78,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, winForm, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, winForm, code);
     }
 }

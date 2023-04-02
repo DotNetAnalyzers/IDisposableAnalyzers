@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class TestFixture
     {
-        public static class TestFixture
+        [Test]
+        public static void DisposingFieldInTearDown()
         {
-            [Test]
-            public static void DisposingFieldInTearDown()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Disposable, code);
-            }
+            RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
 
-            [Test]
-            public static void DisposingFieldInOneTimeTearDown()
-            {
-                var code = @"
+        [Test]
+        public static void DisposingFieldInOneTimeTearDown()
+        {
+            var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -60,8 +60,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, Disposable, code);
-            }
+            RoslynAssert.Valid(Analyzer, Disposable, code);
         }
     }
 }

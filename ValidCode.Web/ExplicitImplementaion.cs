@@ -1,17 +1,16 @@
 ﻿// ReSharper disable All
-namespace ValidCode.NetCore
+namespace ValidCode.NetCore;
+
+using System;
+using ValidCode.Web;
+
+public sealed class ExplicitImplementaion : IDisposable
 {
-    using System;
-    using ValidCode.Web;
+    private Disposable? disposable = new Disposable();
 
-    public sealed class ExplicitImplementaion : IDisposable
+    void IDisposable.Dispose()
     {
-        private Disposable? disposable = new Disposable();
-
-        void IDisposable.Dispose()
-        {
-            this.disposable?.Dispose();
-            this.disposable = null;
-        }
+        this.disposable?.Dispose();
+        this.disposable = null;
     }
 }

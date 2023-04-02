@@ -1,26 +1,25 @@
-﻿namespace ValidCode.Partial
+﻿namespace ValidCode.Partial;
+
+using System;
+using System.IO;
+
+public partial class PartialClass : IDisposable
 {
-    using System;
-    using System.IO;
+    private readonly IDisposable disposable = File.OpenRead(string.Empty);
 
-    public partial class PartialClass : IDisposable
+    private bool disposed;
+
+    public void Dispose()
     {
-        private readonly IDisposable disposable = File.OpenRead(string.Empty);
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        private bool disposed;
-
-        public void Dispose()
+    protected virtual void ThrowIfDisposed()
+    {
+        if (this.disposed)
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void ThrowIfDisposed()
-        {
-            if (this.disposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }

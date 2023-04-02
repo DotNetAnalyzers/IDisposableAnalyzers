@@ -1,19 +1,19 @@
-namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class RefAndOut
     {
-        public static class RefAndOut
-        {
-            // ReSharper disable once MemberHidesStaticFromOuterClass
-            private static readonly ArgumentAnalyzer Analyzer = new();
+        // ReSharper disable once MemberHidesStaticFromOuterClass
+        private static readonly ArgumentAnalyzer Analyzer = new();
 
-            [Test]
-            public static void LocalViaObjectCreationThenOutParameter()
-            {
-                var before = @"
+        [Test]
+        public static void LocalViaObjectCreationThenOutParameter()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -34,7 +34,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -55,14 +55,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void LocalInvocationThenOutParameter()
-            {
-                var before = @"
+        [Test]
+        public static void LocalInvocationThenOutParameter()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -84,7 +84,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -106,14 +106,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void LocalViaOutTwice()
-            {
-                var before = @"
+        [Test]
+        public static void LocalViaOutTwice()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -136,7 +136,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -159,14 +159,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldViaOutInPublicMethod()
-            {
-                var before = @"
+        [Test]
+        public static void FieldViaOutInPublicMethod()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -189,7 +189,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -212,14 +212,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldViaOutInPublicMethodNoThis()
-            {
-                var before = @"
+        [Test]
+        public static void FieldViaOutInPublicMethodNoThis()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -242,7 +242,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -265,14 +265,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldOfTypeObjectViaOutParameterInPublicMethodNoThis()
-            {
-                var before = @"
+        [Test]
+        public static void FieldOfTypeObjectViaOutParameterInPublicMethodNoThis()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -295,7 +295,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -318,14 +318,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldPrivateMethodRef()
-            {
-                var before = @"
+        [Test]
+        public static void FieldPrivateMethodRef()
+        {
+            var before = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -353,7 +353,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -381,14 +381,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldPrivateMethodRefTwice()
-            {
-                var before = @"
+        [Test]
+        public static void FieldPrivateMethodRefTwice()
+        {
+            var before = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -417,7 +417,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -446,14 +446,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldPrivateMethodRefTwiceDifferentMethods()
-            {
-                var before = @"
+        [Test]
+        public static void FieldPrivateMethodRefTwiceDifferentMethods()
+        {
+            var before = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -487,7 +487,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -521,14 +521,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldPublicMethodRef()
-            {
-                var before = @"
+        [Test]
+        public static void FieldPublicMethodRef()
+        {
+            var before = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -556,7 +556,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -584,14 +584,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void FieldPublicMethodRefExpressionBody()
-            {
-                var before = @"
+        [Test]
+        public static void FieldPublicMethodRefExpressionBody()
+        {
+            var before = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -616,7 +616,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8601
 namespace N
 {
@@ -644,9 +644,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

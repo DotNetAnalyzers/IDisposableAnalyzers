@@ -1,19 +1,19 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class Assigns
     {
-        public static class Assigns
+        [Test]
+        public static void WhenNotUsed()
         {
-            [Test]
-            public static void WhenNotUsed()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -25,19 +25,19 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(false, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void AssigningLocal()
-            {
-                var code = @"
+        [Test]
+        public static void AssigningLocal()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -50,19 +50,19 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(false, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(false, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void FieldAssignedInCtor()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAssignedInCtor()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -77,20 +77,20 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
+        }
 
-            [Test]
-            public static void FieldAssignedViaCalledMethodParameter()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAssignedViaCalledMethodParameter()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -110,20 +110,20 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
+        }
 
-            [Test]
-            public static void FieldAssignedInCtorViaLocal()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAssignedInCtorViaLocal()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -139,20 +139,20 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.disposable", field.Symbol.ToString());
+        }
 
-            [Test]
-            public static void PropertyAssignedInCtor()
-            {
-                var code = @"
+        [Test]
+        public static void PropertyAssignedInCtor()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -167,20 +167,20 @@ namespace N
         public IDisposable Disposable { get; }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
+        }
 
-            [Test]
-            public static void PropertyAssignedInCalledMethod()
-            {
-                var code = @"
+        [Test]
+        public static void PropertyAssignedInCalledMethod()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -200,20 +200,20 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
+        }
 
-            [Test]
-            public static void PropertyAssignedViaIdentity()
-            {
-                var code = @"
+        [Test]
+        public static void PropertyAssignedViaIdentity()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -230,24 +230,24 @@ namespace N
         private void M(IDisposable arg) => arg;
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("IDisposable disposable");
-                var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
-                Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
-                Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
-                Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("IDisposable disposable");
+            var symbol = semanticModel.GetDeclaredSymbol(value, CancellationToken.None);
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, Disposable.Assigns(localOrParameter, semanticModel, CancellationToken.None, out var field));
+            Assert.AreEqual("N.C.Disposable", field.Symbol.ToString());
+        }
 
-            [TestCase("Task.FromResult(File.OpenRead(fileName))")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            [TestCase("Task.Run(() => { return File.OpenRead(fileName); })")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
-            public static void AssigningFieldAwait(string expression)
-            {
-                var code = @"
+        [TestCase("Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("Task.Run(() => { return File.OpenRead(fileName); })")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+        public static void AssigningFieldAwait(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -270,23 +270,23 @@ namespace N
         }
     }
 }".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
-                Assert.AreEqual("disposable", fieldOrProperty.Name);
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
+            Assert.AreEqual("disposable", fieldOrProperty.Name);
+        }
 
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).Result")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).GetAwaiter().GetResult()")]
-            [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).Result")]
-            [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).GetAwaiter().GetResult()")]
-            public static void AssigningFieldGetAwaiterGetResult(string expression)
-            {
-                var code = @"
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).Result")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+        [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).Result")]
+        [TestCase("Task.Run(() => { return File.OpenRead(fileName); }).GetAwaiter().GetResult()")]
+        public static void AssigningFieldGetAwaiterGetResult(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -309,13 +309,12 @@ namespace N
         }
     }
 }".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
-                Assert.AreEqual("disposable", fieldOrProperty.Name);
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Assigns(value, semanticModel, CancellationToken.None, out var fieldOrProperty));
+            Assert.AreEqual("disposable", fieldOrProperty.Name);
         }
     }
 }

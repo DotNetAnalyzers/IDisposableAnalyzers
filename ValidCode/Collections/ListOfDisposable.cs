@@ -1,33 +1,32 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Collections
+namespace ValidCode.Collections;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+internal sealed class ListOfDisposable : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
+    private readonly List<Stream?> _streams = new List<Stream?> { null };
 
-    internal sealed class ListOfDisposable : IDisposable
+    public ListOfDisposable()
     {
-        private readonly List<Stream?> _streams = new List<Stream?> { null };
+        this._streams.Add(File.OpenRead(string.Empty));
+    }
 
-        public ListOfDisposable()
+    public void Meh()
+    {
+        this._streams[0]?.Dispose();
+        this._streams[0] = File.OpenRead(string.Empty);
+    }
+
+    public void Dispose()
+    {
+        foreach (var stream in this._streams)
         {
-            this._streams.Add(File.OpenRead(string.Empty));
+            stream?.Dispose();
         }
 
-        public void Meh()
-        {
-            this._streams[0]?.Dispose();
-            this._streams[0] = File.OpenRead(string.Empty);
-        }
-
-        public void Dispose()
-        {
-            foreach (var stream in this._streams)
-            {
-                stream?.Dispose();
-            }
-
-            this._streams.Clear();
-        }
+        this._streams.Clear();
     }
 }

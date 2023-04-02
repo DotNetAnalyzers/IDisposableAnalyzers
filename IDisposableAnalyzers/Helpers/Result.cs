@@ -1,11 +1,10 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+internal enum Result
 {
-    internal enum Result
-    {
-        Unknown,
-        Yes,
-        AssumeYes,
-        No,
-        AssumeNo,
-    }
+    Unknown,
+    Yes,
+    AssumeYes,
+    No,
+    AssumeNo,
 }

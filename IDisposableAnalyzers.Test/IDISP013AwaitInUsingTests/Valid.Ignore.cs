@@ -1,16 +1,16 @@
-namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class Ignore
     {
-        public static class Ignore
+        [Test]
+        public static void NUnitAssertThrowsAsync()
         {
-            [Test]
-            public static void NUnitAssertThrowsAsync()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -29,8 +29,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

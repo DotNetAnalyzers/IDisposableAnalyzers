@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class Inheritance
     {
-        public static class Inheritance
+        [Test]
+        public static void WhenNotCallingBaseDispose()
         {
-            [Test]
-            public static void WhenNotCallingBaseDispose()
-            {
-                var baseClass = @"
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -41,7 +41,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -56,13 +56,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
-            }
+            RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
+        }
 
-            [Test]
-            public static void WhenCallingBaseDisposeAfterIfDisposedReturn()
-            {
-                var baseClass = @"
+        [Test]
+        public static void WhenCallingBaseDisposeAfterIfDisposedReturn()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -93,7 +93,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -116,13 +116,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
-            }
+            RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
+        }
 
-            [Test]
-            public static void WhenCallingBaseDispose()
-            {
-                var baseClass = @"
+        [Test]
+        public static void WhenCallingBaseDispose()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -153,7 +153,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -169,13 +169,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
-            }
+            RoslynAssert.Valid(Analyzer, Descriptor, Disposable, baseClass, code);
+        }
 
-            [Test]
-            public static void WhenOverriddenIsNotVirtualDispose()
-            {
-                var baseClass = @"
+        [Test]
+        public static void WhenOverriddenIsNotVirtualDispose()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -191,7 +191,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -207,14 +207,14 @@ namespace N
     }
 }";
 
-                RoslynAssert.Valid(Analyzer, Descriptor, baseClass, code);
-            }
+            RoslynAssert.Valid(Analyzer, Descriptor, baseClass, code);
+        }
 
-            [TestCase("this.components.Add(stream)")]
-            [TestCase("components.Add(stream)")]
-            public static void LocalAddedToFormComponents(string expression)
-            {
-                var code = @"
+        [TestCase("this.components.Add(stream)")]
+        [TestCase("components.Add(stream)")]
+        public static void LocalAddedToFormComponents(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -230,14 +230,14 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(stream)", expression);
-                RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-            }
+            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+        }
 
-            [TestCase("this.components.Add(this.stream)")]
-            [TestCase("components.Add(stream)")]
-            public static void FieldAddedToFormComponents(string expression)
-            {
-                var code = @"
+        [TestCase("this.components.Add(this.stream)")]
+        [TestCase("components.Add(stream)")]
+        public static void FieldAddedToFormComponents(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -255,8 +255,7 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(this.stream)", expression);
-                RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-            }
+            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
         }
     }
 }

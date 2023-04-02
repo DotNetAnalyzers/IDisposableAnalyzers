@@ -1,37 +1,36 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+
+public sealed class Lazy : IDisposable
 {
-    using System;
+    private readonly IDisposable? created;
+    private bool disposed;
+    private IDisposable? lazyDisposable;
+    private IDisposable? compoundLazyDisposable;
 
-    public sealed class Lazy : IDisposable
+    public Lazy(IDisposable? injected)
     {
-        private readonly IDisposable? created;
-        private bool disposed;
-        private IDisposable? lazyDisposable;
-        private IDisposable? compoundLazyDisposable;
+        this.Disposable = injected ?? (this.created = new Disposable());
+    }
 
-        public Lazy(IDisposable? injected)
+    public IDisposable Disposable { get; }
+
+    public IDisposable LazyDisposable => this.lazyDisposable ?? (this.lazyDisposable = new Disposable());
+    
+    public IDisposable CompoundLazyDisposable => this.compoundLazyDisposable ??= new Disposable();
+
+    public void Dispose()
+    {
+        if (this.disposed)
         {
-            this.Disposable = injected ?? (this.created = new Disposable());
+            return;
         }
 
-        public IDisposable Disposable { get; }
-
-        public IDisposable LazyDisposable => this.lazyDisposable ?? (this.lazyDisposable = new Disposable());
-        
-        public IDisposable CompoundLazyDisposable => this.compoundLazyDisposable ??= new Disposable();
-
-        public void Dispose()
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            this.created?.Dispose();
-            this.lazyDisposable?.Dispose();
-            this.compoundLazyDisposable?.Dispose();
-        }
+        this.disposed = true;
+        this.created?.Dispose();
+        this.lazyDisposable?.Dispose();
+        this.compoundLazyDisposable?.Dispose();
     }
 }

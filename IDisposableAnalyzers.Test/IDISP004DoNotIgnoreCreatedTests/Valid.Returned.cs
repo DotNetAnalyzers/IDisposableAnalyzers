@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-
-    using NUnit.Framework;
-
-    public static partial class Valid
+    [Test]
+    public static void Generic()
     {
-        [Test]
-        public static void Generic()
-        {
-            var factory = @"
+        var factory = @"
 namespace N
 {
     public class Factory
@@ -18,7 +18,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, factory, code);
-        }
+        RoslynAssert.Valid(Analyzer, factory, code);
+    }
 
-        [Test]
-        public static void Operator()
-        {
-            var c1 = @"
+    [Test]
+    public static void Operator()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -44,7 +44,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -57,13 +57,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, c1, code);
+    }
 
-        [Test]
-        public static void OperatorNestedCall()
-        {
-            var c1 = @"
+    [Test]
+    public static void OperatorNestedCall()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -72,7 +72,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -90,13 +90,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, c1, code);
+    }
 
-        [Test]
-        public static void OperatorEquals()
-        {
-            var c1 = @"
+    [Test]
+    public static void OperatorEquals()
+    {
+        var c1 = @"
 namespace N
 {
     public class C1
@@ -104,7 +104,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -117,13 +117,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, c1, code);
+    }
 
-        [Test]
-        public static void MethodReturningObject()
-        {
-            var code = @"
+    [Test]
+    public static void MethodReturningObject()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -136,13 +136,13 @@ namespace N
         private static object M2() => new object();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MethodWithArgReturningObject()
-        {
-            var code = @"
+    [Test]
+    public static void MethodWithArgReturningObject()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -155,13 +155,13 @@ namespace N
         private static object M2(string arg) => new object();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MethodWithObjArgReturningObject()
-        {
-            var code = @"
+    [Test]
+    public static void MethodWithObjArgReturningObject()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -174,13 +174,13 @@ namespace N
         private static object Id(object arg) => arg;
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningStatementBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturningStatementBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -193,13 +193,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningLocalStatementBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturningLocalStatementBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -213,13 +213,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturningExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -229,13 +229,13 @@ namespace N
         public Stream M() => File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningNewAssigningAndDisposing()
-        {
-            var c1 = @"
+    [Test]
+    public static void ReturningNewAssigningAndDisposing()
+    {
+        var c1 = @"
 namespace N
 {
     using System;
@@ -255,7 +255,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -266,15 +266,15 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
+    }
 
-        [TestCase("new C1()")]
-        [TestCase("new C1(new Disposable())")]
-        [TestCase("new C1(new Disposable(), new Disposable())")]
-        public static void ReturningNewAssigningAndDisposingParams(string objectCreation)
-        {
-            var c1 = @"
+    [TestCase("new C1()")]
+    [TestCase("new C1(new Disposable())")]
+    [TestCase("new C1(new Disposable(), new Disposable())")]
+    public static void ReturningNewAssigningAndDisposingParams(string objectCreation)
+    {
+        var c1 = @"
 namespace N
 {
     using System;
@@ -297,7 +297,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -309,13 +309,13 @@ namespace N
     }
 }".AssertReplace("new C1(new Disposable(), new Disposable())", objectCreation);
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
+    }
 
-        [Test]
-        public static void ReturningCreateNewAssigningAndDisposing()
-        {
-            var c1 = @"
+    [Test]
+    public static void ReturningCreateNewAssigningAndDisposing()
+    {
+        var c1 = @"
 namespace N
 {
     using System;
@@ -335,7 +335,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -350,13 +350,13 @@ namespace N
         private static C1 Create(IDisposable disposable) => new C1(disposable);
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
+    }
 
-        [Test]
-        public static void ReturningCreateNewStreamReader()
-        {
-            var code = @"
+    [Test]
+    public static void ReturningCreateNewStreamReader()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -371,13 +371,13 @@ namespace N
         private static StreamReader Create(Stream stream) => new StreamReader(stream);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturningAssigningPrivateChained()
-        {
-            var c1 = @"
+    [Test]
+    public static void ReturningAssigningPrivateChained()
+    {
+        var c1 = @"
 namespace N
 {
     using System;
@@ -402,7 +402,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -413,13 +413,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, c1, code);
+    }
 
-        [Test]
-        public static void StreamInStreamReader()
-        {
-            var code = @"
+    [Test]
+    public static void StreamInStreamReader()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -432,13 +432,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StreamInStreamReaderLocal()
-        {
-            var code = @"
+    [Test]
+    public static void StreamInStreamReaderLocal()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -452,17 +452,17 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
-        [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName))")]
-        [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
-        [TestCase("new CompositeDisposable { File.OpenRead(fileName), File.OpenRead(fileName) }")]
-        [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName)) { File.OpenRead(fileName), File.OpenRead(fileName) }")]
-        public static void ReturnedInCompositeDisposable(string expression)
-        {
-            var code = @"
+    [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
+    [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName))")]
+    [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
+    [TestCase("new CompositeDisposable { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+    [TestCase("new CompositeDisposable(File.OpenRead(fileName), File.OpenRead(fileName)) { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+    public static void ReturnedInCompositeDisposable(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -474,13 +474,13 @@ namespace N
         public static IDisposable M(string fileName) => new CompositeDisposable(File.OpenRead(fileName));
     }
 }".AssertReplace("new CompositeDisposable(File.OpenRead(fileName))", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void YieldReturnFileOpenRead()
-        {
-            var code = @"
+    [Test]
+    public static void YieldReturnFileOpenRead()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -495,13 +495,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturnChainedReturningThis()
-        {
-            var disposable = @"
+    [Test]
+    public static void ReturnChainedReturningThis()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -516,7 +516,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -529,13 +529,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void FactoryChainedReturned()
-        {
-            var disposable = @"
+    [Test]
+    public static void FactoryChainedReturned()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -548,7 +548,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -586,13 +586,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void FactoryChainedManyReturned()
-        {
-            var disposable = @"
+    [Test]
+    public static void FactoryChainedManyReturned()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -605,7 +605,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -647,13 +647,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void FactoryChainedBinaryReturned()
-        {
-            var disposable = @"
+    [Test]
+    public static void FactoryChainedBinaryReturned()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -666,7 +666,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -686,13 +686,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void FactoryChainedManyBinaryReturned()
-        {
-            var disposable = @"
+    [Test]
+    public static void FactoryChainedManyBinaryReturned()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -705,7 +705,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -730,13 +730,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void ExtensionMethodBindReturn()
-        {
-            var disposable = @"
+    [Test]
+    public static void ExtensionMethodBindReturn()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -749,7 +749,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -764,13 +764,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void ExtensionMethodReturnBindMany()
-        {
-            var disposable = @"
+    [Test]
+    public static void ExtensionMethodReturnBindMany()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -783,7 +783,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -800,7 +800,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
     }
 }

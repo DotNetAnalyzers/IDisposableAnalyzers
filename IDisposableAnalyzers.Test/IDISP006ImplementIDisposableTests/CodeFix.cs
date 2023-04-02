@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+[TestFixture]
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ImplementIDisposableFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
 
-    [TestFixture]
-    public static partial class CodeFix
-    {
-        private static readonly ImplementIDisposableFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP006ImplementIDisposable);
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -21,5 +21,4 @@ namespace N
         }
     }
 }";
-    }
 }

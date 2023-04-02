@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ReturnValueAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated);
 
-    public static class Diagnostics
+    [Test]
+    public static void ReturnFileOpenReadGetBody()
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP012PropertyShouldNotReturnCreated);
-
-        [Test]
-        public static void ReturnFileOpenReadGetBody()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -43,13 +43,13 @@ namespace N
         public Stream P => ↓File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadGetExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadGetExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -62,7 +62,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

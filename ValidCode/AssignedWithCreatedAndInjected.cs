@@ -1,21 +1,20 @@
 // ReSharper disable All
 #pragma warning disable IDISP008
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+
+public class AssignedWithCreatedAndInjected
 {
-    using System;
+    private readonly IDisposable disposable;
 
-    public class AssignedWithCreatedAndInjected
+    public AssignedWithCreatedAndInjected()
     {
-        private readonly IDisposable disposable;
+        this.disposable = new Disposable();
+    }
 
-        public AssignedWithCreatedAndInjected()
-        {
-            this.disposable = new Disposable();
-        }
-
-        public AssignedWithCreatedAndInjected(IDisposable disposable)
-        {
-            this.disposable = disposable;
-        }
+    public AssignedWithCreatedAndInjected(IDisposable disposable)
+    {
+        this.disposable = disposable;
     }
 }

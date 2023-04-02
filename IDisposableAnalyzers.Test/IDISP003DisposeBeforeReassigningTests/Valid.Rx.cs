@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests;
+
+using Gu.Roslyn.Asserts;
+
+using NUnit.Framework;
+
+public static partial class Valid<T>
 {
-    using Gu.Roslyn.Asserts;
-
-    using NUnit.Framework;
-
-    public static partial class Valid<T>
+    [Test]
+    public static void UsingSerialDisposable()
     {
-        [Test]
-        public static void UsingSerialDisposable()
-        {
-            var notifyPropertyChanged = @"
+        var notifyPropertyChanged = @"
 namespace N
 {
     using System.ComponentModel;
@@ -40,7 +40,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void UsingGenericSerialDisposable()
-        {
-            var notifyPropertyChanged = @"
+    [Test]
+    public static void UsingGenericSerialDisposable()
+    {
+        var notifyPropertyChanged = @"
 namespace N
 {
     using System.ComponentModel;
@@ -105,7 +105,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -132,13 +132,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, new[] { notifyPropertyChanged, code }, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void AssigningGenericSerialDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningGenericSerialDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -163,7 +163,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
     }
 }

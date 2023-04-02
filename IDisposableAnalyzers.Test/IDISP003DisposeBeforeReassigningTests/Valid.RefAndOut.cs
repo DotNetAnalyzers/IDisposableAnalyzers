@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public static partial class Valid<T>
+{
+    [Test]
+    public static void OutParameter()
     {
-        [Test]
-        public static void OutParameter()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -24,17 +24,17 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Descriptor, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var temp")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream? temp")]
-        [TestCase("out FileStream _")]
-        public static void DictionaryTryGetValue(string expression)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var temp")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream? temp")]
+    [TestCase("out FileStream _")]
+    public static void DictionaryTryGetValue(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -47,17 +47,17 @@ namespace N
         public static bool M(int i) => Map.TryGetValue(i, out _);
     }
 }".AssertReplace("out _", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var temp")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream? temp")]
-        [TestCase("out FileStream _")]
-        public static void CallWithOutParameter(string expression)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var temp")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream? temp")]
+    [TestCase("out FileStream _")]
+    public static void CallWithOutParameter(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -77,17 +77,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-            RoslynAssert.Valid(Analyzer, Descriptor, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var temp")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream temp")]
-        [TestCase("out FileStream _")]
-        public static void CallWithOutParameterExpressionBody(string expression)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var temp")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream temp")]
+    [TestCase("out FileStream _")]
+    public static void CallWithOutParameterExpressionBody(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -104,17 +104,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-            RoslynAssert.Valid(Analyzer, Descriptor, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var temp")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream? temp")]
-        [TestCase("out FileStream _")]
-        public static void DiscardedCachedOutParameter(string expression)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var temp")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream? temp")]
+    [TestCase("out FileStream _")]
+    public static void DiscardedCachedOutParameter(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -140,13 +140,13 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CachedOutParameter()
-        {
-            var code = @"
+    [Test]
+    public static void CachedOutParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -177,13 +177,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningVariableViaOutParameter()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningVariableViaOutParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -212,13 +212,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningOutParameterExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningOutParameterExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -229,13 +229,13 @@ namespace N
         public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningVariableViaOutParameterTwiceDisposingBetweenCalls()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -258,13 +258,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningFieldViaConcurrentDictionaryTryGetValue()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningFieldViaConcurrentDictionaryTryGetValue()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -282,13 +282,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningFieldViaConcurrentDictionaryTryGetValueTwice()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -307,13 +307,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningFieldWithCachedViaOutParameter()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningFieldWithCachedViaOutParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -335,13 +335,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningVariableViaRefParameter()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningVariableViaRefParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -362,13 +362,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningVariableViaRefParameterTwiceDisposingBetweenCalls()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -391,13 +391,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ChainedOut()
-        {
-            var code = @"
+    [Test]
+    public static void ChainedOut()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -416,13 +416,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SeparateDeclarationAndCreation()
-        {
-            var code = @"
+    [Test]
+    public static void SeparateDeclarationAndCreation()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -438,13 +438,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void TryGetOutVar()
-        {
-            var code = @"
+    [Test]
+    public static void TryGetOutVar()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -470,13 +470,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void AssigningReturnOut()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningReturnOut()
+    {
+        var code = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -497,13 +497,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void AssigningReturnOutTwice()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningReturnOutTwice()
+    {
+        var code = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -530,7 +530,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
     }
 }

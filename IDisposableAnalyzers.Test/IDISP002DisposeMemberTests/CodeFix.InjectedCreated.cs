@@ -1,20 +1,20 @@
-namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class InjectedCreated
     {
-        public static class InjectedCreated
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-            private static readonly DisposeMemberFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly DisposeMemberFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
-            [Test]
-            public static void CtorPassingCreatedIntoPrivateCtor()
-            {
-                var before = @"
+        [Test]
+        public static void CtorPassingCreatedIntoPrivateCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -39,7 +39,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -64,14 +64,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
-            {
-                var before = @"
+        [Test]
+        public static void FieldAssignedWithFactoryPassingCreatedIntoPrivateCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -96,7 +96,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -121,14 +121,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
-            {
-                var factoryCode = @"
+        [Test]
+        public static void FieldAssignedWithExtensionMethodFactoryAssigningInCtor()
+        {
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -142,7 +142,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -162,7 +162,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -182,14 +182,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
+        }
 
-            [Test]
-            public static void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
-            {
-                var factoryCode = @"
+        [Test]
+        public static void FieldAssignedWithGenericExtensionMethodFactoryAssigningInCtor()
+        {
+            var factoryCode = @"
 namespace N
 {
     using System;
@@ -203,7 +203,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -223,7 +223,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -243,14 +243,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, factoryCode, before }, after);
+        }
 
-            [Test]
-            public static void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void FieldAssignedWithInjectedListOfIntGetEnumeratorInCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -271,7 +271,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -292,9 +292,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

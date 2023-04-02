@@ -1,21 +1,20 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+
+public sealed class Disposable : IDisposable
 {
-    using System;
-
-    public sealed class Disposable : IDisposable
+    public Disposable(string meh)
+        : this()
     {
-        public Disposable(string meh)
-            : this()
-        {
-        }
+    }
 
-        public Disposable()
-        {
-        }
+    public Disposable()
+    {
+    }
 
-        public void Dispose()
-        {
-        }
+    public void Dispose()
+    {
     }
 }

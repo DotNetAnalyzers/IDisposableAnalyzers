@@ -5,9 +5,8 @@
 // ReSharper disable RedundantAssignment
 // ReSharper disable ArrangeAccessorOwnerBody
 // ReSharper disable FunctionRecursiveOnAllPaths
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+class AbstractFooImpl1Impl : AbstractFooImpl1
 {
-    class AbstractFooImpl1Impl : AbstractFooImpl1
-    {
-    }
 }

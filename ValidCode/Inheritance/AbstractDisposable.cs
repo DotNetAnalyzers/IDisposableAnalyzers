@@ -1,15 +1,14 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+using System;
+
+public abstract class AbstractDisposable : IDisposable
 {
-    using System;
-
-    public abstract class AbstractDisposable : IDisposable
+    public void Dispose()
     {
-        public void Dispose()
-        {
-            this.Dispose(disposing: true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected abstract void Dispose(bool disposing);
+        this.Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
+
+    protected abstract void Dispose(bool disposing);
 }

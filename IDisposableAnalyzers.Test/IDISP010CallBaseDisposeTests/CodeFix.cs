@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests
+﻿namespace IDisposableAnalyzers.Test.IDISP010CallBaseDisposeTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DisposeMethodAnalyzer Analyzer = new();
+    private static readonly AddBaseCallFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP010CallBaseDispose);
 
-    public static class CodeFix
-    {
-        private static readonly DisposeMethodAnalyzer Analyzer = new();
-        private static readonly AddBaseCallFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP010CallBaseDispose);
-
-        private const string DisposableCode = @"
+    private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -22,10 +22,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void WhenNotCallingBaseDisposeWithBaseCode()
-        {
-            var baseClass = @"
+    [Test]
+    public static void WhenNotCallingBaseDisposeWithBaseCode()
+    {
+        var baseClass = @"
 namespace N
 {
     using System;
@@ -56,7 +56,7 @@ namespace N
         }
     }
 }";
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C : BaseClass
@@ -67,7 +67,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C : BaseClass
@@ -78,14 +78,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+    }
 
-        [Test]
-        public static void WhenNotCallingBaseDisposeWithoutBaseCode()
-        {
-            var before = @"
+    [Test]
+    public static void WhenNotCallingBaseDisposeWithoutBaseCode()
+    {
+        var before = @"
 namespace N
 {
     using System.IO;
@@ -103,7 +103,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.IO;
@@ -121,14 +121,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, before }, after);
+    }
 
-        [Test]
-        public static void WhenNotCallingOverriddenDispose()
-        {
-            var baseClass = @"
+    [Test]
+    public static void WhenNotCallingOverriddenDispose()
+    {
+        var baseClass = @"
 namespace N
 {
     using System;
@@ -153,7 +153,7 @@ namespace N
     }
 }";
 
-            var before = @"
+        var before = @"
 namespace N
 {
     public class C : BaseClass
@@ -164,7 +164,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     public class C : BaseClass
@@ -176,8 +176,7 @@ namespace N
     }
 }";
 
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { DisposableCode, baseClass, before }, after);
     }
 }

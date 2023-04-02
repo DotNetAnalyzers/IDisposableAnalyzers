@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class DisposableMixins : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod DisposeWith;
 
-    internal class DisposableMixins : QualifiedType
+    internal DisposableMixins()
+        : base("System.Reactive.Disposables.DisposableMixins")
     {
-        internal readonly QualifiedMethod DisposeWith;
-
-        internal DisposableMixins()
-            : base("System.Reactive.Disposables.DisposableMixins")
-        {
-            this.DisposeWith = new QualifiedMethod(this, nameof(this.DisposeWith));
-        }
+        this.DisposeWith = new QualifiedMethod(this, nameof(this.DisposeWith));
     }
 }

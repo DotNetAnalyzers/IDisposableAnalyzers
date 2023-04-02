@@ -1,18 +1,17 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using System;
+using System.Collections.Concurrent;
+
+internal static class ConcurrentQueueExt
 {
-    using System;
-    using System.Collections.Concurrent;
-
-    internal static class ConcurrentQueueExt
+    internal static T GetOrCreate<T>(this ConcurrentQueue<T> queue, Func<T> create)
     {
-        internal static T GetOrCreate<T>(this ConcurrentQueue<T> queue, Func<T> create)
+        if (queue.TryDequeue(out var item))
         {
-            if (queue.TryDequeue(out var item))
-            {
-                return item;
-            }
-
-            return create();
+            return item;
         }
+
+        return create();
     }
 }

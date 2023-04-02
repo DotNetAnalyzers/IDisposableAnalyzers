@@ -1,16 +1,15 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+// ReSharper disable once InconsistentNaming
+internal class IEnumerableType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod GetEnumerator;
 
-    // ReSharper disable once InconsistentNaming
-    internal class IEnumerableType : QualifiedType
+    internal IEnumerableType()
+        : base("System.Collections.IEnumerable")
     {
-        internal readonly QualifiedMethod GetEnumerator;
-
-        internal IEnumerableType()
-            : base("System.Collections.IEnumerable")
-        {
-            this.GetEnumerator = new QualifiedMethod(this, nameof(this.GetEnumerator));
-        }
+        this.GetEnumerator = new QualifiedMethod(this, nameof(this.GetEnumerator));
     }
 }

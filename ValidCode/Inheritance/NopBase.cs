@@ -1,17 +1,16 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+using System;
+
+public class NopBase : IDisposable
 {
-    using System;
-
-    public class NopBase : IDisposable
+    public void Dispose()
     {
-        public void Dispose()
-        {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        protected virtual void Dispose(bool disposing)
-        {
-        }
+    protected virtual void Dispose(bool disposing)
+    {
     }
 }

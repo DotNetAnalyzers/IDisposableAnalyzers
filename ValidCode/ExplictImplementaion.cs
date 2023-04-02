@@ -1,14 +1,13 @@
-﻿namespace ValidCode
+﻿namespace ValidCode;
+
+using System;
+
+public sealed class ExplictImplementaion : IDisposable
 {
-    using System;
+    private readonly Disposable disposable = new();
 
-    public sealed class ExplictImplementaion : IDisposable
+    void IDisposable.Dispose()
     {
-        private readonly Disposable disposable = new();
-
-        void IDisposable.Dispose()
-        {
-            this.disposable.Dispose();
-        }
+        this.disposable.Dispose();
     }
 }

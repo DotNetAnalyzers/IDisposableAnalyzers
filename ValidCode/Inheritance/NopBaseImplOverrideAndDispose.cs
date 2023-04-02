@@ -1,19 +1,18 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+using System.IO;
+
+class NopBaseImplOverrideAndDispose : NopBase
 {
-    using System.IO;
+    private readonly Stream stream = File.OpenRead(string.Empty);
 
-    class NopBaseImplOverrideAndDispose : NopBase
+    protected override void Dispose(bool disposing)
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-
-        protected override void Dispose(bool disposing)
+        if (disposing)
         {
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
-
-            base.Dispose(disposing);
+            this.stream.Dispose();
         }
+
+        base.Dispose(disposing);
     }
 }

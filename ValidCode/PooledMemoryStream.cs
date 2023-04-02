@@ -1,100 +1,99 @@
-﻿namespace ValidCode
+﻿namespace ValidCode;
+
+using System;
+using System.Collections.Concurrent;
+using System.IO;
+
+internal class PooledMemoryStream : Stream
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.IO;
+    private static readonly ConcurrentQueue<MemoryStream> Pool = new ConcurrentQueue<MemoryStream>();
+    private readonly MemoryStream inner;
 
-    internal class PooledMemoryStream : Stream
+    private bool disposed;
+
+    private PooledMemoryStream(MemoryStream inner)
     {
-        private static readonly ConcurrentQueue<MemoryStream> Pool = new ConcurrentQueue<MemoryStream>();
-        private readonly MemoryStream inner;
+        this.inner = inner;
+    }
 
-        private bool disposed;
+    /// <inheritdoc/>
+    public override bool CanRead => !this.disposed;
 
-        private PooledMemoryStream(MemoryStream inner)
+    /// <inheritdoc/>
+    public override bool CanSeek => !this.disposed;
+
+    /// <inheritdoc/>
+    public override bool CanWrite => !this.disposed;
+
+    /// <see cref="MemoryStream.Length"/>
+    public override long Length => this.inner.Length;
+
+    /// <inheritdoc/>
+    public override long Position
+    {
+        get => this.inner.Position;
+        set => this.inner.Position = value;
+    }
+
+    /// <inheritdoc/>
+    public override void Flush()
+    {
+        // nop
+    }
+
+    /// <inheritdoc/>
+    public override long Seek(long offset, SeekOrigin origin) => this.inner.Seek(offset, origin);
+
+    /// <inheritdoc/>
+    public override void SetLength(long value) => this.inner.SetLength(value);
+
+    /// <inheritdoc/>
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        this.CheckDisposed();
+        return this.inner.Read(buffer, offset, count);
+    }
+
+    /// <inheritdoc/>
+    public override void Write(byte[] buffer, int offset, int count)
+    {
+        this.CheckDisposed();
+        this.inner.Write(buffer, offset, count);
+    }
+
+    internal static PooledMemoryStream Borrow()
+    {
+        if (Pool.TryDequeue(out var stream))
         {
-            this.inner = inner;
+            return new PooledMemoryStream(stream);
         }
 
-        /// <inheritdoc/>
-        public override bool CanRead => !this.disposed;
+        return new PooledMemoryStream(new MemoryStream());
+    }
 
-        /// <inheritdoc/>
-        public override bool CanSeek => !this.disposed;
-
-        /// <inheritdoc/>
-        public override bool CanWrite => !this.disposed;
-
-        /// <see cref="MemoryStream.Length"/>
-        public override long Length => this.inner.Length;
-
-        /// <inheritdoc/>
-        public override long Position
+    /// <inheritdoc/>
+    protected override void Dispose(bool disposing)
+    {
+        if (this.disposed)
         {
-            get => this.inner.Position;
-            set => this.inner.Position = value;
+            return;
         }
 
-        /// <inheritdoc/>
-        public override void Flush()
+        this.disposed = true;
+        if (disposing)
         {
-            // nop
+            this.inner.SetLength(0);
+            Pool.Enqueue(this.inner);
         }
 
-        /// <inheritdoc/>
-        public override long Seek(long offset, SeekOrigin origin) => this.inner.Seek(offset, origin);
+        base.Dispose(disposing);
+    }
 
-        /// <inheritdoc/>
-        public override void SetLength(long value) => this.inner.SetLength(value);
-
-        /// <inheritdoc/>
-        public override int Read(byte[] buffer, int offset, int count)
+    private void CheckDisposed()
+    {
+        if (this.disposed)
         {
-            this.CheckDisposed();
-            return this.inner.Read(buffer, offset, count);
-        }
-
-        /// <inheritdoc/>
-        public override void Write(byte[] buffer, int offset, int count)
-        {
-            this.CheckDisposed();
-            this.inner.Write(buffer, offset, count);
-        }
-
-        internal static PooledMemoryStream Borrow()
-        {
-            if (Pool.TryDequeue(out var stream))
-            {
-                return new PooledMemoryStream(stream);
-            }
-
-            return new PooledMemoryStream(new MemoryStream());
-        }
-
-        /// <inheritdoc/>
-        protected override void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-                this.inner.SetLength(0);
-                Pool.Enqueue(this.inner);
-            }
-
-            base.Dispose(disposing);
-        }
-
-        private void CheckDisposed()
-        {
-            if (this.disposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }

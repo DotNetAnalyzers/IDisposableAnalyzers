@@ -1,29 +1,28 @@
-﻿namespace ValidCode
+﻿namespace ValidCode;
+
+using System;
+using System.IO;
+
+public sealed class ReassigningField : IDisposable
 {
-    using System;
-    using System.IO;
+    private Stream? stream;
 
-    public sealed class ReassigningField : IDisposable
+    public void DisposeAndReassign()
     {
-        private Stream? stream;
-
-        public void DisposeAndReassign()
-        {
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-            this.stream.Dispose();
+        this.stream.Dispose();
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
-            this.stream = File.OpenRead(string.Empty);
-        }
+        this.stream = File.OpenRead(string.Empty);
+    }
 
-        public void ConditionalDisposeAndReassign()
-        {
-            this.stream?.Dispose();
-            this.stream = File.OpenRead(string.Empty);
-        }
+    public void ConditionalDisposeAndReassign()
+    {
+        this.stream?.Dispose();
+        this.stream = File.OpenRead(string.Empty);
+    }
 
-        public void Dispose()
-        {
-            this.stream?.Dispose();
-        }
+    public void Dispose()
+    {
+        this.stream?.Dispose();
     }
 }

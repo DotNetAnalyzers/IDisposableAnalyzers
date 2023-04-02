@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-
-    using NUnit.Framework;
-
-    public static partial class Valid
+    [Test]
+    public static void SerialDisposable()
     {
-        [Test]
-        public static void SerialDisposable()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -32,13 +32,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void SingleAssignmentDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void SingleAssignmentDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -61,13 +61,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void CompositeDisposableInitializer()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -94,13 +94,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableCtor()
-        {
-            var code = @"
+    [Test]
+    public static void CompositeDisposableCtor()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -125,13 +125,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableAddIObservableSubscribe()
-        {
-            var code = @"
+    [Test]
+    public static void CompositeDisposableAddIObservableSubscribe()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -152,13 +152,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableAddNewSingleAssignmentDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void CompositeDisposableAddNewSingleAssignmentDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -179,13 +179,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableAddThrottleSubscribe()
-        {
-            var code = @"
+    [Test]
+    public static void CompositeDisposableAddThrottleSubscribe()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -208,13 +208,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableExtAddAndReturn()
-        {
-            var compositeDisposableExtCode = @"
+    [Test]
+    public static void CompositeDisposableExtAddAndReturn()
+    {
+        var compositeDisposableExtCode = @"
 namespace N
 {
     using System;
@@ -234,7 +234,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -255,13 +255,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void CompositeDisposableExtAddAndReturnToString()
-        {
-            var compositeDisposableExtCode = @"
+    [Test]
+    public static void CompositeDisposableExtAddAndReturnToString()
+    {
+        var compositeDisposableExtCode = @"
 namespace N
 {
     using System;
@@ -281,7 +281,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -302,13 +302,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, new[] { DisposableCode, compositeDisposableExtCode, code }, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void ISchedulerSchedule()
-        {
-            var code = @"
+    [Test]
+    public static void ISchedulerSchedule()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -323,13 +323,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void ObservableElvisSubscribeIssue221()
-        {
-            var code = @"
+    [Test]
+    public static void ObservableElvisSubscribeIssue221()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -367,13 +367,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void AsReadOnlyViewAsReadOnlyFilteredView()
-        {
-            var code = @"
+    [Test]
+    public static void AsReadOnlyViewAsReadOnlyFilteredView()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -402,13 +402,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void AsReadOnlyFilteredViewAsMappingView()
-        {
-            var code = @"
+    [Test]
+    public static void AsReadOnlyFilteredViewAsMappingView()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -435,13 +435,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void AssigningGenericSerialDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void AssigningGenericSerialDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -466,13 +466,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
+    }
 
-        [Test]
-        public static void DisposeWith()
-        {
-            var code = @"
+    [Test]
+    public static void DisposeWith()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -495,7 +495,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: LibrarySettings.Reactive);
     }
 }

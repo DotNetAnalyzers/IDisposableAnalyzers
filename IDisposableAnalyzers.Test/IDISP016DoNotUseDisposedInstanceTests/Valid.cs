@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP016DoNotUseDisposedInstanceTests
+﻿namespace IDisposableAnalyzers.Test.IDISP016DoNotUseDisposedInstanceTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using NUnit.Framework;
+    private static readonly DisposeCallAnalyzer Analyzer = new();
+    private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP016DoNotUseDisposedInstance;
 
-    public static partial class Valid
-    {
-        private static readonly DisposeCallAnalyzer Analyzer = new();
-        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP016DoNotUseDisposedInstance;
-
-        private const string DisposableCode = @"
+    private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -22,10 +22,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void Issue348()
-        {
-            var code = @"
+    [Test]
+    public static void Issue348()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -89,7 +89,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, DisposableCode, code);
     }
 }

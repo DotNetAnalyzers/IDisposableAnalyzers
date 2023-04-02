@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class GCType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod SuppressFinalize;
 
-    internal class GCType : QualifiedType
+    internal GCType()
+        : base("System.GC")
     {
-        internal readonly QualifiedMethod SuppressFinalize;
-
-        internal GCType()
-            : base("System.GC")
-        {
-            this.SuppressFinalize = new QualifiedMethod(this, nameof(this.SuppressFinalize));
-        }
+        this.SuppressFinalize = new QualifiedMethod(this, nameof(this.SuppressFinalize));
     }
 }

@@ -1,32 +1,31 @@
-﻿namespace ValidCode.Rx
+﻿namespace ValidCode.Rx;
+
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+public class NotifyPropertyChanged : INotifyPropertyChanged
 {
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
+    private int value;
 
-    public class NotifyPropertyChanged : INotifyPropertyChanged
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public int Value
     {
-        private int value;
-
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        public int Value
+        get => this.value;
+        set
         {
-            get => this.value;
-            set
+            if (value == this.value)
             {
-                if (value == this.value)
-                {
-                    return;
-                }
-
-                this.value = value;
-                this.OnPropertyChanged();
+                return;
             }
-        }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.value = value;
+            this.OnPropertyChanged();
         }
+    }
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

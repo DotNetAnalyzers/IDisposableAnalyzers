@@ -1,23 +1,22 @@
 ﻿// ReSharper disable All
-namespace ValidCode.ReactiveIUi
+namespace ValidCode.ReactiveIUi;
+
+using System;
+using System.IO;
+using System.Reactive.Disposables;
+
+sealed class DisposeWith : IDisposable
 {
-    using System;
-    using System.IO;
-    using System.Reactive.Disposables;
+    private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private readonly IDisposable disposable;
 
-    sealed class DisposeWith : IDisposable
+    public DisposeWith()
     {
-        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
-        private readonly IDisposable disposable;
+        this.disposable = File.OpenRead(string.Empty).DisposeWith(this.compositeDisposable);
+    }
 
-        public DisposeWith()
-        {
-            this.disposable = File.OpenRead(string.Empty).DisposeWith(this.compositeDisposable);
-        }
-
-        public void Dispose()
-        {
-            this.compositeDisposable.Dispose();
-        }
+    public void Dispose()
+    {
+        this.compositeDisposable.Dispose();
     }
 }

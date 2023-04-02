@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class HttpResponseMessageType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod EnsureSuccessStatusCode;
 
-    internal class HttpResponseMessageType : QualifiedType
+    internal HttpResponseMessageType()
+        : base("System.Net.Http.HttpResponseMessage")
     {
-        internal readonly QualifiedMethod EnsureSuccessStatusCode;
-
-        internal HttpResponseMessageType()
-            : base("System.Net.Http.HttpResponseMessage")
-        {
-            this.EnsureSuccessStatusCode = new QualifiedMethod(this, nameof(this.EnsureSuccessStatusCode));
-        }
+        this.EnsureSuccessStatusCode = new QualifiedMethod(this, nameof(this.EnsureSuccessStatusCode));
     }
 }

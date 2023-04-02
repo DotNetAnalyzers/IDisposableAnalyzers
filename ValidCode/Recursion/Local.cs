@@ -1,14 +1,13 @@
-﻿namespace ValidCode.Recursion
-{
-    using System;
+﻿namespace ValidCode.Recursion;
 
-    public class Local
+using System;
+
+public class Local
+{
+    public Local(IDisposable disposable)
     {
-        public Local(IDisposable disposable)
-        {
-            var value = disposable;
+        var value = disposable;
 #pragma warning disable CS1717
-            value = value;
-        }
+        value = value;
     }
 }

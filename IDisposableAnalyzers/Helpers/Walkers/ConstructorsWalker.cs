@@ -1,151 +1,150 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using System.Collections.Generic;
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+internal sealed class ConstructorsWalker : PooledWalker<ConstructorsWalker>
 {
-    using System.Collections.Generic;
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new();
+    private readonly List<ObjectCreationExpressionSyntax> objectCreations = new();
+    private readonly List<ConstructorInitializerSyntax> initializers = new();
 
-    internal sealed class ConstructorsWalker : PooledWalker<ConstructorsWalker>
+    private SemanticModel semanticModel = null!;
+    private CancellationToken cancellationToken;
+    private TypeDeclarationSyntax context = null!;
+    private INamedTypeSymbol? type;
+
+    private ConstructorsWalker()
     {
-        private readonly List<ConstructorDeclarationSyntax> nonPrivateCtors = new();
-        private readonly List<ObjectCreationExpressionSyntax> objectCreations = new();
-        private readonly List<ConstructorInitializerSyntax> initializers = new();
+    }
 
-        private SemanticModel semanticModel = null!;
-        private CancellationToken cancellationToken;
-        private TypeDeclarationSyntax context = null!;
-        private INamedTypeSymbol? type;
+    internal IReadOnlyList<ConstructorDeclarationSyntax> NonPrivateCtors => this.nonPrivateCtors;
 
-        private ConstructorsWalker()
+    internal IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
+
+    internal IReadOnlyList<ConstructorInitializerSyntax> Initializers => this.initializers;
+
+    internal ConstructorDeclarationSyntax? Default { get; private set; }
+
+    private INamedTypeSymbol Type => this.type ??= (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken)!;
+
+    public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+    {
+        if (ReferenceEquals(this.context, node.Parent))
         {
+            if (!node.Modifiers.Any(SyntaxKind.PrivateKeyword))
+            {
+                this.nonPrivateCtors.Add(node);
+            }
+
+            if (node.ParameterList.Parameters.Count == 0)
+            {
+                this.Default = node;
+            }
         }
 
-        internal IReadOnlyList<ConstructorDeclarationSyntax> NonPrivateCtors => this.nonPrivateCtors;
+        base.VisitConstructorDeclaration(node);
+    }
 
-        internal IReadOnlyList<ObjectCreationExpressionSyntax> ObjectCreations => this.objectCreations;
-
-        internal IReadOnlyList<ConstructorInitializerSyntax> Initializers => this.initializers;
-
-        internal ConstructorDeclarationSyntax? Default { get; private set; }
-
-        private INamedTypeSymbol Type => this.type ??= (INamedTypeSymbol)this.semanticModel.GetDeclaredSymbolSafe(this.context, this.cancellationToken)!;
-
-        public override void VisitConstructorDeclaration(ConstructorDeclarationSyntax node)
+    public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
+    {
+        if (node.Type is SimpleNameSyntax typeName &&
+            typeName.Identifier.ValueText == this.context.Identifier.ValueText)
         {
-            if (ReferenceEquals(this.context, node.Parent))
-            {
-                if (!node.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                {
-                    this.nonPrivateCtors.Add(node);
-                }
-
-                if (node.ParameterList.Parameters.Count == 0)
-                {
-                    this.Default = node;
-                }
-            }
-
-            base.VisitConstructorDeclaration(node);
-        }
-
-        public override void VisitObjectCreationExpression(ObjectCreationExpressionSyntax node)
-        {
-            if (node.Type is SimpleNameSyntax typeName &&
-                typeName.Identifier.ValueText == this.context.Identifier.ValueText)
-            {
-                if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                    TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
-                {
-                    this.objectCreations.Add(node);
-                }
-            }
-            else if (node.Type is QualifiedNameSyntax qualifiedName &&
-                     qualifiedName.Right.Identifier.ValueText == this.context.Identifier.ValueText)
-            {
-                if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                    TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
-                {
-                    this.objectCreations.Add(node);
-                }
-            }
-            else if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
-                     TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
+            if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
             {
                 this.objectCreations.Add(node);
             }
-
-            base.VisitObjectCreationExpression(node);
         }
-
-        public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
+        else if (node.Type is QualifiedNameSyntax qualifiedName &&
+                 qualifiedName.Right.Identifier.ValueText == this.context.Identifier.ValueText)
         {
-            if (node.Parent?.Parent == this.context)
+            if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
             {
-                this.initializers.Add(node);
+                this.objectCreations.Add(node);
             }
-
-            base.VisitConstructorInitializer(node);
         }
-
-        internal static ConstructorsWalker Borrow(TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+        else if (this.semanticModel.TryGetSymbol(node, this.cancellationToken, out var ctor) &&
+                 TypeSymbolComparer.Equal(this.Type, ctor.ContainingType))
         {
-            var walker = Borrow(() => new ConstructorsWalker());
-            walker.semanticModel = semanticModel;
-            walker.cancellationToken = cancellationToken;
-            walker.context = context;
-
-            if (context.Modifiers.Any(SyntaxKind.PartialKeyword))
-            {
-                foreach (var reference in walker.Type.DeclaringSyntaxReferences)
-                {
-                    walker.Visit(reference.GetSyntax(cancellationToken));
-                }
-            }
-            else
-            {
-                walker.Visit(context);
-                if (context is StructDeclarationSyntax)
-                {
-                    return walker;
-                }
-
-                if (context is ClassDeclarationSyntax { BaseList: null })
-                {
-                    return walker;
-                }
-            }
-
-            if (walker.nonPrivateCtors.Count == 0 &&
-                walker.Default is null)
-            {
-                if (Constructor.TryFindDefault(walker.Type, Search.Recursive, out var defaultCtor) &&
-                    defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax? defaultCtorDeclaration))
-                {
-                    walker.Default = defaultCtorDeclaration;
-                    if (!defaultCtorDeclaration.Modifiers.Any(SyntaxKind.PrivateKeyword))
-                    {
-                        walker.nonPrivateCtors.Add(defaultCtorDeclaration);
-                    }
-
-                    walker.Visit(walker.Default);
-                }
-            }
-
-            return walker;
+            this.objectCreations.Add(node);
         }
 
-        protected override void Clear()
+        base.VisitObjectCreationExpression(node);
+    }
+
+    public override void VisitConstructorInitializer(ConstructorInitializerSyntax node)
+    {
+        if (node.Parent?.Parent == this.context)
         {
-            this.nonPrivateCtors.Clear();
-            this.objectCreations.Clear();
-            this.initializers.Clear();
-            this.Default = null!;
-            this.semanticModel = null!;
-            this.cancellationToken = CancellationToken.None;
-            this.type = null!;
-            this.context = null!;
+            this.initializers.Add(node);
         }
+
+        base.VisitConstructorInitializer(node);
+    }
+
+    internal static ConstructorsWalker Borrow(TypeDeclarationSyntax context, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        var walker = Borrow(() => new ConstructorsWalker());
+        walker.semanticModel = semanticModel;
+        walker.cancellationToken = cancellationToken;
+        walker.context = context;
+
+        if (context.Modifiers.Any(SyntaxKind.PartialKeyword))
+        {
+            foreach (var reference in walker.Type.DeclaringSyntaxReferences)
+            {
+                walker.Visit(reference.GetSyntax(cancellationToken));
+            }
+        }
+        else
+        {
+            walker.Visit(context);
+            if (context is StructDeclarationSyntax)
+            {
+                return walker;
+            }
+
+            if (context is ClassDeclarationSyntax { BaseList: null })
+            {
+                return walker;
+            }
+        }
+
+        if (walker.nonPrivateCtors.Count == 0 &&
+            walker.Default is null)
+        {
+            if (Constructor.TryFindDefault(walker.Type, Search.Recursive, out var defaultCtor) &&
+                defaultCtor.TrySingleDeclaration(cancellationToken, out ConstructorDeclarationSyntax? defaultCtorDeclaration))
+            {
+                walker.Default = defaultCtorDeclaration;
+                if (!defaultCtorDeclaration.Modifiers.Any(SyntaxKind.PrivateKeyword))
+                {
+                    walker.nonPrivateCtors.Add(defaultCtorDeclaration);
+                }
+
+                walker.Visit(walker.Default);
+            }
+        }
+
+        return walker;
+    }
+
+    protected override void Clear()
+    {
+        this.nonPrivateCtors.Clear();
+        this.objectCreations.Clear();
+        this.initializers.Clear();
+        this.Default = null!;
+        this.semanticModel = null!;
+        this.cancellationToken = CancellationToken.None;
+        this.type = null!;
+        this.context = null!;
     }
 }

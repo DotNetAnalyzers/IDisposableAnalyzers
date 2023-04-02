@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class Injected
     {
-        public static class Injected
+        [Test]
+        public static void IgnoreAssignedWithCtorArgument()
         {
-            [Test]
-            public static void IgnoreAssignedWithCtorArgument()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -25,13 +25,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void IgnoreAssignedWithCtorArgumentIndexer()
-            {
-                var code = @"
+        [Test]
+        public static void IgnoreAssignedWithCtorArgumentIndexer()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -46,13 +46,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
-            {
-                var code = @"
+        [Test]
+        public static void IgnoreInjectedAndCreatedPropertyWhenFactoryTouchesIndexer()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -73,13 +73,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, DisposableCode, code);
-            }
+            RoslynAssert.Valid(Analyzer, DisposableCode, code);
+        }
 
-            [Test]
-            public static void IgnoreDictionaryPassedInViaCtor()
-            {
-                var code = @"
+        [Test]
+        public static void IgnoreDictionaryPassedInViaCtor()
+        {
+            var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -95,13 +95,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void IgnorePassedInViaCtorUnderscore()
-            {
-                var code = @"
+        [Test]
+        public static void IgnorePassedInViaCtorUnderscore()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -116,13 +116,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
-            {
-                var code = @"
+        [Test]
+        public static void IgnorePassedInViaCtorUnderscoreWhenClassIsDisposable()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -141,13 +141,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void AssignedWithCreatedAndInjected()
-            {
-                var code = @"
+        [Test]
+        public static void AssignedWithCreatedAndInjected()
+        {
+            var code = @"
 #pragma warning disable IDISP008
 namespace N
 {
@@ -169,8 +169,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

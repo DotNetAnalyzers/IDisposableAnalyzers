@@ -1,13 +1,13 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
+    private static readonly CreationAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
-    public static partial class CodeFix
-    {
-        private static readonly CreationAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -19,5 +19,4 @@ namespace N
         }
     }
 }";
-    }
 }

@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+[TestFixture(typeof(LocalDeclarationAnalyzer))]
+[TestFixture(typeof(ArgumentAnalyzer))]
+[TestFixture(typeof(AssignmentAnalyzer))]
+public static class Valid<T>
+    where T : DiagnosticAnalyzer, new()
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new T();
 
-    [TestFixture(typeof(LocalDeclarationAnalyzer))]
-    [TestFixture(typeof(ArgumentAnalyzer))]
-    [TestFixture(typeof(AssignmentAnalyzer))]
-    public static class Valid<T>
-        where T : DiagnosticAnalyzer, new()
-    {
-        private static readonly DiagnosticAnalyzer Analyzer = new T();
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -31,10 +31,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void LocalDisposeAsync()
-        {
-            var code = @"
+    [Test]
+    public static void LocalDisposeAsync()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -50,13 +50,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void LocalDisposeAsyncInFinally()
-        {
-            var code = @"
+    [Test]
+    public static void LocalDisposeAsyncInFinally()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -79,13 +79,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IServiceProviderGetRequiredService()
-        {
-            var code = @"
+    [Test]
+    public static void IServiceProviderGetRequiredService()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -119,14 +119,14 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("response.RegisterForDispose(new Disposable())")]
-        [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
-        public static void RegisterForDispose(string expression)
-        {
-            var code = @"
+    [TestCase("response.RegisterForDispose(new Disposable())")]
+    [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
+    public static void RegisterForDispose(string expression)
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.AspNetCore.Http;
@@ -140,14 +140,14 @@ namespace N
     }
 }".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [TestCase("serviceProvider.GetService<Disposable>()")]
-        [TestCase("serviceProvider.GetRequiredService<Disposable>()")]
-        public static void Issue293(string expression)
-        {
-            var code = @"
+    [TestCase("serviceProvider.GetService<Disposable>()")]
+    [TestCase("serviceProvider.GetRequiredService<Disposable>()")]
+    public static void Issue293(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -162,15 +162,15 @@ namespace N
     }
 }".AssertReplace("serviceProvider.GetService<Disposable>()", expression);
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [TestCase("app.Run()")]
-        [TestCase("await app.RunAsync()")]
-        [TestCase("await app.RunAsync().ConfigureAwait(false)")]
-        public static void AppRun(string expression)
-        {
-            var code = @"
+    [TestCase("app.Run()")]
+    [TestCase("await app.RunAsync()")]
+    [TestCase("await app.RunAsync().ConfigureAwait(false)")]
+    public static void AppRun(string expression)
+    {
+        var code = @"
 using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -178,13 +178,13 @@ var app = builder.Build();
 app.Run();
 ".AssertReplace("app.Run()", expression);
 
-            RoslynAssert.Valid(Analyzer, code, settings: WebSettings.Exe);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: WebSettings.Exe);
+    }
 
-        [Test]
-        public static void Issue330()
-        {
-            var code = @"
+    [Test]
+    public static void Issue330()
+    {
+        var code = @"
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -216,7 +216,6 @@ app.MapRazorPages();
 app.Run();
 ";
 
-            RoslynAssert.Valid(Analyzer, code, settings: WebSettings.Exe);
-        }
+        RoslynAssert.Valid(Analyzer, code, settings: WebSettings.Exe);
     }
 }

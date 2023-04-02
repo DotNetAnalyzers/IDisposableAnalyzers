@@ -1,19 +1,19 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public static partial class Valid<T>
+{
+    [TestCase("out _")]
+    [TestCase("out var stream")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream? stream")]
+    [TestCase("out FileStream _")]
+    public static void DictionaryTryGetValue(string expression)
     {
-        [TestCase("out _")]
-        [TestCase("out var stream")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream? stream")]
-        [TestCase("out FileStream _")]
-        public static void DictionaryTryGetValue(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -26,17 +26,17 @@ namespace N
         public static bool M(int i) => Map.TryGetValue(i, out _);
     }
 }".AssertReplace("out _", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("out _")]
-        [TestCase("out var temp")]
-        [TestCase("out var _")]
-        [TestCase("out FileStream? temp")]
-        [TestCase("out FileStream _")]
-        public static void DiscardCachedOutParameter(string expression)
-        {
-            var code = @"
+    [TestCase("out _")]
+    [TestCase("out var temp")]
+    [TestCase("out var _")]
+    [TestCase("out FileStream? temp")]
+    [TestCase("out FileStream _")]
+    public static void DiscardCachedOutParameter(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -62,13 +62,13 @@ namespace N
         }
     }
 }".AssertReplace("out _", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticConcurrentDictionaryGetOrAdd()
-        {
-            var code = @"
+    [Test]
+    public static void StaticConcurrentDictionaryGetOrAdd()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -85,13 +85,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConcurrentDictionaryGetOrAdd()
-        {
-            var code = @"
+    [Test]
+    public static void ConcurrentDictionaryGetOrAdd()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -108,13 +108,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConcurrentDictionaryTryGetValue()
-        {
-            var code = @"
+    [Test]
+    public static void ConcurrentDictionaryTryGetValue()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -136,13 +136,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConcurrentDictionaryTryGetValueVarOut()
-        {
-            var code = @"
+    [Test]
+    public static void ConcurrentDictionaryTryGetValueVarOut()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Concurrent;
@@ -163,13 +163,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConditionalWeakTableTryGetValue()
-        {
-            var code = @"
+    [Test]
+    public static void ConditionalWeakTableTryGetValue()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -191,13 +191,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ConditionalWeakTableTryGetValueVarOut()
-        {
-            var code = @"
+    [Test]
+    public static void ConditionalWeakTableTryGetValueVarOut()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -218,13 +218,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CustomCacheWrappingDictionary()
-        {
-            var code = @"
+    [Test]
+    public static void CustomCacheWrappingDictionary()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -275,13 +275,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PooledConcurrentQueueTryDequeue()
-        {
-            var code = @"
+    [Test]
+    public static void PooledConcurrentQueueTryDequeue()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -333,13 +333,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PooledConcurrentQueueTryDequeue2()
-        {
-            var code = @"
+    [Test]
+    public static void PooledConcurrentQueueTryDequeue2()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -397,13 +397,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TryGetRecursive()
-        {
-            var code = @"
+    [Test]
+    public static void TryGetRecursive()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -455,7 +455,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

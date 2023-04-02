@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CodeFixes;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
+    private static readonly CodeFixProvider Fix = new DisposeMemberFix();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
-    public static class CodeFix
+    [Test]
+    public static void FieldIAsyncDisposable()
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-        private static readonly CodeFixProvider Fix = new DisposeMemberFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
-
-        [Test]
-        public static void FieldIAsyncDisposable()
-        {
-            var before = @"
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -32,7 +32,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -50,13 +50,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldOfTypeObjectIAsyncDisposable()
-        {
-            var before = @"
+    [Test]
+    public static void FieldOfTypeObjectIAsyncDisposable()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -74,7 +74,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -92,13 +92,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldIAsyncDisposableAndIDisposable1()
-        {
-            var before = @"
+    [Test]
+    public static void FieldIAsyncDisposableAndIDisposable1()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -121,7 +121,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -144,13 +144,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldIAsyncDisposableAndIDisposable2()
-        {
-            var before = @"
+    [Test]
+    public static void FieldIAsyncDisposableAndIDisposable2()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -173,7 +173,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -196,13 +196,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void NullableFieldIAsyncDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void NullableFieldIAsyncDisposable()
+    {
+        var code = @"
 #nullable enable
 namespace N
 {
@@ -221,13 +221,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.NoFix(Analyzer, Fix, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void FieldConvertibleToIDisposable()
-        {
-            var before = @"
+    [Test]
+    public static void FieldConvertibleToIDisposable()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -244,7 +244,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -261,13 +261,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldConvertibleToIDisposableAndIAsyncDisposable1()
-        {
-            var before = @"
+    [Test]
+    public static void FieldConvertibleToIDisposableAndIAsyncDisposable1()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -290,7 +290,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -313,13 +313,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldConvertibleToIDisposableAndIAsyncDisposable2()
-        {
-            var before = @"
+    [Test]
+    public static void FieldConvertibleToIDisposableAndIAsyncDisposable2()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -342,7 +342,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -365,13 +365,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void FieldConvertibleToIDisposableAndIAsyncDisposable3()
-        {
-            var before = @"
+    [Test]
+    public static void FieldConvertibleToIDisposableAndIAsyncDisposable3()
+    {
+        var before = @"
 #nullable enable
 namespace N
 {
@@ -393,7 +393,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 #nullable enable
 namespace N
 {
@@ -416,7 +416,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

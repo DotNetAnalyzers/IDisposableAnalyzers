@@ -1,17 +1,16 @@
 ﻿// ReSharper disable All
-namespace ValidCode
-{
-    using System.IO;
+namespace ValidCode;
 
-    public class Locals
+using System.IO;
+
+public class Locals
+{
+    public void TempLocal(string file)
     {
-        public void TempLocal(string file)
-        {
-            var stream = File.OpenRead(file);
+        var stream = File.OpenRead(file);
 #pragma warning disable IDISP017 // Prefer using
-            var temp = stream;
-            temp.Dispose();
+        var temp = stream;
+        temp.Dispose();
 #pragma warning restore IDISP017
-        }
     }
 }

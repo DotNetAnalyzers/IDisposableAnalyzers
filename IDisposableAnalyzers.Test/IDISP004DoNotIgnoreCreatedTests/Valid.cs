@@ -1,13 +1,13 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly CreationAnalyzer Analyzer = new();
 
-    public static partial class Valid
-    {
-        private static readonly CreationAnalyzer Analyzer = new();
-
-        private const string DisposableCode = @"
+    private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -20,20 +20,20 @@ namespace N
     }
 }";
 
-        [TestCase("new Disposable()")]
-        [TestCase("File.OpenRead(fileName)")]
-        [TestCase("(File.OpenRead(fileName), 1)")]
-        [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
-        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
-        [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
-        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
-        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
-        [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
-        [TestCase("new List<Disposable> { new Disposable() }")]
-        [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
-        public static void AssigningLocal(string expression)
-        {
-            var code = @"
+    [TestCase("new Disposable()")]
+    [TestCase("File.OpenRead(fileName)")]
+    [TestCase("(File.OpenRead(fileName), 1)")]
+    [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
+    [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+    [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
+    [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+    [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+    [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+    [TestCase("new List<Disposable> { new Disposable() }")]
+    [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
+    public static void AssigningLocal(string expression)
+    {
+        var code = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -49,23 +49,23 @@ namespace N
         }
     }
 }".AssertReplace("new Disposable()", expression);
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [TestCase("new Disposable()")]
-        [TestCase("File.OpenRead(fileName)")]
-        [TestCase("(File.OpenRead(fileName), 1)")]
-        [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
-        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
-        [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
-        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
-        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
-        [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
-        [TestCase("new List<Disposable> { new Disposable() }")]
-        [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
-        public static void AssigningField(string expression)
-        {
-            var code = @"
+    [TestCase("new Disposable()")]
+    [TestCase("File.OpenRead(fileName)")]
+    [TestCase("(File.OpenRead(fileName), 1)")]
+    [TestCase("(File.OpenRead(fileName), File.OpenRead(fileName))")]
+    [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+    [TestCase("Tuple.Create(File.OpenRead(fileName), File.OpenRead(fileName))")]
+    [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+    [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+    [TestCase("new List<FileStream> { File.OpenRead(fileName), File.OpenRead(fileName) }")]
+    [TestCase("new List<Disposable> { new Disposable() }")]
+    [TestCase("new List<Disposable> { new Disposable(), new Disposable() }")]
+    public static void AssigningField(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -82,13 +82,13 @@ namespace N
         }
     }
 }".AssertReplace("new Disposable()", expression);
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void RealisticExtensionMethodClass()
-        {
-            var code = @"
+    [Test]
+    public static void RealisticExtensionMethodClass()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -205,13 +205,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IfTry()
-        {
-            var code = @"
+    [Test]
+    public static void IfTry()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -232,13 +232,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReadAsyncCall()
-        {
-            var code = @"
+    [Test]
+    public static void ReadAsyncCall()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -273,13 +273,13 @@ namespace N
 }
 ";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReadAsyncConfigureAwait()
-        {
-            var code = @"
+    [Test]
+    public static void ReadAsyncConfigureAwait()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -314,13 +314,13 @@ namespace N
 }
 ";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenGettingPropertyOfDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void WhenGettingPropertyOfDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -373,13 +373,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenGettingPropertyOfProperty()
-        {
-            var code = @"
+    [Test]
+    public static void WhenGettingPropertyOfProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -435,13 +435,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AddingFileOpenReadToList()
-        {
-            var code = @"
+    [Test]
+    public static void AddingFileOpenReadToList()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -456,13 +456,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AddingNewDisposableToList()
-        {
-            var code = @"
+    [Test]
+    public static void AddingNewDisposableToList()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -478,13 +478,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void AddingNewDisposableToListThatIsDisposed()
-        {
-            var code = @"
+    [Test]
+    public static void AddingNewDisposableToListThatIsDisposed()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -508,13 +508,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
-        {
-            var code = @"
+    [Test]
+    public static void AddingNewDisposableToListOfObjectThatIsTouchedInDisposeMethod()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -538,14 +538,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [TestCase("File.Create(fileName).Dispose()")]
-        [TestCase("File.Create(fileName)?.Dispose()")]
-        public static void DisposingInSameStatement(string statement)
-        {
-            var code = @"
+    [TestCase("File.Create(fileName).Dispose()")]
+    [TestCase("File.Create(fileName)?.Dispose()")]
+    public static void DisposingInSameStatement(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -558,16 +558,16 @@ namespace N
         }
     }
 }".AssertReplace("File.Create(fileName).Dispose()", statement);
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [TestCase("Stream().Dispose()")]
-        [TestCase("Stream()?.Dispose()")]
-        [TestCase("this.Stream().Dispose()")]
-        [TestCase("this.Stream()?.Dispose()")]
-        public static void DisposingMethodReturnValue(string expression)
-        {
-            var code = @"
+    [TestCase("Stream().Dispose()")]
+    [TestCase("Stream()?.Dispose()")]
+    [TestCase("this.Stream().Dispose()")]
+    [TestCase("this.Stream()?.Dispose()")]
+    public static void DisposingMethodReturnValue(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -583,14 +583,14 @@ namespace N
     }
 }".AssertReplace("this.Stream().Dispose()", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Stream().Dispose()")]
-        [TestCase("Stream()?.Dispose()")]
-        public static void DisposingStaticMethodReturnValue(string expression)
-        {
-            var code = @"
+    [TestCase("Stream().Dispose()")]
+    [TestCase("Stream()?.Dispose()")]
+    public static void DisposingStaticMethodReturnValue(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -605,16 +605,16 @@ namespace N
         }
     }
 }".AssertReplace("Stream().Dispose()", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Stream.Dispose()")]
-        [TestCase("Stream?.Dispose()")]
-        [TestCase("this.Stream.Dispose()")]
-        [TestCase("this.Stream?.Dispose()")]
-        public static void DisposingPropertyReturnValue(string expression)
-        {
-            var code = @"
+    [TestCase("Stream.Dispose()")]
+    [TestCase("Stream?.Dispose()")]
+    [TestCase("this.Stream.Dispose()")]
+    [TestCase("this.Stream?.Dispose()")]
+    public static void DisposingPropertyReturnValue(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -630,14 +630,14 @@ namespace N
     }
 }".AssertReplace("this.Stream.Dispose()", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Stream.Dispose()")]
-        [TestCase("Stream?.Dispose()")]
-        public static void DisposingStaticPropertyReturnValue(string expression)
-        {
-            var code = @"
+    [TestCase("Stream.Dispose()")]
+    [TestCase("Stream?.Dispose()")]
+    public static void DisposingStaticPropertyReturnValue(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -652,13 +652,13 @@ namespace N
         }
     }
 }".AssertReplace("Stream.Dispose()", expression);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AddFileOpenReadToListOfObjectField()
-        {
-            var code = @"
+    [Test]
+    public static void AddFileOpenReadToListOfObjectField()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -683,20 +683,20 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
-        [TestCase("using (await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
-        [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)))")]
-        [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
-        [TestCase("using (await Task.FromResult(File.OpenRead(fileName)))")]
-        [TestCase("using (await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
-        [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)))")]
-        [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
-        public static void UsingAwaited(string statement)
-        {
-            var code = @"
+    [TestCase("using (await Task.Run(() => File.OpenRead(fileName)))")]
+    [TestCase("using (await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
+    [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)))")]
+    [TestCase("using (var stream = await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false))")]
+    [TestCase("using (await Task.FromResult(File.OpenRead(fileName)))")]
+    [TestCase("using (await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
+    [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)))")]
+    [TestCase("using (var stream = await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false))")]
+    public static void UsingAwaited(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -712,16 +712,16 @@ namespace N
         }
     }
 }".AssertReplace("using (await Task.FromResult(File.OpenRead(fileName)))", statement);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
-        [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
-        [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
-        [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
-        public static void AssigningAwaitedToLocal(string statement)
-        {
-            var code = @"
+    [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
+    [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
+    [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
+    [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+    public static void AssigningAwaitedToLocal(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -736,16 +736,16 @@ namespace N
         }
     }
 }".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
-        [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
-        [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
-        [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
-        public static void AssigningAwaitedToField(string statement)
-        {
-            var code = @"
+    [TestCase("await Task.Run(() => File.OpenRead(fileName))")]
+    [TestCase("await Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
+    [TestCase("await Task.FromResult(File.OpenRead(fileName))")]
+    [TestCase("await Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+    public static void AssigningAwaitedToField(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -768,13 +768,13 @@ namespace N
         }
     }
 }".AssertReplace("await Task.FromResult(File.OpenRead(fileName))", statement);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DispatcherInvoke()
-        {
-            var code = @"
+    [Test]
+    public static void DispatcherInvoke()
+    {
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -787,14 +787,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("this.components.Add(stream)")]
-        [TestCase("components.Add(stream)")]
-        public static void LocalAddedToFormComponents(string expression)
-        {
-            var code = @"
+    [TestCase("this.components.Add(stream)")]
+    [TestCase("components.Add(stream)")]
+    public static void LocalAddedToFormComponents(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -810,14 +810,14 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(stream)", expression);
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+    }
 
-        [TestCase("this.components.Add(this.stream)")]
-        [TestCase("components.Add(stream)")]
-        public static void FieldAddedToFormComponents(string expression)
-        {
-            var code = @"
+    [TestCase("this.components.Add(this.stream)")]
+    [TestCase("components.Add(stream)")]
+    public static void FieldAddedToFormComponents(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -835,13 +835,13 @@ namespace N
         }
     }
 }".AssertReplace("this.components.Add(this.stream)", expression);
-            RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
-        }
+        RoslynAssert.NoAnalyzerDiagnostics(Analyzer, code);
+    }
 
-        [Test]
-        public static void InterlockedExchange()
-        {
-            var code = @"
+    [Test]
+    public static void InterlockedExchange()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -864,13 +864,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void PositionNotWithinSyntaxTree()
-        {
-            var target = @"
+    [Test]
+    public static void PositionNotWithinSyntaxTree()
+    {
+        var target = @"
 #pragma warning disable CS0219
 using System;
 namespace N
@@ -912,7 +912,7 @@ Sit amet justo donec enim diam vulputate ut."";
         public Configuration(Logger? logger = null) => _logger = logger;
     }
 }";
-            var cause = @"
+        var cause = @"
 namespace N
 {
     public static partial class Foo
@@ -923,13 +923,13 @@ namespace N
         private static Logger CreateDefaultLogger() => new Logger();
     }
 }";
-            RoslynAssert.Valid(Analyzer, cause, target);
-        }
+        RoslynAssert.Valid(Analyzer, cause, target);
+    }
 
-        [Test]
-        public static void UsingOuterTaskIssue299()
-        {
-            var code = @"
+    [Test]
+    public static void UsingOuterTaskIssue299()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -943,13 +943,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StructBuilder()
-        {
-            var structCode = """
+    [Test]
+    public static void StructBuilder()
+    {
+        var structCode = """
                 namespace N;
 
                 using System;
@@ -971,7 +971,7 @@ namespace N
                     public void Dispose() { }
                 }
                 """;
-            var code = """
+        var code = """
                 namespace N;
 
                 sealed class C
@@ -982,7 +982,6 @@ namespace N
                     }
                 }
                 """;
-            RoslynAssert.Valid(Analyzer, structCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, structCode, code);
     }
 }

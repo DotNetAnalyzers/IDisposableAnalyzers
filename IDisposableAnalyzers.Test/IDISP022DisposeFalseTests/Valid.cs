@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests
+﻿namespace IDisposableAnalyzers.Test.IDISP022DisposeFalseTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly FinalizerAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void SealedWithFinalizer()
     {
-        private static readonly FinalizerAnalyzer Analyzer = new();
-
-        [Test]
-        public static void SealedWithFinalizer()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -39,7 +39,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

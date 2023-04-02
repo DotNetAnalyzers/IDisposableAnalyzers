@@ -1,19 +1,19 @@
-namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public static partial class Valid<T>
+{
+    [TestCase("disposables.First();")]
+    [TestCase("disposables.First(x => x != null);")]
+    [TestCase("disposables.Where(x => x != null);")]
+    [TestCase("disposables.Single();")]
+    [TestCase("Enumerable.Empty<IDisposable>();")]
+    public static void Linq(string linq)
     {
-        [TestCase("disposables.First();")]
-        [TestCase("disposables.First(x => x != null);")]
-        [TestCase("disposables.Where(x => x != null);")]
-        [TestCase("disposables.Single();")]
-        [TestCase("Enumerable.Empty<IDisposable>();")]
-        public static void Linq(string linq)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }".AssertReplace("disposables.First();", linq);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MockOf()
-        {
-            var code = @"
+    [Test]
+    public static void MockOf()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Ninject()
-        {
-            var code = @"
+    [Test]
+    public static void Ninject()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -69,7 +69,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

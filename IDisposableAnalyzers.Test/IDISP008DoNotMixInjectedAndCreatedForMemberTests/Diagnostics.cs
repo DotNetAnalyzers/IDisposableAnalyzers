@@ -1,14 +1,14 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly AssignmentAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember);
 
-    public static partial class Diagnostics
-    {
-        private static readonly AssignmentAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP008DoNotMixInjectedAndCreatedForMember);
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -21,10 +21,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void PublicMethodRefParameter()
-        {
-            var code = @"
+    [Test]
+    public static void PublicMethodRefParameter()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -39,7 +39,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

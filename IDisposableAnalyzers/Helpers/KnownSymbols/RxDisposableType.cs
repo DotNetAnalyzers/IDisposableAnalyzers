@@ -1,17 +1,16 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class RxDisposableType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Create;
+    internal readonly QualifiedProperty Empty;
 
-    internal class RxDisposableType : QualifiedType
+    internal RxDisposableType()
+        : base("System.Reactive.Disposables.Disposable")
     {
-        internal readonly QualifiedMethod Create;
-        internal readonly QualifiedProperty Empty;
-
-        internal RxDisposableType()
-            : base("System.Reactive.Disposables.Disposable")
-        {
-            this.Create = new QualifiedMethod(this, nameof(this.Create));
-            this.Empty = new QualifiedProperty(this, nameof(this.Empty));
-        }
+        this.Create = new QualifiedMethod(this, nameof(this.Create));
+        this.Empty = new QualifiedProperty(this, nameof(this.Empty));
     }
 }

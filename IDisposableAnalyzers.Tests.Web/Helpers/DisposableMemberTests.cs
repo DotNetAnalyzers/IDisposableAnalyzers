@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Tests.Web.Helpers;
 
-    public static class DisposableMemberTests
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static class DisposableMemberTests
+{
+    [Test]
+    public static void SimpleFieldIAsyncDisposable()
     {
-        [Test]
-        public static void SimpleFieldIAsyncDisposable()
-        {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -28,11 +28,10 @@ namespace N
         }
     }
 }");
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var declaration = syntaxTree.FindFieldDeclaration("disposable");
-            var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
-            Assert.AreEqual(true, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol!, declaration), semanticModel, CancellationToken.None));
-        }
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var declaration = syntaxTree.FindFieldDeclaration("disposable");
+        var symbol = semanticModel.GetDeclaredSymbolSafe(declaration, CancellationToken.None);
+        Assert.AreEqual(true, DisposableMember.IsDisposed(new FieldOrPropertyAndDeclaration(symbol!, declaration), semanticModel, CancellationToken.None));
     }
 }

@@ -1,19 +1,18 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using System;
+using System.Diagnostics;
+using System.Linq;
+
+internal class SmallSetDebugView<T>
 {
-    using System;
-    using System.Diagnostics;
-    using System.Linq;
+    private readonly SmallSet<T> set;
 
-    internal class SmallSetDebugView<T>
+    internal SmallSetDebugView(SmallSet<T> set)
     {
-        private readonly SmallSet<T> set;
-
-        internal SmallSetDebugView(SmallSet<T> set)
-        {
-            this.set = set ?? throw new ArgumentNullException(nameof(set));
-        }
-
-        [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-        internal T[] Items => this.set.ToArray();
+        this.set = set ?? throw new ArgumentNullException(nameof(set));
     }
+
+    [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+    internal T[] Items => this.set.ToArray();
 }

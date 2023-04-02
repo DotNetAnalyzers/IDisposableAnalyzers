@@ -1,29 +1,28 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using NUnit.Framework;
+
+public class UsingNUnit
 {
-    using System;
-    using NUnit.Framework;
+    private IDisposable? _container;
 
-    public class UsingNUnit
+    [OneTimeSetUp]
+    public void OneTimeSetUp()
     {
-        private IDisposable? _container;
+        _container = System.Reactive.Disposables.Disposable.Create(() => { });
+    }
 
-        [OneTimeSetUp]
-        public void OneTimeSetUp()
-        {
-            _container = System.Reactive.Disposables.Disposable.Create(() => { });
-        }
+    [OneTimeTearDown]
+    public void OneTimeTearDown()
+    {
+        _container?.Dispose();
+    }
 
-        [OneTimeTearDown]
-        public void OneTimeTearDown()
-        {
-            _container?.Dispose();
-        }
-
-        [Test]
-        public void M()
-        {
-            Assert.AreSame(_container, _container);
-        }
+    [Test]
+    public void M()
+    {
+        Assert.AreSame(_container, _container);
     }
 }

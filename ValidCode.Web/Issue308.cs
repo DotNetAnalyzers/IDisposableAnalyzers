@@ -1,40 +1,39 @@
-﻿namespace ValidCode.Web
+﻿namespace ValidCode.Web;
+
+using System;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
+
+public static class Issue308
 {
-    using System;
-    using System.Collections.Concurrent;
-    using System.Threading.Tasks;
+    private static readonly ConcurrentDictionary<int, object> Queue = new();
 
-    public static class Issue308
+    public static unsafe void M1(ReadOnlySpan<byte> bytes)
     {
-        private static readonly ConcurrentDictionary<int, object> Queue = new();
+        M2<int>(1, bytes, &M3);
+    }
 
-        public static unsafe void M1(ReadOnlySpan<byte> bytes)
+    private static unsafe void M2<T>(int x, ReadOnlySpan<byte> bytes, delegate*<ReadOnlySpan<byte>, T> read)
+    {
+        if (Queue.TryRemove(1, out var tcs))
         {
-            M2<int>(1, bytes, &M3);
-        }
-
-        private static unsafe void M2<T>(int x, ReadOnlySpan<byte> bytes, delegate*<ReadOnlySpan<byte>, T> read)
-        {
-            if (Queue.TryRemove(1, out var tcs))
+            if (tcs is TaskCompletionSource<T> typed)
             {
-                if (tcs is TaskCompletionSource<T> typed)
+                try
                 {
-                    try
-                    {
-                        typed.SetResult(read(bytes));
-                    }
-                    catch (Exception e)
-                    {
-                        typed.SetException(e);
-                    }
+                    typed.SetResult(read(bytes));
                 }
-                else
+                catch (Exception e)
                 {
-                    throw new InvalidOperationException("The response type does not match.");
+                    typed.SetException(e);
                 }
             }
+            else
+            {
+                throw new InvalidOperationException("The response type does not match.");
+            }
         }
-
-        private static int M3(ReadOnlySpan<byte> bytes) => 1;
     }
+
+    private static int M3(ReadOnlySpan<byte> bytes) => 1;
 }

@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class Rx
     {
-        public static class Rx
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-            private static readonly DisposeMemberFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly DisposeMemberFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
-            [Test]
-            public static void SerialDisposable()
-            {
-                var before = @"
+        [Test]
+        public static void SerialDisposable()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -36,7 +36,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -58,14 +58,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+        }
 
-            [Test]
-            public static void ObservableSubscribe()
-            {
-                var before = @"
+        [Test]
+        public static void ObservableSubscribe()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -85,7 +85,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -105,14 +105,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+        }
 
-            [Test]
-            public static void ObservableElvisSubscribe()
-            {
-                var before = @"
+        [Test]
+        public static void ObservableElvisSubscribe()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -132,7 +132,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -152,9 +152,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, settings: LibrarySettings.Reactive);
         }
     }
 }

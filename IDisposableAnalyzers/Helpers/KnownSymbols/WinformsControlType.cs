@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class WinformsControlType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Show;
 
-    internal class WinformsControlType : QualifiedType
+    internal WinformsControlType()
+        : base("System.Windows.Forms.Control")
     {
-        internal readonly QualifiedMethod Show;
-
-        internal WinformsControlType()
-            : base("System.Windows.Forms.Control")
-        {
-            this.Show = new QualifiedMethod(this, nameof(this.Show));
-        }
+        this.Show = new QualifiedMethod(this, nameof(this.Show));
     }
 }

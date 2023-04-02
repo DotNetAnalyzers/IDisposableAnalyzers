@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP003DisposeBeforeReassigningTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public static partial class Valid<T>
+{
+    [Test]
+    public static void DisposingFieldInTearDown()
     {
-        [Test]
-        public static void DisposingFieldInTearDown()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -31,13 +31,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void DisposingFieldInOneTimeTearDown()
-        {
-            var code = @"
+    [Test]
+    public static void DisposingFieldInOneTimeTearDown()
+    {
+        var code = @"
 namespace N
 {
     using NUnit.Framework;
@@ -59,13 +59,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void DisposingFieldInTestCleanup()
-        {
-            var code = @"
+    [Test]
+    public static void DisposingFieldInTestCleanup()
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -87,13 +87,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void DisposingFieldInClassCleanup()
-        {
-            var code = @"
+    [Test]
+    public static void DisposingFieldInClassCleanup()
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -115,7 +115,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
     }
 }

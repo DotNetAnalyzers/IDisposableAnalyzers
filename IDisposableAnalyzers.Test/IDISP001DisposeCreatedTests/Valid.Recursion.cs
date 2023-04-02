@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public partial class Valid<T>
+{
+    [Test]
+    public static void IgnoresRecursiveCalculatedProperty()
     {
-        [Test]
-        public static void IgnoresRecursiveCalculatedProperty()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresRecursiveGetSetProperty()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresRecursiveGetSetProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -64,13 +64,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void MethodStatementBody()
-        {
-            var code = @"
+    [Test]
+    public static void MethodStatementBody()
+    {
+        var code = @"
     using System;
 
     public static class C
@@ -93,13 +93,13 @@ namespace N
             return Forever();
         }
     }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void MethodExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void MethodExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -123,13 +123,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WithOptionalParameter()
-        {
-            var code = @"
+    [Test]
+    public static void WithOptionalParameter()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -154,13 +154,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void GenericOut()
-        {
-            var code = @"
+    [Test]
+    public static void GenericOut()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -179,7 +179,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

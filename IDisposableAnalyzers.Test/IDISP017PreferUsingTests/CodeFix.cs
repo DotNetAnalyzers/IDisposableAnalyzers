@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
+﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DisposeCallAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP017PreferUsing);
+    private static readonly AddUsingFix Fix = new();
 
-    public static class CodeFix
+    [Test]
+    public static void Local()
     {
-        private static readonly DisposeCallAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP017PreferUsing);
-        private static readonly AddUsingFix Fix = new();
-
-        [Test]
-        public static void Local()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System.IO;
@@ -28,7 +28,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.IO;
@@ -44,13 +44,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void InitializedLocalDisposeInFinally()
-        {
-            var before = @"
+    [Test]
+    public static void InitializedLocalDisposeInFinally()
+    {
+        var before = @"
 namespace N
 {
     using System.IO;
@@ -72,7 +72,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.IO;
@@ -88,13 +88,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        public static void AssignedInTryDisposeInFinally()
-        {
-            var before = @"
+    [Test]
+    public static void AssignedInTryDisposeInFinally()
+    {
+        var before = @"
 namespace N
 {
     using System.IO;
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System.IO;
@@ -133,7 +133,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

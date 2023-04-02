@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class Field
     {
-        public static class Field
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-            private static readonly DisposeMemberFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly DisposeMemberFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
-            [Test]
-            public static void PrivateReadonlyInitializedWithFileOpenRead()
-            {
-                var before = @"
+        [Test]
+        public static void PrivateReadonlyInitializedWithFileOpenRead()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -30,7 +30,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -46,14 +46,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void PrivateReadonlyFieldInitializedWithNewDisposable()
-            {
-                var before = @"
+        [Test]
+        public static void PrivateReadonlyFieldInitializedWithNewDisposable()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -68,7 +68,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -83,14 +83,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AssignedInExpressionBody()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedInExpressionBody()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -107,7 +107,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -124,14 +124,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void InitializedAndSetToNullInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void InitializedAndSetToNullInCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -153,7 +153,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -175,14 +175,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AssignedWithFileOpenReadInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedWithFileOpenReadInCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -203,7 +203,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -224,14 +224,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AssignedWithNewDisposableInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedWithNewDisposableInCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -252,7 +252,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -273,14 +273,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void ConditionallyAssignedInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void ConditionallyAssignedInCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -304,7 +304,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -328,14 +328,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AssignedInCtorNullCoalescing()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedInCtorNullCoalescing()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -356,7 +356,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -377,14 +377,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AssignedInCtorTernary()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedInCtorTernary()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -405,7 +405,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -426,14 +426,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void WhenAlreadyDisposingOther()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAlreadyDisposingOther()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -451,7 +451,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -469,14 +469,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void DisposeMethodExpressionBody()
-            {
-                var before = @"
+        [Test]
+        public static void DisposeMethodExpressionBody()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -491,7 +491,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -509,14 +509,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void OfTypeObject()
-            {
-                var before = @"
+        [Test]
+        public static void OfTypeObject()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -532,7 +532,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -548,14 +548,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
-            {
-                var before = @"
+        [Test]
+        public static void GetPrivateSetPropertyWithBackingFieldWhenInitializedInCtor()
+        {
+            var before = @"
 #pragma warning disable CS8618
 namespace N
 {
@@ -583,7 +583,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS8618
 namespace N
 {
@@ -611,14 +611,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
-            {
-                var before = @"
+        [Test]
+        public static void DisposeMemberWhenVirtualDisposeMethodUnderscoreNames()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -657,7 +657,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -696,14 +696,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void DisposeSecondMemberWhenOverriddenDisposeMethod()
-            {
-                var baseClass = @"
+        [Test]
+        public static void DisposeSecondMemberWhenOverriddenDisposeMethod()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -739,7 +739,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -769,7 +769,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -799,14 +799,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+        }
 
-            [Test]
-            public static void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
-            {
-                var baseClass = @"
+        [Test]
+        public static void DisposeSecondMemberWhenOverriddenDisposeMethodNoCurlies()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -842,7 +842,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -870,7 +870,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -900,14 +900,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+        }
 
-            [Test]
-            public static void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
-            {
-                var c1 = @"
+        [Test]
+        public static void PrivateReadonlyFieldOfTypeSubclassInDisposeMethod()
+        {
+            var c1 = @"
 namespace N
 {
     using System;
@@ -916,7 +916,7 @@ namespace N
     {
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -931,7 +931,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -946,14 +946,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1, before }, after);
+        }
 
-            [Test]
-            public static void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
-            {
-                var c1OfT = @"
+        [Test]
+        public static void PrivateReadonlyFieldOfTypeSubclassGenericInDisposeMethod()
+        {
+            var c1OfT = @"
 namespace N
 {
     using System;
@@ -962,7 +962,7 @@ namespace N
     {
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -977,7 +977,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -992,14 +992,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, c1OfT, before }, after);
+        }
 
-            [Test]
-            public static void LazyPropertyBackingField()
-            {
-                var before = @"
+        [Test]
+        public static void LazyPropertyBackingField()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1023,7 +1023,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1047,14 +1047,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AssignedInCoalesce()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedInCoalesce()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1083,7 +1083,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1112,14 +1112,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AssignedInTernary()
-            {
-                var before = @"
+        [Test]
+        public static void AssignedInTernary()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1143,7 +1143,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1167,14 +1167,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void DisposeMemberWhenVirtualDisposeMethod()
-            {
-                var before = @"
+        [Test]
+        public static void DisposeMemberWhenVirtualDisposeMethod()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1213,7 +1213,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1252,14 +1252,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void DisposeAfterIfNotDisposingReturn()
-            {
-                var before = @"
+        [Test]
+        public static void DisposeAfterIfNotDisposingReturn()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1300,7 +1300,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1342,14 +1342,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
-            {
-                var baseClass = @"
+        [Test]
+        public static void DisposeFirstMemberWhenOverriddenDisposeMethod()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -1385,7 +1385,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -1412,7 +1412,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -1439,14 +1439,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+        }
 
-            [Test]
-            public static void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
-            {
-                var baseClass = @"
+        [Test]
+        public static void DisposeFirstMemberWhenOverriddenDisposeMethodEmptyBlock()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -1482,7 +1482,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -1509,7 +1509,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -1536,14 +1536,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+        }
 
-            [Test]
-            public static void CreateIfDisposingWhenEmpty()
-            {
-                var before = @"
+        [Test]
+        public static void CreateIfDisposingWhenEmpty()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -1563,7 +1563,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1586,14 +1586,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void WhenCallingBaseDispose()
-            {
-                var baseClass = @"
+        [Test]
+        public static void WhenCallingBaseDispose()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -1624,7 +1624,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -1640,7 +1640,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -1660,14 +1660,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, baseClass, before }, after);
+        }
 
-            [Test]
-            public static void WhenBaseHasPublicOverrideDisposeAndThrowIfDisposed()
-            {
-                var baseClass = @"
+        [Test]
+        public static void WhenBaseHasPublicOverrideDisposeAndThrowIfDisposed()
+        {
+            var baseClass = @"
 namespace N
 {
     using System;
@@ -1695,7 +1695,7 @@ namespace N
         }
     }
 }";
-                var before = @"
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -1719,7 +1719,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -1743,9 +1743,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { baseClass, before }, after);
         }
     }
 }

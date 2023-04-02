@@ -1,95 +1,94 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
+using Gu.Reactive;
+
+public sealed class UsingGuReactive : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Globalization;
-    using System.IO;
-    using Gu.Reactive;
+    private readonly IDisposable? disposable;
+    private readonly IReadOnlyView<int>? view;
+    private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
 
-    public sealed class UsingGuReactive : IDisposable
+    public UsingGuReactive(IObservable<int> observable)
     {
-        private readonly IDisposable? disposable;
-        private readonly IReadOnlyView<int>? view;
-        private readonly SerialDisposable<MemoryStream> serialDisposable = new SerialDisposable<MemoryStream>();
+        this.disposable = observable.Subscribe(x => this.serialDisposable.Disposable = new MemoryStream());
+    }
 
-        public UsingGuReactive(IObservable<int> observable)
+    public UsingGuReactive(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+    {
+        this.view = source.AsReadOnlyView()
+                          .AsReadOnlyFilteredView(filter, leaveOpen: false);
+    }
+
+    public static ReadOnlyFilteredView<T> M1<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
+    {
+        if (source is null)
         {
-            this.disposable = observable.Subscribe(x => this.serialDisposable.Disposable = new MemoryStream());
+            throw new ArgumentNullException(nameof(source));
         }
 
-        public UsingGuReactive(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+        if (filter is null)
         {
-            this.view = source.AsReadOnlyView()
-                              .AsReadOnlyFilteredView(filter, leaveOpen: false);
+            throw new ArgumentNullException(nameof(filter));
         }
 
-        public static ReadOnlyFilteredView<T> M1<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
+        return source.AsReadOnlyView()
+                     .AsReadOnlyFilteredView(filter, leaveOpen: false);
+    }
+
+    public static IReadOnlyView<IDisposable> M2(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+    {
+        if (source is null)
         {
-            if (source is null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (filter is null)
-            {
-                throw new ArgumentNullException(nameof(filter));
-            }
-
-            return source.AsReadOnlyView()
-                         .AsReadOnlyFilteredView(filter, leaveOpen: false);
+            throw new ArgumentNullException(nameof(source));
         }
 
-        public static IReadOnlyView<IDisposable> M2(IObservable<IEnumerable<int>> source, Func<int, bool> filter)
+        if (filter is null)
         {
-            if (source is null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (filter is null)
-            {
-                throw new ArgumentNullException(nameof(filter));
-            }
-
-            return source.AsReadOnlyFilteredView(filter).AsMappingView(x => new Disposable(), onRemove:x => x.Dispose());
+            throw new ArgumentNullException(nameof(filter));
         }
 
-        public static void M2<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
+        return source.AsReadOnlyFilteredView(filter).AsMappingView(x => new Disposable(), onRemove:x => x.Dispose());
+    }
+
+    public static void M2<T>(IObservable<IEnumerable<T>> source, Func<T, bool> filter)
+    {
+        using var view = source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
+    }
+
+    public static void AsReadOnlyFilteredViewAsMappingView()
+    {
+        var source = new ObservableCollection<int>();
+        using (source.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
         {
-            using var view = source.AsReadOnlyView().AsReadOnlyFilteredView(filter, leaveOpen: false);
         }
 
-        public static void AsReadOnlyFilteredViewAsMappingView()
+        using (source.AsReadOnlyFilteredView(x => true)
+                     .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
         {
-            var source = new ObservableCollection<int>();
-            using (source.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
-            {
-            }
-
-            using (source.AsReadOnlyFilteredView(x => true)
-                         .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
-            {
-            }
-
-
-            var readonlyInts = new ReadOnlyObservableCollection<int>(source);
-            using (readonlyInts.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
-            {
-            }
-
-            using (readonlyInts.AsReadOnlyFilteredView(x => true)
-                               .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
-            {
-            }
         }
 
-        public void Dispose()
+
+        var readonlyInts = new ReadOnlyObservableCollection<int>(source);
+        using (readonlyInts.AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
         {
-            this.disposable?.Dispose();
-            this.view?.Dispose();
-            this.serialDisposable.Dispose();
         }
+
+        using (readonlyInts.AsReadOnlyFilteredView(x => true)
+                           .AsMappingView(x => x.ToString(CultureInfo.InvariantCulture)))
+        {
+        }
+    }
+
+    public void Dispose()
+    {
+        this.disposable?.Dispose();
+        this.view?.Dispose();
+        this.serialDisposable.Dispose();
     }
 }

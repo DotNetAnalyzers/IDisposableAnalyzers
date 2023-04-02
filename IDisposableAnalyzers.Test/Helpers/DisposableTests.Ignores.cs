@@ -1,22 +1,22 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class Ignores
     {
-        public static class Ignores
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("true ? File.OpenRead(fileName) : (FileStream)null")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+        public static void AssignedToLocal(string statement)
         {
-            [TestCase("File.OpenRead(fileName)")]
-            [TestCase("true ? File.OpenRead(fileName) : (FileStream)null")]
-            [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
-            [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
-            [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
-            public static void AssignedToLocal(string statement)
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -31,17 +31,17 @@ namespace N
     }
 }".AssertReplace("File.OpenRead(fileName)", statement);
 
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("string.Format(\"{0}\", File.OpenRead(fileName))")]
-            public static void ArgumentPassedTo(string expression)
-            {
-                var code = @"
+        [TestCase("string.Format(\"{0}\", File.OpenRead(fileName))")]
+        public static void ArgumentPassedTo(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -52,25 +52,25 @@ namespace N
         public static object M() => string.Format(""{0}"", File.OpenRead(fileName));
     }
 }".AssertReplace("string.Format(\"{0}\", File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("disposable")]
-            ////[TestCase("disposable ?? disposable")]
-            ////[TestCase("true ? disposable : (IDisposable)null")]
-            ////[TestCase("Tuple.Create(disposable, 1)")]
-            ////[TestCase("(disposable, 1)")]
-            ////[TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
-            ////[TestCase("new List<IDisposable> { disposable }")]
-            ////[TestCase("new List<IDisposable>() { disposable }")]
-            ////[TestCase("new List<IDisposable> { disposable, null }")]
-            public static void ArgumentAssignedToTempLocal(string expression)
-            {
-                var code = @"
+        [TestCase("disposable")]
+        ////[TestCase("disposable ?? disposable")]
+        ////[TestCase("true ? disposable : (IDisposable)null")]
+        ////[TestCase("Tuple.Create(disposable, 1)")]
+        ////[TestCase("(disposable, 1)")]
+        ////[TestCase("new Tuple<IDisposable, int>(disposable, 1)")]
+        ////[TestCase("new List<IDisposable> { disposable }")]
+        ////[TestCase("new List<IDisposable>() { disposable }")]
+        ////[TestCase("new List<IDisposable> { disposable, null }")]
+        public static void ArgumentAssignedToTempLocal(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -90,18 +90,18 @@ namespace N
         }
     }
 }".AssertReplace("new List<IDisposable> { disposable }", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("var temp = disposable")]
-            [TestCase("var temp = true ? disposable : (IDisposable)null")]
-            public static void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
-            {
-                var code = @"
+        [TestCase("var temp = disposable")]
+        [TestCase("var temp = true ? disposable : (IDisposable)null")]
+        public static void ArgumentAssignedToTempLocalThatIsDisposed(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -122,18 +122,18 @@ namespace N
         }
     }
 }".AssertReplace("var temp = disposable", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("var temp = disposable")]
-            [TestCase("var temp = true ? disposable : (IDisposable)null")]
-            public static void ArgumentAssignedTempLocalInUsing(string expression)
-            {
-                var code = @"
+        [TestCase("var temp = disposable")]
+        [TestCase("var temp = true ? disposable : (IDisposable)null")]
+        public static void ArgumentAssignedTempLocalInUsing(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -157,21 +157,21 @@ namespace N
         }
     }
 }".AssertReplace("var temp = disposable", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("File.OpenRead(fileName)")]
-            [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
-            [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
-            [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
-            [TestCase("new FileStream [] { File.OpenRead(fileName) }")]
-            public static void AssignedToField(string statement)
-            {
-                var code = @"
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("Tuple.Create(File.OpenRead(fileName), 1)")]
+        [TestCase("new Tuple<FileStream, int>(File.OpenRead(fileName), 1)")]
+        [TestCase("new List<FileStream> { File.OpenRead(fileName) }")]
+        [TestCase("new FileStream [] { File.OpenRead(fileName) }")]
+        public static void AssignedToField(string statement)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -187,20 +187,20 @@ namespace N
         }
     }
 }".AssertReplace("File.OpenRead(fileName)", statement);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName))")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
-            public static void AssignedToFieldAsync(string expression)
-            {
-                var code = @"
+        [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(false)")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(false)")]
+        public static void AssignedToFieldAsync(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -216,21 +216,21 @@ namespace N
         }
     }
 }".AssertReplace("Task.Run(() => File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("File.OpenRead(fileName)")]
-            [TestCase("_ = File.OpenRead(fileName)")]
-            [TestCase("var _ = File.OpenRead(fileName)")]
-            [TestCase("M(File.OpenRead(fileName))")]
-            [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
-            public static void Discarded(string expression)
-            {
-                var code = @"
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("_ = File.OpenRead(fileName)")]
+        [TestCase("var _ = File.OpenRead(fileName)")]
+        [TestCase("M(File.OpenRead(fileName))")]
+        [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
+        public static void Discarded(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -246,24 +246,24 @@ namespace N
         public static void M(IDisposable) { }
     }
 }".AssertReplace("File.OpenRead(fileName)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("new C(File.OpenRead(fileName))")]
-            [TestCase("_ = new C(File.OpenRead(fileName))")]
-            [TestCase("var _ = new C(File.OpenRead(fileName))")]
-            [TestCase("M(new C(File.OpenRead(fileName)))")]
-            [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
-            [TestCase("_ = new List<IDisposable> { File.OpenRead(fileName) }")]
-            [TestCase("new List<C> { new C(File.OpenRead(fileName)) }")]
-            [TestCase("_ = new List<C> { new C(File.OpenRead(fileName)) }")]
-            public static void DiscardedWrapped(string expression)
-            {
-                var code = @"
+        [TestCase("new C(File.OpenRead(fileName))")]
+        [TestCase("_ = new C(File.OpenRead(fileName))")]
+        [TestCase("var _ = new C(File.OpenRead(fileName))")]
+        [TestCase("M(new C(File.OpenRead(fileName)))")]
+        [TestCase("new List<IDisposable> { File.OpenRead(fileName) }")]
+        [TestCase("_ = new List<IDisposable> { File.OpenRead(fileName) }")]
+        [TestCase("new List<C> { new C(File.OpenRead(fileName)) }")]
+        [TestCase("_ = new List<C> { new C(File.OpenRead(fileName)) }")]
+        public static void DiscardedWrapped(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -292,17 +292,17 @@ namespace N
         }
     }
 }".AssertReplace("new C(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void ReturnedExpressionBody()
-            {
-                var code = @"
+        [Test]
+        public static void ReturnedExpressionBody()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -313,17 +313,17 @@ namespace N
         internal IDisposable C(string fileName) => File.OpenRead(fileName);
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void ReturnedStatementBody()
-            {
-                var code = @"
+        [Test]
+        public static void ReturnedStatementBody()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -337,17 +337,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void ReturnedDisposableCtorArg()
-            {
-                var code = @"
+        [Test]
+        public static void ReturnedDisposableCtorArg()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -373,20 +373,20 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("new StreamReader(File.OpenRead(string.Empty))")]
-            [TestCase("File.OpenRead(string.Empty).M2()")]
-            [TestCase("File.OpenRead(string.Empty)?.M2()")]
-            [TestCase("M2(File.OpenRead(string.Empty))")]
-            public static void ReturnedStreamWrappedInStreamReader(string expression)
-            {
-                var code = @"
+        [TestCase("new StreamReader(File.OpenRead(string.Empty))")]
+        [TestCase("File.OpenRead(string.Empty).M2()")]
+        [TestCase("File.OpenRead(string.Empty)?.M2()")]
+        [TestCase("M2(File.OpenRead(string.Empty))")]
+        public static void ReturnedStreamWrappedInStreamReader(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -398,20 +398,20 @@ namespace N
         private static StreamReader M2(this Stream stream) => new StreamReader(stream);
     }
 }".AssertReplace("File.OpenRead(string.Empty).M2()", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("await File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
-            [TestCase("await File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
-            [TestCase("File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
-            [TestCase("File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
-            public static void FileOpenReadReadAsync(string expression)
-            {
-                var code = @"
+        [TestCase("await File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
+        [TestCase("await File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
+        [TestCase("File.OpenRead(string.Empty).ReadAsync(null, 0, 0)")]
+        [TestCase("File.OpenRead(string.Empty)?.ReadAsync(null, 0, 0)")]
+        public static void FileOpenReadReadAsync(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -422,18 +422,18 @@ namespace N
         public async Task<int> M() => await File.OpenRead(string.Empty).ReadAsync(null, 0, 0);
     }
 }".AssertReplace("await File.OpenRead(string.Empty).ReadAsync(null, 0, 0)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(string.Empty)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
-            [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
-            public static void ReturnedInCompositeDisposable(string expression)
-            {
-                var code = @"
+        [TestCase("new CompositeDisposable(File.OpenRead(fileName))")]
+        [TestCase("new CompositeDisposable { File.OpenRead(fileName) }")]
+        public static void ReturnedInCompositeDisposable(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -445,17 +445,17 @@ namespace N
         public static IDisposable M(string fileName) => new CompositeDisposable(File.OpenRead(fileName));
     }
 }".AssertReplace("new CompositeDisposable(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedNotDisposable()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedNotDisposable()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -479,17 +479,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedNotDisposableFactoryMethod()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedNotDisposableFactoryMethod()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -507,17 +507,17 @@ namespace N
         public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedNotDisposed()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedNotDisposed()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -545,17 +545,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedNotDisposedFactoryMethod()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedNotDisposedFactoryMethod()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -577,17 +577,17 @@ namespace N
         public static C Create(string fileName) => new C(File.OpenRead(fileName));
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgNotAssigned()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgNotAssigned()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -609,17 +609,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedDisposed()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedDisposed()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -645,17 +645,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void CtorArgAssignedNotAssigned()
-            {
-                var code = @"
+        [Test]
+        public static void CtorArgAssignedNotAssigned()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -677,18 +677,18 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("disposable.AddAndReturn(File.OpenRead(fileName))")]
-            [TestCase("disposable.AddAndReturn(File.OpenRead(fileName)).ToString()")]
-            public static void CompositeDisposableExtAddAndReturn(string expression)
-            {
-                var code = @"
+        [TestCase("disposable.AddAndReturn(File.OpenRead(fileName))")]
+        [TestCase("disposable.AddAndReturn(File.OpenRead(fileName)).ToString()")]
+        public static void CompositeDisposableExtAddAndReturn(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -724,19 +724,19 @@ namespace N
         }
     }
 }".AssertReplace("disposable.AddAndReturn(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("File.OpenRead(fileName)")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
-            public static void UsingDeclaration(string expression)
-            {
-                var code = @"
+        [TestCase("File.OpenRead(fileName)")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).Result")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).GetAwaiter().GetResult()")]
+        public static void UsingDeclaration(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -751,20 +751,20 @@ namespace N
         }
     }
 }".AssertReplace("File.OpenRead(fileName)", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("Task.FromResult(File.OpenRead(fileName))")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
-            public static void UsingDeclarationAwait(string expression)
-            {
-                var code = @"
+        [TestCase("Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+        public static void UsingDeclarationAwait(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -779,20 +779,20 @@ namespace N
         }
     }
 }".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("Task.FromResult(File.OpenRead(fileName))")]
-            [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName))")]
-            [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
-            public static void AssigningFieldAwait(string expression)
-            {
-                var code = @"
+        [TestCase("Task.FromResult(File.OpenRead(fileName))")]
+        [TestCase("Task.FromResult(File.OpenRead(fileName)).ConfigureAwait(true)")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName))")]
+        [TestCase("Task.Run(() => File.OpenRead(fileName)).ConfigureAwait(true)")]
+        public static void AssigningFieldAwait(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -815,18 +815,18 @@ namespace N
         }
     }
 }".AssertReplace("Task.FromResult(File.OpenRead(fileName))", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("File.OpenRead(fileName)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("leaveOpen: false", false)]
-            [TestCase("leaveOpen: true", true)]
-            public static void ReturnAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
-            {
-                var code = @"
+        [TestCase("leaveOpen: false", false)]
+        [TestCase("leaveOpen: true", true)]
+        public static void ReturnAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -843,17 +843,17 @@ namespace N
         }
     }
 }".AssertReplace("leaveOpen: false", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
-                Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+            Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void UsingAsReadOnlyViewAsReadOnlyFilteredView()
-            {
-                var code = @"
+        [Test]
+        public static void UsingAsReadOnlyViewAsReadOnlyFilteredView()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -868,18 +868,18 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("leaveOpen: false", false)]
-            [TestCase("leaveOpen: true",  true)]
-            public static void AssignAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
-            {
-                var code = @"
+        [TestCase("leaveOpen: false", false)]
+        [TestCase("leaveOpen: true",  true)]
+        public static void AssignAsReadOnlyViewAsReadOnlyFilteredView(string expression, bool expected)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -902,17 +902,17 @@ namespace N
         }
     }
 }".AssertReplace("leaveOpen: false", expression);
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("AsReadOnlyView()");
-                Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("AsReadOnlyView()");
+            Assert.AreEqual(expected, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void ReturnAsReadOnlyFilteredViewAsMappingView()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void ReturnAsReadOnlyFilteredViewAsMappingView()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -928,16 +928,16 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindInvocation("AsReadOnlyFilteredView(filter)");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("AsReadOnlyFilteredView(filter)");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void AssigningGenericSerialDisposable()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void AssigningGenericSerialDisposable()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -960,19 +960,19 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("new MemoryStream()");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("new MemoryStream()");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("Create(true)")]
-            [TestCase("Create(!false)")]
-            [TestCase("CreateAsync(true)")]
-            [TestCase("CreateAsync(!false)")]
-            public static void AssertThrows(string expressionText)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("Create(true)")]
+        [TestCase("Create(!false)")]
+        [TestCase("CreateAsync(true)")]
+        [TestCase("CreateAsync(!false)")]
+        public static void AssertThrows(string expressionText)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace ValidCode
 {
     using System;
@@ -1017,19 +1017,19 @@ namespace ValidCode
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(expressionText);
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expressionText);
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("x1 => new Disposable()")]
-            [TestCase("x2 => new Disposable()")]
-            [TestCase("x3 => new Disposable()")]
-            [TestCase("x4 => new Disposable()")]
-            public static void ServiceCollection(string expressionText)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("x1 => new Disposable()")]
+        [TestCase("x2 => new Disposable()")]
+        [TestCase("x3 => new Disposable()")]
+        [TestCase("x4 => new Disposable()")]
+        public static void ServiceCollection(string expressionText)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace ValidCode
 {
     using System;
@@ -1052,17 +1052,17 @@ namespace ValidCode
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(expressionText);
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expressionText);
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("observable.Subscribe(x => Console.WriteLine(x))")]
-            [TestCase("observable.Subscribe(x => Console.WriteLine(x)).DisposeWith(this.disposable)")]
-            public static void DisposeWith(string expressionText)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("observable.Subscribe(x => Console.WriteLine(x))")]
+        [TestCase("observable.Subscribe(x => Console.WriteLine(x)).DisposeWith(this.disposable)")]
+        public static void DisposeWith(string expressionText)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -1084,21 +1084,21 @@ namespace N
     }
 }");
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(expressionText);
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expressionText);
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase(".Append(1)")]
-            [TestCase(".Append(true)")]
-            [TestCase(".Append((string?)null)")]
-            [TestCase(".Append(condition, string.Empty)")]
-            [TestCase(".Append(!condition, string.Empty)")]
-            [TestCase(".Append(true).Append(condition).Append(!condition)")]
-            public static void Builder(string expression)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText("""
+        [TestCase(".Append(1)")]
+        [TestCase(".Append(true)")]
+        [TestCase(".Append((string?)null)")]
+        [TestCase(".Append(condition, string.Empty)")]
+        [TestCase(".Append(!condition, string.Empty)")]
+        [TestCase(".Append(true).Append(condition).Append(!condition)")]
+        public static void Builder(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
                 namespace N;
 
                 using System;
@@ -1142,11 +1142,10 @@ namespace N
                 }
                 """.AssertReplace(".Append(true)", expression));
 
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("new S()");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("new S()");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
         }
     }
 }

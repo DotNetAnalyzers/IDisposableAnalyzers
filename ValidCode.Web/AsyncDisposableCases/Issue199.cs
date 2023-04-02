@@ -1,28 +1,27 @@
-﻿namespace ValidCode.Web.AsyncDisposableCases
+﻿namespace ValidCode.Web.AsyncDisposableCases;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+public sealed class Issue199 : IAsyncDisposable
 {
-    using System;
-    using System.Threading;
-    using System.Threading.Tasks;
+    private Timer? _timer;
 
-    public sealed class Issue199 : IAsyncDisposable
+    public async Task ResetTimerAsync()
     {
-        private Timer? _timer;
-
-        public async Task ResetTimerAsync()
+        if (this._timer != null)
         {
-            if (this._timer != null)
-            {
-                await this._timer.DisposeAsync();
-                this._timer = null; // Warns with IDISP003: Dispose previous before re-assigning
-            }
+            await this._timer.DisposeAsync();
+            this._timer = null; // Warns with IDISP003: Dispose previous before re-assigning
         }
+    }
 
-        public async ValueTask DisposeAsync()
+    public async ValueTask DisposeAsync()
+    {
+        if (this._timer is { })
         {
-            if (this._timer is { })
-            {
-                await this._timer.DisposeAsync().ConfigureAwait(false);
-            }
+            await this._timer.DisposeAsync().ConfigureAwait(false);
         }
     }
 }

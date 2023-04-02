@@ -1,20 +1,20 @@
-namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests
+namespace IDisposableAnalyzers.Test.IDISP023ReferenceTypeInFinalizerContextTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Diagnostics
+    public static class Finalizer
     {
-        public static class Finalizer
-        {
-            private static readonly FinalizerAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext);
+        private static readonly FinalizerAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP023ReferenceTypeInFinalizerContext);
 
-            [TestCase("↓Builder.Append(1)")]
-            [TestCase("_ = ↓Builder.Length")]
-            public static void Static(string expression)
-            {
-                var code = @"
+        [TestCase("↓Builder.Append(1)")]
+        [TestCase("_ = ↓Builder.Length")]
+        public static void Static(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -30,15 +30,15 @@ namespace N
     }
 }".AssertReplace("↓Builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [TestCase("this.↓Builder.Append(1)")]
-            [TestCase("↓Builder.Append(1)")]
-            [TestCase("_ = ↓Builder.Length")]
-            public static void Instance(string expression)
-            {
-                var code = @"
+        [TestCase("this.↓Builder.Append(1)")]
+        [TestCase("↓Builder.Append(1)")]
+        [TestCase("_ = ↓Builder.Length")]
+        public static void Instance(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -54,13 +54,13 @@ namespace N
     }
 }".AssertReplace("this.↓Builder.Append(1)", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void CallingStatic()
-            {
-                var code = @"
+        [Test]
+        public static void CallingStatic()
+        {
+            var code = @"
 namespace N
 {
     using System.Text;
@@ -78,8 +78,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

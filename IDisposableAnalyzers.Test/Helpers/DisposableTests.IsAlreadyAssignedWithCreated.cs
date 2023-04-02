@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class IsAlreadyAssignedWithCreated
     {
-        public static class IsAlreadyAssignedWithCreated
+        [Test]
+        public static void FieldAssignedInCtor()
         {
-            [Test]
-            public static void FieldAssignedInCtor()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -34,17 +34,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("this.disposable = new Disposable()").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void FieldAssignedInLambdaCtor()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAssignedInLambdaCtor()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -69,17 +69,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void LocalSeparateDeclarationAndAssignment()
-            {
-                var code = @"
+        [Test]
+        public static void LocalSeparateDeclarationAndAssignment()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -100,17 +100,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void LocalSeparateDeclarationAndAssignmentInLambda()
-            {
-                var code = @"
+        [Test]
+        public static void LocalSeparateDeclarationAndAssignmentInLambda()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -134,17 +134,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void LocalAssignmentInLambda()
-            {
-                var code = @"
+        [Test]
+        public static void LocalAssignmentInLambda()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -168,17 +168,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("disposable = new Disposable()").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void FieldAfterEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void FieldAfterEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -200,17 +200,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.stream = null").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("this.stream = null").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void PropertyAfterEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void PropertyAfterEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -232,17 +232,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.Stream = null").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("this.Stream = null").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void ParameterAfterEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void ParameterAfterEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -262,17 +262,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void ParameterBeforeEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void ParameterBeforeEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -293,17 +293,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void LocalAfterEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void LocalAfterEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -324,17 +324,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("stream = null").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void LocalBeforeEarlyReturn()
-            {
-                var code = @"
+        [Test]
+        public static void LocalBeforeEarlyReturn()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -356,17 +356,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
-                Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("stream = default(Stream)").Left;
+            Assert.AreEqual(true, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void OutParameterInExpressionBody()
-            {
-                var code = @"
+        [Test]
+        public static void OutParameterInExpressionBody()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -377,17 +377,17 @@ namespace N
         public void M(out IDisposable disposable) => disposable = File.OpenRead(string.Empty);
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("disposable = File.OpenRead(string.Empty)").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("disposable = File.OpenRead(string.Empty)").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
+        }
 
-            [Test]
-            public static void Repro()
-            {
-                var code = @"
+        [Test]
+        public static void Repro()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -465,12 +465,11 @@ namespace N
         public bool Selected { get; set; }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindAssignmentExpression("this.P1 = null;").Left;
-                Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindAssignmentExpression("this.P1 = null;").Left;
+            Assert.AreEqual(false, Disposable.IsAlreadyAssignedWithCreated(value, semanticModel, CancellationToken.None, out _));
         }
     }
 }

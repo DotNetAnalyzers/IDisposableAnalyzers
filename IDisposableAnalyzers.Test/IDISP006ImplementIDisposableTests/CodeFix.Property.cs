@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class Property
     {
-        public static class Property
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
 
-            [Test]
-            public static void ImplementIDisposableAndMakeSealed()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableAndMakeSealed()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -37,7 +37,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -83,13 +83,13 @@ namespace N
     }
 }";
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, "Implement IDisposable and make class sealed.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, "Implement IDisposable and make class sealed.");
+        }
 
-            [Test]
-            public static void ImplementIDisposableWithVirtualDisposeMethod()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableWithVirtualDisposeMethod()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -122,7 +122,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -184,13 +184,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+        }
 
-            [Test]
-            public static void ImplementIDisposableSealedClassUsingsInside()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableSealedClassUsingsInside()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -201,7 +201,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -232,14 +232,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void ImplementIDisposableSealedClassUsingsOutside()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableSealedClassUsingsOutside()
+        {
+            var before = @"
 using System.IO;
 
 namespace N
@@ -250,7 +250,7 @@ namespace N
     }
 }";
 
-                var after = @"using System;
+            var after = @"using System;
 using System.IO;
 
 namespace N
@@ -280,14 +280,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void ImplementIDisposableSealedClassUnderscoreWithConst()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableSealedClassUnderscoreWithConst()
+        {
+            var before = @"
 #pragma warning disable CS0414
 namespace N
 {
@@ -302,7 +302,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0414
 namespace N
 {
@@ -336,14 +336,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void ImplementIDisposableAbstractClass()
-            {
-                var before = @"
+        [Test]
+        public static void ImplementIDisposableAbstractClass()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -354,7 +354,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -394,14 +394,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "LEGACY Implement IDisposable with protected virtual dispose method.");
+        }
 
-            [Test]
-            public static void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
-            {
-                var before = @"
+        [Test]
+        public static void FactoryMethodCallingPrivateCtorWithCreatedDisposable()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -419,7 +419,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -456,14 +456,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void Issue111PartialUserControl()
-            {
-                var before = @"
+        [Test]
+        public static void Issue111PartialUserControl()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -475,7 +475,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -507,8 +507,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, "Implement IDisposable and make class sealed.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, "Implement IDisposable and make class sealed.");
         }
     }
 }

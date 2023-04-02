@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Tests.Web.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class Ignores
     {
-        public static class Ignores
+        [Test]
+        public static void HostBuildRun()
         {
-            [Test]
-            public static void HostBuildRun()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using Microsoft.Extensions.Hosting;
@@ -25,17 +25,17 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("Host.CreateDefaultBuilder(args).Build()");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("Host.CreateDefaultBuilder(args).Build()");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
 
-            [Test]
-            public static void HostBuildRunAsync()
-            {
-                var code = @"
+        [Test]
+        public static void HostBuildRunAsync()
+        {
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -49,12 +49,11 @@ namespace N
         }
     }
 }";
-                var syntaxTree = CSharpSyntaxTree.ParseText(code);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression("Host.CreateDefaultBuilder(args).Build()");
-                Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(code);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression("Host.CreateDefaultBuilder(args).Build()");
+            Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
         }
     }
 }

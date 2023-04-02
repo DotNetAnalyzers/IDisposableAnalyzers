@@ -1,18 +1,17 @@
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+
+public class EmptyDisposable
 {
-    using System;
+    public IDisposable M(bool b) => b ? new Disposable() : Empty.Default;
 
-    public class EmptyDisposable
+    private sealed class Empty : IDisposable
     {
-        public IDisposable M(bool b) => b ? new Disposable() : Empty.Default;
+        public static readonly IDisposable Default = new Empty();
 
-        private sealed class Empty : IDisposable
+        public void Dispose()
         {
-            public static readonly IDisposable Default = new Empty();
-
-            public void Dispose()
-            {
-            }
         }
     }
 }

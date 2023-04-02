@@ -1,15 +1,15 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace IDisposableAnalyzers.Tests.Web.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
+namespace IDisposableAnalyzers.Tests.Web.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
 
-    public static class Valid
-    {
-        private static readonly DiagnosticAnalyzer Analyzer = new CreationAnalyzer();
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -28,10 +28,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void AwaitUsing()
-        {
-            var asyncDisposable = @"
+    [Test]
+    public static void AwaitUsing()
+    {
+        var asyncDisposable = @"
 namespace N
 {
     using System;
@@ -48,7 +48,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -62,13 +62,13 @@ namespace N
     }
 }
 ";
-            RoslynAssert.Valid(Analyzer, asyncDisposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, asyncDisposable, code);
+    }
 
-        [Test]
-        public static void ILoggerFactoryAddApplicationInsights()
-        {
-            var code = @"
+    [Test]
+    public static void ILoggerFactoryAddApplicationInsights()
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.AspNetCore.Builder;
@@ -86,16 +86,16 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.Warnings));
-        }
+        RoslynAssert.Valid(Analyzer, code, Settings.Default.WithAllowedCompilerDiagnostics(AllowedCompilerDiagnostics.Warnings));
+    }
 
-        [TestCase("var disposable = serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("_ = serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("var loggerFactory = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
-        [TestCase("_ = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
-        public static void IServiceProviderGetRequiredService(string statement)
-        {
-            var code = @"
+    [TestCase("var disposable = serviceProvider.GetRequiredService<Disposable>();")]
+    [TestCase("_ = serviceProvider.GetRequiredService<Disposable>();")]
+    [TestCase("var loggerFactory = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+    [TestCase("_ = serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+    public static void IServiceProviderGetRequiredService(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -116,16 +116,16 @@ namespace N
         }
     }
 }".AssertReplace("var disposable = serviceProvider.GetRequiredService<Disposable>();", statement);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("var disposable = this.serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("_ = this.serviceProvider.GetRequiredService<Disposable>();")]
-        [TestCase("var loggerFactory = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
-        [TestCase("_ = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
-        public static void IServiceProviderGetRequiredServiceField(string statement)
-        {
-            var code = @"
+    [TestCase("var disposable = this.serviceProvider.GetRequiredService<Disposable>();")]
+    [TestCase("_ = this.serviceProvider.GetRequiredService<Disposable>();")]
+    [TestCase("var loggerFactory = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+    [TestCase("_ = this.serviceProvider.GetRequiredService<Microsoft.Extensions.Logging.ILoggerFactory>();")]
+    public static void IServiceProviderGetRequiredServiceField(string statement)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -149,13 +149,13 @@ namespace N
         }
     }
 }".AssertReplace("var disposable = this.serviceProvider.GetRequiredService<Disposable>();", statement);
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void HostBuildRun()
-        {
-            var code = @"
+    [Test]
+    public static void HostBuildRun()
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.Extensions.Hosting;
@@ -168,13 +168,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void HostBuildRunAsync()
-        {
-            var code = @"
+    [Test]
+    public static void HostBuildRunAsync()
+    {
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -188,14 +188,14 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("response.RegisterForDispose(new Disposable())")]
-        [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
-        public static void RegisterForDispose(string expression)
-        {
-            var code = @"
+    [TestCase("response.RegisterForDispose(new Disposable())")]
+    [TestCase("response.RegisterForDisposeAsync(new Disposable())")]
+    public static void RegisterForDispose(string expression)
+    {
+        var code = @"
 namespace N
 {
     using Microsoft.AspNetCore.Http;
@@ -209,7 +209,6 @@ namespace N
     }
 }".AssertReplace("response.RegisterForDispose(new Disposable())", expression);
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
     }
 }

@@ -1,14 +1,14 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP015DoNotReturnCachedAndCreatedTest
+﻿namespace IDisposableAnalyzers.Test.IDISP015DoNotReturnCachedAndCreatedTest;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly MethodReturnValuesAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated);
 
-    public static class Diagnostics
-    {
-        private static readonly MethodReturnValuesAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP015DoNotReturnCachedAndCreated);
-
-        private const string DisposableCode = @"
+    private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -30,10 +30,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void Ternary()
-        {
-            var code = @"
+    [Test]
+    public static void Ternary()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -50,13 +50,13 @@ namespace N
         public IDisposable ↓M(bool b) => b ? new Disposable() : this.disposable;
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+    }
 
-        [Test]
-        public static void NullCoalesce()
-        {
-            var code = @"
+    [Test]
+    public static void NullCoalesce()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -73,13 +73,13 @@ namespace N
         public IDisposable ↓P() => this.disposable ?? new Disposable();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadFromUsing()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadFromUsing()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -105,7 +105,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

@@ -1,15 +1,14 @@
 // ReSharper disable RedundantNameQualifier
-namespace IDisposableAnalyzers.Benchmarks.Benchmarks
-{
-    [BenchmarkDotNet.Attributes.MemoryDiagnoser]
-    public class FieldAndPropertyDeclarationAnalyzerBenchmarks
-    {
-        private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.FieldAndPropertyDeclarationAnalyzer());
+namespace IDisposableAnalyzers.Benchmarks.Benchmarks;
 
-        [BenchmarkDotNet.Attributes.Benchmark]
-        public void RunOnValidCodeProject()
-        {
-            Benchmark.Run();
-        }
+[BenchmarkDotNet.Attributes.MemoryDiagnoser]
+public class FieldAndPropertyDeclarationAnalyzerBenchmarks
+{
+    private static readonly Gu.Roslyn.Asserts.Benchmark Benchmark = Gu.Roslyn.Asserts.Benchmark.Create(Code.ValidCodeProject, new IDisposableAnalyzers.FieldAndPropertyDeclarationAnalyzer());
+
+    [BenchmarkDotNet.Attributes.Benchmark]
+    public void RunOnValidCodeProject()
+    {
+        Benchmark.Run();
     }
 }

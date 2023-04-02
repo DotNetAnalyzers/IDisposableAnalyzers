@@ -1,19 +1,19 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests;
 
-    public static partial class AssignedValueWalkerTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class AssignedValueWalkerTests
+{
+    public static class Indexer
     {
-        public static class Indexer
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedArrayIndexer(string code, string expected)
         {
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedArrayIndexer(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class C
 {
     internal C()
@@ -24,19 +24,19 @@ internal class C
         var temp2 = ints[0];
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedTypedArrayIndexer(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedTypedArrayIndexer(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 internal class C
 {
     internal C()
@@ -47,20 +47,20 @@ internal class C
         var temp2 = ints[0];
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedListOfIntIndexerAfterSetItem(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -76,20 +76,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedListOfIntIndexerAfterAddItem(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -105,20 +105,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedElementStyleDictionaryIndexer(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedElementStyleDictionaryIndexer(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -138,20 +138,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedDictionaryIndexer(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedDictionaryIndexer(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -171,20 +171,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = ints[0];", "1, 2")]
-            [TestCase("var temp2 = ints[0];", "1, 2, 3")]
-            public static void InitializedDictionaryAfterAdd(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = ints[0];", "1, 2")]
+        [TestCase("var temp2 = ints[0];", "1, 2, 3")]
+        public static void InitializedDictionaryAfterAdd(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -204,14 +204,13 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code)
-                                      .Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code)
+                                  .Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
         }
     }
 }

@@ -1,20 +1,19 @@
-﻿namespace IDisposableAnalyzers
-{
-    using System.Collections.Generic;
+﻿namespace IDisposableAnalyzers;
 
-    internal static class ListExt
+using System.Collections.Generic;
+
+internal static class ListExt
+{
+    internal static void PurgeDuplicates<T>(this List<T> list, IEqualityComparer<T>? comparer = null)
     {
-        internal static void PurgeDuplicates<T>(this List<T> list, IEqualityComparer<T>? comparer = null)
+        comparer ??= EqualityComparer<T>.Default;
+        for (var i = 0; i < list.Count; i++)
         {
-            comparer ??= EqualityComparer<T>.Default;
-            for (var i = 0; i < list.Count; i++)
+            for (var j = list.Count - 1; j > i; j--)
             {
-                for (var j = list.Count - 1; j > i; j--)
+                if (comparer.Equals(list[i], list[j]))
                 {
-                    if (comparer.Equals(list[i], list[j]))
-                    {
-                        list.RemoveAt(j);
-                    }
+                    list.RemoveAt(j);
                 }
             }
         }

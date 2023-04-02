@@ -1,21 +1,20 @@
-﻿namespace ValidCode.Rx
+﻿namespace ValidCode.Rx;
+
+using System;
+using System.Reactive.Disposables;
+
+public sealed class Issue298 : IDisposable
 {
-    using System;
-    using System.Reactive.Disposables;
+    private readonly CompositeDisposable disposable = new();
 
-    public sealed class Issue298 : IDisposable
+    public Issue298(IObservable<object> observable)
     {
-        private readonly CompositeDisposable disposable = new();
+        observable.Subscribe(x => Console.WriteLine(x))
+                  .DisposeWith(this.disposable);
+    }
 
-        public Issue298(IObservable<object> observable)
-        {
-            observable.Subscribe(x => Console.WriteLine(x))
-                      .DisposeWith(this.disposable);
-        }
-
-        public void Dispose()
-        {
-            this.disposable.Dispose();
-        }
+    public void Dispose()
+    {
+        this.disposable.Dispose();
     }
 }

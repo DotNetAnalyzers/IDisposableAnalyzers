@@ -1,21 +1,21 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CodeFixes;
+using NUnit.Framework;
+
+public static class NoFix
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CodeFixes;
-    using NUnit.Framework;
+    private static readonly CreationAnalyzer Analyzer = new();
+    private static readonly CodeFixProvider AddUsingFix = new AddUsingFix();
+    private static readonly CodeFixProvider CreateAndAssignFieldFix = new CreateAndAssignFieldFix();
+    private static readonly CodeFixProvider AddToCompositeDisposableFix = new AddToCompositeDisposableFix();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
-    public static class NoFix
+    [Test]
+    public static void WhenArgument()
     {
-        private static readonly CreationAnalyzer Analyzer = new();
-        private static readonly CodeFixProvider AddUsingFix = new AddUsingFix();
-        private static readonly CodeFixProvider CreateAndAssignFieldFix = new CreateAndAssignFieldFix();
-        private static readonly CodeFixProvider AddToCompositeDisposableFix = new AddToCompositeDisposableFix();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
-
-        [Test]
-        public static void WhenArgument()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -31,9 +31,8 @@ namespace N
     }
 }";
 
-            RoslynAssert.NoFix(Analyzer, AddUsingFix, ExpectedDiagnostic, code);
-            RoslynAssert.NoFix(Analyzer, CreateAndAssignFieldFix, ExpectedDiagnostic, code);
-            RoslynAssert.NoFix(Analyzer, AddToCompositeDisposableFix, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.NoFix(Analyzer, AddUsingFix, ExpectedDiagnostic, code);
+        RoslynAssert.NoFix(Analyzer, CreateAndAssignFieldFix, ExpectedDiagnostic, code);
+        RoslynAssert.NoFix(Analyzer, AddToCompositeDisposableFix, ExpectedDiagnostic, code);
     }
 }

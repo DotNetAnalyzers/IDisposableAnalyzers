@@ -1,12 +1,11 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Recursion
+namespace ValidCode.Recursion;
+
+using System.IO;
+
+class Issue178
 {
-    using System.IO;
+    void M() => M(new MemoryStream());
 
-    class Issue178
-    {
-        void M() => M(new MemoryStream());
-
-        void M(System.IDisposable p) => M(p);
-    }
+    void M(System.IDisposable p) => M(p);
 }

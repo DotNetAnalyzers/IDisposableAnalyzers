@@ -1,32 +1,31 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+
+public sealed class Issue273Concrete : Issue273Abstract, IDisposable
 {
-    using System;
+    private readonly Disposable disposable;
 
-    public sealed class Issue273Concrete : Issue273Abstract, IDisposable
+    public Issue273Concrete(int x)
+        : base(x)
     {
-        private readonly Disposable disposable;
+        this.disposable = new Disposable();
+    }
 
-        public Issue273Concrete(int x)
-            : base(x)
+    public Issue273Concrete(string x)
+        : base(x.Length)
+    {
+        this.disposable = new Disposable();
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            this.disposable = new Disposable();
+            this.disposable.Dispose();
         }
 
-        public Issue273Concrete(string x)
-            : base(x.Length)
-        {
-            this.disposable = new Disposable();
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                this.disposable.Dispose();
-            }
-
-            base.Dispose(disposing);
-        }
+        base.Dispose(disposing);
     }
 }

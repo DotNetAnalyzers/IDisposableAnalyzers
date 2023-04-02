@@ -1,129 +1,128 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Reactive.Disposables;
+
+public sealed class Misc : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
-    using System.ComponentModel;
-    using System.IO;
-    using System.Reactive.Disposables;
-
-    public sealed class Misc : IDisposable
-    {
 #pragma warning disable CS0169
-        private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
-        private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
-        private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
-        private readonly Lazy<IDisposable> lazyDisposable;
+    private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
+    private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
+    private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private readonly Lazy<IDisposable> lazyDisposable;
 
-        private readonly IDisposable? meh1;
-        private readonly IDisposable? meh2;
-        private readonly IDisposable disposable;
-        private bool isDirty;
+    private readonly IDisposable? meh1;
+    private readonly IDisposable? meh2;
+    private readonly IDisposable disposable;
+    private bool isDirty;
 
-        public Misc(IDisposable disposable)
+    public Misc(IDisposable disposable)
+    {
+        this.subscription.Disposable = File.OpenRead(string.Empty);
+        this.disposable = Bar(disposable);
+        using (var temp = this.CreateDisposableProperty)
         {
-            this.subscription.Disposable = File.OpenRead(string.Empty);
-            this.disposable = Bar(disposable);
-            using (var temp = this.CreateDisposableProperty)
-            {
-            }
-
-            using (var temp = this.CreateDisposable())
-            {
-            }
-
-            this.lazyDisposable = new Lazy<IDisposable>(() =>
-            {
-                var temp = new Disposable();
-                return temp;
-            });
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged
+        using (var temp = this.CreateDisposable())
         {
-            add { this.PropertyChangedCore += value; }
-            remove { this.PropertyChangedCore -= value; }
         }
 
-        private event PropertyChangedEventHandler? PropertyChangedCore;
+        this.lazyDisposable = new Lazy<IDisposable>(() =>
+        {
+            var temp = new Disposable();
+            return temp;
+        });
+    }
 
-        public IDisposable? Disposable => this.subscription.Disposable;
+    public event PropertyChangedEventHandler? PropertyChanged
+    {
+        add { this.PropertyChangedCore += value; }
+        remove { this.PropertyChangedCore -= value; }
+    }
+
+    private event PropertyChangedEventHandler? PropertyChangedCore;
+
+    public IDisposable? Disposable => this.subscription.Disposable;
 
 #pragma warning disable IDISP012 // Property should not return created disposable
-        public IDisposable CreateDisposableProperty => new Disposable();
+    public IDisposable CreateDisposableProperty => new Disposable();
 #pragma warning restore IDISP012 // Property should not return created disposable
 
-        public bool IsDirty
+    public bool IsDirty
+    {
+        get
         {
-            get
+            return this.isDirty;
+        }
+
+        private set
+        {
+            if (value == this.isDirty)
             {
-                return this.isDirty;
+                return;
             }
 
-            private set
-            {
-                if (value == this.isDirty)
-                {
-                    return;
-                }
+            this.isDirty = value;
+            this.PropertyChangedCore?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+        }
+    }
 
-                this.isDirty = value;
-                this.PropertyChangedCore?.Invoke(this, IsDirtyPropertyChangedEventArgs);
+    public static IDisposable? AssignLocalInSwitch(int i)
+    {
+        IDisposable? result;
+        if (i == 0)
+        {
+            result = null;
+        }
+        else
+        {
+            switch (i)
+            {
+                case 1:
+                    result = File.OpenRead(string.Empty);
+                    break;
+                case 2:
+                    result = File.OpenRead(string.Empty);
+                    break;
+                default:
+                    result = null;
+                    break;
             }
         }
 
-        public static IDisposable? AssignLocalInSwitch(int i)
-        {
-            IDisposable? result;
-            if (i == 0)
-            {
-                result = null;
-            }
-            else
-            {
-                switch (i)
-                {
-                    case 1:
-                        result = File.OpenRead(string.Empty);
-                        break;
-                    case 2:
-                        result = File.OpenRead(string.Empty);
-                        break;
-                    default:
-                        result = null;
-                        break;
-                }
-            }
+        return result;
+    }
 
-            return result;
+    public void Dispose()
+    {
+        this.subscription.Dispose();
+        this.compositeDisposable.Dispose();
+        if (this.lazyDisposable.IsValueCreated)
+        {
+            this.lazyDisposable.Value.Dispose();
+        }
+    }
+
+    public IDisposable CreateDisposable() => new Disposable();
+
+    public static void Touch(string fileName)
+    {
+        File.Create(fileName).Dispose();
+        File.Create(fileName)?.Dispose();
+    }
+
+    private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable>? disposables = null)
+    {
+        if (disposables == null)
+        {
+            return Bar(disposable, new[] { disposable });
         }
 
-        public void Dispose()
-        {
-            this.subscription.Dispose();
-            this.compositeDisposable.Dispose();
-            if (this.lazyDisposable.IsValueCreated)
-            {
-                this.lazyDisposable.Value.Dispose();
-            }
-        }
-
-        public IDisposable CreateDisposable() => new Disposable();
-
-        public static void Touch(string fileName)
-        {
-            File.Create(fileName).Dispose();
-            File.Create(fileName)?.Dispose();
-        }
-
-        private static IDisposable Bar(IDisposable disposable, IEnumerable<IDisposable>? disposables = null)
-        {
-            if (disposables == null)
-            {
-                return Bar(disposable, new[] { disposable });
-            }
-
-            return disposable;
-        }
+        return disposable;
     }
 }

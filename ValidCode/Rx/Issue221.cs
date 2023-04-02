@@ -1,36 +1,35 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.Reactive.Linq;
+
+sealed class Issue221 : IDisposable
 {
-    using System;
-    using System.Reactive.Linq;
+    private readonly IDisposable? subscription;
+    private bool disposed;
 
-    sealed class Issue221 : IDisposable
+    public Issue221(IObservable<object>? observable = null)
     {
-        private readonly IDisposable? subscription;
-        private bool disposed;
+        this.subscription = observable?.Subscribe(_ => { });
+    }
 
-        public Issue221(IObservable<object>? observable = null)
+    public void Dispose()
+    {
+        if (this.disposed)
         {
-            this.subscription = observable?.Subscribe(_ => { });
+            return;
         }
 
-        public void Dispose()
-        {
-            if (this.disposed)
-            {
-                return;
-            }
+        this.disposed = true;
+        this.subscription?.Dispose();
+    }
 
-            this.disposed = true;
-            this.subscription?.Dispose();
-        }
-
-        private void ThrowIfDisposed()
+    private void ThrowIfDisposed()
+    {
+        if (this.disposed)
         {
-            if (this.disposed)
-            {
-                throw new ObjectDisposedException(this.GetType().FullName);
-            }
+            throw new ObjectDisposedException(this.GetType().FullName);
         }
     }
 }

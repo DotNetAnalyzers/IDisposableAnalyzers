@@ -1,14 +1,14 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    [Test]
+    public static void FileOpenRead()
     {
-        [Test]
-        public static void FileOpenRead()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -23,13 +23,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NewStreamReader()
-        {
-            var code = @"
+    [Test]
+    public static void NewStreamReader()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -44,18 +44,18 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("await Task.FromResult(new Disposable())")]
-        [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
-        [TestCase("await Task.Run(() => new Disposable())")]
-        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
-        [TestCase("Task.Run(() => new Disposable()).Result")]
-        [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
-        public static void AwaitSimple(string expression)
-        {
-            var code = @"
+    [TestCase("await Task.FromResult(new Disposable())")]
+    [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
+    [TestCase("await Task.Run(() => new Disposable())")]
+    [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
+    [TestCase("Task.Run(() => new Disposable()).Result")]
+    [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+    public static void AwaitSimple(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -72,19 +72,19 @@ namespace N
         }
     }
 }".AssertReplace("await Task.FromResult(new Disposable())", expression);
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [TestCase("await Task.FromResult(new Disposable())")]
-        [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
-        [TestCase("Task.FromResult(new Disposable()).GetAwaiter().GetResult()")]
-        [TestCase("await Task.Run(() => new Disposable())")]
-        [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
-        [TestCase("Task.Run(() => new Disposable()).Result")]
-        [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
-        public static void AwaitSimpleUsingDeclaration(string expression)
-        {
-            var code = @"
+    [TestCase("await Task.FromResult(new Disposable())")]
+    [TestCase("await Task.FromResult(new Disposable()).ConfigureAwait(false)")]
+    [TestCase("Task.FromResult(new Disposable()).GetAwaiter().GetResult()")]
+    [TestCase("await Task.Run(() => new Disposable())")]
+    [TestCase("await Task.Run(() => new Disposable()).ConfigureAwait(false)")]
+    [TestCase("Task.Run(() => new Disposable()).Result")]
+    [TestCase("Task.Run(() => new Disposable()).GetAwaiter().GetResult()")]
+    public static void AwaitSimpleUsingDeclaration(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -98,13 +98,13 @@ namespace N
         }
     }
 }".AssertReplace("await Task.FromResult(new Disposable())", expression);
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void AwaitWeirdCase()
-        {
-            var code = @"
+    [Test]
+    public static void AwaitWeirdCase()
+    {
+        var code = @"
 #nullable disable
 namespace N
 {
@@ -129,13 +129,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingChainedReturningThis()
-        {
-            var disposable = @"
+    [Test]
+    public static void UsingChainedReturningThis()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -150,7 +150,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public static class C
@@ -161,13 +161,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void UsingChainedReturningThisExpressionStatement()
-        {
-            var disposable = @"
+    [Test]
+    public static void UsingChainedReturningThisExpressionStatement()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -182,7 +182,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public static class C
@@ -194,13 +194,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 
-        [Test]
-        public static void UsingChainedExtension()
-        {
-            var disposable = @"
+    [Test]
+    public static void UsingChainedExtension()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -213,7 +213,7 @@ namespace N
     }
 }";
 
-            var disposableExt = @"
+        var disposableExt = @"
 namespace N
 {
     public static class DisposableExt
@@ -222,7 +222,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public static class C
@@ -233,13 +233,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
+    }
 
-        [Test]
-        public static void UsingChainedExtensionExpressionStatement()
-        {
-            var disposable = @"
+    [Test]
+    public static void UsingChainedExtensionExpressionStatement()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -252,7 +252,7 @@ namespace N
     }
 }";
 
-            var disposableExt = @"
+        var disposableExt = @"
 namespace N
 {
     public static class DisposableExt
@@ -261,7 +261,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     public static class C
@@ -273,13 +273,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, disposableExt, code);
+    }
 
-        [Test]
-        public static void NewKernelBindStatement()
-        {
-            var disposable = @"
+    [Test]
+    public static void NewKernelBindStatement()
+    {
+        var disposable = @"
 namespace N
 {
     using System;
@@ -292,7 +292,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -307,7 +307,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
     }
 }

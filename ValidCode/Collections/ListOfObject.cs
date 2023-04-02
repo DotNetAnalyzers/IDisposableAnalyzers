@@ -1,24 +1,23 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Collections
+namespace ValidCode.Collections;
+
+using System;
+using System.Collections.Generic;
+
+internal sealed class ListOfObject : IDisposable
 {
-    using System;
-    using System.Collections.Generic;
+    private readonly List<object> disposables = new List<object>();
 
-    internal sealed class ListOfObject : IDisposable
+    public ListOfObject()
     {
-        private readonly List<object> disposables = new List<object>();
+        this.disposables.Add(new Disposable());
+    }
 
-        public ListOfObject()
+    public void Dispose()
+    {
+        foreach (var disposable in this.disposables)
         {
-            this.disposables.Add(new Disposable());
-        }
-
-        public void Dispose()
-        {
-            foreach (var disposable in this.disposables)
-            {
-                (disposable as IDisposable)?.Dispose();
-            }
+            (disposable as IDisposable)?.Dispose();
         }
     }
 }

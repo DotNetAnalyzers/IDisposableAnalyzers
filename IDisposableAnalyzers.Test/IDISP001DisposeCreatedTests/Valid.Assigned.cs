@@ -1,15 +1,15 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    // ReSharper disable once UnusedTypeParameter
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+// ReSharper disable once UnusedTypeParameter
+public static partial class Valid<T>
+{
+    [Test]
+    public static void AssignLocalWithInt()
     {
-        [Test]
-        public static void AssignLocalWithInt()
-        {
-            var code = @"
+        var code = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -22,13 +22,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignField()
-        {
-            var code = @"
+    [Test]
+    public static void AssignField()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -41,13 +41,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignFieldLocal()
-        {
-            var code = @"
+    [Test]
+    public static void AssignFieldLocal()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -62,13 +62,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignFieldViaLocal()
-        {
-            var code = @"
+    [Test]
+    public static void AssignFieldViaLocal()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -84,13 +84,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignFieldViaParameter()
-        {
-            var code = @"
+    [Test]
+    public static void AssignFieldViaParameter()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -110,13 +110,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Descriptor, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignProperty()
-        {
-            var code = @"
+    [Test]
+    public static void AssignProperty()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -130,13 +130,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignPropertyLocal()
-        {
-            var code = @"
+    [Test]
+    public static void AssignPropertyLocal()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -151,13 +151,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignFieldIndexer()
-        {
-            var code = @"
+    [Test]
+    public static void AssignFieldIndexer()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -175,13 +175,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignFieldListAdd()
-        {
-            var code = @"
+    [Test]
+    public static void AssignFieldListAdd()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -201,13 +201,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, Disposable, code);
+    }
 
-        [Test]
-        public static void AssignAssemblyLoadToLocal()
-        {
-            var code = @"
+    [Test]
+    public static void AssignAssemblyLoadToLocal()
+    {
+        var code = @"
 namespace N
 {
     using System.Reflection;
@@ -220,13 +220,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssignedTernary()
-        {
-            var code = @"
+    [Test]
+    public static void AssignedTernary()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -244,13 +244,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AssignedCoalesce()
-        {
-            var code = @"
+    [Test]
+    public static void AssignedCoalesce()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -267,13 +267,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenDisposedAndReassigned()
-        {
-            var code = @"
+    [Test]
+    public static void WhenDisposedAndReassigned()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -290,7 +290,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

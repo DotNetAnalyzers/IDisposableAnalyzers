@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP003DisposeBeforeReassigningTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP003DisposeBeforeReassigningTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
 
-    public static class Valid
+    [Test]
+    public static void FieldDisposeAsyncInDisposeAsync()
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new AssignmentAnalyzer();
-
-        [Test]
-        public static void FieldDisposeAsyncInDisposeAsync()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -40,13 +40,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void NullableAnnotated()
-        {
-            var code = @"
+    [Test]
+    public static void NullableAnnotated()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -63,13 +63,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IHostedService()
-        {
-            var code = @"
+    [Test]
+    public static void IHostedService()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -95,7 +95,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

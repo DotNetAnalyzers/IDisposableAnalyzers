@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class AddUsingOutParameter
     {
-        public static class AddUsingOutParameter
-        {
-            private static readonly ArgumentAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
-            private static readonly AddUsingFix Fix = new();
+        private static readonly ArgumentAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
+        private static readonly AddUsingFix Fix = new();
 
-            [Test]
-            public static void OutParameter()
-            {
-                var before = @"
+        [Test]
+        public static void OutParameter()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -37,7 +37,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -62,13 +62,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void OutVarParameter()
-            {
-                var before = @"
+        [Test]
+        public static void OutVarParameter()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -90,7 +90,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -114,8 +114,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

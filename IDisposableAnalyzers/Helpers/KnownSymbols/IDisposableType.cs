@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class IDisposableType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Dispose;
 
-    internal class IDisposableType : QualifiedType
+    internal IDisposableType()
+        : base("System.IDisposable")
     {
-        internal readonly QualifiedMethod Dispose;
-
-        internal IDisposableType()
-            : base("System.IDisposable")
-        {
-            this.Dispose = new QualifiedMethod(this, nameof(this.Dispose));
-        }
+        this.Dispose = new QualifiedMethod(this, nameof(this.Dispose));
     }
 }

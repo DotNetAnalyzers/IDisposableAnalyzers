@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Diagnostics
+    public static class AsyncAwait
     {
-        public static class AsyncAwait
-        {
-            private static readonly LocalDeclarationAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
+        private static readonly LocalDeclarationAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
 
-            private const string Disposable = @"
+        private const string Disposable = @"
 namespace N
 {
     using System;
@@ -23,10 +23,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void AwaitTaskRun()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitTaskRun()
+        {
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -39,13 +39,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
+        }
 
-            [Test]
-            public static void AwaitTaskFromResult()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitTaskFromResult()
+        {
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -58,13 +58,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
+        }
 
-            [Test]
-            public static void AwaitCreate()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitCreate()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -84,13 +84,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
+        }
 
-            [Test]
-            public static void AwaitCreateAsyncTaskFromResult()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitCreateAsyncTaskFromResult()
+        {
+            var code = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -108,13 +108,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
+        }
 
-            [Test]
-            public static void AwaitRead()
-            {
-                var code = @"
+        [Test]
+        public static void AwaitRead()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -141,8 +141,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

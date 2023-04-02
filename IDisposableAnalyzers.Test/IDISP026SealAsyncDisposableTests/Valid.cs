@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP026SealAsyncDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP026SealAsyncDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ClassDeclarationAnalyzer Analyzer = new();
 
-    public static class Valid
+    public static class DisposeAsync
     {
-        private static readonly ClassDeclarationAnalyzer Analyzer = new();
-
-        public static class DisposeAsync
+        [Test]
+        public static void SealedSimple()
         {
-            [Test]
-            public static void SealedSimple()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     using System;
@@ -26,13 +26,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void SealedPartial()
-            {
-                var part1 = @"
+        [Test]
+        public static void SealedPartial()
+        {
+            var part1 = @"
 namespace N
 {
     using System;
@@ -42,7 +42,7 @@ namespace N
     }
 }";
 
-                var part2 = @"
+            var part2 = @"
 namespace N
 {
     using System.Threading.Tasks;
@@ -55,13 +55,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, part1, part2);
-            }
+            RoslynAssert.Valid(Analyzer, part1, part2);
+        }
 
-            [Test]
-            public static void WithDisposeAsyncCore()
-            {
-                var code = @"
+        [Test]
+        public static void WithDisposeAsyncCore()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -81,8 +81,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

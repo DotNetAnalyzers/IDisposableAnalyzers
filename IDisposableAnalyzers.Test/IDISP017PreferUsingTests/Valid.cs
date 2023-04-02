@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests
+﻿namespace IDisposableAnalyzers.Test.IDISP017PreferUsingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly DisposeCallAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void DisposingField()
     {
-        private static readonly DisposeCallAnalyzer Analyzer = new();
-
-        [Test]
-        public static void DisposingField()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -34,13 +34,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DisposingArrayItem()
-        {
-            var code = @"
+    [Test]
+    public static void DisposingArrayItem()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -60,13 +60,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void DisposingDictionaryItem()
-        {
-            var code = @"
+    [Test]
+    public static void DisposingDictionaryItem()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -87,13 +87,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReassignAfterDispose()
-        {
-            var code = @"
+    [Test]
+    public static void ReassignAfterDispose()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -111,13 +111,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReassignViaOutAfterDispose()
-        {
-            var code = @"
+    [Test]
+    public static void ReassignViaOutAfterDispose()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -141,7 +141,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

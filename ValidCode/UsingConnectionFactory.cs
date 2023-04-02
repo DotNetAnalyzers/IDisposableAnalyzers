@@ -1,21 +1,20 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System.Data.Entity.Infrastructure;
+
+public class UsingConnectionFactory
 {
-    using System.Data.Entity.Infrastructure;
+    private readonly SqlConnectionFactory connectionFactory;
 
-    public class UsingConnectionFactory
+    public UsingConnectionFactory(SqlConnectionFactory connectionFactory)
     {
-        private readonly SqlConnectionFactory connectionFactory;
+        this.connectionFactory = connectionFactory;
+    }
 
-        public UsingConnectionFactory(SqlConnectionFactory connectionFactory)
-        {
-            this.connectionFactory = connectionFactory;
-        }
-
-        public void M()
-        {
-            this.connectionFactory.CreateConnection(string.Empty).Dispose();
-            this.connectionFactory.CreateConnection(string.Empty)?.Dispose();
-        }
+    public void M()
+    {
+        this.connectionFactory.CreateConnection(string.Empty).Dispose();
+        this.connectionFactory.CreateConnection(string.Empty)?.Dispose();
     }
 }

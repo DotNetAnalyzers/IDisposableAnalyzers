@@ -1,19 +1,19 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class InterfaceOnly
     {
-        public static class InterfaceOnly
-        {
-            //// ReSharper disable once InconsistentNaming
-            private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
+        //// ReSharper disable once InconsistentNaming
+        private static readonly ExpectedDiagnostic CS0535 = ExpectedDiagnostic.Create(nameof(CS0535));
 
-            [Test]
-            public static void Struct()
-            {
-                var before = @"
+        [Test]
+        public static void Struct()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -23,7 +23,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -35,14 +35,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after);
-                RoslynAssert.FixAll(Fix, CS0535, before, after);
-            }
+            RoslynAssert.CodeFix(Fix, CS0535, before, after);
+            RoslynAssert.FixAll(Fix, CS0535, before, after);
+        }
 
-            [Test]
-            public static void NestedStruct()
-            {
-                var before = @"
+        [Test]
+        public static void NestedStruct()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -55,7 +55,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -70,9 +70,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Fix, CS0535, before, after);
-                RoslynAssert.FixAll(Fix, CS0535, before, after);
-            }
+            RoslynAssert.CodeFix(Fix, CS0535, before, after);
+            RoslynAssert.FixAll(Fix, CS0535, before, after);
         }
     }
 }

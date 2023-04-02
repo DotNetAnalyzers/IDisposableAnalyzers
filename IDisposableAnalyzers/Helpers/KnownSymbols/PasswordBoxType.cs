@@ -1,15 +1,14 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class PasswordBoxType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedProperty SecurePassword;
 
-    internal class PasswordBoxType : QualifiedType
+    internal PasswordBoxType()
+        : base("System.Windows.Controls.PasswordBox")
     {
-        internal readonly QualifiedProperty SecurePassword;
-
-        internal PasswordBoxType()
-            : base("System.Windows.Controls.PasswordBox")
-        {
-            this.SecurePassword = new QualifiedProperty(this, nameof(this.SecurePassword));
-        }
+        this.SecurePassword = new QualifiedProperty(this, nameof(this.SecurePassword));
     }
 }

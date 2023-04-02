@@ -1,21 +1,21 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Tests.Web.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class IsPotentiallyAssignableTo
     {
-        public static class IsPotentiallyAssignableTo
+        [TestCase("new string(' ', 1)", false)]
+        [TestCase("new System.Text.StringBuilder()", false)]
+        [TestCase("new System.IO.MemoryStream()", true)]
+        [TestCase("(Microsoft.Extensions.Logging.ILoggerFactory)o", true)]
+        public static void Expression(string code, bool expected)
         {
-            [TestCase("new string(' ', 1)", false)]
-            [TestCase("new System.Text.StringBuilder()", false)]
-            [TestCase("new System.IO.MemoryStream()", true)]
-            [TestCase("(Microsoft.Extensions.Logging.ILoggerFactory)o", true)]
-            public static void Expression(string code, bool expected)
-            {
-                var testCode = @"
+            var testCode = @"
 namespace N
 {
     internal class Foo
@@ -26,12 +26,11 @@ namespace N
         }
     }
 }".AssertReplace("PLACEHOLDER", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            Assert.AreEqual(expected, Disposable.IsPotentiallyAssignableFrom(value, semanticModel, CancellationToken.None));
         }
     }
 }

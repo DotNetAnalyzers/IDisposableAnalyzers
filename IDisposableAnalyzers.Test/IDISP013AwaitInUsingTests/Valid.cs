@@ -1,17 +1,17 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests
+namespace IDisposableAnalyzers.Test.IDISP013AwaitInUsingTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ReturnValueAnalyzer Analyzer = new();
 
-    public static partial class Valid
+    [Test]
+    public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new();
-
-        [Test]
-        public static void AwaitWebClientDownloadStringTaskAsyncInUsing()
-        {
-            var code = @"
+        var code = @"
 #pragma warning disable SYSLIB0014
 namespace N
 {
@@ -29,13 +29,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void AwaitWebClientDownloadStringTaskAsyncInUsingDeclaration()
-        {
-            var code = @"
+    [Test]
+    public static void AwaitWebClientDownloadStringTaskAsyncInUsingDeclaration()
+    {
+        var code = @"
 #pragma warning disable SYSLIB0014
 namespace N
 {
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingAwaited()
-        {
-            var code = @"
+    [Test]
+    public static void UsingAwaited()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -90,13 +90,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TaskFromResult()
-        {
-            var code = @"
+    [Test]
+    public static void TaskFromResult()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -113,13 +113,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void TaskCompletedTask()
-        {
-            var code = @"
+    [Test]
+    public static void TaskCompletedTask()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -136,13 +136,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingNewMTaskRun()
-        {
-            var code = @"
+    [Test]
+    public static void UsingNewMTaskRun()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -172,13 +172,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingNewMLocalTaskRun()
-        {
-            var code = @"
+    [Test]
+    public static void UsingNewMLocalTaskRun()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -208,13 +208,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void UsingNewMLocalFuncTask()
-        {
-            var code = @"
+    [Test]
+    public static void UsingNewMLocalFuncTask()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -245,13 +245,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturnNullAfterAwaitIssue89()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnNullAfterAwaitIssue89()
+    {
+        var code = @"
 #pragma warning disable SYSLIB0014
 namespace N
 {
@@ -270,13 +270,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturnNullIssue89()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnNullIssue89()
+    {
+        var code = @"
 #pragma warning disable SYSLIB0014
 namespace N
 {
@@ -294,13 +294,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void EarlyReturnNullIssue89()
-        {
-            var code = @"
+    [Test]
+    public static void EarlyReturnNullIssue89()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -324,13 +324,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ReturnInValueTask()
-        {
-            var disposable = """
+    [Test]
+    public static void ReturnInValueTask()
+    {
+        var disposable = """
 
                 namespace N;
 
@@ -344,7 +344,7 @@ namespace N
                 }
                 """;
 
-            var code = """
+        var code = """
 
                 namespace N;
 
@@ -360,7 +360,6 @@ namespace N
                     }
                 }
                 """;
-            RoslynAssert.Valid(Analyzer, disposable, code);
-        }
+        RoslynAssert.Valid(Analyzer, disposable, code);
     }
 }

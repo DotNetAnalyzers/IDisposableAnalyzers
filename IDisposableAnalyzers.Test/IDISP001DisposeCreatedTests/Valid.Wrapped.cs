@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
 
-    public static partial class Valid<T>
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid<T>
+{
+    [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
+    [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
+    [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]
+    [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
+    public static void LocalTupleThatIsDisposed(string expression)
     {
-        [TestCase("Tuple.Create(File.OpenRead(file), new object())")]
-        [TestCase("Tuple.Create(File.OpenRead(file), File.OpenRead(file))")]
-        [TestCase("new Tuple<FileStream, object>(File.OpenRead(file), new object())")]
-        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file), File.OpenRead(file))")]
-        public static void LocalTupleThatIsDisposed(string expression)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -28,14 +28,14 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file), new object())", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("(File.OpenRead(file), new object())")]
-        [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
-        public static void LocalValueTupleThatDisposed(string expression)
-        {
-            var code = @"
+    [TestCase("(File.OpenRead(file), new object())")]
+    [TestCase("(File.OpenRead(file), File.OpenRead(file))")]
+    public static void LocalValueTupleThatDisposed(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -52,13 +52,13 @@ namespace N
     }
 }".AssertReplace("(File.OpenRead(file), new object())", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldTuple()
-        {
-            var code = @"
+    [Test]
+    public static void FieldTuple()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -81,13 +81,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldTupleWithLocals()
-        {
-            var code = @"
+    [Test]
+    public static void FieldTupleWithLocals()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -112,13 +112,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldValueTuple()
-        {
-            var code = @"
+    [Test]
+    public static void FieldValueTuple()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -141,13 +141,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void FieldValueTupleWithLocals()
-        {
-            var code = @"
+    [Test]
+    public static void FieldValueTupleWithLocals()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -172,14 +172,14 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void LocalPairThatIsDisposed(string expression)
-        {
-            var staticPairCode = @"
+    [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void LocalPairThatIsDisposed(string expression)
+    {
+        var staticPairCode = @"
 namespace N
 {
     public static class Pair
@@ -188,7 +188,7 @@ namespace N
     }
 }";
 
-            var pairOfT = @"
+        var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -205,7 +205,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -222,14 +222,14 @@ namespace N
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
+    }
 
-        [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void FieldTupleThatIsDisposed(string expression)
-        {
-            var code = @"
+    [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void FieldTupleThatIsDisposed(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -252,13 +252,13 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void FieldValueTupleThatIsDisposed(string expression)
-        {
-            var code = @"
+    [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void FieldValueTupleThatIsDisposed(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -281,14 +281,14 @@ namespace N
     }
 }".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void FieldPairThatIsDisposed(string expression)
-        {
-            var staticPairCode = @"
+    [TestCase("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void FieldPairThatIsDisposed(string expression)
+    {
+        var staticPairCode = @"
 namespace N
 {
     public static class Pair
@@ -297,7 +297,7 @@ namespace N
     }
 }";
 
-            var pairOfT = @"
+        var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -314,7 +314,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -337,14 +337,14 @@ namespace N
     }
 }".AssertReplace("Pair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, pairOfT, staticPairCode, code);
+    }
 
-        [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void FieldTuple(string expression)
-        {
-            var code = @"
+    [TestCase("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Tuple<FileStream, FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void FieldTuple(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -367,13 +367,13 @@ namespace N
     }
 }".AssertReplace("Tuple.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void FieldValueTuple(string expression)
-        {
-            var code = @"
+    [TestCase("(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void FieldValueTuple(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -396,14 +396,14 @@ namespace N
     }
 }".AssertReplace("(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [TestCase("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void Pair(string expression)
-        {
-            var staticPair = @"
+    [TestCase("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void Pair(string expression)
+    {
+        var staticPair = @"
 namespace N
 {
     public static class StaticPair
@@ -412,7 +412,7 @@ namespace N
     }
 }";
 
-            var pairOfT = @"
+        var pairOfT = @"
 namespace N
 {
     public class Pair<T>
@@ -429,7 +429,7 @@ namespace N
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -452,14 +452,14 @@ namespace N
     }
 }".AssertReplace("StaticPair.Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, pairOfT, staticPair, code);
-        }
+        RoslynAssert.Valid(Analyzer, pairOfT, staticPair, code);
+    }
 
-        [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]
-        [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
-        public static void DisposingPair(string expression)
-        {
-            var code = @"
+    [TestCase("Create(File.OpenRead(file1), File.OpenRead(file2))")]
+    [TestCase("new Pair<FileStream>(File.OpenRead(file1), File.OpenRead(file2))")]
+    public static void DisposingPair(string expression)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -502,7 +502,6 @@ namespace N
     }
 }".AssertReplace("Create(File.OpenRead(file1), File.OpenRead(file2))", expression);
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

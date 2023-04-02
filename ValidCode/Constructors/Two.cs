@@ -1,31 +1,30 @@
-﻿namespace ValidCode.Constructors
+﻿namespace ValidCode.Constructors;
+
+using System;
+
+public sealed class Two : IDisposable
 {
-    using System;
+    private readonly IDisposable disposable;
+    private bool disposed;
 
-    public sealed class Two : IDisposable
+    public Two(int _)
     {
-        private readonly IDisposable disposable;
-        private bool disposed;
+        this.disposable = new Disposable();
+    }
 
-        public Two(int _)
+    public Two(string _)
+    {
+        this.disposable = new Disposable();
+    }
+
+    public void Dispose()
+    {
+        if (this.disposed)
         {
-            this.disposable = new Disposable();
+            return;
         }
 
-        public Two(string _)
-        {
-            this.disposable = new Disposable();
-        }
-
-        public void Dispose()
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            this.disposable?.Dispose();
-        }
+        this.disposed = true;
+        this.disposable?.Dispose();
     }
 }

@@ -1,6 +1,5 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+class AbstractFooImpl3Impl : AbstractFooImpl3
 {
-    class AbstractFooImpl3Impl : AbstractFooImpl3
-    {
-    }
 }

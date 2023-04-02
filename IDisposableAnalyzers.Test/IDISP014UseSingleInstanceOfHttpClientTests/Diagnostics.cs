@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
+﻿namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly CreationAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP014UseSingleInstanceOfHttpClient);
 
-    public static class Diagnostics
+    [Test]
+    public static void Using()
     {
-        private static readonly CreationAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP014UseSingleInstanceOfHttpClient);
-
-        [Test]
-        public static void Using()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -28,13 +28,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void UsingFullyQualified()
-        {
-            var code = @"
+    [Test]
+    public static void UsingFullyQualified()
+    {
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -51,13 +51,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void Field()
-        {
-            var code = @"
+    [Test]
+    public static void Field()
+    {
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -67,13 +67,13 @@ namespace N
        private readonly HttpClient client = ↓new HttpClient();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void Property()
-        {
-            var code = @"
+    [Test]
+    public static void Property()
+    {
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -83,7 +83,6 @@ namespace N
        public HttpClient Client { get; } = ↓new HttpClient();
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

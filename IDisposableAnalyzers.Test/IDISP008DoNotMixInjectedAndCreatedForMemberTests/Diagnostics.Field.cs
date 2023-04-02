@@ -1,24 +1,24 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP008DoNotMixInjectedAndCreatedForMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Diagnostics
+    public static class Field
     {
-        public static class Field
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
 
-            [TestCase("arg ?? File.OpenRead(string.Empty)")]
-            [TestCase("File.OpenRead(string.Empty) ?? arg")]
-            [TestCase("true ? arg : File.OpenRead(string.Empty)")]
-            [TestCase("true ? File.OpenRead(string.Empty) : arg")]
-            [TestCase("Stream ?? File.OpenRead(string.Empty)")]
-            [TestCase("File.OpenRead(string.Empty) ?? Stream")]
-            [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
-            public static void InjectedAndCreated(string expression)
-            {
-                var code = @"
+        [TestCase("arg ?? File.OpenRead(string.Empty)")]
+        [TestCase("File.OpenRead(string.Empty) ?? arg")]
+        [TestCase("true ? arg : File.OpenRead(string.Empty)")]
+        [TestCase("true ? File.OpenRead(string.Empty) : arg")]
+        [TestCase("Stream ?? File.OpenRead(string.Empty)")]
+        [TestCase("File.OpenRead(string.Empty) ?? Stream")]
+        [TestCase("true ? Stream : File.OpenRead(string.Empty)")]
+        public static void InjectedAndCreated(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -35,14 +35,14 @@ namespace N
         }
     }
 }".AssertReplace("arg ?? File.OpenRead(string.Empty)", expression);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [TestCase("public Stream Stream")]
-            [TestCase("internal Stream Stream")]
-            public static void MutableFieldInSealed(string property)
-            {
-                var code = @"
+        [TestCase("public Stream Stream")]
+        [TestCase("internal Stream Stream")]
+        public static void MutableFieldInSealed(string property)
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -58,13 +58,13 @@ namespace N
         }
     }
 }".AssertReplace("public Stream Stream", property);
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void InjectedAndCreatedCtorAndInitializer()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedAndCreatedCtorAndInitializer()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -79,13 +79,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void InjectedAndCreatedTwoCtors()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedAndCreatedTwoCtors()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -105,13 +105,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void ProtectedMutable()
-            {
-                var code = @"
+        [Test]
+        public static void ProtectedMutable()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -121,13 +121,13 @@ namespace N
         ↓protected Stream stream = File.OpenRead(string.Empty);
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
-            {
-                var code = @"
+        [Test]
+        public static void BackingFieldAssignedWithCreatedAndPropertyWithInjected()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -148,13 +148,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
-            {
-                var code = @"
+        [Test]
+        public static void BackingFieldAssignedWithInjectedAndPropertyWithCreated()
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -176,13 +176,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [Test]
-            public static void InjectedAndCreatedViaFactory()
-            {
-                var code = @"
+        [Test]
+        public static void InjectedAndCreatedViaFactory()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -199,13 +199,13 @@ namespace N
         public static C Create() => new C(new Disposable());
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, Disposable, code);
+        }
 
-            [Test]
-            public static void Issue185()
-            {
-                var c1 = @"
+        [Test]
+        public static void Issue185()
+        {
+            var c1 = @"
 namespace N
 {
     using System;
@@ -217,7 +217,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 #nullable disable
 namespace N
 {
@@ -253,8 +253,7 @@ namespace N
     }
 }";
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, c1, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, c1, code);
         }
     }
 }

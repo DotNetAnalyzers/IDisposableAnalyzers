@@ -1,29 +1,28 @@
-﻿namespace ValidCode
+﻿namespace ValidCode;
+
+using System;
+
+internal sealed class Issue267 : IDisposable
 {
-    using System;
+    private readonly Disposable? disposable;
 
-    internal sealed class Issue267 : IDisposable
+    internal Issue267()
     {
-        private readonly Disposable? disposable;
+        this.M(ref this.disposable);
+    }
 
-        internal Issue267()
+    public void Dispose()
+    {
+        this.disposable?.Dispose();
+    }
+
+    private void M(ref Disposable? item)
+    {
+        if (item is { })
         {
-            this.M(ref this.disposable);
+            return;
         }
 
-        public void Dispose()
-        {
-            this.disposable?.Dispose();
-        }
-
-        private void M(ref Disposable? item)
-        {
-            if (item is { })
-            {
-                return;
-            }
-
-            item = new Disposable();
-        }
+        item = new Disposable();
     }
 }

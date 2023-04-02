@@ -1,23 +1,23 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP007DoNotDisposeInjectedTests;
+
+using Gu.Roslyn.Asserts;
+
+using Microsoft.CodeAnalysis.Diagnostics;
+
+using NUnit.Framework;
+
+[TestFixture(typeof(DisposeCallAnalyzer))]
+[TestFixture(typeof(LocalDeclarationAnalyzer))]
+[TestFixture(typeof(UsingStatementAnalyzer))]
+public static class ValidRecursion<T>
+    where T : DiagnosticAnalyzer, new()
 {
-    using Gu.Roslyn.Asserts;
+    private static readonly T Analyzer = new();
 
-    using Microsoft.CodeAnalysis.Diagnostics;
-
-    using NUnit.Framework;
-
-    [TestFixture(typeof(DisposeCallAnalyzer))]
-    [TestFixture(typeof(LocalDeclarationAnalyzer))]
-    [TestFixture(typeof(UsingStatementAnalyzer))]
-    public static class ValidRecursion<T>
-        where T : DiagnosticAnalyzer, new()
+    [Test]
+    public static void IgnoresWhenDisposingRecursiveProperty()
     {
-        private static readonly T Analyzer = new();
-
-        [Test]
-        public static void IgnoresWhenDisposingRecursiveProperty()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -32,13 +32,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenNotDisposingRecursiveProperty()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenNotDisposingRecursiveProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -52,13 +52,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenDisposingFieldAssignedWithRecursiveProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -80,13 +80,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenNotDisposingFieldAssignedWithRecursiveProperty()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -107,13 +107,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IgnoresWhenDisposingRecursiveMethod()
-        {
-            var code = @"
+    [Test]
+    public static void IgnoresWhenDisposingRecursiveMethod()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -128,7 +128,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

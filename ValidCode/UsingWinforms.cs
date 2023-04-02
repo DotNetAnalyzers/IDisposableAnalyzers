@@ -1,16 +1,15 @@
 ﻿// ReSharper disable All
-namespace ValidCode
-{
-    using System;
-    using System.Windows.Forms;
+namespace ValidCode;
 
-    public class UsingWinforms
+using System;
+using System.Windows.Forms;
+
+public class UsingWinforms
+{
+    public UsingWinforms(Form form)
     {
-        public UsingWinforms(Form form)
-        {
-            var a = Control.FromHandle(IntPtr.Zero);
-            var b = Control.FromChildHandle(IntPtr.Zero);
-            var e = form.FindForm();
-        }
+        var a = Control.FromHandle(IntPtr.Zero);
+        var b = Control.FromChildHandle(IntPtr.Zero);
+        var e = form.FindForm();
     }
 }

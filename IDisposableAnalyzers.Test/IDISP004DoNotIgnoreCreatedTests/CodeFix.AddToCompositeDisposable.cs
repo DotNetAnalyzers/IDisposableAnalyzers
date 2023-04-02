@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class AddToCompositeDisposable
     {
-        public static class AddToCompositeDisposable
-        {
-            private static readonly AddToCompositeDisposableFix Fix = new();
+        private static readonly AddToCompositeDisposableFix Fix = new();
 
-            [Test]
-            public static void CreateNewCompositeDisposable()
-            {
-                var before = @"
+        [Test]
+        public static void CreateNewCompositeDisposable()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -28,7 +28,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -48,14 +48,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void CreateNewCompositeDisposableWithTrivia()
-            {
-                var before = @"
+        [Test]
+        public static void CreateNewCompositeDisposableWithTrivia()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -71,7 +71,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -91,14 +91,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void CreateNewCompositeDisposableWhenUsingsAndFields()
-            {
-                var before = @"
+        [Test]
+        public static void CreateNewCompositeDisposableWhenUsingsAndFields()
+        {
+            var before = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -122,7 +122,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -148,14 +148,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
-            {
-                var before = @"
+        [Test]
+        public static void CreateNewCompositeDisposableWhenUsingsAndFieldsUnderscoreNames()
+        {
+            var before = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -179,7 +179,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0169
 namespace N
 {
@@ -205,14 +205,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddToExistingCompositeDisposableInitializer()
-            {
-                var before = @"
+        [Test]
+        public static void AddToExistingCompositeDisposableInitializer()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -230,7 +230,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -249,14 +249,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddToExistingCompositeDisposableInitializerWithCtorArg()
-            {
-                var before = @"
+        [Test]
+        public static void AddToExistingCompositeDisposableInitializerWithCtorArg()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -274,7 +274,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -293,14 +293,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddToExistingCompositeDisposableInitializerWithTrivia()
-            {
-                var before = @"
+        [Test]
+        public static void AddToExistingCompositeDisposableInitializerWithTrivia()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -318,7 +318,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -337,14 +337,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddToExistingCompositeDisposableWithInitializerOneLine()
-            {
-                var before = @"
+        [Test]
+        public static void AddToExistingCompositeDisposableWithInitializerOneLine()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -362,7 +362,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -382,14 +382,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
-            {
-                var before = @"
+        [Test]
+        public static void AddWithTriviaToExistingCompositeDisposableWithInitializerOneLine()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -407,7 +407,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -427,14 +427,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializer()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -455,7 +455,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -475,14 +475,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithCtorArg()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithCtorArg()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -503,7 +503,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -523,14 +523,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToExistingCompositeDisposableInitializerWithComment()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -552,7 +552,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -574,14 +574,14 @@ namespace N
     }
 }";
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToExistingCompositeDisposableCtor()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -599,7 +599,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -616,14 +616,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToExistingCompositeDisposableCtorUnderscore()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -641,7 +641,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -658,14 +658,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddIgnoredReturnValueToCompositeDisposableInitializer()
-            {
-                var before = @"
+        [Test]
+        public static void AddIgnoredReturnValueToCompositeDisposableInitializer()
+        {
+            var before = @"
 namespace N
 {
     using System.IO;
@@ -683,7 +683,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.IO;
@@ -702,14 +702,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        }
 
-            [Test]
-            public static void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
-            {
-                var before = @"
+        [Test]
+        public static void AddToExistingCompositeDisposableWithInitializerOneLineWithStatementsBetween()
+        {
+            var before = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -729,7 +729,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -748,9 +748,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
         }
     }
 }

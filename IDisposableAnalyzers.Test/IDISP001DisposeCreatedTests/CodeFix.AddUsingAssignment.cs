@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class AddUsingAssignment
     {
-        public static class AddUsingAssignment
-        {
-            private static readonly AssignmentAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
-            private static readonly AddUsingFix Fix = new();
+        private static readonly AssignmentAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
+        private static readonly AddUsingFix Fix = new();
 
-            private const string Disposable = @"
+        private const string Disposable = @"
 namespace N
 {
     using System;
@@ -24,10 +24,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void NewDisposableSplitDeclarationAndAssignment()
-            {
-                var before = @"
+        [Test]
+        public static void NewDisposableSplitDeclarationAndAssignment()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -42,7 +42,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -58,14 +58,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void WhenAssigningParameter()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningParameter()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -79,7 +79,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -94,14 +94,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void WhenAssigningLocalInLambda()
-            {
-                var before = @"
+        [Test]
+        public static void WhenAssigningLocalInLambda()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -119,7 +119,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -138,9 +138,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
         }
     }
 }

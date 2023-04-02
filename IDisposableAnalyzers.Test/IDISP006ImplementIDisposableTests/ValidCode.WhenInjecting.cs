@@ -1,16 +1,16 @@
-namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
-{
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
 
-    public static partial class Valid
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    public static class WhenInjecting
     {
-        public static class WhenInjecting
+        [Test]
+        public static void FactoryMethodCallingPrivateCtor()
         {
-            [Test]
-            public static void FactoryMethodCallingPrivateCtor()
-            {
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -25,13 +25,13 @@ namespace N
         public static C Create() => new C(true);
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
+        }
 
-            [Test]
-            public static void FactoryMethodCallingPrivateCtorWithCachedDisposable()
-            {
-                var code = @"
+        [Test]
+        public static void FactoryMethodCallingPrivateCtorWithCachedDisposable()
+        {
+            var code = @"
 namespace N
 {
     using System;
@@ -49,13 +49,13 @@ namespace N
         public static C Create() => new C(Cached);
     }
 }";
-                RoslynAssert.Valid(Analyzer, Disposable, code);
-            }
+            RoslynAssert.Valid(Analyzer, Disposable, code);
+        }
 
-            [Test]
-            public static void AssignedWithCreatedAndInjected()
-            {
-                var code = @"
+        [Test]
+        public static void AssignedWithCreatedAndInjected()
+        {
+            var code = @"
 #pragma warning disable IDISP008
 namespace N
 {
@@ -77,8 +77,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Valid(Analyzer, code);
-            }
+            RoslynAssert.Valid(Analyzer, code);
         }
     }
 }

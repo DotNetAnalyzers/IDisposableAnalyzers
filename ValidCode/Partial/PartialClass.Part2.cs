@@ -1,19 +1,18 @@
-﻿namespace ValidCode.Partial
-{
-    public partial class PartialClass
-    {
-        protected virtual void Dispose(bool disposing)
-        {
-            if (this.disposed)
-            {
-                return;
-            }
+﻿namespace ValidCode.Partial;
 
-            this.disposed = true;
-            if (disposing)
-            {
-                this.disposable.Dispose();
-            }
+public partial class PartialClass
+{
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
+        {
+            return;
+        }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.disposable.Dispose();
         }
     }
 }

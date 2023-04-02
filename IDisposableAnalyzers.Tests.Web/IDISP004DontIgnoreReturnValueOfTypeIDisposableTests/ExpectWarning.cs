@@ -1,12 +1,12 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests
-{
-    using System;
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP004DontIgnoreReturnValueOfTypeIDisposableTests;
 
-    public class ExpectWarning
-    {
-        private const string BaseCode = @"
+using System;
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public class ExpectWarning
+{
+    private const string BaseCode = @"
 namespace N
 {
     using System;
@@ -30,10 +30,10 @@ InterfaceOrImplementationHere
     }
 }";
 
-        [Test]
-        public void IDisposableReturnedFromImplementedFactory()
-        {
-            const string classDefinition = @"
+    [Test]
+    public void IDisposableReturnedFromImplementedFactory()
+    {
+        const string classDefinition = @"
     public class IDbConnectionFactory
     {
         public IDbConnection GetConnection()
@@ -41,22 +41,21 @@ InterfaceOrImplementationHere
             return new Connection();
         }
     }";
-            var code = BaseCode.Replace("InterfaceOrImplementationHere", classDefinition, StringComparison.OrdinalIgnoreCase);
+        var code = BaseCode.Replace("InterfaceOrImplementationHere", classDefinition, StringComparison.OrdinalIgnoreCase);
 
-            RoslynAssert.Diagnostics(new CreationAnalyzer(), ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated), code);
-        }
+        RoslynAssert.Diagnostics(new CreationAnalyzer(), ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated), code);
+    }
 
-        [Test]
-        public void IDisposableFromFactoryInterface()
-        {
-            const string interfaceDefinition = @"
+    [Test]
+    public void IDisposableFromFactoryInterface()
+    {
+        const string interfaceDefinition = @"
     public interface IDbConnectionFactory
     {
         IDbConnection GetConnection();
     }";
-            var code = BaseCode.Replace("InterfaceOrImplementationHere", interfaceDefinition, StringComparison.OrdinalIgnoreCase);
+        var code = BaseCode.Replace("InterfaceOrImplementationHere", interfaceDefinition, StringComparison.OrdinalIgnoreCase);
 
-            RoslynAssert.Diagnostics(new CreationAnalyzer(), ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated), code);
-        }
+        RoslynAssert.Diagnostics(new CreationAnalyzer(), ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated), code);
     }
 }

@@ -1,19 +1,19 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP005ReturnTypeShouldBeIDisposableTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP005ReturnTypeShouldBeIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
+    private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP005ReturnTypeShouldBeIDisposable;
 
-    public static class Valid
+    [Test]
+    public static void LocalDisposeAsync()
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new ReturnValueAnalyzer();
-        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP005ReturnTypeShouldBeIDisposable;
-
-        [Test]
-        public static void LocalDisposeAsync()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -25,7 +25,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, Descriptor, code);
-        }
+        RoslynAssert.Valid(Analyzer, Descriptor, code);
     }
 }

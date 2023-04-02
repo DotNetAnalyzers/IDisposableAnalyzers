@@ -1,108 +1,107 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using System.Collections.Generic;
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>
 {
-    using System.Collections.Generic;
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    private readonly List<DisposeCall> invocations = new();
+    private readonly List<IdentifierNameSyntax> identifiers = new();
 
-    internal sealed class DisposeWalker : ExecutionWalker<DisposeWalker>
+    private DisposeWalker()
     {
-        private readonly List<DisposeCall> invocations = new();
-        private readonly List<IdentifierNameSyntax> identifiers = new();
+        this.SearchScope = SearchScope.Instance;
+    }
 
-        private DisposeWalker()
+    internal IReadOnlyList<DisposeCall> Invocations => this.invocations;
+
+    internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
+
+    public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+    {
+        if (DisposeCall.MatchAny(node, this.SemanticModel, this.CancellationToken) is { } dispose)
         {
-            this.SearchScope = SearchScope.Instance;
+            this.invocations.Add(dispose);
         }
 
-        internal IReadOnlyList<DisposeCall> Invocations => this.invocations;
+        base.VisitInvocationExpression(node);
+    }
 
-        internal IReadOnlyList<IdentifierNameSyntax> Identifiers => this.identifiers;
+    public override void VisitIdentifierName(IdentifierNameSyntax node)
+    {
+        this.identifiers.Add(node);
+        base.VisitIdentifierName(node);
+    }
 
-        public override void VisitInvocationExpression(InvocationExpressionSyntax node)
+    internal static DisposeWalker Borrow(INamedTypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        if (type.IsAssignableTo(KnownSymbols.IDisposable, semanticModel.Compilation) &&
+            DisposeMethod.FindFirst(type, semanticModel.Compilation, Search.Recursive) is { } disposeMethod &&
+            disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
         {
-            if (DisposeCall.MatchAny(node, this.SemanticModel, this.CancellationToken) is { } dispose)
+            return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
+        }
+
+        if (type.IsAssignableTo(KnownSymbols.IAsyncDisposable, semanticModel.Compilation) &&
+            type.TryFindFirstMethod(x => x is { Parameters.Length: 0 } && x == KnownSymbols.IAsyncDisposable.DisposeAsync, out var disposeAsync) &&
+            disposeAsync.TrySingleDeclaration(cancellationToken, out declaration))
+        {
+            return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
+        }
+
+        return Borrow(() => new DisposeWalker());
+    }
+
+    internal static DisposeWalker Borrow(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
+        {
+            return BorrowAndVisit(declaration, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+        }
+
+        return Borrow(() => new DisposeWalker());
+    }
+
+    internal static DisposeWalker Borrow(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
+    {
+        return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
+    }
+
+    internal bool IsMemberDisposed(ISymbol member)
+    {
+        foreach (var invocation in this.invocations)
+        {
+            if (invocation.IsDisposing(member, this.SemanticModel, this.CancellationToken))
             {
-                this.invocations.Add(dispose);
+                return true;
             }
-
-            base.VisitInvocationExpression(node);
         }
 
-        public override void VisitIdentifierName(IdentifierNameSyntax node)
+        if (member is IPropertySymbol { OverriddenProperty: { } overridden })
         {
-            this.identifiers.Add(node);
-            base.VisitIdentifierName(node);
+            return this.IsMemberDisposed(overridden);
         }
 
-        internal static DisposeWalker Borrow(INamedTypeSymbol type, SemanticModel semanticModel, CancellationToken cancellationToken)
+        foreach (var identifier in this.identifiers)
         {
-            if (type.IsAssignableTo(KnownSymbols.IDisposable, semanticModel.Compilation) &&
-                DisposeMethod.FindFirst(type, semanticModel.Compilation, Search.Recursive) is { } disposeMethod &&
-                disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
+            if (member.Name == identifier.Identifier.ValueText &&
+                this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out var candidate) &&
+                SymbolComparer.Equal(member, candidate))
             {
-                return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
+                return true;
             }
-
-            if (type.IsAssignableTo(KnownSymbols.IAsyncDisposable, semanticModel.Compilation) &&
-                type.TryFindFirstMethod(x => x is { Parameters.Length: 0 } && x == KnownSymbols.IAsyncDisposable.DisposeAsync, out var disposeAsync) &&
-                disposeAsync.TrySingleDeclaration(cancellationToken, out declaration))
-            {
-                return BorrowAndVisit(declaration, SearchScope.Instance, type, semanticModel, () => new DisposeWalker(), cancellationToken);
-            }
-
-            return Borrow(() => new DisposeWalker());
         }
 
-        internal static DisposeWalker Borrow(IMethodSymbol disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            if (disposeMethod.TrySingleDeclaration(cancellationToken, out MethodDeclarationSyntax? declaration))
-            {
-                return BorrowAndVisit(declaration, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
-            }
+        return false;
+    }
 
-            return Borrow(() => new DisposeWalker());
-        }
-
-        internal static DisposeWalker Borrow(MethodDeclarationSyntax disposeMethod, SemanticModel semanticModel, CancellationToken cancellationToken)
-        {
-            return BorrowAndVisit(disposeMethod, SearchScope.Instance, semanticModel, cancellationToken, () => new DisposeWalker());
-        }
-
-        internal bool IsMemberDisposed(ISymbol member)
-        {
-            foreach (var invocation in this.invocations)
-            {
-                if (invocation.IsDisposing(member, this.SemanticModel, this.CancellationToken))
-                {
-                    return true;
-                }
-            }
-
-            if (member is IPropertySymbol { OverriddenProperty: { } overridden })
-            {
-                return this.IsMemberDisposed(overridden);
-            }
-
-            foreach (var identifier in this.identifiers)
-            {
-                if (member.Name == identifier.Identifier.ValueText &&
-                    this.SemanticModel.TryGetSymbol(identifier, this.CancellationToken, out var candidate) &&
-                    SymbolComparer.Equal(member, candidate))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        protected override void Clear()
-        {
-            this.invocations.Clear();
-            this.identifiers.Clear();
-            base.Clear();
-        }
+    protected override void Clear()
+    {
+        this.invocations.Clear();
+        this.identifiers.Clear();
+        base.Clear();
     }
 }

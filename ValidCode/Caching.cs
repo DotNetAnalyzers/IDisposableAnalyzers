@@ -1,23 +1,22 @@
-﻿namespace ValidCode
+﻿namespace ValidCode;
+
+using System.Collections.Concurrent;
+using System.IO;
+
+internal class Caching
 {
-    using System.Collections.Concurrent;
-    using System.IO;
+    private static readonly ConcurrentDictionary<int, Stream> Cache = new();
+    private readonly ConcurrentDictionary<int, Stream> cache = new();
 
-    internal class Caching
+    public static long Bar()
     {
-        private static readonly ConcurrentDictionary<int, Stream> Cache = new();
-        private readonly ConcurrentDictionary<int, Stream> cache = new();
+        var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+        return stream.Length;
+    }
 
-        public static long Bar()
-        {
-            var stream = Cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
-            return stream.Length;
-        }
-
-        public long Bar1()
-        {
-            var stream = this.cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
-            return stream.Length;
-        }
+    public long Bar1()
+    {
+        var stream = this.cache.GetOrAdd(1, _ => File.OpenRead(string.Empty));
+        return stream.Length;
     }
 }

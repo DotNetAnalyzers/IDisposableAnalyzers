@@ -1,13 +1,13 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP006ImplementIDisposableTests;
+
+using Microsoft.CodeAnalysis;
+
+public static partial class Valid
 {
-    using Microsoft.CodeAnalysis;
+    private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+    private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP006ImplementIDisposable;
 
-    public static partial class Valid
-    {
-        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-        private static readonly DiagnosticDescriptor Descriptor = Descriptors.IDISP006ImplementIDisposable;
-
-        private const string Disposable = @"
+    private const string Disposable = @"
 namespace N
 {
     using System;
@@ -19,5 +19,4 @@ namespace N
         }
     }
 }";
-    }
 }

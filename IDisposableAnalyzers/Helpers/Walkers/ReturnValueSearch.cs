@@ -1,9 +1,8 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+internal enum ReturnValueSearch
 {
-    internal enum ReturnValueSearch
-    {
-        Member,
-        Recursive,
-        RecursiveInside,
-    }
+    Member,
+    Recursive,
+    RecursiveInside,
 }

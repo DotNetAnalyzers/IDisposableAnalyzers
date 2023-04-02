@@ -1,21 +1,20 @@
-﻿namespace ValidCode.Chained
+﻿namespace ValidCode.Chained;
+
+using System;
+
+public static class C
 {
-    using System;
+    public static IDisposable Create() => new Disposable().M();
 
-    public static class C
+    public static void Use()
     {
-        public static IDisposable Create() => new Disposable().M();
+        using var disposable = new Disposable().M();
+    }
 
-        public static void Use()
-        {
-            using var disposable = new Disposable().M();
-        }
+    public static IDisposable CreateId() => new Disposable().Id();
 
-        public static IDisposable CreateId() => new Disposable().Id();
-
-        public static void UseId()
-        {
-            using var disposable = new Disposable().Id();
-        }
+    public static void UseId()
+    {
+        using var disposable = new Disposable().Id();
     }
 }

@@ -1,18 +1,17 @@
-﻿namespace ValidCode
-{
-    using System.IO;
+﻿namespace ValidCode;
 
-    public class Issue202
+using System.IO;
+
+public class Issue202
+{
+    void M()
     {
-        void M()
+        Stream stream;
+        while (true)
         {
-            Stream stream;
-            while (true)
+            using (stream = new MemoryStream())
             {
-                using (stream = new MemoryStream())
-                {
-                    // Do work.
-                }
+                // Do work.
             }
         }
     }

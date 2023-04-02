@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.IDISP006ImplementIDisposableTests
+﻿namespace IDisposableAnalyzers.Tests.Web.IDISP006ImplementIDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.Diagnostics;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.Diagnostics;
-    using NUnit.Framework;
+    private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
 
-    public static class Valid
+    [Test]
+    public static void FieldDisposeAsyncInDisposeAsync()
     {
-        private static readonly DiagnosticAnalyzer Analyzer = new FieldAndPropertyDeclarationAnalyzer();
-
-        [Test]
-        public static void FieldDisposeAsyncInDisposeAsync()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -28,13 +28,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IHostedService()
-        {
-            var code = @"
+    [Test]
+    public static void IHostedService()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -60,13 +60,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IHostedServiceWhenAssignedInFieldInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void IHostedServiceWhenAssignedInFieldInitializer()
+    {
+        var code = @"
 namespace N
 {
     using System.Threading;
@@ -89,13 +89,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IHostedServiceWhenAssignedInConstructor()
-        {
-            var code = @"
+    [Test]
+    public static void IHostedServiceWhenAssignedInConstructor()
+    {
+        var code = @"
 namespace N
 {
     using System.Threading;
@@ -123,13 +123,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void IHostedServiceWhenAssignedInPropertyInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void IHostedServiceWhenAssignedInPropertyInitializer()
+    {
+        var code = @"
 namespace N
 {
     using System.Threading;
@@ -152,13 +152,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void WhenImplementingIAsyncDisposable()
-        {
-            var code = @"
+    [Test]
+    public static void WhenImplementingIAsyncDisposable()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -175,7 +175,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

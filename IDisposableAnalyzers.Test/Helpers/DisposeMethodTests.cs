@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers
-{
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers;
 
-    public static class DisposeMethodTests
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static class DisposeMethodTests
+{
+    [TestCase(Search.TopLevel)]
+    [TestCase(Search.Recursive)]
+    public static void Find(Search search)
     {
-        [TestCase(Search.TopLevel)]
-        [TestCase(Search.Recursive)]
-        public static void Find(Search search)
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -39,19 +39,19 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
-        }
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
+        Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
+    }
 
-        [Ignore("Not sure if we want to find explicit.")]
-        [TestCase(Search.TopLevel)]
-        [TestCase(Search.Recursive)]
-        public static void FindWhenExplicit(Search search)
-        {
-            var code = @"
+    [Ignore("Not sure if we want to find explicit.")]
+    [TestCase(Search.TopLevel)]
+    [TestCase(Search.Recursive)]
+    public static void FindWhenExplicit(Search search)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -79,18 +79,18 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
-        }
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
+        Assert.AreEqual("N.C.Dispose()", DisposeMethod.Find(method, compilation, search).ToString());
+    }
 
-        [TestCase(Search.TopLevel)]
-        [TestCase(Search.Recursive)]
-        public static void FindVirtual(Search search)
-        {
-            var code = @"
+    [TestCase(Search.TopLevel)]
+    [TestCase(Search.Recursive)]
+    public static void FindVirtual(Search search)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -126,18 +126,18 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual("N.C.Dispose(bool)", DisposeMethod.FindVirtual(method, compilation, search).ToString());
-        }
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
+        Assert.AreEqual("N.C.Dispose(bool)", DisposeMethod.FindVirtual(method, compilation, search).ToString());
+    }
 
-        [TestCase(Search.TopLevel)]
-        [TestCase(Search.Recursive)]
-        public static void FindFirst(Search search)
-        {
-            var code = @"
+    [TestCase(Search.TopLevel)]
+    [TestCase(Search.Recursive)]
+    public static void FindFirst(Search search)
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -173,11 +173,10 @@ namespace N
         }
     }
 }";
-            var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-            var semanticModel = compilation.GetSemanticModel(syntaxTree);
-            var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
-            Assert.AreEqual("N.C.Dispose()", DisposeMethod.FindFirst(method, compilation, search).ToString());
-        }
+        var syntaxTree = CSharpSyntaxTree.ParseText(code);
+        var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+        var semanticModel = compilation.GetSemanticModel(syntaxTree);
+        var method = semanticModel.GetDeclaredSymbol(syntaxTree.FindClassDeclaration("C"));
+        Assert.AreEqual("N.C.Dispose()", DisposeMethod.FindFirst(method, compilation, search).ToString());
     }
 }

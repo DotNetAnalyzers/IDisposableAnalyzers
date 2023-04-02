@@ -1,17 +1,17 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests
+namespace IDisposableAnalyzers.Test.IDISP014UseSingleInstanceOfHttpClientTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly CreationAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void StaticFieldAssignedInInitializer()
     {
-        private static readonly CreationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void StaticFieldAssignedInInitializer()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -21,13 +21,13 @@ namespace N
         public static readonly HttpClient Client = new HttpClient();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticFieldAssignedInStaticCtor()
-        {
-            var code = @"
+    [Test]
+    public static void StaticFieldAssignedInStaticCtor()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -43,13 +43,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticPropertyAssignedInInitializer()
-        {
-            var code = @"
+    [Test]
+    public static void StaticPropertyAssignedInInitializer()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -65,13 +65,13 @@ namespace N
         public static HttpClient Client { get; }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void StaticPropertyAssignedInStaticCtor()
-        {
-            var code = @"
+    [Test]
+    public static void StaticPropertyAssignedInStaticCtor()
+    {
+        var code = @"
 namespace N
 {
     using System.Net.Http;
@@ -81,13 +81,13 @@ namespace N
         public static HttpClient Client { get; } = new HttpClient();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void CustomHttpClient()
-        {
-            var httpClientCode = @"
+    [Test]
+    public static void CustomHttpClient()
+    {
+        var httpClientCode = @"
 namespace N
 {
     using System;
@@ -99,7 +99,7 @@ namespace N
         }
     }
 }";
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -112,7 +112,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, httpClientCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, httpClientCode, code);
     }
 }

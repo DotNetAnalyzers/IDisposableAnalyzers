@@ -1,26 +1,25 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+using System.IO;
+
+public class AbstractFooImpl1 : AbstractFooBase
 {
-    using System.IO;
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
 
-    public class AbstractFooImpl1 : AbstractFooBase
+    protected override void Dispose(bool disposing)
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-        private bool disposed;
-
-        protected override void Dispose(bool disposing)
+        if (this.disposed)
         {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
-
-            base.Dispose(disposing);
+            return;
         }
+
+        this.disposed = true;
+        if (disposing)
+        {
+            this.stream.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 }

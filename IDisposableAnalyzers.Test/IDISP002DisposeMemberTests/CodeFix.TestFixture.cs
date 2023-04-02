@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class TestFixture
     {
-        public static class TestFixture
-        {
-            private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-            private static readonly DisposeInTearDownFix Fix = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
+        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+        private static readonly DisposeInTearDownFix Fix = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP002DisposeMember);
 
-            [Test]
-            public static void AssigningFieldInSetUpWhenNoTearDown()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningFieldInSetUpWhenNoTearDown()
+        {
+            var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -36,7 +36,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -63,14 +63,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AssigningFieldInOneTimeSetUp()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningFieldInOneTimeSetUp()
+        {
+            var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -92,7 +92,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -119,14 +119,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AssigningFieldInOneTimeSetUpWhenOneTimeTearDownExists()
-            {
-                var before = @"
+        [Test]
+        public static void AssigningFieldInOneTimeSetUpWhenOneTimeTearDownExists()
+        {
+            var before = @"
 namespace N
 {
     using NUnit.Framework;
@@ -153,7 +153,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using NUnit.Framework;
@@ -180,9 +180,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
         }
     }
 }

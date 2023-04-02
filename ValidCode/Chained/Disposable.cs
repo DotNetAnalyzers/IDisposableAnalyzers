@@ -1,13 +1,12 @@
-﻿namespace ValidCode.Chained
+﻿namespace ValidCode.Chained;
+
+using System;
+
+public sealed class Disposable : IDisposable
 {
-    using System;
+    public Disposable M() => this;
 
-    public sealed class Disposable : IDisposable
+    public void Dispose()
     {
-        public Disposable M() => this;
-
-        public void Dispose()
-        {
-        }
     }
 }

@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Diagnostics
+    public static class OutParameter
     {
-        public static class OutParameter
-        {
-            private static readonly ArgumentAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
+        private static readonly ArgumentAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
 
-            private const string DisposableCode = @"
+        private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -23,14 +23,14 @@ namespace N
     }
 }";
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out Disposable temp")]
-            [TestCase("out Disposable _")]
-            public static void DiscardedNewDisposableStatementBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out Disposable temp")]
+        [TestCase("out Disposable _")]
+        public static void DiscardedNewDisposableStatementBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     public static class C
@@ -48,17 +48,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out Disposable temp")]
-            [TestCase("out Disposable _")]
-            public static void DiscardedNewDisposableExpressionBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out Disposable temp")]
+        [TestCase("out Disposable _")]
+        public static void DiscardedNewDisposableExpressionBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     public static class C
@@ -73,17 +73,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out FileStream? temp")]
-            [TestCase("out FileStream _")]
-            public static void DiscardedFileOpenReadStatementBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream? temp")]
+        [TestCase("out FileStream _")]
+        public static void DiscardedFileOpenReadStatementBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -110,17 +110,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out FileStream? temp")]
-            [TestCase("out FileStream _")]
-            public static void DiscardedFileOpenReadExpressionBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream? temp")]
+        [TestCase("out FileStream _")]
+        public static void DiscardedFileOpenReadExpressionBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.Diagnostics.CodeAnalysis;
@@ -144,17 +144,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out FileStream temp")]
-            [TestCase("out FileStream _")]
-            public static void DiscardedOutAssignedWithArgumentStatementBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream _")]
+        public static void DiscardedOutAssignedWithArgumentStatementBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -174,17 +174,17 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var temp")]
-            [TestCase("out var _")]
-            [TestCase("out FileStream temp")]
-            [TestCase("out FileStream _")]
-            public static void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
-            {
-                var code = @"
+        [TestCase("out _")]
+        [TestCase("out var temp")]
+        [TestCase("out var _")]
+        [TestCase("out FileStream temp")]
+        [TestCase("out FileStream _")]
+        public static void DiscardedOutAssignedWithArgumentExpressionBody(string expression)
+        {
+            var code = @"
 namespace N
 {
     using System.IO;
@@ -201,8 +201,7 @@ namespace N
     }
 }".AssertReplace("out _", expression);
 
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
     }
 }

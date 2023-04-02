@@ -1,40 +1,39 @@
-namespace ValidCode.Tuples
+namespace ValidCode.Tuples;
+
+using System;
+using System.IO;
+
+public sealed class TupleOfFileStreams : IDisposable
 {
-    using System;
-    using System.IO;
+    private readonly Tuple<FileStream, FileStream> tuple;
 
-    public sealed class TupleOfFileStreams : IDisposable
+    public TupleOfFileStreams(string file1, string file2)
     {
-        private readonly Tuple<FileStream, FileStream> tuple;
+        var stream1 = File.OpenRead(file1);
+        var stream2 = File.OpenRead(file2);
+        this.tuple = Tuple.Create(stream1, stream2);
+    }
 
-        public TupleOfFileStreams(string file1, string file2)
-        {
-            var stream1 = File.OpenRead(file1);
-            var stream2 = File.OpenRead(file2);
-            this.tuple = Tuple.Create(stream1, stream2);
-        }
+    public TupleOfFileStreams(string file)
+    {
+        this.tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
+    }
 
-        public TupleOfFileStreams(string file)
-        {
-            this.tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
-        }
+    public TupleOfFileStreams(int file)
+    {
+        this.tuple = new Tuple<FileStream, FileStream>(File.OpenRead(file.ToString()), File.OpenRead(file.ToString()));
+    }
 
-        public TupleOfFileStreams(int file)
-        {
-            this.tuple = new Tuple<FileStream, FileStream>(File.OpenRead(file.ToString()), File.OpenRead(file.ToString()));
-        }
+    public static void LocalTupleOfFileStreams(string file)
+    {
+        var tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
+        tuple.Item1.Dispose();
+        (tuple.Item2 as IDisposable)?.Dispose();
+    }
 
-        public static void LocalTupleOfFileStreams(string file)
-        {
-            var tuple = Tuple.Create(File.OpenRead(file), File.OpenRead(file));
-            tuple.Item1.Dispose();
-            (tuple.Item2 as IDisposable)?.Dispose();
-        }
-
-        public void Dispose()
-        {
-            this.tuple.Item1.Dispose();
-            this.tuple.Item2.Dispose();
-        }
+    public void Dispose()
+    {
+        this.tuple.Item1.Dispose();
+        this.tuple.Item2.Dispose();
     }
 }

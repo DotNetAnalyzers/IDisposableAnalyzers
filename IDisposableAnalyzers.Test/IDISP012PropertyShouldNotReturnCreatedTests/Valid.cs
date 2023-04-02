@@ -1,13 +1,13 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP012PropertyShouldNotReturnCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ReturnValueAnalyzer Analyzer = new();
 
-    public static class Valid
-    {
-        private static readonly ReturnValueAnalyzer Analyzer = new();
-
-        private const string DisposableCode = @"
+    private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -20,10 +20,10 @@ namespace N
     }
 }";
 
-        [Test]
-        public static void PropertyReturning1()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturning1()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -38,13 +38,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyReturningBoxed1()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningBoxed1()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -59,13 +59,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyReturning1ExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturning1ExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     public sealed class C
@@ -80,13 +80,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyReturningNewTimeSpan()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningNewTimeSpan()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -103,13 +103,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyReturningNewTimeSpanExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningNewTimeSpanExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -120,13 +120,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void PropertyReturningBackingFieldExpressionBody()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningBackingFieldExpressionBody()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -147,13 +147,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void PropertyReturningBackingField()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningBackingField()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -171,13 +171,13 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
+    }
 
-        [Test]
-        public static void PropertyReturningBackingFieldFunc()
-        {
-            var code = @"
+    [Test]
+    public static void PropertyReturningBackingFieldFunc()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -195,7 +195,6 @@ namespace N
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, DisposableCode, code);
-        }
+        RoslynAssert.Valid(Analyzer, DisposableCode, code);
     }
 }

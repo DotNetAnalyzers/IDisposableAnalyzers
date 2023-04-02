@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class AddUsingForObjectCreation
     {
-        public static class AddUsingForObjectCreation
-        {
-            private static readonly AddUsingFix Fix = new();
+        private static readonly AddUsingFix Fix = new();
 
-            [Test]
-            public static void AddUsingForIgnoredFileOpenRead()
-            {
-                var before = @"
+        [Test]
+        public static void AddUsingForIgnoredFileOpenRead()
+        {
+            var before = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -26,7 +26,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -41,14 +41,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AddUsingForIgnoredReturnEmpty()
-            {
-                var before = @"
+        [Test]
+        public static void AddUsingForIgnoredReturnEmpty()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -62,7 +62,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -77,14 +77,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+        }
 
-            [Test]
-            public static void AddUsingForIgnoredReturnManyStatements()
-            {
-                var before = @"
+        [Test]
+        public static void AddUsingForIgnoredReturnManyStatements()
+        {
+            var before = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -105,7 +105,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -127,9 +127,8 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after);
         }
     }
 }

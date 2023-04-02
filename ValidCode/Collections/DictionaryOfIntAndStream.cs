@@ -1,31 +1,30 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Collections
+namespace ValidCode.Collections;
+
+using System.Collections.Generic;
+using System.IO;
+
+public class DictionaryOfIntAndStream
 {
-    using System.Collections.Generic;
-    using System.IO;
+    private readonly Dictionary<int, Stream> streams = new();
 
-    public class DictionaryOfIntAndStream
+    public DictionaryOfIntAndStream()
     {
-        private readonly Dictionary<int, Stream> streams = new();
+        this.streams[0] = File.OpenRead(string.Empty);
+    }
 
-        public DictionaryOfIntAndStream()
+    public Stream Get(int i)
+    {
+        return this.streams[i];
+    }
+
+    public void Set(int i, string fileName)
+    {
+        if (this.streams.TryGetValue(i, out var stream))
         {
-            this.streams[0] = File.OpenRead(string.Empty);
+            stream.Dispose();
         }
 
-        public Stream Get(int i)
-        {
-            return this.streams[i];
-        }
-
-        public void Set(int i, string fileName)
-        {
-            if (this.streams.TryGetValue(i, out var stream))
-            {
-                stream.Dispose();
-            }
-
-            this.streams[i] = File.OpenRead(fileName);
-        }
+        this.streams[i] = File.OpenRead(fileName);
     }
 }

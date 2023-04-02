@@ -1,25 +1,24 @@
 ﻿// ReSharper disable All
-namespace IDisposableAnalyzers.Test.Sandbox
+namespace IDisposableAnalyzers.Test.Sandbox;
+
+using System.IO;
+
+public sealed class C
 {
-    using System.IO;
+    private static readonly Stream StaticStream = File.OpenRead(string.Empty);
+    private Stream stream;
 
-    public sealed class C
+    public C(Stream stream)
     {
-        private static readonly Stream StaticStream = File.OpenRead(string.Empty);
-        private Stream stream;
+        this.stream = stream;
+        this.stream = StaticStream;
+        this.Stream = stream;
+        this.Stream = StaticStream;
+    }
 
-        public C(Stream stream)
-        {
-            this.stream = stream;
-            this.stream = StaticStream;
-            this.Stream = stream;
-            this.Stream = StaticStream;
-        }
-
-        public Stream Stream
-        {
-            get { return this.stream; }
-            private set { this.stream = value; }
-        }
+    public Stream Stream
+    {
+        get { return this.stream; }
+        private set { this.stream = value; }
     }
 }

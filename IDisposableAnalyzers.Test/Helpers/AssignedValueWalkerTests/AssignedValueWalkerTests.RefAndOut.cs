@@ -1,20 +1,20 @@
-﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests
-{
-    using System.Linq;
-    using System.Threading;
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.Helpers.AssignedValueWalkerTests;
 
-    public static partial class AssignedValueWalkerTests
+using System.Linq;
+using System.Threading;
+using Gu.Roslyn.AnalyzerExtensions;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class AssignedValueWalkerTests
+{
+    public static class RefAndOut
     {
-        public static class RefAndOut
+        [Test]
+        public static void LocalAssignedWithOutParameterSimple()
         {
-            [Test]
-            public static void LocalAssignedWithOutParameterSimple()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -32,20 +32,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("1", walker.Values.Single().ToString());
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", walker.Values.Single().ToString());
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var _")]
-            [TestCase("out var temp")]
-            [TestCase("out int temp")]
-            public static void DiscardedOut(string expression)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("out _")]
+        [TestCase("out var _")]
+        [TestCase("out var temp")]
+        [TestCase("out int temp")]
+        public static void DiscardedOut(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     public static class C
@@ -59,20 +59,20 @@ namespace N
         }
     }
 }".AssertReplace("out _", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindArgument(expression).Expression;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("1", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindArgument(expression).Expression;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", string.Join(", ", walker.Values));
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var _")]
-            [TestCase("out var temp")]
-            [TestCase("out int temp")]
-            public static void DiscardedOutAssignedWithArgument(string expression)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("out _")]
+        [TestCase("out var _")]
+        [TestCase("out var temp")]
+        [TestCase("out int temp")]
+        public static void DiscardedOutAssignedWithArgument(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     public static class C
@@ -86,20 +86,20 @@ namespace N
         }
     }
 }".AssertReplace("out _", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindArgument(expression).Expression;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                CollectionAssert.AreEqual("1", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindArgument(expression).Expression;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            CollectionAssert.AreEqual("1", string.Join(", ", walker.Values));
+        }
 
-            [TestCase("out _")]
-            [TestCase("out var _")]
-            [TestCase("out var temp")]
-            [TestCase("out int temp")]
-            public static void DiscardedOutCachedAndAssigned(string expression)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("out _")]
+        [TestCase("out var _")]
+        [TestCase("out var temp")]
+        [TestCase("out int temp")]
+        public static void DiscardedOutCachedAndAssigned(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -123,17 +123,17 @@ namespace N
         }
     }
 }".AssertReplace("out _", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindArgument(expression).Expression;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("result, 1", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindArgument(expression).Expression;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("result, 1", string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void OutParameterCachedAndAssigned()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void OutParameterCachedAndAssigned()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System.Collections.Generic;
@@ -155,18 +155,18 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindParameter("result");
-                Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var parameter));
-                using var walker = AssignedValueWalker.Borrow(parameter, semanticModel, CancellationToken.None);
-                Assert.AreEqual("result, 1", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindParameter("result");
+            Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var parameter));
+            using var walker = AssignedValueWalker.Borrow(parameter, semanticModel, CancellationToken.None);
+            Assert.AreEqual("result, 1", string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void LocalAssignedWithOutParameterOtherClass()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void LocalAssignedWithOutParameterOtherClass()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     class C
@@ -187,17 +187,17 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("1", walker.Values.Single().ToString());
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", walker.Values.Single().ToString());
+        }
 
-            [Test]
-            public static void LocalAssignedWithOutParameterOtherClassElvis()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void LocalAssignedWithOutParameterOtherClassElvis()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     class C
@@ -218,20 +218,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("1", walker.Values.Single().ToString());
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("1", walker.Values.Single().ToString());
+        }
 
-            [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "1")]
-            [TestCase("var temp3 = value;", "")]
-            [TestCase("var temp4 = value;", "2")]
-            public static void LocalAssignedWithOutParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = value;", "")]
+        [TestCase("var temp2 = value;", "1")]
+        [TestCase("var temp3 = value;", "")]
+        [TestCase("var temp4 = value;", "2")]
+        public static void LocalAssignedWithOutParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -258,17 +258,17 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual(expected, string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void LocalAssignedWithOutParameterGeneric()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void LocalAssignedWithOutParameterGeneric()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C<T>
@@ -286,18 +286,18 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("default(T)", walker.Values.Single().ToString());
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value;").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("default(T)", walker.Values.Single().ToString());
+        }
 
-            [TestCase("var temp1 = value;", "0")]
-            [TestCase("var temp2 = value;", "0, 1")]
-            public static void LocalAssignedWithChainedOutParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = value;", "0")]
+        [TestCase("var temp2 = value;", "0, 1")]
+        public static void LocalAssignedWithChainedOutParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -321,19 +321,19 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = value;", "")]
-            [TestCase("var temp2 = value;", "1")]
-            public static void LocalAssignedWithChainedRefParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = value;", "")]
+        [TestCase("var temp2 = value;", "1")]
+        public static void LocalAssignedWithChainedRefParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -357,19 +357,19 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = value", "")]
-            [TestCase("var temp2 = value", "1")]
-            public static void LocalAssignedWithRefParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = value", "")]
+        [TestCase("var temp2 = value", "1")]
+        public static void LocalAssignedWithRefParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -388,21 +388,21 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2, 3")]
-            [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public static void FieldAssignedWithOutParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = this.value;", "1")]
+        [TestCase("var temp2 = this.value;", "1, 2")]
+        [TestCase("var temp3 = this.value;", "1, 2, 3")]
+        [TestCase("var temp4 = this.value;", "1, 2, 3")]
+        public static void FieldAssignedWithOutParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -429,21 +429,21 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                var actual = string.Join(", ", walker.Values);
-                Assert.AreEqual(expected, actual);
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            var actual = string.Join(", ", walker.Values);
+            Assert.AreEqual(expected, actual);
+        }
 
-            [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2")]
-            [TestCase("var temp4 = this.value;", "1, 2")]
-            public static void FieldAssignedWithRefParameter(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = this.value;", "1")]
+        [TestCase("var temp2 = this.value;", "1, 2")]
+        [TestCase("var temp3 = this.value;", "1, 2")]
+        [TestCase("var temp4 = this.value;", "1, 2")]
+        public static void FieldAssignedWithRefParameter(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -470,20 +470,20 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual(expected, string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", walker.Values));
+        }
 
-            [TestCase("var temp1 = this.value;", "1")]
-            [TestCase("var temp2 = this.value;", "1, 2")]
-            [TestCase("var temp3 = this.value;", "1, 2, 3")]
-            [TestCase("var temp4 = this.value;", "1, 2, 3")]
-            public static void FieldAssignedWithRefParameterArgument(string code, string expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("var temp1 = this.value;", "1")]
+        [TestCase("var temp2 = this.value;", "1, 2")]
+        [TestCase("var temp3 = this.value;", "1, 2, 3")]
+        [TestCase("var temp4 = this.value;", "1, 2, 3")]
+        public static void FieldAssignedWithRefParameterArgument(string code, string expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -510,17 +510,17 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause(code).Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual(expected, string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause(code).Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual(expected, string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void RefBeforeOut()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void RefBeforeOut()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -539,17 +539,17 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("0, 1, 2", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("0, 1, 2", string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void RecursiveOutAssigned()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void RecursiveOutAssigned()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -574,17 +574,17 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("0, result, 1", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("0, result, 1", string.Join(", ", walker.Values));
+        }
 
-            [Test]
-            public static void RecursiveOut()
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [Test]
+        public static void RecursiveOut()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     internal class C
@@ -603,12 +603,11 @@ namespace N
         }
     }
 }");
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
-                using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
-                Assert.AreEqual("0, result", string.Join(", ", walker.Values));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindEqualsValueClause("var temp = value").Value;
+            using var walker = AssignedValueWalker.Borrow(value, semanticModel, CancellationToken.None);
+            Assert.AreEqual("0, result", string.Join(", ", walker.Values));
         }
     }
 }

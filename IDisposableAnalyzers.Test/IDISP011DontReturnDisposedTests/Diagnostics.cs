@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP011DontReturnDisposedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ReturnValueAnalyzer Analyzer = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP011DontReturnDisposed);
 
-    public static class Diagnostics
+    [Test]
+    public static void ReturnFileOpenReadFromUsing()
     {
-        private static readonly ReturnValueAnalyzer Analyzer = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP011DontReturnDisposed);
-
-        [Test]
-        public static void ReturnFileOpenReadFromUsing()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -27,13 +27,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadFromUsingDeclaration()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadFromUsingDeclaration()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -47,13 +47,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnFileOpenReadDisposed()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnFileOpenReadDisposed()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -68,13 +68,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnLazyFromUsing()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnLazyFromUsing()
+    {
+        var code = @"
 namespace N
 {
     using System.Collections.Generic;
@@ -98,13 +98,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
 
-        [Test]
-        public static void ReturnLazyFromUsingNested()
-        {
-            var code = @"
+    [Test]
+    public static void ReturnLazyFromUsingNested()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -139,7 +139,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
-        }
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
     }
 }

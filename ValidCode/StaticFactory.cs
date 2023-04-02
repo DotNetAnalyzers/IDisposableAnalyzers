@@ -1,10 +1,9 @@
 ﻿// ReSharper disable All
-namespace ValidCode
-{
-    using System;
+namespace ValidCode;
 
-    public static class StaticFactory
-    {
-        public static IDisposable Create() => new Disposable();
-    }
+using System;
+
+public static class StaticFactory
+{
+    public static IDisposable Create() => new Disposable();
 }

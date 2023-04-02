@@ -1,15 +1,14 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class TupleType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Create;
 
-    internal class TupleType : QualifiedType
+    internal TupleType()
+        : base("System.Tuple")
     {
-        internal readonly QualifiedMethod Create;
-
-        internal TupleType()
-            : base("System.Tuple")
-        {
-            this.Create = new QualifiedMethod(this, nameof(this.Create));
-        }
+        this.Create = new QualifiedMethod(this, nameof(this.Create));
     }
 }

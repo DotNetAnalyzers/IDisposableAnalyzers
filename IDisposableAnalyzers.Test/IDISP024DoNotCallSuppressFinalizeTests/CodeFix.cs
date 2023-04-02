@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeTests
+﻿namespace IDisposableAnalyzers.Test.IDISP024DoNotCallSuppressFinalizeTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly SuppressFinalizeAnalyzer Analyzer = new();
+    private static readonly RemoveCallFix Fix = new();
 
-    public static class CodeFix
+    [Test]
+    public static void SealedSimple()
     {
-        private static readonly SuppressFinalizeAnalyzer Analyzer = new();
-        private static readonly RemoveCallFix Fix = new();
-
-        [Test]
-        public static void SealedSimple()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -25,7 +25,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -37,7 +37,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, before, after);
     }
 }

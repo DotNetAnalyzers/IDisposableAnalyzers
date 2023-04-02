@@ -1,17 +1,17 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP001DisposeCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class CodeFix
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class CodeFix
+    public static class AddUsingDeclaration
     {
-        public static class AddUsingDeclaration
-        {
-            private static readonly LocalDeclarationAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
-            private static readonly AddUsingFix Fix = new();
+        private static readonly LocalDeclarationAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP001DisposeCreated);
+        private static readonly AddUsingFix Fix = new();
 
-            private const string Disposable = @"
+        private const string Disposable = @"
 namespace N
 {
     using System;
@@ -24,10 +24,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void LocalToUsingDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LocalToUsingDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -42,7 +42,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -56,14 +56,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void Local()
-            {
-                var before = @"
+        [Test]
+        public static void Local()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -78,7 +78,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -94,14 +94,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalWithTriviaToUsingDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LocalWithTriviaToUsingDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -117,7 +117,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -132,14 +132,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void LocalWithTrivia()
-            {
-                var before = @"
+        [Test]
+        public static void LocalWithTrivia()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -155,7 +155,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -172,14 +172,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalOneStatementAfterToUsingDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LocalOneStatementAfterToUsingDeclaration()
+        {
+            var before = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -196,7 +196,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -212,13 +212,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void LocalOneStatementAfter()
-            {
-                var before = @"
+        [Test]
+        public static void LocalOneStatementAfter()
+        {
+            var before = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -235,7 +235,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 #pragma warning disable CS0219
 namespace N
 {
@@ -253,13 +253,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalManyStatements()
-            {
-                var before = @"
+        [Test]
+        public static void LocalManyStatements()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -283,7 +283,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -306,13 +306,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void LocalInLambdaToUsingDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LocalInLambdaToUsingDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -330,7 +330,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -347,14 +347,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void LocalInLambda()
-            {
-                var before = @"
+        [Test]
+        public static void LocalInLambda()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -372,7 +372,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -391,14 +391,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalManyStatementsToUsingDeclaration()
-            {
-                var before = @"
+        [Test]
+        public static void LocalManyStatementsToUsingDeclaration()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -422,7 +422,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -447,14 +447,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalInSwitchCase()
-            {
-                var before = @"
+        [Test]
+        public static void LocalInSwitchCase()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -486,7 +486,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -520,14 +520,14 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [Test]
-            public static void LocalFactoryMethod()
-            {
-                var before = @"
+        [Test]
+        public static void LocalFactoryMethod()
+        {
+            var before = @"
 namespace N
 {
     using System;
@@ -547,7 +547,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -568,17 +568,17 @@ namespace N
         }
     }
 }";
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after, fixTitle: "Add using to end of block.");
+        }
 
-            [TestCase("System.Activator.CreateInstance<Disposable>()")]
-            [TestCase("(Disposable)System.Activator.CreateInstance(typeof(Disposable))!")]
-            [TestCase("(Disposable?)System.Activator.CreateInstance(typeof(Disposable))")]
-            [TestCase("(Disposable)constructorInfo.Invoke(null)")]
-            public static void Reflection(string expression)
-            {
-                var before = @"
+        [TestCase("System.Activator.CreateInstance<Disposable>()")]
+        [TestCase("(Disposable)System.Activator.CreateInstance(typeof(Disposable))!")]
+        [TestCase("(Disposable?)System.Activator.CreateInstance(typeof(Disposable))")]
+        [TestCase("(Disposable)constructorInfo.Invoke(null)")]
+        public static void Reflection(string expression)
+        {
+            var before = @"
 namespace N
 {
     using System.Reflection;
@@ -592,7 +592,7 @@ namespace N
     }
 }".AssertReplace("Activator.CreateInstance<Disposable>()", expression);
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System.Reflection;
@@ -605,14 +605,14 @@ namespace N
         }
     }
 }".AssertReplace("Activator.CreateInstance<Disposable>()", expression);
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { Disposable, before }, after, fixTitle: "using");
+        }
 
-            [Test]
-            public static void CreateRebind()
-            {
-                var disposable = @"
+        [Test]
+        public static void CreateRebind()
+        {
+            var disposable = @"
 namespace N
 {
     using System;
@@ -625,7 +625,7 @@ namespace N
     }
 }";
 
-                var before = @"
+            var before = @"
 namespace N
 {
     using System;
@@ -646,7 +646,7 @@ namespace N
     }
 }";
 
-                var after = @"
+            var after = @"
 namespace N
 {
     using System;
@@ -667,9 +667,8 @@ namespace N
     }
 }";
 
-                RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
-                RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
-            }
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
+            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
         }
     }
 }

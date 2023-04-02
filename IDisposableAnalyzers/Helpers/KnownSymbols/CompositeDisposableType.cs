@@ -1,15 +1,14 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class CompositeDisposableType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Add;
 
-    internal class CompositeDisposableType : QualifiedType
+    internal CompositeDisposableType()
+        : base("System.Reactive.Disposables.CompositeDisposable")
     {
-        internal readonly QualifiedMethod Add;
-
-        internal CompositeDisposableType()
-            : base("System.Reactive.Disposables.CompositeDisposable")
-        {
-            this.Add = new QualifiedMethod(this, nameof(this.Add));
-        }
+        this.Add = new QualifiedMethod(this, nameof(this.Add));
     }
 }

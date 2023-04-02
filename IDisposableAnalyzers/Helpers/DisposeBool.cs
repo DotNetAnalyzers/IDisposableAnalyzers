@@ -1,44 +1,43 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+
+internal readonly struct DisposeBool
 {
-    using Gu.Roslyn.AnalyzerExtensions;
-    using Microsoft.CodeAnalysis.CSharp.Syntax;
+    internal readonly InvocationExpressionSyntax Invocation;
 
-    internal readonly struct DisposeBool
+    internal DisposeBool(InvocationExpressionSyntax invocation)
     {
-        internal readonly InvocationExpressionSyntax Invocation;
+        this.Invocation = invocation;
+    }
 
-        internal DisposeBool(InvocationExpressionSyntax invocation)
+    internal ArgumentSyntax Argument => this.Invocation.ArgumentList.Arguments[0];
+
+    internal static DisposeBool? Match(InvocationExpressionSyntax candidate)
+    {
+        if (candidate.ArgumentList is { Arguments: { Count: 1 } arguments } &&
+            arguments[0] is { Expression: { } } &&
+            candidate.TryGetMethodName(out var name) &&
+            name == "Dispose")
         {
-            this.Invocation = invocation;
+            return new DisposeBool(candidate);
         }
 
-        internal ArgumentSyntax Argument => this.Invocation.ArgumentList.Arguments[0];
+        return null;
+    }
 
-        internal static DisposeBool? Match(InvocationExpressionSyntax candidate)
+    internal static DisposeBool? Find(BaseMethodDeclarationSyntax disposeMethod)
+    {
+        using var walker = InvocationWalker.Borrow(disposeMethod);
+        foreach (var candidate in walker.Invocations)
         {
-            if (candidate.ArgumentList is { Arguments: { Count: 1 } arguments } &&
-                arguments[0] is { Expression: { } } &&
-                candidate.TryGetMethodName(out var name) &&
-                name == "Dispose")
+            if (Match(candidate) is { } match)
             {
-                return new DisposeBool(candidate);
+                return match;
             }
-
-            return null;
         }
 
-        internal static DisposeBool? Find(BaseMethodDeclarationSyntax disposeMethod)
-        {
-            using var walker = InvocationWalker.Borrow(disposeMethod);
-            foreach (var candidate in walker.Invocations)
-            {
-                if (Match(candidate) is { } match)
-                {
-                    return match;
-                }
-            }
-
-            return null;
-        }
+        return null;
     }
 }

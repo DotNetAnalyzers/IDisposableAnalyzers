@@ -1,65 +1,64 @@
 ﻿// ReSharper disable All
-namespace ValidCode.Tuples
+namespace ValidCode.Tuples;
+
+using System;
+using System.IO;
+
+public sealed class DisposingGenericPairOfFileStreams : IDisposable
 {
-    using System;
-    using System.IO;
+    private readonly Pair<FileStream> pair;
 
-    public sealed class DisposingGenericPairOfFileStreams : IDisposable
+    public DisposingGenericPairOfFileStreams(string file1, string file2)
     {
-        private readonly Pair<FileStream> pair;
+        var stream1 = File.OpenRead(file1);
+        var stream2 = File.OpenRead(file2);
+        this.pair = Pair.Create(stream1, stream2);
+    }
 
-        public DisposingGenericPairOfFileStreams(string file1, string file2)
+    public DisposingGenericPairOfFileStreams(string file)
+    {
+        this.pair = Pair.Create(File.OpenRead(file), File.OpenRead(file));
+    }
+
+    public DisposingGenericPairOfFileStreams(int i)
+    {
+        this.pair = new Pair<FileStream>(File.OpenRead(i.ToString()), File.OpenRead(i.ToString()));
+    }
+
+    public static void LocalPairOfFileStreams(string file)
+    {
+        using (var pair = Pair.Create(File.OpenRead(file), File.OpenRead(file)))
         {
-            var stream1 = File.OpenRead(file1);
-            var stream2 = File.OpenRead(file2);
-            this.pair = Pair.Create(stream1, stream2);
         }
+    }
 
-        public DisposingGenericPairOfFileStreams(string file)
-        {
-            this.pair = Pair.Create(File.OpenRead(file), File.OpenRead(file));
-        }
+    public void Dispose()
+    {
+        this.pair.Dispose();
+    }
 
-        public DisposingGenericPairOfFileStreams(int i)
-        {
-            this.pair = new Pair<FileStream>(File.OpenRead(i.ToString()), File.OpenRead(i.ToString()));
-        }
+    private static class Pair
+    {
+        public static Pair<T> Create<T>(T item1, T item2) where T : IDisposable => new Pair<T>(item1, item2);
+    }
 
-        public static void LocalPairOfFileStreams(string file)
+    private sealed class Pair<T> : IDisposable where T : IDisposable
+    {
+        private readonly T item1;
+        private readonly T item2;
+
+        public Pair(T item1, T item2)
         {
-            using (var pair = Pair.Create(File.OpenRead(file), File.OpenRead(file)))
-            {
-            }
+            this.item1 = item1;
+            this.item2 = item2;
         }
 
         public void Dispose()
         {
-            this.pair.Dispose();
-        }
-
-        private static class Pair
-        {
-            public static Pair<T> Create<T>(T item1, T item2) where T : IDisposable => new Pair<T>(item1, item2);
-        }
-
-        private sealed class Pair<T> : IDisposable where T : IDisposable
-        {
-            private readonly T item1;
-            private readonly T item2;
-
-            public Pair(T item1, T item2)
-            {
-                this.item1 = item1;
-                this.item2 = item2;
-            }
-
-            public void Dispose()
-            {
 #pragma warning disable IDISP007 // Don't dispose injected
-                this.item1.Dispose();
-                (this.item2 as IDisposable)?.Dispose();
+            this.item1.Dispose();
+            (this.item2 as IDisposable)?.Dispose();
 #pragma warning restore IDISP007
-            }
         }
     }
 }

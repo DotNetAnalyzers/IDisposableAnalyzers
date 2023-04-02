@@ -1,15 +1,14 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class SerialDisposableType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedProperty Disposable;
 
-    internal class SerialDisposableType : QualifiedType
+    internal SerialDisposableType()
+        : base("System.Reactive.Disposables.SerialDisposable")
     {
-        internal readonly QualifiedProperty Disposable;
-
-        internal SerialDisposableType()
-            : base("System.Reactive.Disposables.SerialDisposable")
-        {
-            this.Disposable = new QualifiedProperty(this, nameof(this.Disposable));
-        }
+        this.Disposable = new QualifiedProperty(this, nameof(this.Disposable));
     }
 }

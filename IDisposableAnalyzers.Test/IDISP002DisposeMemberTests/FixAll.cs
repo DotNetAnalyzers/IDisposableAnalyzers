@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests
+﻿namespace IDisposableAnalyzers.Test.IDISP002DisposeMemberTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class FixAll
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
+    private static readonly DisposeMemberFix Fix = new();
+    private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
 
-    public static class FixAll
+    [Test]
+    public static void NotDisposingFieldAssignedInCtor()
     {
-        private static readonly FieldAndPropertyDeclarationAnalyzer Analyzer = new();
-        private static readonly DisposeMemberFix Fix = new();
-        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create("IDISP002");
-
-        [Test]
-        public static void NotDisposingFieldAssignedInCtor()
-        {
-            var before = @"
+        var before = @"
 namespace N
 {
     using System;
@@ -33,7 +33,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -54,15 +54,15 @@ namespace N
         }
     }
 }";
-            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
+    }
 
-        [Test]
-        [Ignore("Order is random due to async.")]
-        public static void NotDisposingFieldsAssignedInCtor()
-        {
-            var before = @"
+    [Test]
+    [Ignore("Order is random due to async.")]
+    public static void NotDisposingFieldsAssignedInCtor()
+    {
+        var before = @"
 namespace N
 {
     using System;
@@ -85,7 +85,7 @@ namespace N
     }
 }";
 
-            var after = @"
+        var after = @"
 namespace N
 {
     using System;
@@ -109,7 +109,6 @@ namespace N
         }
     }
 }";
-            RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
-        }
+        RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

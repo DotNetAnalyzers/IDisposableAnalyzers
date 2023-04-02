@@ -1,11 +1,10 @@
-﻿namespace ValidCode.Web
-{
-    using System;
+﻿namespace ValidCode.Web;
 
-    public sealed class Disposable : IDisposable
+using System;
+
+public sealed class Disposable : IDisposable
+{
+    public void Dispose()
     {
-        public void Dispose()
-        {
-        }
     }
 }

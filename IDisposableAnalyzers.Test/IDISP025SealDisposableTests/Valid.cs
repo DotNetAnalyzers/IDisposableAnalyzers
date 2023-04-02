@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP025SealDisposableTests
+﻿namespace IDisposableAnalyzers.Test.IDISP025SealDisposableTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static class Valid
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
+    private static readonly ClassDeclarationAnalyzer Analyzer = new();
 
-    public static class Valid
+    [Test]
+    public static void SealedSimple()
     {
-        private static readonly ClassDeclarationAnalyzer Analyzer = new();
-
-        [Test]
-        public static void SealedSimple()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     using System;
@@ -22,13 +22,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void SealedPartial()
-        {
-            var part1 = @"
+    [Test]
+    public static void SealedPartial()
+    {
+        var part1 = @"
 namespace N
 {
     using System;
@@ -38,7 +38,7 @@ namespace N
     }
 }";
 
-            var part2 = @"
+        var part2 = @"
 namespace N
 {
     public sealed partial class C
@@ -48,13 +48,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, part1, part2);
-        }
+        RoslynAssert.Valid(Analyzer, part1, part2);
+    }
 
-        [Test]
-        public static void VirtualSimple()
-        {
-            var code = @"
+    [Test]
+    public static void VirtualSimple()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -66,13 +66,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void VirtualPartial()
-        {
-            var part1 = @"
+    [Test]
+    public static void VirtualPartial()
+    {
+        var part1 = @"
 namespace N
 {
     using System;
@@ -82,7 +82,7 @@ namespace N
     }
 }";
 
-            var part2 = @"
+        var part2 = @"
 namespace N
 {
     public partial class C
@@ -92,13 +92,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, part1, part2);
-        }
+        RoslynAssert.Valid(Analyzer, part1, part2);
+    }
 
-        [Test]
-        public static void ProtectedVirtualPartial()
-        {
-            var part1 = @"
+    [Test]
+    public static void ProtectedVirtualPartial()
+    {
+        var part1 = @"
 namespace N
 {
     using System;
@@ -115,7 +115,7 @@ namespace N
     }
 }";
 
-            var part2 = @"
+        var part2 = @"
 namespace N
 {
     public partial class C
@@ -134,13 +134,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, part1, part2);
-        }
+        RoslynAssert.Valid(Analyzer, part1, part2);
+    }
 
-        [Test]
-        public static void Abstract()
-        {
-            var code = @"
+    [Test]
+    public static void Abstract()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -150,13 +150,13 @@ namespace N
         public abstract void Dispose();
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void ProtectedAbstract()
-        {
-            var code = @"
+    [Test]
+    public static void ProtectedAbstract()
+    {
+        var code = @"
 namespace N
 {
     using System;
@@ -172,7 +172,6 @@ namespace N
         protected abstract void Dispose(bool disposing);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
     }
 }

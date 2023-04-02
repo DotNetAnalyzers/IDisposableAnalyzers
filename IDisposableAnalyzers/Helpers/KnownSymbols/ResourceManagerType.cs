@@ -1,17 +1,16 @@
-namespace IDisposableAnalyzers
+namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class ResourceManagerType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod GetStream;
+    internal readonly QualifiedMethod GetResourceSet;
 
-    internal class ResourceManagerType : QualifiedType
+    internal ResourceManagerType()
+        : base("System.Resources.ResourceManager")
     {
-        internal readonly QualifiedMethod GetStream;
-        internal readonly QualifiedMethod GetResourceSet;
-
-        internal ResourceManagerType()
-            : base("System.Resources.ResourceManager")
-        {
-            this.GetStream = new QualifiedMethod(this, nameof(this.GetStream));
-            this.GetResourceSet = new QualifiedMethod(this, nameof(this.GetResourceSet));
-        }
+        this.GetStream = new QualifiedMethod(this, nameof(this.GetStream));
+        this.GetResourceSet = new QualifiedMethod(this, nameof(this.GetResourceSet));
     }
 }

@@ -1,10 +1,9 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+class NopBaseImplOverride : NopBase
 {
-    class NopBaseImplOverride : NopBase
+    protected override void Dispose(bool disposing)
     {
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
+        base.Dispose(disposing);
     }
 }

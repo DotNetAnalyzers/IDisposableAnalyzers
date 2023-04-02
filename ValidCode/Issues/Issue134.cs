@@ -1,16 +1,15 @@
-namespace ValidCode
-{
-    using System;
-    using System.IO;
+namespace ValidCode;
 
-    public class Issue134
+using System;
+using System.IO;
+
+public class Issue134
+{
+    public IDisposable M2(string fileName)
     {
-        public IDisposable M2(string fileName)
-        {
-            var x = File.OpenRead(fileName);
-            x.Dispose();
-            x = File.OpenRead(fileName);
-            return x;
-        }
+        var x = File.OpenRead(fileName);
+        x.Dispose();
+        x = File.OpenRead(fileName);
+        return x;
     }
 }

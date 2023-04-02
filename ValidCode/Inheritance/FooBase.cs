@@ -1,32 +1,31 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+using System;
+using System.IO;
+
+public class FooBase : IDisposable
 {
-    using System;
-    using System.IO;
+    private readonly Stream stream = File.OpenRead(string.Empty);
+    private bool disposed;
 
-    public class FooBase : IDisposable
+    public void Dispose()
     {
-        private readonly Stream stream = File.OpenRead(string.Empty);
-        private bool disposed;
+        this.Dispose(true);
+        GC.SuppressFinalize(this);
+    }
 
-        public void Dispose()
+    protected virtual void Dispose(bool disposing)
+    {
+        if (this.disposed)
         {
-            this.Dispose(true);
-            GC.SuppressFinalize(this);
+            return;
         }
 
-        protected virtual void Dispose(bool disposing)
+        this.disposed = true;
+
+        if (disposing)
         {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-
-            if (disposing)
-            {
-                this.stream.Dispose();
-            }
+            this.stream.Dispose();
         }
     }
 }

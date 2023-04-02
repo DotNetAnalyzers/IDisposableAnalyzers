@@ -1,13 +1,12 @@
-﻿namespace ValidCode.Web
-{
-    using System;
-    using System.Threading.Tasks;
+﻿namespace ValidCode.Web;
 
-    public sealed class AsyncDisposable : IAsyncDisposable
+using System;
+using System.Threading.Tasks;
+
+public sealed class AsyncDisposable : IAsyncDisposable
+{
+    public ValueTask DisposeAsync()
     {
-        public ValueTask DisposeAsync()
-        {
-            throw new NotImplementedException();
-        }
+        throw new NotImplementedException();
     }
 }

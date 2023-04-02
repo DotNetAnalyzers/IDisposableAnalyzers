@@ -1,27 +1,26 @@
-﻿namespace ValidCode.Web
+﻿namespace ValidCode.Web;
+
+using System;
+
+sealed class Annotated : IDisposable
 {
-    using System;
+    private IDisposable? _foo;
+    private bool _disposed;
 
-    sealed class Annotated : IDisposable
+    public void Dispose()
     {
-        private IDisposable? _foo;
-        private bool _disposed;
-
-        public void Dispose()
+        if (this._disposed)
         {
-            if (this._disposed)
-            {
-                return;
-            }
-
-            this._disposed = true;
-            this._foo?.Dispose();
+            return;
         }
 
-        void Reassign()
-        {
-            this._foo!.Dispose();
-            this._foo = new Disposable();
-        }
+        this._disposed = true;
+        this._foo?.Dispose();
+    }
+
+    void Reassign()
+    {
+        this._foo!.Dispose();
+        this._foo = new Disposable();
     }
 }

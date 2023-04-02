@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
-{
-    using System.Linq;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
 
-    public static partial class Valid
+using System.Linq;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis;
+using NUnit.Framework;
+
+public static partial class Valid
+{
+    [Test]
+    public static void Simple()
     {
-        [Test]
-        public static void Simple()
-        {
-            var code = @"
+        var code = @"
 namespace N
 {
     public class C
@@ -23,7 +23,7 @@ namespace N
         }
     }
 }";
-            var extCode = @"
+        var extCode = @"
 namespace N
 {
     using System;
@@ -34,7 +34,7 @@ namespace N
     }
 }";
 
-            var wrappingDisposableCode = @"
+        var wrappingDisposableCode = @"
 namespace N
 {
     using System;
@@ -56,13 +56,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
-        }
+        RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
+    }
 
-        [Test]
-        public static void SimpleWithArg()
-        {
-            var code = @"
+    [Test]
+    public static void SimpleWithArg()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -75,7 +75,7 @@ namespace N
         }
     }
 }";
-            var extCode = @"
+        var extCode = @"
 namespace N
 {
     using System;
@@ -86,7 +86,7 @@ namespace N
     }
 }";
 
-            var wrappingDisposableCode = @"
+        var wrappingDisposableCode = @"
 namespace N
 {
     using System;
@@ -108,13 +108,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
-        }
+        RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
+    }
 
-        [Test]
-        public static void SimpleWhenArg()
-        {
-            var code = @"
+    [Test]
+    public static void SimpleWhenArg()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -127,7 +127,7 @@ namespace N
         }
     }
 }";
-            var extCode = @"
+        var extCode = @"
 namespace N
 {
     using System;
@@ -138,7 +138,7 @@ namespace N
     }
 }";
 
-            var wrappingDisposableCode = @"
+        var wrappingDisposableCode = @"
 namespace N
 {
     using System;
@@ -160,13 +160,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
-        }
+        RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
+    }
 
-        [Test]
-        public static void Chained()
-        {
-            var code = @"
+    [Test]
+    public static void Chained()
+    {
+        var code = @"
 namespace N
 {
     public class C
@@ -179,7 +179,7 @@ namespace N
         }
     }
 }";
-            var extCode = @"
+        var extCode = @"
 namespace N
 {
     using System;
@@ -192,7 +192,7 @@ namespace N
     }
 }";
 
-            var wrappingDisposableCode = @"
+        var wrappingDisposableCode = @"
 namespace N
 {
     using System;
@@ -214,13 +214,13 @@ namespace N
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
-        }
+        RoslynAssert.Valid(Analyzer, code, extCode, DisposableCode, wrappingDisposableCode);
+    }
 
-        [Test]
-        public static void ExtensionMethodWrappingStreamInStreamReader()
-        {
-            var code = @"
+    [Test]
+    public static void ExtensionMethodWrappingStreamInStreamReader()
+    {
+        var code = @"
 namespace N
 {
     using System.IO;
@@ -232,13 +232,13 @@ namespace N
         private static StreamReader M2(this Stream stream) => new StreamReader(stream);
     }
 }";
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void Issue174()
-        {
-            var code = @"
+    [Test]
+    public static void Issue174()
+    {
+        var code = @"
 namespace Gu.Inject.Tests
 {
     using System;
@@ -271,13 +271,13 @@ namespace Gu.Inject.Tests
     }
 }";
 
-            RoslynAssert.Valid(Analyzer, code);
-        }
+        RoslynAssert.Valid(Analyzer, code);
+    }
 
-        [Test]
-        public static void KernelBinaryExtensionMethod()
-        {
-            var binaryReference = BinaryReference.Compile(@"
+    [Test]
+    public static void KernelBinaryExtensionMethod()
+    {
+        var binaryReference = BinaryReference.Compile(@"
 namespace BinaryReferencedAssembly
 {
     using Gu.Inject;
@@ -288,7 +288,7 @@ namespace BinaryReferencedAssembly
     }
 }");
 
-            var code = @"
+        var code = @"
 namespace N
 {
     using Gu.Inject;
@@ -303,16 +303,16 @@ namespace N
         }
     }
 }";
-            var settings = Settings.Default
-               .WithCompilationOptions(x => x.WithMetadataImportOptions(MetadataImportOptions.Public))
-               .WithMetadataReferences(x => x.Append(binaryReference));
-            RoslynAssert.Valid(Analyzer, code, settings: settings);
-        }
+        var settings = Settings.Default
+           .WithCompilationOptions(x => x.WithMetadataImportOptions(MetadataImportOptions.Public))
+           .WithMetadataReferences(x => x.Append(binaryReference));
+        RoslynAssert.Valid(Analyzer, code, settings: settings);
+    }
 
-        [Test]
-        public static void KernelExtensionMethodInOtherProject()
-        {
-            var ext = @"
+    [Test]
+    public static void KernelExtensionMethodInOtherProject()
+    {
+        var ext = @"
 namespace A
 {
     using Gu.Inject;
@@ -323,7 +323,7 @@ namespace A
     }
 }";
 
-            var code = @"
+        var code = @"
 namespace B
 {
     using Gu.Inject;
@@ -338,7 +338,6 @@ namespace B
         }
     }
 }";
-            RoslynAssert.Valid(Analyzer, ext, code);
-        }
+        RoslynAssert.Valid(Analyzer, ext, code);
     }
 }

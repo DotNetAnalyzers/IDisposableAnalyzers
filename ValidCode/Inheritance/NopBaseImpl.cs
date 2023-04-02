@@ -1,6 +1,5 @@
-namespace ValidCode.Inheritance
+namespace ValidCode.Inheritance;
+
+class NopBaseImpl : NopBase
 {
-    class NopBaseImpl : NopBase
-    {
-    }
 }

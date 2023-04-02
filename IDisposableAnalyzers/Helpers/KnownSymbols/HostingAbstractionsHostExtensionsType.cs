@@ -1,17 +1,16 @@
-﻿namespace IDisposableAnalyzers
+﻿namespace IDisposableAnalyzers;
+
+using Gu.Roslyn.AnalyzerExtensions;
+
+internal class HostingAbstractionsHostExtensionsType : QualifiedType
 {
-    using Gu.Roslyn.AnalyzerExtensions;
+    internal readonly QualifiedMethod Run;
+    internal readonly QualifiedMethod RunAsync;
 
-    internal class HostingAbstractionsHostExtensionsType : QualifiedType
+    internal HostingAbstractionsHostExtensionsType()
+        : base("Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions")
     {
-        internal readonly QualifiedMethod Run;
-        internal readonly QualifiedMethod RunAsync;
-
-        internal HostingAbstractionsHostExtensionsType()
-            : base("Microsoft.Extensions.Hosting.HostingAbstractionsHostExtensions")
-        {
-            this.Run = new QualifiedMethod(this, nameof(this.Run));
-            this.RunAsync = new QualifiedMethod(this, nameof(this.RunAsync));
-        }
+        this.Run = new QualifiedMethod(this, nameof(this.Run));
+        this.RunAsync = new QualifiedMethod(this, nameof(this.RunAsync));
     }
 }

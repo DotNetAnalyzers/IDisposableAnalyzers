@@ -1,18 +1,18 @@
-﻿namespace IDisposableAnalyzers.Tests.Web.Helpers
-{
-    using System.Threading;
-    using Gu.Roslyn.Asserts;
-    using Microsoft.CodeAnalysis.CSharp;
-    using NUnit.Framework;
+﻿namespace IDisposableAnalyzers.Tests.Web.Helpers;
 
-    public static partial class DisposableTests
+using System.Threading;
+using Gu.Roslyn.Asserts;
+using Microsoft.CodeAnalysis.CSharp;
+using NUnit.Framework;
+
+public static partial class DisposableTests
+{
+    public static class IsCreation
     {
-        public static class IsCreation
+        [TestCase("Microsoft.Extensions.Logging.ApplicationInsightsLoggerFactoryExtensions.AddApplicationInsights(((Microsoft.Extensions.Logging.ILoggerFactory)o), null)")]
+        public static void WhiteList(string code)
         {
-            [TestCase("Microsoft.Extensions.Logging.ApplicationInsightsLoggerFactoryExtensions.AddApplicationInsights(((Microsoft.Extensions.Logging.ILoggerFactory)o), null)")]
-            public static void WhiteList(string code)
-            {
-                var testCode = @"
+            var testCode = @"
 namespace N
 {
     internal class Foo
@@ -23,19 +23,19 @@ namespace N
         }
     }
 }".AssertReplace("PLACEHOLDER", code);
-                var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(code);
-                Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
-            }
+            var syntaxTree = CSharpSyntaxTree.ParseText(testCode);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(code);
+            Assert.AreEqual(false, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+        }
 
-            // [TestCase("HttpClient.GetAsync(\"http://example.com\")",                             false)]
-            [TestCase("await HttpClient.GetAsync(\"http://example.com\")",                       true)]
-            [TestCase("await HttpClient.GetAsync(\"http://example.com\").ConfigureAwait(false)", true)]
-            public static void AwaitExpression(string expression, bool expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        // [TestCase("HttpClient.GetAsync(\"http://example.com\")",                             false)]
+        [TestCase("await HttpClient.GetAsync(\"http://example.com\")",                       true)]
+        [TestCase("await HttpClient.GetAsync(\"http://example.com\").ConfigureAwait(false)", true)]
+        public static void AwaitExpression(string expression, bool expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -59,19 +59,19 @@ namespace N
         }
     }
 }".AssertReplace("await HttpClient.GetAsync(\"http://example.com\")", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(expression);
-                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expression);
+            Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+        }
 
-            [TestCase("await task",                      true)]
-            [TestCase("await task.ConfigureAwait(true)", true)]
-            [TestCase("task.Result",                     true)]
-            [TestCase("task.GetAwaiter().GetResult()",   true)]
-            public static void AwaitTask(string expression, bool expected)
-            {
-                var syntaxTree = CSharpSyntaxTree.ParseText(@"
+        [TestCase("await task",                      true)]
+        [TestCase("await task.ConfigureAwait(true)", true)]
+        [TestCase("task.Result",                     true)]
+        [TestCase("task.GetAwaiter().GetResult()",   true)]
+        public static void AwaitTask(string expression, bool expected)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText(@"
 namespace N
 {
     using System;
@@ -89,11 +89,10 @@ namespace N
         }
     }
 }".AssertReplace("await task", expression));
-                var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
-                var semanticModel = compilation.GetSemanticModel(syntaxTree);
-                var value = syntaxTree.FindExpression(expression);
-                Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
-            }
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expression);
+            Assert.AreEqual(expected, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
         }
     }
 }

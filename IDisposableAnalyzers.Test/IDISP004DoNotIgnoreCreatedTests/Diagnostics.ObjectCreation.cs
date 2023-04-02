@@ -1,16 +1,16 @@
-﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests
+﻿namespace IDisposableAnalyzers.Test.IDISP004DoNotIgnoreCreatedTests;
+
+using Gu.Roslyn.Asserts;
+using NUnit.Framework;
+
+public static partial class Diagnostics
 {
-    using Gu.Roslyn.Asserts;
-    using NUnit.Framework;
-
-    public static partial class Diagnostics
+    public static class ObjectCreation
     {
-        public static class ObjectCreation
-        {
-            private static readonly CreationAnalyzer Analyzer = new();
-            private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
+        private static readonly CreationAnalyzer Analyzer = new();
+        private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP004DoNotIgnoreCreated);
 
-            private const string DisposableCode = @"
+        private const string DisposableCode = @"
 namespace N
 {
     using System;
@@ -23,10 +23,10 @@ namespace N
     }
 }";
 
-            [Test]
-            public static void NewDisposable()
-            {
-                var code = @"
+        [Test]
+        public static void NewDisposable()
+        {
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -37,13 +37,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [Test]
-            public static void NewDisposablePassedIntoCtor()
-            {
-                var c1 = @"
+        [Test]
+        public static void NewDisposablePassedIntoCtor()
+        {
+            var c1 = @"
 namespace N
 {
     using System;
@@ -59,7 +59,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     public sealed class C
@@ -70,13 +70,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
+        }
 
-            [Test]
-            public static void ReturningNewAssigningNotDisposing()
-            {
-                var c1 = @"
+        [Test]
+        public static void ReturningNewAssigningNotDisposing()
+        {
+            var c1 = @"
 namespace N
 {
     using System;
@@ -95,7 +95,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -106,13 +106,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
+        }
 
-            [Test]
-            public static void ReturningNewNotAssigning()
-            {
-                var c1 = @"
+        [Test]
+        public static void ReturningNewNotAssigning()
+        {
+            var c1 = @"
 namespace N
 {
     using System;
@@ -128,7 +128,7 @@ namespace N
         }
     }
 }";
-                var code = @"
+            var code = @"
 namespace N
 {
     public class C
@@ -139,13 +139,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, c1, code);
+        }
 
-            [Test]
-            public static void StringFormatArgument()
-            {
-                var code = @"
+        [Test]
+        public static void StringFormatArgument()
+        {
+            var code = @"
 namespace N
 {
     public static class C
@@ -153,13 +153,13 @@ namespace N
         public static string M() => string.Format(""{0}"", ↓new Disposable());
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [Test]
-            public static void NewDisposableToString()
-            {
-                var code = @"
+        [Test]
+        public static void NewDisposableToString()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -170,13 +170,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [Test]
-            public static void ReturnNewDisposableToString()
-            {
-                var code = @"
+        [Test]
+        public static void ReturnNewDisposableToString()
+        {
+            var code = @"
 namespace N
 {
     public class C
@@ -187,13 +187,13 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, DisposableCode, code);
+        }
 
-            [Test]
-            public static void NewStandardKernelNewModuleArgument()
-            {
-                var module = @"
+        [Test]
+        public static void NewStandardKernelNewModuleArgument()
+        {
+            var module = @"
 namespace N
 {
     using System;
@@ -208,7 +208,7 @@ namespace N
     }
 }";
 
-                var code = @"
+            var code = @"
 namespace N
 {
     using Ninject;
@@ -223,8 +223,7 @@ namespace N
         }
     }
 }";
-                RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, module, code);
-            }
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, module, code);
         }
     }
 }

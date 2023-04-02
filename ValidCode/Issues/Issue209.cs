@@ -1,23 +1,22 @@
 ﻿// ReSharper disable All
-namespace ValidCode
+namespace ValidCode;
+
+using System;
+using System.Threading;
+
+sealed class Issue209 : IDisposable
 {
-    using System;
-    using System.Threading;
+    private IDisposable? _disposable = new Disposable();
 
-    sealed class Issue209 : IDisposable
+    public void Update()
     {
-        private IDisposable? _disposable = new Disposable();
+        var oldValue = Interlocked.Exchange(ref _disposable, new Disposable());
+        oldValue?.Dispose();
+    }
 
-        public void Update()
-        {
-            var oldValue = Interlocked.Exchange(ref _disposable, new Disposable());
-            oldValue?.Dispose();
-        }
-
-        public void Dispose()
-        {
-            var oldValue = Interlocked.Exchange(ref _disposable, null);
-            oldValue?.Dispose();
-        }
+    public void Dispose()
+    {
+        var oldValue = Interlocked.Exchange(ref _disposable, null);
+        oldValue?.Dispose();
     }
 }
