@@ -27,7 +27,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>4.0.3</Version>
+    <Version>4.0.4</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
