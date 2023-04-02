@@ -1090,8 +1090,12 @@ namespace N
                 Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
             }
 
-            [Test]
-            public static void Builder()
+            [TestCase(".Append(1)")]
+            [TestCase(".Append(true)")]
+            [TestCase(".Append((string?)null)")]
+            [TestCase(".Append(condition)")]
+            [TestCase(".Append(!condition, null)")]
+            public static void Builder(string expression)
             {
                 var syntaxTree = CSharpSyntaxTree.ParseText("""
                 namespace N;
@@ -1100,7 +1104,23 @@ namespace N
 
                 public record struct S : IDisposable
                 {
-                    public S Append(int value)
+                    internal Request Append(string? value, string? name = null)
+                    {
+                        if (value is not null)
+                        {
+                            foreach (var c in value)
+                            {
+                                this.bytes[this.position] = (byte)c;
+                                this.position++;
+                            }
+                        }
+
+                        this.bytes[this.position] = 0;
+                        this.position++;
+                        return this;
+                    }
+
+                    public S Append(int value, string? name = null)
                     {
                         if (value > 3)
                         {
@@ -1110,16 +1130,16 @@ namespace N
                         throw new Exception();
                     }
                 
-                    internal S Append(bool value) => this.Append(1);
+                    internal S Append(bool value, string? name = null) => this.Append(value ? 1 : 0, name);
 
                     public void Dispose() { }
 
-                    public void M()
+                    public void M(bool condition)
                     {
                         using var s = new S().Append(true);
                     }
                 }
-                """);
+                """.AssertReplace(".Append(true)", expression));
 
                 var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
                 var semanticModel = compilation.GetSemanticModel(syntaxTree);
