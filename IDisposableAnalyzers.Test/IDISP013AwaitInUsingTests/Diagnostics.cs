@@ -87,6 +87,35 @@ namespace N
     }
 
     [Test]
+    public static void UsingDeclarationInner()
+    {
+        var code = @"
+namespace N
+{
+    using System.Threading.Tasks;
+
+    public static class C
+    {
+        public static ValueTask<int> MAsync()
+        {
+            using var file = System.IO.File.OpenRead(string.Empty);
+            while (true)
+            {
+                return ↓InnerAsync();
+            }
+        }
+
+        private static async ValueTask<int> InnerAsync()
+        {
+            await Task.Delay(10).ConfigureAwait(false);
+            return 1;
+        }
+    }
+}";
+        RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+    }
+
+    [Test]
     public static void LocalTask()
     {
         var code = @"

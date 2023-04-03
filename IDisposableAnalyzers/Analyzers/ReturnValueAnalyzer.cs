@@ -146,7 +146,7 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
             {
                 if (statement.SpanStart >= node.SpanStart)
                 {
-                    return false;
+                    break;
                 }
 
                 if (statement is LocalDeclarationStatementSyntax { UsingKeyword.ValueText: "using" })
@@ -154,6 +154,8 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
                     return true;
                 }
             }
+
+            return node.Parent != null && IsInUsing(node.Parent);
         }
 
         return false;
