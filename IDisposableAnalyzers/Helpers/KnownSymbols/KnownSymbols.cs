@@ -57,6 +57,7 @@ internal static class KnownSymbols
     internal static readonly EnumerableType Enumerable = new();
     internal static readonly QualifiedType ConditionalWeakTable = Create("System.Runtime.CompilerServices.ConditionalWeakTable`2");
     internal static readonly TaskType Task = new();
+    internal static readonly ValueTaskType ValueTask = new();
     internal static readonly QualifiedType ValueTaskOfT = new("System.Threading.Tasks.ValueTask`1");
     internal static readonly QualifiedType TaskOfT = new("System.Threading.Tasks.Task`1");
     internal static readonly QualifiedType CancellationToken = new("System.Threading.CancellationToken");

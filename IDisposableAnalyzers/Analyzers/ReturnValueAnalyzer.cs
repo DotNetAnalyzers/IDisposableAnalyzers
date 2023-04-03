@@ -186,9 +186,11 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
         return returnValue switch
         {
             InvocationExpressionSyntax invocation
-            => !invocation.IsSymbol(KnownSymbols.Task.FromResult, context.SemanticModel, context.CancellationToken),
+            => !(invocation.IsSymbol(KnownSymbols.Task.FromResult, context.SemanticModel, context.CancellationToken)
+                || invocation.IsSymbol(KnownSymbols.ValueTask.FromResult, context.SemanticModel, context.CancellationToken)),
             MemberAccessExpressionSyntax { Name.Identifier.ValueText: "CompletedTask" } memberAccess
-            => !memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask, context.SemanticModel, context.CancellationToken),
+            => !(memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask,   context.SemanticModel, context.CancellationToken)
+                || memberAccess.IsSymbol(KnownSymbols.ValueTask.CompletedTask, context.SemanticModel, context.CancellationToken)),
             _ => true,
         };
     }
