@@ -117,6 +117,29 @@ namespace N
     }
 
     [Test]
+    public static void ValueTaskFromResult()
+    {
+        var code = @"
+namespace N
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public ValueTask<int> M()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                return ValueTask.FromResult(1);
+            }
+        }
+    }
+}";
+        RoslynAssert.Valid(Analyzer, code);
+    }
+
+    [Test]
     public static void TaskCompletedTask()
     {
         var code = @"
@@ -132,6 +155,29 @@ namespace N
             using (var stream = File.OpenRead(string.Empty))
             {
                 return Task.CompletedTask;
+            }
+        }
+    }
+}";
+        RoslynAssert.Valid(Analyzer, code);
+    }
+
+    [Test]
+    public static void ValueTaskCompletedTask()
+    {
+        var code = @"
+namespace N
+{
+    using System.IO;
+    using System.Threading.Tasks;
+
+    public class C
+    {
+        public ValueTask M()
+        {
+            using (var stream = File.OpenRead(string.Empty))
+            {
+                return ValueTask.CompletedTask;
             }
         }
     }
