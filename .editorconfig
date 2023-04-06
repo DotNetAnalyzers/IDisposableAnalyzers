@@ -205,3 +205,6 @@ csharp_preserve_single_line_statements = true
 dotnet_diagnostic.IDE0079.severity = warning
 
 dotnet_diagnostic.CS8002.severity = none # Referenced assembly '...' does not have a strong name
+
+# CA5403: Do not hard code certificate insanely slow analyzer adding 30 s to build time
+dotnet_diagnostic.CA5403.severity = none
