@@ -58,7 +58,7 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
     /// <summary>
     /// Create an instance with a value.
     /// </summary>
-    public static Maybe<T> Some(T value) => new Maybe<T>(hasValue: true, value: value);
+    public static Maybe<T> Some(T value) => new(hasValue: true, value: value);
 #pragma warning restore CA1000 // Do not declare static members on generic types
 
     /// <inheritdoc />
