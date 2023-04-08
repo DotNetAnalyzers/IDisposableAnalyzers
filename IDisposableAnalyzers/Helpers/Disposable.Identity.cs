@@ -34,6 +34,9 @@ internal static partial class Disposable
             { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: ObjectCreationExpressionSyntax { } objectCreation } } }
                 when objectCreation.IsType(KnownSymbols.ValueTaskOfT, recursion.SemanticModel, recursion.CancellationToken)
                 => Recursive(objectCreation, recursion),
+            { Parent: ArgumentSyntax { Parent.Parent: ImplicitObjectCreationExpressionSyntax objectCreation } }
+                when recursion.SemanticModel.GetType(objectCreation, recursion.CancellationToken) == KnownSymbols.ValueTaskOfT
+                => Recursive(objectCreation, recursion),
             { Parent: ArgumentSyntax { Parent: ArgumentListSyntax { Parent: InvocationExpressionSyntax invocation } } argument }
                 when recursion.Target(argument) is { } target &&
                      IsIdentity(target, recursion)

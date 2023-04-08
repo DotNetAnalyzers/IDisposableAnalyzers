@@ -844,4 +844,37 @@ public static partial class Valid
             """;
         RoslynAssert.Valid(Analyzer, disposable, code);
     }
+
+    [Test]
+    public static void ReturnedInTargetTyped()
+    {
+        var disposable = """
+            namespace N;
+
+            using System;
+
+            public class Disposable : IDisposable
+            {
+                public void Dispose()
+                {
+                }
+            }
+            """;
+
+        var code = """
+            namespace N;
+
+            using System;
+            using System.Threading.Tasks;
+
+            public static class C
+            {
+                public static ValueTask<IDisposable> MAsync()
+                {
+                    return new(new Disposable());
+                }
+            }
+            """;
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 }
