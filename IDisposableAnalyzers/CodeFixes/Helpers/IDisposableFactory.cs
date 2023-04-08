@@ -302,7 +302,7 @@ internal static class IDisposableFactory
         return SyntaxFactory.ArgumentList(SyntaxFactory.SingletonSeparatedList(SyntaxFactory.Argument(expression)));
     }
 
-    internal struct MemberAccessContext
+    internal readonly struct MemberAccessContext
     {
         internal readonly ExpressionSyntax? NotNull;
         internal readonly ExpressionSyntax? MaybeNull;

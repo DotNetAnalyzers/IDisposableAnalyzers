@@ -6,7 +6,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Similar to Nullable{T} but for any type.
 /// </summary>
-public struct Maybe<T> : IEquatable<Maybe<T>>
+public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 {
     private readonly T value;
 
