@@ -125,11 +125,38 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
         if (ReturnType(context)?.IsAwaitable() == true &&
             IsInUsing(returnValue) &&
             !returnValue.TryFirstAncestorOrSelf<AwaitExpressionSyntax>(out _) &&
-            context.SemanticModel.TryGetType(returnValue, context.CancellationToken, out var returnValueType2) &&
-            returnValueType2.IsAwaitable() &&
             ShouldAwait(context, returnValue))
         {
             context.ReportDiagnostic(Diagnostic.Create(Descriptors.IDISP013AwaitInUsing, returnValue.GetLocation()));
+        }
+
+        static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
+        {
+            if (context.SemanticModel.GetType(returnValue, context.CancellationToken)?.IsAwaitable() == true)
+            {
+                if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax? ancestor) &&
+                    ancestor.TryGetMethodName(out var ancestorName) &&
+                    ancestorName == "ThrowsAsync")
+                {
+                    return false;
+                }
+
+                return returnValue switch
+                {
+                    InvocationExpressionSyntax invocation
+                        => !(invocation.IsSymbol(KnownSymbols.Task.FromResult,         context.SemanticModel, context.CancellationToken)
+                             || invocation.IsSymbol(KnownSymbols.ValueTask.FromResult, context.SemanticModel, context.CancellationToken)),
+                    MemberAccessExpressionSyntax { Name.Identifier.ValueText: "CompletedTask" } memberAccess
+                        => !(memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask,         context.SemanticModel, context.CancellationToken)
+                             || memberAccess.IsSymbol(KnownSymbols.ValueTask.CompletedTask, context.SemanticModel, context.CancellationToken)),
+                    DefaultExpressionSyntax => false,
+                    LiteralExpressionSyntax => false,
+                    ObjectCreationExpressionSyntax => false,
+                    _ => true,
+                };
+            }
+
+            return false;
         }
     }
 
@@ -174,27 +201,6 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
         }
 
         return false;
-    }
-
-    private static bool ShouldAwait(SyntaxNodeAnalysisContext context, ExpressionSyntax returnValue)
-    {
-        if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax? ancestor) &&
-            ancestor.TryGetMethodName(out var ancestorName) &&
-            ancestorName == "ThrowsAsync")
-        {
-            return false;
-        }
-
-        return returnValue switch
-        {
-            InvocationExpressionSyntax invocation
-            => !(invocation.IsSymbol(KnownSymbols.Task.FromResult, context.SemanticModel, context.CancellationToken)
-                || invocation.IsSymbol(KnownSymbols.ValueTask.FromResult, context.SemanticModel, context.CancellationToken)),
-            MemberAccessExpressionSyntax { Name.Identifier.ValueText: "CompletedTask" } memberAccess
-            => !(memberAccess.IsSymbol(KnownSymbols.Task.CompletedTask,   context.SemanticModel, context.CancellationToken)
-                || memberAccess.IsSymbol(KnownSymbols.ValueTask.CompletedTask, context.SemanticModel, context.CancellationToken)),
-            _ => true,
-        };
     }
 
     private static bool IsLazyEnumerable(InvocationExpressionSyntax invocation, INamedTypeSymbol containingType, SemanticModel semanticModel, CancellationToken cancellationToken)

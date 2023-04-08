@@ -420,4 +420,42 @@ public static partial class Valid
                 """;
         RoslynAssert.Valid(Analyzer, disposable, code);
     }
+
+    [TestCase("default")]
+    [TestCase("new ValueTask<int>(1)")]
+    [TestCase("new ValueTask<int>(disposable.Equals(disposable) ? 1 : 0)")]
+    public static void ReturnNewValueTask(string expression)
+    {
+        var disposable = """
+                namespace N;
+
+                using System;
+
+                public class Disposable : IDisposable
+                {
+                    public void Dispose()
+                    {
+                    }
+                }
+                """;
+
+        var code = """
+
+                namespace N;
+
+                using System.Threading.Tasks;
+
+                public class C
+                {
+                    public ValueTask<int> M1Async()
+                    {
+                      using (var disposable = new Disposable())
+                      {
+                        return new ValueTask<int>(1);
+                      }
+                    }
+                }
+                """.AssertReplace("new ValueTask<int>(1)", expression);
+        RoslynAssert.Valid(Analyzer, disposable, code);
+    }
 }

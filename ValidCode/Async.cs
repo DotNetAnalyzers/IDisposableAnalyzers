@@ -152,4 +152,12 @@ public class Async
         using var ct = new CancellationTokenSource();
         _ = ct.Token.Register(() => { }, useSynchronizationContext: false);
     }
+
+    public ValueTask<int> Issue457Async()
+    {
+        using (var disposable = new Disposable())
+        {
+            return new ValueTask<int>(disposable.Equals(disposable) ? 1 : 0);
+        }
+    }
 }
