@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 internal class CustomCollection<T> : IList<T>
 {
-    private readonly List<T> inner = new List<T>();
+    private readonly List<T> inner = new();
 
     public int Count => this.inner.Count;
 
