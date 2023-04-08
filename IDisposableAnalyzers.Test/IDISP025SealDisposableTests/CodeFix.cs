@@ -26,7 +26,7 @@ public static class CodeFix
             """;
 
         var after = """
-            namespace N
+            namespace N;
 
             using System;
 
