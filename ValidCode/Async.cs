@@ -160,4 +160,17 @@ public class Async
             return new ValueTask<int>(disposable.Equals(disposable) ? 1 : 0);
         }
     }
+
+    public ValueTask<IDisposable> Issue476(bool condition)
+    {
+        if (condition)
+        {
+            var disposable = new Disposable();
+            return new(disposable);
+        }
+        else
+        {
+            return new(new Disposable());
+        }
+    }
 }
