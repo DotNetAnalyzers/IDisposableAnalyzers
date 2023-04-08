@@ -63,6 +63,8 @@ internal static partial class Disposable
                 => true,
             { Parent: EqualsValueClauseSyntax { Parent: VariableDeclaratorSyntax { Identifier.ValueText: "_" } } }
                 => true,
+            { Parent: AwaitExpressionSyntax { Parent: ParenthesizedExpressionSyntax { } expression } }
+                => Ignores(expression, recursion),
             { Parent: AnonymousFunctionExpressionSyntax _ }
                 => false,
             { Parent: StatementSyntax _ }

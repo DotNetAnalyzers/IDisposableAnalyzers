@@ -1244,5 +1244,31 @@ public static partial class DisposableTests
             var value = syntaxTree.FindExpression("new Disposable()");
             Assert.AreEqual(false, Disposable.Ignores(value, semanticModel, CancellationToken.None));
         }
+
+        [Test]
+        public static void AwaitAwaitHttpClientGetAsync()
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N;
+
+                using System.Net.Http;
+                using System.Threading.Tasks;
+
+                public class Issue248
+                {
+                    private static readonly HttpClient Client = new();
+
+                    public static async Task<string> M()
+                    {
+                        string versions = await (await Client.GetAsync(string.Empty)).Content.ReadAsStringAsync();
+                        return versions;
+                    }
+                }
+                """);
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindInvocation("Client.GetAsync(string.Empty)");
+            Assert.AreEqual(true, Disposable.Ignores(value, semanticModel, CancellationToken.None));
+        }
     }
 }

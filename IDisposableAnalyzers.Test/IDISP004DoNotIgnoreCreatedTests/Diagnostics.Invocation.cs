@@ -396,5 +396,28 @@ public static partial class Diagnostics
                 """;
             RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
         }
+
+        [Test]
+        public static void AwaitAwaitHttpClientGetAsync()
+        {
+            var code = """
+                namespace N;
+
+                using System.Net.Http;
+                using System.Threading.Tasks;
+
+                public class Issue248
+                {
+                    private static readonly HttpClient Client = new();
+
+                    public static async Task<string> M()
+                    {
+                        string versions = await (await ↓Client.GetAsync("versions")).Content.ReadAsStringAsync();
+                        return versions;
+                    }
+                }
+                """;
+            RoslynAssert.Diagnostics(Analyzer, ExpectedDiagnostic, code);
+        }
     }
 }
