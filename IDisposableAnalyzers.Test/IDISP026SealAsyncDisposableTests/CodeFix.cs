@@ -10,37 +10,37 @@ public static class CodeFix
     private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP026SealAsyncDisposable);
 
     [Test]
-    public static void Simple()
+    public static void IAsyncDisposable()
     {
-        var before = @"
-namespace N
-{
-    using System;
-    using System.Threading.Tasks;
+        var before = """
+            namespace N;
 
-    public class ↓C : IAsyncDisposable
-    {
-        public ValueTask DisposeAsync()
-        {
-            return ValueTask.CompletedTask;
-        }
-    }
-}";
+            using System;
+            using System.Threading.Tasks;
+        
+            public class ↓C : IAsyncDisposable
+            {
+                public ValueTask DisposeAsync()
+                {
+                    return ValueTask.CompletedTask;
+                }
+            }
+            """;
 
-        var after = @"
-namespace N
-{
-    using System;
-    using System.Threading.Tasks;
+        var after = """
+            namespace N;
 
-    public sealed class C : IAsyncDisposable
-    {
-        public ValueTask DisposeAsync()
-        {
-            return ValueTask.CompletedTask;
-        }
-    }
-}";
+            using System;
+            using System.Threading.Tasks;
+        
+            public sealed class C : IAsyncDisposable
+            {
+                public ValueTask DisposeAsync()
+                {
+                    return ValueTask.CompletedTask;
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }

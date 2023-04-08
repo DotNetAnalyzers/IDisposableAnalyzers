@@ -10,33 +10,33 @@ public static class CodeFix
     private static readonly ExpectedDiagnostic ExpectedDiagnostic = ExpectedDiagnostic.Create(Descriptors.IDISP025SealDisposable);
 
     [Test]
-    public static void Simple()
+    public static void IDisposable()
     {
-        var before = @"
-namespace N
-{
-    using System;
+        var before = """
+            namespace N;
 
-    public class ↓C : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-}";
+            using System;
 
-        var after = @"
-namespace N
-{
-    using System;
+            public class ↓C : IDisposable
+            {
+                public void Dispose()
+                {
+                }
+            }
+            """;
 
-    public sealed class C : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
-}";
+        var after = """
+            namespace N
+
+            using System;
+
+            public sealed class C : IDisposable
+            {
+                public void Dispose()
+                {
+                }
+            }
+            """;
         RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, before, after);
     }
 }
