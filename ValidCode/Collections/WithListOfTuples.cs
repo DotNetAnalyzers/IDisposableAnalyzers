@@ -7,7 +7,7 @@ using System.IO;
 
 public sealed class WithListOfTuples : IDisposable
 {
-    private readonly List<Tuple<FileStream, FileStream>> xs = new List<Tuple<FileStream, FileStream>>();
+    private readonly List<Tuple<FileStream, FileStream>> xs = new();
 
     public void M(string file1, string file2)
     {

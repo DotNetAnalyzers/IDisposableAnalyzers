@@ -10,9 +10,9 @@ using System.Reactive.Disposables;
 public sealed class Misc : IDisposable
 {
 #pragma warning disable CS0169
-    private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(IsDirty));
-    private readonly SingleAssignmentDisposable subscription = new SingleAssignmentDisposable();
-    private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private static readonly PropertyChangedEventArgs IsDirtyPropertyChangedEventArgs = new(nameof(IsDirty));
+    private readonly SingleAssignmentDisposable subscription = new();
+    private readonly CompositeDisposable compositeDisposable = new();
     private readonly Lazy<IDisposable> lazyDisposable;
 
     private readonly IDisposable? meh1;
