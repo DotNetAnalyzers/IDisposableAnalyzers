@@ -7,7 +7,7 @@ using System.Reactive.Disposables;
 
 sealed class DisposeWith : IDisposable
 {
-    private readonly CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private readonly CompositeDisposable compositeDisposable = new();
     private readonly IDisposable disposable;
 
     public DisposeWith()
