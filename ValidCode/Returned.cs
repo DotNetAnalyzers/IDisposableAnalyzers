@@ -23,7 +23,9 @@ public class Returned
 
     object NewImplicitObject() => new();
 
+#pragma warning disable IDE0090
     object NewObject() => new object();
+#pragma warning restore IDE0090
 
     IEnumerable<IDisposable> YieldReturnFileOpenRead()
     {

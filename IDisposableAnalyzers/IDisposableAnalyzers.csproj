@@ -27,12 +27,15 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Version>4.0.5</Version>
+    <Version>4.0.6</Version>
     <DevelopmentDependency>true</DevelopmentDependency>
     <Authors>Johan Larsson, milleniumbug</Authors>
     <Description>Analyzers and fixes for IDisposable.</Description>
     <PackageTags>IDisposable Roslyn Diagnostic Analyzer DotnetAnalyzers</PackageTags>
     <PackageReleaseNotes>
+      4.0.6
+      BUGFIX: Handle ref struct
+      BUGFIX: Handle target typed new
       4.0.5
       BUGFIX: Handle ValueTask
       BUGFIX: awaited in expression

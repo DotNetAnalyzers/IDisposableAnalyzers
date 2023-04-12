@@ -1,3 +1,11 @@
+#### 4.0.6
+BUGFIX: Handle ref struct
+BUGFIX: Handle target typed new
+
+#### 4.0.5
+BUGFIX: Handle ValueTask
+BUGFIX: awaited in expression
+
 ####  4.0.3
 * BUGFIX: Handle recursive builder
 

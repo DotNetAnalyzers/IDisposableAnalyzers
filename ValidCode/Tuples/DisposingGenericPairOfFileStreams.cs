@@ -39,7 +39,11 @@ public sealed class DisposingGenericPairOfFileStreams : IDisposable
 
     private static class Pair
     {
+#pragma warning disable IDE0090
         public static Pair<T> Create<T>(T item1, T item2) where T : IDisposable => new Pair<T>(item1, item2);
+#pragma warning restore IDE0090
+
+        public static Pair<T> CreateImplicit<T>(T item1, T item2) where T : IDisposable => new(item1, item2);
     }
 
     private sealed class Pair<T> : IDisposable where T : IDisposable
