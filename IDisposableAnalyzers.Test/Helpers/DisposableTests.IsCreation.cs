@@ -31,26 +31,27 @@ public static partial class DisposableTests
         [TestCase("true ? System.IO.File.OpenRead(string.Empty) : null", true)]
         public static void LanguageConstructs(string expression, bool expected)
         {
-            var code = @"
-namespace N
-{
-    using System;
+            var code = """
+                namespace N
+                {
+                    using System;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    internal class C
-    {
-        internal C()
-        {
-            var value = new Disposable();
-        }
-    }
-}".AssertReplace("new Disposable()", expression);
+                    internal class C
+                    {
+                        internal C()
+                        {
+                            var value = new Disposable();
+                        }
+                    }
+                }
+                """.AssertReplace("new Disposable()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -74,55 +75,56 @@ namespace N
         [TestCase("Id<int>()")]
         public static void MethodReturningNotDisposable(string expression)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.IO;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.IO;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    internal class C
-    {
-        internal C()
-        {
-            // M();
-        }
+                    internal class C
+                    {
+                        internal C()
+                        {
+                            // M();
+                        }
 
-        internal static int StaticCreateIntStatementBody()
-        {
-            return 1;
-        }
+                        internal static int StaticCreateIntStatementBody()
+                        {
+                            return 1;
+                        }
 
-        internal static int StaticCreateIntExpressionBody() => 2;
+                        internal static int StaticCreateIntExpressionBody() => 2;
 
-        internal static int StaticCreateIntWithArg(int arg) => 3;
+                        internal static int StaticCreateIntWithArg(int arg) => 3;
 
-        internal static int StaticCreateIntId(int arg) => arg;
+                        internal static int StaticCreateIntId(int arg) => arg;
 
-        internal static int StaticCreateIntSquare(int arg) => arg * arg;
+                        internal static int StaticCreateIntSquare(int arg) => arg * arg;
 
-        internal int CreateIntStatementBody()
-        {
-            return 1;
-        }
+                        internal int CreateIntStatementBody()
+                        {
+                            return 1;
+                        }
 
-        internal int CreateIntExpressionBody() => 2;
+                        internal int CreateIntExpressionBody() => 2;
 
-        internal int CreateIntWithArg(int arg) => 3;
-   
-        internal int CreateIntId(int arg) => arg;
-   
-        internal int CreateIntSquare(int arg) => arg * arg;
+                        internal int CreateIntWithArg(int arg) => 3;
+                   
+                        internal int CreateIntId(int arg) => arg;
+                   
+                        internal int CreateIntSquare(int arg) => arg * arg;
 
-        internal T Id<T>(T arg) => arg;
-    }
-}".AssertReplace("// M()", expression);
+                        internal T Id<T>(T arg) => arg;
+                    }
+                }
+                """.AssertReplace("// M()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -146,80 +148,81 @@ namespace N
         [TestCase("ReturningLocal()",                                 true)]
         public static void Call(string expression, bool expected)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.IO;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.IO;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    internal class C
-    {
-        private readonly IDisposable disposable = new Disposable();
+                    internal class C
+                    {
+                        private readonly IDisposable disposable = new Disposable();
 
-        internal C()
-        {
-            Id(disposable);
-        }
+                        internal C()
+                        {
+                            Id(disposable);
+                        }
 
-        internal static IDisposable Id(IDisposable arg) => arg;
+                        internal static IDisposable Id(IDisposable arg) => arg;
 
-        internal T Id<T>(T arg) => arg;
+                        internal T Id<T>(T arg) => arg;
 
-        internal T ConstrainedFactory<T>(T arg) where T : IDisposable, new() => new T();
+                        internal T ConstrainedFactory<T>(T arg) where T : IDisposable, new() => new T();
 
-        internal T ConstrainedStructFactory<T>(T arg) where T : struct, new() => new T();
+                        internal T ConstrainedStructFactory<T>(T arg) where T : struct, new() => new T();
 
-        internal IDisposable CreateDisposableStatementBody()
-        {
-            return new Disposable();
-        }
+                        internal IDisposable CreateDisposableStatementBody()
+                        {
+                            return new Disposable();
+                        }
 
-        internal IDisposable CreateDisposableExpressionBody() => new Disposable();
-       
-        internal object CreateDisposableExpressionBodyReturnTypeObject() => new Disposable();
+                        internal IDisposable CreateDisposableExpressionBody() => new Disposable();
+                       
+                        internal object CreateDisposableExpressionBodyReturnTypeObject() => new Disposable();
 
-        internal IDisposable CreateDisposableInIf(bool flag)
-        {
-            if (flag)
-            {
-                return new Disposable();
-            }
-            else
-            {
-                return null;
-            }
+                        internal IDisposable CreateDisposableInIf(bool flag)
+                        {
+                            if (flag)
+                            {
+                                return new Disposable();
+                            }
+                            else
+                            {
+                                return null;
+                            }
 
-            return null;
-        }
+                            return null;
+                        }
 
-        internal IDisposable CreateDisposableInElse(bool flag)
-        {
-            if (flag)
-            {
-                return null;
-            }
-            else
-            {
-                return new Disposable();
-            }
+                        internal IDisposable CreateDisposableInElse(bool flag)
+                        {
+                            if (flag)
+                            {
+                                return null;
+                            }
+                            else
+                            {
+                                return new Disposable();
+                            }
 
-            return null;
-        }
+                            return null;
+                        }
 
-        public static Stream ReturningLocal()
-        {
-            var stream = File.OpenRead(string.Empty);
-            return stream;
-        }
-    }
-}".AssertReplace("Id(disposable)", expression);
+                        public static Stream ReturningLocal()
+                        {
+                            var stream = File.OpenRead(string.Empty);
+                            return stream;
+                        }
+                    }
+                }
+                """.AssertReplace("Id(disposable)", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -236,45 +239,46 @@ namespace N
         [TestCase("this.RecursiveStatementBody()",   false)]
         public static void CallRecursiveMethod(string expression, bool expected)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.IO;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.IO;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    internal class C
-    {
-        internal C()
-        {
-            // M();
-        }
+                    internal class C
+                    {
+                        internal C()
+                        {
+                            // M();
+                        }
 
-        private static IDisposable StaticRecursiveStatementBody()
-        {
-            return StaticRecursiveStatementBody();
-        }
+                        private static IDisposable StaticRecursiveStatementBody()
+                        {
+                            return StaticRecursiveStatementBody();
+                        }
 
-        private static IDisposable StaticRecursiveExpressionBody() => StaticRecursiveExpressionBody();
+                        private static IDisposable StaticRecursiveExpressionBody() => StaticRecursiveExpressionBody();
 
-        private static IDisposable CallingRecursive() => StaticRecursiveStatementBody();
+                        private static IDisposable CallingRecursive() => StaticRecursiveStatementBody();
 
-        private static IDisposable RecursiveTernary(bool flag) => flag ? new Disposable() : RecursiveTernary(bool flag);
+                        private static IDisposable RecursiveTernary(bool flag) => flag ? new Disposable() : RecursiveTernary(bool flag);
 
-        private IDisposable RecursiveStatementBody()
-        {
-            return this.RecursiveStatementBody();
-        }
+                        private IDisposable RecursiveStatementBody()
+                        {
+                            return this.RecursiveStatementBody();
+                        }
 
-        private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
-    }
-}".AssertReplace("// M()", expression);
+                        private IDisposable RecursiveExpressionBody() => this.RecursiveExpressionBody();
+                    }
+                }
+                """.AssertReplace("// M()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -286,31 +290,32 @@ namespace N
         [Test]
         public static void RecursiveWithOptionalParameter()
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.Collections.Generic;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.Collections.Generic;
 
-    public abstract class C
-    {
-        public C(IDisposable disposable)
-        {
-            var value = disposable;
-            value = WithOptionalParameter(value);
-        }
+                    public abstract class C
+                    {
+                        public C(IDisposable disposable)
+                        {
+                            var value = disposable;
+                            value = WithOptionalParameter(value);
+                        }
 
-        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
-        {
-            if (values == null)
-            {
-                return WithOptionalParameter(value, new[] { value });
-            }
+                        private static IDisposable WithOptionalParameter(IDisposable value, IEnumerable<IDisposable> values = null)
+                        {
+                            if (values == null)
+                            {
+                                return WithOptionalParameter(value, new[] { value });
+                            }
 
-            return value;
-        }
-    }
-}";
+                            return value;
+                        }
+                    }
+                }
+                """;
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -330,40 +335,41 @@ namespace N
         [TestCase("await CreateDisposableAsync()",             true)]
         public static void AsyncAwait(string expression, bool expected)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.IO;
-    using System.Threading.Tasks;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.IO;
+                    using System.Threading.Tasks;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    internal class C
-    {
-        internal async Task M()
-        {
-            var value = // M();
-        }
+                    internal class C
+                    {
+                        internal async Task M()
+                        {
+                            var value = // M();
+                        }
 
-        internal static async Task<string> CreateStringAsync()
-        {
-            await Task.Delay(0);
-            return new string(' ', 1);
-        }
+                        internal static async Task<string> CreateStringAsync()
+                        {
+                            await Task.Delay(0);
+                            return new string(' ', 1);
+                        }
 
-        internal static async Task<IDisposable> CreateDisposableAsync()
-        {
-            await Task.Delay(0);
-            return new Disposable();
-        }
-    }
-}".AssertReplace("// M()", expression);
+                        internal static async Task<IDisposable> CreateDisposableAsync()
+                        {
+                            await Task.Delay(0);
+                            return new Disposable();
+                        }
+                    }
+                }
+                """.AssertReplace("// M()", expression);
 
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
@@ -379,20 +385,21 @@ namespace N
         [TestCase("form.FindForm()",                   false)]
         public static void Winforms(string expression, bool expected)
         {
-            var code = @"
-namespace ValidCode
-{
-    using System;
-    using System.Windows.Forms;
+            var code = """
+                namespace ValidCode
+                {
+                    using System;
+                    using System.Windows.Forms;
 
-    public class C
-    {
-        public void M(Form form)
-        {
-            var a = Control.FromHandle(IntPtr.Zero);
-        }
-    }
-}".AssertReplace("Control.FromHandle(IntPtr.Zero)", expression);
+                    public class C
+                    {
+                        public void M(Form form)
+                        {
+                            var a = Control.FromHandle(IntPtr.Zero);
+                        }
+                    }
+                }
+                """.AssertReplace("Control.FromHandle(IntPtr.Zero)", expression);
 
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
@@ -406,42 +413,43 @@ namespace ValidCode
         [Test]
         public static void CompositeDisposableExtAddAndReturn()
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.IO;
-    using System.Reactive.Disposables;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.IO;
+                    using System.Reactive.Disposables;
 
-    public static class CompositeDisposableExt
-    {
-        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
-            where T : IDisposable
-        {
-            if (item != null)
-            {
-                disposable.Add(item);
-            }
+                    public static class CompositeDisposableExt
+                    {
+                        public static T AddAndReturn<T>(this CompositeDisposable disposable, T item)
+                            where T : IDisposable
+                        {
+                            if (item != null)
+                            {
+                                disposable.Add(item);
+                            }
 
-            return item;
-        }
-    }
+                            return item;
+                        }
+                    }
 
-    public sealed class C : IDisposable
-    {
-        private readonly CompositeDisposable disposable = new CompositeDisposable();
+                    public sealed class C : IDisposable
+                    {
+                        private readonly CompositeDisposable disposable = new CompositeDisposable();
 
-        public C()
-        {
-            disposable.AddAndReturn(File.OpenRead(string.Empty));
-        }
+                        public C()
+                        {
+                            disposable.AddAndReturn(File.OpenRead(string.Empty));
+                        }
 
-        public void Dispose()
-        {
-            this.disposable.Dispose();
-        }
-    }
-}";
+                        public void Dispose()
+                        {
+                            this.disposable.Dispose();
+                        }
+                    }
+                }
+                """;
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
@@ -455,35 +463,37 @@ namespace N
         [TestCase("other ?? disposable.AsCustom()")]
         public static void AssumeYesForExtensionMethodReturningDifferentTypeThanThisParameter(string expression)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using BinaryReference;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using BinaryReference;
 
-    class C
-    {
-        public C(IDisposable disposable, ICustomDisposable other)
-        {
-            _ = disposable.AsCustom();
-        }
-    }
-}".AssertReplace("disposable.AsCustom()", expression);
+                    class C
+                    {
+                        public C(IDisposable disposable, ICustomDisposable other)
+                        {
+                            _ = disposable.AsCustom();
+                        }
+                    }
+                }
+                """.AssertReplace("disposable.AsCustom()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
-            var binary = BinaryReference.Compile(@"
-namespace BinaryReference
-{
-    using System;
+            var binary = BinaryReference.Compile("""
+                namespace BinaryReference
+                {
+                    using System;
 
-    public static class Extensions
-    {
-        public static ICustomDisposable? AsCustom(this IDisposable disposable) => default(ICustomDisposable);
-    }
+                    public static class Extensions
+                    {
+                        public static ICustomDisposable? AsCustom(this IDisposable disposable) => default(ICustomDisposable);
+                    }
 
-    public interface ICustomDisposable : IDisposable
-    {
-    }
-}");
+                    public interface ICustomDisposable : IDisposable
+                    {
+                    }
+                }
+                """);
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences!.Append(binary));
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindExpression(expression);
@@ -495,31 +505,33 @@ namespace BinaryReference
         [TestCase("other ?? disposable.Fluent()")]
         public static void AssumeNoForUnknownExtensionMethodReturningSameTypeAsThisParameter(string expression)
         {
-            var binary = @"
-namespace BinaryReference
-{
-    using System;
+            var binary = """
+                namespace BinaryReference
+                {
+                    using System;
 
-    public static class Extensions
-    {
-        public static IDisposable Fluent(this IDisposable disposable) => disposable;
-    }
-}";
+                    public static class Extensions
+                    {
+                        public static IDisposable Fluent(this IDisposable disposable) => disposable;
+                    }
+                }
+                """;
 
-            var code = @"
-namespace N
-{
-    using System;
-    using BinaryReference;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using BinaryReference;
 
-    class C
-    {
-        public C(IDisposable disposable, IDisposable other)
-        {
-            _ = disposable.Fluent();
-        }
-    }
-}".AssertReplace("disposable.Fluent()", expression);
+                    class C
+                    {
+                        public C(IDisposable disposable, IDisposable other)
+                        {
+                            _ = disposable.Fluent();
+                        }
+                    }
+                }
+                """.AssertReplace("disposable.Fluent()", expression);
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
             var references = Settings.Default.MetadataReferences!
                                                .Append(BinaryReference.Compile(binary));
@@ -559,24 +571,25 @@ namespace N
         [TestCase("System.Net.Http.HttpResponseMessage message",                                        "message.EnsureSuccessStatusCode()",                                  false)]
         public static void ThirdParty(string parameter, string expression, bool expected)
         {
-            var code = @"
-namespace N
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Collections.Immutable;
-    using System.IO;
-    using System.Linq;
+            var code = """
+                namespace N
+                {
+                    using System;
+                    using System.Collections;
+                    using System.Collections.Generic;
+                    using System.Collections.Immutable;
+                    using System.IO;
+                    using System.Linq;
 
-    internal class C
-    {
-        internal C(int value)
-        {
-            _ = value;
-        }
-    }
-}".AssertReplace("int value", parameter)
+                    internal class C
+                    {
+                        internal C(int value)
+                        {
+                            _ = value;
+                        }
+                    }
+                }
+                """.AssertReplace("int value", parameter)
 .AssertReplace("value", expression);
 
             var syntaxTree = CSharpSyntaxTree.ParseText(code);
@@ -595,27 +608,28 @@ namespace N
         [TestCase("(System.Text.StringBuilder)Activator.CreateInstance(typeof(System.Text.StringBuilder))", false)]
         public static void Reflection(string expression, bool expected)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace N
-{
-    using System;
-    using System.Reflection;
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N
+                {
+                    using System;
+                    using System.Reflection;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
-    }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
+                    }
 
-    class C
-    {
-        static void M(ConstructorInfo constructorInfo)
-        {
-            var value = Activator.CreateInstance<Disposable>();
-        }
-    }
-}".AssertReplace("Activator.CreateInstance<Disposable>()", expression));
+                    class C
+                    {
+                        static void M(ConstructorInfo constructorInfo)
+                        {
+                            var value = Activator.CreateInstance<Disposable>();
+                        }
+                    }
+                }
+                """.AssertReplace("Activator.CreateInstance<Disposable>()", expression));
             var compilation =
                 CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -642,65 +656,67 @@ namespace N
         [TestCase("Disposable disposable", "disposable.IdGeneric()",                         false)]
         public static void Assumptions(string parameter, string expression, bool expected)
         {
-            var binaryReference = BinaryReference.Compile(@"
-namespace BinaryReferencedAssembly
-{
-    using System;
+            var binaryReference = BinaryReference.Compile("""
+                namespace BinaryReferencedAssembly
+                {
+                    using System;
 
-    public class Disposable : IDisposable
-    {
-        public void Dispose()
-        {
-        }
+                    public class Disposable : IDisposable
+                    {
+                        public void Dispose()
+                        {
+                        }
 
-        public Disposable ReturnThis() => this;
-    }
+                        public Disposable ReturnThis() => this;
+                    }
 
-    public static class Ext
-    {
-        public static IDisposable Id(this IDisposable disposable) => disposable;
+                    public static class Ext
+                    {
+                        public static IDisposable Id(this IDisposable disposable) => disposable;
 
-        public static T IdGeneric<T>(this T item) => item;
-    }
+                        public static T IdGeneric<T>(this T item) => item;
+                    }
 
-    public class Factory
-    {
-        public static readonly Disposable StaticDisposableField = new Disposable();
+                    public class Factory
+                    {
+                        public static readonly Disposable StaticDisposableField = new Disposable();
 
-        public static IDisposable StaticIDisposableProperty => StaticDisposableField;
+                        public static IDisposable StaticIDisposableProperty => StaticDisposableField;
 
-        public IDisposable IDisposableProperty => StaticDisposableField;
+                        public IDisposable IDisposableProperty => StaticDisposableField;
 
-        public static Disposable StaticCreateIDisposable() => new Disposable();
+                        public static Disposable StaticCreateIDisposable() => new Disposable();
 
-        public static object StaticCreateObject() => new object();
+                        public static object StaticCreateObject() => new object();
 
-        public Disposable CreateIDisposable() => new Disposable();
+                        public Disposable CreateIDisposable() => new Disposable();
 
-        public object CreateObject() => new object();
-    }
-}");
+                        public object CreateObject() => new object();
+                    }
+                }
+                """);
 
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace N
-{
-    using System;
-    using BinaryReferencedAssembly;
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N
+                {
+                    using System;
+                    using BinaryReferencedAssembly;
 
-    class C
-    {
-        static object M(Factory factory)
-        {
-            return factory.CreateIDisposable();
-        }
-    }
-}".AssertReplace("Factory factory", parameter)
+                    class C
+                    {
+                        static object M(Factory factory)
+                        {
+                            return factory.CreateIDisposable();
+                        }
+                    }
+                }
+                """.AssertReplace("Factory factory", parameter)
 .AssertReplace("factory.CreateIDisposable()", expression));
 
             var compilation = CSharpCompilation.Create(
                 "test",
                 new[] { syntaxTree },
-                Settings.Default.MetadataReferences.Append(binaryReference),
+                Settings.Default.MetadataReferences!.Append(binaryReference),
                 CodeFactory.DllCompilationOptions.WithMetadataImportOptions(MetadataImportOptions.Public));
             CollectionAssert.IsEmpty(compilation.GetDiagnostics().Where(x => x.Severity == DiagnosticSeverity.Error));
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
@@ -714,23 +730,24 @@ namespace N
         [TestCase("Interlocked.Exchange(ref _disposable, null)")]
         public static void InterlockedExchange(string expression)
         {
-            var syntaxTree = CSharpSyntaxTree.ParseText(@"
-namespace N
-{
-    using System;
-    using System.IO;
-    using System.Threading;
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N
+                {
+                    using System;
+                    using System.IO;
+                    using System.Threading;
 
-    sealed class C : IDisposable
-    {
-        private IDisposable _disposable = new MemoryStream();
+                    sealed class C : IDisposable
+                    {
+                        private IDisposable _disposable = new MemoryStream();
 
-        public void Update()
-        {
-            var oldValue = Interlocked.Exchange(ref _disposable, new MemoryStream());
-        }
-    }
-}".AssertReplace("Interlocked.Exchange(ref _disposable, new MemoryStream())", expression));
+                        public void Update()
+                        {
+                            var oldValue = Interlocked.Exchange(ref _disposable, new MemoryStream());
+                        }
+                    }
+                }
+                """.AssertReplace("Interlocked.Exchange(ref _disposable, new MemoryStream())", expression));
 
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
