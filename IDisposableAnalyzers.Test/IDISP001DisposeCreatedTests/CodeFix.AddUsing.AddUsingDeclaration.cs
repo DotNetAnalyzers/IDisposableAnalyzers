@@ -700,5 +700,45 @@ public static partial class CodeFix
             RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
             RoslynAssert.FixAll(Analyzer, Fix, ExpectedDiagnostic, new[] { disposable, before }, after, fixTitle: "using");
         }
+
+        [TestCase("new S()")]
+        public static void LocalRefStructToUsingDeclaration(string expression)
+        {
+            var refStruct = """
+                namespace N;
+
+                public ref struct S
+                {
+                    public void Dispose()
+                    {
+                    }
+                }
+                """;
+            var before = """
+                namespace N;
+           
+                public sealed class C
+                {
+                    public void M()
+                    {
+                        ↓S s = new S();
+                    }
+                }
+                """.AssertReplace("new S()", expression);
+
+            var after = """
+                namespace N;
+            
+                public sealed class C
+                {
+                    public void M()
+                    {
+                        using S s = new S();
+                    }
+                }
+                """.AssertReplace("new S()", expression);
+
+            RoslynAssert.CodeFix(Analyzer, Fix, ExpectedDiagnostic, new[] { refStruct, before }, after, fixTitle: "using");
+        }
     }
 }

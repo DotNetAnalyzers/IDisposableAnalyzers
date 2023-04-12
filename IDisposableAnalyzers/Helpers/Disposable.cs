@@ -9,19 +9,16 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 internal static partial class Disposable
 {
-    internal static bool IsPotentiallyAssignableFrom(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
+    internal static bool IsPotentiallyAssignableFrom(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken) => candidate switch
     {
-        return candidate switch
-        {
-            { IsMissing: true } => false,
-            LiteralExpressionSyntax _ => false,
-            ObjectCreationExpressionSyntax objectCreation
-                => semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
-                   IsAssignableFrom(type, semanticModel.Compilation),
-            _ => semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
-                 IsPotentiallyAssignableFrom(type, semanticModel.Compilation),
-        };
-    }
+        { IsMissing: true } => false,
+        LiteralExpressionSyntax _ => false,
+        ObjectCreationExpressionSyntax objectCreation
+            => semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
+               IsAssignableFrom(type, semanticModel.Compilation),
+        _ => semanticModel.TryGetType(candidate, cancellationToken, out var type) &&
+             IsPotentiallyAssignableFrom(type, semanticModel.Compilation),
+    };
 
     internal static bool IsPotentiallyAssignableFrom(ITypeSymbol type, Compilation compilation)
     {
@@ -45,18 +42,16 @@ internal static partial class Disposable
         return true;
     }
 
-    internal static bool IsAssignableFrom(ITypeSymbol type, Compilation compilation)
+    internal static bool IsAssignableFrom(ITypeSymbol type, Compilation compilation) => type switch
     {
-        return type switch
-        {
-            null => false,
-            //// https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
-            { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task" } => false,
-            INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
-                => IsAssignableFrom(arguments[0], compilation),
-            _ => type.IsAssignableTo(KnownSymbols.IDisposable, compilation),
-        };
-    }
+        null => false,
+        //// https://blogs.msdn.microsoft.com/pfxteam/2012/03/25/do-i-need-to-dispose-of-tasks/
+        { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task" } => false,
+        INamedTypeSymbol { ContainingNamespace: { MetadataName: "Tasks", ContainingNamespace: { MetadataName: "Threading", ContainingNamespace.MetadataName: "System" } }, MetadataName: "Task`1", TypeArguments: { Length: 1 } arguments }
+            => IsAssignableFrom(arguments[0], compilation),
+        { IsRefLikeType: true } => DisposeMethod.IsAccessibleOn(type, compilation),
+        _ => type.IsAssignableTo(KnownSymbols.IDisposable, compilation),
+    };
 
     internal static bool IsNop(ExpressionSyntax candidate, SemanticModel semanticModel, CancellationToken cancellationToken)
     {

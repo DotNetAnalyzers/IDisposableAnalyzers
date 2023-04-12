@@ -755,6 +755,28 @@ public static partial class DisposableTests
             Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
         }
 
+        [TestCase("new S()")]
+        public static void RefStruct(string expression)
+        {
+            var syntaxTree = CSharpSyntaxTree.ParseText("""
+                namespace N;
+
+                public ref struct S
+                {
+                    public static S M() => new S();
+            
+                    public void Dispose()
+                    {
+                    }
+                }
+                """.AssertReplace("new S()", expression));
+
+            var compilation = CSharpCompilation.Create("test", new[] { syntaxTree });
+            var semanticModel = compilation.GetSemanticModel(syntaxTree);
+            var value = syntaxTree.FindExpression(expression);
+            Assert.AreEqual(true, Disposable.IsCreation(value, semanticModel, CancellationToken.None));
+        }
+
         [Ignore("Script")]
         [Test]
         public static void Dump()

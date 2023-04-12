@@ -11,7 +11,8 @@ internal static class DisposeMethod
 {
     internal static IMethodSymbol? Find(ITypeSymbol type, Compilation compilation, Search search)
     {
-        if (!type.IsAssignableTo(KnownSymbols.IDisposable, compilation))
+        if (!type.IsAssignableTo(KnownSymbols.IDisposable, compilation) &&
+            !type.IsRefLikeType)
         {
             return null;
         }
