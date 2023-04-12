@@ -13,7 +13,7 @@ internal static partial class Disposable
     {
         { IsMissing: true } => false,
         LiteralExpressionSyntax _ => false,
-        ObjectCreationExpressionSyntax objectCreation
+        BaseObjectCreationExpressionSyntax objectCreation
             => semanticModel.TryGetType(objectCreation, cancellationToken, out var type) &&
                IsAssignableFrom(type, semanticModel.Compilation),
         _ => semanticModel.TryGetType(candidate, cancellationToken, out var type) &&

@@ -168,8 +168,9 @@ namespace N
         RoslynAssert.Valid(Analyzer, code);
     }
 
-    [Test]
-    public static void MethodReturningObject()
+    [TestCase("new object()")]
+    [TestCase("new()")]
+    public static void MethodReturningObject(string expression)
     {
         var code = @"
 namespace N
@@ -186,7 +187,7 @@ namespace N
             return new object();
         }
     }
-}";
+}".AssertReplace("new object()", expression);
         RoslynAssert.Valid(Analyzer, code);
     }
 

@@ -756,6 +756,7 @@ public static partial class DisposableTests
         }
 
         [TestCase("new S()")]
+        [TestCase("new()")]
         public static void RefStruct(string expression)
         {
             var syntaxTree = CSharpSyntaxTree.ParseText("""

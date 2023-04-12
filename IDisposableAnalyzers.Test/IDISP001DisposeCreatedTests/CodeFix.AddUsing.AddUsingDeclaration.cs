@@ -702,6 +702,7 @@ public static partial class CodeFix
         }
 
         [TestCase("new S()")]
+        [TestCase("new()")]
         public static void LocalRefStructToUsingDeclaration(string expression)
         {
             var refStruct = """

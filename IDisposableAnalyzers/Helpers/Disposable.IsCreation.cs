@@ -153,7 +153,7 @@ internal static partial class Disposable
             return false;
         }
 
-        if (candidate is ObjectCreationExpressionSyntax)
+        if (candidate is BaseObjectCreationExpressionSyntax)
         {
             return true;
         }

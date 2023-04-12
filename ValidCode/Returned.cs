@@ -21,6 +21,10 @@ public class Returned
 
     IDisposable FileOpenRead() => File.OpenRead(string.Empty);
 
+    object NewImplicitObject() => new();
+
+    object NewObject() => new object();
+
     IEnumerable<IDisposable> YieldReturnFileOpenRead()
     {
         yield return File.OpenRead(string.Empty);
