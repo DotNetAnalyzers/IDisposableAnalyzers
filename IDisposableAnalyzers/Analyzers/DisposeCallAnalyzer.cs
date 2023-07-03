@@ -110,11 +110,7 @@ internal class DisposeCallAnalyzer : DiagnosticAnalyzer
                     !IsAssigned(identifierName) &&
                     !IsReassigned(identifierName))
                 {
-                    if (temp is null)
-                    {
-                        temp = new List<Location>();
-                    }
-
+                    temp ??= new List<Location>();
                     temp.Add(identifierName.GetLocation());
                 }
             }
