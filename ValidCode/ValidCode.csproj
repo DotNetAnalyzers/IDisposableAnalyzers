@@ -27,6 +27,6 @@
     <PackageReference Include="Ninject" Version="3.3.6" />
     <PackageReference Include="NUnit" Version="3.13.3" />
     <PackageReference Include="System.Reactive.Linq" Version="6.0.0" />
-    <PackageReference Include="reactiveui" Version="19.3.3" />
+    <PackageReference Include="reactiveui" Version="19.4.1" />
   </ItemGroup>
 </Project>
