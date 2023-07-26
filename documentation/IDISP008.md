@@ -62,7 +62,7 @@ Change to
 public readonly IDisposable Disposable; // We can now check all places it is assigned and hopefully figure out if we should dispose
 ```
 
-#### Example public field
+#### Example public property
 ```cs
 public IDisposable Disposable { get; set; } // could be assigned from the outside so we don't know if disposing it is safe.
 ```
