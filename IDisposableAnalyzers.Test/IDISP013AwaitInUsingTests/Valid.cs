@@ -424,6 +424,8 @@ public static partial class Valid
     [TestCase("default")]
     [TestCase("new ValueTask<int>(1)")]
     [TestCase("new ValueTask<int>(disposable.Equals(disposable) ? 1 : 0)")]
+    [TestCase("new(1)")]
+    [TestCase("new(disposable.Equals(disposable) ? 1 : 0)")]
     public static void ReturnNewValueTask(string expression)
     {
         var disposable = """
