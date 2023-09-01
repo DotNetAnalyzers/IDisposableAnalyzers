@@ -151,7 +151,7 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
                              || memberAccess.IsSymbol(KnownSymbols.ValueTask.CompletedTask, context.SemanticModel, context.CancellationToken)),
                     DefaultExpressionSyntax => false,
                     LiteralExpressionSyntax => false,
-                    ObjectCreationExpressionSyntax => false,
+                    BaseObjectCreationExpressionSyntax => false,
                     _ => true,
                 };
             }
