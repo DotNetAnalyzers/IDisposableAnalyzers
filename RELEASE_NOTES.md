@@ -1,3 +1,6 @@
+#### 4.0.7
+BUGFIX: Handle target typed new
+
 #### 4.0.6
 BUGFIX: Handle ref struct
 BUGFIX: Handle target typed new
