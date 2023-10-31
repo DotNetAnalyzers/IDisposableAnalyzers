@@ -71,4 +71,34 @@ namespace N
 }";
         RoslynAssert.Valid(Analyzer, code);
     }
+
+    [Test]
+    public static void ReactiveUiDisposeWith()
+    {
+        const string Code = """
+            namespace N
+            {
+                using System;
+                using System.Reactive.Disposables;
+                using ReactiveUI;
+                
+                public sealed class C : IDisposable
+                {
+                    private readonly CompositeDisposable _disposables = new();
+                    
+                    public C()
+                    {
+                        var command = ReactiveCommand.Create(() => { Console.WriteLine("Hi"); }).DisposeWith(_disposables);
+                    }
+                    
+                    public void Dispose()
+                    {
+                        _disposables.Dispose();
+                    }
+                }
+            }
+            """;
+
+        RoslynAssert.Valid(Analyzer, Code);
+    }
 }
