@@ -948,8 +948,8 @@ namespace N
             var compilation = CSharpCompilation.Create("test", new[] { syntaxTree }, Settings.Default.MetadataReferences);
             var semanticModel = compilation.GetSemanticModel(syntaxTree);
             var value = syntaxTree.FindParameter("Stream stream");
-            Assert.AreEqual(true,  semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
-            Assert.AreEqual(true,  LocalOrParameter.TryCreate(symbol, out var localOrParameter));
+            Assert.AreEqual(true, semanticModel.TryGetSymbol(value, CancellationToken.None, out var symbol));
+            Assert.AreEqual(true, LocalOrParameter.TryCreate(symbol, out var localOrParameter));
             Assert.AreEqual(true, Disposable.Stores(localOrParameter, semanticModel, CancellationToken.None, out _));
         }
     }
