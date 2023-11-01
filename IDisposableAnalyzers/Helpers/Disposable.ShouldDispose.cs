@@ -118,50 +118,10 @@ internal static partial class Disposable
         }
     }
 
+    // For simplicity reasons, we do not validate the variable type, or what is to the left of the call.
+    // Instead, we simply check if the last invocation of the rhs is `.DisposeWith(<one argument>);`
     private static bool IsVariableDeclarationWithDisposeAsExtensionCall(BlockSyntax localBlock)
-    {
-        if (localBlock is not { Statements: { Count: 1 } statements })
-        {
-            return false;
-        }
-
-        if (statements[0] is not LocalDeclarationStatementSyntax { Declaration: { } variableDeclaration })
-        {
-            return false;
-        }
-
-        if (variableDeclaration.Variables is not { Count: 1 } vars)
-        {
-            return false;
-        }
-
-        if (vars[0].Initializer is not { } rhs)
-        {
-            return false;
-        }
-
-        // For simplicity reasons, we do not validate the variable type, or what is to the left of the call.
-        // Instead, we simply check if the last invocation of the rhs is `.DisposeWith(<one argument>);`
-        if (rhs.Value is not InvocationExpressionSyntax lastInvocationInChain)
-        {
-            return false;
-        }
-
-        if (lastInvocationInChain.Expression is not MemberAccessExpressionSyntax memberAccess)
-        {
-            return false;
-        }
-
-        if (memberAccess.Name.Identifier.Value is not "DisposeWith")
-        {
-            return false;
-        }
-
-        if (lastInvocationInChain.ArgumentList.Arguments is not { Count: 1 } arguments)
-        {
-            return false;
-        }
-
-        return true;
-    }
+        => localBlock is { Statements: { Count: 1 } statements } &&
+           statements[0] is LocalDeclarationStatementSyntax { Declaration.Variables: { Count: 1 } vars } &&
+           vars[0].Initializer is { Value: InvocationExpressionSyntax { ArgumentList.Arguments.Count: 1, Expression: MemberAccessExpressionSyntax { Name.Identifier.Value: "DisposeWith" } } };
 }
