@@ -136,7 +136,7 @@ internal class ReturnValueAnalyzer : DiagnosticAnalyzer
             {
                 if (returnValue.TryFirstAncestor(out InvocationExpressionSyntax? ancestor) &&
                     ancestor.TryGetMethodName(out var ancestorName) &&
-                    ancestorName == "ThrowsAsync")
+                    ancestorName is "ThrowsAsync" or "Setup" or "Verify")
                 {
                     return false;
                 }
